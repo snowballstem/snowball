@@ -60,7 +60,7 @@ int main(int argc, char ** argv)
 	   );
     for (i = 2; i < argc; i++) {
 	char * lang = argv[i];
-	fprintf(out, "#include \"../%s/stem.h\"\n", lang);
+	fprintf(out, "#include \"../algorithms/%s/stem.h\"\n", lang);
     }
     fprintf(out, 
 	    "\n"
