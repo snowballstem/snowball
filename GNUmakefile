@@ -1,6 +1,7 @@
 # -*- makefile -*-
 
-languages=english porter
+languages = danish dutch english french german italian norwegian \
+            porter portuguese russian spanish swedish finnish
 
 COMPILER_SOURCES = compiler/space.c \
                    compiler/sort.c \
@@ -38,7 +39,8 @@ all: snowball libstemmer.o stemwords
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) $(MKMODULES_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball mkmodules \
-	      libstemmer.o stemwords libstemmer/modules.h snowball.splint
+	      libstemmer.o stemwords libstemmer/modules.h snowball.splint \
+	      $(languages:=/stem.h) $(languages:=/stem.c) $(languages:=/stem.o)
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
@@ -49,7 +51,7 @@ mkmodules: $(MKMODULES_SOURCES)
 libstemmer/modules.h: mkmodules
 	./mkmodules $@ $(languages)
 
-libstemmer/libstemmer.o: libstemmer/modules.h
+libstemmer/libstemmer.o: libstemmer/modules.h $(languages:=/stem.h)
 
 libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(languages:=/stem.o)
 	$(AR) -cru $@ $^
@@ -57,8 +59,9 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(languages:=/stem.o)
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
 
-%/stem.c: %/stem.sbl snowball
+%/stem.c %/stem.h: %/stem.sbl snowball
 	@l=`echo "$<" | sed 's!\(.*\)/stem.sbl$$!\1!;s!^.*/!!'`; \
+	echo "./snowball $< -o $${l}/stem -eprefix $${l}_"; \
 	./snowball $< -o $${l}/stem -eprefix $${l}_
 
 %/stem.o: %/stem.c %/stem.h
