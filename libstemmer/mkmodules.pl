@@ -13,15 +13,17 @@ my $c_src_dir = shift(@ARGV);
 
 my $arg;
 my %aliases = ();
-my @langs = ();
+my %algorithms = ();
 foreach $arg (@ARGV) {
-  if ($arg =~ /^([a-z_]+)=([a-z_]+)$/) {
-    $aliases{$1} = $2;
+  if ($arg =~ /^([a-z0-9_]+)=([a-z0-9_]+)$/) {
+    $aliases{$2} = $1;
+    $algorithms{$1}=1;
   } else {
-    push @langs, $arg;
+    $algorithms{$arg}=1;
     $aliases{$arg} = $arg;
   }
 }
+my @algorithms = sort keys(%algorithms);
 
 open (OUT, ">$outname") or die "Can't open output file `$outname': $!\n";
 
@@ -39,7 +41,7 @@ print OUT $line;
 my $linelen = length($line);
 
 my $need_sep = 0;
-foreach $lang (@langs) {
+foreach $lang (@algorithms) {
   if ($need_sep) {
     if (($linelen + 2 + length($lang)) > 77) {
       print OUT ",\n * ";
@@ -55,7 +57,7 @@ foreach $lang (@langs) {
 }
 print OUT "\n */\n\n";
 
-foreach $lang (@langs) {
+foreach $lang (@algorithms) {
   print OUT "#include \"../$c_src_dir/stem_$lang.h\"\n";
 }
 
@@ -84,7 +86,7 @@ print OUT <<EOS;
 static const char * algorithm_names[] = {
 EOS
 
-for $lang (sort @langs) {
+for $lang (@algorithms) {
   my $l = $aliases{$lang};
   print OUT "  \"$lang\", \n";
 }
