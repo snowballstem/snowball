@@ -117,6 +117,10 @@ c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 ls include/*.h >> MANIFEST && \
 	 echo 'snowball_sources= \' >> mkinc.mak && \
 	 ls $(c_src_dir)/*.c runtime/*.c libstemmer/*.c \
+	  | sed 's/$$/ \\/' >> mkinc.mak && \
+	 echo >> mkinc.mak && \
+	 echo 'snowball_headers= \' >> mkinc.mak && \
+	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
 	  | sed 's/$$/ \\/' >> mkinc.mak) && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
