@@ -3,12 +3,13 @@ use strict;
 
 my $progname = $0;
 
-if (scalar @ARGV < 2) {
-  print "Usage: $progname <outfile> <language[=alias]> <language[=alias]> ...\n";
+if (scalar @ARGV < 3) {
+  print "Usage: $progname <outfile> <C source directory> <language[=alias]> <language[=alias]> ...\n";
   exit 1;
 }
 
 my $outname = shift(@ARGV);
+my $c_src_dir = shift(@ARGV);
 
 my $arg;
 my %aliases = ();
@@ -55,7 +56,7 @@ foreach $lang (@langs) {
 print OUT "\n */\n\n";
 
 foreach $lang (@langs) {
-  print OUT "#include \"../algorithms/$lang/stem.h\"\n";
+  print OUT "#include \"../$c_src_dir/stem_$lang.h\"\n";
 }
 
 print OUT <<EOS;

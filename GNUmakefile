@@ -1,5 +1,7 @@
 # -*- makefile -*-
 
+c_src_dir = src_c
+
 languages = danish dutch english finnish french german italian lovins \
             norwegian porter portuguese russian spanish swedish
 lang_aliases = danish=da \
@@ -33,8 +35,6 @@ RUNTIME_SOURCES  = runtime/api.c \
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
-MKMODULES_SOURCES = libstemmer/mkmodules.c
-
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c \
 		     libstemmer/modules.h
 
@@ -42,7 +42,6 @@ STEMWORDS_SOURCES = examples/stemwords.c
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
-MKMODULES_OBJECTS=$(MKMODULES_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 
@@ -51,38 +50,36 @@ CFLAGS=-Ilibstemmer
 all: snowball libstemmer.o stemwords
 
 clean:
-	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) $(MKMODULES_OBJECTS) \
-	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball mkmodules \
+	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
+	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
 	      libstemmer.o stemwords libstemmer/modules.h snowball.splint \
-	      $(languages:%=algorithms/%/stem.h) \
-	      $(languages:%=algorithms/%/stem.c) \
-	      $(languages:%=algorithms/%/stem.o)
+	      $(languages:%=$(c_src_dir)/stem_%.h) \
+	      $(languages:%=$(c_src_dir)/stem_%.c) \
+	      $(languages:%=$(c_src_dir)/stem_%.o)
+	rmdir $(c_src_dir)
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
-mkmodules: $(MKMODULES_SOURCES)
-	$(CC) -o $@ $^
-
-#libstemmer/modules.h: mkmodules
-#	./mkmodules $@ $(languages)
 libstemmer/modules.h: libstemmer/mkmodules.pl
-	libstemmer/mkmodules.pl $@ $(languages) $(lang_aliases)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(languages) $(lang_aliases)
 
-libstemmer/libstemmer.o: libstemmer/modules.h $(languages:%=algorithms/%/stem.h)
+libstemmer/libstemmer.o: libstemmer/modules.h $(languages:%=$(c_src_dir)/stem_%.h)
 
-libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(languages:%=algorithms/%/stem.o)
+libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(languages:%=$(c_src_dir)/stem_%.o)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
 
-%/stem.c %/stem.h: %/stem.sbl snowball
+$(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h: algorithms/%/stem.sbl snowball
+	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem.sbl$$!\1!;s!^.*/!!'`; \
-	echo "./snowball $< -o $${l}/stem -eprefix $${l}_"; \
-	./snowball $< -o algorithms/$${l}/stem -eprefix $${l}_
+	o="$(c_src_dir)/stem_$${l}"; \
+	echo "./snowball $< -o $${o} -eprefix $${l}_"; \
+	./snowball $< -o $${o} -eprefix $${l}_
 
-%/stem.o: %/stem.c %/stem.h
+$(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) -O4 -c -o $@ -I runtime/ $<
 
 splint: snowball.splint
