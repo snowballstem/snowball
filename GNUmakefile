@@ -35,15 +35,19 @@ RUNTIME_SOURCES  = runtime/api.c \
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
-LIBSTEMMER_SOURCES = libstemmer/libstemmer.c \
-		     libstemmer/modules.h
+LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
+LIBSTEMMER_HEADERS = libstemmer/libstemmer.h libstemmer/modules.h
 
 STEMWORDS_SOURCES = examples/stemwords.c
+
+C_SOURCES = $(languages:%=$(c_src_dir)/stem_%.c)
+C_HEADERS = $(languages:%=$(c_src_dir)/stem_%.h)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
+C_OBJECTS = $(C_SOURCES:.c=.o)
 
 CFLAGS=-Ilibstemmer
 
@@ -53,9 +57,8 @@ clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
 	      libstemmer.o stemwords libstemmer/modules.h snowball.splint \
-	      $(languages:%=$(c_src_dir)/stem_%.h) \
-	      $(languages:%=$(c_src_dir)/stem_%.c) \
-	      $(languages:%=$(c_src_dir)/stem_%.o)
+	      $(C_SOURCES) $(C_HEADERS) $(C_OBJECTS)
+	rm -rf dist
 	rmdir $(c_src_dir)
 
 snowball: $(COMPILER_OBJECTS)
@@ -64,9 +67,9 @@ snowball: $(COMPILER_OBJECTS)
 libstemmer/modules.h: libstemmer/mkmodules.pl
 	libstemmer/mkmodules.pl $@ $(c_src_dir) $(languages) $(lang_aliases)
 
-libstemmer/libstemmer.o: libstemmer/modules.h $(languages:%=$(c_src_dir)/stem_%.h)
+libstemmer/libstemmer.o: libstemmer/modules.h $(C_HEADERS)
 
-libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(languages:%=$(c_src_dir)/stem_%.o)
+libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
@@ -85,3 +88,24 @@ $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
+
+# Make a full source distribution
+dist:
+	@echo "UNIMPLEMENTED"
+
+# Make a distribution of all the sources required to compile the C library.
+c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+            $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+	    $(C_SOURCES) $(C_HEADERS)
+	dest=dist/snowball_c_src; \
+	rm -rf $${dest} && \
+	mkdir -p $${dest}/runtime && \
+	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
+	ls $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) >> $${dest}/MANIFEST && \
+	mkdir -p $${dest}/libstemmer && \
+	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $${dest}/libstemmer && \
+	ls $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) >> $${dest}/MANIFEST && \
+	mkdir -p $${dest}/src_c && \
+	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/src_c && \
+	ls $(C_SOURCES) $(C_HEADERS) >> $${dest}/MANIFEST
+
