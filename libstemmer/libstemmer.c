@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "libstemmer.h"
+#include "../include/libstemmer.h"
 #include "../runtime/api.h"
 #include "modules.h"
 
