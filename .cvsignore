@@ -1,7 +1,3 @@
-mkmodules
 snowball
 stemwords
-libstemmer/modules.h
-*/stem.c
-*/stem.h
 src_c
