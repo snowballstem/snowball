@@ -1,0 +1,23 @@
+Authors
+=======
+
+Martin Porter
+-------------
+
+ - Designed the snowball langauge.
+ - Implemented the snowball to C compiler.
+ - Implemented the stemming algorithms in C.
+ - Wrote the documentation.
+
+Richard Boulton
+---------------
+
+ - Implemened Java backend of the snowball compiler.
+ - Developed build system.
+ - Assisted with website maintainance.
+
+
+Assistance from
+---------------
+
+Olivier Bornet - fixes to java packaging and build system.

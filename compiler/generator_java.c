@@ -4,7 +4,7 @@
 #include <stdio.h> /* for fprintf etc */
 #include "header.h"
 
-#define BASE_PACKAGE "net.sf.snowball"
+#define BASE_PACKAGE "org.tartarus.snowball"
 #define BASE_CLASS   "SnowballProgram"
 
 /* prototypes */

@@ -1,7 +1,8 @@
 # -*- makefile -*-
 
 c_src_dir = src_c
-java_src_dir = java/org/tartarus/snowball/ext
+java_src_main_dir = java/org/tartarus/snowball
+java_src_dir = $(java_src_main_dir)/ext
 
 algorithms = danish dutch english finnish french german german2 italian \
 	     kraaij_pohlmann lovins norwegian porter portuguese russian \
@@ -54,7 +55,8 @@ RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
 JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
-		      java/org/tartarus/snowball/SnowballProgram.java
+		      java/org/tartarus/snowball/SnowballProgram.java \
+		      java/org/tartarus/snowball/TestApp.java
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
@@ -116,15 +118,15 @@ $(java_src_dir)/%Stemmer.java: algorithms/%/stem.sbl snowball
 	@mkdir -p $(java_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
-	echo "./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime"; \
-	./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime
+	echo "./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
+	./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_java
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -190,29 +192,10 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	rm -f $${dest}.tgz && \
 	mkdir -p $${dest}/$(java_src_dir) && \
 	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
-	mkdir -p $${dest}/runtime && \
-	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
-	mkdir -p $${dest}/libstemmer && \
-	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $${dest}/libstemmer && \
-	mkdir -p $${dest}/include && \
-	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
+	mkdir -p $${dest}/$(java_src_main_dir) && \
+	cp -a $(JAVARUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
 	(cd $${dest} && \
-	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
-	 ls runtime/*.c runtime/*.h >> MANIFEST && \
-	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
-	 ls include/*.h >> MANIFEST && \
-	 echo 'snowball_sources= \' >> mkinc.mak && \
-	 ls $(c_src_dir)/*.c runtime/*.c libstemmer/*.c \
-	  | sed 's/$$/ \\/' >> mkinc.mak && \
-	 echo >> mkinc.mak && \
-	 echo 'snowball_headers= \' >> mkinc.mak && \
-	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
-	  | sed 's/$$/ \\/' >> mkinc.mak) && \
-	echo 'include mkinc.mak' >> $${dest}/Makefile && \
-	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
-	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
-	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	 ls $(java_src_dir)/*.java >> MANIFEST && \
+	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
-

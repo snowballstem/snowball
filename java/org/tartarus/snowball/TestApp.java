@@ -1,5 +1,5 @@
 
-package net.sf.snowball;
+package org.tartarus.snowball;
 
 import java.lang.reflect.Method;
 import java.io.Reader;
@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 
 public class TestApp {
     public static void main(String [] args) throws Throwable {
-	Class stemClass = Class.forName("net.sf.snowball.ext." +
+	Class stemClass = Class.forName("org.tartarus.snowball.ext." +
 					args[0] + "Stemmer");
         SnowballProgram stemmer = (SnowballProgram) stemClass.newInstance();
 	Method stemMethod = stemClass.getMethod("stem", new Class[0]);
