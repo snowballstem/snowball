@@ -40,6 +40,7 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
+ALGORITHMS = $(languages:%=algorithms/%/stem.sbl)
 C_SOURCES = $(languages:%=$(c_src_dir)/stem_%.c)
 C_HEADERS = $(languages:%=$(c_src_dir)/stem_%.h)
 
@@ -91,14 +92,31 @@ snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist:
-	@echo "UNIMPLEMENTED"
+dist: dist_snowball dist_libstemmer_c
+
+# Make a distribution of all the sources involved in snowball
+dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
+	    $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+	    $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+	    $(ALGORITHMS) $(STEMWORDS_SOURCES) \
+	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
+	destname=snowball; \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
+	for file in $^; do \
+	  dir=`dirname $$file` && \
+	  mkdir -p $${dest}/$${dir} && \
+	  cp $${file} $${dest}/$${dir} || exit 1 ; \
+	done && \
+	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C library.
-c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
 	    $(C_SOURCES) $(C_HEADERS)
-	destname=snowball_c_src; \
+	destname=libstemmer_c; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
