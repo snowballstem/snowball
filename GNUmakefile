@@ -36,7 +36,7 @@ RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
-LIBSTEMMER_HEADERS = libstemmer/libstemmer.h libstemmer/modules.h
+LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
@@ -49,7 +49,7 @@ LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 C_OBJECTS = $(C_SOURCES:.c=.o)
 
-CFLAGS=-Ilibstemmer
+CFLAGS=-Iinclude
 CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations -Werror
 
 all: snowball libstemmer.o stemwords
@@ -80,11 +80,11 @@ $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h: algorithms/%/stem.sbl snowball
 	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_$${l}"; \
-	echo "./snowball $< -o $${o} -eprefix $${l}_"; \
-	./snowball $< -o $${o} -eprefix $${l}_
+	echo "./snowball $< -o $${o} -eprefix $${l}_ -r ../runtime"; \
+	./snowball $< -o $${o} -eprefix $${l}_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) -O4 -c -o $@ -I runtime/ $<
+	$(CC) $(CFLAGS) -O4 -c -o $@ $<
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
@@ -102,15 +102,27 @@ c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
+	mkdir -p $${dest}/$(c_src_dir) && \
+	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/$(c_src_dir) && \
 	mkdir -p $${dest}/runtime && \
 	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
-	ls $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) >> $${dest}/MANIFEST && \
 	mkdir -p $${dest}/libstemmer && \
 	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $${dest}/libstemmer && \
-	ls $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) >> $${dest}/MANIFEST && \
-	mkdir -p $${dest}/src_c && \
-	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/src_c && \
-	ls $(C_SOURCES) $(C_HEADERS) >> $${dest}/MANIFEST && \
+	mkdir -p $${dest}/include && \
+	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
+	(cd $${dest} && \
+	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
+	 ls runtime/*.c runtime/*.h >> MANIFEST && \
+	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
+	 ls include/*.h >> MANIFEST && \
+	 echo 'snowball_sources= \' >> mkinc.mak && \
+	 ls $(c_src_dir)/*.c runtime/*.c libstemmer/*.c \
+	  | sed 's/$$/ \\/' >> mkinc.mak) && \
+	echo 'include mkinc.mak' >> $${dest}/Makefile && \
+	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
+	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
+	echo 'clean:' >> $${dest}/Makefile && \
+	echo '	rm -f *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
