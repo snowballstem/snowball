@@ -11,13 +11,14 @@ struct sb_stemmer {
     struct SN_env * env;
 };
 
-/** Create a new stemmer object, using the specified algorithm.
- *
- *  @return If the specified algorithm is not recognised, 0 will be 
- *  returned; otherwise a pointer to a newly created stemmer for that
- *  algorithm will be returned.
- */
-struct sb_stemmer * sb_stemmer_new(const char * algorithm)
+const char **
+sb_stemmer_list()
+{
+    return algorithm_names;
+}
+
+struct sb_stemmer *
+sb_stemmer_new(const char * algorithm)
 {
     struct stemmer_modules * module;
     struct sb_stemmer * stemmer =
@@ -38,15 +39,8 @@ struct sb_stemmer * sb_stemmer_new(const char * algorithm)
     return stemmer;
 }
 
-/** Delete a stemmer object.
- *
- *  This frees all resources allocated for the stemmer.  After calling
- *  this function, the supplied stemmer may no longer be used in any way.
- *
- *  It is safe to pass a null pointer to this function - this will have
- *  no effect.
- */
-void sb_stemmer_delete(struct sb_stemmer * stemmer)
+void
+sb_stemmer_delete(struct sb_stemmer * stemmer)
 {
     if (stemmer == 0) return;
     if (stemmer->close == 0) return;
@@ -55,12 +49,6 @@ void sb_stemmer_delete(struct sb_stemmer * stemmer)
     free(stemmer);
 }
 
-/** Stem a word.
- *
- *  The return value is owned by the stemmer - it must not be freed or
- *  modified, and it will become invalid when the stemmer is called again,
- *  or if the stemmer is freed.
- */
 const sb_symbol *
 sb_stemmer_stem(struct sb_stemmer * stemmer, const sb_symbol * word, int size)
 {
@@ -68,4 +56,10 @@ sb_stemmer_stem(struct sb_stemmer * stemmer, const sb_symbol * word, int size)
     (void) stemmer->stem(stemmer->env);
     stemmer->env->p[stemmer->env->l] = 0;
     return stemmer->env->p;
+}
+
+int
+sb_stemmer_length(struct sb_stemmer * stemmer)
+{
+    return stemmer->env->l;
 }

@@ -65,7 +65,8 @@ struct stemmer_modules {
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
-} modules[] = {
+};
+static struct stemmer_modules modules[] = {
 EOS
 
 for $lang (sort keys %aliases) {
@@ -78,4 +79,17 @@ print OUT <<EOS;
 };
 EOS
 
+print OUT <<EOS;
+static const char * algorithm_names[] = {
+EOS
+
+for $lang (sort @langs) {
+  my $l = $aliases{$lang};
+  print OUT "  \"$lang\", \n";
+}
+
+print OUT <<EOS;
+  0
+};
+EOS
 close OUT or die "Can't close ${outname}: $!\n";
