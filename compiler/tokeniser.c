@@ -235,12 +235,12 @@ static void read_chars(struct tokeniser * t)
     }
 }
 
-static int decimal_to_num(ch)
+static int decimal_to_num(int ch)
 {   if ('0' <= ch && ch <= '9') return ch - '0';
     return -1;
 }
 
-static int hex_to_num(ch)
+static int hex_to_num(int ch)
 {   if ('0' <= ch && ch <= '9') return ch - '0';
     if ('a' <= ch && ch <= 'f') return ch - 'a' + 10;
     return -1;

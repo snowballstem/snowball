@@ -50,7 +50,7 @@ STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 C_OBJECTS = $(C_SOURCES:.c=.o)
 
 CFLAGS=-Ilibstemmer
-CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations # -Werror
+CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations -Werror
 
 all: snowball libstemmer.o stemwords
 
@@ -84,7 +84,7 @@ $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h: algorithms/%/stem.sbl snowball
 	./snowball $< -o $${o} -eprefix $${l}_
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -O4 -c -o $@ -I runtime/ $<
+	$(CC) $(CFLAGS) -O4 -c -o $@ -I runtime/ $<
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
