@@ -29,6 +29,7 @@ static void print_arglist(void)
                     "                  [-ep[refix] string]\n"
                     "                  [-vp[refix] string]\n"
                     "                  [-i[nclude] directory]\n"
+                    "                  [-r[untime] path to runtime headers]\n"
            );
     exit(1);
 }
@@ -61,6 +62,7 @@ static void read_options(struct options * o, int argc, char * argv[])
     o->syntax_tree = false;
     o->externals_prefix = "";
     o->variables_prefix = 0;
+    o->runtime_path = 0;
     o->name = "";
     o->make_c = true;
     o->make_java = false;
@@ -119,6 +121,11 @@ static void read_options(struct options * o, int argc, char * argv[])
                                           o->includes_end->next = p;
                     o->includes_end = p;
                 }
+                continue;
+            }
+            if (eq(s, "-r") || eq(s, "-runtime"))
+            {   check_lim(i, argc);
+                o->runtime_path = argv[i++];
                 continue;
             }
             fprintf(stderr, "'%s' misplaced\n", s);

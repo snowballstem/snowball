@@ -288,6 +288,7 @@ struct options {
     byte widechars;
     char * externals_prefix;
     char * variables_prefix;
+    char * runtime_path;
     struct include * includes;
     struct include * includes_end;
 

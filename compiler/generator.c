@@ -955,7 +955,15 @@ static void generate_start_comment(struct generator * g)
 
 static void generate_head(struct generator * g)
 {
-    w(g, "~N#include \"header.h\"~N~N");
+    if (g->options->runtime_path == 0) {
+        w(g, "~N#include \"header.h\"~N~N");
+    } else {
+        w(g, "~N#include \"");
+        ws(g, g->options->runtime_path);
+        if (g->options->runtime_path[strlen(g->options->runtime_path) - 1] != '/')
+            wch(g, '/');
+        w(g, "header.h\"~N~N");
+    }
 }
 
 static void generate_routine_headers(struct generator * g)
