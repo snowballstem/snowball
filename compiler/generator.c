@@ -146,7 +146,7 @@ static void wk(struct generator * g, struct node * p)     /* keep c */
 
 static char * restore_string(struct generator * g, struct node * p)
 {
-    (void) g;
+    (void) g;   /* to suppress compiler warning */
     return p->mode == m_forward ? "z->c = c;" :
                                   "z->c = z->l - m;";
 }
