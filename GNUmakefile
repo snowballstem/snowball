@@ -97,8 +97,10 @@ dist:
 c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
 	    $(C_SOURCES) $(C_HEADERS)
-	dest=dist/snowball_c_src; \
+	destname=snowball_c_src; \
+	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
 	mkdir -p $${dest}/runtime && \
 	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
 	ls $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) >> $${dest}/MANIFEST && \
@@ -107,5 +109,7 @@ c-src-dist: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	ls $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) >> $${dest}/MANIFEST && \
 	mkdir -p $${dest}/src_c && \
 	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/src_c && \
-	ls $(C_SOURCES) $(C_HEADERS) >> $${dest}/MANIFEST
+	ls $(C_SOURCES) $(C_HEADERS) >> $${dest}/MANIFEST && \
+	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	rm -rf $${dest}
 
