@@ -1,0 +1,12 @@
+Various parts of the api for libstemmer need fixing:
+
+    * call to get list of available algorithm.
+    * calls to get a version number for each algorithm.
+    * possibly, ask for a given version, and get null if not available.
+    * get length of stemmed result
+    * sort out unicode issues (should accept utf-8 input, use 16 bit
+      characters internally?)
+
+Documentation of the build process needs to be written.
+
+Code checking tools need to be applied to the generated stemmers.
