@@ -1,6 +1,7 @@
 
-#include <stdio.h>   /* main etc */
-#include <stdlib.h>  /* free etc */
+#include <stdio.h>   /* for main etc */
+#include <stdlib.h>  /* for free etc */
+#include <string.h>  /* for strlen */
 #include "header.h"
 
 /*-static int intof(char * s)

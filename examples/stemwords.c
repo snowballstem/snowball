@@ -96,6 +96,8 @@ main(int argc, char * argv[])
     FILE * f_out;
     struct sb_stemmer * stemmer;
 
+    char * language = "english";
+
     char * s;
     int i = 1;
     pretty = 0;
@@ -144,9 +146,9 @@ main(int argc, char * argv[])
     }
 
     /* do the stemming process: */
-    stemmer = sb_stemmer_new("english");
+    stemmer = sb_stemmer_new(language);
     if (stemmer == 0) {
-	fprintf(stderr, "language `%s' not available for stemming\n");
+	fprintf(stderr, "language `%s' not available for stemming\n", language);
 	exit(1);
     }
     stem_file(stemmer, f_in, f_out);

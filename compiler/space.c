@@ -7,7 +7,6 @@
 
 #define HEAD 2*sizeof(int)
 #define EXTENDER 40
-#define DEBUG 0
 
 
 /*  This modules provides a simple mechanism for arbitrary length writable
@@ -55,7 +54,6 @@ extern symbol * create_b(int n)
 {   symbol * p = (symbol *) (HEAD + (char *) MALLOC(HEAD + (n + 1) * sizeof(symbol)));
     CAPACITY(p) = n;
     SIZE(p) = 0;
-    if (DEBUG) printf("<-- %d\n", p);
     return p;
 }
 
@@ -66,13 +64,11 @@ extern void report_b(FILE * out, symbol * p)
 
 extern void lose_b(symbol * p)
 {   if (p == 0) return;
-    if (DEBUG) printf("--> %d\n", p);
     FREE((char *) p - HEAD);
 }
 
 extern symbol * increase_capacity(symbol * p, int n)
 {   symbol * q = create_b(CAPACITY(p) + n + EXTENDER);
-    if (DEBUG) printf("%d --> %d\n", p, q);
     memmove(q, p, CAPACITY(p) * sizeof(symbol));
     SIZE(q) = SIZE(p);
     lose_b(p); return q;

@@ -2,7 +2,7 @@
 
 c_src_dir = src_c
 
-languages = danish dutch english finnish french german italian lovins \
+languages = danish dutch english finnish french german german2 italian lovins \
             norwegian porter portuguese russian spanish swedish
 lang_aliases = da=danish \
 	       de=german \
@@ -50,6 +50,7 @@ STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 C_OBJECTS = $(C_SOURCES:.c=.o)
 
 CFLAGS=-Ilibstemmer
+CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations # -Werror
 
 all: snowball libstemmer.o stemwords
 
@@ -83,7 +84,7 @@ $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h: algorithms/%/stem.sbl snowball
 	./snowball $< -o $${o} -eprefix $${l}_
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) -O4 -c -o $@ -I runtime/ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -O4 -c -o $@ -I runtime/ $<
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)

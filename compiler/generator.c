@@ -1,6 +1,7 @@
 
 #include <stdio.h>   /* for fprintf etc */
-#include <stdlib.h>  /* free etc */
+#include <stdlib.h>  /* for free etc */
+#include <string.h>  /* for strlen */
 #include "header.h"
 
 /* recursive use: */

@@ -1,5 +1,6 @@
 
 #include <stdio.h>   /* main etc */
+#include <stdlib.h>  /* exit */
 #include <string.h>  /* memmove */
 #include "header.h"
 

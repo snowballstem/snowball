@@ -1,4 +1,5 @@
 
+#include <stdlib.h> /* for calloc, free */
 #include "header.h"
 
 extern struct SN_env * SN_create_env(int S_size, int I_size, int B_size)

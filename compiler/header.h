@@ -30,7 +30,7 @@ extern symbol * add_s_to_b(symbol * p, char * s);
 
 struct str; /* defined in space.c */
 
-extern struct str * str_new();
+extern struct str * str_new(void);
 extern void str_delete(struct str * str);
 extern void str_append(struct str * str, struct str * add);
 extern void str_append_ch(struct str * str, char add);
