@@ -17,7 +17,7 @@ typedef char sb_symbol;
  *
  *  The list must not be modified in any way.
  */
-const char ** sb_stemmer_list();
+const char ** sb_stemmer_list(void);
 
 /** Create a new stemmer object, using the specified algorithm.
  *

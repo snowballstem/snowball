@@ -1,4 +1,6 @@
 
+#include <stdlib.h>
+#include <string.h>
 #include "libstemmer.h"
 #include "../runtime/api.h"
 #include "modules.h"
@@ -11,13 +13,13 @@ struct sb_stemmer {
     struct SN_env * env;
 };
 
-const char **
-sb_stemmer_list()
+extern const char **
+sb_stemmer_list(void)
 {
     return algorithm_names;
 }
 
-struct sb_stemmer *
+extern struct sb_stemmer *
 sb_stemmer_new(const char * algorithm)
 {
     struct stemmer_modules * module;
