@@ -4,20 +4,20 @@ c_src_dir = src_c
 
 languages = danish dutch english finnish french german italian lovins \
             norwegian porter portuguese russian spanish swedish
-lang_aliases = danish=da \
- 	       dutch=nl \
-	       english=en \
-	       finnish=fi \
-	       french=fr \
-	       german=de \
-	       italian=it \
-	       lovins=english_lovins \
-	       norwegian=no \
-	       porter=english_porter \
-	       portuguese=pt \
-	       russian=ru \
-	       spanish=es \
-	       swedish=sv \
+lang_aliases = da=danish \
+	       de=german \
+	       en=english \
+	       english_lovins=lovins \
+	       english_porter=porter \
+	       es=spanish \
+	       fi=finnish \
+	       fr=french \
+	       it=italian \
+ 	       nl=dutch \
+	       no=norwegian \
+	       pt=portuguese \
+	       ru=russian \
+	       sv=swedish
 
 COMPILER_SOURCES = compiler/space.c \
                    compiler/sort.c \
