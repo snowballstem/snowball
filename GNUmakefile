@@ -1,7 +1,21 @@
 # -*- makefile -*-
 
-languages = danish dutch english french german italian norwegian \
-            porter portuguese russian spanish swedish finnish
+languages = danish dutch english finnish french german italian lovins \
+            norwegian porter portuguese russian spanish swedish
+lang_aliases = danish=da \
+ 	       dutch=nl \
+	       english=en \
+	       finnish=fi \
+	       french=fr \
+	       german=de \
+	       italian=it \
+	       lovins=english_lovins \
+	       norwegian=no \
+	       porter=english_porter \
+	       portuguese=pt \
+	       russian=ru \
+	       spanish=es \
+	       swedish=sv \
 
 COMPILER_SOURCES = compiler/space.c \
                    compiler/sort.c \
@@ -50,8 +64,10 @@ snowball: $(COMPILER_OBJECTS)
 mkmodules: $(MKMODULES_SOURCES)
 	$(CC) -o $@ $^
 
-libstemmer/modules.h: mkmodules
-	./mkmodules $@ $(languages)
+#libstemmer/modules.h: mkmodules
+#	./mkmodules $@ $(languages)
+libstemmer/modules.h: libstemmer/mkmodules.pl
+	libstemmer/mkmodules.pl $@ $(languages) $(lang_aliases)
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(languages:%=algorithms/%/stem.h)
 

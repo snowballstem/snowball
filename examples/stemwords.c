@@ -144,13 +144,13 @@ main(int argc, char * argv[])
     }
 
     /* do the stemming process: */
-    stemmer = sb_stemmer_create("english");
+    stemmer = sb_stemmer_new("english");
     if (stemmer == 0) {
 	fprintf(stderr, "language `%s' not available for stemming\n");
 	exit(1);
     }
     stem_file(stemmer, f_in, f_out);
-    sb_stemmer_release(stemmer);
+    sb_stemmer_delete(stemmer);
 
     if (in != 0) (void) fclose(f_in);
     if (out != 0) (void) fclose(f_out);

@@ -12,16 +12,19 @@ int main () {
     const char * unstemmed;
     struct sb_stemmer * s;
     
-    s = sb_stemmer_create("e");
+    s = sb_stemmer_new("e");
     if (s != 0) error("TEST FAIL: non zero return for unrecognised language");
-    s = sb_stemmer_create("english");
+    s = sb_stemmer_new("english");
+    if (s == 0) error("TEST FAIL: zero return for recognised language");
+    sb_stemmer_delete(s);
+    s = sb_stemmer_new("en");
     if (s == 0) error("TEST FAIL: zero return for recognised language");
     unstemmed = "recognised";
     stemmed = sb_stemmer_stem(s, unstemmed, 10);
     printf("%s -> %s\n", unstemmed, stemmed);
     unstemmed = "recognized";
     printf("%s -> %s\n", unstemmed, stemmed);
-    sb_stemmer_close(s);
+    sb_stemmer_delete(s);
     printf("Success\n");
     return 0;
 }

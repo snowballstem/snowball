@@ -17,7 +17,7 @@ struct sb_stemmer {
  *  returned; otherwise a pointer to a newly created stemmer for that
  *  algorithm will be returned.
  */
-struct sb_stemmer * sb_stemmer_create(const char * algorithm)
+struct sb_stemmer * sb_stemmer_new(const char * algorithm)
 {
     struct stemmer_modules * module;
     struct sb_stemmer * stemmer =
@@ -38,7 +38,7 @@ struct sb_stemmer * sb_stemmer_create(const char * algorithm)
     return stemmer;
 }
 
-/** Release a stemmer.
+/** Delete a stemmer object.
  *
  *  This frees all resources allocated for the stemmer.  After calling
  *  this function, the supplied stemmer may no longer be used in any way.
@@ -46,7 +46,7 @@ struct sb_stemmer * sb_stemmer_create(const char * algorithm)
  *  It is safe to pass a null pointer to this function - this will have
  *  no effect.
  */
-void sb_stemmer_release(struct sb_stemmer * stemmer)
+void sb_stemmer_delete(struct sb_stemmer * stemmer)
 {
     if (stemmer == 0) return;
     if (stemmer->close == 0) return;
