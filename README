@@ -1,0 +1,51 @@
+This module is in development, by Richard Boulton <richard@tartarus.org>
+
+For now, please use only the code found in the "website" module.  Whilst I
+sort out this tree, Martin is still adding the latest updates to the
+algorithms and documentation to that module.
+
+For further explanation, here's a copy of a message discussing this, sent to
+the snowball-devel mailing list:
+
+
+On Thu, 2003-06-05 at 02:16, Dmitry Serebrennikov wrote:
+> I just checked out the CVS tree but then realized that there are 
+> actually two source trees to choose from...
+> 
+> Judging by the fact that latest changes were made to the snowball module 
+> in CVS rather then the website one, I guess this is where the best stuff 
+> is found. But since it seems that the tree is being actively moved and 
+> established, maybe it's not yet ready? It certainly looks much nicer! :)
+
+Absolutely correct.  For now, you should probably use the code from "website".
+
+I'm setting up the "snowball" module to contain the source files for the
+compiler and algorithms, a straightforward build system, and a standard
+interface for the stemming algorithms.  However, I havn't yet finished the work
+(and have been putting in about 1 afternoon per month, so it's not going too
+quickly).
+
+Martin is still developing in the "website" module, so the very latest versions
+of the algorithms are likely to be found there - though currently I believe
+that those in "snowball" are exactly consistent.
+
+Once I'm happy with the structure in "snowball", the plan is to check it with
+Martin, and assuming he approves to make it the standard.
+
+> Also, from the looks of it, I may be able to help here and there with 
+> the new tree. I already added a language flag to the sample program so it
+> does not require recompilation and now I am finding that I'd like to make a
+> few changes to the make file to make it build the Java stemmers...
+
+I'm interested in patches - feel free to send them directly to me.  (Note -
+this only applies to patches for the "snowball" module.  Any patches to the
+algorithms or the website should be sent to this list, as always.)
+
+> I guess I am looking to find out what's hapenning with the tree and what 
+> the plans are, so that I can get production-ready code for my use and also
+> steer my own efforts in a way the would be helpful to you'all.
+
+Hope the above helps.
+
+-- 
+Richard

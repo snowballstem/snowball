@@ -1087,6 +1087,13 @@ static void generate_header_file(struct generator * g)
     struct name * q = g->analyser->names;
     char * vp = g->options->variables_prefix;
     g->S[0] = vp;
+
+    w(g, "~N"
+         "#ifdef __cplusplus~N"
+         "extern \"C\" {~N"
+         "#endif~N");            /* for C++ */
+
+
     generate_create_and_close_templates(g);
     until (q == 0)
     {   g->V[0] = q;
@@ -1109,6 +1116,12 @@ static void generate_header_file(struct generator * g)
         }
         q = q->next;
     }
+
+    w(g, "~N"
+         "#ifdef __cplusplus~N"
+         "}~N"
+         "#endif~N");            /* for C++ */
+
     w(g, "~N");
 }
 

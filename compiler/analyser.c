@@ -578,6 +578,7 @@ static struct node * read_C(struct analyser * a)
         case c_reverse:
             {   int mode = a->mode;
                 int modifyable = a->modifyable;
+                a->modifyable = false;
                 a->mode = mode == m_forward ? m_backward : m_forward;
                 {   struct node * p = C_style(a, "C", token);
                     a->mode = mode;
