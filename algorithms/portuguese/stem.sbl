@@ -201,8 +201,8 @@ define stem as (
     do mark_regions
     backwards (
         do (
-            ( standard_suffix or verb_suffix
-              do ( ['i'] test 'c' RV delete )
+            ( ( standard_suffix or verb_suffix )
+              and do ( ['i'] test 'c' RV delete )
             )
             or residual_suffix
         )
