@@ -1,14 +1,7 @@
-Things to do before this module can become the official code module for the
-snowball project.
+Things to do:
 
- - Modify build system to include building of the Java stemmers.
  - Write documentation for how to use libstemmer (as opposed to how stemming
    algorithms themselves work).
- - Modify the website module so that it doesn't contain the code.  The website
-   module should just contain the HTML for the website, and possibly some
-   tarballs containing data.  A script will be required to build the website,
-   by copying or building all the files which contain code, or which are
-   derived from code.
  - Support a range of character sets.  Alternatively, use UTF-8 as the standard
    character set for algorithms, and require applications to convert to UTF-8.
 
