@@ -77,7 +77,7 @@ JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-Iinclude
-CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations -Werror
+CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations
 
 all: snowball libstemmer.o stemwords
 
