@@ -134,7 +134,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
 	    $(ALGORITHMS) $(STEMWORDS_SOURCES) \
 	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
-	destname=snowball; \
+	destname=snowball_code; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
