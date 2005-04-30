@@ -24,6 +24,8 @@ const char ** sb_stemmer_list(void);
  *  @return If the specified algorithm is not recognised, 0 will be 
  *  returned; otherwise a pointer to a newly created stemmer for that
  *  algorithm will be returned.
+ *
+ *  @note NULL will also be returned if an out of memory error occurs.
  */
 struct sb_stemmer * sb_stemmer_new(const char * algorithm);
 
@@ -43,7 +45,9 @@ void                sb_stemmer_delete(struct sb_stemmer * stemmer);
  *  modified, and it will become invalid when the stemmer is called again,
  *  or if the stemmer is freed.
  *
- *  The length of the return value can be obtained using sb_stemmer_length()
+ *  The length of the return value can be obtained using sb_stemmer_length().
+ *
+ *  If an out-of-memory error occurs, this will return NULL.
  */
 const sb_symbol *   sb_stemmer_stem(struct sb_stemmer * stemmer,
 				    const sb_symbol * word, int size);

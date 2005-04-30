@@ -51,11 +51,19 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
             }
 	    {
 		const sb_symbol * stemmed = sb_stemmer_stem(stemmer, b, i);
-                int j;
-                /*for (j = 0; j < z->l; j++) */
-                for (j = 0; stemmed[j] != 0; j++)
-		    fprintf(f_out, "%c", stemmed[j]);
-                fprintf(f_out, "\n");
+                if (stemmed == NULL)
+                {
+                    fprintf(stderr, "Out of memory");
+                    exit(1);
+                }
+                else
+                {
+                    int j;
+                    /*for (j = 0; j < z->l; j++) */
+                    for (j = 0; stemmed[j] != 0; j++)
+                        fprintf(f_out, "%c", stemmed[j]);
+                    fprintf(f_out, "\n");
+                }
             }
         }
     }

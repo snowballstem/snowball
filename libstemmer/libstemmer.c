@@ -25,18 +25,23 @@ sb_stemmer_new(const char * algorithm)
     struct stemmer_modules * module;
     struct sb_stemmer * stemmer =
 	    (struct sb_stemmer *) malloc(sizeof(struct sb_stemmer));
-    if (stemmer == 0) return 0;
+    if (stemmer == 0) return NULL;
 
     for (module = modules; module->name != 0; module++) {
 	if (strcmp(module->name, algorithm) == 0) break;
     }
-    if (module->name == 0) return 0;
+    if (module->name == 0) return NULL;
     
     stemmer->create = module->create;
     stemmer->close = module->close;
     stemmer->stem = module->stem;
 
     stemmer->env = stemmer->create();
+    if (stemmer->env == NULL)
+    {
+        sb_stemmer_delete(stemmer);
+        return NULL;
+    }
 
     return stemmer;
 }
@@ -54,7 +59,11 @@ sb_stemmer_delete(struct sb_stemmer * stemmer)
 const sb_symbol *
 sb_stemmer_stem(struct sb_stemmer * stemmer, const sb_symbol * word, int size)
 {
-    SN_set_current(stemmer->env, size, word);
+    if (SN_set_current(stemmer->env, size, word))
+    {
+        stemmer->env->l = 0;
+        return NULL;
+    }
     (void) stemmer->stem(stemmer->env);
     stemmer->env->p[stemmer->env->l] = 0;
     return stemmer->env->p;
