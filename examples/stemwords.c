@@ -78,7 +78,7 @@ error:
 static void
 usage(int n)
 {
-    printf("usage: %s [-i <input file>] [-o <output file>] [-p] [-h]\n"
+    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-p] [-h]\n"
 	  "\n"
 	  "The input file consists of a list of words to be stemmed, one per\n"
 	  "line. Words should be in lower case, but (for English) A-Z letters\n"
@@ -127,6 +127,12 @@ main(int argc, char * argv[])
 		    exit(1);
 		}
 		in = argv[i++];
+	    } else if (strcmp(s, "-l") == 0) {
+		if (i >= argc) {
+		    fprintf(stderr, "%s requires an argument\n", s);
+		    exit(1);
+		}
+		language = argv[i++];
 	    } else if (strcmp(s, "-p") == 0) {
 		pretty = 1;
 	    } else if (strcmp(s, "-h") == 0) {
