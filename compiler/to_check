@@ -1,8 +1,0 @@
-Check generated code for:
-  slice_to() - returns NULL on error, frees "p".
-  assign_to() - returns NULL on error, frees "p".
-  insert_s() - returns error code, frees z->p.
-  insert_v() - returns error code, frees z->p.
-  slice_from_s() - returns error code, frees z->p.
-  slice_from_v() - returns error code, frees z->p.
-  slice_del() - returns error code, frees z->p.

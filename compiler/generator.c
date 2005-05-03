@@ -609,7 +609,11 @@ static void generate_hop(struct generator * g, struct node * p)
 }
 
 static void generate_delete(struct generator * g, struct node * p)
-{   wp(g, "~Mslice_del(z);~C", p);
+{
+    wp(g, "~{int ret;~N", p);
+    wp(g, "~Mret = slice_del(z);~C", p);
+    wp(g, "~Mif (ret < 0) return ret;~N"
+          "~}", p);
 }
 
 
@@ -641,12 +645,14 @@ static void generate_rightslice(struct generator * g, struct node * p)
 
 static void generate_assignto(struct generator * g, struct node * p)
 {   g->V[0] = p->name;
-    wp(g, "~M~V0 = assign_to(z, ~V0);~C", p);
+    wp(g, "~M~V0 = assign_to(z, ~V0);~C"
+          "~Mif (~V0 == 0) return -1;~C", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p)
 {   g->V[0] = p->name;
-    wp(g, "~M~V0 = slice_to(z, ~V0);~C", p);
+    wp(g, "~M~V0 = slice_to(z, ~V0);~C"
+          "~Mif (~V0 == 0) return -1;~C", p);
 }
 
 static void generate_data_address(struct generator * g, struct node * p)
@@ -663,22 +669,28 @@ static void generate_insert(struct generator * g, struct node * p, int style)
 {
     int keep_c = style == c_attach;
     if (p->mode == m_backward) keep_c = !keep_c;
+    wp(g, "~{int ret;~N", p);
     if (keep_c) w(g, "~{int c = z->c;~N");
-    wp(g, "~Minsert_~$(z, z->c, z->c, ", p);
+    wp(g, "~Mret = insert_~$(z, z->c, z->c, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
     if (keep_c) w(g, "~Mz->c = c;~N~}");
+    wp(g, "~Mif (ret < 0) return ret;~N"
+          "~}", p);
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p)
 {
     int keep_c = p->mode == m_forward; /* like 'attach' */
+    wp(g, "~{int ret;~N", p);
     if (keep_c) wp(g, "~{int c = z->c;~N"
-                   "~Minsert_~$(z, z->c, z->l, ", p);
-                else wp(g, "~Minsert_~$(z, z->lb, z->c, ", p);
+                   "~Mret = insert_~$(z, z->c, z->l, ", p);
+                else wp(g, "~Mret = insert_~$(z, z->lb, z->c, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
     if (keep_c) w(g, "~Mz->c = c;~N~}");
+    wp(g, "~Mif (ret < 0) return ret;~N"
+          "~}", p);
 }
 
 /* bugs marked <======= fixed 22/7/02. Similar fixes required for Java */
@@ -686,9 +698,12 @@ static void generate_assignfrom(struct generator * g, struct node * p)
 static void generate_slicefrom(struct generator * g, struct node * p)
 {
 /*  w(g, "~Mslice_from_s(z, ");   <============= bug! should be: */
-    wp(g, "~Mslice_from_~$(z, ", p);
+    wp(g, "~{int ret;~N", p);
+    wp(g, "~Mret = slice_from_~$(z, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
+    wp(g, "~Mif (ret < 0) return ret;~N"
+          "~}", p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p)
@@ -767,7 +782,9 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
 static void generate_call(struct generator * g, struct node * p)
 {
     g->V[0] = p->name;
-    wp(g, "~Mif (!~V0(z)) ~f~C", p);
+    wp(g, "~{int ret = ~V0(z);~N"
+          "~Mif (ret == 0) ~f~C"
+          "~Mif (ret < 0) return ret;~N~}", p);
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement)

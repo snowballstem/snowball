@@ -59,12 +59,14 @@ sb_stemmer_delete(struct sb_stemmer * stemmer)
 const sb_symbol *
 sb_stemmer_stem(struct sb_stemmer * stemmer, const sb_symbol * word, int size)
 {
+    int ret;
     if (SN_set_current(stemmer->env, size, word))
     {
         stemmer->env->l = 0;
         return NULL;
     }
-    (void) stemmer->stem(stemmer->env);
+    ret = stemmer->stem(stemmer->env);
+    if (ret < 0) return NULL;
     stemmer->env->p[stemmer->env->l] = 0;
     return stemmer->env->p;
 }
