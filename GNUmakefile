@@ -112,7 +112,7 @@ $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h: algorithms/%/stem.sbl snowball
 	./snowball $< -o $${o} -eprefix $${l}_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) -O4 -c -o $@ $<
+	$(CC) $(CFLAGS) -O4 -c -o $@ $< -Wall
 
 $(java_src_dir)/%Stemmer.java: algorithms/%/stem.sbl snowball
 	@mkdir -p $(java_src_dir)

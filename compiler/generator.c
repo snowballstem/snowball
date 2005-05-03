@@ -141,7 +141,7 @@ static void wbe(struct generator * g)    /* block end */
 
 static void wk(struct generator * g, struct node * p)     /* keep c */
 {   ws(g, p->mode == m_forward ? "int c = z->c;" :
-                                 "int m = z->l - z->c;");
+                                 "int m = z->l - z->c; (void) m;");
 }
 
 static char * restore_string(struct generator * g, struct node * p)
@@ -161,7 +161,8 @@ static void winc(struct generator * g, struct node * p)     /* increment c */
 }
 
 static void wsetl(struct generator * g, int n)
-{   g->margin--;
+{
+    g->margin--;
     wms(g, "lab"); wi(g, n); wch(g, ':'); wnl(g);
     g->line_labelled = g->line_count;
     g->margin++;
@@ -176,9 +177,13 @@ static void wf(struct generator * g)          /* fail */
     switch (g->failure_label)
     {
         case x_return:
-           ws(g, "return 0;"); break;
+           ws(g, "return 0;");
+           break;
         default:
-           ws(g, "goto lab"); wi(g, g->failure_label); wch(g, ';');
+           ws(g, "goto lab");
+           wi(g, g->failure_label);
+           wch(g, ';');
+           g->label_used = 1;
     }
     if (g->failure_string != 0) ws(g, " }");
 }
@@ -387,6 +392,7 @@ static void generate_and(struct generator * g, struct node * p)
 static void generate_or(struct generator * g, struct node * p)
 {   int keep_c = K_needed(g, p->left);
 
+    int used = g->label_used;
     int a0 = g->failure_label;
     char * a1 = g->failure_string;
 
@@ -400,12 +406,15 @@ static void generate_or(struct generator * g, struct node * p)
     {   if (p->right != 0)
         {
             g->failure_label = new_label(g);
+            g->label_used = 0;
             generate(g, p);
             wgotol(g, out_lab);
-            wsetl(g, g->failure_label);
+            if (g->label_used)
+                wsetl(g, g->failure_label);
             if (keep_c) wp(g, "~M~r~N", p);
         } else
         {
+            g->label_used = used;
             g->failure_label = a0;
             g->failure_string = a1;
 
@@ -428,6 +437,7 @@ static void generate_backwards(struct generator * g, struct node * p)
 static void generate_not(struct generator * g, struct node * p)
 {   int keep_c = K_needed(g, p->left);
 
+    int used = g->label_used;
     int a0 = g->failure_label;
     char * a1 = g->failure_string;
 
@@ -435,16 +445,21 @@ static void generate_not(struct generator * g, struct node * p)
            else wp(g, "~M~C", p);
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     g->failure_string = 0;
     generate(g, p->left);
 
-    {   int l = g->failure_label;
+    {
+        int l = g->failure_label;
+        int u = g->label_used;
 
+        g->label_used = used;
         g->failure_label = a0;
         g->failure_string = a1;
 
         w(g, "~M~f~N");
-        wsetl(g, l);
+        if (u)
+            wsetl(g, l);
     }
     if (keep_c) wp(g, "~M~r~N"
                    "~}", p);
@@ -458,10 +473,12 @@ static void generate_try(struct generator * g, struct node * p)
            else wp(g, "~M~C", p);
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     g->failure_string = keep_c ? restore_string(g, p) : 0;
     generate(g, p->left);
 
-    wsetl(g, g->failure_label);
+    if (g->label_used)
+        wsetl(g, g->failure_label);
 
     if (keep_c) w(g, "~}");
 }
@@ -498,10 +515,12 @@ static void generate_do(struct generator * g, struct node * p)
            else wp(g, "~M~C", p);
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     g->failure_string = 0;
     generate(g, p->left);
 
-    wsetl(g, g->failure_label);
+    if (g->label_used)
+        wsetl(g, g->failure_label);
     if (keep_c) wp(g, "~M~r~N"
                    "~}", p);
 }
@@ -509,6 +528,7 @@ static void generate_do(struct generator * g, struct node * p)
 static void generate_GO(struct generator * g, struct node * p, int style)
 {   int keep_c = style == 1 || repeat_restore(g, p->left);
 
+    int used = g->label_used;
     int a0 = g->failure_label;
     char * a1 = g->failure_string;
 
@@ -517,13 +537,16 @@ static void generate_GO(struct generator * g, struct node * p, int style)
     if (keep_c) wp(g, "~M~k~N", p);
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     generate(g, p->left);
 
     if (style == 1) wp(g, "~M~r~N", p);  /* include for goto; omit for gopast */
     w(g, "~Mbreak;~N");
-    wsetl(g, g->failure_label);
+    if (g->label_used)
+        wsetl(g, g->failure_label);
     if (keep_c) wp(g, "~M~r~N", p);
 
+    g->label_used = used;
     g->failure_label = a0;
     g->failure_string = a1;
 
@@ -549,13 +572,15 @@ static void generate_repeat(struct generator * g, struct node * p, int atleast_c
     if (keep_c) wp(g, "~M~k~N", p);
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     g->failure_string = 0;
     generate(g, p->left);
 
     if (atleast_case) w(g, "~Mi--;~N");
 
     w(g, "~Mcontinue;~N");
-    wsetl(g, g->failure_label);
+    if (g->label_used)
+        wsetl(g, g->failure_label);
 
     if (keep_c) wp(g, "~M~r~N", p);
 
@@ -566,11 +591,13 @@ static void generate_repeat(struct generator * g, struct node * p, int atleast_c
 static void generate_atleast(struct generator * g, struct node * p)
 {   w(g, "~{int i = "); generate_AE(g, p->AE); w(g, ";~N");
     {
+        int used = g->label_used;
         int a0 = g->failure_label;
         char * a1 = g->failure_string;
 
         generate_repeat(g, p, true);
 
+        g->label_used = used;
         g->failure_label = a0;
         g->failure_string = a1;
     }
@@ -741,9 +768,11 @@ static void generate_setlimit(struct generator * g, struct node * p)
 
 static void generate_dollar(struct generator * g, struct node * p)
 {
+    int used = g->label_used;
     int a0 = g->failure_label;
     char * a1 = g->failure_string;
     g->failure_label = new_label(g);
+    g->label_used = 0;
     g->failure_string = 0;
 
     g->V[0] = p->name;
@@ -754,9 +783,11 @@ static void generate_dollar(struct generator * g, struct node * p)
              "~Mz->l = SIZE(z->p);~N", p);
     generate(g, p->left);
     w(g, "~Mfailure = 0; /* mark success */~N");
-    wsetl(g, g->failure_label);
+    if (g->label_used)
+        wsetl(g, g->failure_label);
     g->V[0] = p->name; /* necessary */
 
+    g->label_used = used;
     g->failure_label = a0;
     g->failure_string = a1;
 
@@ -828,6 +859,7 @@ static void generate_define(struct generator * g, struct node * p)
     if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     g->failure_string = 0;
     g->failure_label = x_return;
+    g->label_used = 0;
     generate(g, p->left);
     w(g, "~Mreturn 1;~N~}");
 }
@@ -893,6 +925,7 @@ static void generate_debug(struct generator * g, struct node * p)
 
 static void generate(struct generator * g, struct node * p)
 {
+    int used = g->label_used;
     int a0 = g->failure_label;
     char * a1 = g->failure_string;
 
@@ -960,9 +993,10 @@ static void generate(struct generator * g, struct node * p)
                  exit(1);
     }
 
+    if (g->failure_label != a0)
+        g->label_used = used;
     g->failure_label = a0;
     g->failure_string = a1;
-
 }
 
 static void generate_start_comment(struct generator * g)

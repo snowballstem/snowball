@@ -259,6 +259,7 @@ struct generator {
     char * failure_string;     /* String to output in case of a failure. */
     struct str * failure_str;  /* This is used by the java generator instead of failure_string */
 
+    int label_used;     /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
 
