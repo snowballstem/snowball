@@ -11,9 +11,10 @@
 
 extern symbol * create_s(void)
 {
+    symbol * p;
     void * mem = malloc(HEAD + (CREATE_SIZE + 1) * sizeof(symbol));
     if (mem == NULL) return NULL;
-    symbol * p = (symbol *) (HEAD + (char *) mem);
+    p = (symbol *) (HEAD + (char *) mem);
     CAPACITY(p) = CREATE_SIZE;
     SET_SIZE(p, CREATE_SIZE);
     return p;
@@ -237,6 +238,7 @@ extern int find_among_b(struct SN_env * z, struct among * v, int v_size)
  */
 static symbol * increase_size(symbol * p, int n)
 {
+    symbol * q;
     int new_size = n + 20;
     void * mem = realloc((char *) p - HEAD,
                          HEAD + (new_size + 1) * sizeof(symbol));
@@ -246,7 +248,7 @@ static symbol * increase_size(symbol * p, int n)
         return NULL;
     }
 
-    symbol * q = (symbol *) (HEAD + (char *)mem);
+    q = (symbol *) (HEAD + (char *)mem);
     CAPACITY(q) = new_size;
     return q;
 }

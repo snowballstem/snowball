@@ -734,8 +734,10 @@ static void generate_slicefrom(struct generator * g, struct node * p)
 }
 
 static void generate_setlimit(struct generator * g, struct node * p)
-{   wp(g, "~{~k~C"
-              "~Mint m3;~N", p);
+{
+    wp(g, "~{int m3;~C"
+          "~M~k~N"
+          , p);
     generate(g, p->left);
     if (p->mode == m_forward) w(g, "~Mm3 = z->l - z->c; z->l = z->c;~N");
                          else w(g, "~Mm3 = z->lb; z->lb = z->c;~N");
