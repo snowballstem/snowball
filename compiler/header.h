@@ -42,6 +42,8 @@ extern void str_assign(struct str * str, char * s);
 extern struct str * str_copy(struct str * old);
 extern symbol * str_data(struct str * str);
 extern int str_len(struct str * str);
+extern int get_utf8(const symbol * p, int * slot);
+extern int put_utf8(int ch, symbol * p);
 
 extern void sort(void * p, void * p_end, int unit, int (*f)());
 
@@ -87,6 +89,7 @@ struct tokeniser {
     int previous_token;
     byte token_held;
     byte widechars;
+    byte utf8;
 
     int omission;
     struct include * includes;
@@ -169,7 +172,7 @@ struct grouping {
     symbol * b;               /* the characters of this group */
     int largest_ch;           /* character with max code */
     int smallest_ch;          /* character with min code */
-    byte no_gaps;             /* no gaps between min and max codes */
+    byte no_gaps;             /* not used in generator.c after 11/5/05 */
     struct name * name;       /* so g->name->grouping == g */
 };
 
@@ -229,7 +232,7 @@ struct analyser {
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
-
+    byte utf8;
 };
 
 enum analyser_modes {
@@ -292,7 +295,7 @@ struct options {
     char * runtime_path;
     struct include * includes;
     struct include * includes_end;
-
+    byte utf8;
 };
 
 /* Generator for C code. */

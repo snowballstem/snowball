@@ -4,24 +4,14 @@
 #include <string.h>  /* for strlen */
 #include "header.h"
 
-/*-static int intof(char * s)
--{   int n = 0;
--    int i; for (i = 0; i < strlen(s); i++)
--    {   int d = s[i] - '0';
--        if (d < 0 || d > 9) { fprintf(stderr, "%s not a number\n", s); exit(1); }
--        n = 10*n + d;
--    }
--    return n;
--} */
-
-static int eq(char * s1, char * s2)
-{   int s1_len = strlen(s1);
+static int eq(char * s1, char * s2) {
+    int s1_len = strlen(s1);
     int s2_len = strlen(s2);
     return s1_len == s2_len && memcmp(s1, s2, s1_len) == 0;
 }
 
-static void print_arglist(void)
-{   fprintf(stderr, "options are: file [-o[utput] file] \n"
+static void print_arglist(void) {
+    fprintf(stderr, "options are: file [-o[utput] file] \n"
                     "                  [-s[yntax]]\n"
                     "                  [-j[ava]]\n"
                     "                  [-w[idechars]]\n"
@@ -30,30 +20,31 @@ static void print_arglist(void)
                     "                  [-vp[refix] string]\n"
                     "                  [-i[nclude] directory]\n"
                     "                  [-r[untime] path to runtime headers]\n"
+                    "                  [-u[tf8]]\n"
            );
     exit(1);
 }
 
-static void check_lim(int i, int argc)
-{   if (i >= argc)
-    {   fprintf(stderr, "argument list is one short\n");
+static void check_lim(int i, int argc) {
+    if (i >= argc) {
+        fprintf(stderr, "argument list is one short\n");
         print_arglist();
     }
 }
 
-static FILE * get_output(symbol * b)
-{   char * s = b_to_s(b);
+static FILE * get_output(symbol * b) {
+    char * s = b_to_s(b);
     FILE * output = fopen(s, "w");
-    if (output == 0)
-    {   fprintf(stderr, "Can't open output %s\n", s);
+    if (output == 0) {
+        fprintf(stderr, "Can't open output %s\n", s);
         exit(1);
     }
     free(s);
     return output;
 }
 
-static void read_options(struct options * o, int argc, char * argv[])
-{   char * s;
+static void read_options(struct options * o, int argc, char * argv[]) {
+    char * s;
     int i = 2;
 
     /* set defauts: */
@@ -69,50 +60,52 @@ static void read_options(struct options * o, int argc, char * argv[])
     o->widechars = false;
     o->includes = 0;
     o->includes_end = 0;
+    o->utf8 = false;
 
     /* read options: */
 
-    repeat
-    {   if (i >= argc) break;
+    repeat {
+        if (i >= argc) break;
         s = argv[i++];
-        {   if (eq(s, "-o") || eq(s, "-output"))
-            {   check_lim(i, argc);
+        {   if (eq(s, "-o") || eq(s, "-output")) {
+                check_lim(i, argc);
                 o->output_file = argv[i++];
                 continue;
             }
-            if (eq(s, "-n") || eq(s, "-name"))
-            {   check_lim(i, argc);
+            if (eq(s, "-n") || eq(s, "-name")) {
+                check_lim(i, argc);
                 o->name = argv[i++];
                 continue;
             }
-            if (eq(s, "-j") || eq(s, "-java"))
-            {   o->make_java = true;
+            if (eq(s, "-j") || eq(s, "-java")) {
+                o->make_java = true;
                 o->widechars = true;
                 o->make_c = false;
                 continue;
             }
-            if (eq(s, "-w") || eq(s, "-widechars"))
-            {   o->widechars = true;
+            if (eq(s, "-w") || eq(s, "-widechars")) {
+                o->widechars = true;
                 continue;
             }
-            if (eq(s, "-s") || eq(s, "-syntax"))
-            {   o->syntax_tree = true;
+            if (eq(s, "-s") || eq(s, "-syntax")) {
+                o->syntax_tree = true;
                 continue;
             }
-            if (eq(s, "-ep") || eq(s, "-eprefix"))
-            {   check_lim(i, argc);
+            if (eq(s, "-ep") || eq(s, "-eprefix")) {
+                check_lim(i, argc);
                 o->externals_prefix = argv[i++];
                 continue;
             }
-            if (eq(s, "-vp") || eq(s, "-vprefix"))
-            {   check_lim(i, argc);
+            if (eq(s, "-vp") || eq(s, "-vprefix")) {
+                check_lim(i, argc);
                 o->variables_prefix = argv[i++];
                 continue;
             }
-            if (eq(s, "-i") || eq(s, "-include"))
-            {   check_lim(i, argc);
+            if (eq(s, "-i") || eq(s, "-include")) {
+                check_lim(i, argc);
 
-                {   NEW(include, p);
+                {
+                    NEW(include, p);
                     symbol * b = add_s_to_b(0, argv[i++]);
                     b = add_s_to_b(b, "/");
                     p->next = 0; p->b = b;
@@ -123,9 +116,13 @@ static void read_options(struct options * o, int argc, char * argv[])
                 }
                 continue;
             }
-            if (eq(s, "-r") || eq(s, "-runtime"))
-            {   check_lim(i, argc);
+            if (eq(s, "-r") || eq(s, "-runtime")) {
+                check_lim(i, argc);
                 o->runtime_path = argv[i++];
+                continue;
+            }
+            if (eq(s, "-u") || eq(s, "-utf8")) {
+                o->utf8 = true;
                 continue;
             }
             fprintf(stderr, "'%s' misplaced\n", s);
@@ -134,32 +131,34 @@ static void read_options(struct options * o, int argc, char * argv[])
     }
 }
 
-extern int main(int argc, char * argv[])
-{
+extern int main(int argc, char * argv[]) {
+
     NEW(options, o);
     if (argc == 1) print_arglist();
     read_options(o, argc, argv);
     {
         symbol * filename = add_s_to_b(0, argv[1]);
         symbol * u = get_input(filename);
-        if (u == 0)
-        {   fprintf(stderr, "Can't open input %s\n", argv[1]);
+        if (u == 0) {
+            fprintf(stderr, "Can't open input %s\n", argv[1]);
             exit(1);
         }
-        {   struct tokeniser * t = create_tokeniser(u);
+        {
+            struct tokeniser * t = create_tokeniser(u);
             struct analyser * a = create_analyser(t);
             t->widechars = o->widechars;
             t->includes = o->includes;
+            a->utf8 = t->utf8 = o->utf8;
             read_program(a);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
             close_tokeniser(t);
-            unless (o->syntax_tree)
-            {   struct generator * g;
+            unless (o->syntax_tree) {
+                struct generator * g;
 
                 char * s = o->output_file;
-                unless (s)
-                {   fprintf(stderr, "Please include the -o option\n");
+                unless (s) {
+                    fprintf(stderr, "Please include the -o option\n");
                     exit(1);
                 }
                 if (o->make_c) {
