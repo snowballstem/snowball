@@ -23,15 +23,17 @@ struct among
 extern symbol * create_s(void);
 extern void lose_s(symbol * p);
 
+extern int skip_utf8(const symbol * p, int c, int lb, int l, int n);
+
+extern int in_grouping_U(struct SN_env * z, unsigned char * s, int min, int max);
+extern int in_grouping_b_U(struct SN_env * z, unsigned char * s, int min, int max);
+extern int out_grouping_U(struct SN_env * z, unsigned char * s, int min, int max);
+extern int out_grouping_b_U(struct SN_env * z, unsigned char * s, int min, int max);
+
 extern int in_grouping(struct SN_env * z, unsigned char * s, int min, int max);
 extern int in_grouping_b(struct SN_env * z, unsigned char * s, int min, int max);
 extern int out_grouping(struct SN_env * z, unsigned char * s, int min, int max);
 extern int out_grouping_b(struct SN_env * z, unsigned char * s, int min, int max);
-
-extern int in_range(struct SN_env * z, int min, int max);
-extern int in_range_b(struct SN_env * z, int min, int max);
-extern int out_range(struct SN_env * z, int min, int max);
-extern int out_range_b(struct SN_env * z, int min, int max);
 
 extern int eq_s(struct SN_env * z, int s_size, symbol * s);
 extern int eq_s_b(struct SN_env * z, int s_size, symbol * s);

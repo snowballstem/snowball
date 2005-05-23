@@ -10,7 +10,7 @@ externals ( stem )
 
 strings ( ch )
 
-integers ( p1 )
+integers ( p1 x )
 
 groupings ( v s_ending )
 
@@ -30,8 +30,9 @@ define mark_regions as (
 
     $p1 = limit
 
+    test ( hop 3 setmark x )
     goto v gopast non-v  setmark p1
-    try ( $p1 < 3  $p1 = 3 )
+    try ( $p1 < x  $p1 = x )
 )
 
 backwardmode (
