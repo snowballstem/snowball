@@ -82,7 +82,6 @@ foreach $lang (@algorithms) {
 print OUT "\n */\n\n";
 
 foreach $lang (@algorithms) {
-  print OUT "#include \"../$c_src_dir/stem_UTF_8_$lang.h\"\n";
   my $hashref = $algorithm_encs{$lang};
   foreach $enc (sort keys (%$hashref)) {
     print OUT "#include \"../$c_src_dir/stem_${enc}_$lang.h\"\n";

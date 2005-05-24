@@ -5,11 +5,24 @@ java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
 libstemmer_algorithms = danish dutch english finnish french german italian \
-			norwegian porter portuguese russian \
-			spanish swedish
+			norwegian porter portuguese russian spanish swedish
 
 KOI8_R_algorithms = russian
-mkmodules_extra = russian,KOI8_R
+ISO_8859_1_algorithms = danish dutch english finnish french german italian \
+			norwegian porter portuguese spanish swedish
+mkmodules_extra = russian,KOI8_R \
+		  danish,ISO_8859_1 \
+		  dutch,ISO_8859_1 \
+		  english,ISO_8859_1 \
+		  finnish,ISO_8859_1 \
+		  french,ISO_8859_1 \
+		  german,ISO_8859_1 \
+		  italian,ISO_8859_1 \
+		  norwegian,ISO_8859_1 \
+		  porter,ISO_8859_1 \
+		  portuguese,ISO_8859_1 \
+		  spanish,ISO_8859_1 \
+		  swedish,ISO_8859_1
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -85,9 +98,11 @@ STEMWORDS_SOURCES = examples/stemwords.c
 
 ALGORITHMS = $(all_algorithms:%=algorithms/%/stem.sbl)
 C_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
-	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c)
+	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
+	    $(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c)
 C_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
-	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.h)
+	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.h) \
+	    $(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
@@ -130,6 +145,15 @@ algorithms/%/stem-Unicode.sbl: algorithms/%/stem.sbl
 	cp $^ $@
 algorithms/russian/stem-KOI8-R.sbl: algorithms/russian/stem.sbl
 	cp $^ $@
+algorithms/%/stem-ISO-8859-1.sbl: algorithms/%/stem.sbl
+	cp $^ $@
+
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%/stem-Unicode.sbl snowball
+	@mkdir -p $(c_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem-Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(c_src_dir)/stem_UTF_8_$${l}"; \
+	echo "./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u"; \
+	./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u
 
 $(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%/stem-KOI8-R.sbl snowball
 	@mkdir -p $(c_src_dir)
@@ -138,12 +162,12 @@ $(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%/stem-KOI
 	echo "./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%/stem-Unicode.sbl snowball
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/stem-ISO-8859-1.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem-Unicode.sbl$$!\1!;s!^.*/!!'`; \
-	o="$(c_src_dir)/stem_UTF_8_$${l}"; \
-	echo "./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u"; \
-	./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u
+	@l=`echo "$<" | sed 's!\(.*\)/stem-ISO-8859-1.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(c_src_dir)/stem_ISO_8859_1_$${l}"; \
+	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime"; \
+	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) -O4 -c -o $@ $< -Wall
