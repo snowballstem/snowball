@@ -43,6 +43,19 @@ of stemming operations.  Such caching can greatly increase the performance of a
 stemmer under certain situations, so suitable patches will be considered for
 inclusion.
 
+The standard libstemmer sources contain an algorithm for each of the supported
+languages.  The algorithm may be selected using the english name of the
+language, or using the 2 or 3 letter ISO 639 language codes.  In addition,
+the traditional "Porter" stemming algorithm for english is included for
+backwards compatibility purposes, but we recommend use of the "English"
+stemmer in preference for new projects.
+
+(Some minor algorithms which are included only as curiosities in the snowball
+website, such as the Lovins stemmer and the Kraaij Pohlmann stemmer, are not
+included in the standard libstemmer sources.  These are not really supported by
+the snowball project, but it would be possible to compile a modified libstemmer
+library containing these if desired.)
+
 
 The stemwords example
 =====================

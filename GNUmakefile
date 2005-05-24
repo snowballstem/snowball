@@ -24,9 +24,6 @@ algorithms = danish dutch english finnish french german italian \
 # should be used in preference.
 
 # Aliases - these are the 2 and 3 letter ISO 639 codes for each language.
-# Also, any additional algorithms will have names defined of the form
-# "xx_name", where "xx" is the 2 letter code for the language, and "name"
-# is the name of the algorithm.
 lang_aliases = danish=da \
 	       danish=dan \
 	       dutch=nl \
