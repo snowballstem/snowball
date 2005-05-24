@@ -13,7 +13,17 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 
 public class TestApp {
+    private static void usage()
+    {
+        System.err.println("Usage: TestApp <algorithm> <input file> [-o <output file>]");
+    }
+
     public static void main(String [] args) throws Throwable {
+	if (args.length < 2) {
+            usage();
+            return;
+        }
+
 	Class stemClass = Class.forName("org.tartarus.snowball.ext." +
 					args[0] + "Stemmer");
         SnowballProgram stemmer = (SnowballProgram) stemClass.newInstance();
@@ -27,11 +37,13 @@ public class TestApp {
 
         OutputStream outstream;
 
-	if (args.length > 2 && args[2].equals("-o")) {
-	    outstream = new FileOutputStream(args[3]);
-	} else if (args.length == 2) {
-	    System.err.println("Usage: TestApp <input file> [-o <output file>]");
-	    return;
+	if (args.length > 2) {
+            if (args.length == 4 && args[2].equals("-o")) {
+                outstream = new FileOutputStream(args[3]);
+            } else {
+                usage();
+                return;
+            }
 	} else {
 	    outstream = System.out;
 	}
