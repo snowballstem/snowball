@@ -78,12 +78,15 @@ error:
 static void
 usage(int n)
 {
-    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-p] [-h]\n"
+    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p] [-h]\n"
 	  "\n"
 	  "The input file consists of a list of words to be stemmed, one per\n"
 	  "line. Words should be in lower case, but (for English) A-Z letters\n"
 	  "are mapped to their a-z equivalents anyway. If omitted, stdin is\n"
 	  "used.\n"
+	  "\n"
+	  "If -c is given, the argument is the character encoding of the input\n"
+          "and output files.  If it is omitted, the UTF-8 encoding is used.\n"
 	  "\n"
 	  "If -p is given the output file consists of each word of the input\n"
 	  "file followed by \"->\" followed by its stemmed equivalent.\n"
@@ -105,6 +108,7 @@ main(int argc, char * argv[])
     struct sb_stemmer * stemmer;
 
     char * language = "english";
+    char * charenc = NULL;
 
     char * s;
     int i = 1;
@@ -133,6 +137,12 @@ main(int argc, char * argv[])
 		    exit(1);
 		}
 		language = argv[i++];
+	    } else if (strcmp(s, "-c") == 0) {
+		if (i >= argc) {
+		    fprintf(stderr, "%s requires an argument\n", s);
+		    exit(1);
+		}
+		charenc = argv[i++];
 	    } else if (strcmp(s, "-p") == 0) {
 		pretty = 1;
 	    } else if (strcmp(s, "-h") == 0) {
@@ -160,10 +170,15 @@ main(int argc, char * argv[])
     }
 
     /* do the stemming process: */
-    stemmer = sb_stemmer_new(language);
+    stemmer = sb_stemmer_new(language, charenc);
     if (stemmer == 0) {
-	fprintf(stderr, "language `%s' not available for stemming\n", language);
-	exit(1);
+        if (charenc == NULL) {
+            fprintf(stderr, "language `%s' not available for stemming\n", language);
+            exit(1);
+        } else {
+            fprintf(stderr, "language `%s' not available for stemming in encoding `%s'\n", language, charenc);
+            exit(1);
+        }
     }
     stem_file(stemmer, f_in, f_out);
     sb_stemmer_delete(stemmer);

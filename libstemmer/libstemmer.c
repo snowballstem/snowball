@@ -19,18 +19,32 @@ sb_stemmer_list(void)
     return algorithm_names;
 }
 
-extern struct sb_stemmer *
-sb_stemmer_new(const char * algorithm)
+static stemmer_encoding sb_getenc(const char * charenc)
 {
+    struct stemmer_encoding * encoding;
+    if (charenc == NULL) return ENC_UTF_8;
+    for (encoding = encodings; encoding->name != 0; encoding++) {
+	if (strcmp(encoding->name, charenc) == 0) break;
+    }
+    if (encoding->name == NULL) return ENC_UNKNOWN;
+    return encoding->enc;
+}
+
+extern struct sb_stemmer *
+sb_stemmer_new(const char * algorithm, const char * charenc)
+{
+    stemmer_encoding enc;
     struct stemmer_modules * module;
     struct sb_stemmer * stemmer =
 	    (struct sb_stemmer *) malloc(sizeof(struct sb_stemmer));
-    if (stemmer == 0) return NULL;
+    if (stemmer == NULL) return NULL;
+    enc = sb_getenc(charenc);
+    if (enc == ENC_UNKNOWN) return NULL;
 
     for (module = modules; module->name != 0; module++) {
-	if (strcmp(module->name, algorithm) == 0) break;
+	if (strcmp(module->name, algorithm) == 0 && module->enc == enc) break;
     }
-    if (module->name == 0) return NULL;
+    if (module->name == NULL) return NULL;
     
     stemmer->create = module->create;
     stemmer->close = module->close;

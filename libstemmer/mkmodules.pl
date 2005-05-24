@@ -4,24 +4,47 @@ use strict;
 my $progname = $0;
 
 if (scalar @ARGV < 3) {
-  print "Usage: $progname <outfile> <C source directory> <[alias=]language> <[alias=]language> ...\n";
+  print "Usage: $progname <outfile> <C source directory> <[alias=]language,enc> <[alias=]language,enc> ...\n";
   exit 1;
 }
 
 my $outname = shift(@ARGV);
 my $c_src_dir = shift(@ARGV);
 
+
 my $arg;
 my %aliases = ();
 my %algorithms = ();
-foreach $arg (@ARGV) {
-  if ($arg =~ /^([a-z0-9_]+)=([a-z0-9_]+)$/) {
-    $aliases{$2} = $1;
-    $algorithms{$1}=1;
+my %algorithm_encs = ();
+
+my %encs = ('UTF_8', 1);
+
+sub addalgenc($$) {
+  my $alg = shift();
+  my $enc = shift();
+
+  if (defined $algorithm_encs{$alg}) {
+      my $hashref = $algorithm_encs{$alg};
+      $$hashref{$enc}=1;
   } else {
-    $algorithms{$arg}=1;
-    $aliases{$arg} = $arg;
+      my %newhash = ($enc => 1);
+      $algorithm_encs{$alg}=\%newhash;
   }
+
+  $encs{$enc} = 1;
+}
+
+foreach $arg (@ARGV) {
+    if ($arg =~ /^([a-z0-9_]+)=([a-z0-9_]+)$/) {
+        $aliases{$2} = $1;
+        $algorithms{$1}=1;
+        addalgenc($1, 'UTF_8');
+    } elsif ($arg =~ /^([^,]+),([^,]+)$/) {
+        addalgenc($1, $2);
+    } else {
+        $algorithms{$arg}=1;
+        $aliases{$arg} = $arg;
+    }
 }
 my @algorithms = sort keys(%algorithms);
 
@@ -35,12 +58,13 @@ print OUT <<EOS;
  *
 EOS
 
-my $lang;
 my $line = " * Modules included by this file are: ";
 print OUT $line;
 my $linelen = length($line);
 
 my $need_sep = 0;
+my $lang;
+my $enc;
 foreach $lang (@algorithms) {
   if ($need_sep) {
     if (($linelen + 2 + length($lang)) > 77) {
@@ -58,13 +82,40 @@ foreach $lang (@algorithms) {
 print OUT "\n */\n\n";
 
 foreach $lang (@algorithms) {
-  print OUT "#include \"../$c_src_dir/stem_$lang.h\"\n";
+  print OUT "#include \"../$c_src_dir/stem_UTF_8_$lang.h\"\n";
+  my $hashref = $algorithm_encs{$lang};
+  foreach $enc (sort keys (%$hashref)) {
+    print OUT "#include \"../$c_src_dir/stem_${enc}_$lang.h\"\n";
+  }
 }
 
 print OUT <<EOS;
 
+typedef enum {
+  ENC_UNKNOWN,
+EOS
+for $enc (sort keys %encs) {
+  print OUT "  ENC_${enc},\n";
+}
+print OUT <<EOS;
+} stemmer_encoding;
+
+struct stemmer_encoding {
+  const char * name;
+  stemmer_encoding enc;
+};
+static struct stemmer_encoding encodings[] = {
+EOS
+for $enc (sort keys %encs) {
+  print OUT "  {\"${enc}\", ENC_${enc}},\n";
+}
+print OUT <<EOS;
+  {0,0}
+};
+
 struct stemmer_modules {
   const char * name;
+  stemmer_encoding enc; 
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
@@ -74,11 +125,16 @@ EOS
 
 for $lang (sort keys %aliases) {
   my $l = $aliases{$lang};
-  print OUT "  {\"$lang\", ${l}_create_env, ${l}_close_env, ${l}_stem},\n";
+  my $hashref = $algorithm_encs{$l};
+  my $enc;
+  foreach $enc (sort keys (%$hashref)) {
+    my $p = "${l}_${enc}";
+    print OUT "  {\"$lang\", ENC_$enc, ${p}_create_env, ${p}_close_env, ${p}_stem},\n";
+  }
 }
 
 print OUT <<EOS;
-  {0,0,0,0}
+  {0,0,0,0,0}
 };
 EOS
 
