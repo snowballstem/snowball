@@ -154,6 +154,10 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
+	mkdir -p $${dest} && \
+	cp -a doc/libstemmer_c_README $${dest}/README && \
+	mkdir -p $${dest}/examples && \
+	cp -a examples/stemwords.c $${dest}/examples && \
 	mkdir -p $${dest}/$(c_src_dir) && \
 	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/$(c_src_dir) && \
 	mkdir -p $${dest}/runtime && \
@@ -175,10 +179,14 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
 	  | sed 's/$$/ \\/' >> mkinc.mak) && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
+	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
+	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
 	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
+	echo 'stemwords: examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
+	echo '	$$(CC) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	echo '	rm -f stemwords *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
