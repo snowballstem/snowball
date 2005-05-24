@@ -21,7 +21,7 @@ stringdef o/   hex 'F8'
 
 define v 'aeiouy{ae}{ao}{o/}'
 
-define s_ending  'bcdfghjklmnoprtvyz'
+define s_ending  'bcdfghjlmnoprtvyz'
 
 define mark_regions as (
 
@@ -43,7 +43,7 @@ backwardmode (
             'hetens' 'ers' 'ets' 'et' 'het' 'ast'
                 (delete)
             's'
-                (s_ending delete)
+                (s_ending or ('k' non-v) delete)
             'erte' 'ert'
                 (<-'er')
         )
