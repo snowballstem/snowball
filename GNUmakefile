@@ -167,6 +167,7 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/include && \
 	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
 	(cd $${dest} && \
+	 echo "README" >> MANIFEST && \
 	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
 	 ls runtime/*.c runtime/*.h >> MANIFEST && \
 	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
@@ -198,11 +199,14 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
+	mkdir -p $${dest} && \
+	cp -a doc/libstemmer_java_README $${dest}/README && \
 	mkdir -p $${dest}/$(java_src_dir) && \
 	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
 	mkdir -p $${dest}/$(java_src_main_dir) && \
 	cp -a $(JAVARUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
 	(cd $${dest} && \
+	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
