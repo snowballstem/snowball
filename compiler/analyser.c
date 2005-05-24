@@ -707,7 +707,7 @@ static int next_symbol(symbol * p, symbol * W, int utf8) {
     }
 }
 
-static symbol * alter_grouping(struct analyser * a, symbol * p, symbol * q, int style, int utf8) {
+static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
     int j = 0;
     symbol W[1];
     int width;
@@ -752,12 +752,12 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                         struct name * r = find_name(a);
                         unless (r == 0) {
                             check_name_type(a, r, 'g');
-                            p->b = alter_grouping(a, p->b, r->grouping->b, style, false);
+                            p->b = alter_grouping(p->b, r->grouping->b, style, false);
                         }
                     }
                     break;
                 case c_literalstring:
-                    p->b = alter_grouping(a, p->b, t->b, style, a->utf8);
+                    p->b = alter_grouping(p->b, t->b, style, a->utf8);
                     break;
                 default: error(a, 1); return;
             }

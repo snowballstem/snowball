@@ -237,9 +237,9 @@ extern int get_utf8(const symbol * p, int * slot) {
     }
     b1 = *p++;
     if (b0 < 0xE0) {   /* 1110 0000 */
-        * slot = (b0 & 0x1F) << 6 | b1 & 0x3F; return 2;
+        * slot = (b0 & 0x1F) << 6 | (b1 & 0x3F); return 2;
     }
-    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | *p & 0x3F; return 3;
+    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | (*p & 0x3F); return 3;
 }
 
 extern int put_utf8(int ch, symbol * p) {
@@ -248,10 +248,10 @@ extern int put_utf8(int ch, symbol * p) {
     }
     if (ch < 0x800) {
         p[0] = (ch >> 6) | 0xC0;
-        p[1] = ch & 0x3F | 0x80; return 2;
+        p[1] = (ch & 0x3F) | 0x80; return 2;
     }
     p[0] = (ch >> 12) | 0xE0;
-    p[1] = (ch >> 6) & 0x3F | 0x80;
-    p[2] = ch & 0x3F | 0x80; return 3;
+    p[1] = ((ch >> 6) & 0x3F) | 0x80;
+    p[2] = (ch & 0x3F) | 0x80; return 3;
 }
 

@@ -1086,8 +1086,6 @@ static void generate_amongs(struct generator * g) {
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
 
-static int bit_is_set(symbol * b, int i) { return b[i/8] & 1 << i%8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     int range = q->largest_ch - q->smallest_ch + 1;

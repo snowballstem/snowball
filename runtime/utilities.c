@@ -74,9 +74,9 @@ static int get_utf8(const symbol * p, int c, int l, int * slot) {
     }
     b1 = p[c++];
     if (b0 < 0xE0 || c == l) {   /* 1110 0000 */
-        * slot = (b0 & 0x1F) << 6 | b1 & 0x3F; return 2;
+        * slot = (b0 & 0x1F) << 6 | (b1 & 0x3F); return 2;
     }
-    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | *p & 0x3F; return 3;
+    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | (*p & 0x3F); return 3;
 }
 
 static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
@@ -88,9 +88,9 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
     }
     b1 = p[--c];
     if (b1 >= 0xC0 || c == lb) {   /* 1100 0000 */
-        * slot = (b1 & 0x1F) << 6 | b0 & 0x3F; return 2;
+        * slot = (b1 & 0x1F) << 6 | (b0 & 0x3F); return 2;
     }
-    * slot = (*p & 0xF) << 12 | (b1 & 0x3F) << 6 | b0 & 0x3F; return 3;
+    * slot = (*p & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
 }
 
 extern int in_grouping_U(struct SN_env * z, unsigned char * s, int min, int max) {
