@@ -4,12 +4,17 @@ c_src_dir = src_c
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
-algorithms = danish dutch english finnish french german italian \
-	     norwegian porter portuguese russian \
-	     spanish swedish
+libstemmer_algorithms = danish dutch english finnish french german italian \
+			norwegian porter portuguese russian \
+			spanish swedish
 
-# Note - the following algorithms are not included in libstemmer.  To compile a
-# libstemmer with them in, simply add them to the "algorithms" variable above.
+other_algorithms = german2 kraaij_pohlmann lovins
+
+all_algorithms = $(libstemmer_algorithsm) $(other_algorithms)
+
+# Note - the other_algorithms are not included in libstemmer.  To compile a
+# libstemmer with them in, simply add them to the "libstemmer_algorithms"
+# variable above.
 # They are included in the snowball website as curiosities, but are not
 # intended for general use, and use of them is is not fully supported.
 #
@@ -75,10 +80,10 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
-ALGORITHMS = $(algorithms:%=algorithms/%/stem.sbl)
-C_SOURCES = $(algorithms:%=$(c_src_dir)/stem_%.c)
-C_HEADERS = $(algorithms:%=$(c_src_dir)/stem_%.h)
-JAVA_SOURCES = $(algorithms:%=$(java_src_dir)/%Stemmer.java)
+ALGORITHMS = $(all_algorithms:%=algorithms/%/stem.sbl)
+C_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_%.c)
+C_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_%.h)
+JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -106,7 +111,7 @@ snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
 libstemmer/modules.h: libstemmer/mkmodules.pl GNUmakefile
-	libstemmer/mkmodules.pl $@ $(c_src_dir) $(algorithms) $(lang_aliases)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(libstemmer_algorithms) $(lang_aliases)
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_HEADERS)
 
