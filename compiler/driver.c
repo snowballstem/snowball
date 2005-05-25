@@ -11,16 +11,16 @@ static int eq(char * s1, char * s2) {
 }
 
 static void print_arglist(void) {
-    fprintf(stderr, "options are: file [-o[utput] file] \n"
+    fprintf(stderr, "options are: file [-o[utput] file]\n"
                     "                  [-s[yntax]]\n"
                     "                  [-j[ava]]\n"
                     "                  [-w[idechars]]\n"
+                    "                  [-u[tf8]]\n"
                     "                  [-n[ame] class name]\n"
                     "                  [-ep[refix] string]\n"
                     "                  [-vp[refix] string]\n"
                     "                  [-i[nclude] directory]\n"
                     "                  [-r[untime] path to runtime headers]\n"
-                    "                  [-u[tf8]]\n"
            );
     exit(1);
 }
@@ -159,6 +159,7 @@ extern int main(int argc, char * argv[]) {
                 char * s = o->output_file;
                 unless (s) {
                     fprintf(stderr, "Please include the -o option\n");
+                    print_arglist();
                     exit(1);
                 }
                 if (o->make_c) {

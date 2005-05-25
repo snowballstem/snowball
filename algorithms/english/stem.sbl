@@ -32,6 +32,7 @@ define mark_regions as (
     do(
         among (
             'gener'
+            'commun'  //  added May 2005
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
