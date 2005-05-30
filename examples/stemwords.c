@@ -37,7 +37,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                     lim = lim + INC;
                 }
                 /* force lower case: */
-                if isupper(ch) ch = tolower(ch);
+                if (isupper(ch)) ch = tolower(ch);
 
                 b[i] = ch;
 		i++;
