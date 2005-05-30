@@ -10,66 +10,10 @@ libstemmer_algorithms = danish dutch english finnish french german italian \
 KOI8_R_algorithms = russian
 ISO_8859_1_algorithms = danish dutch english finnish french german italian \
 			norwegian porter portuguese spanish swedish
-mkmodules_extra = russian,KOI8_R \
-		  danish,ISO_8859_1 \
-		  dutch,ISO_8859_1 \
-		  english,ISO_8859_1 \
-		  finnish,ISO_8859_1 \
-		  french,ISO_8859_1 \
-		  german,ISO_8859_1 \
-		  italian,ISO_8859_1 \
-		  norwegian,ISO_8859_1 \
-		  porter,ISO_8859_1 \
-		  portuguese,ISO_8859_1 \
-		  spanish,ISO_8859_1 \
-		  swedish,ISO_8859_1
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
 all_algorithms = $(libstemmer_algorithsm) $(other_algorithms)
-
-# Note - the other_algorithms are not included in libstemmer.  To compile a
-# libstemmer with them in, simply add them to the "libstemmer_algorithms"
-# variable above.
-# They are included in the snowball website as curiosities, but are not
-# intended for general use, and use of them is is not fully supported.
-#
-# german2          - This is a slight modification of the german stemmer.
-# kraaij_pohlmann  - This is a different dutch stemmer.
-# lovins           - This is an english stemmer, but fairly outdated, and
-#                    only really applicable to a restricted type of input text
-#                    (keywords in academic publications).
-#
-# The porter algorithm is included in the libstemmer distribution to assist
-# with backwards compatibility, but for new systems the english algorithm
-# should be used in preference.
-
-# Aliases - these are the 2 and 3 letter ISO 639 codes for each language.
-lang_aliases = danish=da \
-	       danish=dan \
-	       dutch=nl \
-	       dutch=dut \
-	       dutch=nld \
-	       english=en \
-	       english=eng \
-	       finnish=fi \
-	       finnish=fin \
-	       french=fr \
-	       french=fre \
-	       french=fra \
-	       german=de \
-	       german=ger \
-	       german=deu \
-	       italian=it \
-	       italian=ita \
-	       norwegian=no \
-	       norwegian=nor \
-	       portuguese=pt \
-	       portuguese=por \
-	       russian=ru \
-	       russian=rus \
-	       swedish=sv \
-	       swedish=swe
 
 COMPILER_SOURCES = compiler/space.c \
                    compiler/sort.c \
@@ -125,13 +69,13 @@ clean:
 	      $(C_SOURCES) $(C_HEADERS) $(C_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 	rm -rf dist
-	rmdir $(c_src_dir)
+	rmdir $(c_src_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
-libstemmer/modules.h: libstemmer/mkmodules.pl GNUmakefile
-	libstemmer/mkmodules.pl $@ $(c_src_dir) $(libstemmer_algorithms) $(lang_aliases) $(mkmodules_extra)
+libstemmer/modules.h: libstemmer/mkmodules.pl libstemmer/modules.txt
+	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_HEADERS)
 
