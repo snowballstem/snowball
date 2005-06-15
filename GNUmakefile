@@ -180,7 +180,8 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 echo >> mkinc.mak && \
 	 echo 'snowball_headers= \' >> mkinc.mak && \
 	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
-	  | sed 's/$$/ \\/' >> mkinc.mak) && \
+	  | sed 's/$$/ \\/' >> mkinc.mak && \
+	 echo >> mkinc.mak) && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
 	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
