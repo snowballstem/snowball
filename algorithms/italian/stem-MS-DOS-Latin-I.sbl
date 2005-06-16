@@ -107,6 +107,7 @@ backwardmode (
             'ismi' 'abile' 'abili' 'ibile' 'ibili' 'ista' 'iste' 'isti'
             'ist{a`}' 'ist{e`}' 'ist{i`}' 'oso' 'osi' 'osa' 'ose' 'mente'
             'atrice' 'atrici'
+            'ante' 'anti' // Note 1
                ( R2 delete )
             'azione' 'azioni' 'atore' 'atori'
                ( R2 delete
@@ -187,3 +188,8 @@ define stem as (
     )
     do postlude
 )
+
+/*
+    Note 1: additions of 15 Jun 2005
+*/
+
