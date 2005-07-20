@@ -43,8 +43,13 @@ static void wi(struct generator * g, int i) {
     str_append_int(g->outbuf, i); /* integer */
 }
 
-static void wh(struct generator * g, int i) {
+static void wh_ch(struct generator * g, int i) {
     str_append_ch(g->outbuf, "0123456789ABCDEF"[i & 0xF]); /* hexchar */
+}
+
+static void wh(struct generator * g, int i) {
+    if (i >> 4) wh(g, i >> 4);
+    wh_ch(g, i); /* hex integer */
 }
 
 static void wi3(struct generator * g, int i) {
@@ -90,7 +95,7 @@ static void wlitarray(struct generator * g, symbol * p) {  /* write literal arra
                 }
                 wch(g, '\'');
             }  else {
-                wch(g, '0'); wch(g, 'x'); wh(g, ch >> 4); wh(g, ch);
+                wch(g, '0'); wch(g, 'x'); wh(g, ch);
             }
             if (i < SIZE(p) - 1) ws(g, ", ");
         }
