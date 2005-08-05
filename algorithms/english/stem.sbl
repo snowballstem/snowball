@@ -15,6 +15,8 @@ externals ( stem )
 
 groupings ( v v_WXY valid_LI )
 
+stringescapes {}
+
 define v        'aeiouy'
 define v_WXY    v + 'wxY'
 
@@ -22,6 +24,7 @@ define valid_LI 'cdeghkmnrt'
 
 define prelude as (
     unset Y_found
+    do ( ['{'}'] delete)
     do ( ['y'] v <-'Y' set Y_found)
     do repeat(goto (v ['y']) <-'Y' set Y_found)
 )
@@ -52,6 +55,12 @@ backwardmode (
     define R2 as $p2 <= cursor
 
     define Step_1a as (
+        try (
+            [substring] among (
+                '{'}' '{'}s' '{'}s{'}'
+                       (delete)
+            )
+        )
         [substring] among (
             'sses' (<-'ss')
             'ied' 'ies'
