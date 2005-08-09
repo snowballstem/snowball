@@ -68,5 +68,5 @@ define stem as (
         do main_suffix
         do consonant_pair
         do other_suffix
-        )
+    )
 )

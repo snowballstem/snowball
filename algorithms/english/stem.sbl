@@ -203,9 +203,8 @@ define postlude as (Y_found  repeat(goto (['Y']) <-'y'))
 
 define stem as (
 
-    exception1 or (
-
-        test hop 3
+    exception1 or
+    not hop 3 or (
         do prelude
         do mark_regions
         backwards (
