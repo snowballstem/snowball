@@ -41,32 +41,36 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
 STEMWORDS_SOURCES = examples/stemwords.c
 
 ALGORITHMS = $(all_algorithms:%=algorithms/%/stem.sbl)
-C_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
-	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
-	    $(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c)
-C_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
-	    $(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.h) \
-	    $(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.h)
+C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
+		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
+		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c)
+C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
+		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.h) \
+		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.h)
+C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
+C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
-C_OBJECTS = $(C_SOURCES:.c=.o)
+C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
+C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-Iinclude
 CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations
 
-all: snowball libstemmer.o stemwords
+all: snowball libstemmer.o stemwords $(C_OTHER_OBJECTS)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
 	      libstemmer.o stemwords libstemmer/modules.h snowball.splint \
-	      $(C_SOURCES) $(C_HEADERS) $(C_OBJECTS) \
+	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
+	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 	rm -rf dist
 	rmdir $(c_src_dir) || true
@@ -77,9 +81,9 @@ snowball: $(COMPILER_OBJECTS)
 libstemmer/modules.h: libstemmer/mkmodules.pl libstemmer/modules.txt
 	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt
 
-libstemmer/libstemmer.o: libstemmer/modules.h $(C_HEADERS)
+libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
-libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_OBJECTS)
+libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
@@ -151,7 +155,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 # Make a distribution of all the sources required to compile the C library.
 dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
-	    $(C_SOURCES) $(C_HEADERS)
+	    $(C_LIB_SOURCES) $(C_LIB_HEADERS)
 	destname=libstemmer_c; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
@@ -161,7 +165,7 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/examples && \
 	cp -a examples/stemwords.c $${dest}/examples && \
 	mkdir -p $${dest}/$(c_src_dir) && \
-	cp -a $(C_SOURCES) $(C_HEADERS) $${dest}/$(c_src_dir) && \
+	cp -a $(C_LIB_SOURCES) $(C_LIB_HEADERS) $${dest}/$(c_src_dir) && \
 	mkdir -p $${dest}/runtime && \
 	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
 	mkdir -p $${dest}/libstemmer && \
