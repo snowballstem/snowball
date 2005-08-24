@@ -5,7 +5,7 @@ extern "C" {
 #endif
 
 struct sb_stemmer;
-typedef char sb_symbol;
+typedef unsigned char sb_symbol;
 
 /* FIXME - should be able to get a version number for each stemming
  * algorithm (which will be incremented each time the output changes). */
