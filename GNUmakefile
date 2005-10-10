@@ -180,11 +180,13 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 ls include/*.h >> MANIFEST && \
 	 echo 'snowball_sources= \' >> mkinc.mak && \
 	 ls $(c_src_dir)/*.c runtime/*.c libstemmer/*.c \
-	  | sed 's/$$/ \\/' >> mkinc.mak && \
+	  | perl -ne 'print " \\\n" if $$neednl;chomp($$_);print $$_;$$neednl=1' >> mkinc.mak && \
+	 echo >> mkinc.mak && \
 	 echo >> mkinc.mak && \
 	 echo 'snowball_headers= \' >> mkinc.mak && \
 	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
-	  | sed 's/$$/ \\/' >> mkinc.mak && \
+	  | perl -ne 'print " \\\n" if $$neednl;chomp($$_);print $$_;$$neednl=1' >> mkinc.mak && \
+	 echo >> mkinc.mak && \
 	 echo >> mkinc.mak) && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
