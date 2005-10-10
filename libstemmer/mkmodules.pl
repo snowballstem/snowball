@@ -104,10 +104,14 @@ EOS
 typedef enum {
   ENC_UNKNOWN,
 EOS
+    my $neednl = 0;
     for $enc (sort keys %encs) {
-        print OUT "  ENC_${enc},\n";
+        print OUT ",\n" if $neednl;
+        print OUT "  ENC_${enc}";
+        $neednl = 1;
     }
     print OUT <<EOS;
+
 } stemmer_encoding;
 
 struct stemmer_encoding {
