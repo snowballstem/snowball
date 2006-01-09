@@ -25,7 +25,7 @@ define valid_LI 'cdeghkmnrt'
 define prelude as (
     unset Y_found
     do ( ['{'}'] delete)
-    do ( ['y'] v <-'Y' set Y_found)
+    do ( ['y'] <-'Y' set Y_found)
     do repeat(goto (v ['y']) <-'Y' set Y_found)
 )
 
