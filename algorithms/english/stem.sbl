@@ -64,7 +64,7 @@ backwardmode (
         [substring] among (
             'sses' (<-'ss')
             'ied' 'ies'
-                   ((next atlimit <-'ie') or <-'i')
+                   ((hop 2 <-'i') or <-'ie')
             's'    (next gopast v delete)
             'us' 'ss'
         )
