@@ -325,7 +325,7 @@ public class SnowballProgram {
     protected int replace_s(int c_bra, int c_ket, String s)
     {
 	int adjustment = s.length() - (c_ket - c_bra);
-	current.replace(bra, ket, s);
+	current.replace(c_bra, c_ket, s);
 	limit += adjustment;
 	if (cursor >= c_ket) cursor += adjustment;
 	else if (cursor > c_bra) cursor = c_bra;
