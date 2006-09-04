@@ -4,11 +4,13 @@ c_src_dir = src_c
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
-libstemmer_algorithms = danish dutch english finnish french german italian \
+libstemmer_algorithms = danish dutch english finnish french german hungarian \
+			italian \
 			norwegian porter portuguese russian spanish swedish
 
 KOI8_R_algorithms = russian
-ISO_8859_1_algorithms = danish dutch english finnish french german italian \
+ISO_8859_1_algorithms = danish dutch english finnish french german hungarian \
+			italian \
 			norwegian porter portuguese spanish swedish
 
 other_algorithms = german2 kraaij_pohlmann lovins
