@@ -15,7 +15,7 @@ ISO_8859_1_algorithms = danish dutch english finnish french german hungarian \
 
 other_algorithms = german2 kraaij_pohlmann romanian1 romanian2 lovins
 
-all_algorithms = $(libstemmer_algorithsm) $(other_algorithms)
+all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
 COMPILER_SOURCES = compiler/space.c \
                    compiler/sort.c \
@@ -65,7 +65,7 @@ JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 CFLAGS=-Iinclude
 CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations
 
-all: snowball libstemmer.o stemwords $(C_OTHER_OBJECTS)
+all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \

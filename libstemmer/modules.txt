@@ -15,6 +15,7 @@ english         UTF_8,ISO_8859_1        english,en,eng
 finnish         UTF_8,ISO_8859_1        finnish,fi,fin
 french          UTF_8,ISO_8859_1        french,fr,fre,fra
 german          UTF_8,ISO_8859_1        german,de,ger,deu
+hungarian       UTF_8,ISO_8859_1        hungarian,hu,hun
 italian         UTF_8,ISO_8859_1        italian,it,ita
 norwegian       UTF_8,ISO_8859_1        norwegian,no,nor
 portuguese      UTF_8,ISO_8859_1        portuguese,pt,por
@@ -40,3 +41,8 @@ porter          UTF_8,ISO_8859_1        porter
 # lovins           - This is an english stemmer, but fairly outdated, and
 #                    only really applicable to a restricted type of input text
 #                    (keywords in academic publications).
+# romanian1        - This is a romanian stemmer, which we haven't yet
+#                    evaluated.
+# romanian2        - This is a different romanian stemmer, which we haven't
+#                    yet evaluated.
+
