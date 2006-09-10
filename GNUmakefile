@@ -39,6 +39,7 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
+LIBSTEMMER_EXTRA = libstemmer/modules.txt
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
@@ -141,6 +142,7 @@ dist: dist_snowball dist_libstemmer_c dist_libstemmer_java
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	    $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+	    $(LIBSTEMMER_EXTRA) \
 	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
 	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
 	destname=snowball_code; \
@@ -158,6 +160,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 # Make a distribution of all the sources required to compile the C library.
 dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+            $(LIBSTEMMER_EXTRA) \
 	    $(C_LIB_SOURCES) $(C_LIB_HEADERS)
 	destname=libstemmer_c; \
 	dest=dist/$${destname}; \
@@ -172,7 +175,7 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/runtime && \
 	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
 	mkdir -p $${dest}/libstemmer && \
-	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $${dest}/libstemmer && \
+	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $(LIBSTEMMER_EXTRA) $${dest}/libstemmer && \
 	mkdir -p $${dest}/include && \
 	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
 	(cd $${dest} && \
@@ -206,6 +209,7 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 # Make a distribution of all the sources required to compile the Java library.
 dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+            $(LIBSTEMMER_EXTRA) \
 	    $(JAVA_SOURCES)
 	destname=libstemmer_java; \
 	dest=dist/$${destname}; \
