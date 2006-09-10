@@ -43,6 +43,7 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
 STEMWORDS_SOURCES = examples/stemwords.c
 
 ALGORITHMS = $(all_algorithms:%=algorithms/%/stem.sbl)
+ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
 		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c)
@@ -140,7 +141,7 @@ dist: dist_snowball dist_libstemmer_c dist_libstemmer_java
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	    $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
-	    $(ALGORITHMS) $(STEMWORDS_SOURCES) \
+	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
 	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
 	destname=snowball_code; \
 	dest=dist/$${destname}; \
@@ -149,7 +150,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	for file in $^; do \
 	  dir=`dirname $$file` && \
 	  mkdir -p $${dest}/$${dir} && \
-	  cp $${file} $${dest}/$${dir} || exit 1 ; \
+	  cp -a $${file} $${dest}/$${dir} || exit 1 ; \
 	done && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
