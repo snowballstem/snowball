@@ -10,8 +10,8 @@
 /* prototypes */
 
 static void generate(struct generator * g, struct node * p);
-static void w(struct generator * g, char * s);
-static void writef(struct generator * g, char * s, struct node * p);
+static void w(struct generator * g, const char * s);
+static void writef(struct generator * g, const char * s, struct node * p);
 
 
 enum special_labels {
@@ -53,7 +53,7 @@ static void write_newline(struct generator * g) {
     str_append_string(g->outbuf, "\n");
 }
 
-static void write_string(struct generator * g, char * s) {
+static void write_string(struct generator * g, const char * s) {
 
     str_append_string(g->outbuf, s);
 }
@@ -269,7 +269,7 @@ static void write_check_limit(struct generator * g, struct node * p) {
 }
 
 /* Formatted write. */
-static void writef(struct generator * g, char * input, struct node * p) {
+static void writef(struct generator * g, const char * input, struct node * p) {
 
     int i = 0;
     int l = strlen(input);
@@ -305,7 +305,7 @@ static void writef(struct generator * g, char * input, struct node * p) {
     }
 }
 
-static void w(struct generator * g, char * s) {
+static void w(struct generator * g, const char * s) {
     writef(g, s, 0);
 }
 

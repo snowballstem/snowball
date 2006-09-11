@@ -102,7 +102,7 @@ EOS
     print OUT <<EOS;
 
 typedef enum {
-  ENC_UNKNOWN,
+  ENC_UNKNOWN=0,
 EOS
     my $neednl = 0;
     for $enc (sort keys %encs) {
@@ -112,11 +112,11 @@ EOS
     }
     print OUT <<EOS;
 
-} stemmer_encoding;
+} stemmer_encoding_t;
 
 struct stemmer_encoding {
   const char * name;
-  stemmer_encoding enc;
+  stemmer_encoding_t enc;
 };
 static struct stemmer_encoding encodings[] = {
 EOS
@@ -124,12 +124,12 @@ EOS
         print OUT "  {\"${enc}\", ENC_${enc}},\n";
     }
     print OUT <<EOS;
-  {0,0}
+  {0,ENC_UNKNOWN}
 };
 
 struct stemmer_modules {
   const char * name;
-  stemmer_encoding enc; 
+  stemmer_encoding_t enc; 
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
@@ -148,7 +148,7 @@ EOS
     }
 
     print OUT <<EOS;
-  {0,0,0,0,0}
+  {0,ENC_UNKNOWN,0,0,0}
 };
 EOS
 

@@ -35,7 +35,7 @@ static void wnl(struct generator * g) {
     g->line_count++;
 }
 
-static void ws(struct generator * g, char * s) {
+static void ws(struct generator * g, const char * s) {
     str_append_string(g->outbuf, s); /* string */
 }
 
@@ -135,7 +135,7 @@ static void wc(struct generator * g, struct node * p) { /* comment */
     wnl(g);
 }
 
-static void wms(struct generator * g, char * s) {
+static void wms(struct generator * g, const char * s) {
     wm(g); ws(g, s);   } /* margin + string */
 
 static void wbs(struct generator * g) { /* block start */
@@ -155,7 +155,7 @@ static void wk(struct generator * g, struct node * p) {     /* keep c */
                                  "int m = z->l - z->c; (void) m;");
 }
 
-static char * restore_string(struct generator * g, struct node * p) {
+static const char * restore_string(struct generator * g, struct node * p) {
 
     (void) g;   /* to suppress compiler warning */
     return p->mode == m_forward ? "z->c = c;" :
@@ -206,7 +206,7 @@ static void wlim(struct generator * g, struct node * p) {     /* if at limit fai
     wf(g);
 }
 
-static void wp(struct generator * g, char * s, struct node * p) { /* formatted write */
+static void wp(struct generator * g, const char * s, struct node * p) { /* formatted write */
     int i = 0;
     int l = strlen(s);
     until (i >= l) {
@@ -249,7 +249,7 @@ static void wp(struct generator * g, char * s, struct node * p) { /* formatted w
     }
 }
 
-static void w(struct generator * g, char * s) { wp(g, s, 0); }
+static void w(struct generator * g, const char * s) { wp(g, s, 0); }
 
 static void generate_AE(struct generator * g, struct node * p) {
     char * s;
@@ -405,7 +405,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
     int used = g->label_used;
     int a0 = g->failure_label;
-    char * a1 = g->failure_string;
+    const char * a1 = g->failure_string;
 
     int out_lab = new_label(g);
 
@@ -450,7 +450,7 @@ static void generate_not(struct generator * g, struct node * p) {
 
     int used = g->label_used;
     int a0 = g->failure_label;
-    char * a1 = g->failure_string;
+    const char * a1 = g->failure_string;
 
     if (keep_c) wp(g, "~{~k~C", p);
            else wp(g, "~M~C", p);
@@ -556,7 +556,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     int used = g->label_used;
     int a0 = g->failure_label;
-    char * a1 = g->failure_string;
+    const char * a1 = g->failure_string;
 
     w(g, "~Mwhile(1) {"); wp(g, "~C~+", p);
 
@@ -620,7 +620,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
     {
         int used = g->label_used;
         int a0 = g->failure_label;
-        char * a1 = g->failure_string;
+        const char * a1 = g->failure_string;
 
         generate_repeat(g, p, true);
 
@@ -778,7 +778,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     int used = g->label_used;
     int a0 = g->failure_label;
-    char * a1 = g->failure_string;
+    const char * a1 = g->failure_string;
     g->failure_label = new_label(g);
     g->label_used = 0;
     g->failure_string = 0;
@@ -933,7 +933,7 @@ static void generate(struct generator * g, struct node * p) {
 
     int used = g->label_used;
     int a0 = g->failure_label;
-    char * a1 = g->failure_string;
+    const char * a1 = g->failure_string;
 
     switch (p->type)
     {
@@ -1028,10 +1028,20 @@ static void generate_routine_headers(struct generator * g) {
     until (q == 0) {
         g->V[0] = q;
         switch (q->type) {
-            case t_routine:  g->S[0] = "static"; goto label0;
-            case t_external: g->S[0] = "extern";
-            label0:
-                w(g, "~S0 int ~W0(struct SN_env * z);~N");
+            case t_routine:
+                w(g, "static int ~W0(struct SN_env * z);~N");
+                break;
+            case t_external:
+                w(g,
+                  "#ifdef __cplusplus~N"
+                  "extern \"C\" {~N"
+                  "#endif~N"
+                  "extern int ~W0(struct SN_env * z);~N"
+                  "#ifdef __cplusplus~N"
+                  "}~N"
+                  "#endif~N"
+                  );
+                break;
         }
         q = q->next;
     }
@@ -1144,7 +1154,8 @@ static void generate_close(struct generator * g) {
 static void generate_create_and_close_templates(struct generator * g) {
     w(g, "~N"
          "extern struct SN_env * ~pcreate_env(void);~N"
-         "extern void ~pclose_env(struct SN_env * z);~N~N");
+         "extern void ~pclose_env(struct SN_env * z);~N"
+         "~N");
 }
 
 static void generate_header_file(struct generator * g) {
@@ -1157,7 +1168,6 @@ static void generate_header_file(struct generator * g) {
          "#ifdef __cplusplus~N"
          "extern \"C\" {~N"
          "#endif~N");            /* for C++ */
-
 
     generate_create_and_close_templates(g);
     until (q == 0) {
@@ -1196,7 +1206,15 @@ extern void generate_program_c(struct generator * g) {
     generate_start_comment(g);
     generate_head(g);
     generate_routine_headers(g);
+    w(g, "#ifdef __cplusplus~N"
+         "extern \"C\" {~N"
+         "#endif~N"
+         "~N");
     generate_create_and_close_templates(g);
+    w(g, "~N"
+         "#ifdef __cplusplus~N"
+         "}~N"
+         "#endif~N");
     generate_amongs(g);
     generate_groupings(g);
     g->declarations = g->outbuf;

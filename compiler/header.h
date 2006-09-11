@@ -26,7 +26,7 @@ extern symbol * move_to_b(symbol * p, int n, symbol * q);
 extern symbol * add_to_b(symbol * p, int n, symbol * q);
 extern symbol * copy_b(symbol * p);
 extern char * b_to_s(symbol * p);
-extern symbol * add_s_to_b(symbol * p, char * s);
+extern symbol * add_s_to_b(symbol * p, const char * s);
 
 struct str; /* defined in space.c */
 
@@ -35,7 +35,7 @@ extern void str_delete(struct str * str);
 extern void str_append(struct str * str, struct str * add);
 extern void str_append_ch(struct str * str, char add);
 extern void str_append_b(struct str * str, symbol * q);
-extern void str_append_string(struct str * str, char * s);
+extern void str_append_string(struct str * str, const char * s);
 extern void str_append_int(struct str * str, int i);
 extern void str_clear(struct str * str);
 extern void str_assign(struct str * str, char * s);
@@ -45,7 +45,7 @@ extern int str_len(struct str * str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 
-extern void sort(void * p, void * p_end, int unit, int (*f)());
+extern void sort(void * p, void * p_end, int unit, int (*f)(void *, void *));
 
 struct m_pair {
 
@@ -259,14 +259,14 @@ struct generator {
     int next_label;
     int margin;
 
-    char * failure_string;     /* String to output in case of a failure. */
+    const char * failure_string;     /* String to output in case of a failure. */
     struct str * failure_str;  /* This is used by the java generator instead of failure_string */
 
     int label_used;     /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
 
-    char * S[10];        /* strings */
+    const char * S[10];        /* strings */
     symbol * B[10];      /* blocks */
     int I[10];           /* integers */
     struct name * V[5];  /* variables */

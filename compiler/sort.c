@@ -9,7 +9,7 @@ static void merge_part(char * p1, char * p1_end,  /* source 1 */
                        char * p2, char * p2_end,  /* source 2 */
                        char * s,                  /* destination */
                        int unit,                  /* size of each item */
-                       int (*f)())                /* comparison routine */
+                       int (*f)(void *, void *))                /* comparison routine */
 {
     repeat
     {   if (p1 >= p1_end) { memmove(s, p2, p2_end - p2); return; }
@@ -29,7 +29,7 @@ static void merge_all(char * p, char * p_end,  /* source */
                       char * s,                /* destination */
                       int width,               /* size of blocks to merge */
                       int unit,                /* size of each item */
-                      int (*f)())              /* comparison routine */
+                      int (*f)(void *, void *))              /* comparison routine */
 {
     repeat
     {   char * p2 = p + width;
@@ -44,7 +44,7 @@ static void merge_all(char * p, char * p_end,  /* source */
     }
 }
 
-extern void sort(void * p, void * p_end, int unit, int (*f)()) {
+extern void sort(void * p, void * p_end, int unit, int (*f)(void *, void *)) {
     int size = (char *) p_end - (char *) p;
     char * s = (char *) MALLOC(size);
     char * s_end = s + size;

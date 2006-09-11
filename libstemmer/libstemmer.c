@@ -19,7 +19,8 @@ sb_stemmer_list(void)
     return algorithm_names;
 }
 
-static stemmer_encoding sb_getenc(const char * charenc)
+static stemmer_encoding_t
+sb_getenc(const char * charenc)
 {
     struct stemmer_encoding * encoding;
     if (charenc == NULL) return ENC_UTF_8;
@@ -33,7 +34,7 @@ static stemmer_encoding sb_getenc(const char * charenc)
 extern struct sb_stemmer *
 sb_stemmer_new(const char * algorithm, const char * charenc)
 {
-    stemmer_encoding enc;
+    stemmer_encoding_t enc;
     struct stemmer_modules * module;
     struct sb_stemmer * stemmer =
 	    (struct sb_stemmer *) malloc(sizeof(struct sb_stemmer));

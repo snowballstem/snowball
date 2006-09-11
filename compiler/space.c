@@ -109,7 +109,7 @@ extern void check_free(void * p) {
 
 extern char * b_to_s(symbol * p) {
     int n = SIZE(p);
-    char * s = malloc(n + 1);
+    char * s = (char *)malloc(n + 1);
     {
         int i;
         for (i = 0; i < n; i++) s[i] = p[i];
@@ -121,7 +121,7 @@ extern char * b_to_s(symbol * p) {
 /* To add a zero terminated string to a block. If p = 0 the
    block is created. */
 
-extern symbol * add_s_to_b(symbol * p, char * s) {
+extern symbol * add_s_to_b(symbol * p, const char * s) {
     int n = strlen(s);
     int k;
     if (p == 0) p = create_b(n);
@@ -183,7 +183,7 @@ extern void str_append_b(struct str * str, symbol * q) {
 }
 
 /* Append a (char *, null teminated) string to a str. */
-extern void str_append_string(struct str * str, char * s) {
+extern void str_append_string(struct str * str, const char * s) {
 
     str->data = add_s_to_b(str->data, s);
 }
@@ -212,9 +212,9 @@ extern void str_assign(struct str * str, char * s) {
 /* Copy a string. */
 extern struct str * str_copy(struct str * old) {
 
-    struct str * new = str_new();
-    str_append(new, old);
-    return new;
+    struct str * newstr = str_new();
+    str_append(newstr, old);
+    return newstr;
 }
 
 /* Get the data stored in this str. */
