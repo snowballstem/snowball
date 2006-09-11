@@ -43,7 +43,6 @@ LIBSTEMMER_EXTRA = libstemmer/modules.txt
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
-ALGORITHMS = $(all_algorithms:%=algorithms/%/stem.sbl)
 ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
@@ -93,30 +92,26 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
 
-algorithms/%/stem-Unicode.sbl: algorithms/%/stem.sbl
-	cp $^ $@
-algorithms/russian/stem-KOI8-R.sbl: algorithms/russian/stem.sbl
-	cp $^ $@
-algorithms/%/stem-ISO-8859-1.sbl: algorithms/%/stem.sbl
+algorithms/%/stem_Unicode.sbl: algorithms/%/stem_ISO_8859_1.sbl
 	cp $^ $@
 
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%/stem-Unicode.sbl snowball
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem-Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_UTF_8_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u"; \
 	./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u
 
-$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%/stem-KOI8-R.sbl snowball
+$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%/stem_KOI8_R.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem-KOI8-R.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)/stem_KOI8_R.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_KOI8_R_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/stem-ISO-8859-1.sbl snowball
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/stem_ISO_8859_1.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem-ISO-8859-1.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)/stem_ISO_8859_1.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_ISO_8859_1_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
@@ -124,9 +119,9 @@ $(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) -O4 -c -o $@ $< -Wall
 
-$(java_src_dir)/%Stemmer.java: algorithms/%/stem-Unicode.sbl snowball
+$(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(java_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem-Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
 	echo "./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
 	./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
