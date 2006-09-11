@@ -17,7 +17,7 @@ struct SN_env {
     int S_size; int I_size; int B_size;
     symbol * * S;
     int * I;
-    symbol * B;
+    unsigned char * B;
 };
 
 extern struct SN_env * SN_create_env(int S_size, int I_size, int B_size);

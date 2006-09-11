@@ -31,7 +31,7 @@ extern struct SN_env * SN_create_env(int S_size, int I_size, int B_size)
 
     if (B_size)
     {
-        z->B = (symbol *) calloc(B_size, sizeof(symbol));
+        z->B = (unsigned char *) calloc(B_size, sizeof(unsigned char));
         if (z->B == NULL) goto error;
         z->B_size = B_size;
     }
