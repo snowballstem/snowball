@@ -19,43 +19,40 @@ extern struct SN_env * SN_create_env(int S_size, int I_size, int B_size)
             z->S[i] = create_s();
             if (z->S[i] == NULL) goto error;
         }
-        z->S_size = S_size;
     }
 
     if (I_size)
     {
         z->I = (int *) calloc(I_size, sizeof(int));
         if (z->I == NULL) goto error;
-        z->I_size = I_size;
     }
 
     if (B_size)
     {
         z->B = (unsigned char *) calloc(B_size, sizeof(unsigned char));
         if (z->B == NULL) goto error;
-        z->B_size = B_size;
     }
 
     return z;
 error:
-    SN_close_env(z);
+    SN_close_env(z, S_size);
     return NULL;
 }
 
-extern void SN_close_env(struct SN_env * z)
+extern void SN_close_env(struct SN_env * z, int S_size)
 {
     if (z == NULL) return;
-    if (z->S_size)
+    if (S_size)
     {
         int i;
-        for (i = 0; i < z->S_size; i++)
+        for (i = 0; i < S_size; i++)
         {
             lose_s(z->S[i]);
         }
         free(z->S);
     }
-    if (z->I_size) free(z->I);
-    if (z->B_size) free(z->B);
+    free(z->I);
+    free(z->B);
     if (z->p) lose_s(z->p);
     free(z);
 }

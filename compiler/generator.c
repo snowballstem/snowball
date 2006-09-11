@@ -1136,7 +1136,9 @@ static void generate_create(struct generator * g) {
 
 static void generate_close(struct generator * g) {
 
-    w(g, "~Nextern void ~pclose_env(struct SN_env * z) { SN_close_env(z); }~N~N");
+    int * p = g->analyser->name_count;
+    g->I[0] = p[t_string];
+    w(g, "~Nextern void ~pclose_env(struct SN_env * z) { SN_close_env(z, ~I0); }~N~N");
 }
 
 static void generate_create_and_close_templates(struct generator * g) {
