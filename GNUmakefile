@@ -63,7 +63,7 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
-CFLAGS=-Iinclude
+CFLAGS=-Iinclude -O2
 CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations
 
 all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
@@ -117,7 +117,7 @@ $(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) -O4 -c -o $@ $< -Wall
+	$(CC) $(CFLAGS) -O2 -c -o $@ $< -Wall
 
 $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(java_src_dir)
