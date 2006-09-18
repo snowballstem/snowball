@@ -38,8 +38,9 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/TestApp.java
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
-LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt
+LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
+LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
+LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
@@ -57,6 +58,7 @@ JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
+LIBSTEMMER_UTF8_OBJECTS=$(LIBSTEMMER_UTF8_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
@@ -70,19 +72,33 @@ all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_O
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
-	      $(LIBSTEMMER_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
-	      libstemmer.o stemwords libstemmer/modules.h snowball.splint \
+	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
+	      libstemmer.o stemwords \
+              libstemmer/modules.h \
+              libstemmer/modules_utf8.h \
+              snowball.splint \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
-	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
+	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+              libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
+              libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
 	rm -rf dist
 	rmdir $(c_src_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
-libstemmer/modules.h: libstemmer/mkmodules.pl libstemmer/modules.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt
+libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
+	cat $^ | sed 's/@MODULES_H@/modules.h/' >$@
+
+libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
+	cat $^ | sed 's/@MODULES_H@/modules_utf8.h/' >$@
+
+libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
+	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
+
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules_utf8.txt
+	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules_utf8.txt libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
@@ -136,7 +152,9 @@ dist: dist_snowball dist_libstemmer_c dist_libstemmer_java
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
-	    $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+	    $(LIBSTEMMER_SOURCES) \
+	    $(LIBSTEMMER_UTF8_SOURCES) \
+            $(LIBSTEMMER_HEADERS) \
 	    $(LIBSTEMMER_EXTRA) \
 	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
 	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
@@ -153,10 +171,17 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C library.
-dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
-            $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
+dist_libstemmer_c: \
+            $(RUNTIME_SOURCES) \
+            $(RUNTIME_HEADERS) \
+            $(LIBSTEMMER_SOURCES) \
+            $(LIBSTEMMER_UTF8_SOURCES) \
+            $(LIBSTEMMER_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
-	    $(C_LIB_SOURCES) $(C_LIB_HEADERS)
+	    $(C_LIB_SOURCES) \
+            $(C_LIB_HEADERS) \
+            libstemmer/mkinc.mak \
+            libstemmer/mkinc_utf8.mak
 	destname=libstemmer_c; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
@@ -170,7 +195,7 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/runtime && \
 	cp -a $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) $${dest}/runtime && \
 	mkdir -p $${dest}/libstemmer && \
-	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) $(LIBSTEMMER_EXTRA) $${dest}/libstemmer && \
+	cp -a $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_UTF8_SOURCES) $(LIBSTEMMER_HEADERS) $(LIBSTEMMER_EXTRA) $${dest}/libstemmer && \
 	mkdir -p $${dest}/include && \
 	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
 	(cd $${dest} && \
@@ -178,17 +203,8 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
 	 ls runtime/*.c runtime/*.h >> MANIFEST && \
 	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
-	 ls include/*.h >> MANIFEST && \
-	 echo 'snowball_sources= \' >> mkinc.mak && \
-	 ls $(c_src_dir)/*.c runtime/*.c libstemmer/*.c \
-	  | perl -ne 'print " \\\n" if $$neednl;chomp($$_);print $$_;$$neednl=1' >> mkinc.mak && \
-	 echo >> mkinc.mak && \
-	 echo >> mkinc.mak && \
-	 echo 'snowball_headers= \' >> mkinc.mak && \
-	 ls $(c_src_dir)/*.h runtime/*.h libstemmer/*.h include/*.h \
-	  | perl -ne 'print " \\\n" if $$neednl;chomp($$_);print $$_;$$neednl=1' >> mkinc.mak && \
-	 echo >> mkinc.mak && \
-	 echo >> mkinc.mak) && \
+	 ls include/*.h >> MANIFEST) && \
+        cp -a libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak $${dest}/ && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
 	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
@@ -203,7 +219,6 @@ dist_libstemmer_c: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 
 # Make a distribution of all the sources required to compile the Java library.
 dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
-            $(LIBSTEMMER_SOURCES) $(LIBSTEMMER_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
 	    $(JAVA_SOURCES)
 	destname=libstemmer_java; \

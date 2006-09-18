@@ -19,6 +19,15 @@ system (or call the compiler directly).  The files to compile are
 all contained in the "libstemmer", "runtime" and "src_c" directories,
 and the public header file is contained in the "include" directory.
 
+The library comes in two flavours; UTF-8 only, and UTF-8 plus other character
+sets.  To use the utf-8 only flavour, compile "libstemmer_utf8.c" instead of
+"libstemmer.c".
+
+For convenience "mkinc.mak" is a makefile fragment listing the source files and
+header files used to compile the standard version of the library.
+"mkinc_utf8.mak" is a comparable makefile fragment listing just the source
+files for the UTF-8 only version of the library.
+
 
 Using the library
 =================

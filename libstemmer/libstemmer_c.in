@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../include/libstemmer.h"
 #include "../runtime/api.h"
-#include "modules.h"
+#include "@MODULES_H@"
 
 struct sb_stemmer {
     struct SN_env * (*create)(void);
