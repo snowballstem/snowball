@@ -36,6 +36,7 @@ define mark_regions as (
         among (
             'gener'
             'commun'  //  added May 2005
+            'arsen'   //  added Nov 2006 (arsenic/arsenal)
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
