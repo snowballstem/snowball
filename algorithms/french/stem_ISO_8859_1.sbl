@@ -54,7 +54,16 @@ define mark_regions as (
     $p2 = limit  // defaults
 
     do (
-        ( v v next ) or ( next gopast v )
+        ( v v next )
+        or
+        among ( // this exception list begun Nov 2006
+            'par'  // paris, parie, pari
+            'col'  // colis
+            'tap'  // tapis
+            // extensions possible here
+        )
+        or
+        ( next gopast v )
         setmark pV
     )
     do (
