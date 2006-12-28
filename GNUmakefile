@@ -89,10 +89,10 @@ snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
 libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
-	cat $^ | sed 's/@MODULES_H@/modules.h/' >$@
+	sed 's/@MODULES_H@/modules.h/' $^ >$@
 
 libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
-	cat $^ | sed 's/@MODULES_H@/modules_utf8.h/' >$@
+	sed 's/@MODULES_H@/modules_utf8.h/' $^ >$@
 
 libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
 	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
