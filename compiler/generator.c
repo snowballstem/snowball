@@ -1,8 +1,12 @@
 
+#include <limits.h>  /* for INT_MAX */
 #include <stdio.h>   /* for fprintf etc */
 #include <stdlib.h>  /* for free etc */
 #include <string.h>  /* for strlen */
 #include "header.h"
+
+/* Define this to get warning messages when optimisations can't be used. */
+/* #define OPTIMISATION_WARNINGS */
 
 /* recursive use: */
 
@@ -873,10 +877,110 @@ static void generate_define(struct generator * g, struct node * p) {
 static void generate_substring(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
+    int block = -1;
+    unsigned int bitmap = 0;
+    struct amongvec * among_cases = x->b;
+    int c;
+    int empty_case = -1;
+    int n_cases = 0;
+    symbol cases[2];
+    int shortest_size = INT_MAX; /* Only if p->mode == m_forward */
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
+
+    if (p->mode == m_forward) {
+	/* In forward mode with non-ASCII UTF-8 characters, the first character
+	 * of the string will often be the same, so instead look at the last
+	 * common character position. */
+	for (c = 0; c < x->literalstring_count; ++c) {
+	    int size = among_cases[c].size;
+	    if (size != 0 && size < shortest_size) {
+		shortest_size = size;
+	    }
+	}
+    }
+
+    for (c = 0; c < x->literalstring_count; ++c) {
+	symbol ch;
+	if (among_cases[c].size == 0) {
+	    empty_case = c;
+	    continue;
+	}
+	if (p->mode == m_forward) {
+	    ch = among_cases[c].b[shortest_size - 1];
+	} else {
+	    ch = among_cases[c].b[among_cases[c].size - 1];
+	}
+	if (n_cases == 0) {
+	    block = ch >> 5;
+	} else if (ch >> 5 != block) {
+	    block = -1;
+	    if (n_cases > 2) break;
+	}
+	if (block == -1) {
+	    if (ch == cases[0]) continue;
+	    if (n_cases < 2) {
+		cases[n_cases++] = ch;
+	    } else if (ch != cases[1]) {
+		++n_cases;
+		break;
+	    }
+	} else {
+	    if ((bitmap & (1u << (ch & 0x1f))) == 0) {
+		bitmap |= 1u << (ch & 0x1f);
+		if (n_cases < 2)
+		    cases[n_cases] = ch;
+		++n_cases;
+	    }
+	}
+    }
+
+    if (block != -1 || n_cases <= 2) {
+	char buf[64];
+	g->I[2] = block;
+	g->I[3] = bitmap;
+	if (p->mode == m_forward) {
+	    sprintf(buf, "z->p[z->c + %d]", shortest_size - 1);
+	    g->S[1] = buf;
+	    g->I[4] = shortest_size - 1;
+	    wp(g, "~Mif (z->c + ~I4 >= z->l || ", p);
+	} else {
+	    g->S[1] = "z->p[z->c - 1]";
+	    wp(g, "~Mif (z->c <= z->lb || ", p);
+	}
+	if (n_cases == 0) {
+	    /* We get this for the degenerate case: among { '' }
+	     * This doesn't seem to be a useful construct, but it is
+	     * syntactically valid.
+	     */
+	    wp(g, "0", p);
+	} else if (n_cases == 1) {
+	    g->I[4] = cases[0];
+	    wp(g, "~S1 != ~I4", p);
+	} else if (n_cases == 2) {
+	    g->I[4] = cases[0];
+	    g->I[5] = cases[1];
+	    wp(g, "(~S1 != ~I4 && ~S1 != ~I5)", p);
+	} else {
+	    wp(g, "~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
+	}
+	ws(g, ") ");
+	if (empty_case != -1) {
+	    /* If the among includes the empty string, it can never fail
+	     * so not matching the bitmap means we match the empty string.
+	     */
+	    g->I[4] = among_cases[empty_case].result;
+	    wp(g, "among_var = ~I4; else~N", p);
+	} else {
+	    wp(g, "~f~N", p);
+	}
+    } else {
+#ifdef OPTIMISATION_WARNINGS
+	printf("Couldn't shortcut among %d\n", x->number);
+#endif
+    }
 
     if (x->command_count == 0 && x->starter == 0)
         wp(g, "~Mif (!(find_among~S0(z, a_~I0, ~I1))) ~f~C", p);
