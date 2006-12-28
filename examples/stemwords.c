@@ -45,9 +45,8 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
             }
 
             if (pretty) {
-                int j;
-                for (j = 0; j < i; j++) fprintf(f_out, "%c", b[j]);
-                fprintf(f_out, "%s", " -> ");
+		fwrite(b, i, 1, f_out);
+		fputs(" -> ", f_out);
             }
 	    {
 		const sb_symbol * stemmed = sb_stemmer_stem(stemmer, b, i);
@@ -58,11 +57,8 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                 }
                 else
                 {
-                    int j;
-                    /*for (j = 0; j < z->l; j++) */
-                    for (j = 0; stemmed[j] != 0; j++)
-                        fprintf(f_out, "%c", stemmed[j]);
-                    fprintf(f_out, "\n");
+		    fputs((char *)stemmed, f_out);
+		    putc('\n', f_out);
                 }
             }
         }
