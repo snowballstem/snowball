@@ -45,7 +45,7 @@ extern int str_len(struct str * str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 
-extern void sort(void * p, void * p_end, int unit, int (*f)(void *, void *));
+extern void sort(void * p, void * p_end, int unit, int (*f)(const void *, const void *));
 
 struct m_pair {
 
