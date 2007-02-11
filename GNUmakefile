@@ -25,8 +25,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/driver.c \
 		   compiler/generator_java.c
 COMPILER_HEADERS = compiler/header.h \
-		   compiler/syswords \
-		   compiler/syswords2
+		   compiler/syswords.h \
+		   compiler/syswords2.h
 
 RUNTIME_SOURCES  = runtime/api.c \
 		   runtime/utilities.c
