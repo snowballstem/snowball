@@ -11,18 +11,19 @@ static int eq(char * s1, char * s2) {
 }
 
 static void print_arglist(void) {
-    fprintf(stderr, "options are: file [-o[utput] file]\n"
-                    "                  [-s[yntax]]\n"
+    fprintf(stderr, "Usage: snowball <file> [options]\n\n"
+	            "options are: [-o[utput] file]\n"
+                    "             [-s[yntax]]\n"
 #ifndef DISABLE_JAVA
-                    "                  [-j[ava]]\n"
+                    "             [-j[ava]]\n"
 #endif
-                    "                  [-w[idechars]]\n"
-                    "                  [-u[tf8]]\n"
-                    "                  [-n[ame] class name]\n"
-                    "                  [-ep[refix] string]\n"
-                    "                  [-vp[refix] string]\n"
-                    "                  [-i[nclude] directory]\n"
-                    "                  [-r[untime] path to runtime headers]\n"
+                    "             [-w[idechars]]\n"
+                    "             [-u[tf8]]\n"
+                    "             [-n[ame] class name]\n"
+                    "             [-ep[refix] string]\n"
+                    "             [-vp[refix] string]\n"
+                    "             [-i[nclude] directory]\n"
+                    "             [-r[untime] path to runtime headers]\n"
            );
     exit(1);
 }
