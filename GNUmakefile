@@ -18,7 +18,6 @@ other_algorithms = german2 kraaij_pohlmann romanian1 romanian2 lovins
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
 COMPILER_SOURCES = compiler/space.c \
-                   compiler/sort.c \
 		   compiler/tokeniser.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
