@@ -237,18 +237,25 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
-check: check_latin1 check_utf8
+check: check_utf8 check_latin1 check_koi8r
+
+check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
 
 check_latin1: $(ISO_8859_1_algorithms:%=check_latin1_%)
 
-check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
+check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
+
+check_utf8_%: ../data/%
+	./stemwords -c UTF_8 -l `echo $^|sed 's!.*/!!'` -i $^/voc.txt -o tmp.txt
+	diff $^/output.txt tmp.txt
+	rm tmp.txt
 
 check_latin1_%: ../data/%
 	iconv -fUTF8 -tISO8859-1 $^/voc.txt|./stemwords -c ISO_8859_1 -l `echo $^|sed 's!.*/!!'` -o tmp.txt
 	iconv -fUTF8 -tISO8859-1 $^/output.txt|diff - tmp.txt
 	rm tmp.txt
 
-check_utf8_%: ../data/%
-	./stemwords -c UTF_8 -l `echo $^|sed 's!.*/!!'` -i $^/voc.txt -o tmp.txt
-	diff $^/output.txt tmp.txt
+check_koi8r_%: ../data/%
+	iconv -fUTF8 -tKOI8R $^/voc.txt|./stemwords -c KOI8_R -l `echo $^|sed 's!.*/!!'` -o tmp.txt
+	iconv -fUTF8 -tKOI8R $^/output.txt|diff - tmp.txt
 	rm tmp.txt
