@@ -155,19 +155,22 @@ static void wbe(struct generator * g) {    /* block end */
 }
 
 static void wk(struct generator * g, struct node * p) {     /* keep c */
-    ws(g, p->mode == m_forward ? "int c = z->c;" :
-                                 "int m = z->l - z->c; (void) m;");
+    ++g->keep_count;
+    if (p->mode == m_forward) {
+	ws(g, "int c"); wi(g, g->keep_count); ws(g, " = z->c;");
+    } else {
+	ws(g, "int m"); wi(g, g->keep_count); ws(g, " = z->l - z->c; (void)m");
+	wi(g, g->keep_count); ws(g, ";");
+    }
 }
 
-static const char * restore_string(struct generator * g, struct node * p) {
-
-    (void) g;   /* to suppress compiler warning */
-    return p->mode == m_forward ? "z->c = c;" :
-                                  "z->c = z->l - m;";
-}
-
-static void wr(struct generator * g, struct node * p) {     /* restore c */
-    ws(g, restore_string(g, p));
+static void wrestore(struct generator * g, struct node * p, int keep_token) {     /* restore c */
+    if (p->mode == m_forward) {
+	ws(g, "z->c = c");
+    } else {
+	ws(g, "z->c = z->l - m");
+    }
+    wi(g, keep_token); ws(g, ";");
 }
 
 static void winc(struct generator * g, struct node * p) {     /* increment c */
@@ -224,7 +227,6 @@ static void wp(struct generator * g, const char * s, struct node * p) { /* forma
                 ws(g, p->mode == m_forward ? "int c_test = z->c;" :
                                              "int m_test = z->l - z->c;");
                 continue;
-            case 'r': wr(g, p); continue;
             case 'R': /* restore for c_test */
                 ws(g, p->mode == m_forward ? "z->c = c_test;" :
                                              "z->c = z->l - m_test;");
@@ -392,20 +394,26 @@ static void generate_bra(struct generator * g, struct node * p) {
 }
 
 static void generate_and(struct generator * g, struct node * p) {
-    int keep_c = K_needed(g, p->left);
-    if (keep_c) wp(g, "~{~k~C", p);
-           else wp(g, "~M~C", p);
+    int keep_c = 0;
+    if (K_needed(g, p->left)) {
+	wp(g, "~{~k~C", p);
+	keep_c = g->keep_count;
+    } else {
+	wp(g, "~M~C", p);
+    }
     p = p->left;
     until (p == 0) {
         generate(g, p);
-        if (keep_c && p->right != 0) wp(g, "~M~r~N", p);
+        if (keep_c && p->right != 0) {
+	    w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+	}
         p = p->right;
     }
     if (keep_c) w(g, "~}");
 }
 
 static void generate_or(struct generator * g, struct node * p) {
-    int keep_c = K_needed(g, p->left);
+    int keep_c = 0;
 
     int used = g->label_used;
     int a0 = g->failure_label;
@@ -413,32 +421,33 @@ static void generate_or(struct generator * g, struct node * p) {
 
     int out_lab = new_label(g);
 
-    if (keep_c) wp(g, "~{~k~C", p);
-           else wp(g, "~M~C", p);
+    if (K_needed(g, p->left)) {
+	wp(g, "~{~k~C", p);
+	keep_c = g->keep_count;
+    } else {
+	wp(g, "~M~C", p);
+    }
     p = p->left;
     g->failure_string = 0;
-    until (p == 0) {
-        if (p->right != 0)
-        {
-            g->failure_label = new_label(g);
-            g->label_used = 0;
-            generate(g, p);
-            wgotol(g, out_lab);
-            if (g->label_used)
-                wsetl(g, g->failure_label);
-            if (keep_c) wp(g, "~M~r~N", p);
-        } else
-        {
-            g->label_used = used;
-            g->failure_label = a0;
-            g->failure_string = a1;
-
-            generate(g, p);
-            if (keep_c) w(g, "~}");
-            wsetl(g, out_lab);
-        }
+    until (p->right == 0) {
+	g->failure_label = new_label(g);
+	g->label_used = 0;
+	generate(g, p);
+	wgotol(g, out_lab);
+	if (g->label_used)
+	    wsetl(g, g->failure_label);
+	if (keep_c) {
+	    w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+	}
         p = p->right;
     }
+    g->label_used = used;
+    g->failure_label = a0;
+    g->failure_string = a1;
+
+    generate(g, p);
+    if (keep_c) w(g, "~}");
+    wsetl(g, out_lab);
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
@@ -450,14 +459,18 @@ static void generate_backwards(struct generator * g, struct node * p) {
 
 
 static void generate_not(struct generator * g, struct node * p) {
-    int keep_c = K_needed(g, p->left);
+    int keep_c = 0;
 
     int used = g->label_used;
     int a0 = g->failure_label;
     const char * a1 = g->failure_string;
 
-    if (keep_c) wp(g, "~{~k~C", p);
-           else wp(g, "~M~C", p);
+    if (K_needed(g, p->left)) {
+	wp(g, "~{~k~C", p);
+	keep_c = g->keep_count;
+    } else {
+	wp(g, "~M~C", p);
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
@@ -476,20 +489,30 @@ static void generate_not(struct generator * g, struct node * p) {
         if (u)
             wsetl(g, l);
     }
-    if (keep_c) wp(g, "~M~r~N"
-                   "~}", p);
+    if (keep_c) {
+	w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N~}");
+    }
 }
 
 
 static void generate_try(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
 
-    if (keep_c) wp(g, "~{~k~C", p);
-           else wp(g, "~M~C", p);
+    if (keep_c) {
+	if (p->mode == m_forward) {
+	    wp(g, "~{int c_keep = z->c;~C", p);
+	    g->failure_string = "z->c = c_keep;";
+	} else {
+	    wp(g, "~{int m_keep = z->l - z->c;/* (void) m_keep;*/~C", p);
+	    g->failure_string = "z->c = z->l - m_keep;";
+	}
+    } else {
+	wp(g, "~M~C", p);
+	g->failure_string = 0;
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
-    g->failure_string = keep_c ? restore_string(g, p) : 0;
     generate(g, p->left);
 
     if (g->label_used)
@@ -525,9 +548,13 @@ static void generate_test(struct generator * g, struct node * p) {
 }
 
 static void generate_do(struct generator * g, struct node * p) {
-    int keep_c = K_needed(g, p->left);
-    if (keep_c) wp(g, "~{~k~C", p);
-           else wp(g, "~M~C", p);
+    int keep_c = 0;
+    if (K_needed(g, p->left)) {
+	wp(g, "~{~k~C", p);
+	keep_c = g->keep_count;
+    } else {
+	wp(g, "~M~C", p);
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
@@ -536,8 +563,10 @@ static void generate_do(struct generator * g, struct node * p) {
 
     if (g->label_used)
         wsetl(g, g->failure_label);
-    if (keep_c) wp(g, "~M~r~N"
-                   "~}", p);
+    if (keep_c) {
+	w(g, "~M"); wrestore(g, p, keep_c);
+	w(g, "~N~}");
+    }
 }
 
 static void generate_next(struct generator * g, struct node * p) {
@@ -556,7 +585,7 @@ static void generate_next(struct generator * g, struct node * p) {
 }
 
 static void generate_GO(struct generator * g, struct node * p, int style) {
-    int keep_c = style == 1 || repeat_restore(g, p->left);
+    int keep_c = 0;
 
     int used = g->label_used;
     int a0 = g->failure_label;
@@ -564,17 +593,25 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     w(g, "~Mwhile(1) {"); wp(g, "~C~+", p);
 
-    if (keep_c) wp(g, "~M~k~N", p);
+    if (style == 1 || repeat_restore(g, p->left)) {
+	wp(g, "~M~k~N", p);
+	keep_c = g->keep_count;
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
     generate(g, p->left);
 
-    if (style == 1) wp(g, "~M~r~N", p);  /* include for goto; omit for gopast */
+    if (style == 1) {
+	/* include for goto; omit for gopast */
+	w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+    }
     w(g, "~Mbreak;~N");
     if (g->label_used)
         wsetl(g, g->failure_label);
-    if (keep_c) wp(g, "~M~r~N", p);
+    if (keep_c) {
+	w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+    }
 
     g->label_used = used;
     g->failure_label = a0;
@@ -597,10 +634,13 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat(struct generator * g, struct node * p, int atleast_case) {
-    int keep_c = repeat_restore(g, p->left);
+    int keep_c = 0;
     wp(g, "~Mwhile(1) {~C~+", p);
 
-    if (keep_c) wp(g, "~M~k~N", p);
+    if (repeat_restore(g, p->left)) {
+	wp(g, "~M~k~N", p);
+	keep_c = g->keep_count;
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
@@ -613,7 +653,9 @@ static void generate_repeat(struct generator * g, struct node * p, int atleast_c
     if (g->label_used)
         wsetl(g, g->failure_label);
 
-    if (keep_c) wp(g, "~M~r~N", p);
+    if (keep_c) {
+	w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+    }
 
     w(g, "~Mbreak;~N"
       "~}");
@@ -761,21 +803,21 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
-    wp(g, "~{int m3;~C"
+    int keep_c;
+    wp(g, "~{int mlimit;~C"
           "~M~k~N"
           , p);
+    keep_c = g->keep_count;
     generate(g, p->left);
-    if (p->mode == m_forward) w(g, "~Mm3 = z->l - z->c; z->l = z->c;~N");
-                         else w(g, "~Mm3 = z->lb; z->lb = z->c;~N");
-    wp(g, "~M~r~N", p);
-    {
-        g->failure_string = p->mode == m_forward ? "z->l += m3;" :
-                                                   "z->lb = m3;";
-        generate(g, p->aux);
-        wms(g, g->failure_string);
-        w(g, "~N"
-          "~}");
-    }
+    if (p->mode == m_forward) w(g, "~Mmlimit = z->l - z->c; z->l = z->c;~N");
+                         else w(g, "~Mmlimit = z->lb; z->lb = z->c;~N");
+    w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+    g->failure_string = p->mode == m_forward ? "z->l += mlimit;" :
+					       "z->lb = mlimit;";
+    generate(g, p->aux);
+    wms(g, g->failure_string);
+    w(g, "~N"
+      "~}");
 }
 
 static void generate_dollar(struct generator * g, struct node * p) {
@@ -870,6 +912,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->failure_string = 0;
     g->failure_label = x_return;
     g->label_used = 0;
+    g->keep_count = 0;
     generate(g, p->left);
     w(g, "~Mreturn 1;~N~}");
 }
