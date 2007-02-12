@@ -246,16 +246,16 @@ check_latin1: $(ISO_8859_1_algorithms:%=check_latin1_%)
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
 check_utf8_%: ../data/% stemwords
-	./stemwords -c UTF_8 -l `echo $^|sed 's!.*/!!'` -i $^/voc.txt -o tmp.txt
-	diff $^/output.txt tmp.txt
+	./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
+	diff $</output.txt tmp.txt
 	rm tmp.txt
 
 check_latin1_%: ../data/% stemwords
-	iconv -fUTF8 -tISO8859-1 $^/voc.txt|./stemwords -c ISO_8859_1 -l `echo $^|sed 's!.*/!!'` -o tmp.txt
-	iconv -fUTF8 -tISO8859-1 $^/output.txt|diff - tmp.txt
+	iconv -fUTF8 -tISO8859-1 $</voc.txt|./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	iconv -fUTF8 -tISO8859-1 $</output.txt|diff - tmp.txt
 	rm tmp.txt
 
 check_koi8r_%: ../data/% stemwords
-	iconv -fUTF8 -tKOI8R $^/voc.txt|./stemwords -c KOI8_R -l `echo $^|sed 's!.*/!!'` -o tmp.txt
-	iconv -fUTF8 -tKOI8R $^/output.txt|diff - tmp.txt
+	iconv -fUTF8 -tKOI8R $</voc.txt|./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	iconv -fUTF8 -tKOI8R $</output.txt|diff - tmp.txt
 	rm tmp.txt
