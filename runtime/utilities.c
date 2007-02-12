@@ -198,9 +198,9 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
         int common = common_i < common_j ? common_i : common_j; /* smaller */
         w = v + k;
         {
-            int i; for (i = common; i < w->s_size; i++) {
+            int i2; for (i2 = common; i2 < w->s_size; i2++) {
                 if (c + common == l) { diff = -1; break; }
-                diff = q[common] - w->s[i];
+                diff = q[common] - w->s[i2];
                 if (diff != 0) break;
                 common++;
             }
@@ -258,9 +258,9 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
         int common = common_i < common_j ? common_i : common_j;
         w = v + k;
         {
-            int i; for (i = w->s_size - 1 - common; i >= 0; i--) {
+            int i2; for (i2 = w->s_size - 1 - common; i2 >= 0; i2--) {
                 if (c - common == lb) { diff = -1; break; }
-                diff = q[- common] - w->s[i];
+                diff = q[- common] - w->s[i2];
                 if (diff != 0) break;
                 common++;
             }
