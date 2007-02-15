@@ -25,8 +25,8 @@ extern void lose_s(symbol * p) {
 }
 
 /*
-   new_p = X_skip_utf8(p, c, lb, l, n); skips n characters forwards from p + c
-   if n +ve, or n characters backwards from p +c - 1 if n -ve. new_p is the new
+   new_p = skip_utf8(p, c, lb, l, n); skips n characters forwards from p + c
+   if n +ve, or n characters backwards from p + c - 1 if n -ve. new_p is the new
    position, or 0 on failure.
 
    -- used to implement hop and next in the utf8 case.
@@ -76,7 +76,7 @@ static int get_utf8(const symbol * p, int c, int l, int * slot) {
     if (b0 < 0xE0 || c == l) {   /* 1110 0000 */
         * slot = (b0 & 0x1F) << 6 | (b1 & 0x3F); return 2;
     }
-    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | (*p & 0x3F); return 3;
+    * slot = (b0 & 0xF) << 12 | (b1 & 0x3F) << 6 | (p[c] & 0x3F); return 3;
 }
 
 static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
@@ -90,7 +90,7 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
     if (b1 >= 0xC0 || c == lb) {   /* 1100 0000 */
         * slot = (b1 & 0x1F) << 6 | (b0 & 0x3F); return 2;
     }
-    * slot = (*p & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
+    * slot = (p[c] & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
 }
 
 extern int in_grouping_U(struct SN_env * z, const unsigned char * s, int min, int max) {
