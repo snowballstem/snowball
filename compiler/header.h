@@ -286,9 +286,8 @@ struct options {
     FILE * output_h;
     FILE * output_java;
     byte syntax_tree;
-    byte make_java;
-    byte make_c;
     byte widechars;
+    enum { LANG_JAVA, LANG_C } make_lang;
     char * externals_prefix;
     char * variables_prefix;
     char * runtime_path;

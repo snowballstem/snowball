@@ -58,8 +58,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->variables_prefix = 0;
     o->runtime_path = 0;
     o->name = "";
-    o->make_c = true;
-    o->make_java = false;
+    o->make_lang = LANG_C;
     o->widechars = false;
     o->includes = 0;
     o->includes_end = 0;
@@ -82,9 +81,8 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             }
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
-                o->make_java = true;
+                o->make_lang = LANG_JAVA;
                 o->widechars = true;
-                o->make_c = false;
                 continue;
             }
 #endif
@@ -167,7 +165,7 @@ extern int main(int argc, char * argv[]) {
                     print_arglist();
                     exit(1);
                 }
-                if (o->make_c) {
+                if (o->make_lang == LANG_C) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".c");
                     o->output_c = get_output(b);
@@ -182,7 +180,7 @@ extern int main(int argc, char * argv[]) {
                     fclose(o->output_h);
                 }
 #ifndef DISABLE_JAVA
-                if (o->make_java) {
+                if (o->make_lang == LANG_JAVA) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".java");
                     o->output_java = get_output(b);
