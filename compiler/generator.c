@@ -572,12 +572,12 @@ static void generate_do(struct generator * g, struct node * p) {
 static void generate_next(struct generator * g, struct node * p) {
     if (g->options->utf8) {
         if (p->mode == m_forward)
-            w(g, "~{int c = skip_utf8(z->p, z->c, 0, z->l, 1");
+            w(g, "~{int ret = skip_utf8(z->p, z->c, 0, z->l, 1");
         else
-            w(g, "~{int c = skip_utf8(z->p, z->c, z->lb, 0, -1");
+            w(g, "~{int ret = skip_utf8(z->p, z->c, z->lb, 0, -1");
         wp(g, ");~N"
-              "~Mif (c < 0) ~f~N"
-              "~Mz->c = c;~C"
+              "~Mif (ret < 0) ~f~N"
+              "~Mz->c = ret;~C"
               "~}", p);
     } else
         wp(g, "~M~l~N"
@@ -699,21 +699,20 @@ static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "+" : "-";
     g->S[1] = p->mode == m_forward ? "0" : "z->lb";
     if (g->options->utf8) {
-        w(g, "~{int c = skip_utf8(z->p, z->c, ~S1, z->l, ~S0 ");
+        w(g, "~{int ret = skip_utf8(z->p, z->c, ~S1, z->l, ~S0 ");
         generate_AE(g, p->AE); w(g, ");~N");
-        w(g, "~Mif (c < 0) ~f~N");
+        w(g, "~Mif (ret < 0) ~f~N");
     } else {
-        w(g, "~{int c = z->c ~S0 ");
+        w(g, "~{int ret = z->c ~S0 ");
         generate_AE(g, p->AE); w(g, ";~N");
-        w(g, "~Mif (~S1 > c || c > z->l) ~f~N");
+        w(g, "~Mif (~S1 > ret || ret > z->l) ~f~N");
     }
-    wp(g, "~Mz->c = c;~C"
+    wp(g, "~Mz->c = ret;~C"
           "~}", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
-    wp(g, "~{int ret;~N", p);
-    wp(g, "~Mret = slice_del(z);~C", p);
+    wp(g, "~{int ret = slice_del(z);~C", p);
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -765,12 +764,12 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
 
     int keep_c = style == c_attach;
     if (p->mode == m_backward) keep_c = !keep_c;
-    wp(g, "~{int ret;~N", p);
-    if (keep_c) w(g, "~{int c = z->c;~N");
-    wp(g, "~Mret = insert_~$(z, z->c, z->c, ", p);
+    wp(g, "~{", p);
+    if (keep_c) w(g, "int c_keep = z->c;~N~M");
+    wp(g, "int ret = insert_~$(z, z->c, z->c, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
-    if (keep_c) w(g, "~Mz->c = c;~N~}");
+    if (keep_c) w(g, "~Mz->c = c_keep;~N");
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -778,13 +777,13 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
 static void generate_assignfrom(struct generator * g, struct node * p) {
 
     int keep_c = p->mode == m_forward; /* like 'attach' */
-    wp(g, "~{int ret;~N", p);
-    if (keep_c) wp(g, "~{int c = z->c;~N"
+    wp(g, "~{", p);
+    if (keep_c) wp(g, "int c_keep = z->c;~N"
                    "~Mret = insert_~$(z, z->c, z->l, ", p);
-                else wp(g, "~Mret = insert_~$(z, z->lb, z->c, ", p);
+                else wp(g, "ret = insert_~$(z, z->lb, z->c, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
-    if (keep_c) w(g, "~Mz->c = c;~N~}");
+    if (keep_c) w(g, "~Mz->c = c_keep;~N");
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -794,8 +793,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
 /*  w(g, "~Mslice_from_s(z, ");   <============= bug! should be: */
-    wp(g, "~{int ret;~N", p);
-    wp(g, "~Mret = slice_from_~$(z, ", p);
+    wp(g, "~{int ret = slice_from_~$(z, ", p);
     generate_data_address(g, p);
     wp(g, ");~C", p);
     wp(g, "~Mif (ret < 0) return ret;~N"
