@@ -95,6 +95,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             }
             if (eq(s, "-w") || eq(s, "-widechars")) {
                 o->widechars = true;
+		o->utf8 = false;
                 continue;
             }
             if (eq(s, "-s") || eq(s, "-syntax")) {
@@ -133,6 +134,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             }
             if (eq(s, "-u") || eq(s, "-utf8")) {
                 o->utf8 = true;
+		o->widechars = false;
                 continue;
             }
             if (eq(s, "-p") || eq(s, "-parentclassname")) {
