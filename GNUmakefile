@@ -6,7 +6,7 @@ java_src_dir = $(java_src_main_dir)/ext
 
 libstemmer_algorithms = danish dutch english finnish french german hungarian \
 			italian \
-			norwegian porter portuguese russian spanish swedish
+			norwegian porter portuguese russian spanish swedish turkish
 
 KOI8_R_algorithms = russian
 ISO_8859_1_algorithms = danish dutch english finnish french german hungarian \
