@@ -87,6 +87,8 @@ clean:
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
 
+$(COMPILER_OBJECTS): $(COMPILER_HEADERS)
+
 libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
 	sed 's/@MODULES_H@/modules.h/' $^ >$@
 
