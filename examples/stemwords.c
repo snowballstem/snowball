@@ -26,6 +26,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
         }
         {
             int i = 0;
+	    int inlen = 0;
             while(1) {
                 if (ch == '\n' || ch == EOF) break;
                 if (i == lim) {
@@ -36,6 +37,8 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
 		    b = newb;
                     lim = lim + INC;
                 }
+		/* Update count of utf-8 characters. */
+		if (ch < 0x80 || ch > 0xBF) inlen += 1;
                 /* force lower case: */
                 if (isupper(ch)) ch = tolower(ch);
 
@@ -44,10 +47,15 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                 ch = getc(f_in);
             }
 
-            if (pretty) {
+            if (pretty == 1) {
 		fwrite(b, i, 1, f_out);
 		fputs(" -> ", f_out);
-            }
+            } else if (pretty == 2) {
+		int j;
+		fwrite(b, i, 1, f_out);
+		for (j = 30 - inlen; j > 0; j--)
+		    fputs(" ", f_out);
+            } 
 	    {
 		const sb_symbol * stemmed = sb_stemmer_stem(stemmer, b, i);
                 if (stemmed == NULL)
@@ -74,7 +82,7 @@ error:
 static void
 usage(int n)
 {
-    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p] [-h]\n"
+    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]\n"
 	  "\n"
 	  "The input file consists of a list of words to be stemmed, one per\n"
 	  "line. Words should be in lower case, but (for English) A-Z letters\n"
@@ -86,6 +94,9 @@ usage(int n)
 	  "\n"
 	  "If -p is given the output file consists of each word of the input\n"
 	  "file followed by \"->\" followed by its stemmed equivalent.\n"
+	  "If -p2 is given the output file is a two column layout containing\n"
+	  "the input words in the first column and the stemmed eqivalents in\n"
+	  "the second column.\n"
 	  "Otherwise, the output file consists of the stemmed words, one per\n"
 	  "line.\n"
 	  "\n"
@@ -139,6 +150,8 @@ main(int argc, char * argv[])
 		    exit(1);
 		}
 		charenc = argv[i++];
+	    } else if (strcmp(s, "-p2") == 0) {
+		pretty = 2;
 	    } else if (strcmp(s, "-p") == 0) {
 		pretty = 1;
 	    } else if (strcmp(s, "-h") == 0) {
