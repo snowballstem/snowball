@@ -47,15 +47,6 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                 ch = getc(f_in);
             }
 
-            if (pretty == 1) {
-		fwrite(b, i, 1, f_out);
-		fputs(" -> ", f_out);
-            } else if (pretty == 2) {
-		int j;
-		fwrite(b, i, 1, f_out);
-		for (j = 30 - inlen; j > 0; j--)
-		    fputs(" ", f_out);
-            } 
 	    {
 		const sb_symbol * stemmed = sb_stemmer_stem(stemmer, b, i);
                 if (stemmed == NULL)
@@ -64,10 +55,28 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                     exit(1);
                 }
                 else
-                {
+		{
+		    if (pretty == 1) {
+			fwrite(b, i, 1, f_out);
+			fputs(" -> ", f_out);
+		    } else if (pretty == 2) {
+			fwrite(b, i, 1, f_out);
+			if (sb_stemmer_length(stemmer) > 0) {
+			    int j;
+			    if (inlen < 30) {
+				for (j = 30 - inlen; j > 0; j--)
+				    fputs(" ", f_out);
+			    } else {
+				fputs("\n", f_out);
+				for (j = 30; j > 0; j--)
+				    fputs(" ", f_out);
+			    }
+			}
+		    }
+
 		    fputs((char *)stemmed, f_out);
 		    putc('\n', f_out);
-                }
+		}
             }
         }
     }
