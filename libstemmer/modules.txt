@@ -47,11 +47,3 @@ porter          UTF_8,ISO_8859_1        porter
 #                    only really applicable to a restricted type of input text
 #                    (keywords in academic publications).
 #lovins           UTF_8,ISO_8859_1        lovins
-#
-# romanian1        - This is a romanian stemmer, which we haven't yet
-#                    evaluated.
-#romanian1        UTF_8                   romanian1
-#
-# romanian2        - This is a different romanian stemmer, which we haven't
-#                    yet evaluated.
-#romanian2        UTF_8                   romanian2

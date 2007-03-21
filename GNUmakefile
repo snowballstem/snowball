@@ -13,7 +13,7 @@ ISO_8859_1_algorithms = danish dutch english finnish french german hungarian \
 			italian \
 			norwegian porter portuguese spanish swedish
 
-other_algorithms = german2 kraaij_pohlmann romanian1 romanian2 lovins
+other_algorithms = german2 kraaij_pohlmann lovins
 
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
