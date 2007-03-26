@@ -89,3 +89,37 @@ format for inclusion by a Makefile.  By including this file in your build
 system, you can link the snowball system into your program with a few
 extra rules.
 
+Using the library in a system using GNU autotools
+=================================================
+
+The libstemmer_c library can be integrated into a larger system which uses the
+GNU autotool framework (and in particular, automake and autoconf) as follows:
+
+1) Unpack libstemmer_c.tgz in the top level project directory so that there is
+   a libstemmer_c subdirectory of the top level directory of the project.
+
+2) Add a file "Makefile.am" to the unpacked libstemmer_c folder, containing:
+   
+noinst_LTLIBRARIES = libstemmer.la
+include $(srcdir)/mkinc.mak
+noinst_HEADERS = $(snowball_headers)
+libstemmer_la_SOURCES = $(snowball_sources) 
+
+(You may also need to add other lines to this, for example, if you are using
+compiler options which are not compatible with compiling the libstemmer
+library.)
+
+3) Add libstemmer_c to the AC_CONFIG_FILES declaration in the project's
+   configure.ac file.
+
+4) Add to the top level makefile the following lines (or modify existing
+   assignments to these variables appropriately):
+
+AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS = -I$(top_srcdir)/libstemmer_c/include
+SUBDIRS=libstemmer_c
+<name>_LIBADD = libstemmer_c/libstemmer.la
+
+(Where <name> is the name of the library or executable which links against
+libstemmer.) 
+
