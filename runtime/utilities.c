@@ -455,7 +455,7 @@ extern symbol * assign_to(struct SN_env * z, symbol * p) {
     return p;
 }
 
-#if 0
+#if 1
 extern void debug(struct SN_env * z, int number, int line_count) {
     int i;
     int limit = SIZE(z->p);
