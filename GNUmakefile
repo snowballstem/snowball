@@ -6,12 +6,14 @@ java_src_dir = $(java_src_main_dir)/ext
 
 libstemmer_algorithms = danish dutch english finnish french german hungarian \
 			italian \
-			norwegian porter portuguese russian spanish swedish turkish
+			norwegian porter portuguese romanian \
+			russian spanish swedish turkish
 
 KOI8_R_algorithms = russian
 ISO_8859_1_algorithms = danish dutch english finnish french german hungarian \
 			italian \
 			norwegian porter portuguese spanish swedish
+ISO_8859_2_algorithms = romanian
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -46,10 +48,12 @@ STEMWORDS_SOURCES = examples/stemwords.c
 ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
-		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c)
+		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c) \
+		$(ISO_8859_2_algorithms:%=$(c_src_dir)/stem_ISO_8859_2_%.c)
 C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.h) \
-		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.h)
+		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.h) \
+		$(ISO_8859_2_algorithms:%=$(c_src_dir)/stem_ISO_8859_2_%.h)
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
@@ -132,6 +136,13 @@ $(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/
 	o="$(c_src_dir)/stem_ISO_8859_1_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
+
+$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%/stem_ISO_8859_2.sbl snowball
+	@mkdir -p $(c_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem_ISO_8859_2.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(c_src_dir)/stem_ISO_8859_2_$${l}"; \
+	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime"; \
+	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) -O2 -c -o $@ $< -Wall
@@ -239,11 +250,13 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
-check: check_utf8 check_latin1 check_koi8r
+check: check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
 
-check_latin1: $(ISO_8859_1_algorithms:%=check_latin1_%)
+check_iso_8859_1: $(ISO_8859_1_algorithms:%=check_iso_8859_1_%)
+
+check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)
 
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
@@ -258,10 +271,16 @@ check_utf8_%: ../data/% stemwords
 	fi
 	@rm tmp.txt
 
-check_latin1_%: ../data/% stemwords
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with Latin1"
+check_iso_8859_1_%: ../data/% stemwords
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
 	@iconv -fUTF8 -tISO8859-1 $</voc.txt|./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
 	@iconv -fUTF8 -tISO8859-1 $</output.txt|diff -u - tmp.txt
+	@rm tmp.txt
+
+check_iso_8859_2_%: ../data/% stemwords
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
+	@iconv -fUTF8 -tISO8859-2 $</voc.txt|./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	@iconv -fUTF8 -tISO8859-2 $</output.txt|diff -u - tmp.txt
 	@rm tmp.txt
 
 check_koi8r_%: ../data/% stemwords

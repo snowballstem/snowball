@@ -18,9 +18,11 @@ hungarian       UTF_8                   hungarian,hu,hun
 italian         UTF_8                   italian,it,ita
 norwegian       UTF_8                   norwegian,no,nor
 portuguese      UTF_8                   portuguese,pt,por
+romanian        UTF_8                   romanian,ro,rum,ron
 russian         UTF_8                   russian,ru,rus
 spanish         UTF_8                   spanish,es,esl,spa
 swedish         UTF_8                   swedish,sv,swe
+turkish         UTF_8                   turkish,tr,tur
 
 # Also include the traditional porter algorithm for english.
 # The porter algorithm is included in the libstemmer distribution to assist
@@ -36,12 +38,12 @@ porter          UTF_8                   porter
 # algorithms are:
 #
 # german2          - This is a slight modification of the german stemmer.
+#german2          UTF_8                   german2
+#
 # kraaij_pohlmann  - This is a different dutch stemmer.
+#kraaij_pohlmann  UTF_8                   kraaij_pohlmann
+#
 # lovins           - This is an english stemmer, but fairly outdated, and
 #                    only really applicable to a restricted type of input text
 #                    (keywords in academic publications).
-# romanian1        - This is a romanian stemmer, which we haven't yet
-#                    evaluated.
-# romanian2        - This is a different romanian stemmer, which we haven't
-#                    yet evaluated.
-
+#lovins           UTF_8                   lovins
