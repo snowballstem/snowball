@@ -26,8 +26,7 @@ public class TestApp {
 
 	Class stemClass = Class.forName("org.tartarus.snowball.ext." +
 					args[0] + "Stemmer");
-        SnowballProgram stemmer = (SnowballProgram) stemClass.newInstance();
-	Method stemMethod = stemClass.getMethod("stem", new Class[0]);
+        SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
 
 	Reader reader;
 	reader = new InputStreamReader(new FileInputStream(args[1]));
@@ -38,7 +37,7 @@ public class TestApp {
         OutputStream outstream;
 
 	if (args.length > 2) {
-            if (args.length == 4 && args[2].equals("-o")) {
+            if (args.length >= 4 && args[2].equals("-o")) {
                 outstream = new FileOutputStream(args[3]);
             } else {
                 usage();
@@ -63,7 +62,7 @@ public class TestApp {
 		if (input.length() > 0) {
 		    stemmer.setCurrent(input.toString());
 		    for (int i = repeat; i != 0; i--) {
-			stemMethod.invoke(stemmer, emptyArgs);
+			stemmer.stem();
 		    }
 		    output.write(stemmer.getCurrent());
 		    output.write('\n');

@@ -293,6 +293,9 @@ struct options {
     char * variables_prefix;
     char * runtime_path;
     char * parent_class_name;
+    char * package;
+    char * string_class;
+    char * among_class;
     struct include * includes;
     struct include * includes_end;
     byte utf8;

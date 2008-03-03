@@ -1,8 +1,12 @@
-
 #include <stdio.h>   /* for main etc */
 #include <stdlib.h>  /* for free etc */
 #include <string.h>  /* for strlen */
 #include "header.h"
+
+#define DEFAULT_PACKAGE "org.tartarus.snowball.ext"
+#define DEFAULT_BASE_CLASS "org.tartarus.snowball.SnowballProgram"
+#define DEFAULT_AMONG_CLASS "org.tartarus.snowball.Among"
+#define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
 
 static int eq(char * s1, char * s2) {
     int s1_len = strlen(s1);
@@ -25,7 +29,12 @@ static void print_arglist(void) {
                     "             [-vp[refix] string]\n"
                     "             [-i[nclude] directory]\n"
                     "             [-r[untime] path to runtime headers]\n"
-                    "             [-p[arentclassname] parent class name]\n"
+#ifndef DISABLE_JAVA
+                    "             [-p[arentclassname] fully qualified parent class name]\n"
+                    "             [-P[ackage] package name for stemmers]\n"
+                    "             [-S[tringclass] StringBuffer-compatible class]\n"
+                    "             [-a[mongclass] fully qualified name of the Among class]\n"
+#endif
            );
     exit(1);
 }
@@ -59,7 +68,10 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->externals_prefix = "";
     o->variables_prefix = 0;
     o->runtime_path = 0;
-    o->parent_class_name = 0;
+    o->parent_class_name = DEFAULT_BASE_CLASS;
+    o->string_class = DEFAULT_STRING_CLASS;
+    o->among_class = DEFAULT_AMONG_CLASS;
+    o->package = DEFAULT_PACKAGE;
     o->name = "";
     o->make_lang = LANG_C;
     o->widechars = false;
@@ -137,11 +149,28 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->widechars = false;
                 continue;
             }
+#ifndef DISABLE_JAVA
             if (eq(s, "-p") || eq(s, "-parentclassname")) {
                 check_lim(i, argc);
                 o->parent_class_name = argv[i++];
                 continue;
             }
+            if (eq(s, "-P") || eq(s, "-Package")) {
+                check_lim(i, argc);
+                o->package = argv[i++];
+                continue;
+            }
+            if (eq(s, "-S") || eq(s, "-stringclass")) {
+                check_lim(i, argc);
+                o->string_class = argv[i++];
+                continue;
+            }
+            if (eq(s, "-a") || eq(s, "-amongclass")) {
+                check_lim(i, argc);
+                o->among_class = argv[i++];
+                continue;
+            }
+#endif
             fprintf(stderr, "'%s' misplaced\n", s);
             print_arglist();
         }

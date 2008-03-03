@@ -36,6 +36,7 @@ RUNTIME_HEADERS  = runtime/api.h \
 
 JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
+		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
@@ -151,8 +152,8 @@ $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(java_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
-	echo "./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
-	./snowball $< -j -o $${o} -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
+	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
+	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
