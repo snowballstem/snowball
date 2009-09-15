@@ -112,7 +112,7 @@ extern char * b_to_s(symbol * p) {
     char * s = (char *)malloc(n + 1);
     {
         int i;
-        for (i = 0; i < n; i++) s[i] = p[i];
+        for (i = 0; i < n; i++) s[i] = (char)p[i]; /* cast to suppress possible warnings */
     }
     s[n] = 0;
     return s;
