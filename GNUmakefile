@@ -42,7 +42,7 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt
+LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
