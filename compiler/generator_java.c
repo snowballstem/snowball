@@ -239,9 +239,9 @@ static void write_failure(struct generator * g) {
             write_string(g, "break lab");
             write_int(g, g->failure_label);
             write_string(g, ";");
+            g->unreachable = true;
     }
     write_newline(g);
-    g->unreachable = true;
 }
 
 static void write_failure_if(struct generator * g, char * s, struct node * p) {
@@ -973,7 +973,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
     writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mcurrent = ~V0;~N"
+             "~Mcurrent = new StringBuffer(~V0.toString());~N"
              "~Mcursor = 0;~N"
              "~Mlimit = (current.length());~N", p);
     generate(g, p->left);
