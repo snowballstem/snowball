@@ -23,6 +23,7 @@ russian         UTF_8                   russian,ru,rus
 spanish         UTF_8                   spanish,es,esl,spa
 swedish         UTF_8                   swedish,sv,swe
 turkish         UTF_8                   turkish,tr,tur
+tamil           UTF_8                   tamil,ta,tam
 
 # Also include the traditional porter algorithm for english.
 # The porter algorithm is included in the libstemmer distribution to assist
