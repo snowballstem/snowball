@@ -90,10 +90,9 @@ routines (
  has_min_length
 )
 
-integers (mark mark2)
-
 externals ( stem )
 
+/*
 groupings (
  suttezhuthu
  q_suffixes
@@ -105,21 +104,21 @@ groupings (
  uyir
  vowel_signs
 )
+*/
 
 booleans (
- found_vallinam_doubling
  found_a_match
  found_vetrumai_urupu
  found_wrong_ending
- was_stripped
 )
 
 integers (
  length
 )
 
+/*
 define q_suffixes '{vs_aa}{vs_oo}{vs_ee}'
-define q_prefixes '{e}' /* not clear about {ya}{vs_aa} and {ee} */
+define q_prefixes '{e}' 
 define word_starter '{ka}{ca}{tha}{va}{na}{pa}{ma}{ya}{nga}{nya}'
 define suttezhuthu '{a}{i}{u}'
 define vallinam '{ka}{ca}{tta}{tha}{pa}{rra}'
@@ -127,38 +126,45 @@ define mellinam '{nga}{nya}{nna}{na}{ma}{nnna}'
 define itaiyinam '{ya}{ra}{la}{va}{zha}{lla}'
 define vowel_signs '{vs_aa}{vs_i}{vs_ii}{vs_e}{vs_ee}{vs_u}{vs_uu}{vs_ai}'
 define uyir '{a}{aa}{i}{ii}{u}{uu}{e}{ee}{ai}{o}{oo}{au}'
+*/
+
 define strlen as (
  // size in snowball returns bytes which is not very useful for utf8
  // this routine gives the number of characters
  $length = 0
  do repeat (next ($length = length+1))
 )
+
 define has_min_length as (
  strlen
  $length > 4
 )
+
 define fix_va_start as (
  (try '{va}{vs_oo}' and [ '{va}{vs_oo}' ] <- '{oo}' ) or
  (try '{va}{vs_o}' and [ '{va}{vs_o}' ] <- '{o}' ) or
  (try '{va}{vs_u}' and [ '{va}{vs_u}' ] <- '{u}' ) or
  (try '{va}{vs_uu}' and [ '{va}{vs_uu}' ] <- '{uu}' )
 )
+
 define fix_endings as (
  set found_wrong_ending
  repeat (found_wrong_ending (do fix_ending))
 )
+
 define remove_question_prefixes as (
- [ ('{e}' ) ('{ka}' or '{ca}' or '{tha}' or '{va}' or '{na}' or '{pa}' or '{ma}' or '{ya}' or '{nga}' or '{nya}') '{pulli}' ] delete
+ [ ('{e}' ) among('{ka}' '{ca}' '{tha}' '{va}' '{na}' '{pa}' '{ma}' '{ya}' '{nga}' '{nya}') '{pulli}' ] delete
  do fix_va_start
 )
+
 define fix_ending as (
  unset found_wrong_ending
  strlen
  $length > 3
  backwards (
-  ( ['{na}{pulli}' or '{na}{pulli}{ta}' or '{na}{pulli}{ta}{pulli}' ] delete )
+  ( [among('{na}{pulli}' '{na}{pulli}{ta}' '{na}{pulli}{ta}{pulli}') ] delete )
   or
-  ( ['{ya}{pulli}' test ('{vs_ai}' or '{vs_i}' or '{vs_ii}') ] delete )
+  ( ['{ya}{pulli}' test among('{vs_ai}' '{vs_i}' '{vs_ii}') ] delete )
   or
   ( [ '{tta}{pulli}{pa}{pulli}' or '{tta}{pulli}{ka}{pulli}' ] <- '{lla}{pulli}' )
   or
@@ -173,65 +179,67 @@ define fix_ending as (
   or
   ( [ '{vs_u}{ka}{pulli}' or '{vs_u}{ka}{pulli}{ka}{pulli}' ] <- '{pulli}' )
   or
-  ( [ '{pulli}' ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}') '{pulli}' ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}') ] delete )
+  ( [ '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') ] delete )
   or
   ( [ '{vs_u}{ka}{pulli}' ] <- '{pulli}' )
   or
-  ( [ '{pulli}' ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}') ] delete )
+  ( [ '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') ] delete )
   or
-  ( [ '{pulli}' (('{ya}' or '{ra}' or '{la}' or '{va}' or '{zha}' or '{lla}') or ('{nga}' or '{nya}' or '{nna}' or '{na}' or '{ma}' or '{nnna}')) '{pulli}' ] <- '{pulli}' )
+  ( [ '{pulli}' (among('{ya}' '{ra}' '{la}' '{va}' '{zha}' '{lla}') or among('{nga}' '{nya}' '{nna}' '{na}' '{ma}' '{nnna}')) '{pulli}' ] <- '{pulli}' )
   or
-  ( [ '{va}' or '{ya}' or '{va}{pulli}' ] delete )
+  ( [ among('{va}' '{ya}' '{va}{pulli}') ] delete )
   or
-  ( [ '{nnna}{vs_u}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}')) ] delete )
+  ( [ '{nnna}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) ] delete )
   or
   ( [ '{nga}{pulli}' (test not '{vs_ai}')] <- '{ma}{pulli}' )
   or
   ( [ '{nga}{pulli}' ] delete )
   or
-  ( [ '{pulli}' (test (('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}') or '{pulli}')) ] delete )
+  ( [ '{pulli}' (test (among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}') or '{pulli}')) ] delete )
   )
 
  set found_wrong_ending // If any of above test pass set the flag
 )
+
 define remove_pronoun_prefixes as (
  unset found_a_match
- [ ('{a}' or '{i}' or '{u}') ('{ka}' or '{ca}' or '{tha}' or '{va}' or '{na}' or '{pa}' or '{ma}' or '{ya}' or '{nga}' or '{nya}') '{pulli}' ] delete
+ [ among('{a}' '{i}' '{u}') among('{ka}' '{ca}' '{tha}' '{va}' '{na}' '{pa}' '{ma}' '{ya}' '{nga}' '{nya}') '{pulli}' ] delete
  (set found_a_match)
  do fix_va_start
 )
+
 define remove_plural_suffix as (
  unset found_a_match
  backwards (
-  ( [ '{vs_u}{nga}{pulli}{ka}{lla}{pulli}' (test not ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}')) ] <- '{pulli}' ) or
+  ( [ '{vs_u}{nga}{pulli}{ka}{lla}{pulli}' (test not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}')) ] <- '{pulli}' ) or
   ( [ '{rra}{pulli}{ka}{lla}{pulli}' ] <- '{la}{pulli}' ) or
   ( [ '{tta}{pulli}{ka}{lla}{pulli}' ] <- '{lla}{pulli}' ) or
   ( [ '{ka}{lla}{pulli}' ] delete )
   (set found_a_match)
- 
  )
 )
+
 define remove_question_suffixes as (
  has_min_length
  unset found_a_match
  backwards (
   do (
-   [ ( '{vs_oo}' or '{vs_ee}' or '{vs_aa}') ] <- '{pulli}'
+   [ among('{vs_oo}' '{vs_ee}' '{vs_aa}') ] <- '{pulli}'
    (set found_a_match)
-  
   )
  )
  do fix_endings
 )
+
 define remove_command_suffixes as (
  has_min_length
  unset found_a_match
  backwards (
-  [ ('{pa}{vs_i}' or '{va}{vs_i}') ] delete
-  (set found_a_match)
- 
+  [ among('{pa}{vs_i}' '{va}{vs_i}') ] delete
+  (set found_a_match) 
  )
 )
+
 define remove_um as (
  unset found_a_match
  has_min_length
@@ -240,41 +248,51 @@ define remove_um as (
     )
  do fix_ending
 )
+
 define remove_common_word_endings as (
  // These are not suffixes actually but are 
  // some words that are attached to other words
  // but can be removed for stemming
-
  unset found_a_match
  has_min_length
  backwards (
   test ( [ '{vs_u}{tta}{nnna}{pulli}' or
      '{vs_i}{la}{pulli}{la}{vs_ai}' or
-       '{vs_i}{tta}{ma}{pulli}' or '{vs_i}{nnna}{pulli}{rra}{vs_i}' or
-     '{vs_aa}{ka}{vs_i}' or '{vs_aa}{ka}{vs_i}{ya}' or
-     '{vs_e}{nnna}{pulli}{rra}{vs_u}' or '{vs_u}{lla}{pulli}{lla}' or
-     '{vs_u}{tta}{vs_ai}{ya}' or '{vs_u}{tta}{vs_ai}' or
+     '{vs_i}{tta}{ma}{pulli}' or 
+     '{vs_i}{nnna}{pulli}{rra}{vs_i}' or
+     '{vs_aa}{ka}{vs_i}' or 
+     '{vs_aa}{ka}{vs_i}{ya}' or
+     '{vs_e}{nnna}{pulli}{rra}{vs_u}' or 
+     '{vs_u}{lla}{pulli}{lla}' or
+     '{vs_u}{tta}{vs_ai}{ya}' or 
+     '{vs_u}{tta}{vs_ai}' or
      '{vs_e}{nnna}{vs_u}{ma}{pulli}' or
-     ('{la}{pulli}{la}' test (not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) or
-     '{vs_e}{nnna}' or '{vs_aa}{ka}{vs_i}' ] <- '{pulli}'
+     ('{la}{pulli}{la}' test (not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+     '{vs_e}{nnna}' or 
+     '{vs_aa}{ka}{vs_i}' ] <- '{pulli}'
      (set found_a_match)
      )
   or
-  test ( [ '{pa}{tta}{vs_u}' or
-     '{pa}{tta}{pulli}{tta}' or '{pa}{tta}{pulli}{tta}{vs_u}' or
-     '{pa}{tta}{pulli}{tta}{ta}{vs_u}' or
-     '{pa}{tta}{pulli}{tta}{nna}' or '{ka}{vs_u}{ra}{vs_i}{ya}' or
-     '{ka}{vs_u}{ra}{vs_i}{ya}' or '{pa}{rra}{pulli}{rra}{vs_i}' or
-     '{va}{vs_i}{tta}{vs_u}' or '{va}{vs_i}{tta}{pulli}{tta}{vs_u}' or
-     '{pa}{tta}{vs_i}{ta}{vs_aa}{nnna}' or
-     '{pa}{tta}{vs_i}' or '{ta}{vs_aa}{nnna}' or
-     '{vs_e}{la}{pulli}{la}{vs_aa}{ma}{pulli}'
+  test ( [ among('{pa}{tta}{vs_u}' 
+     '{pa}{tta}{pulli}{tta}' 
+     '{pa}{tta}{pulli}{tta}{vs_u}'
+     '{pa}{tta}{pulli}{tta}{ta}{vs_u}' 
+     '{pa}{tta}{pulli}{tta}{nna}' 
+     '{ka}{vs_u}{ra}{vs_i}{ya}' 
+     '{pa}{rra}{pulli}{rra}{vs_i}'
+     '{va}{vs_i}{tta}{vs_u}'
+     '{va}{vs_i}{tta}{pulli}{tta}{vs_u}'
+     '{pa}{tta}{vs_i}{ta}{vs_aa}{nnna}'
+     '{pa}{tta}{vs_i}' 
+     '{ta}{vs_aa}{nnna}'
+     '{vs_e}{la}{pulli}{la}{vs_aa}{ma}{pulli}')
     ] delete
     (set found_a_match)
     )
  )
  do fix_endings
 )
+
 define remove_vetrumai_urupukal as (
  unset found_a_match
  unset found_vetrumai_urupu
@@ -284,35 +302,42 @@ define remove_vetrumai_urupukal as (
     test ( ['{nnna}{vs_ai}'] delete )
    or
     test ([ ( '{vs_i}{nnna}{vs_ai}' or
-     '{vs_ai}' (test not ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}'))) or
-      ( '{vs_ai}' (test (('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}') '{pulli}')))
+     '{vs_ai}' (test not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}'))) or
+      ( '{vs_ai}' (test (among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') '{pulli}')))
     ] <- '{pulli}'
    
     )
    or
-   test ( [ '{vs_o}{tta}{vs_u}' or '{vs_oo}{tta}{vs_u}' or
-     '{vs_i}{la}{pulli}' or '{vs_i}{rra}{pulli}' or
-        ( '{vs_i}{nnna}{pulli}' (test not '{ma}')) or
-      '{vs_i}{nnna}{pulli}{rra}{vs_u}' or
-      '{vs_i}{ra}{vs_u}{na}{pulli}{ta}{vs_u}' or
-      '{va}{vs_i}{tta}' or ($length >= 7 '{vs_i}{tta}{ma}{pulli}') or
-      '{vs_aa}{la}{pulli}' or '{vs_u}{tta}{vs_ai}' or
-      '{vs_aa}{ma}{la}{pulli}' or
-      ( '{la}{pulli}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) or
-      '{vs_u}{lla}{pulli}' ] <- '{pulli}'
-   
+   test ( [ 
+            '{vs_o}{tta}{vs_u}' or 
+            '{vs_oo}{tta}{vs_u}' or
+            '{vs_i}{la}{pulli}' or 
+            '{vs_i}{rra}{pulli}' or
+            ('{vs_i}{nnna}{pulli}' (test not '{ma}')) or
+            '{vs_i}{nnna}{pulli}{rra}{vs_u}' or
+            '{vs_i}{ra}{vs_u}{na}{pulli}{ta}{vs_u}' or
+            '{va}{vs_i}{tta}' or 
+            ($length >= 7 '{vs_i}{tta}{ma}{pulli}') or
+            '{vs_aa}{la}{pulli}' or 
+            '{vs_u}{tta}{vs_ai}' or
+            '{vs_aa}{ma}{la}{pulli}' or
+            ('{la}{pulli}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+            '{vs_u}{lla}{pulli}' 
+           ] <- '{pulli}'
      )
    or
-   test ( [ '{ka}{nna}{pulli}' or '{ma}{vs_u}{nnna}{pulli}' or
-     '{ma}{vs_ee}{la}{pulli}' or '{ma}{vs_ee}{rra}{pulli}' or
-     '{ka}{vs_ii}{llla}{pulli}' or '{pa}{vs_i}{nnna}{pulli}' or
-     ('{ta}{vs_u}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) ] delete
-   
+   test ( [ 
+           '{ka}{nna}{pulli}' or 
+           '{ma}{vs_u}{nnna}{pulli}' or
+           '{ma}{vs_ee}{la}{pulli}' or 
+           '{ma}{vs_ee}{rra}{pulli}' or
+           '{ka}{vs_ii}{llla}{pulli}' or 
+           '{pa}{vs_i}{nnna}{pulli}' or
+           ('{ta}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) 
+          ] delete
       )
    or
-   test ( [ '{vs_ii}' ] <- '{vs_i}'
-   
-      )
+   test ([ '{vs_ii}' ] <- '{vs_i}')
   )
   (set found_a_match)
   (set found_vetrumai_urupu)
@@ -320,52 +345,74 @@ define remove_vetrumai_urupukal as (
  )
  do fix_endings
 )
+
 define remove_tense_suffixes as (
  set found_a_match
  repeat ( found_a_match (do remove_tense_suffix) )
 )
+
 define remove_tense_suffix as (
  unset found_a_match
  has_min_length
  backwards (
   do (
-   test ( ['{ka}{vs_o}{nna}{pulli}{tta}{vs_i}{ra}{pulli}' or
-     '{pa}{tta}{vs_u}']
-     delete
+   test ( [among(
+           '{ka}{vs_o}{nna}{pulli}{tta}{vs_i}{ra}{pulli}'
+           '{pa}{tta}{vs_u}'
+           )] delete
      (set found_a_match)
      )
    or
    test ( [
-     '{ma}{vs_aa}{ra}{pulli}' or '{ma}{vs_i}{nnna}{pulli}' or
-     '{nnna}{nnna}{pulli}' or '{nnna}{vs_aa}{nnna}{pulli}' or
-     '{nnna}{vs_aa}{lla}{pulli}' or '{nnna}{vs_aa}{ra}{pulli}' or
-     ('{va}{nnna}{pulli}' test (not ( '{a}' or '{aa}' or '{i}' or '{ii}' or '{u}' or '{uu}' or '{e}' or '{ee}' or '{ai}' or '{o}' or '{oo}' or '{au}' )) ) or
-     '{nnna}{lla}{pulli}' or '{va}{lla}{pulli}' or
-     '{nnna}{ra}{pulli}' or '{va}{ra}{pulli}' or
-     '{nnna}' or '{pa}' or '{ka}' or '{ta}' or '{ya}' or
-     '{pa}{nnna}{pulli}' or '{pa}{lla}{pulli}' or
-     '{pa}{ra}{pulli}' or
-     ('{ta}{vs_u}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) or
-     '{vs_i}{rra}{pulli}{rra}{vs_u}' or
-     '{pa}{ma}{pulli}' or '{nnna}{ma}{pulli}' or
-     '{ta}{vs_u}{ma}{pulli}' or '{rra}{vs_u}{ma}{pulli}' or
-     '{ka}{vs_u}{ma}{pulli}' or '{nnna}{vs_e}{nnna}{pulli}' or
-     '{nnna}{vs_ai}' or '{va}{vs_ai}'
+            '{ma}{vs_aa}{ra}{pulli}' or 
+            '{ma}{vs_i}{nnna}{pulli}' or
+            '{nnna}{nnna}{pulli}' or 
+            '{nnna}{vs_aa}{nnna}{pulli}' or
+            '{nnna}{vs_aa}{lla}{pulli}' or 
+            '{nnna}{vs_aa}{ra}{pulli}' or
+            ('{va}{nnna}{pulli}' test (not among('{a}' '{aa}' '{i}' '{ii}' '{u}' '{uu}' '{e}' '{ee}' '{ai}' '{o}' '{oo}' '{au}')) ) or
+            '{nnna}{lla}{pulli}' or 
+            '{va}{lla}{pulli}' or
+            '{nnna}{ra}{pulli}' or 
+            '{va}{ra}{pulli}' or
+            '{nnna}' or '{pa}' or '{ka}' or '{ta}' or '{ya}' or
+            '{pa}{nnna}{pulli}' or 
+            '{pa}{lla}{pulli}' or
+            '{pa}{ra}{pulli}' or
+            ('{ta}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+            '{vs_i}{rra}{pulli}{rra}{vs_u}' or
+            '{pa}{ma}{pulli}' or 
+            '{nnna}{ma}{pulli}' or
+            '{ta}{vs_u}{ma}{pulli}' or 
+            '{rra}{vs_u}{ma}{pulli}' or
+            '{ka}{vs_u}{ma}{pulli}' or 
+            '{nnna}{vs_e}{nnna}{pulli}' or
+            '{nnna}{vs_ai}' or 
+            '{va}{vs_ai}'
        ] delete
        (set found_a_match)
        )
    or
-   test ( [('{vs_aa}{nnna}{pulli}' test (not '{ca}')) or
-     '{vs_aa}{lla}{pulli}' or
-       '{vs_aa}{ra}{pulli}' or
-        '{vs_ee}{nnna}{pulli}' or '{vs_aa}' or
-        '{vs_aa}{ma}{pulli}' or '{vs_e}{ma}{pulli}' or
-        '{vs_ee}{ma}{pulli}' or '{vs_oo}{ma}{pulli}' or
-        '{ka}{vs_u}{ma}{pulli}' or '{ta}{vs_u}{ma}{pulli}' or
-        '{tta}{vs_u}{ma}{pulli}' or '{rra}{vs_u}{ma}{pulli}' or
-        '{vs_aa}{ya}{pulli}' or '{nnna}{vs_e}{nnna}{pulli}' or
-        '{nnna}{vs_i}{ra}{pulli}' or '{vs_ii}{ra}{pulli}' or
-        '{vs_ii}{ya}{ra}{pulli}' ] <- '{pulli}'
+   test ( [
+           ('{vs_aa}{nnna}{pulli}' test (not '{ca}')) or
+           '{vs_aa}{lla}{pulli}' or
+           '{vs_aa}{ra}{pulli}' or
+           '{vs_ee}{nnna}{pulli}' or 
+           '{vs_aa}' or
+           '{vs_aa}{ma}{pulli}' or
+           '{vs_e}{ma}{pulli}' or
+           '{vs_ee}{ma}{pulli}' or 
+           '{vs_oo}{ma}{pulli}' or
+           '{ka}{vs_u}{ma}{pulli}' or
+           '{ta}{vs_u}{ma}{pulli}' or
+           '{tta}{vs_u}{ma}{pulli}' or
+           '{rra}{vs_u}{ma}{pulli}' or
+           '{vs_aa}{ya}{pulli}' or
+           '{nnna}{vs_e}{nnna}{pulli}' or
+           '{nnna}{vs_i}{ra}{pulli}' or
+           '{vs_ii}{ra}{pulli}' or
+           '{vs_ii}{ya}{ra}{pulli}' 
+          ] <- '{pulli}'
       (set found_a_match)
       )
    or
@@ -373,19 +420,21 @@ define remove_tense_suffix as (
       (set found_a_match)
       )
   )
-  do (['{vs_aa}{na}{vs_i}{nnna}{pulli}{rra}' or
-    '{vs_aa}{na}{vs_i}{nnna}{pulli}{rra}{pulli}' or
-    '{ka}{vs_i}{nnna}{pulli}{rra}' or
-    '{ka}{vs_i}{nnna}{pulli}{rra}{pulli}' or
-    '{ka}{vs_i}{rra}' or
-    '{ka}{vs_i}{rra}{pulli}' ] delete
+  do ([among(
+              '{vs_aa}{na}{vs_i}{nnna}{pulli}{rra}'
+              '{vs_aa}{na}{vs_i}{nnna}{pulli}{rra}{pulli}'
+              '{ka}{vs_i}{nnna}{pulli}{rra}'
+              '{ka}{vs_i}{nnna}{pulli}{rra}{pulli}'
+              '{ka}{vs_i}{rra}'
+              '{ka}{vs_i}{rra}{pulli}' 
+            )] delete
     (set found_a_match)
     )
  )
  do fix_endings
 )
-define stem as (
 
+define stem as (
  do fix_ending
  has_min_length
  do remove_question_prefixes
