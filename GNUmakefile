@@ -274,18 +274,24 @@ check_utf8_%: ../data/% stemwords
 
 check_iso_8859_1_%: ../data/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
-	@iconv -fUTF8 -tISO8859-1 $</voc.txt|./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@iconv -fUTF8 -tISO8859-1 $</output.txt|diff -u - tmp.txt
+	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-1"))' | \
+	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("iso8859-1"))' | \
+	    diff -u - tmp.txt
 	@rm tmp.txt
 
 check_iso_8859_2_%: ../data/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
-	@iconv -fUTF8 -tISO8859-2 $</voc.txt|./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@iconv -fUTF8 -tISO8859-2 $</output.txt|diff -u - tmp.txt
+	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-2"))' | \
+	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("iso8859-2"))' | \
+	    diff -u - tmp.txt
 	@rm tmp.txt
 
 check_koi8r_%: ../data/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with KOI8R"
-	@iconv -fUTF8 -tKOI8R $</voc.txt|./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@iconv -fUTF8 -tKOI8R $</output.txt|diff -u - tmp.txt
+	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("koi8_r"))' | \
+	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
+	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("koi8_r"))' | \
+	    diff -u - tmp.txt
 	@rm tmp.txt
