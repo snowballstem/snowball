@@ -37,7 +37,7 @@ stringdef o"  hex 'F6'  //o-umlaut
 stringdef oq  hex '151' //o-double acute
 stringdef u'  hex 'FA'  //u-acute
 stringdef u"  hex 'FC'  //u-umlaut
-stringdef uq  hex 'FB'  //u-double acute
+stringdef uq  hex '171' //u-double acute
 
 define v 'aeiou{a'}{e'}{i'}{o'}{o"}{oq}{u'}{u"}{uq}'
 
