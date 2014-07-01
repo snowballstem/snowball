@@ -300,6 +300,7 @@ struct options {
     char * package;
     char * string_class;
     char * among_class;
+    char * strategy_class;
     struct include * includes;
     struct include * includes_end;
     byte utf8;
@@ -316,4 +317,3 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
 extern void close_generator_java(struct generator * g);
 
 extern void generate_program_java(struct generator * g);
-

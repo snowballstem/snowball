@@ -1,6 +1,4 @@
-
 package org.tartarus.snowball;
-import java.lang.reflect.InvocationTargetException;
 
 public class SnowballProgram {
     protected SnowballProgram()
@@ -169,16 +167,16 @@ public class SnowballProgram {
 	return true;
     }
 
-    protected boolean eq_v(CharSequence s)
+    protected boolean eq_v(StringBuffer s)
     {
 	return eq_s(s.length(), s.toString());
     }
 
-    protected boolean eq_v_b(CharSequence s)
+    protected boolean eq_v_b(StringBuffer s)
     {   return eq_s_b(s.length(), s.toString());
     }
 
-    protected int find_among(Among v[], int v_size)
+    protected int find_among(Among v[], BooleanStrategy strategies[], int v_size)
     {
 	int i = 0;
 	int j = v_size;
@@ -202,7 +200,7 @@ public class SnowballProgram {
 		    diff = -1;
 		    break;
 		}
-		diff = current.charAt(c + common) - w.s[i2];
+		diff = current.charAt(c + common) - w.s[ i2 ];
 		if (diff != 0) break;
 		common++;
 	    }
@@ -227,21 +225,13 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
+	    BooleanStrategy strategy = strategies[i];
 	    if (common_i >= w.s_size) {
 		cursor = c + w.s_size;
-		if (w.method == null) return w.result;
-		boolean res;
-		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
-		    res = resobj.toString().equals("true");
-		} catch (InvocationTargetException e) {
-		    res = false;
-		    // FIXME - debug message
-		} catch (IllegalAccessException e) {
-		    res = false;
-		    // FIXME - debug message
-		}
+		if ( strategy == null ) return w.result;
+		
+		boolean res = strategy.invoke();
+		
 		cursor = c + w.s_size;
 		if (res) return w.result;
 	    }
@@ -251,7 +241,7 @@ public class SnowballProgram {
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    protected int find_among_b(Among v[], int v_size)
+    protected int find_among_b(Among v[], BooleanStrategy strategies[], int v_size)
     {
 	int i = 0;
 	int j = v_size;
@@ -275,7 +265,7 @@ public class SnowballProgram {
 		    diff = -1;
 		    break;
 		}
-		diff = current.charAt(c - 1 - common) - w.s[i2];
+		diff = current.charAt(c - 1 - common) - w.s[ i2 ];
 		if (diff != 0) break;
 		common++;
 	    }
@@ -295,22 +285,14 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
+	    BooleanStrategy strategy = strategies[ i ];
 	    if (common_i >= w.s_size) {
 		cursor = c - w.s_size;
-		if (w.method == null) return w.result;
+		
+		if ( strategy == null ) return w.result;
 
-		boolean res;
-		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
-		    res = resobj.toString().equals("true");
-		} catch (InvocationTargetException e) {
-		    res = false;
-		    // FIXME - debug message
-		} catch (IllegalAccessException e) {
-		    res = false;
-		    // FIXME - debug message
-		}
+		boolean res = strategy.invoke();
+		
 		cursor = c - w.s_size;
 		if (res) return w.result;
 	    }
@@ -355,7 +337,7 @@ public class SnowballProgram {
 	replace_s(bra, ket, s);
     }
 
-    protected void slice_from(CharSequence s)
+    protected void slice_from(StringBuffer s)
     {
         slice_from(s.toString());
     }
@@ -372,21 +354,15 @@ public class SnowballProgram {
 	if (c_bra <= ket) ket += adjustment;
     }
 
-    protected void insert(int c_bra, int c_ket, CharSequence s)
+    protected void insert(int c_bra, int c_ket, StringBuffer s)
     {
 	insert(c_bra, c_ket, s.toString());
     }
 
     /* Copy the slice into the supplied StringBuffer */
-    protected StringBuffer slice_to(StringBuffer s)
-    {
-	slice_check();
-	int len = ket - bra;
-	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
-    }
-
-    /* Copy the slice into the supplied StringBuilder */
+    
+    
+    /* Copy the slice into the supplied StringBuffer */
     protected StringBuilder slice_to(StringBuilder s)
     {
 	slice_check();
@@ -400,7 +376,7 @@ public class SnowballProgram {
 	s.replace(0, s.length(), current.substring(0, limit));
 	return s;
     }
-
+    
     protected StringBuilder assign_to(StringBuilder s)
     {
 	s.replace(0, s.length(), current.substring(0, limit));
@@ -430,3 +406,4 @@ extern void debug(struct SN_env * z, int number, int line_count)
 */
 
 };
+
