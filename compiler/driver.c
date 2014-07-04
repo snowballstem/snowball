@@ -199,7 +199,7 @@ extern int main(int argc, char * argv[]) {
             exit(1);
         }
         {
-            struct tokeniser * t = create_tokeniser(u);
+            struct tokeniser * t = create_tokeniser(u, file);
             struct analyser * a = create_analyser(t);
             t->widechars = o->widechars;
             t->includes = o->includes;
