@@ -7,6 +7,7 @@
 #define DEFAULT_BASE_CLASS "org.tartarus.snowball.SnowballProgram"
 #define DEFAULT_AMONG_CLASS "org.tartarus.snowball.Among"
 #define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
+#define DEFAULT_STRATEGY_CLASS "org.tartarus.snowball.BooleanStrategy"
 
 static int eq(char * s1, char * s2) {
     int s1_len = strlen(s1);
@@ -34,6 +35,7 @@ static void print_arglist(void) {
                     "             [-P[ackage] package name for stemmers]\n"
                     "             [-S[tringclass] StringBuffer-compatible class]\n"
                     "             [-a[mongclass] fully qualified name of the Among class]\n"
+                    "             [-B[ooleanStrategy] fully qualified name of the BooleanStrategy class]\n"
 #endif
            );
     exit(1);
@@ -71,6 +73,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->parent_class_name = DEFAULT_BASE_CLASS;
     o->string_class = DEFAULT_STRING_CLASS;
     o->among_class = DEFAULT_AMONG_CLASS;
+    o->strategy_class = DEFAULT_STRATEGY_CLASS;
     o->package = DEFAULT_PACKAGE;
     o->name = "";
     o->make_lang = LANG_C;
@@ -170,6 +173,11 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->among_class = argv[i++];
                 continue;
             }
+            if (eq(s, "-B") || eq(s, "-BooleanStrategy")) {
+                check_lim(i, argc);
+                o->strategy_class = argv[i++];
+                continue;
+            }
 #endif
             fprintf(stderr, "'%s' misplaced\n", s);
             print_arglist();
@@ -191,7 +199,7 @@ extern int main(int argc, char * argv[]) {
             exit(1);
         }
         {
-            struct tokeniser * t = create_tokeniser(u, file);
+            struct tokeniser * t = create_tokeniser(u);
             struct analyser * a = create_analyser(t);
             t->widechars = o->widechars;
             t->includes = o->includes;

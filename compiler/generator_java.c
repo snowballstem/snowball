@@ -4,6 +4,8 @@
 #include <stdio.h> /* for fprintf etc */
 #include "header.h"
 
+
+
 /* prototypes */
 
 static void generate(struct generator * g, struct node * p);
@@ -127,13 +129,11 @@ static void write_margin(struct generator * g) {
 }
 
 /* Write a variable declaration. */
-static void write_declare(struct generator * g,
-                          char * declaration,
-                          struct node * p) {
+static void write_declare(struct generator * g, char * declaration, struct node * p) {
 
     struct str * temp = g->outbuf;
     g->outbuf = g->declarations;
-    write_string(g, "            ");
+    w(g, "~M");
     writef(g, declaration, p);
     write_string(g, ";");
     write_newline(g);
@@ -164,8 +164,7 @@ static void write_block_end(struct generator * g)    /* block end */ {
     w(g, "~-~M}~N");
 }
 
-static void write_savecursor(struct generator * g, struct node * p,
-                             struct str * savevar) {
+static void write_savecursor(struct generator * g, struct node * p, struct str * savevar) {
 
     g->B[0] = str_data(savevar);
     g->S[1] = "";
@@ -183,8 +182,7 @@ static void restore_string(struct node * p, struct str * out, struct str * savev
     str_append_string(out, ";");
 }
 
-static void write_restorecursor(struct generator * g, struct node * p,
-                                struct str * savevar) {
+static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
 
     struct str * temp = str_new();
     write_margin(g);
@@ -239,9 +237,9 @@ static void write_failure(struct generator * g) {
             write_string(g, "break lab");
             write_int(g, g->failure_label);
             write_string(g, ";");
-            g->unreachable = true;
     }
     write_newline(g);
+    g->unreachable = true;
 }
 
 static void write_failure_if(struct generator * g, char * s, struct node * p) {
@@ -279,7 +277,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 case 'C': write_comment(g, p); continue;
                 case 'f': write_block_start(g);
                           write_failure(g);
-			  g->unreachable = false;
+                          g->unreachable = false;
                           write_block_end(g);
                           continue;
                 case 'M': write_margin(g); continue;
@@ -973,7 +971,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
     writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mcurrent = new StringBuffer(~V0.toString());~N"
+             "~Mcurrent = ~V0;~N"
              "~Mcursor = 0;~N"
              "~Mlimit = (current.length());~N", p);
     generate(g, p->left);
@@ -1006,9 +1004,24 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
 
 static void generate_call(struct generator * g, struct node * p) {
 
+    struct name * q = p->name;
+    int i, all_upper = true, len = SIZE(q->b);
+    for( i = 0; i < len; i++ ){
+        char c = q->b[ i ];
+        if( c < 'A' || c > 'Z' ){
+            all_upper = false;
+            break;
+        }
+    }
+
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "!~V0()", p);
+    if( q->type == t_routine && all_upper ){
+        write_failure_if(g, "!~V0.invoke()", p); 
+    }
+    else{
+        write_failure_if(g, "!~V0()", p);
+    }
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -1046,13 +1059,30 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_define(struct generator * g, struct node * p) {
 
     struct name * q = p->name;
+    
+    int i, all_upper = true, len = SIZE(q->b);
+    for( i = 0; i < len; i++ ){
+        char c = q->b[ i ];
+        if( c < 'A' || c > 'Z' ){
+            all_upper = false;
+            break;
+        }
+    }
 
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
 
     g->S[0] = q->type == t_routine ? "private" : "public";
     g->V[0] = q;
-    w(g, "~+~+~N~M~S0 boolean ~V0() {~+~N");
+
+    if( q->type == t_routine && all_upper ){
+        
+        w(g, "~M~S0 BooleanStrategy ~V0 = new BooleanStrategy() {~+~N");
+        w(g, "~Mpublic boolean invoke(){~+~N");
+    }
+    else{
+        w(g, "~M~S0 boolean ~V0() {~+~N");
+    }
 
     g->outbuf = str_new();
     g->declarations = str_new();
@@ -1066,7 +1096,14 @@ static void generate_define(struct generator * g, struct node * p) {
     g->unreachable = false;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~Mreturn true;~N");
-    w(g, "~}~-~-");
+    
+
+    if( q->type == t_routine && all_upper ){
+        w(g, "~-~M}~-~N~M};~N~N");
+    }else{
+        w(g, "~N"); 
+        w(g, "~}~N");
+    }
 
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
@@ -1087,9 +1124,9 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[1] = x->literalstring_count;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "find_among~S0(a_~I0, ~I1) == 0", p);
+        write_failure_if(g, "find_among~S0(a_~I0, s_~I0, ~I1) == 0", p);
     } else {
-        writef(g, "~Mamong_var = find_among~S0(a_~I0, ~I1);~N", p);
+        writef(g, "~Mamong_var = find_among~S0(a_~I0, s_~I0, ~I1);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1241,6 +1278,9 @@ static void generate_class_begin(struct generator * g) {
     w(g, "import ");
     w(g, g->options->among_class );
     w(g, ";~N"
+        "import ");
+    w(g, g->options->strategy_class );
+    w(g, ";~N"
          "~N"
          " /**~N"
          "  * This class was automatically generated by a Snowball to Java compiler ~N"
@@ -1251,10 +1291,9 @@ static void generate_class_begin(struct generator * g) {
 
      w(g, g->options->parent_class_name);
      w(g, " {~N"
-          "~N"
-	  "private static final long serialVersionUID = 1L;~N"
-	  "~N"
-	  "~+~+~Mprivate final static ~n methodObject = new ~n ();~N"
+         "~N"
+			"private static final long serialVersionUID = 1L;~N"
+			"~N~+~+"
          "~N");
 }
 
@@ -1267,16 +1306,16 @@ static void generate_class_end(struct generator * g) {
 static void generate_equals(struct generator * g) {
 
     w(g, "~N"
-         "~Mpublic boolean equals( Object o ) {~N"
-         "~+~Mreturn o instanceof ");
+			"~Mpublic boolean equals( Object o ) {~N"
+			"~+~Mreturn o instanceof ");
     w(g, g->options->name);
 	 w(g, ";~N~-~M}~N"
-	      "~N"
-	      "~Mpublic int hashCode() {~N"
-	      "~+~Mreturn ");
+			"~N"
+			"~Mpublic int hashCode() {~N"
+			"~+~Mreturn ");
     w(g, g->options->name);
 	 w(g, ".class.getName().hashCode();~N"
-	      "~-~M}~N");
+			"~-~M}~N");
     w(g, "~N~N");
 }
 
@@ -1286,8 +1325,8 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
-
-    w(g, "~+~+~Mprivate final static Among a_~I0[] = {~N~+");
+    
+    w(g, "~Mprivate final static Among a_~I0[] = {~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1297,22 +1336,53 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among ( ~L0, ~I1, ~I2, \"");
-            if (v->function != 0) {
-                write_varname(g, v->function);
-            }
-            w(g, "\", methodObject )~S0~N");
+            w(g, "~Mnew Among ( ~L0, ~I1, ~I2 )~S0~N");
             v++;
         }
     }
-    w(g, "~-~M};~-~-~N~N");
+    w(g, "~-~M};~N~N");
+    
 }
+
 
 static void generate_amongs(struct generator * g) {
 
     struct among * x = g->analyser->amongs;
     while (x != 0) {
-        generate_among_table(g, x);
+        generate_among_table(g, x);    
+        x = x->next;
+    }
+}
+
+static void generate_strategy_table( struct generator * g, struct among * x){
+    struct amongvec * v = x->b;
+    
+    g->I[0] = x->number;
+    
+    w(g, "~Mprotected final BooleanStrategy s_~I0[] = {~N~+");
+    {
+        int i;
+        for (i = 0; i < x->literalstring_count; i++){
+            g->S[0] = i < x->literalstring_count - 1 ? "," : "";
+            w(g, "~M"); 
+            if (v->function != 0) {
+                write_varname(g, v->function);
+            }else{ 
+                w(g, "null");
+            }
+            
+            w(g, "~S0~N");
+            v++;
+        }
+    }
+    w(g, "~-~M};~N~N");
+}
+
+static void generate_strategies(struct generator * g){
+
+    struct among * x = g->analyser->amongs;
+    while( x != 0 ){
+        generate_strategy_table(g, x);
         x = x->next;
     }
 }
@@ -1331,7 +1401,6 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (i = 0; i < size; i++) map[i] = 0;
 
     /* Using unicode would require revision here */
-
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     q->no_gaps = true;
@@ -1340,12 +1409,12 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     unless (q->no_gaps) {
         g->V[0] = q->name;
 
-        w(g, "~+~+~Mprivate static final char ~V0[] = {");
+        w(g, "~Mprivate static final char ~V0[] = {");
         for (i = 0; i < size; i++) {
              write_int(g, map[i]);
              if (i < size - 1) w(g, ", ");
         }
-        w(g, " };~N~-~-~N");
+        w(g, " };~N~N");
     }
     lose_b(map);
 }
@@ -1365,17 +1434,17 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "        private ");
+                w(g, "~Mprivate ");
                 w(g, g->options->string_class );
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
                 break;
             case t_integer:
-                w(g, "        private int ~W0;~N");
+                w(g, "~Mprivate int ~W0;~N");
                 break;
             case t_boolean:
-                w(g, "        private boolean ~W0;~N");
+                w(g, "~Mprivate boolean ~W0;~N");
                 break;
         }
         q = q->next;
@@ -1423,9 +1492,13 @@ extern void generate_program_java(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
-    generate_copyfrom(g);
-    generate_methods(g);
+    /* Omitted. Never used. 
+	 generate_copyfrom(g);
+	 */
+	generate_methods(g);
     generate_equals(g);
+    
+    generate_strategies(g);
 
     generate_class_end(g);
 
@@ -1442,11 +1515,11 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
     g->margin = 0;
     g->debug_count = 0;
     g->unreachable = false;
+    
     return g;
 }
 
 extern void close_generator_java(struct generator * g) {
-
     FREE(g);
 }
 
