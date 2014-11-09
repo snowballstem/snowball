@@ -3,3 +3,29 @@ algorithms on the website.
 
 See http://snowball.tartarus.org/ for more details.
 
+-------
+LAW Modifications
+
+* snowball/compiler/driver.c:
+
+Added new defaults for a more parameterised generation of java code.
+
+java.lang.StringBuilder is the new String building class instead of
+java.util.StringBuffer. This avoids the synchronised methods of the
+StringBuffer class and also allows the user to specify a personal developed
+StringBuilder compatible class (e.g., it.unimi.dsi.lang.MutableString).
+
+The package, base-class and Among class are parameterised so the defaults
+may be overridden if needed. (The needed changes were added to header.h)
+
+* snowball/compiler/generator_java.c
+The Among arrays in the generated stemmers are declared static final. The
+lookup is thus much faster w.r.t. the previous version.
+Package, base-class and Among classes will be those provided on the CLI.
+
+* header.c
+Add strategy_class char*
+
+* Java packages:
+
+  - Add java_law package folders for MG4J libraries

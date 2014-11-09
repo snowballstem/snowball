@@ -1,4 +1,6 @@
-package org.tartarus.snowball;
+package it.unimi.di.big.mg4j.index.snowball;
+
+//import java.lang.reflect.Method;
 
 public class Among {
 	public Among( String s, int substring_i, int result ) {
