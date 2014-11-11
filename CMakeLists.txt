@@ -174,7 +174,6 @@ MACRO(gen_stem IN ENCODING)
 			ADD_CUSTOM_COMMAND(OUTPUT ${_source}
 				COMMAND ${CMAKE_BINARY_DIR}/snowball  "${CMAKE_SOURCE_DIR}/algorithms/${_it}/stem_ISO_8859_1.sbl" -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_SOURCE_DIR}/runtime -u
 				DEPENDS snowball)
-			ADD_DEPENDENCIES(stemmer_deps ${_source})
 			LIST(APPEND STEMMER_SOURCES ${_source})
 
 		ELSE()
@@ -182,7 +181,6 @@ MACRO(gen_stem IN ENCODING)
 			ADD_CUSTOM_COMMAND(OUTPUT ${_source}
 				COMMAND ${CMAKE_BINARY_DIR}/snowball ${_input} -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_SOURCE_DIR}/runtime -u
 				DEPENDS snowball)
-			ADD_DEPENDENCIES(stemmer_deps ${_source})
 			LIST(APPEND STEMMER_SOURCES ${_source})
 		ENDIF()
 		ENDIF()
@@ -195,7 +193,7 @@ INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/libstemmer")
 ADD_EXECUTABLE(snowball ${COMPILER_SOURCES})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/libstemmer/modules.h
- COMMAND ${PERL_EXECUTABLE} ${CMAKE_SOURCE_DIR}/libstemmer/mkmodules_cmake.pl ${CMAKE_BINARY_DIR}/libstemmer/modules.h ${CMAKE_BINARY_DIR}/libstemmer ${CMAKE_SOURCE_DIR}/libstemmer/modules.txt ${CMAKE_BINARY_DIR}/libstemmer/mkinc.mak)
+ COMMAND ${PERL_EXECUTABLE} ${CMAKE_SOURCE_DIR}/libstemmer/mkmodules.pl -f ${CMAKE_BINARY_DIR}/libstemmer/modules.h ${CMAKE_BINARY_DIR}/libstemmer ${CMAKE_SOURCE_DIR}/libstemmer/modules.txt ${CMAKE_BINARY_DIR}/libstemmer/mkinc.mak)
 ADD_CUSTOM_TARGET(modules DEPENDS "${CMAKE_BINARY_DIR}/libstemmer/modules.h")
 
 SET(STEMMER_SOURCES "${CMAKE_BINARY_DIR}/libstemmer/libstemmer.c")
