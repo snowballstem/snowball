@@ -8,7 +8,7 @@
 struct system_word {
     int s_size;   /* size of system word */
     byte * s;     /* pointer to the system word */
-    int code;     /* it's internal code */
+    int code;     /* its internal code */
 };
 
 
