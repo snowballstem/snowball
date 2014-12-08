@@ -260,7 +260,11 @@ check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)
 
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
-check_utf8_%: ../data/% stemwords
+# Where the data files are located - assumed their repo is checked out as
+# a sibling to this one.
+STEMMING_DATA = ../snowball-data
+
+check_utf8_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
 	@./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
 	@diff -u $</output.txt tmp.txt
@@ -271,7 +275,7 @@ check_utf8_%: ../data/% stemwords
 	fi
 	@rm tmp.txt
 
-check_iso_8859_1_%: ../data/% stemwords
+check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
 	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-1"))' | \
 	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
@@ -279,7 +283,7 @@ check_iso_8859_1_%: ../data/% stemwords
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
-check_iso_8859_2_%: ../data/% stemwords
+check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
 	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-2"))' | \
 	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
@@ -287,7 +291,7 @@ check_iso_8859_2_%: ../data/% stemwords
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
-check_koi8r_%: ../data/% stemwords
+check_koi8r_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with KOI8R"
 	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("koi8_r"))' | \
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
