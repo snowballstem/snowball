@@ -270,7 +270,7 @@ struct generator {
     int failure_label;
     int debug_count;
 
-    const char * S[10];        /* strings */
+    const char * S[10];  /* strings */
     symbol * B[10];      /* blocks */
     int I[10];           /* integers */
     struct name * V[5];  /* variables */

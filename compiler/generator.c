@@ -1015,55 +1015,55 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (block != -1 || n_cases <= 2) {
-    char buf[64];
-    g->I[2] = block;
-    g->I[3] = bitmap;
-    g->I[4] = shortest_size - 1;
-    if (p->mode == m_forward) {
-        sprintf(buf, "z->p[z->c + %d]", shortest_size - 1);
-        g->S[1] = buf;
-        if (shortest_size == 1) {
-            wp(g, "~Mif (z->c >= z->l || ", p);
+        char buf[64];
+        g->I[2] = block;
+        g->I[3] = bitmap;
+        g->I[4] = shortest_size - 1;
+        if (p->mode == m_forward) {
+            sprintf(buf, "z->p[z->c + %d]", shortest_size - 1);
+            g->S[1] = buf;
+            if (shortest_size == 1) {
+                wp(g, "~Mif (z->c >= z->l || ", p);
+            } else {
+                wp(g, "~Mif (z->c + ~I4 >= z->l || ", p);
+            }
         } else {
-            wp(g, "~Mif (z->c + ~I4 >= z->l || ", p);
+            g->S[1] = "z->p[z->c - 1]";
+            if (shortest_size == 1) {
+                wp(g, "~Mif (z->c <= z->lb || ", p);
+            } else {
+                wp(g, "~Mif (z->c - ~I4 <= z->lb || ", p);
+            }
         }
-    } else {
-        g->S[1] = "z->p[z->c - 1]";
-        if (shortest_size == 1) {
-            wp(g, "~Mif (z->c <= z->lb || ", p);
+        if (n_cases == 0) {
+            /* We get this for the degenerate case: among { '' }
+             * This doesn't seem to be a useful construct, but it is
+             * syntactically valid.
+             */
+            wp(g, "0", p);
+        } else if (n_cases == 1) {
+            g->I[4] = cases[0];
+            wp(g, "~S1 != ~I4", p);
+        } else if (n_cases == 2) {
+            g->I[4] = cases[0];
+            g->I[5] = cases[1];
+            wp(g, "(~S1 != ~I4 && ~S1 != ~I5)", p);
         } else {
-            wp(g, "~Mif (z->c - ~I4 <= z->lb || ", p);
+            wp(g, "~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
         }
-    }
-    if (n_cases == 0) {
-        /* We get this for the degenerate case: among { '' }
-         * This doesn't seem to be a useful construct, but it is
-         * syntactically valid.
-         */
-        wp(g, "0", p);
-    } else if (n_cases == 1) {
-        g->I[4] = cases[0];
-        wp(g, "~S1 != ~I4", p);
-    } else if (n_cases == 2) {
-        g->I[4] = cases[0];
-        g->I[5] = cases[1];
-        wp(g, "(~S1 != ~I4 && ~S1 != ~I5)", p);
-    } else {
-        wp(g, "~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
-    }
-    ws(g, ") ");
-    if (empty_case != -1) {
-        /* If the among includes the empty string, it can never fail
-         * so not matching the bitmap means we match the empty string.
-         */
-        g->I[4] = among_cases[empty_case].result;
-        wp(g, "among_var = ~I4; else~N", p);
-    } else {
-        wp(g, "~f~N", p);
-    }
+        ws(g, ") ");
+        if (empty_case != -1) {
+            /* If the among includes the empty string, it can never fail
+             * so not matching the bitmap means we match the empty string.
+             */
+            g->I[4] = among_cases[empty_case].result;
+            wp(g, "among_var = ~I4; else~N", p);
+        } else {
+            wp(g, "~f~N", p);
+        }
     } else {
 #ifdef OPTIMISATION_WARNINGS
-    printf("Couldn't shortcut among %d\n", x->number);
+        printf("Couldn't shortcut among %d\n", x->number);
 #endif
     }
 
