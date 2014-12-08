@@ -1,5 +1,5 @@
 
-#include <stdio.h>   /* main etc */
+#include <stdio.h>   /* printf etc */
 #include <stdlib.h>  /* exit */
 #include <string.h>  /* memmove */
 #include "header.h"
