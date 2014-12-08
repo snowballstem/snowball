@@ -145,7 +145,7 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%/
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) -O2 -c -o $@ $< -Wall
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(java_src_dir)
