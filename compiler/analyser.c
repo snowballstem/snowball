@@ -13,7 +13,7 @@ static struct node * C_style(struct analyser * a, char * s, int token);
 
 static void fault(int n) { fprintf(stderr, "fault %d\n", n); exit(1); }
 
-static void print_node_(struct node * p, int n, char * s) {
+static void print_node_(struct node * p, int n, const char * s) {
 
     int i;
     for (i = 0; i < n; i++) fputs(i == n - 1 ? s : "  ", stdout);
@@ -50,7 +50,7 @@ static struct node * new_node(struct analyser * a, int type) {
     return p;
 }
 
-static char * name_of_mode(int n) {
+static const char * name_of_mode(int n) {
     switch (n) {
          default: fault(0);
          case m_backward: return "string backward";
@@ -59,7 +59,7 @@ static char * name_of_mode(int n) {
     }
 }
 
-static char * name_of_type(int n) {
+static const char * name_of_type(int n) {
     switch (n) {
          default: fault(1);
          case 's': return "string";

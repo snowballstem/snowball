@@ -8,7 +8,7 @@
 #define DEFAULT_AMONG_CLASS "org.tartarus.snowball.Among"
 #define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
 
-static int eq(char * s1, char * s2) {
+static int eq(const char * s1, const char * s2) {
     int s1_len = strlen(s1);
     int s2_len = strlen(s2);
     return s1_len == s2_len && memcmp(s1, s2, s1_len) == 0;
