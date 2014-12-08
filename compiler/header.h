@@ -101,7 +101,7 @@ struct tokeniser {
 extern symbol * get_input(symbol * p, char ** p_file);
 extern struct tokeniser * create_tokeniser(symbol * b, char * file);
 extern int read_token(struct tokeniser * t);
-extern byte * name_of_token(int code);
+extern const char * name_of_token(int code);
 extern void close_tokeniser(struct tokeniser * t);
 
 enum token_codes {

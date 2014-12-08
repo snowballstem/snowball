@@ -74,7 +74,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
 			}
 		    }
 
-		    fputs((char *)stemmed, f_out);
+		    fputs((const char *)stemmed, f_out);
 		    putc('\n', f_out);
 		}
             }

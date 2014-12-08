@@ -130,7 +130,7 @@ static void wm(struct generator * g) {       /* margin */
 static void wc(struct generator * g, struct node * p) { /* comment */
 
     ws(g, " /* ");
-    ws(g, (char *) name_of_token(p->type));
+    ws(g, name_of_token(p->type));
     unless (p->name == 0) {
         ws(g, " ");
         str_append_b(g->outbuf, p->name->b);
