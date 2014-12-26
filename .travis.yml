@@ -1,4 +1,4 @@
 language: c
 compiler: gcc
-before_script: git clone https://github.com/snowballstem/snowball-data ../data
+before_script: git clone https://github.com/snowballstem/snowball-data ../snowball-data
 script:  make check
