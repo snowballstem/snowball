@@ -161,25 +161,25 @@ SET(LIBSTEMMER_UTF8_SOURCES libstemmer/libstemmer_utf8.c)
 
 SET(STEMWORDS_SOURCES examples/stemwords.c)
 SET(MODULES_H "modules.h")
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/libstemmer/libstemmer_c.in ${CMAKE_BINARY_DIR}/libstemmer/libstemmer.c @ONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libstemmer/libstemmer_c.in ${CMAKE_CURRENT_BINARY_DIR}/libstemmer/libstemmer.c @ONLY)
 
 MACRO(gen_stem IN ENCODING)
 	FOREACH(_it ${IN})
-		SET(_base "${CMAKE_BINARY_DIR}/libstemmer/stem_${ENCODING}_${_it}")
+		SET(_base "${CMAKE_CURRENT_BINARY_DIR}/libstemmer/stem_${ENCODING}_${_it}")
 		SET(_header "${_base}.h")
 		SET(_source "${_base}.c")
 		STRING(REPLACE "UTF_8" "Unicode" _in_enc "${ENCODING}")
-		SET(_input "${CMAKE_SOURCE_DIR}/algorithms/${_it}/stem_${_in_enc}.sbl")
+		SET(_input "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/${_it}/stem_${_in_enc}.sbl")
 		IF(${_in_enc} STREQUAL "Unicode" AND NOT EXISTS ${_input})
 			ADD_CUSTOM_COMMAND(OUTPUT ${_source}
-				COMMAND ${CMAKE_BINARY_DIR}/snowball  "${CMAKE_SOURCE_DIR}/algorithms/${_it}/stem_ISO_8859_1.sbl" -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_SOURCE_DIR}/runtime -u
+				COMMAND ${CMAKE_CURRENT_BINARY_DIR}/snowball  "${CMAKE_CURRENT_SOURCE_DIR}/algorithms/${_it}/stem_ISO_8859_1.sbl" -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_CURRENT_SOURCE_DIR}/runtime -u
 				DEPENDS snowball)
 			LIST(APPEND STEMMER_SOURCES ${_source})
 
 		ELSE()
 		IF(EXISTS "${_input}")
 			ADD_CUSTOM_COMMAND(OUTPUT ${_source}
-				COMMAND ${CMAKE_BINARY_DIR}/snowball ${_input} -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_SOURCE_DIR}/runtime -u
+				COMMAND ${CMAKE_CURRENT_BINARY_DIR}/snowball ${_input} -o ${_base} -eprefix ${_it}_${ENCODING}_ -r ${CMAKE_CURRENT_SOURCE_DIR}/runtime -u
 				DEPENDS snowball)
 			LIST(APPEND STEMMER_SOURCES ${_source})
 		ENDIF()
@@ -188,15 +188,15 @@ MACRO(gen_stem IN ENCODING)
 ENDMACRO()
 
 INCLUDE_DIRECTORIES("include")
-INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/libstemmer")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/libstemmer")
 
 ADD_EXECUTABLE(snowball ${COMPILER_SOURCES})
 
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/libstemmer/modules.h
- COMMAND ${PERL_EXECUTABLE} ${CMAKE_SOURCE_DIR}/libstemmer/mkmodules.pl -f ${CMAKE_BINARY_DIR}/libstemmer/modules.h ${CMAKE_BINARY_DIR}/libstemmer ${CMAKE_SOURCE_DIR}/libstemmer/modules.txt ${CMAKE_BINARY_DIR}/libstemmer/mkinc.mak)
-ADD_CUSTOM_TARGET(modules DEPENDS "${CMAKE_BINARY_DIR}/libstemmer/modules.h")
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libstemmer/modules.h
+ COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/libstemmer/mkmodules.pl -f ${CMAKE_CURRENT_BINARY_DIR}/libstemmer/modules.h ${CMAKE_CURRENT_BINARY_DIR}/libstemmer ${CMAKE_CURRENT_SOURCE_DIR}/libstemmer/modules.txt ${CMAKE_CURRENT_BINARY_DIR}/libstemmer/mkinc.mak)
+ADD_CUSTOM_TARGET(modules DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libstemmer/modules.h")
 
-SET(STEMMER_SOURCES "${CMAKE_BINARY_DIR}/libstemmer/libstemmer.c")
+SET(STEMMER_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/libstemmer/libstemmer.c")
 ADD_CUSTOM_TARGET(stemmer_deps ALL)
 ADD_DEPENDENCIES(stemmer_deps modules)
 
@@ -206,8 +206,8 @@ gen_stem("${ISO_8859_1_ALGORITHMS}" "ISO_8859_1")
 gen_stem("${ISO_8859_2_ALGORITHMS}" "ISO_8859_2")
 
 
-ADD_LIBRARY(stemmer ${LINK_TYPE} ${STEMMER_SOURCES})
+ADD_LIBRARY(stemmer ${LINK_TYPE} ${SNOWBALL_RUNTIME} ${STEMMER_SOURCES})
 ADD_DEPENDENCIES(stemmer stemmer_deps)
 
-ADD_EXECUTABLE(stemwords ${SNOWBALL_RUNTIME} ${STEMWORDS_SOURCES})
+ADD_EXECUTABLE(stemwords ${STEMWORDS_SOURCES})
 TARGET_LINK_LIBRARIES(stemwords stemmer)
