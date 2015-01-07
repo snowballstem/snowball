@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\libstemmer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_danish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_dutch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_english.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_finnish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_french.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_german.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_hungarian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_italian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_norwegian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_porter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_portuguese.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_romanian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_russian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_spanish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_swedish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_turkish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_KOI8_R_russian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_danish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_dutch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_english.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_finnish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_french.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_german.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_italian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_norwegian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_porter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_portuguese.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_spanish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_swedish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_hungarian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_romanian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\CMakeLists.txt" />
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_danish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_dutch.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_english.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_finnish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_french.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_german.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_hungarian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_italian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_norwegian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_porter.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_portuguese.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_romanian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_russian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_spanish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_swedish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_UTF_8_turkish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_KOI8_R_russian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_danish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_dutch.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_english.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_finnish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_french.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_german.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_italian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_norwegian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_porter.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_portuguese.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_spanish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_1_swedish.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_2_hungarian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Projects\GitHub\snowball\vs2013\CMakeFiles\ea552feac2cd9f9c8b140f7d0b3918b7\stem_ISO_8859_2_romanian.c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A50A4C52-8F9F-4097-8B98-F83014030A1D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{91EC7FA4-52F9-4C19-BA82-4688FF8C6821}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
