@@ -7,25 +7,32 @@ set ALG_PATH=..\algorithms\
 set SNOWBALL=%LOCAL%snowball.exe
 set TARGET=%LOCAL%Snowball\Algorithms\
 
+
 echo.
-echo - Algorithms: %ALG_PATH%
-echo - Snowball  : %SNOWBALL%
+echo  Stemmer generation script
+echo.
+echo   - Source:    %ALG_PATH%
+echo   - Target:    %TARGET%
+echo   - Compiler:  %SNOWBALL%
 echo.
 
 pause
 
+echo.
+
 IF EXIST "%TARGET%" (
-    echo Cleaning ...
+    echo  Clearning target directory
     cd %TARGET%
     del *.cs
     cd %LOCAL%
 )
 
-echo Ready
+echo  Starting code generation
+echo.
 
 for /f "tokens=*" %%D in ('dir /b /s /a:d "%ALG_PATH%"') do (
     
-    echo Processing %%~nD
+    echo   - Processing %%~nD
     pushd %%D
     
     call :FirstUp result %%~nD
@@ -33,7 +40,7 @@ for /f "tokens=*" %%D in ('dir /b /s /a:d "%ALG_PATH%"') do (
     
     for /r %%f in (*8859_1.sbl) do (
         SET FILE_PATH=%%f
-        SET TARGET_PATH=%TARGET%\!FILE_NAME!
+        SET TARGET_PATH=%TARGET%\!FILE_NAME!.generated
                 
         %SNOWBALL% !FILE_PATH! -cs -o !TARGET_PATH! -name !FILE_NAME! -u        
     )

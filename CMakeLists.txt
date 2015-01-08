@@ -149,7 +149,8 @@ SET(COMPILER_SOURCES compiler/space.c
 		   compiler/analyser.c
 		   compiler/generator.c
 		   compiler/driver.c
-		   compiler/generator_java.c)
+		   compiler/generator_java.c
+		   compiler/generator_csharp.c)
 
 SET(SNOWBALL_RUNTIME runtime/api.c
 		   runtime/utilities.c)

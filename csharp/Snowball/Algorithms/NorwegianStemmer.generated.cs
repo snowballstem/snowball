@@ -1,5 +1,8 @@
 // This file was generated automatically by the Snowball to C# compiler
 
+#pragma warning disable 0164
+#pragma warning disable 0162
+
 namespace Snowball
 {
     using System;
@@ -11,68 +14,77 @@ namespace Snowball
     ///</summary>
     /// 
     [System.CodeDom.Compiler.GeneratedCode("Snowball", "0.0.0")]
-    public class NorwegianStemmer : SnowballStemmer
+    public partial class NorwegianStemmer : SnowballStemmer
     {
-        private static readonly Among[] a_0 =
-        {
-            new Among("a", -1, 1, "", methodObject),
-            new Among("e", -1, 1, "", methodObject),
-            new Among("ede", 1, 1, "", methodObject),
-            new Among("ande", 1, 1, "", methodObject),
-            new Among("ende", 1, 1, "", methodObject),
-            new Among("ane", 1, 1, "", methodObject),
-            new Among("ene", 1, 1, "", methodObject),
-            new Among("hetene", 6, 1, "", methodObject),
-            new Among("erte", 1, 3, "", methodObject),
-            new Among("en", -1, 1, "", methodObject),
-            new Among("heten", 9, 1, "", methodObject),
-            new Among("ar", -1, 1, "", methodObject),
-            new Among("er", -1, 1, "", methodObject),
-            new Among("heter", 12, 1, "", methodObject),
-            new Among("s", -1, 2, "", methodObject),
-            new Among("as", 14, 1, "", methodObject),
-            new Among("es", 14, 1, "", methodObject),
-            new Among("edes", 16, 1, "", methodObject),
-            new Among("endes", 16, 1, "", methodObject),
-            new Among("enes", 16, 1, "", methodObject),
-            new Among("hetenes", 19, 1, "", methodObject),
-            new Among("ens", 14, 1, "", methodObject),
-            new Among("hetens", 21, 1, "", methodObject),
-            new Among("ers", 14, 1, "", methodObject),
-            new Among("ets", 14, 1, "", methodObject),
-            new Among("et", -1, 1, "", methodObject),
-            new Among("het", 25, 1, "", methodObject),
-            new Among("ert", -1, 3, "", methodObject),
-            new Among("ast", -1, 1, "", methodObject)
-        };
-
-        private static readonly Among[] a_1 =
-        {
-            new Among("dt", -1, -1, "", methodObject),
-            new Among("vt", -1, -1, "", methodObject)
-        };
-
-        private static readonly Among[] a_2 =
-        {
-            new Among("leg", -1, 1, "", methodObject),
-            new Among("eleg", 0, 1, "", methodObject),
-            new Among("ig", -1, 1, "", methodObject),
-            new Among("eig", 2, 1, "", methodObject),
-            new Among("lig", 2, 1, "", methodObject),
-            new Among("elig", 4, 1, "", methodObject),
-            new Among("els", -1, 1, "", methodObject),
-            new Among("lov", -1, 1, "", methodObject),
-            new Among("elov", 7, 1, "", methodObject),
-            new Among("slov", 7, 1, "", methodObject),
-            new Among("hetslov", 9, 1, "", methodObject)
-        };
+        private int I_x;
+        private int I_p1;
 
         private static int[] g_v = {17, 65, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 128 };
 
         private static int[] g_s_ending = {119, 125, 149, 1 };
 
-        private int I_x;
-        private int I_p1;
+        private readonly Among[] a_0;
+        private readonly Among[] a_1;
+        private readonly Among[] a_2;
+
+        public NorwegianStemmer()
+        {
+            a_0 = new[] 
+            {
+                new Among("a", -1, 1),
+                new Among("e", -1, 1),
+                new Among("ede", 1, 1),
+                new Among("ande", 1, 1),
+                new Among("ende", 1, 1),
+                new Among("ane", 1, 1),
+                new Among("ene", 1, 1),
+                new Among("hetene", 6, 1),
+                new Among("erte", 1, 3),
+                new Among("en", -1, 1),
+                new Among("heten", 9, 1),
+                new Among("ar", -1, 1),
+                new Among("er", -1, 1),
+                new Among("heter", 12, 1),
+                new Among("s", -1, 2),
+                new Among("as", 14, 1),
+                new Among("es", 14, 1),
+                new Among("edes", 16, 1),
+                new Among("endes", 16, 1),
+                new Among("enes", 16, 1),
+                new Among("hetenes", 19, 1),
+                new Among("ens", 14, 1),
+                new Among("hetens", 21, 1),
+                new Among("ers", 14, 1),
+                new Among("ets", 14, 1),
+                new Among("et", -1, 1),
+                new Among("het", 25, 1),
+                new Among("ert", -1, 3),
+                new Among("ast", -1, 1)
+            };
+
+            a_1 = new[] 
+            {
+                new Among("dt", -1, -1),
+                new Among("vt", -1, -1)
+            };
+
+            a_2 = new[] 
+            {
+                new Among("leg", -1, 1),
+                new Among("eleg", 0, 1),
+                new Among("ig", -1, 1),
+                new Among("eig", 2, 1),
+                new Among("lig", 2, 1),
+                new Among("elig", 4, 1),
+                new Among("els", -1, 1),
+                new Among("lov", -1, 1),
+                new Among("elov", 7, 1),
+                new Among("slov", 7, 1),
+                new Among("hetslov", 9, 1)
+            };
+
+        }
+
 
 
         private bool r_mark_regions()
@@ -97,19 +109,17 @@ namespace Snowball
             // setmark x, line 30
             I_x = cursor;
             cursor = v_1;
-            // goto, line 31
-            golab0: while (true)
+            while (true) 
             {
+                // goto, line 31
                 v_2 = cursor;
-                lab1: do 
+                if (!(in_grouping(g_v, 97, 248)))
                 {
-                    if (!(in_grouping(g_v, 97, 248)))
-                    {
-                        goto lab1;
-                    }
-                    cursor = v_2;
-                    goto golab0;
-                } while (false);
+                    goto lab0;
+                }
+                cursor = v_2;
+                break;
+            lab0: 
                 cursor = v_2;
                 if (cursor >= limit)
                 {
@@ -117,17 +127,15 @@ namespace Snowball
                 }
                 cursor++;
             }
-            // gopast, line 31
-            golab2: while (true)
+            while (true) 
             {
-                lab3: do 
+                // gopast, line 31
+                if (!(out_grouping(g_v, 97, 248)))
                 {
-                    if (!(out_grouping(g_v, 97, 248)))
-                    {
-                        goto lab3;
-                    }
-                    goto golab2;
-                } while (false);
+                    goto lab1;
+                }
+                break;
+            lab1: 
                 if (cursor >= limit)
                 {
                     return false;
@@ -137,16 +145,14 @@ namespace Snowball
             // setmark p1, line 31
             I_p1 = cursor;
             // try, line 32
-            lab4: do 
+            // (, line 32
+            if (!(I_p1 < I_x))
             {
-                // (, line 32
-                if (!(I_p1 < I_x))
+                goto lab2;
+            }
+            I_p1 = I_x;
+        lab2: 
 
-                {
-                    goto lab4;
-                }
-                I_p1 = I_x;
-            } while (false);
             return true;
         }
 
@@ -161,7 +167,6 @@ namespace Snowball
             v_1 = limit - cursor;
             // tomark, line 38
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -182,10 +187,9 @@ namespace Snowball
             // ], line 38
             bra = cursor;
             limit_backward = v_2;
-            switch(among_var) 
+            switch (among_var) 
             {
                 case 0:
-                    return false;
                 case 1:
                     // (, line 44
                     // delete, line 44
@@ -194,29 +198,25 @@ namespace Snowball
                 case 2:
                     // (, line 46
                     // or, line 46
-                    lab0: do 
+                lab0: 
+                    v_3 = limit - cursor;
+                    if (!(in_grouping_b(g_s_ending, 98, 122)))
                     {
-                        v_3 = limit - cursor;
-                        lab1: do 
-                        {
-                            if (!(in_grouping_b(g_s_ending, 98, 122)))
-                            {
-                                goto lab1;
-                            }
-                            goto lab0;
-                        } while (false);
-                        cursor = limit - v_3;
-                        // (, line 46
-                        // literal, line 46
-                        if (!(eq_s_b(1, "k")))
-                        {
-                            return false;
-                        }
-                        if (!(out_grouping_b(g_v, 97, 248)))
-                        {
-                            return false;
-                        }
-                    } while (false);
+                        goto lab1;
+                    }
+                    goto lab0;
+                lab1: 
+                    cursor = limit - v_3;
+                    // (, line 46
+                    // literal, line 46
+                    if (!(eq_s_b(1, "k")))
+                    {
+                        return false;
+                    }
+                    if (!(out_grouping_b(g_v, 97, 248)))
+                    {
+                        return false;
+                    }
                     // delete, line 46
                     slice_del();
                     break;
@@ -226,6 +226,7 @@ namespace Snowball
                     slice_from("er");
                     break;
             }
+
             return true;
         }
 
@@ -242,7 +243,6 @@ namespace Snowball
             v_2 = limit - cursor;
             // tomark, line 54
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -273,6 +273,7 @@ namespace Snowball
             bra = cursor;
             // delete, line 59
             slice_del();
+
             return true;
         }
 
@@ -286,7 +287,6 @@ namespace Snowball
             v_1 = limit - cursor;
             // tomark, line 63
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -307,16 +307,16 @@ namespace Snowball
             // ], line 63
             bra = cursor;
             limit_backward = v_2;
-            switch(among_var) 
+            switch (among_var) 
             {
                 case 0:
-                    return false;
                 case 1:
                     // (, line 67
                     // delete, line 67
                     slice_del();
                     break;
             }
+
             return true;
         }
 
@@ -329,58 +329,52 @@ namespace Snowball
             // (, line 72
             // do, line 74
             v_1 = cursor;
-            lab0: do 
+            // call mark_regions, line 74
+            if (!r_mark_regions())
             {
-                // call mark_regions, line 74
-                if (!r_mark_regions())
-                {
-                    goto lab0;
-                }
-            } while (false);
+                goto lab0;
+            }
+        lab0: 
             cursor = v_1;
             // backwards, line 75
             limit_backward = cursor; cursor = limit;
             // (, line 75
             // do, line 76
             v_2 = limit - cursor;
-            lab1: do 
+            // call main_suffix, line 76
+            if (!r_main_suffix())
             {
-                // call main_suffix, line 76
-                if (!r_main_suffix())
-                {
-                    goto lab1;
-                }
-            } while (false);
+                goto lab1;
+            }
+        lab1: 
             cursor = limit - v_2;
             // do, line 77
             v_3 = limit - cursor;
-            lab2: do 
+            // call consonant_pair, line 77
+            if (!r_consonant_pair())
             {
-                // call consonant_pair, line 77
-                if (!r_consonant_pair())
-                {
-                    goto lab2;
-                }
-            } while (false);
+                goto lab2;
+            }
+        lab2: 
             cursor = limit - v_3;
             // do, line 78
             v_4 = limit - cursor;
-            lab3: do 
+            // call other_suffix, line 78
+            if (!r_other_suffix())
             {
-                // call other_suffix, line 78
-                if (!r_other_suffix())
-                {
-                    goto lab3;
-                }
-            } while (false);
+                goto lab3;
+            }
+        lab3: 
             cursor = limit - v_4;
-            cursor = limit_backward;            return true;
+            cursor = limit_backward;
+            return true;
         }
 
-        public override bool Stem()
+        protected override bool Process()
         {
             return this.stem();
         }
 
     }
 }
+

@@ -5,6 +5,13 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snowball", "Snowball\Snowball.csproj", "{B2912389-DECE-49E8-AC69-2449198C71D4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0AAB09B6-F550-42E5-BD02-78F56EAC9A71}"
+	ProjectSection(SolutionItems) = preProject
+		Generate.bat = Generate.bat
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unit Tests", "Unit Tests\Unit Tests.csproj", "{681B1905-0154-45F0-8731-E5251087EC0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +22,10 @@ Global
 		{B2912389-DECE-49E8-AC69-2449198C71D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2912389-DECE-49E8-AC69-2449198C71D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2912389-DECE-49E8-AC69-2449198C71D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{681B1905-0154-45F0-8731-E5251087EC0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{681B1905-0154-45F0-8731-E5251087EC0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{681B1905-0154-45F0-8731-E5251087EC0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{681B1905-0154-45F0-8731-E5251087EC0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

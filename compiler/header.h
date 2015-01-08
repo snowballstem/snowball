@@ -289,17 +289,18 @@ struct options {
     char * name;
     FILE * output_c;
     FILE * output_h;
-    FILE * output_java;
+	FILE * output_java;
+	FILE * output_csharp;
     byte syntax_tree;
     byte widechars;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP } make_lang;
     char * externals_prefix;
     char * variables_prefix;
     char * runtime_path;
-    char * parent_class_name;
-    char * package;
-    char * string_class;
-    char * among_class;
+	char * parent_class_name;
+	char * package;
+	char * string_class;
+	char * among_class;
     struct include * includes;
     struct include * includes_end;
     byte utf8;
@@ -316,4 +317,10 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
 extern void close_generator_java(struct generator * g);
 
 extern void generate_program_java(struct generator * g);
+
+/* Generator for Csharp code. */
+extern struct generator * create_generator_csharp(struct analyser * a, struct options * o);
+extern void close_generator_csharp(struct generator * g);
+
+extern void generate_program_csharp(struct generator * g);
 

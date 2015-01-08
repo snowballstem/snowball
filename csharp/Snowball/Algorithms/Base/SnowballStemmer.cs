@@ -9,7 +9,12 @@ namespace Snowball
 
     public abstract class SnowballStemmer
     {
-        public abstract bool Stem();
+        protected abstract bool Process();
+
+        public bool Stem()
+        {
+            return Process();
+        }
 
         protected static Func<bool> methodObject;
 
@@ -460,7 +465,7 @@ namespace Snowball
 
         public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
         {
-            sb.Remove(index, length);
+            sb.Remove(index, length - index);
             sb.Insert(0, text);
             return sb;
         }

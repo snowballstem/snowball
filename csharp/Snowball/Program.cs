@@ -12,7 +12,7 @@ namespace Snowball
 
         private static void usage()
         {
-            Console.WriteLine("Usage: Steamer.exe <algorithm> <input file> [-o <output file>]");
+            Console.WriteLine("Usage: Stemmer.exe <algorithm> <input file> [-o <output file>]");
         }
 
         public static void Main(String[] args)
@@ -33,7 +33,7 @@ namespace Snowball
 
             TextReader reader = new StreamReader(args[1]);
             StringBuilder input = new StringBuilder();
-            TextWriter output;
+            TextWriter output = output = System.Console.Out;
 
             if (args.Length > 2)
             {
@@ -46,10 +46,6 @@ namespace Snowball
                     usage();
                     return;
                 }
-            }
-            else
-            {
-                output = System.Console.Out;
             }
 
 

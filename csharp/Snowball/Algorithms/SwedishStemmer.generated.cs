@@ -1,5 +1,8 @@
 // This file was generated automatically by the Snowball to C# compiler
 
+#pragma warning disable 0164
+#pragma warning disable 0162
+
 namespace Snowball
 {
     using System;
@@ -11,75 +14,84 @@ namespace Snowball
     ///</summary>
     /// 
     [System.CodeDom.Compiler.GeneratedCode("Snowball", "0.0.0")]
-    public class SwedishStemmer : SnowballStemmer
+    public partial class SwedishStemmer : SnowballStemmer
     {
-        private static readonly Among[] a_0 =
-        {
-            new Among("a", -1, 1, "", methodObject),
-            new Among("arna", 0, 1, "", methodObject),
-            new Among("erna", 0, 1, "", methodObject),
-            new Among("heterna", 2, 1, "", methodObject),
-            new Among("orna", 0, 1, "", methodObject),
-            new Among("ad", -1, 1, "", methodObject),
-            new Among("e", -1, 1, "", methodObject),
-            new Among("ade", 6, 1, "", methodObject),
-            new Among("ande", 6, 1, "", methodObject),
-            new Among("arne", 6, 1, "", methodObject),
-            new Among("are", 6, 1, "", methodObject),
-            new Among("aste", 6, 1, "", methodObject),
-            new Among("en", -1, 1, "", methodObject),
-            new Among("anden", 12, 1, "", methodObject),
-            new Among("aren", 12, 1, "", methodObject),
-            new Among("heten", 12, 1, "", methodObject),
-            new Among("ern", -1, 1, "", methodObject),
-            new Among("ar", -1, 1, "", methodObject),
-            new Among("er", -1, 1, "", methodObject),
-            new Among("heter", 18, 1, "", methodObject),
-            new Among("or", -1, 1, "", methodObject),
-            new Among("s", -1, 2, "", methodObject),
-            new Among("as", 21, 1, "", methodObject),
-            new Among("arnas", 22, 1, "", methodObject),
-            new Among("ernas", 22, 1, "", methodObject),
-            new Among("ornas", 22, 1, "", methodObject),
-            new Among("es", 21, 1, "", methodObject),
-            new Among("ades", 26, 1, "", methodObject),
-            new Among("andes", 26, 1, "", methodObject),
-            new Among("ens", 21, 1, "", methodObject),
-            new Among("arens", 29, 1, "", methodObject),
-            new Among("hetens", 29, 1, "", methodObject),
-            new Among("erns", 21, 1, "", methodObject),
-            new Among("at", -1, 1, "", methodObject),
-            new Among("andet", -1, 1, "", methodObject),
-            new Among("het", -1, 1, "", methodObject),
-            new Among("ast", -1, 1, "", methodObject)
-        };
-
-        private static readonly Among[] a_1 =
-        {
-            new Among("dd", -1, -1, "", methodObject),
-            new Among("gd", -1, -1, "", methodObject),
-            new Among("nn", -1, -1, "", methodObject),
-            new Among("dt", -1, -1, "", methodObject),
-            new Among("gt", -1, -1, "", methodObject),
-            new Among("kt", -1, -1, "", methodObject),
-            new Among("tt", -1, -1, "", methodObject)
-        };
-
-        private static readonly Among[] a_2 =
-        {
-            new Among("ig", -1, 1, "", methodObject),
-            new Among("lig", 0, 1, "", methodObject),
-            new Among("els", -1, 1, "", methodObject),
-            new Among("fullt", -1, 3, "", methodObject),
-            new Among("l\u00C3\u00B6st", -1, 2, "", methodObject)
-        };
+        private int I_x;
+        private int I_p1;
 
         private static int[] g_v = {17, 65, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 32 };
 
         private static int[] g_s_ending = {119, 127, 149 };
 
-        private int I_x;
-        private int I_p1;
+        private readonly Among[] a_0;
+        private readonly Among[] a_1;
+        private readonly Among[] a_2;
+
+        public SwedishStemmer()
+        {
+            a_0 = new[] 
+            {
+                new Among("a", -1, 1),
+                new Among("arna", 0, 1),
+                new Among("erna", 0, 1),
+                new Among("heterna", 2, 1),
+                new Among("orna", 0, 1),
+                new Among("ad", -1, 1),
+                new Among("e", -1, 1),
+                new Among("ade", 6, 1),
+                new Among("ande", 6, 1),
+                new Among("arne", 6, 1),
+                new Among("are", 6, 1),
+                new Among("aste", 6, 1),
+                new Among("en", -1, 1),
+                new Among("anden", 12, 1),
+                new Among("aren", 12, 1),
+                new Among("heten", 12, 1),
+                new Among("ern", -1, 1),
+                new Among("ar", -1, 1),
+                new Among("er", -1, 1),
+                new Among("heter", 18, 1),
+                new Among("or", -1, 1),
+                new Among("s", -1, 2),
+                new Among("as", 21, 1),
+                new Among("arnas", 22, 1),
+                new Among("ernas", 22, 1),
+                new Among("ornas", 22, 1),
+                new Among("es", 21, 1),
+                new Among("ades", 26, 1),
+                new Among("andes", 26, 1),
+                new Among("ens", 21, 1),
+                new Among("arens", 29, 1),
+                new Among("hetens", 29, 1),
+                new Among("erns", 21, 1),
+                new Among("at", -1, 1),
+                new Among("andet", -1, 1),
+                new Among("het", -1, 1),
+                new Among("ast", -1, 1)
+            };
+
+            a_1 = new[] 
+            {
+                new Among("dd", -1, -1),
+                new Among("gd", -1, -1),
+                new Among("nn", -1, -1),
+                new Among("dt", -1, -1),
+                new Among("gt", -1, -1),
+                new Among("kt", -1, -1),
+                new Among("tt", -1, -1)
+            };
+
+            a_2 = new[] 
+            {
+                new Among("ig", -1, 1),
+                new Among("lig", 0, 1),
+                new Among("els", -1, 1),
+                new Among("fullt", -1, 3),
+                new Among("l\u00C3\u00B6st", -1, 2)
+            };
+
+        }
+
 
 
         private bool r_mark_regions()
@@ -104,19 +116,17 @@ namespace Snowball
             // setmark x, line 29
             I_x = cursor;
             cursor = v_1;
-            // goto, line 30
-            golab0: while (true)
+            while (true) 
             {
+                // goto, line 30
                 v_2 = cursor;
-                lab1: do 
+                if (!(in_grouping(g_v, 97, 246)))
                 {
-                    if (!(in_grouping(g_v, 97, 246)))
-                    {
-                        goto lab1;
-                    }
-                    cursor = v_2;
-                    goto golab0;
-                } while (false);
+                    goto lab0;
+                }
+                cursor = v_2;
+                break;
+            lab0: 
                 cursor = v_2;
                 if (cursor >= limit)
                 {
@@ -124,17 +134,15 @@ namespace Snowball
                 }
                 cursor++;
             }
-            // gopast, line 30
-            golab2: while (true)
+            while (true) 
             {
-                lab3: do 
+                // gopast, line 30
+                if (!(out_grouping(g_v, 97, 246)))
                 {
-                    if (!(out_grouping(g_v, 97, 246)))
-                    {
-                        goto lab3;
-                    }
-                    goto golab2;
-                } while (false);
+                    goto lab1;
+                }
+                break;
+            lab1: 
                 if (cursor >= limit)
                 {
                     return false;
@@ -144,16 +152,14 @@ namespace Snowball
             // setmark p1, line 30
             I_p1 = cursor;
             // try, line 31
-            lab4: do 
+            // (, line 31
+            if (!(I_p1 < I_x))
             {
-                // (, line 31
-                if (!(I_p1 < I_x))
+                goto lab2;
+            }
+            I_p1 = I_x;
+        lab2: 
 
-                {
-                    goto lab4;
-                }
-                I_p1 = I_x;
-            } while (false);
             return true;
         }
 
@@ -167,7 +173,6 @@ namespace Snowball
             v_1 = limit - cursor;
             // tomark, line 37
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -188,10 +193,9 @@ namespace Snowball
             // ], line 37
             bra = cursor;
             limit_backward = v_2;
-            switch(among_var) 
+            switch (among_var) 
             {
                 case 0:
-                    return false;
                 case 1:
                     // (, line 44
                     // delete, line 44
@@ -207,6 +211,7 @@ namespace Snowball
                     slice_del();
                     break;
             }
+
             return true;
         }
 
@@ -219,7 +224,6 @@ namespace Snowball
             v_1 = limit - cursor;
             // tomark, line 50
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -252,6 +256,7 @@ namespace Snowball
             // delete, line 52
             slice_del();
             limit_backward = v_2;
+
             return true;
         }
 
@@ -264,7 +269,6 @@ namespace Snowball
             v_1 = limit - cursor;
             // tomark, line 55
             if (cursor < I_p1)
-
             {
                 return false;
             }
@@ -284,11 +288,9 @@ namespace Snowball
             }
             // ], line 56
             bra = cursor;
-            switch(among_var) 
+            switch (among_var) 
             {
                 case 0:
-                    limit_backward = v_2;
-                    return false;
                 case 1:
                     // (, line 57
                     // delete, line 57
@@ -306,6 +308,7 @@ namespace Snowball
                     break;
             }
             limit_backward = v_2;
+
             return true;
         }
 
@@ -318,58 +321,52 @@ namespace Snowball
             // (, line 64
             // do, line 66
             v_1 = cursor;
-            lab0: do 
+            // call mark_regions, line 66
+            if (!r_mark_regions())
             {
-                // call mark_regions, line 66
-                if (!r_mark_regions())
-                {
-                    goto lab0;
-                }
-            } while (false);
+                goto lab0;
+            }
+        lab0: 
             cursor = v_1;
             // backwards, line 67
             limit_backward = cursor; cursor = limit;
             // (, line 67
             // do, line 68
             v_2 = limit - cursor;
-            lab1: do 
+            // call main_suffix, line 68
+            if (!r_main_suffix())
             {
-                // call main_suffix, line 68
-                if (!r_main_suffix())
-                {
-                    goto lab1;
-                }
-            } while (false);
+                goto lab1;
+            }
+        lab1: 
             cursor = limit - v_2;
             // do, line 69
             v_3 = limit - cursor;
-            lab2: do 
+            // call consonant_pair, line 69
+            if (!r_consonant_pair())
             {
-                // call consonant_pair, line 69
-                if (!r_consonant_pair())
-                {
-                    goto lab2;
-                }
-            } while (false);
+                goto lab2;
+            }
+        lab2: 
             cursor = limit - v_3;
             // do, line 70
             v_4 = limit - cursor;
-            lab3: do 
+            // call other_suffix, line 70
+            if (!r_other_suffix())
             {
-                // call other_suffix, line 70
-                if (!r_other_suffix())
-                {
-                    goto lab3;
-                }
-            } while (false);
+                goto lab3;
+            }
+        lab3: 
             cursor = limit - v_4;
-            cursor = limit_backward;            return true;
+            cursor = limit_backward;
+            return true;
         }
 
-        public override bool Stem()
+        protected override bool Process()
         {
             return this.stem();
         }
 
     }
 }
+

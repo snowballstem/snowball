@@ -196,10 +196,10 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{A50A4C52-8F9F-4097-8B98-F83014030A1D}</UniqueIdentifier>
+      <UniqueIdentifier>{39581D29-92E4-4A4F-B52E-5176E400DD28}</UniqueIdentifier>
     </Filter>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{91EC7FA4-52F9-4C19-BA82-4688FF8C6821}</UniqueIdentifier>
+      <UniqueIdentifier>{5097AD2C-2E60-4BF6-A735-7223AE76709A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

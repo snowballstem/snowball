@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{AB735167-4D95-42A3-867E-5FBDC3C1E128}</ProjectGUID>
+    <ProjectGUID>{BF67DE10-8D91-4258-A259-CDCFDA269BC3}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>stemmer</ProjectName>
@@ -56,25 +56,25 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Projects\GitHub\snowball\vs2013\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stemmer.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stemmer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Projects\GitHub\snowball\vs2013\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stemmer.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stemmer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Projects\GitHub\snowball\vs2013\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">stemmer.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">stemmer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Projects\GitHub\snowball\vs2013\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">stemmer.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">stemmer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Projects\GitHub\snowball\vs2013\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stemmer.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stemmer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Projects\GitHub\snowball\vs2013\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stemmer.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stemmer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Projects\GitHub\snowball\vs2013\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">stemmer.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">stemmer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Projects\GitHub\snowball\vs2013\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">stemmer.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">stemmer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalOptions> -O0 -fstrict-aliasing %(AdditionalOptions)</AdditionalOptions>
@@ -121,7 +121,8 @@
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -151,7 +152,8 @@
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1989,48 +1991,45 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\libstemmer.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_danish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_dutch.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_english.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_finnish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_french.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_german.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_hungarian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_italian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_norwegian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_porter.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_portuguese.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_romanian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_russian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_spanish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_swedish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_turkish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_KOI8_R_russian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_danish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_dutch.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_english.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_finnish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_french.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_german.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_italian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_norwegian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_porter.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_portuguese.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_spanish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_swedish.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_hungarian.c"  />
-    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_romanian.c"  />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\libstemmer.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_danish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_dutch.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_english.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_finnish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_french.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_german.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_hungarian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_italian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_norwegian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_porter.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_portuguese.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_romanian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_russian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_spanish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_swedish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_UTF_8_turkish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_KOI8_R_russian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_danish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_dutch.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_english.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_finnish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_french.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_german.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_italian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_norwegian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_porter.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_portuguese.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_spanish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_1_swedish.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_hungarian.c" />
+    <ClCompile Include="D:\Projects\GitHub\snowball\vs2013\libstemmer\stem_ISO_8859_2_romanian.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:/Projects/GitHub/snowball/vs2013/ZERO_CHECK.vcxproj">
-      <Project>091A04B0-9F34-4D06-B3CC-24FD551EDECF</Project>
-    </ProjectReference>
     <ProjectReference Include="D:/Projects/GitHub/snowball/vs2013/snowball.vcxproj">
-      <Project>346880E6-373A-422D-8133-1211EA89605F</Project>
+      <Project>621B8660-4CC2-4F61-8CD4-0439BFAB8054</Project>
     </ProjectReference>
     <ProjectReference Include="D:/Projects/GitHub/snowball/vs2013/stemmer_deps.vcxproj">
-      <Project>3770D6D3-F0A8-4C87-BD6F-B8E1B73C88B8</Project>
+      <Project>2A63DA1D-E24F-42B2-AB83-3EC18EAAF159</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
