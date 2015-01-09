@@ -1,4 +1,4 @@
-# Install script for directory: D:/Projects/GitHub/snowball
+# Install script for directory: D:/Projects/GitHub/Snowball
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,7 +33,7 @@ else()
   set(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 endif()
 
-file(WRITE "D:/Projects/GitHub/snowball/vs2013/${CMAKE_INSTALL_MANIFEST}" "")
+file(WRITE "D:/Projects/GitHub/Snowball/vs2013/${CMAKE_INSTALL_MANIFEST}" "")
 foreach(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  file(APPEND "D:/Projects/GitHub/snowball/vs2013/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  file(APPEND "D:/Projects/GitHub/Snowball/vs2013/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 endforeach()

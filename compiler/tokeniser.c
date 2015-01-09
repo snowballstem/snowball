@@ -6,9 +6,9 @@
 #include "header.h"
 
 struct system_word {
-    int s_size;   /* size of system word */
-    byte * s;     /* pointer to the system word */
-    int code;     /* it's internal code */
+    int s_size;      /* size of system word */
+    const byte * s;  /* pointer to the system word */
+    int code;        /* its internal code */
 };
 
 
@@ -61,7 +61,7 @@ static void error2(struct tokeniser * t, char * s) {
     error(t, "unexpected end of text after ", 0,0, s);
 }
 
-static int compare_words(int m, symbol * p, int n, byte * q) {
+static int compare_words(int m, symbol * p, int n, const byte * q) {
     unless (m == n) return m - n;
     {
         int i; for (i = 0; i < n; i++) {
@@ -76,7 +76,7 @@ static int find_word(int n, symbol * p) {
     int i = 0; int j = vocab->code;
     repeat {
         int k = i + (j - i)/2;
-        struct system_word * w = vocab + k;
+        const struct system_word * w = vocab + k;
         int diff = compare_words(n, p, w->s_size, w->s);
         if (diff == 0) return w->code;
         if (diff < 0) j = k; else i = k;
@@ -406,22 +406,22 @@ extern int read_token(struct tokeniser * t) {
     }
 }
 
-extern byte * name_of_token(int code) {
+extern const char * name_of_token(int code) {
     int i;
     for (i = 1; i < vocab->code; i++)
-        if ((vocab + i)->code == code) return (vocab + i)->s;
+        if ((vocab + i)->code == code) return (const char *)(vocab + i)->s;
     switch (code) {
-        case c_mathassign:   return (byte *) "=";
-        case c_name:         return (byte *) "name";
-        case c_number:       return (byte *) "number";
-        case c_literalstring:return (byte *) "literal";
-        case c_neg:          return (byte *) "neg";
-        case c_grouping:     return (byte *) "grouping";
-        case c_call:         return (byte *) "call";
-        case c_booltest:     return (byte *) "Boolean test";
-        case -2:             return (byte *) "start of text";
-        case -1:             return (byte *) "end of text";
-        default:             return (byte *) "?";
+        case c_mathassign:   return "=";
+        case c_name:         return "name";
+        case c_number:       return "number";
+        case c_literalstring:return "literal";
+        case c_neg:          return "neg";
+        case c_grouping:     return "grouping";
+        case c_call:         return "call";
+        case c_booltest:     return "Boolean test";
+        case -2:             return "start of text";
+        case -1:             return "end of text";
+        default:             return "?";
     }
 }
 

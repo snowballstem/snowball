@@ -1,4 +1,4 @@
-#include <stdio.h>   /* for main etc */
+#include <stdio.h>   /* for fprintf etc */
 #include <stdlib.h>  /* for free etc */
 #include <string.h>  /* for strlen */
 #include "header.h"
@@ -13,7 +13,7 @@
 #define DEFAULT_CS_AMONG_CLASS "Among"
 #define DEFAULT_CS_STRING_CLASS "StringBuilder"
 
-static int eq(char * s1, char * s2) {
+static int eq(const char * s1, const char * s2) {
     int s1_len = strlen(s1);
     int s2_len = strlen(s2);
     return s1_len == s2_len && memcmp(s1, s2, s1_len) == 0;
@@ -37,7 +37,7 @@ static void print_arglist(void) {
                     "             [-vp[refix] string]\n"
                     "             [-i[nclude] directory]\n"
                     "             [-r[untime] path to runtime headers]\n"
-#ifndef DISABLE_JAVA && DISABLE_CSHARP
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
 					"             [-p[arentclassname] fully qualified parent class name]\n"
 					"             [-P[ackage] package name for stemmers]\n"
 					"             [-S[tringclass] StringBuffer-compatible class]\n"
@@ -69,7 +69,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     char * s;
     int i = 2;
 
-    /* set defauts: */
+    /* set defaults: */
 
     o->output_file = 0;
     o->syntax_tree = false;
@@ -164,7 +164,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->widechars = false;
                 continue;
             }
-#ifndef DISABLE_JAVA && DISABLE_CSHARP
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
 			if (eq(s, "-p") || eq(s, "-parentclassname")) {
 				check_lim(i, argc);
 				o->parent_class_name = argv[i++];

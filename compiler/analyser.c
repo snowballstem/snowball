@@ -1,5 +1,5 @@
 
-#include <stdio.h>   /* main etc */
+#include <stdio.h>   /* printf etc */
 #include <stdlib.h>  /* exit */
 #include <string.h>  /* memmove */
 #include "header.h"
@@ -13,7 +13,7 @@ static struct node * C_style(struct analyser * a, char * s, int token);
 
 static void fault(int n) { fprintf(stderr, "fault %d\n", n); exit(1); }
 
-static void print_node_(struct node * p, int n, char * s) {
+static void print_node_(struct node * p, int n, const char * s) {
 
     int i;
     for (i = 0; i < n; i++) fputs(i == n - 1 ? s : "  ", stdout);
@@ -50,7 +50,7 @@ static struct node * new_node(struct analyser * a, int type) {
     return p;
 }
 
-static char * name_of_mode(int n) {
+static const char * name_of_mode(int n) {
     switch (n) {
          default: fault(0);
          case m_backward: return "string backward";
@@ -59,7 +59,7 @@ static char * name_of_mode(int n) {
     }
 }
 
-static char * name_of_type(int n) {
+static const char * name_of_type(int n) {
     switch (n) {
          default: fault(1);
          case 's': return "string";
@@ -142,7 +142,7 @@ static void error(struct analyser * a, int n) { error2(a, n, 0); }
 
 static void error3(struct analyser * a, struct node * p, symbol * b) {
     count_error(a);
-    fprintf(stderr, "among(...) on line %d has repeated string '", p->line_number);
+    fprintf(stderr, "%s:%d: among(...) has repeated string '", a->tokeniser->file, p->line_number);
     report_b(stderr, b);
     fprintf(stderr, "'\n");
 }

@@ -74,7 +74,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
 			}
 		    }
 
-		    fputs((char *)stemmed, f_out);
+		    fputs((const char *)stemmed, f_out);
 		    putc('\n', f_out);
 		}
             }
@@ -104,7 +104,7 @@ usage(int n)
 	  "If -p is given the output file consists of each word of the input\n"
 	  "file followed by \"->\" followed by its stemmed equivalent.\n"
 	  "If -p2 is given the output file is a two column layout containing\n"
-	  "the input words in the first column and the stemmed eqivalents in\n"
+	  "the input words in the first column and the stemmed equivalents in\n"
 	  "the second column.\n"
 	  "Otherwise, the output file consists of the stemmed words, one per\n"
 	  "line.\n"

@@ -1,30 +1,30 @@
 ﻿<?xml version="1.0" encoding="Windows-1252"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\space.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\space.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\tokeniser.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\tokeniser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\analyser.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\analyser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\generator.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\generator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\driver.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\generator_java.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\generator_java.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GitHub\snowball\compiler\generator_csharp.c">
+    <ClCompile Include="D:\Projects\GitHub\Snowball\compiler\generator_csharp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\GitHub\snowball\CMakeLists.txt" />
+    <CustomBuild Include="D:\Projects\GitHub\Snowball\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

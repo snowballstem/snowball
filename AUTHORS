@@ -25,3 +25,4 @@ Andreas Jung - useful bug reports on the libstemmer library.
 Olly Betts - several patches, bug reports, and performance improvements.
 Sebastiano Vigna and Oerd Cukalla - patches for the Java stemming algorithms.
 Ralf Junker - fix a potential memory leak in sb_stemmer_new().
+Vsevolod Stakhov - cmake build system

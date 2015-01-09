@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 use strict;
+use 5.006;
+use warnings;
 use Getopt::Std;
 
 my $progname = $0;
