@@ -9,15 +9,6 @@ namespace Snowball
 
     public abstract class SnowballStemmer
     {
-        protected abstract bool Process();
-
-        public bool Stem()
-        {
-            return Process();
-        }
-
-        protected static Func<bool> methodObject;
-
         // current string
         protected StringBuilder current;
 
@@ -28,43 +19,66 @@ namespace Snowball
         protected int ket;
 
 
+
+
         protected SnowballStemmer()
         {
             current = new StringBuilder();
-            setCurrent("");
+            setBufferContents("");
         }
 
-        /// <summary>
-        ///   Set the current string.
-        /// </summary>
-        /// 
-        public void setCurrent(String value)
+
+
+        protected abstract bool Process();
+
+
+        public bool Stem()
+        {
+            return this.Process();
+        }
+
+        public string Stem(string word)
+        {
+            setBufferContents(word);
+            this.Process();
+            return current.ToString();
+        }
+
+        public string[] Stem(params string[] words)
+        {
+            string[] stemmed = new string[words.Length];
+            for (int i = 0; i < stemmed.Length; i++)
+            {
+                setBufferContents(words[i]);
+                this.Process();
+                stemmed[i] = current.ToString();
+            }
+
+            return stemmed;
+        }
+
+
+        public StringBuilder Buffer
+        {
+            get { return current; }
+        }
+
+        public string Current
+        {
+            get { return current.ToString(); }
+            set { setBufferContents(value); }
+        }
+
+        private void setBufferContents(string value)
         {
             current.Clear();
             current.Insert(0, value);
+
             cursor = 0;
             limit = current.Length;
             limit_backward = 0;
             bra = cursor;
             ket = limit;
-        }
-
-        /**
-         * Get the current string.
-         */
-        public String getCurrent()
-        {
-            String result = current.ToString();
-
-            // Make a new StringBuffer. If we reuse the old one, and a user of
-            // the library keeps a reference to the buffer returned (for example,
-            // by converting it to a String in a way which doesn't force a copy),
-            // the buffer size will not decrease, and we will risk wasting a large
-            // amount of memory.
-
-            // Thanks to Wolfram Esser for spotting this problem.
-            current = new StringBuilder();
-            return result;
         }
 
 
@@ -271,7 +285,7 @@ namespace Snowball
                 int common = common_i < common_j ? common_i : common_j; // smaller
                 Among w = v[k];
                 int i2;
-                for (i2 = common; i2 < w.s_size; i2++)
+                for (i2 = common; i2 < w.s.Length; i2++)
                 {
                     if (c + common == l)
                     {
@@ -279,7 +293,8 @@ namespace Snowball
                         break;
                     }
                     diff = current[c + common] - w.s[i2];
-                    if (diff != 0) break;
+                    if (diff != 0)
+                        break;
                     common++;
                 }
                 if (diff < 0)
@@ -308,18 +323,18 @@ namespace Snowball
             while (true)
             {
                 Among w = v[i];
-                if (common_i >= w.s_size)
+                if (common_i >= w.s.Length)
                 {
-                    cursor = c + w.s_size;
+                    cursor = c + w.s.Length;
 
-                    if (w.methodobject == null)
+                    if (w.action == null)
                         return w.result;
 
                     bool res = false;
 
-                    res = w.methodobject();
+                    res = w.action();
 
-                    cursor = c + w.s_size;
+                    cursor = c + w.s.Length;
 
                     if (res)
                         return w.result;
@@ -350,7 +365,7 @@ namespace Snowball
                 int common = common_i < common_j ? common_i : common_j;
                 Among w = v[k];
                 int i2;
-                for (i2 = w.s_size - 1 - common; i2 >= 0; i2--)
+                for (i2 = w.s.Length - 1 - common; i2 >= 0; i2--)
                 {
                     if (c - common == lb)
                     {
@@ -373,24 +388,27 @@ namespace Snowball
                 }
                 if (j - i <= 1)
                 {
-                    if (i > 0) break;
-                    if (j == i) break;
-                    if (first_key_inspected) break;
+                    if (i > 0)
+                        break;
+                    if (j == i)
+                        break;
+                    if (first_key_inspected)
+                        break;
                     first_key_inspected = true;
                 }
             }
             while (true)
             {
                 Among w = v[i];
-                if (common_i >= w.s_size)
+                if (common_i >= w.s.Length)
                 {
-                    cursor = c - w.s_size;
-                    if (w.methodobject == null)
+                    cursor = c - w.s.Length;
+                    if (w.action == null)
                         return w.result;
 
-                    bool res = w.methodobject();
+                    bool res = w.action();
 
-                    cursor = c - w.s_size;
+                    cursor = c - w.s.Length;
 
                     if (res)
                         return w.result;
@@ -466,7 +484,7 @@ namespace Snowball
         public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
         {
             sb.Remove(index, length - index);
-            sb.Insert(0, text);
+            sb.Insert(index, text);
             return sb;
         }
 

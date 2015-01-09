@@ -64,13 +64,13 @@ namespace Snowball
                 {
                     if (input.Length > 0)
                     {
-                        stemmer.setCurrent(input.ToString());
+                        stemmer.Current = input.ToString();
                         for (int i = repeat; i != 0; i--)
                         {
                             stemmer.Stem();
                         }
 
-                        output.WriteLine(stemmer.getCurrent());
+                        output.WriteLine(stemmer.Current);
                         input.Remove(0, input.Length);
                     }
                 }

@@ -113,23 +113,30 @@ static void write_literal_string(struct generator * g, symbol * p) {
 
 	int i;
 	write_string(g, "\"");
-	for (i = 0; i < SIZE(p); i++) {
+
+	for (i = 0; i < SIZE(p); i++) 
+	{
 		int ch = p[i];
-		if (32 <= ch && ch <= 127) {
-			if (ch == '\"' || ch == '\\') write_string(g, "\\");
+		if (32 <= ch && ch <= 127) 
+		{
+			if (ch == '\"' || ch == '\\')
+				write_string(g, "\\");
 			write_char(g, ch);
 		}
-		else {
+		else 
+		{
 			write_hex(g, ch);
 		}
 	}
+
 	write_string(g, "\"");
 }
 
 static void write_margin(struct generator * g) {
 
 	int i;
-	for (i = 0; i < g->margin; i++) write_string(g, "    ");
+	for (i = 0; i < g->margin; i++) 
+		write_string(g, "    ");
 }
 
 /* Write a variable declaration. */
@@ -144,8 +151,9 @@ static void write_declare(struct generator * g, char * declaration, struct node 
 	g->outbuf = temp;
 }
 
-static void write_comment(struct generator * g, struct node * p) {
-
+static void write_comment(struct generator * g, struct node * p)
+{
+	write_newline(g);
 	write_margin(g);
 	write_string(g, "// ");
 	write_string(g, (char *)name_of_token(p->type));
@@ -463,15 +471,20 @@ static void generate_and(struct generator * g, struct node * p) {
 
 	write_comment(g, p);
 
-	if (keep_c) write_savecursor(g, p, savevar);
+	if (keep_c) 
+		write_savecursor(g, p, savevar);
 
 	p = p->left;
-	while (p != 0) {
+	while (p != 0) 
+	{
 		generate(g, p);
-		if (g->unreachable) break;
-		if (keep_c && p->right != 0) write_restorecursor(g, p, savevar);
+		
+		if (keep_c && p->right != 0) 
+			write_restorecursor(g, p, savevar);
+
 		p = p->right;
 	}
+
 	str_delete(savevar);
 }
 
@@ -480,12 +493,13 @@ static void generate_or(struct generator * g, struct node * p) {
 	struct str * savevar = vars_newname(g);
 	int keep_c = K_needed(g, p->left);
 
+	int used = g->label_used;
 	int a0 = g->failure_label;
 	struct str * a1 = str_copy(g->failure_str);
 
 	int out_lab = new_label(g);
+
 	write_comment(g, p);
-	wsetlab(g, out_lab);
 
 	if (keep_c)
 		write_savecursor(g, p, savevar);
@@ -504,7 +518,7 @@ static void generate_or(struct generator * g, struct node * p) {
 	while (p->right != 0)
 	{
 		g->failure_label = new_label(g);
-		
+		g->label_used = 0;
 		generate(g, p);
 		wgotol(g, out_lab);
 		wsetlab(g, g->failure_label);
@@ -522,6 +536,8 @@ static void generate_or(struct generator * g, struct node * p) {
 	g->failure_str = a1;
 
 	generate(g, p);
+	wsetlab(g, out_lab);
+
 	str_delete(savevar);
 }
 
@@ -531,6 +547,7 @@ static void generate_backwards(struct generator * g, struct node * p) {
 	writef(g, "~Mlimit_backward = cursor; cursor = limit;~N", p);
 	generate(g, p->left);
 	w(g, "~Mcursor = limit_backward;");
+	write_newline(g);
 }
 
 
@@ -544,7 +561,8 @@ static void generate_not(struct generator * g, struct node * p) {
 
 	write_comment(g, p);
 
-	if (keep_c) {
+	if (keep_c) 
+	{
 		write_block_start(g);
 		write_savecursor(g, p, savevar);
 	}
@@ -566,9 +584,11 @@ static void generate_not(struct generator * g, struct node * p) {
 	g->unreachable = false;
 
 	if (keep_c)
+	{
 		write_restorecursor(g, p, savevar);
-	if (keep_c)
 		write_block_end(g);
+	}
+
 	str_delete(savevar);
 }
 
@@ -583,6 +603,7 @@ static void generate_try(struct generator * g, struct node * p) {
 		write_savecursor(g, p, savevar);
 
 	g->failure_label = new_label(g);
+
 	if (keep_c)
 		restore_string(p, g->failure_str, savevar);
 
@@ -630,11 +651,10 @@ static void generate_test(struct generator * g, struct node * p) {
 
 	generate(g, p->left);
 
-	if (!g->unreachable) {
-		if (keep_c) {
-			write_restorecursor(g, p, savevar);
-		}
+	if (keep_c) {
+		write_restorecursor(g, p, savevar);
 	}
+
 	str_delete(savevar);
 }
 
@@ -642,6 +662,7 @@ static void generate_do(struct generator * g, struct node * p)
 {
 	struct str * savevar = vars_newname(g);
 	int keep_c = K_needed(g, p->left);
+
 	write_comment(g, p);
 	if (keep_c)
 		write_savecursor(g, p, savevar);
@@ -1382,7 +1403,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 	unless(q->no_gaps) {
 		g->V[0] = q->name;
 
-		w(g, "~Mprivate static int[] ~V0 = {");
+		w(g, "~Mprivate static int[] ~V0 = { ");
 		for (i = 0; i < size; i++) {
 			write_int(g, map[i]);
 			if (i < size - 1) w(g, ", ");

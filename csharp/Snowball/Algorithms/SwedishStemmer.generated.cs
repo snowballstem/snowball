@@ -19,9 +19,9 @@ namespace Snowball
         private int I_x;
         private int I_p1;
 
-        private static int[] g_v = {17, 65, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 32 };
+        private static int[] g_v = { 17, 65, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 32 };
 
-        private static int[] g_s_ending = {119, 127, 149 };
+        private static int[] g_s_ending = { 119, 127, 149 };
 
         private readonly Among[] a_0;
         private readonly Among[] a_1;
@@ -98,11 +98,15 @@ namespace Snowball
         {
             int v_1;
             int v_2;
+
             // (, line 26
             I_p1 = limit;
+
             // test, line 29
             v_1 = cursor;
+
             // (, line 29
+
             // hop, line 29
 
             {
@@ -113,11 +117,13 @@ namespace Snowball
                 }
                 cursor = c;
             }
+
             // setmark x, line 29
             I_x = cursor;
             cursor = v_1;
             while (true) 
             {
+
                 // goto, line 30
                 v_2 = cursor;
                 if (!(in_grouping(g_v, 97, 246)))
@@ -136,6 +142,7 @@ namespace Snowball
             }
             while (true) 
             {
+
                 // gopast, line 30
                 if (!(out_grouping(g_v, 97, 246)))
                 {
@@ -149,9 +156,12 @@ namespace Snowball
                 }
                 cursor++;
             }
+
             // setmark p1, line 30
             I_p1 = cursor;
+
             // try, line 31
+
             // (, line 31
             if (!(I_p1 < I_x))
             {
@@ -168,9 +178,12 @@ namespace Snowball
             int among_var;
             int v_1;
             int v_2;
+
             // (, line 36
+
             // setlimit, line 37
             v_1 = limit - cursor;
+
             // tomark, line 37
             if (cursor < I_p1)
             {
@@ -180,9 +193,12 @@ namespace Snowball
             v_2 = limit_backward;
             limit_backward = cursor;
             cursor = limit - v_1;
+
             // (, line 37
+
             // [, line 37
             ket = cursor;
+
             // substring, line 37
             among_var = find_among_b(a_0, 37);
             if (among_var == 0)
@@ -190,6 +206,7 @@ namespace Snowball
                 limit_backward = v_2;
                 return false;
             }
+
             // ], line 37
             bra = cursor;
             limit_backward = v_2;
@@ -197,16 +214,20 @@ namespace Snowball
             {
                 case 0:
                 case 1:
+
                     // (, line 44
+
                     // delete, line 44
                     slice_del();
                     break;
                 case 2:
+
                     // (, line 46
                     if (!(in_grouping_b(g_s_ending, 98, 121)))
                     {
                         return false;
                     }
+
                     // delete, line 46
                     slice_del();
                     break;
@@ -220,8 +241,10 @@ namespace Snowball
             int v_1;
             int v_2;
             int v_3;
+
             // setlimit, line 50
             v_1 = limit - cursor;
+
             // tomark, line 50
             if (cursor < I_p1)
             {
@@ -231,9 +254,12 @@ namespace Snowball
             v_2 = limit_backward;
             limit_backward = cursor;
             cursor = limit - v_1;
+
             // (, line 50
+
             // and, line 52
             v_3 = limit - cursor;
+
             // among, line 51
             if (find_among_b(a_1, 7) == 0)
             {
@@ -241,9 +267,12 @@ namespace Snowball
                 return false;
             }
             cursor = limit - v_3;
+
             // (, line 52
+
             // [, line 52
             ket = cursor;
+
             // next, line 52
             if (cursor <= limit_backward)
             {
@@ -251,8 +280,10 @@ namespace Snowball
                 return false;
             }
             cursor--;
+
             // ], line 52
             bra = cursor;
+
             // delete, line 52
             slice_del();
             limit_backward = v_2;
@@ -265,8 +296,10 @@ namespace Snowball
             int among_var;
             int v_1;
             int v_2;
+
             // setlimit, line 55
             v_1 = limit - cursor;
+
             // tomark, line 55
             if (cursor < I_p1)
             {
@@ -276,9 +309,12 @@ namespace Snowball
             v_2 = limit_backward;
             limit_backward = cursor;
             cursor = limit - v_1;
+
             // (, line 55
+
             // [, line 56
             ket = cursor;
+
             // substring, line 56
             among_var = find_among_b(a_2, 5);
             if (among_var == 0)
@@ -286,23 +322,30 @@ namespace Snowball
                 limit_backward = v_2;
                 return false;
             }
+
             // ], line 56
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
                 case 1:
+
                     // (, line 57
+
                     // delete, line 57
                     slice_del();
                     break;
                 case 2:
+
                     // (, line 58
+
                     // <-, line 58
                     slice_from("l\u00C3\u00B6s");
                     break;
                 case 3:
+
                     // (, line 59
+
                     // <-, line 59
                     slice_from("full");
                     break;
@@ -318,9 +361,12 @@ namespace Snowball
             int v_2;
             int v_3;
             int v_4;
+
             // (, line 64
+
             // do, line 66
             v_1 = cursor;
+
             // call mark_regions, line 66
             if (!r_mark_regions())
             {
@@ -328,11 +374,15 @@ namespace Snowball
             }
         lab0: 
             cursor = v_1;
+
             // backwards, line 67
             limit_backward = cursor; cursor = limit;
+
             // (, line 67
+
             // do, line 68
             v_2 = limit - cursor;
+
             // call main_suffix, line 68
             if (!r_main_suffix())
             {
@@ -340,8 +390,10 @@ namespace Snowball
             }
         lab1: 
             cursor = limit - v_2;
+
             // do, line 69
             v_3 = limit - cursor;
+
             // call consonant_pair, line 69
             if (!r_consonant_pair())
             {
@@ -349,8 +401,10 @@ namespace Snowball
             }
         lab2: 
             cursor = limit - v_3;
+
             // do, line 70
             v_4 = limit - cursor;
+
             // call other_suffix, line 70
             if (!r_other_suffix())
             {
@@ -359,6 +413,7 @@ namespace Snowball
         lab3: 
             cursor = limit - v_4;
             cursor = limit_backward;
+
             return true;
         }
 
