@@ -39,231 +39,231 @@ namespace Snowball
         {
             a_0 = new[] 
             {
-                new Among("", -1, 7),
-                new Among("qu", 0, 6),
-                new Among("\u00C3\u00A1", 0, 1),
-                new Among("\u00C3\u00A9", 0, 2),
-                new Among("\u00C3\u00AD", 0, 3),
-                new Among("\u00C3\u00B3", 0, 4),
-                new Among("\u00C3\u00BA", 0, 5)
+                new Among(UTF16(""), -1, 7),
+                new Among(UTF16("qu"), 0, 6),
+                new Among(UTF16("\u00C3\u00A1"), 0, 1),
+                new Among(UTF16("\u00C3\u00A9"), 0, 2),
+                new Among(UTF16("\u00C3\u00AD"), 0, 3),
+                new Among(UTF16("\u00C3\u00B3"), 0, 4),
+                new Among(UTF16("\u00C3\u00BA"), 0, 5)
             };
 
             a_1 = new[] 
             {
-                new Among("", -1, 3),
-                new Among("I", 0, 1),
-                new Among("U", 0, 2)
+                new Among(UTF16(""), -1, 3),
+                new Among(UTF16("I"), 0, 1),
+                new Among(UTF16("U"), 0, 2)
             };
 
             a_2 = new[] 
             {
-                new Among("la", -1, -1),
-                new Among("cela", 0, -1),
-                new Among("gliela", 0, -1),
-                new Among("mela", 0, -1),
-                new Among("tela", 0, -1),
-                new Among("vela", 0, -1),
-                new Among("le", -1, -1),
-                new Among("cele", 6, -1),
-                new Among("gliele", 6, -1),
-                new Among("mele", 6, -1),
-                new Among("tele", 6, -1),
-                new Among("vele", 6, -1),
-                new Among("ne", -1, -1),
-                new Among("cene", 12, -1),
-                new Among("gliene", 12, -1),
-                new Among("mene", 12, -1),
-                new Among("sene", 12, -1),
-                new Among("tene", 12, -1),
-                new Among("vene", 12, -1),
-                new Among("ci", -1, -1),
-                new Among("li", -1, -1),
-                new Among("celi", 20, -1),
-                new Among("glieli", 20, -1),
-                new Among("meli", 20, -1),
-                new Among("teli", 20, -1),
-                new Among("veli", 20, -1),
-                new Among("gli", 20, -1),
-                new Among("mi", -1, -1),
-                new Among("si", -1, -1),
-                new Among("ti", -1, -1),
-                new Among("vi", -1, -1),
-                new Among("lo", -1, -1),
-                new Among("celo", 31, -1),
-                new Among("glielo", 31, -1),
-                new Among("melo", 31, -1),
-                new Among("telo", 31, -1),
-                new Among("velo", 31, -1)
+                new Among(UTF16("la"), -1, -1),
+                new Among(UTF16("cela"), 0, -1),
+                new Among(UTF16("gliela"), 0, -1),
+                new Among(UTF16("mela"), 0, -1),
+                new Among(UTF16("tela"), 0, -1),
+                new Among(UTF16("vela"), 0, -1),
+                new Among(UTF16("le"), -1, -1),
+                new Among(UTF16("cele"), 6, -1),
+                new Among(UTF16("gliele"), 6, -1),
+                new Among(UTF16("mele"), 6, -1),
+                new Among(UTF16("tele"), 6, -1),
+                new Among(UTF16("vele"), 6, -1),
+                new Among(UTF16("ne"), -1, -1),
+                new Among(UTF16("cene"), 12, -1),
+                new Among(UTF16("gliene"), 12, -1),
+                new Among(UTF16("mene"), 12, -1),
+                new Among(UTF16("sene"), 12, -1),
+                new Among(UTF16("tene"), 12, -1),
+                new Among(UTF16("vene"), 12, -1),
+                new Among(UTF16("ci"), -1, -1),
+                new Among(UTF16("li"), -1, -1),
+                new Among(UTF16("celi"), 20, -1),
+                new Among(UTF16("glieli"), 20, -1),
+                new Among(UTF16("meli"), 20, -1),
+                new Among(UTF16("teli"), 20, -1),
+                new Among(UTF16("veli"), 20, -1),
+                new Among(UTF16("gli"), 20, -1),
+                new Among(UTF16("mi"), -1, -1),
+                new Among(UTF16("si"), -1, -1),
+                new Among(UTF16("ti"), -1, -1),
+                new Among(UTF16("vi"), -1, -1),
+                new Among(UTF16("lo"), -1, -1),
+                new Among(UTF16("celo"), 31, -1),
+                new Among(UTF16("glielo"), 31, -1),
+                new Among(UTF16("melo"), 31, -1),
+                new Among(UTF16("telo"), 31, -1),
+                new Among(UTF16("velo"), 31, -1)
             };
 
             a_3 = new[] 
             {
-                new Among("ando", -1, 1),
-                new Among("endo", -1, 1),
-                new Among("ar", -1, 2),
-                new Among("er", -1, 2),
-                new Among("ir", -1, 2)
+                new Among(UTF16("ando"), -1, 1),
+                new Among(UTF16("endo"), -1, 1),
+                new Among(UTF16("ar"), -1, 2),
+                new Among(UTF16("er"), -1, 2),
+                new Among(UTF16("ir"), -1, 2)
             };
 
             a_4 = new[] 
             {
-                new Among("ic", -1, -1),
-                new Among("abil", -1, -1),
-                new Among("os", -1, -1),
-                new Among("iv", -1, 1)
+                new Among(UTF16("ic"), -1, -1),
+                new Among(UTF16("abil"), -1, -1),
+                new Among(UTF16("os"), -1, -1),
+                new Among(UTF16("iv"), -1, 1)
             };
 
             a_5 = new[] 
             {
-                new Among("ic", -1, 1),
-                new Among("abil", -1, 1),
-                new Among("iv", -1, 1)
+                new Among(UTF16("ic"), -1, 1),
+                new Among(UTF16("abil"), -1, 1),
+                new Among(UTF16("iv"), -1, 1)
             };
 
             a_6 = new[] 
             {
-                new Among("ica", -1, 1),
-                new Among("logia", -1, 3),
-                new Among("osa", -1, 1),
-                new Among("ista", -1, 1),
-                new Among("iva", -1, 9),
-                new Among("anza", -1, 1),
-                new Among("enza", -1, 5),
-                new Among("ice", -1, 1),
-                new Among("atrice", 7, 1),
-                new Among("iche", -1, 1),
-                new Among("logie", -1, 3),
-                new Among("abile", -1, 1),
-                new Among("ibile", -1, 1),
-                new Among("usione", -1, 4),
-                new Among("azione", -1, 2),
-                new Among("uzione", -1, 4),
-                new Among("atore", -1, 2),
-                new Among("ose", -1, 1),
-                new Among("ante", -1, 1),
-                new Among("mente", -1, 1),
-                new Among("amente", 19, 7),
-                new Among("iste", -1, 1),
-                new Among("ive", -1, 9),
-                new Among("anze", -1, 1),
-                new Among("enze", -1, 5),
-                new Among("ici", -1, 1),
-                new Among("atrici", 25, 1),
-                new Among("ichi", -1, 1),
-                new Among("abili", -1, 1),
-                new Among("ibili", -1, 1),
-                new Among("ismi", -1, 1),
-                new Among("usioni", -1, 4),
-                new Among("azioni", -1, 2),
-                new Among("uzioni", -1, 4),
-                new Among("atori", -1, 2),
-                new Among("osi", -1, 1),
-                new Among("anti", -1, 1),
-                new Among("amenti", -1, 6),
-                new Among("imenti", -1, 6),
-                new Among("isti", -1, 1),
-                new Among("ivi", -1, 9),
-                new Among("ico", -1, 1),
-                new Among("ismo", -1, 1),
-                new Among("oso", -1, 1),
-                new Among("amento", -1, 6),
-                new Among("imento", -1, 6),
-                new Among("ivo", -1, 9),
-                new Among("it\u00C3\u00A0", -1, 8),
-                new Among("ist\u00C3\u00A0", -1, 1),
-                new Among("ist\u00C3\u00A8", -1, 1),
-                new Among("ist\u00C3\u00AC", -1, 1)
+                new Among(UTF16("ica"), -1, 1),
+                new Among(UTF16("logia"), -1, 3),
+                new Among(UTF16("osa"), -1, 1),
+                new Among(UTF16("ista"), -1, 1),
+                new Among(UTF16("iva"), -1, 9),
+                new Among(UTF16("anza"), -1, 1),
+                new Among(UTF16("enza"), -1, 5),
+                new Among(UTF16("ice"), -1, 1),
+                new Among(UTF16("atrice"), 7, 1),
+                new Among(UTF16("iche"), -1, 1),
+                new Among(UTF16("logie"), -1, 3),
+                new Among(UTF16("abile"), -1, 1),
+                new Among(UTF16("ibile"), -1, 1),
+                new Among(UTF16("usione"), -1, 4),
+                new Among(UTF16("azione"), -1, 2),
+                new Among(UTF16("uzione"), -1, 4),
+                new Among(UTF16("atore"), -1, 2),
+                new Among(UTF16("ose"), -1, 1),
+                new Among(UTF16("ante"), -1, 1),
+                new Among(UTF16("mente"), -1, 1),
+                new Among(UTF16("amente"), 19, 7),
+                new Among(UTF16("iste"), -1, 1),
+                new Among(UTF16("ive"), -1, 9),
+                new Among(UTF16("anze"), -1, 1),
+                new Among(UTF16("enze"), -1, 5),
+                new Among(UTF16("ici"), -1, 1),
+                new Among(UTF16("atrici"), 25, 1),
+                new Among(UTF16("ichi"), -1, 1),
+                new Among(UTF16("abili"), -1, 1),
+                new Among(UTF16("ibili"), -1, 1),
+                new Among(UTF16("ismi"), -1, 1),
+                new Among(UTF16("usioni"), -1, 4),
+                new Among(UTF16("azioni"), -1, 2),
+                new Among(UTF16("uzioni"), -1, 4),
+                new Among(UTF16("atori"), -1, 2),
+                new Among(UTF16("osi"), -1, 1),
+                new Among(UTF16("anti"), -1, 1),
+                new Among(UTF16("amenti"), -1, 6),
+                new Among(UTF16("imenti"), -1, 6),
+                new Among(UTF16("isti"), -1, 1),
+                new Among(UTF16("ivi"), -1, 9),
+                new Among(UTF16("ico"), -1, 1),
+                new Among(UTF16("ismo"), -1, 1),
+                new Among(UTF16("oso"), -1, 1),
+                new Among(UTF16("amento"), -1, 6),
+                new Among(UTF16("imento"), -1, 6),
+                new Among(UTF16("ivo"), -1, 9),
+                new Among(UTF16("it\u00C3\u00A0"), -1, 8),
+                new Among(UTF16("ist\u00C3\u00A0"), -1, 1),
+                new Among(UTF16("ist\u00C3\u00A8"), -1, 1),
+                new Among(UTF16("ist\u00C3\u00AC"), -1, 1)
             };
 
             a_7 = new[] 
             {
-                new Among("isca", -1, 1),
-                new Among("enda", -1, 1),
-                new Among("ata", -1, 1),
-                new Among("ita", -1, 1),
-                new Among("uta", -1, 1),
-                new Among("ava", -1, 1),
-                new Among("eva", -1, 1),
-                new Among("iva", -1, 1),
-                new Among("erebbe", -1, 1),
-                new Among("irebbe", -1, 1),
-                new Among("isce", -1, 1),
-                new Among("ende", -1, 1),
-                new Among("are", -1, 1),
-                new Among("ere", -1, 1),
-                new Among("ire", -1, 1),
-                new Among("asse", -1, 1),
-                new Among("ate", -1, 1),
-                new Among("avate", 16, 1),
-                new Among("evate", 16, 1),
-                new Among("ivate", 16, 1),
-                new Among("ete", -1, 1),
-                new Among("erete", 20, 1),
-                new Among("irete", 20, 1),
-                new Among("ite", -1, 1),
-                new Among("ereste", -1, 1),
-                new Among("ireste", -1, 1),
-                new Among("ute", -1, 1),
-                new Among("erai", -1, 1),
-                new Among("irai", -1, 1),
-                new Among("isci", -1, 1),
-                new Among("endi", -1, 1),
-                new Among("erei", -1, 1),
-                new Among("irei", -1, 1),
-                new Among("assi", -1, 1),
-                new Among("ati", -1, 1),
-                new Among("iti", -1, 1),
-                new Among("eresti", -1, 1),
-                new Among("iresti", -1, 1),
-                new Among("uti", -1, 1),
-                new Among("avi", -1, 1),
-                new Among("evi", -1, 1),
-                new Among("ivi", -1, 1),
-                new Among("isco", -1, 1),
-                new Among("ando", -1, 1),
-                new Among("endo", -1, 1),
-                new Among("Yamo", -1, 1),
-                new Among("iamo", -1, 1),
-                new Among("avamo", -1, 1),
-                new Among("evamo", -1, 1),
-                new Among("ivamo", -1, 1),
-                new Among("eremo", -1, 1),
-                new Among("iremo", -1, 1),
-                new Among("assimo", -1, 1),
-                new Among("ammo", -1, 1),
-                new Among("emmo", -1, 1),
-                new Among("eremmo", 54, 1),
-                new Among("iremmo", 54, 1),
-                new Among("immo", -1, 1),
-                new Among("ano", -1, 1),
-                new Among("iscano", 58, 1),
-                new Among("avano", 58, 1),
-                new Among("evano", 58, 1),
-                new Among("ivano", 58, 1),
-                new Among("eranno", -1, 1),
-                new Among("iranno", -1, 1),
-                new Among("ono", -1, 1),
-                new Among("iscono", 65, 1),
-                new Among("arono", 65, 1),
-                new Among("erono", 65, 1),
-                new Among("irono", 65, 1),
-                new Among("erebbero", -1, 1),
-                new Among("irebbero", -1, 1),
-                new Among("assero", -1, 1),
-                new Among("essero", -1, 1),
-                new Among("issero", -1, 1),
-                new Among("ato", -1, 1),
-                new Among("ito", -1, 1),
-                new Among("uto", -1, 1),
-                new Among("avo", -1, 1),
-                new Among("evo", -1, 1),
-                new Among("ivo", -1, 1),
-                new Among("ar", -1, 1),
-                new Among("ir", -1, 1),
-                new Among("er\u00C3\u00A0", -1, 1),
-                new Among("ir\u00C3\u00A0", -1, 1),
-                new Among("er\u00C3\u00B2", -1, 1),
-                new Among("ir\u00C3\u00B2", -1, 1)
+                new Among(UTF16("isca"), -1, 1),
+                new Among(UTF16("enda"), -1, 1),
+                new Among(UTF16("ata"), -1, 1),
+                new Among(UTF16("ita"), -1, 1),
+                new Among(UTF16("uta"), -1, 1),
+                new Among(UTF16("ava"), -1, 1),
+                new Among(UTF16("eva"), -1, 1),
+                new Among(UTF16("iva"), -1, 1),
+                new Among(UTF16("erebbe"), -1, 1),
+                new Among(UTF16("irebbe"), -1, 1),
+                new Among(UTF16("isce"), -1, 1),
+                new Among(UTF16("ende"), -1, 1),
+                new Among(UTF16("are"), -1, 1),
+                new Among(UTF16("ere"), -1, 1),
+                new Among(UTF16("ire"), -1, 1),
+                new Among(UTF16("asse"), -1, 1),
+                new Among(UTF16("ate"), -1, 1),
+                new Among(UTF16("avate"), 16, 1),
+                new Among(UTF16("evate"), 16, 1),
+                new Among(UTF16("ivate"), 16, 1),
+                new Among(UTF16("ete"), -1, 1),
+                new Among(UTF16("erete"), 20, 1),
+                new Among(UTF16("irete"), 20, 1),
+                new Among(UTF16("ite"), -1, 1),
+                new Among(UTF16("ereste"), -1, 1),
+                new Among(UTF16("ireste"), -1, 1),
+                new Among(UTF16("ute"), -1, 1),
+                new Among(UTF16("erai"), -1, 1),
+                new Among(UTF16("irai"), -1, 1),
+                new Among(UTF16("isci"), -1, 1),
+                new Among(UTF16("endi"), -1, 1),
+                new Among(UTF16("erei"), -1, 1),
+                new Among(UTF16("irei"), -1, 1),
+                new Among(UTF16("assi"), -1, 1),
+                new Among(UTF16("ati"), -1, 1),
+                new Among(UTF16("iti"), -1, 1),
+                new Among(UTF16("eresti"), -1, 1),
+                new Among(UTF16("iresti"), -1, 1),
+                new Among(UTF16("uti"), -1, 1),
+                new Among(UTF16("avi"), -1, 1),
+                new Among(UTF16("evi"), -1, 1),
+                new Among(UTF16("ivi"), -1, 1),
+                new Among(UTF16("isco"), -1, 1),
+                new Among(UTF16("ando"), -1, 1),
+                new Among(UTF16("endo"), -1, 1),
+                new Among(UTF16("Yamo"), -1, 1),
+                new Among(UTF16("iamo"), -1, 1),
+                new Among(UTF16("avamo"), -1, 1),
+                new Among(UTF16("evamo"), -1, 1),
+                new Among(UTF16("ivamo"), -1, 1),
+                new Among(UTF16("eremo"), -1, 1),
+                new Among(UTF16("iremo"), -1, 1),
+                new Among(UTF16("assimo"), -1, 1),
+                new Among(UTF16("ammo"), -1, 1),
+                new Among(UTF16("emmo"), -1, 1),
+                new Among(UTF16("eremmo"), 54, 1),
+                new Among(UTF16("iremmo"), 54, 1),
+                new Among(UTF16("immo"), -1, 1),
+                new Among(UTF16("ano"), -1, 1),
+                new Among(UTF16("iscano"), 58, 1),
+                new Among(UTF16("avano"), 58, 1),
+                new Among(UTF16("evano"), 58, 1),
+                new Among(UTF16("ivano"), 58, 1),
+                new Among(UTF16("eranno"), -1, 1),
+                new Among(UTF16("iranno"), -1, 1),
+                new Among(UTF16("ono"), -1, 1),
+                new Among(UTF16("iscono"), 65, 1),
+                new Among(UTF16("arono"), 65, 1),
+                new Among(UTF16("erono"), 65, 1),
+                new Among(UTF16("irono"), 65, 1),
+                new Among(UTF16("erebbero"), -1, 1),
+                new Among(UTF16("irebbero"), -1, 1),
+                new Among(UTF16("assero"), -1, 1),
+                new Among(UTF16("essero"), -1, 1),
+                new Among(UTF16("issero"), -1, 1),
+                new Among(UTF16("ato"), -1, 1),
+                new Among(UTF16("ito"), -1, 1),
+                new Among(UTF16("uto"), -1, 1),
+                new Among(UTF16("avo"), -1, 1),
+                new Among(UTF16("evo"), -1, 1),
+                new Among(UTF16("ivo"), -1, 1),
+                new Among(UTF16("ar"), -1, 1),
+                new Among(UTF16("ir"), -1, 1),
+                new Among(UTF16("er\u00C3\u00A0"), -1, 1),
+                new Among(UTF16("ir\u00C3\u00A0"), -1, 1),
+                new Among(UTF16("er\u00C3\u00B2"), -1, 1),
+                new Among(UTF16("ir\u00C3\u00B2"), -1, 1)
             };
 
         }
@@ -278,80 +278,60 @@ namespace Snowball
             int v_3;
             int v_4;
             int v_5;
-
             // (, line 34
-
             // test, line 35
             v_1 = cursor;
-
             // repeat, line 35
             while (true)
             {
                 v_2 = cursor;
-
                 // (, line 35
-
                 // [, line 36
                 bra = cursor;
-
                 // substring, line 36
-                among_var = find_among(a_0, 7);
+                among_var = find_among(a_0);
                 if (among_var == 0)
                 {
                     goto lab0;
                 }
-
                 // ], line 36
                 ket = cursor;
                 switch (among_var) 
                 {
                     case 0:
+                        break;
                     case 1:
-
                         // (, line 37
-
                         // <-, line 37
-                        slice_from("\u00C3\u00A0");
+                        slice_from(UTF16("\u00C3\u00A0"));
                         break;
                     case 2:
-
                         // (, line 38
-
                         // <-, line 38
-                        slice_from("\u00C3\u00A8");
+                        slice_from(UTF16("\u00C3\u00A8"));
                         break;
                     case 3:
-
                         // (, line 39
-
                         // <-, line 39
-                        slice_from("\u00C3\u00AC");
+                        slice_from(UTF16("\u00C3\u00AC"));
                         break;
                     case 4:
-
                         // (, line 40
-
                         // <-, line 40
-                        slice_from("\u00C3\u00B2");
+                        slice_from(UTF16("\u00C3\u00B2"));
                         break;
                     case 5:
-
                         // (, line 41
-
                         // <-, line 41
-                        slice_from("\u00C3\u00B9");
+                        slice_from(UTF16("\u00C3\u00B9"));
                         break;
                     case 6:
-
                         // (, line 42
-
                         // <-, line 42
-                        slice_from("qU");
+                        slice_from(UTF16("qU"));
                         break;
                     case 7:
-
                         // (, line 43
-
                         // next, line 43
                         if (cursor >= limit)
                         {
@@ -366,67 +346,54 @@ namespace Snowball
                 break;
             }
             cursor = v_1;
-
             // repeat, line 46
             while (true)
             {
                 v_3 = cursor;
                 while (true) 
                 {
-
                     // goto, line 46
                     v_4 = cursor;
-
                     // (, line 46
                     if (!(in_grouping(g_v, 97, 249)))
                     {
                         goto lab2;
                     }
-
                     // [, line 47
                     bra = cursor;
-
                     // or, line 47
                     v_5 = cursor;
-
                     // (, line 47
-
                     // literal, line 47
-                    if (!(eq_s(1, "u")))
+                    if (!(eq_s(UTF16("u"))))
                     {
                         goto lab4;
                     }
-
                     // ], line 47
                     ket = cursor;
                     if (!(in_grouping(g_v, 97, 249)))
                     {
                         goto lab4;
                     }
-
                     // <-, line 47
-                    slice_from("U");
+                    slice_from(UTF16("U"));
                     goto lab3;
                 lab4: 
                     cursor = v_5;
-
                     // (, line 48
-
                     // literal, line 48
-                    if (!(eq_s(1, "i")))
+                    if (!(eq_s(UTF16("i"))))
                     {
                         goto lab2;
                     }
-
                     // ], line 48
                     ket = cursor;
                     if (!(in_grouping(g_v, 97, 249)))
                     {
                         goto lab2;
                     }
-
                     // <-, line 48
-                    slice_from("I");
+                    slice_from(UTF16("I"));
                 lab3: 
                     cursor = v_4;
                     break;
@@ -454,29 +421,22 @@ namespace Snowball
             int v_3;
             int v_6;
             int v_8;
-
             // (, line 52
             I_pV = limit;
             I_p1 = limit;
             I_p2 = limit;
-
             // do, line 58
             v_1 = cursor;
-
             // (, line 58
-
             // or, line 60
             v_2 = cursor;
-
             // (, line 59
             if (!(in_grouping(g_v, 97, 249)))
             {
                 goto lab2;
             }
-
             // or, line 59
             v_3 = cursor;
-
             // (, line 59
             if (!(out_grouping(g_v, 97, 249)))
             {
@@ -484,7 +444,6 @@ namespace Snowball
             }
             while (true) 
             {
-
                 // gopast, line 59
                 if (!(in_grouping(g_v, 97, 249)))
                 {
@@ -501,7 +460,6 @@ namespace Snowball
             goto lab3;
         lab4: 
             cursor = v_3;
-
             // (, line 59
             if (!(in_grouping(g_v, 97, 249)))
             {
@@ -509,7 +467,6 @@ namespace Snowball
             }
             while (true) 
             {
-
                 // gopast, line 59
                 if (!(out_grouping(g_v, 97, 249)))
                 {
@@ -527,16 +484,13 @@ namespace Snowball
             goto lab1;
         lab2: 
             cursor = v_2;
-
             // (, line 61
             if (!(out_grouping(g_v, 97, 249)))
             {
                 goto lab0;
             }
-
             // or, line 61
             v_6 = cursor;
-
             // (, line 61
             if (!(out_grouping(g_v, 97, 249)))
             {
@@ -544,7 +498,6 @@ namespace Snowball
             }
             while (true) 
             {
-
                 // gopast, line 61
                 if (!(in_grouping(g_v, 97, 249)))
                 {
@@ -561,13 +514,11 @@ namespace Snowball
             goto lab7;
         lab8: 
             cursor = v_6;
-
             // (, line 61
             if (!(in_grouping(g_v, 97, 249)))
             {
                 goto lab0;
             }
-
             // next, line 61
             if (cursor >= limit)
             {
@@ -576,19 +527,15 @@ namespace Snowball
             cursor++;
         lab7: 
         lab1: 
-
             // setmark pV, line 62
             I_pV = cursor;
         lab0: 
             cursor = v_1;
-
             // do, line 64
             v_8 = cursor;
-
             // (, line 64
             while (true) 
             {
-
                 // gopast, line 65
                 if (!(in_grouping(g_v, 97, 249)))
                 {
@@ -604,7 +551,6 @@ namespace Snowball
             }
             while (true) 
             {
-
                 // gopast, line 65
                 if (!(out_grouping(g_v, 97, 249)))
                 {
@@ -618,12 +564,10 @@ namespace Snowball
                 }
                 cursor++;
             }
-
             // setmark p1, line 65
             I_p1 = cursor;
             while (true) 
             {
-
                 // gopast, line 66
                 if (!(in_grouping(g_v, 97, 249)))
                 {
@@ -639,7 +583,6 @@ namespace Snowball
             }
             while (true) 
             {
-
                 // gopast, line 66
                 if (!(out_grouping(g_v, 97, 249)))
                 {
@@ -653,7 +596,6 @@ namespace Snowball
                 }
                 cursor++;
             }
-
             // setmark p2, line 66
             I_p2 = cursor;
         lab10: 
@@ -666,47 +608,37 @@ namespace Snowball
         {
             int among_var;
             int v_1;
-
             // repeat, line 70
             while (true)
             {
                 v_1 = cursor;
-
                 // (, line 70
-
                 // [, line 72
                 bra = cursor;
-
                 // substring, line 72
-                among_var = find_among(a_1, 3);
+                among_var = find_among(a_1);
                 if (among_var == 0)
                 {
                     goto lab0;
                 }
-
                 // ], line 72
                 ket = cursor;
                 switch (among_var) 
                 {
                     case 0:
+                        break;
                     case 1:
-
                         // (, line 73
-
                         // <-, line 73
-                        slice_from("i");
+                        slice_from(UTF16("i"));
                         break;
                     case 2:
-
                         // (, line 74
-
                         // <-, line 74
-                        slice_from("u");
+                        slice_from(UTF16("u"));
                         break;
                     case 3:
-
                         // (, line 75
-
                         // next, line 75
                         if (cursor >= limit)
                         {
@@ -757,30 +689,23 @@ namespace Snowball
         private bool r_attached_pronoun()
         {
             int among_var;
-
             // (, line 86
-
             // [, line 87
             ket = cursor;
-
             // substring, line 87
-            if (find_among_b(a_2, 37) == 0)
+            if (find_among_b(a_2) == 0)
             {
                 return false;
             }
-
             // ], line 87
             bra = cursor;
-
             // among, line 97
-            among_var = find_among_b(a_3, 5);
+            among_var = find_among_b(a_3);
             if (among_var == 0)
             {
                 return false;
             }
-
             // (, line 97
-
             // call RV, line 97
             if (!r_RV())
             {
@@ -789,19 +714,16 @@ namespace Snowball
             switch (among_var) 
             {
                 case 0:
+                    break;
                 case 1:
-
                     // (, line 98
-
                     // delete, line 98
                     slice_del();
                     break;
                 case 2:
-
                     // (, line 99
-
                     // <-, line 99
-                    slice_from("e");
+                    slice_from(UTF16("e"));
                     break;
             }
 
@@ -815,199 +737,156 @@ namespace Snowball
             int v_2;
             int v_3;
             int v_4;
-
             // (, line 103
-
             // [, line 104
             ket = cursor;
-
             // substring, line 104
-            among_var = find_among_b(a_6, 51);
+            among_var = find_among_b(a_6);
             if (among_var == 0)
             {
                 return false;
             }
-
             // ], line 104
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
+                    break;
                 case 1:
-
                     // (, line 111
-
                     // call R2, line 111
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // delete, line 111
                     slice_del();
                     break;
                 case 2:
-
                     // (, line 113
-
                     // call R2, line 113
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // delete, line 113
                     slice_del();
-
                     // try, line 114
                     v_1 = limit - cursor;
-
                     // (, line 114
-
                     // [, line 114
                     ket = cursor;
-
                     // literal, line 114
-                    if (!(eq_s_b(2, "ic")))
+                    if (!(eq_s_b(UTF16("ic"))))
                     {
                         cursor = limit - v_1;
                         goto lab0;
                     }
-
                     // ], line 114
                     bra = cursor;
-
                     // call R2, line 114
                     if (!r_R2())
                     {
                         cursor = limit - v_1;
                         goto lab0;
                     }
-
                     // delete, line 114
                     slice_del();
                 lab0: 
                     break;
                 case 3:
-
                     // (, line 117
-
                     // call R2, line 117
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // <-, line 117
-                    slice_from("log");
+                    slice_from(UTF16("log"));
                     break;
                 case 4:
-
                     // (, line 119
-
                     // call R2, line 119
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // <-, line 119
-                    slice_from("u");
+                    slice_from(UTF16("u"));
                     break;
                 case 5:
-
                     // (, line 121
-
                     // call R2, line 121
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // <-, line 121
-                    slice_from("ente");
+                    slice_from(UTF16("ente"));
                     break;
                 case 6:
-
                     // (, line 123
-
                     // call RV, line 123
                     if (!r_RV())
                     {
                         return false;
                     }
-
                     // delete, line 123
                     slice_del();
                     break;
                 case 7:
-
                     // (, line 124
-
                     // call R1, line 125
                     if (!r_R1())
                     {
                         return false;
                     }
-
                     // delete, line 125
                     slice_del();
-
                     // try, line 126
                     v_2 = limit - cursor;
-
                     // (, line 126
-
                     // [, line 127
                     ket = cursor;
-
                     // substring, line 127
-                    among_var = find_among_b(a_4, 4);
+                    among_var = find_among_b(a_4);
                     if (among_var == 0)
                     {
                         cursor = limit - v_2;
                         goto lab1;
                     }
-
                     // ], line 127
                     bra = cursor;
-
                     // call R2, line 127
                     if (!r_R2())
                     {
                         cursor = limit - v_2;
                         goto lab1;
                     }
-
                     // delete, line 127
                     slice_del();
                     switch (among_var) 
                     {
                         case 0:
+                            break;
                         case 1:
-
                             // (, line 128
-
                             // [, line 128
                             ket = cursor;
-
                             // literal, line 128
-                            if (!(eq_s_b(2, "at")))
+                            if (!(eq_s_b(UTF16("at"))))
                             {
                                 cursor = limit - v_2;
                                 goto lab1;
                             }
-
                             // ], line 128
                             bra = cursor;
-
                             // call R2, line 128
                             if (!r_R2())
                             {
                                 cursor = limit - v_2;
                                 goto lab1;
                             }
-
                             // delete, line 128
                             slice_del();
                             break;
@@ -1015,50 +894,40 @@ namespace Snowball
                 lab1: 
                     break;
                 case 8:
-
                     // (, line 133
-
                     // call R2, line 134
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // delete, line 134
                     slice_del();
-
                     // try, line 135
                     v_3 = limit - cursor;
-
                     // (, line 135
-
                     // [, line 136
                     ket = cursor;
-
                     // substring, line 136
-                    among_var = find_among_b(a_5, 3);
+                    among_var = find_among_b(a_5);
                     if (among_var == 0)
                     {
                         cursor = limit - v_3;
                         goto lab2;
                     }
-
                     // ], line 136
                     bra = cursor;
                     switch (among_var) 
                     {
                         case 0:
+                            break;
                         case 1:
-
                             // (, line 137
-
                             // call R2, line 137
                             if (!r_R2())
                             {
                                 cursor = limit - v_3;
                                 goto lab2;
                             }
-
                             // delete, line 137
                             slice_del();
                             break;
@@ -1066,66 +935,51 @@ namespace Snowball
                 lab2: 
                     break;
                 case 9:
-
                     // (, line 141
-
                     // call R2, line 142
                     if (!r_R2())
                     {
                         return false;
                     }
-
                     // delete, line 142
                     slice_del();
-
                     // try, line 143
                     v_4 = limit - cursor;
-
                     // (, line 143
-
                     // [, line 143
                     ket = cursor;
-
                     // literal, line 143
-                    if (!(eq_s_b(2, "at")))
+                    if (!(eq_s_b(UTF16("at"))))
                     {
                         cursor = limit - v_4;
                         goto lab3;
                     }
-
                     // ], line 143
                     bra = cursor;
-
                     // call R2, line 143
                     if (!r_R2())
                     {
                         cursor = limit - v_4;
                         goto lab3;
                     }
-
                     // delete, line 143
                     slice_del();
-
                     // [, line 143
                     ket = cursor;
-
                     // literal, line 143
-                    if (!(eq_s_b(2, "ic")))
+                    if (!(eq_s_b(UTF16("ic"))))
                     {
                         cursor = limit - v_4;
                         goto lab3;
                     }
-
                     // ], line 143
                     bra = cursor;
-
                     // call R2, line 143
                     if (!r_R2())
                     {
                         cursor = limit - v_4;
                         goto lab3;
                     }
-
                     // delete, line 143
                     slice_del();
                 lab3: 
@@ -1140,10 +994,8 @@ namespace Snowball
             int among_var;
             int v_1;
             int v_2;
-
             // setlimit, line 148
             v_1 = limit - cursor;
-
             // tomark, line 148
             if (cursor < I_pV)
             {
@@ -1153,29 +1005,24 @@ namespace Snowball
             v_2 = limit_backward;
             limit_backward = cursor;
             cursor = limit - v_1;
-
             // (, line 148
-
             // [, line 149
             ket = cursor;
-
             // substring, line 149
-            among_var = find_among_b(a_7, 87);
+            among_var = find_among_b(a_7);
             if (among_var == 0)
             {
                 limit_backward = v_2;
                 return false;
             }
-
             // ], line 149
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
+                    break;
                 case 1:
-
                     // (, line 163
-
                     // delete, line 163
                     slice_del();
                     break;
@@ -1189,14 +1036,10 @@ namespace Snowball
         {
             int v_1;
             int v_2;
-
             // (, line 170
-
             // try, line 171
             v_1 = limit - cursor;
-
             // (, line 171
-
             // [, line 172
             ket = cursor;
             if (!(in_grouping_b(g_AEIO, 97, 242)))
@@ -1204,59 +1047,46 @@ namespace Snowball
                 cursor = limit - v_1;
                 goto lab0;
             }
-
             // ], line 172
             bra = cursor;
-
             // call RV, line 172
             if (!r_RV())
             {
                 cursor = limit - v_1;
                 goto lab0;
             }
-
             // delete, line 172
             slice_del();
-
             // [, line 173
             ket = cursor;
-
             // literal, line 173
-            if (!(eq_s_b(1, "i")))
+            if (!(eq_s_b(UTF16("i"))))
             {
                 cursor = limit - v_1;
                 goto lab0;
             }
-
             // ], line 173
             bra = cursor;
-
             // call RV, line 173
             if (!r_RV())
             {
                 cursor = limit - v_1;
                 goto lab0;
             }
-
             // delete, line 173
             slice_del();
         lab0: 
-
             // try, line 175
             v_2 = limit - cursor;
-
             // (, line 175
-
             // [, line 176
             ket = cursor;
-
             // literal, line 176
-            if (!(eq_s_b(1, "h")))
+            if (!(eq_s_b(UTF16("h"))))
             {
                 cursor = limit - v_2;
                 goto lab1;
             }
-
             // ], line 176
             bra = cursor;
             if (!(in_grouping_b(g_CG, 99, 103)))
@@ -1264,14 +1094,12 @@ namespace Snowball
                 cursor = limit - v_2;
                 goto lab1;
             }
-
             // call RV, line 176
             if (!r_RV())
             {
                 cursor = limit - v_2;
                 goto lab1;
             }
-
             // delete, line 176
             slice_del();
         lab1: 
@@ -1288,12 +1116,9 @@ namespace Snowball
             int v_5;
             int v_6;
             int v_7;
-
             // (, line 181
-
             // do, line 182
             v_1 = cursor;
-
             // call prelude, line 182
             if (!r_prelude())
             {
@@ -1301,10 +1126,8 @@ namespace Snowball
             }
         lab0: 
             cursor = v_1;
-
             // do, line 183
             v_2 = cursor;
-
             // call mark_regions, line 183
             if (!r_mark_regions())
             {
@@ -1312,15 +1135,11 @@ namespace Snowball
             }
         lab1: 
             cursor = v_2;
-
             // backwards, line 184
             limit_backward = cursor; cursor = limit;
-
             // (, line 184
-
             // do, line 185
             v_3 = limit - cursor;
-
             // call attached_pronoun, line 185
             if (!r_attached_pronoun())
             {
@@ -1328,15 +1147,11 @@ namespace Snowball
             }
         lab2: 
             cursor = limit - v_3;
-
             // do, line 186
             v_4 = limit - cursor;
-
             // (, line 186
-
             // or, line 186
             v_5 = limit - cursor;
-
             // call standard_suffix, line 186
             if (!r_standard_suffix())
             {
@@ -1345,7 +1160,6 @@ namespace Snowball
             goto lab4;
         lab5: 
             cursor = limit - v_5;
-
             // call verb_suffix, line 186
             if (!r_verb_suffix())
             {
@@ -1354,10 +1168,8 @@ namespace Snowball
         lab4: 
         lab3: 
             cursor = limit - v_4;
-
             // do, line 187
             v_6 = limit - cursor;
-
             // call vowel_suffix, line 187
             if (!r_vowel_suffix())
             {
@@ -1366,10 +1178,8 @@ namespace Snowball
         lab6: 
             cursor = limit - v_6;
             cursor = limit_backward;
-
             // do, line 189
             v_7 = cursor;
-
             // call postlude, line 189
             if (!r_postlude())
             {

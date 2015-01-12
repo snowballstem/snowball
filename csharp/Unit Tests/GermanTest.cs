@@ -17,6 +17,22 @@ namespace Unit_Tests
 
             Assert.AreEqual("Schrank", german.Stem("Schr\xe4nke"));
             Assert.AreEqual("kein", german.Stem("keinen"));
+            Assert.AreEqual("aeternitatis", german.Stem("aeternitatis"));
+            Assert.AreEqual("affar", german.Stem("affäre"));
+        }
+
+        [TestMethod]
+        public void German_PreludeTest()
+        {
+            GermanStemmer german = new GermanStemmer();
+
+            Assert.AreEqual("ablasst", german.Stem("abläßt"));
+        }
+
+        [TestMethod]
+        public void German_FullTest()
+        {
+            Tools.Test(new GermanStemmer(), "german");
         }
 
     }

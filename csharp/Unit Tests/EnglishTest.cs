@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Snowball;
+using Unit_Tests.Properties;
 
 namespace Unit_Tests
 {
@@ -46,6 +47,12 @@ namespace Unit_Tests
             EnglishStemmer stemmer = new EnglishStemmer();
 
             Assert.AreEqual("y", stemmer.Stem("y's"));
+        }
+
+        [TestMethod]
+        public void English_FullTest()
+        {
+            Tools.Test(new EnglishStemmer(), "english");
         }
     }
 }

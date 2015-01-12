@@ -19,5 +19,10 @@ namespace Unit_Tests
             Assert.AreEqual("algu", stemmer.Stem("algue"));
         }
 
+        [TestMethod]
+        public void Spanish_FullTest()
+        {
+            Tools.Test(new SpanishStemmer(), "spanish");
+        }
     }
 }

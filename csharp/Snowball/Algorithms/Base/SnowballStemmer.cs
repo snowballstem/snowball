@@ -88,11 +88,11 @@ namespace Snowball
             if (cursor >= limit)
                 return false;
 
-            char ch = current[cursor];
+            byte ch = (byte)current[cursor];
             if (ch > max || ch < min)
                 return false;
 
-            ch = (char)(ch - min);
+            ch = (byte)(ch - min);
             if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
                 return false;
 
@@ -105,11 +105,11 @@ namespace Snowball
             if (cursor <= limit_backward)
                 return false;
 
-            char ch = current[cursor - 1];
+            byte ch = (byte)current[cursor - 1];
             if (ch > max || ch < min)
                 return false;
 
-            ch = (char)(ch - min);
+            ch = (byte)(ch - min);
             if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
                 return false;
 
@@ -121,14 +121,15 @@ namespace Snowball
         {
             if (cursor >= limit)
                 return false;
-            char ch = current[cursor];
+
+            byte ch = (byte)current[cursor];
             if (ch > max || ch < min)
             {
                 cursor++;
                 return true;
             }
 
-            ch = (char)(ch - min);
+            ch = (byte)(ch - min);
             if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
             {
                 cursor++;
@@ -142,14 +143,14 @@ namespace Snowball
             if (cursor <= limit_backward)
                 return false;
 
-            char ch = current[cursor - 1];
+            byte ch = (byte)current[cursor - 1];
             if (ch > max || ch < min)
             {
                 cursor--;
                 return true;
             }
 
-            ch = (char)(ch - min);
+            ch = (byte)(ch - min);
             if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
             {
                 cursor--;
@@ -160,9 +161,14 @@ namespace Snowball
 
         protected bool in_range(int min, int max)
         {
-            if (cursor >= limit) return false;
-            char ch = current[cursor];
-            if (ch > max || ch < min) return false;
+            if (cursor >= limit) 
+                return false;
+
+            byte ch = (byte)current[cursor];
+
+            if (ch > max || ch < min) 
+                return false;
+
             cursor++;
             return true;
         }
@@ -172,7 +178,7 @@ namespace Snowball
             if (cursor <= limit_backward)
                 return false;
 
-            char ch = current[cursor - 1];
+            byte ch = (byte)current[cursor - 1];
             if (ch > max || ch < min)
                 return false;
 
@@ -184,7 +190,8 @@ namespace Snowball
         {
             if (cursor >= limit)
                 return false;
-            char ch = current[cursor];
+
+            byte ch = (byte)current[cursor];
             if (!(ch > max || ch < min))
                 return false;
 
@@ -197,7 +204,7 @@ namespace Snowball
             if (cursor <= limit_backward)
                 return false;
 
-            char ch = current[cursor - 1];
+            byte ch = (byte)current[cursor - 1];
             if (!(ch > max || ch < min))
                 return false;
 
@@ -205,70 +212,57 @@ namespace Snowball
             return true;
         }
 
-        protected bool eq_s(int s_size, String s)
+
+        protected bool eq_s(String s)
         {
-            if (limit - cursor < s_size)
+            if (limit - cursor < s.Length)
                 return false;
 
-            for (int i = 0; i != s_size; i++)
+            for (int i = 0; i != s.Length; i++)
             {
                 if (current[cursor + i] != s[i])
                     return false;
             }
 
-            cursor += s_size;
+            cursor += s.Length;
             return true;
         }
 
-        protected bool eq_s_b(int s_size, String s)
+        protected bool eq_s_b(String s)
         {
-            if (cursor - limit_backward < s_size)
+            if (cursor - limit_backward < s.Length)
                 return false;
 
-            for (int i = 0; i != s_size; i++)
+            for (int i = 0; i != s.Length; i++)
             {
-                if (current[cursor - s_size + i] != s[i])
+                if (current[cursor - s.Length + i] != s[i])
                     return false;
             }
 
-            cursor -= s_size;
+            cursor -= s.Length;
             return true;
         }
 
-        protected bool eq_s_b(int s_size, StringBuilder s)
+        protected bool eq_s_b(StringBuilder s)
         {
-            if (cursor - limit_backward < s_size)
+            if (cursor - limit_backward < s.Length)
                 return false;
 
-            for (int i = 0; i != s_size; i++)
+            for (int i = 0; i != s.Length; i++)
             {
-                if (current[cursor - s_size + i] != s[i])
+                if (current[cursor - s.Length + i] != s[i])
                     return false;
             }
 
-            cursor -= s_size;
+            cursor -= s.Length;
             return true;
         }
 
-        protected bool eq_v(string s)
-        {
-            return eq_s(s.Length, s);
-        }
 
-        protected bool eq_v_b(StringBuilder s)
-        {
-            return eq_s_b(s.Length, s);
-        }
-
-        protected bool eq_v_b(string s)
-        {
-            return eq_s_b(s.Length, s);
-        }
-
-        protected int find_among(Among[] v, int v_size)
+        protected int find_among(Among[] v)
         {
             int i = 0;
-            int j = v_size;
+            int j = v.Length;
 
             int c = cursor;
             int l = limit;
@@ -345,10 +339,10 @@ namespace Snowball
         }
 
         // find_among_b is for backwards processing. Same comments apply
-        protected int find_among_b(Among[] v, int v_size)
+        protected int find_among_b(Among[] v)
         {
             int i = 0;
-            int j = v_size;
+            int j = v.Length;
 
             int c = cursor;
             int lb = limit_backward;
@@ -469,23 +463,11 @@ namespace Snowball
             if (c_bra <= ket) ket += adjustment;
         }
 
-        /// <summary>
-        ///   Copy the slice into the supplied StringBuilder
-        /// </summary>
-        /// 
         protected StringBuilder slice_to(StringBuilder s)
         {
             slice_check();
-            int len = ket - bra;
-            Replace(s, 0, s.Length, current.ToString(bra, ket));
+            Replace(s, 0, s.Length, current.ToString(bra, ket - bra));
             return s;
-        }
-
-        public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
-        {
-            sb.Remove(index, length - index);
-            sb.Insert(index, text);
-            return sb;
         }
 
         protected StringBuilder assign_to(StringBuilder s)
@@ -495,5 +477,30 @@ namespace Snowball
         }
 
 
+
+        public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
+        {
+            sb.Remove(index, length - index);
+            sb.Insert(index, text);
+            return sb;
+        }
+
+
+        public static string UTF16(string utf8String)
+        {
+            // Get UTF8 bytes by reading each byte with ANSI encoding
+            char[] chars = utf8String.ToCharArray();
+            byte[] utf8Bytes = new byte[chars.Length];
+            for (int i = 0; i < chars.Length; i++)
+                utf8Bytes[i] = (byte)chars[i];
+
+            // Convert UTF8 bytes to UTF16 bytes
+            byte[] utf16Bytes = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, utf8Bytes);
+
+            // Return UTF16 bytes as UTF16 string
+            string result = Encoding.Unicode.GetString(utf16Bytes);
+
+            return result;
+        }
     }
 }

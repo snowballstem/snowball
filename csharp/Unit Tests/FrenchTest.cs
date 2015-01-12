@@ -78,10 +78,22 @@ namespace Unit_Tests
         {
             FrenchStemmer stemmer = new FrenchStemmer();
 
-            string actual = stemmer.Stem("majesté");
-            string expected = "majest";
+            Assert.AreEqual("majest", stemmer.Stem("majesté"));
+            Assert.AreEqual("affection", stemmer.Stem("affectionné"));
+        }
 
-            Assert.AreEqual(expected, actual);
+        [TestMethod]
+        public void UnaccentTest()
+        {
+            FrenchStemmer stemmer = new FrenchStemmer();
+
+            Assert.AreEqual("abneg", stemmer.Stem("abnégation"));
+        }
+
+        [TestMethod]
+        public void French_FullTest()
+        {
+            Tools.Test(new FrenchStemmer(), "french");
         }
     }
 }
