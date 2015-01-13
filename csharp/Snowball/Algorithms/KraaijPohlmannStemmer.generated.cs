@@ -14,7 +14,7 @@ namespace Snowball
     ///</summary>
     /// 
     [System.CodeDom.Compiler.GeneratedCode("Snowball", "1.0.0")]
-    public partial class KraaijPohlmannStemmer : SnowballStemmer
+    public partial class KraaijPohlmannStemmer : Stemmer
     {
         private bool B_GE_removed;
         private bool B_stemmed;
@@ -37,6 +37,10 @@ namespace Snowball
         private readonly Among[] a_6;
         private readonly Among[] a_7;
 
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="KraaijPohlmannStemmer"/> class.
+        /// </summary>
+        /// 
         public KraaijPohlmannStemmer()
         {
             a_0 = new[] 
@@ -2424,6 +2428,10 @@ namespace Snowball
             return 1;
         }
 
+        /// <summary>
+        ///   Stems the buffer's contents.
+        /// </summary>
+        /// 
         protected override bool Process()
         {
             return this.stem() > 0;

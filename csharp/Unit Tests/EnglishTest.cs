@@ -1,17 +1,17 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 using Unit_Tests.Properties;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EnglishTest
     {
         // Some tests are based on NLTK test cases
         // https://raw.githubusercontent.com/nltk/nltk/develop/nltk/test/unit/test_stem.py
 
-        [TestMethod]
+        [Test]
         public void English_BaseTest()
         {
             EnglishStemmer stemmer = new EnglishStemmer();
@@ -42,7 +42,7 @@ namespace Unit_Tests
             Assert.AreEqual("plot", stemmer.Stem("plotted"));
         }
 
-        [TestMethod]
+        [Test]
         public void English_ShortString()
         {
             EnglishStemmer stemmer = new EnglishStemmer();
@@ -50,7 +50,7 @@ namespace Unit_Tests
             Assert.AreEqual("y", stemmer.Stem("y's"));
         }
 
-        [TestMethod]
+        [Test]
         public void English_FullTest()
         {
             Tools.Test(new EnglishStemmer(), "english");

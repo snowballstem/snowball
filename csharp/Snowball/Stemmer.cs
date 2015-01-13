@@ -1,42 +1,117 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Copyright (c) 2001, Dr Martin Porter
+// Copyright (c) 2002, Richard Boulton
+// Copyright (c) 2015, Cesar Souza
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice,
+//     * this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//     * notice, this list of conditions and the following disclaimer in the
+//     * documentation and/or other materials provided with the distribution.
+//     * Neither the name of the copyright holders nor the names of its contributors
+//     * may be used to endorse or promote products derived from this software
+//     * without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Snowball
 {
+    using System;
+    using System.Linq;
+    using System.Text;
 
-    public abstract class SnowballStemmer
+    /// <summary>
+    ///   Base class for Snowball's stemmer algorithms.
+    /// </summary>
+    /// 
+    public abstract class Stemmer
     {
-        // current string
+        /// <summary>
+        ///   Gets the current string.
+        /// </summary>
+        /// 
         protected StringBuilder current;
 
+        /// <summary>
+        ///   Current cursor position.
+        /// </summary>
+        /// 
         protected int cursor;
+
+        /// <summary>
+        ///   Forward limit for inspecting the buffer.
+        /// </summary>
+        /// 
         protected int limit;
+
+        /// <summary>
+        ///   Backward limit for inspecting the buffer.
+        /// </summary>
+        /// 
         protected int limit_backward;
+
+        /// <summary>
+        ///   Starting bracket position.
+        /// </summary>
+        /// 
         protected int bra;
+
+        /// <summary>
+        ///   Ending bracked position.
+        /// </summary>
+        /// 
         protected int ket;
 
 
 
 
-        protected SnowballStemmer()
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="Stemmer"/> class.
+        /// </summary>
+        /// 
+        protected Stemmer()
         {
             current = new StringBuilder();
             setBufferContents("");
         }
 
 
-
+        /// <summary>
+        ///   Calls the stemmer to process the next word.
+        /// </summary>
+        /// 
         protected abstract bool Process();
 
 
+        /// <summary>
+        ///   Stems the buffer's contents.
+        /// </summary>
+        /// 
         public bool Stem()
         {
             return this.Process();
         }
 
+        /// <summary>
+        ///   Stems a given word.
+        /// </summary>
+        /// 
+        /// <param name="word">The word to be stemmed.</param>
+        /// 
+        /// <returns>The stemmed word.</returns>
+        /// 
         public string Stem(string word)
         {
             setBufferContents(word);
@@ -44,25 +119,22 @@ namespace Snowball
             return current.ToString();
         }
 
-        public string[] Stem(params string[] words)
-        {
-            string[] stemmed = new string[words.Length];
-            for (int i = 0; i < stemmed.Length; i++)
-            {
-                setBufferContents(words[i]);
-                this.Process();
-                stemmed[i] = current.ToString();
-            }
 
-            return stemmed;
-        }
-
-
+        /// <summary>
+        ///   Gets the current processing buffer.
+        /// </summary>
+        /// 
         public StringBuilder Buffer
         {
             get { return current; }
         }
 
+        /// <summary>
+        ///   Gets or sets the current word to be stemmed
+        ///   or the stemmed word, if the stemmer has been
+        ///   proccessed.
+        /// </summary>
+        /// 
         public string Current
         {
             get { return current.ToString(); }
@@ -82,7 +154,10 @@ namespace Snowball
         }
 
 
-
+        /// <summary>
+        ///   Determines whether the current character is 
+        ///   inside a given group of characters <c>s</c>.
+        /// </summary>
         protected int in_grouping(string s, int min, int max, bool repeat)
         {
             do
@@ -104,6 +179,10 @@ namespace Snowball
             return 0;
         }
 
+        /// <summary>
+        ///   Determines whether the current character is 
+        ///   inside a given group of characters <c>s</c>.
+        /// </summary>
         protected int in_grouping_b(string s, int min, int max, bool repeat)
         {
             do
@@ -124,6 +203,10 @@ namespace Snowball
             return 0;
         }
 
+        /// <summary>
+        ///   Determines whether the current character is 
+        ///   outside a given group of characters <c>s</c>.
+        /// </summary>
         protected int out_grouping(string s, int min, int max, bool repeat)
         {
             do
@@ -151,6 +234,10 @@ namespace Snowball
             return 0;
         }
 
+        /// <summary>
+        ///   Determines whether the current character is 
+        ///   outside a given group of characters <c>s</c>.
+        /// </summary>
         protected int out_grouping_b(string s, int min, int max, bool repeat)
         {
             do
@@ -178,61 +265,12 @@ namespace Snowball
             return 0;
         }
 
-        /*
-                protected bool in_range(int min, int max)
-                {
-                    if (cursor >= limit)
-                        return false;
 
-                    byte ch = (byte)current[cursor];
-
-                    if (ch > max || ch < min)
-                        return false;
-
-                    cursor++;
-                    return true;
-                }
-
-                protected bool in_range_b(int min, int max)
-                {
-                    if (cursor <= limit_backward)
-                        return false;
-
-                    byte ch = (byte)current[cursor - 1];
-                    if (ch > max || ch < min)
-                        return false;
-
-                    cursor--;
-                    return true;
-                }
-
-                protected bool out_range(int min, int max)
-                {
-                    if (cursor >= limit)
-                        return false;
-
-                    byte ch = (byte)current[cursor];
-                    if (!(ch > max || ch < min))
-                        return false;
-
-                    cursor++;
-                    return true;
-                }
-
-                protected bool out_range_b(int min, int max)
-                {
-                    if (cursor <= limit_backward)
-                        return false;
-
-                    byte ch = (byte)current[cursor - 1];
-                    if (!(ch > max || ch < min))
-                        return false;
-
-                    cursor--;
-                    return true;
-                }
-        */
-
+        /// <summary>
+        ///   Determines if the current buffer contains the
+        ///   string s, starting from the current position and
+        ///   going forward.
+        /// </summary>
         protected bool eq_s(String s)
         {
             if (limit - cursor < s.Length)
@@ -248,6 +286,11 @@ namespace Snowball
             return true;
         }
 
+        /// <summary>
+        ///   Determines if the current buffer contains the
+        ///   string s, starting from the current position and
+        ///   going backwards.
+        /// </summary>
         protected bool eq_s_b(String s)
         {
             if (cursor - limit_backward < s.Length)
@@ -263,6 +306,11 @@ namespace Snowball
             return true;
         }
 
+        /// <summary>
+        ///   Determines if the current buffer contains the
+        ///   string s, starting from the current position and
+        ///   going backwards.
+        /// </summary>
         protected bool eq_s_b(StringBuilder s)
         {
             if (cursor - limit_backward < s.Length)
@@ -279,11 +327,14 @@ namespace Snowball
         }
 
 
+        /// <summary>
+        ///   Searches if the current buffer matches against one of the 
+        ///   amongs, starting from the current cursor position and going
+        ///   forward.
+        /// </summary>
+        /// 
         protected int find_among(Among[] v)
         {
-            // Array.Sort(v);
-            // string lookup = current.ToString(cursor, limit - cursor);
-
             int i = 0;
             int j = v.Length;
 
@@ -303,7 +354,7 @@ namespace Snowball
 
                 Among w = v[k];
 
-                for (int i2 = common; i2 < w.s.Length; i2++)
+                for (int i2 = common; i2 < w.SearchString.Length; i2++)
                 {
                     if (c + common == l)
                     {
@@ -311,7 +362,7 @@ namespace Snowball
                         break;
                     }
 
-                    diff = current[c + common] - w.s[i2];
+                    diff = current[c + common] - w.SearchString[i2];
 
                     if (diff != 0)
                         break;
@@ -352,33 +403,35 @@ namespace Snowball
             {
                 Among w = v[i];
 
-                if (common_i >= w.s.Length)
+                if (common_i >= w.SearchString.Length)
                 {
-                    cursor = c + w.s.Length;
+                    cursor = c + w.SearchString.Length;
 
-                    if (w.action == null)
-                        return w.result;
+                    if (w.Action == null)
+                        return w.Result;
 
-                    int res = w.action();
-                    cursor = c + w.s.Length;
+                    int res = w.Action();
+                    cursor = c + w.SearchString.Length;
 
                     if (res != 0)
-                        return w.result;
+                        return w.Result;
                 }
 
-                i = w.substring_i;
+                i = w.MatchIndex;
 
                 if (i < 0)
                     return 0;
             }
         }
 
-        // find_among_b is for backwards processing. Same comments apply
+        /// <summary>
+        ///   Searches if the current buffer matches against one of the 
+        ///   amongs, starting from the current cursor position and going
+        ///   backwards.
+        /// </summary>
+        /// 
         protected int find_among_b(Among[] v)
         {
-            // Array.Sort(v);
-            // string lookup = current.ToString(limit_backward, cursor);
-
             int i = 0;
             int j = v.Length;
 
@@ -397,7 +450,7 @@ namespace Snowball
                 int common = common_i < common_j ? common_i : common_j;
                 Among w = v[k];
 
-                for (int i2 = w.s.Length - 1 - common; i2 >= 0; i2--)
+                for (int i2 = w.SearchString.Length - 1 - common; i2 >= 0; i2--)
                 {
                     if (c - common == lb)
                     {
@@ -405,7 +458,7 @@ namespace Snowball
                         break;
                     }
 
-                    diff = current[c - 1 - common] - w.s[i2];
+                    diff = current[c - 1 - common] - w.SearchString[i2];
 
                     if (diff != 0)
                         break;
@@ -443,29 +496,31 @@ namespace Snowball
             {
                 Among w = v[i];
 
-                if (common_i >= w.s.Length)
+                if (common_i >= w.SearchString.Length)
                 {
-                    cursor = c - w.s.Length;
-                    if (w.action == null)
-                        return w.result;
+                    cursor = c - w.SearchString.Length;
+                    if (w.Action == null)
+                        return w.Result;
 
-                    int res = w.action();
-                    cursor = c - w.s.Length;
+                    int res = w.Action();
+                    cursor = c - w.SearchString.Length;
 
                     if (res != 0)
-                        return w.result;
+                        return w.Result;
                 }
 
-                i = w.substring_i;
+                i = w.MatchIndex;
 
                 if (i < 0)
                     return 0;
             }
         }
 
-        /* to replace chars between c_bra and c_ket in current by the
-         * chars in s.
-         */
+        /// <summary>
+        ///   Replaces the characters between <c>c_bra</c>
+        ///   and <c>c_ket</c> by the characters in s.
+        /// </summary>
+        ///   
         protected int replace_s(int c_bra, int c_ket, String s)
         {
             int adjustment = s.Length - (c_ket - c_bra);
@@ -478,6 +533,9 @@ namespace Snowball
             return adjustment;
         }
 
+        /// <summary>
+        ///   Checks if a slicing can be done.
+        /// </summary>
         protected void slice_check()
         {
             if (bra < 0 || bra > ket || ket > limit || limit > current.Length)
@@ -486,17 +544,30 @@ namespace Snowball
             }
         }
 
+        /// <summary>
+        ///   Replaces the contents of the bracket with the string s.
+        /// </summary>
+        /// 
+        /// <param name="s">The s.</param>
         protected void slice_from(String s)
         {
             slice_check();
             replace_s(bra, ket, s);
         }
 
+        /// <summary>
+        ///   Removes the current bracket contents.
+        /// </summary>
+        /// 
         protected void slice_del()
         {
             slice_from("");
         }
 
+        /// <summary>
+        ///   Replaces the contents of the bracket with the string s.
+        /// </summary>
+        /// 
         protected void insert(int c_bra, int c_ket, String s)
         {
             int adjustment = replace_s(c_bra, c_ket, s);
@@ -504,6 +575,10 @@ namespace Snowball
             if (c_bra <= ket) ket += adjustment;
         }
 
+        /// <summary>
+        ///   Replaces the contents of the bracket with the string s.
+        /// </summary>
+        /// 
         protected void insert(int c_bra, int c_ket, StringBuilder s)
         {
             int adjustment = replace_s(c_bra, c_ket, s.ToString());
@@ -511,6 +586,10 @@ namespace Snowball
             if (c_bra <= ket) ket += adjustment;
         }
 
+        /// <summary>
+        ///   Replaces the contents of the bracket with the string s.
+        /// </summary>
+        /// 
         protected StringBuilder slice_to(StringBuilder s)
         {
             slice_check();
@@ -518,6 +597,10 @@ namespace Snowball
             return s;
         }
 
+        /// <summary>
+        ///   Replaces the contents of the bracket with the string s.
+        /// </summary>
+        /// 
         protected StringBuilder assign_to(StringBuilder s)
         {
             Replace(s, 0, s.Length, current.ToString(0, limit));
@@ -526,6 +609,9 @@ namespace Snowball
 
 
 
+        /// <summary>
+        ///   Replaces a specific region of the buffer with another text.
+        /// </summary>
         public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
         {
             sb.Remove(index, length - index);

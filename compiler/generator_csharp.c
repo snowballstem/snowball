@@ -5,16 +5,10 @@
 #include "header.h"
 
 /* prototypes */
-
 static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-static int eq(char * s1, char * s2) {
-	int s1_len = strlen(s1);
-	int s2_len = strlen(s2);
-	return s1_len == s2_len && memcmp(s1, s2, s1_len) == 0;
-}
 
 enum special_labels {
 	x_return = -1
@@ -44,7 +38,6 @@ static void output_str(FILE * outfile, struct str * str) {
 }
 
 /* Write routines for simple entities */
-
 static void write_char(struct generator * g, int ch) {
 
 	str_append_ch(g->outbuf, ch);
@@ -108,20 +101,6 @@ static void write_hex(struct generator * g, int ch) {
 		for (i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i & 0xf);
 	}
 }
-
-static void write_wchar(struct generator * g, int ch) {
-	if (32 <= ch && ch <= 127)
-	{
-		if (ch == '\"' || ch == '\\')
-			write_string(g, "\\");
-		write_char(g, ch);
-	}
-	else
-	{
-		write_hex(g, ch);
-	}
-}
-
 
 static void write_literal_string(struct generator * g, symbol * p) {
 
@@ -1357,8 +1336,6 @@ static void generate_class_end(struct generator * g) {
 
 static void generate_among_declaration(struct generator * g, struct among * x) {
 
-	struct amongvec * v = x->b;
-
 	g->I[0] = x->number;
 	g->I[1] = x->literalstring_count;
 
@@ -1405,8 +1382,12 @@ static void generate_amongs(struct generator * g) {
 		x = x->next;
 	}
 
-	// Generate initializers
-	w(g, "~N~Mpublic ~n()~N~{");
+    w(g, "~N");
+    w(g, "~M/// <summary>~N");
+    w(g, "~M///   Initializes a new instance of the <see cref=\"~n\"/> class.~N");
+    w(g, "~M/// </summary>~N");
+    w(g, "~M/// ~N");
+	w(g, "~Mpublic ~n()~N~{");
 	x = g->analyser->amongs;
 	while (x != 0) {
 		generate_among_table(g, x);
@@ -1416,33 +1397,15 @@ static void generate_amongs(struct generator * g) {
 	w(g, "~}~N~N");
 }
 
-static void set_bit(symbol * b, int i) { b[i / 8] |= 1 << i % 8; }
-
-static int bit_is_set(symbol * b, int i) { return b[i / 8] & 1 << i % 8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
-	int range = q->largest_ch - q->smallest_ch + 1;
-	//int size = (range + 7) / 8;  /* assume 8 bits per symbol */
 	symbol * b = q->b;
-	//symbol * map = create_b(size);
-	int i;
-	//for (i = 0; i < size; i++) 
-	//	map[i] = 0;
-
-	/* Using unicode would require revision here */
-
-	//for (i = 0; i < SIZE(b); i++)
-	//	set_bit(map, b[i] - q->smallest_ch);
 
 	g->V[0] = q->name;
-	int size = SIZE(b);
 
 	w(g, "~Mprivate static string ~V0 = ");
 	write_literal_string(g, b);
 	w(g, ";~N");
-
-	//lose_b(map);
 }
 
 static void generate_groupings(struct generator * g) {
@@ -1486,7 +1449,12 @@ static void generate_methods(struct generator * g) {
 		p = p->right;
 	}
 
-	w(g, "~N~M~protected override bool Process()~N~{");
+    w(g, "~N");
+    w(g, "~M/// <summary>~N");
+    w(g, "~M///   Stems the buffer's contents.~N");
+    w(g, "~M/// </summary>~N");
+    w(g, "~M/// ~N");
+	w(g, "~M~protected override bool Process()~N~{");
 	w(g, "~Mreturn this.stem() > 0;~N");
 	w(g, "~}");
 }

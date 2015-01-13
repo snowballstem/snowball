@@ -1,16 +1,16 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class SpanishTest
     {
         // Some tests are based on NLTK test cases
         // https://raw.githubusercontent.com/nltk/nltk/develop/nltk/test/unit/test_stem.py
 
-        [TestMethod]
+        [Test]
         public void Spanish_BaseTest()
         {
             var stemmer = new SpanishStemmer();
@@ -20,7 +20,7 @@ namespace Unit_Tests
             Assert.AreEqual("algu", stemmer.Stem("algue"));
         }
 
-        [TestMethod]
+        [Test]
         public void Spanish_FullTest()
         {
             Tools.Test(new SpanishStemmer(), "spanish");

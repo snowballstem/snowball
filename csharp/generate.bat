@@ -67,6 +67,6 @@ setlocal EnableDelayedExpansion
   set OutputPath=%TARGET%\!ClassName!.generated
 
   echo   - Processing !Language! (!RelativePath!)
-  %SNOWBALL% !CompletePath! -cs -o !OutputPath! -name !ClassName!
+  %SNOWBALL% !CompletePath! -cs -o !OutputPath! -p Stemmer -name !ClassName!
 
 goto :EOF

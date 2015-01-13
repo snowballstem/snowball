@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class HungarianTest
     {
-        [TestMethod]
+        [Test]
         public void Hungarian_BaseTest()
         {
             var hungarian = new HungarianStemmer();
@@ -15,7 +15,7 @@ namespace Unit_Tests
             Assert.AreEqual("ab", hungarian.Stem("abból"));
         }
 
-        [TestMethod]
+        [Test]
         public void Hungarian_DoubleAcuteTest()
         {
             var hungarian = new HungarianStemmer();
@@ -23,7 +23,7 @@ namespace Unit_Tests
             Assert.AreEqual("bőgőz", hungarian.Stem("bőgőzik"));
         }
 
-        [TestMethod]
+        [Test]
         public void Hungarian_HyphenTest()
         {
             var hungarian = new HungarianStemmer();
@@ -31,7 +31,7 @@ namespace Unit_Tests
             Assert.AreEqual("adattárház-menedzser", hungarian.Stem("adattárház-menedzsertől"));
         }
 
-        [TestMethod]
+        [Test]
         public void Hungarian_FullTest()
         {
             Tools.Test(new HungarianStemmer(), "hungarian");

@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 using Unit_Tests.Properties;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class FinnishTest
     {
-        [TestMethod]
+        [Test]
         public void Finnish_BaseTest()
         {
             var stemmer = new FinnishStemmer();
@@ -16,7 +16,7 @@ namespace Unit_Tests
             Assert.AreEqual("aachen", stemmer.Stem("aachenin"));
         }
 
-        [TestMethod]
+        [Test]
         public void Danish_FullTest()
         {
             Tools.Test(new FinnishStemmer(), "finnish");

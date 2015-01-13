@@ -14,7 +14,7 @@ namespace Snowball
     ///</summary>
     /// 
     [System.CodeDom.Compiler.GeneratedCode("Snowball", "1.0.0")]
-    public partial class NorwegianStemmer : SnowballStemmer
+    public partial class NorwegianStemmer : Stemmer
     {
         private int I_x;
         private int I_p1;
@@ -25,6 +25,10 @@ namespace Snowball
         private readonly Among[] a_1;
         private readonly Among[] a_2;
 
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="NorwegianStemmer"/> class.
+        /// </summary>
+        /// 
         public NorwegianStemmer()
         {
             a_0 = new[] 
@@ -373,6 +377,10 @@ namespace Snowball
             return 1;
         }
 
+        /// <summary>
+        ///   Stems the buffer's contents.
+        /// </summary>
+        /// 
         protected override bool Process()
         {
             return this.stem() > 0;

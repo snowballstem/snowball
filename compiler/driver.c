@@ -9,7 +9,7 @@
 #define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
 
 #define DEFAULT_CS_NAMESPACE "Snowball"
-#define DEFAULT_CS_BASE_CLASS "SnowballStemmer"
+#define DEFAULT_CS_BASE_CLASS "Stemmer"
 #define DEFAULT_CS_AMONG_CLASS "Among"
 #define DEFAULT_CS_STRING_CLASS "StringBuilder"
 

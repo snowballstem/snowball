@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Snowball;
 using System;
 using System.Collections.Generic;
@@ -11,13 +11,13 @@ namespace Unit_Tests
 {
     public static class Tools
     {
-        public static void Test(SnowballStemmer stemmer, string language)
+        public static void Test(Stemmer stemmer, string language)
         {
             string snowballPath = Path.GetFullPath(
                 Path.Combine(Environment.CurrentDirectory, @"..\..\..\..\"));
 
             string dataPath = Path.GetFullPath(
-                Path.Combine(snowballPath, @"..\data"));
+                Path.Combine(snowballPath, @"..\snowball-data"));
 
             string langPath = Path.Combine(dataPath, language);
 
@@ -30,7 +30,7 @@ namespace Unit_Tests
             Test(stemmer, input, output);
         }
 
-        public static void Test(SnowballStemmer stemmer, string input, string output)
+        public static void Test(Stemmer stemmer, string input, string output)
         {
             var crlf = new[] { "\r\n" };
             var inputLines = input.Split(crlf, StringSplitOptions.None);

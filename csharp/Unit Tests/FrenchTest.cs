@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class FrenchTest
     {
-        [TestMethod]
+        [Test]
         public void BaseTest_NormalPath1()
         {
             FrenchStemmer stemmer = new FrenchStemmer();
@@ -42,7 +42,7 @@ namespace Unit_Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void BaseTest_NormalPath2()
         {
             FrenchStemmer stemmer = new FrenchStemmer();
@@ -73,7 +73,7 @@ namespace Unit_Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void AccentTest()
         {
             FrenchStemmer stemmer = new FrenchStemmer();
@@ -82,7 +82,7 @@ namespace Unit_Tests
             Assert.AreEqual("affection", stemmer.Stem("affectionné"));
         }
 
-        [TestMethod]
+        [Test]
         public void UnaccentTest()
         {
             FrenchStemmer stemmer = new FrenchStemmer();
@@ -90,7 +90,7 @@ namespace Unit_Tests
             Assert.AreEqual("abneg", stemmer.Stem("abnégation"));
         }
 
-        [TestMethod]
+        [Test]
         public void French_FullTest()
         {
             Tools.Test(new FrenchStemmer(), "french");

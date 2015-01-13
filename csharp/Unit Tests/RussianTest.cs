@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Snowball;
 
 namespace Unit_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class RussianTest
     {
-        [TestMethod]
+        [Test]
         public void Russian_BaseTest()
         {
             var stemmer = new RussianStemmer();
@@ -16,7 +16,7 @@ namespace Unit_Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void Russian_FullTest()
         {
             Tools.Test(new RussianStemmer(), "russian");
