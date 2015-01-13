@@ -17,6 +17,7 @@ namespace Unit_Tests
             EnglishStemmer stemmer = new EnglishStemmer();
 
             Assert.AreEqual("do", stemmer.Stem("doing"));
+            Assert.AreEqual("andes", stemmer.Stem("andes"));
             Assert.AreEqual("coincidenti", stemmer.Stem("coincidential"));
             Assert.AreEqual("ration", stemmer.Stem("rationalism"));
 

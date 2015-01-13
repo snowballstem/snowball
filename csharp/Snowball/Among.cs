@@ -3,23 +3,23 @@ using System.Text;
 
 namespace Snowball
 {
-    public sealed class Among
+    public sealed class Among : IComparable<Among>
     {
 
 
-        public char[] s;          // search string
+        public string s;          // search string
         public int substring_i;   // index to longest matching substring 
         public int result;        // result of the lookup
-        public Func<bool> action; // object to invoke method on 
+        public Func<int> action;  // object to invoke method on 
 
         public Among(String s, int substring_i, int result)
             : this(s, substring_i, result, null)
         {
         }
 
-        public Among(String s, int substring_i, int result, Func<bool> methodobject)
+        public Among(String s, int substring_i, int result, Func<int> methodobject)
         {
-            this.s = s.ToCharArray();
+            this.s = s;//s.ToCharArray();
             this.substring_i = substring_i;
             this.result = result;
             this.action = methodobject;
@@ -27,10 +27,16 @@ namespace Snowball
 
         public override string ToString()
         {
-            return new String(s);
+            return s;//new String(s);
         }
 
 
-        
+
+
+        public int CompareTo(Among other)
+        {
+            return s.CompareTo(other.s);
+        }
+
     }
 }

@@ -50,7 +50,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CommonTest.cs" />
+    <Compile Include="FinishTest.cs" />
     <Compile Include="DanishTest.cs" />
+    <Compile Include="HungarianTest.cs" />
     <Compile Include="German2Test.cs" />
     <Compile Include="RussianTest.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -13,28 +13,20 @@ namespace Snowball
     ///  It implements the stemming algorithm defined by a snowball script.
     ///</summary>
     /// 
-    [System.CodeDom.Compiler.GeneratedCode("Snowball", "0.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("Snowball", "1.0.0")]
     public partial class TurkishStemmer : SnowballStemmer
     {
         private bool B_continue_stemming_noun_suffixes;
         private int I_strlen;
 
-        private static int[] g_vowel = { 17, 65, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8, 0, 0, 0, 0, 0, 0, 1 };
-
-        private static int[] g_U = { 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1 };
-
-        private static int[] g_vowel1 = { 1, 64, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-
-        private static int[] g_vowel2 = { 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 130 };
-
-        private static int[] g_vowel3 = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-
-        private static int[] g_vowel4 = { 17 };
-
-        private static int[] g_vowel5 = { 65 };
-
-        private static int[] g_vowel6 = { 65 };
-
+        private static string g_vowel = "ae\u0131io\u00F6u\u00FC";
+        private static string g_U = "\u0131iu\u00FC";
+        private static string g_vowel1 = "a\u0131ou";
+        private static string g_vowel2 = "ei\u00F6\u00FC";
+        private static string g_vowel3 = "a\u0131";
+        private static string g_vowel4 = "ei";
+        private static string g_vowel5 = "ou";
+        private static string g_vowel6 = "\u00F6\u00FC";
         private readonly Among[] a_0;
         private readonly Among[] a_1;
         private readonly Among[] a_2;
@@ -64,2557 +56,2953 @@ namespace Snowball
         {
             a_0 = new[] 
             {
-                new Among(UTF16("m"), -1, -1),
-                new Among(UTF16("n"), -1, -1),
-                new Among(UTF16("miz"), -1, -1),
-                new Among(UTF16("niz"), -1, -1),
-                new Among(UTF16("muz"), -1, -1),
-                new Among(UTF16("nuz"), -1, -1),
-                new Among(UTF16("m\u00C4\u00B1z"), -1, -1),
-                new Among(UTF16("n\u00C4\u00B1z"), -1, -1),
-                new Among(UTF16("m\u00C3\u00BCz"), -1, -1),
-                new Among(UTF16("n\u00C3\u00BCz"), -1, -1)
+                new Among("m", -1, -1),
+                new Among("n", -1, -1),
+                new Among("miz", -1, -1),
+                new Among("niz", -1, -1),
+                new Among("muz", -1, -1),
+                new Among("nuz", -1, -1),
+                new Among("m\u00FCz", -1, -1),
+                new Among("n\u00FCz", -1, -1),
+                new Among("m\u0131z", -1, -1),
+                new Among("n\u0131z", -1, -1)
             };
 
             a_1 = new[] 
             {
-                new Among(UTF16("leri"), -1, -1),
-                new Among(UTF16("lar\u00C4\u00B1"), -1, -1)
+                new Among("leri", -1, -1),
+                new Among("lar\u0131", -1, -1)
             };
 
             a_2 = new[] 
             {
-                new Among(UTF16("ni"), -1, -1),
-                new Among(UTF16("nu"), -1, -1),
-                new Among(UTF16("n\u00C4\u00B1"), -1, -1),
-                new Among(UTF16("n\u00C3\u00BC"), -1, -1)
+                new Among("ni", -1, -1),
+                new Among("nu", -1, -1),
+                new Among("n\u00FC", -1, -1),
+                new Among("n\u0131", -1, -1)
             };
 
             a_3 = new[] 
             {
-                new Among(UTF16("in"), -1, -1),
-                new Among(UTF16("un"), -1, -1),
-                new Among(UTF16("\u00C4\u00B1n"), -1, -1),
-                new Among(UTF16("\u00C3\u00BCn"), -1, -1)
+                new Among("in", -1, -1),
+                new Among("un", -1, -1),
+                new Among("\u00FCn", -1, -1),
+                new Among("\u0131n", -1, -1)
             };
 
             a_4 = new[] 
             {
-                new Among(UTF16("a"), -1, -1),
-                new Among(UTF16("e"), -1, -1)
+                new Among("a", -1, -1),
+                new Among("e", -1, -1)
             };
 
             a_5 = new[] 
             {
-                new Among(UTF16("na"), -1, -1),
-                new Among(UTF16("ne"), -1, -1)
+                new Among("na", -1, -1),
+                new Among("ne", -1, -1)
             };
 
             a_6 = new[] 
             {
-                new Among(UTF16("da"), -1, -1),
-                new Among(UTF16("ta"), -1, -1),
-                new Among(UTF16("de"), -1, -1),
-                new Among(UTF16("te"), -1, -1)
+                new Among("da", -1, -1),
+                new Among("ta", -1, -1),
+                new Among("de", -1, -1),
+                new Among("te", -1, -1)
             };
 
             a_7 = new[] 
             {
-                new Among(UTF16("nda"), -1, -1),
-                new Among(UTF16("nde"), -1, -1)
+                new Among("nda", -1, -1),
+                new Among("nde", -1, -1)
             };
 
             a_8 = new[] 
             {
-                new Among(UTF16("dan"), -1, -1),
-                new Among(UTF16("tan"), -1, -1),
-                new Among(UTF16("den"), -1, -1),
-                new Among(UTF16("ten"), -1, -1)
+                new Among("dan", -1, -1),
+                new Among("tan", -1, -1),
+                new Among("den", -1, -1),
+                new Among("ten", -1, -1)
             };
 
             a_9 = new[] 
             {
-                new Among(UTF16("ndan"), -1, -1),
-                new Among(UTF16("nden"), -1, -1)
+                new Among("ndan", -1, -1),
+                new Among("nden", -1, -1)
             };
 
             a_10 = new[] 
             {
-                new Among(UTF16("la"), -1, -1),
-                new Among(UTF16("le"), -1, -1)
+                new Among("la", -1, -1),
+                new Among("le", -1, -1)
             };
 
             a_11 = new[] 
             {
-                new Among(UTF16("ca"), -1, -1),
-                new Among(UTF16("ce"), -1, -1)
+                new Among("ca", -1, -1),
+                new Among("ce", -1, -1)
             };
 
             a_12 = new[] 
             {
-                new Among(UTF16("im"), -1, -1),
-                new Among(UTF16("um"), -1, -1),
-                new Among(UTF16("\u00C4\u00B1m"), -1, -1),
-                new Among(UTF16("\u00C3\u00BCm"), -1, -1)
+                new Among("im", -1, -1),
+                new Among("um", -1, -1),
+                new Among("\u00FCm", -1, -1),
+                new Among("\u0131m", -1, -1)
             };
 
             a_13 = new[] 
             {
-                new Among(UTF16("sin"), -1, -1),
-                new Among(UTF16("sun"), -1, -1),
-                new Among(UTF16("s\u00C4\u00B1n"), -1, -1),
-                new Among(UTF16("s\u00C3\u00BCn"), -1, -1)
+                new Among("sin", -1, -1),
+                new Among("sun", -1, -1),
+                new Among("s\u00FCn", -1, -1),
+                new Among("s\u0131n", -1, -1)
             };
 
             a_14 = new[] 
             {
-                new Among(UTF16("iz"), -1, -1),
-                new Among(UTF16("uz"), -1, -1),
-                new Among(UTF16("\u00C4\u00B1z"), -1, -1),
-                new Among(UTF16("\u00C3\u00BCz"), -1, -1)
+                new Among("iz", -1, -1),
+                new Among("uz", -1, -1),
+                new Among("\u00FCz", -1, -1),
+                new Among("\u0131z", -1, -1)
             };
 
             a_15 = new[] 
             {
-                new Among(UTF16("siniz"), -1, -1),
-                new Among(UTF16("sunuz"), -1, -1),
-                new Among(UTF16("s\u00C4\u00B1n\u00C4\u00B1z"), -1, -1),
-                new Among(UTF16("s\u00C3\u00BCn\u00C3\u00BCz"), -1, -1)
+                new Among("siniz", -1, -1),
+                new Among("sunuz", -1, -1),
+                new Among("s\u00FCn\u00FCz", -1, -1),
+                new Among("s\u0131n\u0131z", -1, -1)
             };
 
             a_16 = new[] 
             {
-                new Among(UTF16("lar"), -1, -1),
-                new Among(UTF16("ler"), -1, -1)
+                new Among("lar", -1, -1),
+                new Among("ler", -1, -1)
             };
 
             a_17 = new[] 
             {
-                new Among(UTF16("niz"), -1, -1),
-                new Among(UTF16("nuz"), -1, -1),
-                new Among(UTF16("n\u00C4\u00B1z"), -1, -1),
-                new Among(UTF16("n\u00C3\u00BCz"), -1, -1)
+                new Among("niz", -1, -1),
+                new Among("nuz", -1, -1),
+                new Among("n\u00FCz", -1, -1),
+                new Among("n\u0131z", -1, -1)
             };
 
             a_18 = new[] 
             {
-                new Among(UTF16("dir"), -1, -1),
-                new Among(UTF16("tir"), -1, -1),
-                new Among(UTF16("dur"), -1, -1),
-                new Among(UTF16("tur"), -1, -1),
-                new Among(UTF16("d\u00C4\u00B1r"), -1, -1),
-                new Among(UTF16("t\u00C4\u00B1r"), -1, -1),
-                new Among(UTF16("d\u00C3\u00BCr"), -1, -1),
-                new Among(UTF16("t\u00C3\u00BCr"), -1, -1)
+                new Among("dir", -1, -1),
+                new Among("tir", -1, -1),
+                new Among("dur", -1, -1),
+                new Among("tur", -1, -1),
+                new Among("d\u00FCr", -1, -1),
+                new Among("t\u00FCr", -1, -1),
+                new Among("d\u0131r", -1, -1),
+                new Among("t\u0131r", -1, -1)
             };
 
             a_19 = new[] 
             {
-                new Among(UTF16("cas\u00C4\u00B1na"), -1, -1),
-                new Among(UTF16("cesine"), -1, -1)
+                new Among("cas\u0131na", -1, -1),
+                new Among("cesine", -1, -1)
             };
 
             a_20 = new[] 
             {
-                new Among(UTF16("di"), -1, -1),
-                new Among(UTF16("ti"), -1, -1),
-                new Among(UTF16("dik"), -1, -1),
-                new Among(UTF16("tik"), -1, -1),
-                new Among(UTF16("duk"), -1, -1),
-                new Among(UTF16("tuk"), -1, -1),
-                new Among(UTF16("d\u00C4\u00B1k"), -1, -1),
-                new Among(UTF16("t\u00C4\u00B1k"), -1, -1),
-                new Among(UTF16("d\u00C3\u00BCk"), -1, -1),
-                new Among(UTF16("t\u00C3\u00BCk"), -1, -1),
-                new Among(UTF16("dim"), -1, -1),
-                new Among(UTF16("tim"), -1, -1),
-                new Among(UTF16("dum"), -1, -1),
-                new Among(UTF16("tum"), -1, -1),
-                new Among(UTF16("d\u00C4\u00B1m"), -1, -1),
-                new Among(UTF16("t\u00C4\u00B1m"), -1, -1),
-                new Among(UTF16("d\u00C3\u00BCm"), -1, -1),
-                new Among(UTF16("t\u00C3\u00BCm"), -1, -1),
-                new Among(UTF16("din"), -1, -1),
-                new Among(UTF16("tin"), -1, -1),
-                new Among(UTF16("dun"), -1, -1),
-                new Among(UTF16("tun"), -1, -1),
-                new Among(UTF16("d\u00C4\u00B1n"), -1, -1),
-                new Among(UTF16("t\u00C4\u00B1n"), -1, -1),
-                new Among(UTF16("d\u00C3\u00BCn"), -1, -1),
-                new Among(UTF16("t\u00C3\u00BCn"), -1, -1),
-                new Among(UTF16("du"), -1, -1),
-                new Among(UTF16("tu"), -1, -1),
-                new Among(UTF16("d\u00C4\u00B1"), -1, -1),
-                new Among(UTF16("t\u00C4\u00B1"), -1, -1),
-                new Among(UTF16("d\u00C3\u00BC"), -1, -1),
-                new Among(UTF16("t\u00C3\u00BC"), -1, -1)
+                new Among("di", -1, -1),
+                new Among("ti", -1, -1),
+                new Among("dik", -1, -1),
+                new Among("tik", -1, -1),
+                new Among("duk", -1, -1),
+                new Among("tuk", -1, -1),
+                new Among("d\u00FCk", -1, -1),
+                new Among("t\u00FCk", -1, -1),
+                new Among("d\u0131k", -1, -1),
+                new Among("t\u0131k", -1, -1),
+                new Among("dim", -1, -1),
+                new Among("tim", -1, -1),
+                new Among("dum", -1, -1),
+                new Among("tum", -1, -1),
+                new Among("d\u00FCm", -1, -1),
+                new Among("t\u00FCm", -1, -1),
+                new Among("d\u0131m", -1, -1),
+                new Among("t\u0131m", -1, -1),
+                new Among("din", -1, -1),
+                new Among("tin", -1, -1),
+                new Among("dun", -1, -1),
+                new Among("tun", -1, -1),
+                new Among("d\u00FCn", -1, -1),
+                new Among("t\u00FCn", -1, -1),
+                new Among("d\u0131n", -1, -1),
+                new Among("t\u0131n", -1, -1),
+                new Among("du", -1, -1),
+                new Among("tu", -1, -1),
+                new Among("d\u00FC", -1, -1),
+                new Among("t\u00FC", -1, -1),
+                new Among("d\u0131", -1, -1),
+                new Among("t\u0131", -1, -1)
             };
 
             a_21 = new[] 
             {
-                new Among(UTF16("sa"), -1, -1),
-                new Among(UTF16("se"), -1, -1),
-                new Among(UTF16("sak"), -1, -1),
-                new Among(UTF16("sek"), -1, -1),
-                new Among(UTF16("sam"), -1, -1),
-                new Among(UTF16("sem"), -1, -1),
-                new Among(UTF16("san"), -1, -1),
-                new Among(UTF16("sen"), -1, -1)
+                new Among("sa", -1, -1),
+                new Among("se", -1, -1),
+                new Among("sak", -1, -1),
+                new Among("sek", -1, -1),
+                new Among("sam", -1, -1),
+                new Among("sem", -1, -1),
+                new Among("san", -1, -1),
+                new Among("sen", -1, -1)
             };
 
             a_22 = new[] 
             {
-                new Among(UTF16("mi\u00C5\u009F"), -1, -1),
-                new Among(UTF16("mu\u00C5\u009F"), -1, -1),
-                new Among(UTF16("m\u00C4\u00B1\u00C5\u009F"), -1, -1),
-                new Among(UTF16("m\u00C3\u00BC\u00C5\u009F"), -1, -1)
+                new Among("mi\u015F", -1, -1),
+                new Among("mu\u015F", -1, -1),
+                new Among("m\u00FC\u015F", -1, -1),
+                new Among("m\u0131\u015F", -1, -1)
             };
 
             a_23 = new[] 
             {
-                new Among(UTF16("b"), -1, 1),
-                new Among(UTF16("c"), -1, 2),
-                new Among(UTF16("d"), -1, 3),
-                new Among(UTF16("\u00C4\u009F"), -1, 4)
+                new Among("b", -1, 1),
+                new Among("c", -1, 2),
+                new Among("d", -1, 3),
+                new Among("\u011F", -1, 4)
             };
 
         }
 
 
 
-        private bool r_check_vowel_harmony()
+        private int r_check_vowel_harmony()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
-            int v_9;
-            int v_10;
-            int v_11;
             // (, line 111
             // test, line 112
-            v_1 = limit - cursor;
-            // (, line 113
-            // (, line 114
-            while (true) 
             {
-                // goto, line 114
-                v_2 = limit - cursor;
-                if (!(in_grouping_b(g_vowel, 97, 305)))
-                {
-                    goto lab0;
+                int c1 = limit - cursor;
+                // (, line 113
+                // (, line 114
+                if (out_grouping_b(g_vowel, 97, 305, true) < 0)                {
+                    return 0;
                 }
-                cursor = limit - v_2;
-                break;
-            lab0: 
-                cursor = limit - v_2;
-                if (cursor <= limit_backward)
+ /* goto */                // (, line 115
+                // or, line 116
                 {
-                    return false;
-                }
-                cursor--;
+                    int c3 = limit - cursor;
+                    // (, line 116
+                    // literal, line 116
+                    if (!(eq_s_b("a")))
+                    {
+                        goto lab1;
+                    }
+                    if (out_grouping_b(g_vowel1, 97, 305, true) < 0)                    {
+                        goto lab1;
+                    }
+ /* goto */                    goto lab0;
+                lab1: ; 
+                    cursor = limit - c3;
+                    // (, line 117
+                    // literal, line 117
+                    if (!(eq_s_b("e")))
+                    {
+                        goto lab2;
+                    }
+                    if (out_grouping_b(g_vowel2, 101, 252, true) < 0)                    {
+                        goto lab2;
+                    }
+ /* goto */                    goto lab0;
+                lab2: ; 
+                    cursor = limit - c3;
+                    // (, line 118
+                    // literal, line 118
+                    if (!(eq_s_b("\u0131")))
+                    {
+                        goto lab3;
+                    }
+                    if (out_grouping_b(g_vowel3, 97, 305, true) < 0)                    {
+                        goto lab3;
+                    }
+ /* goto */                    goto lab0;
+                lab3: ; 
+                    cursor = limit - c3;
+                    // (, line 119
+                    // literal, line 119
+                    if (!(eq_s_b("i")))
+                    {
+                        goto lab4;
+                    }
+                    if (out_grouping_b(g_vowel4, 101, 105, true) < 0)                    {
+                        goto lab4;
+                    }
+ /* goto */                    goto lab0;
+                lab4: ; 
+                    cursor = limit - c3;
+                    // (, line 120
+                    // literal, line 120
+                    if (!(eq_s_b("o")))
+                    {
+                        goto lab5;
+                    }
+                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)                    {
+                        goto lab5;
+                    }
+ /* goto */                    goto lab0;
+                lab5: ; 
+                    cursor = limit - c3;
+                    // (, line 121
+                    // literal, line 121
+                    if (!(eq_s_b("\u00F6")))
+                    {
+                        goto lab6;
+                    }
+                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)                    {
+                        goto lab6;
+                    }
+ /* goto */                    goto lab0;
+                lab6: ; 
+                    cursor = limit - c3;
+                    // (, line 122
+                    // literal, line 122
+                    if (!(eq_s_b("u")))
+                    {
+                        goto lab7;
+                    }
+                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)                    {
+                        goto lab7;
+                    }
+ /* goto */                    goto lab0;
+                lab7: ; 
+                    cursor = limit - c3;
+                    // (, line 123
+                    // literal, line 123
+                    if (!(eq_s_b("\u00FC")))
+                    {
+                        return 0;
+                    }
+                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)                    {
+                        return 0;
+                    }
+ /* goto */                }
+            lab0: ; 
+                cursor = limit - c1;
             }
-            // (, line 115
-            // or, line 116
-            v_3 = limit - cursor;
-            // (, line 116
-            // literal, line 116
-            if (!(eq_s_b(UTF16("a"))))
-            {
-                goto lab2;
-            }
-            while (true) 
-            {
-                // goto, line 116
-                v_4 = limit - cursor;
-                if (!(in_grouping_b(g_vowel1, 97, 305)))
-                {
-                    goto lab3;
-                }
-                cursor = limit - v_4;
-                break;
-            lab3: 
-                cursor = limit - v_4;
-                if (cursor <= limit_backward)
-                {
-                    goto lab2;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab2: 
-            cursor = limit - v_3;
-            // (, line 117
-            // literal, line 117
-            if (!(eq_s_b(UTF16("e"))))
-            {
-                goto lab4;
-            }
-            while (true) 
-            {
-                // goto, line 117
-                v_5 = limit - cursor;
-                if (!(in_grouping_b(g_vowel2, 101, 252)))
-                {
-                    goto lab5;
-                }
-                cursor = limit - v_5;
-                break;
-            lab5: 
-                cursor = limit - v_5;
-                if (cursor <= limit_backward)
-                {
-                    goto lab4;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab4: 
-            cursor = limit - v_3;
-            // (, line 118
-            // literal, line 118
-            if (!(eq_s_b(UTF16("\u00C4\u00B1"))))
-            {
-                goto lab6;
-            }
-            while (true) 
-            {
-                // goto, line 118
-                v_6 = limit - cursor;
-                if (!(in_grouping_b(g_vowel3, 97, 305)))
-                {
-                    goto lab7;
-                }
-                cursor = limit - v_6;
-                break;
-            lab7: 
-                cursor = limit - v_6;
-                if (cursor <= limit_backward)
-                {
-                    goto lab6;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab6: 
-            cursor = limit - v_3;
-            // (, line 119
-            // literal, line 119
-            if (!(eq_s_b(UTF16("i"))))
-            {
-                goto lab8;
-            }
-            while (true) 
-            {
-                // goto, line 119
-                v_7 = limit - cursor;
-                if (!(in_grouping_b(g_vowel4, 101, 105)))
-                {
-                    goto lab9;
-                }
-                cursor = limit - v_7;
-                break;
-            lab9: 
-                cursor = limit - v_7;
-                if (cursor <= limit_backward)
-                {
-                    goto lab8;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab8: 
-            cursor = limit - v_3;
-            // (, line 120
-            // literal, line 120
-            if (!(eq_s_b(UTF16("o"))))
-            {
-                goto lab10;
-            }
-            while (true) 
-            {
-                // goto, line 120
-                v_8 = limit - cursor;
-                if (!(in_grouping_b(g_vowel5, 111, 117)))
-                {
-                    goto lab11;
-                }
-                cursor = limit - v_8;
-                break;
-            lab11: 
-                cursor = limit - v_8;
-                if (cursor <= limit_backward)
-                {
-                    goto lab10;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab10: 
-            cursor = limit - v_3;
-            // (, line 121
-            // literal, line 121
-            if (!(eq_s_b(UTF16("\u00C3\u00B6"))))
-            {
-                goto lab12;
-            }
-            while (true) 
-            {
-                // goto, line 121
-                v_9 = limit - cursor;
-                if (!(in_grouping_b(g_vowel6, 246, 252)))
-                {
-                    goto lab13;
-                }
-                cursor = limit - v_9;
-                break;
-            lab13: 
-                cursor = limit - v_9;
-                if (cursor <= limit_backward)
-                {
-                    goto lab12;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab12: 
-            cursor = limit - v_3;
-            // (, line 122
-            // literal, line 122
-            if (!(eq_s_b(UTF16("u"))))
-            {
-                goto lab14;
-            }
-            while (true) 
-            {
-                // goto, line 122
-                v_10 = limit - cursor;
-                if (!(in_grouping_b(g_vowel5, 111, 117)))
-                {
-                    goto lab15;
-                }
-                cursor = limit - v_10;
-                break;
-            lab15: 
-                cursor = limit - v_10;
-                if (cursor <= limit_backward)
-                {
-                    goto lab14;
-                }
-                cursor--;
-            }
-            goto lab1;
-        lab14: 
-            cursor = limit - v_3;
-            // (, line 123
-            // literal, line 123
-            if (!(eq_s_b(UTF16("\u00C3\u00BC"))))
-            {
-                return false;
-            }
-            while (true) 
-            {
-                // goto, line 123
-                v_11 = limit - cursor;
-                if (!(in_grouping_b(g_vowel6, 246, 252)))
-                {
-                    goto lab16;
-                }
-                cursor = limit - v_11;
-                break;
-            lab16: 
-                cursor = limit - v_11;
-                if (cursor <= limit_backward)
-                {
-                    return false;
-                }
-                cursor--;
-            }
-        lab1: 
-            cursor = limit - v_1;
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_suffix_with_optional_n_consonant()
+        private int r_mark_suffix_with_optional_n_consonant()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
             // (, line 132
             // or, line 134
-            v_1 = limit - cursor;
-            // (, line 133
-            // (, line 133
-            // test, line 133
-            v_2 = limit - cursor;
-            // literal, line 133
-            if (!(eq_s_b(UTF16("n"))))
             {
-                goto lab1;
-            }
-            cursor = limit - v_2;
-            // next, line 133
-            if (cursor <= limit_backward)
-            {
-                goto lab1;
-            }
-            cursor--;
-            // (, line 133
-            // test, line 133
-            v_3 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                goto lab1;
-            }
-            cursor = limit - v_3;
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 135
-            // (, line 135
-            // not, line 135
-
-            {
-                v_4 = limit - cursor;
-                // (, line 135
-                // test, line 135
-                v_5 = limit - cursor;
-                // literal, line 135
-                if (!(eq_s_b(UTF16("n"))))
+                int c1 = limit - cursor;
+                // (, line 133
+                // (, line 133
+                // test, line 133
                 {
-                    goto lab2;
+                    int c2 = limit - cursor;
+                    // literal, line 133
+                    if (!(eq_s_b("n")))
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c2;
                 }
-                cursor = limit - v_5;
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                // next, line 133
+                if (cursor <= limit_backward)
+                {
+                    goto lab1;
+                }
+                cursor--;
+                // (, line 133
+                // test, line 133
+                {
+                    int c3 = limit - cursor;
+                    if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c3;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 135
+                // (, line 135
+                // not, line 135
+                {
+                    int c4 = limit - cursor;
+                    // (, line 135
+                    // test, line 135
+                    {
+                        int c5 = limit - cursor;
+                        // literal, line 135
+                        if (!(eq_s_b("n")))
+                        {
+                            goto lab2;
+                        }
+                        cursor = limit - c5;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c4;
+                }
+                // test, line 135
+                {
+                    int c6 = limit - cursor;
+                    // (, line 135
+                    // next, line 135
+                    if (cursor <= limit_backward)
+                    {
+                        return 0;
+                    }
+                    cursor--;
+                    // (, line 135
+                    // test, line 135
+                    {
+                        int c7 = limit - cursor;
+                        if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                        {
+                            return 0;
+                        }
+                        cursor = limit - c7;
+                    }
+                    cursor = limit - c6;
+                }
             }
-            // test, line 135
-            v_6 = limit - cursor;
-            // (, line 135
-            // next, line 135
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // (, line 135
-            // test, line 135
-            v_7 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                return false;
-            }
-            cursor = limit - v_7;
-            cursor = limit - v_6;
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_suffix_with_optional_s_consonant()
+        private int r_mark_suffix_with_optional_s_consonant()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
             // (, line 143
             // or, line 145
-            v_1 = limit - cursor;
-            // (, line 144
-            // (, line 144
-            // test, line 144
-            v_2 = limit - cursor;
-            // literal, line 144
-            if (!(eq_s_b(UTF16("s"))))
             {
-                goto lab1;
-            }
-            cursor = limit - v_2;
-            // next, line 144
-            if (cursor <= limit_backward)
-            {
-                goto lab1;
-            }
-            cursor--;
-            // (, line 144
-            // test, line 144
-            v_3 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                goto lab1;
-            }
-            cursor = limit - v_3;
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 146
-            // (, line 146
-            // not, line 146
-
-            {
-                v_4 = limit - cursor;
-                // (, line 146
-                // test, line 146
-                v_5 = limit - cursor;
-                // literal, line 146
-                if (!(eq_s_b(UTF16("s"))))
+                int c1 = limit - cursor;
+                // (, line 144
+                // (, line 144
+                // test, line 144
                 {
-                    goto lab2;
+                    int c2 = limit - cursor;
+                    // literal, line 144
+                    if (!(eq_s_b("s")))
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c2;
                 }
-                cursor = limit - v_5;
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                // next, line 144
+                if (cursor <= limit_backward)
+                {
+                    goto lab1;
+                }
+                cursor--;
+                // (, line 144
+                // test, line 144
+                {
+                    int c3 = limit - cursor;
+                    if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c3;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 146
+                // (, line 146
+                // not, line 146
+                {
+                    int c4 = limit - cursor;
+                    // (, line 146
+                    // test, line 146
+                    {
+                        int c5 = limit - cursor;
+                        // literal, line 146
+                        if (!(eq_s_b("s")))
+                        {
+                            goto lab2;
+                        }
+                        cursor = limit - c5;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c4;
+                }
+                // test, line 146
+                {
+                    int c6 = limit - cursor;
+                    // (, line 146
+                    // next, line 146
+                    if (cursor <= limit_backward)
+                    {
+                        return 0;
+                    }
+                    cursor--;
+                    // (, line 146
+                    // test, line 146
+                    {
+                        int c7 = limit - cursor;
+                        if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                        {
+                            return 0;
+                        }
+                        cursor = limit - c7;
+                    }
+                    cursor = limit - c6;
+                }
             }
-            // test, line 146
-            v_6 = limit - cursor;
-            // (, line 146
-            // next, line 146
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // (, line 146
-            // test, line 146
-            v_7 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                return false;
-            }
-            cursor = limit - v_7;
-            cursor = limit - v_6;
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_suffix_with_optional_y_consonant()
+        private int r_mark_suffix_with_optional_y_consonant()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
             // (, line 153
             // or, line 155
-            v_1 = limit - cursor;
-            // (, line 154
-            // (, line 154
-            // test, line 154
-            v_2 = limit - cursor;
-            // literal, line 154
-            if (!(eq_s_b(UTF16("y"))))
             {
-                goto lab1;
-            }
-            cursor = limit - v_2;
-            // next, line 154
-            if (cursor <= limit_backward)
-            {
-                goto lab1;
-            }
-            cursor--;
-            // (, line 154
-            // test, line 154
-            v_3 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                goto lab1;
-            }
-            cursor = limit - v_3;
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 156
-            // (, line 156
-            // not, line 156
-
-            {
-                v_4 = limit - cursor;
-                // (, line 156
-                // test, line 156
-                v_5 = limit - cursor;
-                // literal, line 156
-                if (!(eq_s_b(UTF16("y"))))
+                int c1 = limit - cursor;
+                // (, line 154
+                // (, line 154
+                // test, line 154
                 {
-                    goto lab2;
+                    int c2 = limit - cursor;
+                    // literal, line 154
+                    if (!(eq_s_b("y")))
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c2;
                 }
-                cursor = limit - v_5;
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                // next, line 154
+                if (cursor <= limit_backward)
+                {
+                    goto lab1;
+                }
+                cursor--;
+                // (, line 154
+                // test, line 154
+                {
+                    int c3 = limit - cursor;
+                    if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c3;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 156
+                // (, line 156
+                // not, line 156
+                {
+                    int c4 = limit - cursor;
+                    // (, line 156
+                    // test, line 156
+                    {
+                        int c5 = limit - cursor;
+                        // literal, line 156
+                        if (!(eq_s_b("y")))
+                        {
+                            goto lab2;
+                        }
+                        cursor = limit - c5;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c4;
+                }
+                // test, line 156
+                {
+                    int c6 = limit - cursor;
+                    // (, line 156
+                    // next, line 156
+                    if (cursor <= limit_backward)
+                    {
+                        return 0;
+                    }
+                    cursor--;
+                    // (, line 156
+                    // test, line 156
+                    {
+                        int c7 = limit - cursor;
+                        if (in_grouping_b(g_vowel, 97, 305, false) != 0)
+                        {
+                            return 0;
+                        }
+                        cursor = limit - c7;
+                    }
+                    cursor = limit - c6;
+                }
             }
-            // test, line 156
-            v_6 = limit - cursor;
-            // (, line 156
-            // next, line 156
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // (, line 156
-            // test, line 156
-            v_7 = limit - cursor;
-            if (!(in_grouping_b(g_vowel, 97, 305)))
-            {
-                return false;
-            }
-            cursor = limit - v_7;
-            cursor = limit - v_6;
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_suffix_with_optional_U_vowel()
+        private int r_mark_suffix_with_optional_U_vowel()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
             // (, line 159
             // or, line 161
-            v_1 = limit - cursor;
-            // (, line 160
-            // (, line 160
-            // test, line 160
-            v_2 = limit - cursor;
-            if (!(in_grouping_b(g_U, 105, 305)))
             {
-                goto lab1;
-            }
-            cursor = limit - v_2;
-            // next, line 160
-            if (cursor <= limit_backward)
-            {
-                goto lab1;
-            }
-            cursor--;
-            // (, line 160
-            // test, line 160
-            v_3 = limit - cursor;
-            if (!(out_grouping_b(g_vowel, 97, 305)))
-            {
-                goto lab1;
-            }
-            cursor = limit - v_3;
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 162
-            // (, line 162
-            // not, line 162
-
-            {
-                v_4 = limit - cursor;
-                // (, line 162
-                // test, line 162
-                v_5 = limit - cursor;
-                if (!(in_grouping_b(g_U, 105, 305)))
+                int c1 = limit - cursor;
+                // (, line 160
+                // (, line 160
+                // test, line 160
                 {
-                    goto lab2;
+                    int c2 = limit - cursor;
+                    if (in_grouping_b(g_U, 105, 305, false) != 0)
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c2;
                 }
-                cursor = limit - v_5;
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                // next, line 160
+                if (cursor <= limit_backward)
+                {
+                    goto lab1;
+                }
+                cursor--;
+                // (, line 160
+                // test, line 160
+                {
+                    int c3 = limit - cursor;
+                    if (out_grouping_b(g_vowel, 97, 305, false) != 0)
+                    {
+                        goto lab1;
+                    }
+                    cursor = limit - c3;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 162
+                // (, line 162
+                // not, line 162
+                {
+                    int c4 = limit - cursor;
+                    // (, line 162
+                    // test, line 162
+                    {
+                        int c5 = limit - cursor;
+                        if (in_grouping_b(g_U, 105, 305, false) != 0)
+                        {
+                            goto lab2;
+                        }
+                        cursor = limit - c5;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c4;
+                }
+                // test, line 162
+                {
+                    int c6 = limit - cursor;
+                    // (, line 162
+                    // next, line 162
+                    if (cursor <= limit_backward)
+                    {
+                        return 0;
+                    }
+                    cursor--;
+                    // (, line 162
+                    // test, line 162
+                    {
+                        int c7 = limit - cursor;
+                        if (out_grouping_b(g_vowel, 97, 305, false) != 0)
+                        {
+                            return 0;
+                        }
+                        cursor = limit - c7;
+                    }
+                    cursor = limit - c6;
+                }
             }
-            // test, line 162
-            v_6 = limit - cursor;
-            // (, line 162
-            // next, line 162
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // (, line 162
-            // test, line 162
-            v_7 = limit - cursor;
-            if (!(out_grouping_b(g_vowel, 97, 305)))
-            {
-                return false;
-            }
-            cursor = limit - v_7;
-            cursor = limit - v_6;
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_possessives()
+        private int r_mark_possessives()
         {
             // (, line 166
             // among, line 167
             if (find_among_b(a_0) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 169
-            // call mark_suffix_with_optional_U_vowel, line 169
-            if (!r_mark_suffix_with_optional_U_vowel())
             {
-                return false;
+                // call mark_suffix_with_optional_U_vowel, line 169
+                int ret = r_mark_suffix_with_optional_U_vowel();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_sU()
+        private int r_mark_sU()
         {
             // (, line 172
-            // call check_vowel_harmony, line 173
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 173
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
-            if (!(in_grouping_b(g_U, 105, 305)))
+            if (in_grouping_b(g_U, 105, 305, false) != 0)
             {
-                return false;
+                return 0;
             }
             // (, line 175
-            // call mark_suffix_with_optional_s_consonant, line 175
-            if (!r_mark_suffix_with_optional_s_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_s_consonant, line 175
+                int ret = r_mark_suffix_with_optional_s_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_lArI()
+        private int r_mark_lArI()
         {
             // (, line 178
             // among, line 179
             if (find_among_b(a_1) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yU()
+        private int r_mark_yU()
         {
             // (, line 182
-            // call check_vowel_harmony, line 183
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 183
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
-            if (!(in_grouping_b(g_U, 105, 305)))
+            if (in_grouping_b(g_U, 105, 305, false) != 0)
             {
-                return false;
+                return 0;
             }
             // (, line 185
-            // call mark_suffix_with_optional_y_consonant, line 185
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 185
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_nU()
+        private int r_mark_nU()
         {
             // (, line 188
-            // call check_vowel_harmony, line 189
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 189
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 190
             if (find_among_b(a_2) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_nUn()
+        private int r_mark_nUn()
         {
             // (, line 193
-            // call check_vowel_harmony, line 194
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 194
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 195
             if (find_among_b(a_3) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 196
-            // call mark_suffix_with_optional_n_consonant, line 196
-            if (!r_mark_suffix_with_optional_n_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_n_consonant, line 196
+                int ret = r_mark_suffix_with_optional_n_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yA()
+        private int r_mark_yA()
         {
             // (, line 199
-            // call check_vowel_harmony, line 200
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 200
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 201
             if (find_among_b(a_4) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 202
-            // call mark_suffix_with_optional_y_consonant, line 202
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 202
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_nA()
+        private int r_mark_nA()
         {
             // (, line 205
-            // call check_vowel_harmony, line 206
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 206
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 207
             if (find_among_b(a_5) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_DA()
+        private int r_mark_DA()
         {
             // (, line 210
-            // call check_vowel_harmony, line 211
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 211
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 212
             if (find_among_b(a_6) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ndA()
+        private int r_mark_ndA()
         {
             // (, line 215
-            // call check_vowel_harmony, line 216
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 216
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 217
             if (find_among_b(a_7) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_DAn()
+        private int r_mark_DAn()
         {
             // (, line 220
-            // call check_vowel_harmony, line 221
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 221
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 222
             if (find_among_b(a_8) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ndAn()
+        private int r_mark_ndAn()
         {
             // (, line 225
-            // call check_vowel_harmony, line 226
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 226
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 227
             if (find_among_b(a_9) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ylA()
+        private int r_mark_ylA()
         {
             // (, line 230
-            // call check_vowel_harmony, line 231
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 231
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 232
             if (find_among_b(a_10) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 233
-            // call mark_suffix_with_optional_y_consonant, line 233
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 233
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ki()
+        private int r_mark_ki()
         {
             // (, line 236
             // literal, line 237
-            if (!(eq_s_b(UTF16("ki"))))
+            if (!(eq_s_b("ki")))
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ncA()
+        private int r_mark_ncA()
         {
             // (, line 240
-            // call check_vowel_harmony, line 241
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 241
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 242
             if (find_among_b(a_11) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 243
-            // call mark_suffix_with_optional_n_consonant, line 243
-            if (!r_mark_suffix_with_optional_n_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_n_consonant, line 243
+                int ret = r_mark_suffix_with_optional_n_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yUm()
+        private int r_mark_yUm()
         {
             // (, line 246
-            // call check_vowel_harmony, line 247
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 247
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 248
             if (find_among_b(a_12) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 249
-            // call mark_suffix_with_optional_y_consonant, line 249
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 249
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_sUn()
+        private int r_mark_sUn()
         {
             // (, line 252
-            // call check_vowel_harmony, line 253
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 253
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 254
             if (find_among_b(a_13) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yUz()
+        private int r_mark_yUz()
         {
             // (, line 257
-            // call check_vowel_harmony, line 258
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 258
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 259
             if (find_among_b(a_14) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 260
-            // call mark_suffix_with_optional_y_consonant, line 260
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 260
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_sUnUz()
+        private int r_mark_sUnUz()
         {
             // (, line 263
             // among, line 264
             if (find_among_b(a_15) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_lAr()
+        private int r_mark_lAr()
         {
             // (, line 267
-            // call check_vowel_harmony, line 268
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 268
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 269
             if (find_among_b(a_16) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_nUz()
+        private int r_mark_nUz()
         {
             // (, line 272
-            // call check_vowel_harmony, line 273
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 273
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 274
             if (find_among_b(a_17) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_DUr()
+        private int r_mark_DUr()
         {
             // (, line 277
-            // call check_vowel_harmony, line 278
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 278
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 279
             if (find_among_b(a_18) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_cAsInA()
+        private int r_mark_cAsInA()
         {
             // (, line 282
             // among, line 283
             if (find_among_b(a_19) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yDU()
+        private int r_mark_yDU()
         {
             // (, line 286
-            // call check_vowel_harmony, line 287
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 287
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 288
             if (find_among_b(a_20) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 292
-            // call mark_suffix_with_optional_y_consonant, line 292
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 292
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ysA()
+        private int r_mark_ysA()
         {
             // (, line 296
             // among, line 297
             if (find_among_b(a_21) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 298
-            // call mark_suffix_with_optional_y_consonant, line 298
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 298
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_ymUs_()
+        private int r_mark_ymUs_()
         {
             // (, line 301
-            // call check_vowel_harmony, line 302
-            if (!r_check_vowel_harmony())
             {
-                return false;
+                // call check_vowel_harmony, line 302
+                int ret = r_check_vowel_harmony();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // among, line 303
             if (find_among_b(a_22) == 0)
             {
-                return false;
+                return 0;
             }
             // (, line 304
-            // call mark_suffix_with_optional_y_consonant, line 304
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 304
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_mark_yken()
+        private int r_mark_yken()
         {
             // (, line 307
             // literal, line 308
-            if (!(eq_s_b(UTF16("ken"))))
+            if (!(eq_s_b("ken")))
             {
-                return false;
+                return 0;
             }
             // (, line 308
-            // call mark_suffix_with_optional_y_consonant, line 308
-            if (!r_mark_suffix_with_optional_y_consonant())
             {
-                return false;
+                // call mark_suffix_with_optional_y_consonant, line 308
+                int ret = r_mark_suffix_with_optional_y_consonant();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_stem_nominal_verb_suffixes()
+        private int r_stem_nominal_verb_suffixes()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
-            int v_9;
-            int v_10;
             // (, line 311
             // [, line 312
             ket = cursor;
             // set continue_stemming_noun_suffixes, line 313
             B_continue_stemming_noun_suffixes = true;
             // or, line 315
-            v_1 = limit - cursor;
-            // (, line 314
-            // or, line 314
-            v_2 = limit - cursor;
-            // call mark_ymUs_, line 314
-            if (!r_mark_ymUs_())
             {
-                goto lab3;
+                int c1 = limit - cursor;
+                // (, line 314
+                // or, line 314
+                {
+                    int c2 = limit - cursor;
+                    {
+                        // call mark_ymUs_, line 314
+                        int ret = r_mark_ymUs_();
+                        if (ret == 0)
+                            goto lab3;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab2;
+                lab3: ; 
+                    cursor = limit - c2;
+                    {
+                        // call mark_yDU, line 314
+                        int ret = r_mark_yDU();
+                        if (ret == 0)
+                            goto lab4;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab2;
+                lab4: ; 
+                    cursor = limit - c2;
+                    {
+                        // call mark_ysA, line 314
+                        int ret = r_mark_ysA();
+                        if (ret == 0)
+                            goto lab5;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab2;
+                lab5: ; 
+                    cursor = limit - c2;
+                    {
+                        // call mark_yken, line 314
+                        int ret = r_mark_yken();
+                        if (ret == 0)
+                            goto lab1;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab2: ; 
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 316
+                {
+                    // call mark_cAsInA, line 316
+                    int ret = r_mark_cAsInA();
+                    if (ret == 0)
+                        goto lab6;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // (, line 316
+                // or, line 316
+                {
+                    int c3 = limit - cursor;
+                    {
+                        // call mark_sUnUz, line 316
+                        int ret = r_mark_sUnUz();
+                        if (ret == 0)
+                            goto lab8;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab7;
+                lab8: ; 
+                    cursor = limit - c3;
+                    {
+                        // call mark_lAr, line 316
+                        int ret = r_mark_lAr();
+                        if (ret == 0)
+                            goto lab9;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab7;
+                lab9: ; 
+                    cursor = limit - c3;
+                    {
+                        // call mark_yUm, line 316
+                        int ret = r_mark_yUm();
+                        if (ret == 0)
+                            goto lab10;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab7;
+                lab10: ; 
+                    cursor = limit - c3;
+                    {
+                        // call mark_sUn, line 316
+                        int ret = r_mark_sUn();
+                        if (ret == 0)
+                            goto lab11;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab7;
+                lab11: ; 
+                    cursor = limit - c3;
+                    {
+                        // call mark_yUz, line 316
+                        int ret = r_mark_yUz();
+                        if (ret == 0)
+                            goto lab12;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab7;
+                lab12: ; 
+                    cursor = limit - c3;
+                }
+            lab7: ; 
+                {
+                    // call mark_ymUs_, line 316
+                    int ret = r_mark_ymUs_();
+                    if (ret == 0)
+                        goto lab6;
+                    else if (ret < 0)
+                        return ret;
+                }
+                goto lab0;
+            lab6: ; 
+                cursor = limit - c1;
+                // (, line 318
+                {
+                    // call mark_lAr, line 319
+                    int ret = r_mark_lAr();
+                    if (ret == 0)
+                        goto lab13;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 319
+                bra = cursor;
+                // delete, line 319
+                slice_del();
+                // try, line 319
+                {
+                    int c4 = limit - cursor;
+                    // (, line 319
+                    // [, line 319
+                    ket = cursor;
+                    // (, line 319
+                    // or, line 319
+                    {
+                        int c5 = limit - cursor;
+                        {
+                            // call mark_DUr, line 319
+                            int ret = r_mark_DUr();
+                            if (ret == 0)
+                                goto lab16;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab15;
+                    lab16: ; 
+                        cursor = limit - c5;
+                        {
+                            // call mark_yDU, line 319
+                            int ret = r_mark_yDU();
+                            if (ret == 0)
+                                goto lab17;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab15;
+                    lab17: ; 
+                        cursor = limit - c5;
+                        {
+                            // call mark_ysA, line 319
+                            int ret = r_mark_ysA();
+                            if (ret == 0)
+                                goto lab18;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab15;
+                    lab18: ; 
+                        cursor = limit - c5;
+                        {
+                            // call mark_ymUs_, line 319
+                            int ret = r_mark_ymUs_();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c4;
+                                    goto lab14;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab15: ; 
+                lab14: ; 
+                }
+                // unset continue_stemming_noun_suffixes, line 320
+                B_continue_stemming_noun_suffixes = false;
+                goto lab0;
+            lab13: ; 
+                cursor = limit - c1;
+                // (, line 323
+                {
+                    // call mark_nUz, line 323
+                    int ret = r_mark_nUz();
+                    if (ret == 0)
+                        goto lab19;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // (, line 323
+                // or, line 323
+                {
+                    int c6 = limit - cursor;
+                    {
+                        // call mark_yDU, line 323
+                        int ret = r_mark_yDU();
+                        if (ret == 0)
+                            goto lab21;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab20;
+                lab21: ; 
+                    cursor = limit - c6;
+                    {
+                        // call mark_ysA, line 323
+                        int ret = r_mark_ysA();
+                        if (ret == 0)
+                            goto lab19;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab20: ; 
+                goto lab0;
+            lab19: ; 
+                cursor = limit - c1;
+                // (, line 325
+                // (, line 325
+                // or, line 325
+                {
+                    int c7 = limit - cursor;
+                    {
+                        // call mark_sUnUz, line 325
+                        int ret = r_mark_sUnUz();
+                        if (ret == 0)
+                            goto lab24;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab23;
+                lab24: ; 
+                    cursor = limit - c7;
+                    {
+                        // call mark_yUz, line 325
+                        int ret = r_mark_yUz();
+                        if (ret == 0)
+                            goto lab25;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab23;
+                lab25: ; 
+                    cursor = limit - c7;
+                    {
+                        // call mark_sUn, line 325
+                        int ret = r_mark_sUn();
+                        if (ret == 0)
+                            goto lab26;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab23;
+                lab26: ; 
+                    cursor = limit - c7;
+                    {
+                        // call mark_yUm, line 325
+                        int ret = r_mark_yUm();
+                        if (ret == 0)
+                            goto lab22;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab23: ; 
+                // ], line 325
+                bra = cursor;
+                // delete, line 325
+                slice_del();
+                // try, line 325
+                {
+                    int c8 = limit - cursor;
+                    // (, line 325
+                    // [, line 325
+                    ket = cursor;
+                    {
+                        // call mark_ymUs_, line 325
+                        int ret = r_mark_ymUs_();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c8;
+                                goto lab27;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                lab27: ; 
+                }
+                goto lab0;
+            lab22: ; 
+                cursor = limit - c1;
+                // (, line 327
+                {
+                    // call mark_DUr, line 327
+                    int ret = r_mark_DUr();
+                    if (ret == 0)
+                        return 0;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 327
+                bra = cursor;
+                // delete, line 327
+                slice_del();
+                // try, line 327
+                {
+                    int c9 = limit - cursor;
+                    // (, line 327
+                    // [, line 327
+                    ket = cursor;
+                    // (, line 327
+                    // or, line 327
+                    {
+                        int c10 = limit - cursor;
+                        {
+                            // call mark_sUnUz, line 327
+                            int ret = r_mark_sUnUz();
+                            if (ret == 0)
+                                goto lab30;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab29;
+                    lab30: ; 
+                        cursor = limit - c10;
+                        {
+                            // call mark_lAr, line 327
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                goto lab31;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab29;
+                    lab31: ; 
+                        cursor = limit - c10;
+                        {
+                            // call mark_yUm, line 327
+                            int ret = r_mark_yUm();
+                            if (ret == 0)
+                                goto lab32;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab29;
+                    lab32: ; 
+                        cursor = limit - c10;
+                        {
+                            // call mark_sUn, line 327
+                            int ret = r_mark_sUn();
+                            if (ret == 0)
+                                goto lab33;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab29;
+                    lab33: ; 
+                        cursor = limit - c10;
+                        {
+                            // call mark_yUz, line 327
+                            int ret = r_mark_yUz();
+                            if (ret == 0)
+                                goto lab34;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab29;
+                    lab34: ; 
+                        cursor = limit - c10;
+                    }
+                lab29: ; 
+                    {
+                        // call mark_ymUs_, line 327
+                        int ret = r_mark_ymUs_();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c9;
+                                goto lab28;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                lab28: ; 
+                }
             }
-            goto lab2;
-        lab3: 
-            cursor = limit - v_2;
-            // call mark_yDU, line 314
-            if (!r_mark_yDU())
-            {
-                goto lab4;
-            }
-            goto lab2;
-        lab4: 
-            cursor = limit - v_2;
-            // call mark_ysA, line 314
-            if (!r_mark_ysA())
-            {
-                goto lab5;
-            }
-            goto lab2;
-        lab5: 
-            cursor = limit - v_2;
-            // call mark_yken, line 314
-            if (!r_mark_yken())
-            {
-                goto lab1;
-            }
-        lab2: 
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 316
-            // call mark_cAsInA, line 316
-            if (!r_mark_cAsInA())
-            {
-                goto lab6;
-            }
-            // (, line 316
-            // or, line 316
-            v_3 = limit - cursor;
-            // call mark_sUnUz, line 316
-            if (!r_mark_sUnUz())
-            {
-                goto lab8;
-            }
-            goto lab7;
-        lab8: 
-            cursor = limit - v_3;
-            // call mark_lAr, line 316
-            if (!r_mark_lAr())
-            {
-                goto lab9;
-            }
-            goto lab7;
-        lab9: 
-            cursor = limit - v_3;
-            // call mark_yUm, line 316
-            if (!r_mark_yUm())
-            {
-                goto lab10;
-            }
-            goto lab7;
-        lab10: 
-            cursor = limit - v_3;
-            // call mark_sUn, line 316
-            if (!r_mark_sUn())
-            {
-                goto lab11;
-            }
-            goto lab7;
-        lab11: 
-            cursor = limit - v_3;
-            // call mark_yUz, line 316
-            if (!r_mark_yUz())
-            {
-                goto lab12;
-            }
-            goto lab7;
-        lab12: 
-            cursor = limit - v_3;
-        lab7: 
-            // call mark_ymUs_, line 316
-            if (!r_mark_ymUs_())
-            {
-                goto lab6;
-            }
-            goto lab0;
-        lab6: 
-            cursor = limit - v_1;
-            // (, line 318
-            // call mark_lAr, line 319
-            if (!r_mark_lAr())
-            {
-                goto lab13;
-            }
-            // ], line 319
-            bra = cursor;
-            // delete, line 319
-            slice_del();
-            // try, line 319
-            v_4 = limit - cursor;
-            // (, line 319
-            // [, line 319
-            ket = cursor;
-            // (, line 319
-            // or, line 319
-            v_5 = limit - cursor;
-            // call mark_DUr, line 319
-            if (!r_mark_DUr())
-            {
-                goto lab16;
-            }
-            goto lab15;
-        lab16: 
-            cursor = limit - v_5;
-            // call mark_yDU, line 319
-            if (!r_mark_yDU())
-            {
-                goto lab17;
-            }
-            goto lab15;
-        lab17: 
-            cursor = limit - v_5;
-            // call mark_ysA, line 319
-            if (!r_mark_ysA())
-            {
-                goto lab18;
-            }
-            goto lab15;
-        lab18: 
-            cursor = limit - v_5;
-            // call mark_ymUs_, line 319
-            if (!r_mark_ymUs_())
-            {
-                cursor = limit - v_4;
-                goto lab14;
-            }
-        lab15: 
-        lab14: 
-            // unset continue_stemming_noun_suffixes, line 320
-            B_continue_stemming_noun_suffixes = false;
-            goto lab0;
-        lab13: 
-            cursor = limit - v_1;
-            // (, line 323
-            // call mark_nUz, line 323
-            if (!r_mark_nUz())
-            {
-                goto lab19;
-            }
-            // (, line 323
-            // or, line 323
-            v_6 = limit - cursor;
-            // call mark_yDU, line 323
-            if (!r_mark_yDU())
-            {
-                goto lab21;
-            }
-            goto lab20;
-        lab21: 
-            cursor = limit - v_6;
-            // call mark_ysA, line 323
-            if (!r_mark_ysA())
-            {
-                goto lab19;
-            }
-        lab20: 
-            goto lab0;
-        lab19: 
-            cursor = limit - v_1;
-            // (, line 325
-            // (, line 325
-            // or, line 325
-            v_7 = limit - cursor;
-            // call mark_sUnUz, line 325
-            if (!r_mark_sUnUz())
-            {
-                goto lab24;
-            }
-            goto lab23;
-        lab24: 
-            cursor = limit - v_7;
-            // call mark_yUz, line 325
-            if (!r_mark_yUz())
-            {
-                goto lab25;
-            }
-            goto lab23;
-        lab25: 
-            cursor = limit - v_7;
-            // call mark_sUn, line 325
-            if (!r_mark_sUn())
-            {
-                goto lab26;
-            }
-            goto lab23;
-        lab26: 
-            cursor = limit - v_7;
-            // call mark_yUm, line 325
-            if (!r_mark_yUm())
-            {
-                goto lab22;
-            }
-        lab23: 
-            // ], line 325
-            bra = cursor;
-            // delete, line 325
-            slice_del();
-            // try, line 325
-            v_8 = limit - cursor;
-            // (, line 325
-            // [, line 325
-            ket = cursor;
-            // call mark_ymUs_, line 325
-            if (!r_mark_ymUs_())
-            {
-                cursor = limit - v_8;
-                goto lab27;
-            }
-        lab27: 
-            goto lab0;
-        lab22: 
-            cursor = limit - v_1;
-            // (, line 327
-            // call mark_DUr, line 327
-            if (!r_mark_DUr())
-            {
-                return false;
-            }
-            // ], line 327
-            bra = cursor;
-            // delete, line 327
-            slice_del();
-            // try, line 327
-            v_9 = limit - cursor;
-            // (, line 327
-            // [, line 327
-            ket = cursor;
-            // (, line 327
-            // or, line 327
-            v_10 = limit - cursor;
-            // call mark_sUnUz, line 327
-            if (!r_mark_sUnUz())
-            {
-                goto lab30;
-            }
-            goto lab29;
-        lab30: 
-            cursor = limit - v_10;
-            // call mark_lAr, line 327
-            if (!r_mark_lAr())
-            {
-                goto lab31;
-            }
-            goto lab29;
-        lab31: 
-            cursor = limit - v_10;
-            // call mark_yUm, line 327
-            if (!r_mark_yUm())
-            {
-                goto lab32;
-            }
-            goto lab29;
-        lab32: 
-            cursor = limit - v_10;
-            // call mark_sUn, line 327
-            if (!r_mark_sUn())
-            {
-                goto lab33;
-            }
-            goto lab29;
-        lab33: 
-            cursor = limit - v_10;
-            // call mark_yUz, line 327
-            if (!r_mark_yUz())
-            {
-                goto lab34;
-            }
-            goto lab29;
-        lab34: 
-            cursor = limit - v_10;
-        lab29: 
-            // call mark_ymUs_, line 327
-            if (!r_mark_ymUs_())
-            {
-                cursor = limit - v_9;
-                goto lab28;
-            }
-        lab28: 
-        lab0: 
+        lab0: ; 
             // ], line 328
             bra = cursor;
             // delete, line 328
             slice_del();
 
-            return true;
+            return 1;
         }
 
-        private bool r_stem_suffix_chain_before_ki()
+        private int r_stem_suffix_chain_before_ki()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
-            int v_9;
-            int v_10;
-            int v_11;
             // (, line 332
             // [, line 333
             ket = cursor;
-            // call mark_ki, line 334
-            if (!r_mark_ki())
             {
-                return false;
+                // call mark_ki, line 334
+                int ret = r_mark_ki();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // (, line 335
             // or, line 342
-            v_1 = limit - cursor;
-            // (, line 336
-            // call mark_DA, line 336
-            if (!r_mark_DA())
             {
-                goto lab1;
+                int c1 = limit - cursor;
+                // (, line 336
+                {
+                    // call mark_DA, line 336
+                    int ret = r_mark_DA();
+                    if (ret == 0)
+                        goto lab1;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 336
+                bra = cursor;
+                // delete, line 336
+                slice_del();
+                // try, line 336
+                {
+                    int c2 = limit - cursor;
+                    // (, line 336
+                    // [, line 336
+                    ket = cursor;
+                    // or, line 338
+                    {
+                        int c3 = limit - cursor;
+                        // (, line 337
+                        {
+                            // call mark_lAr, line 337
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                goto lab4;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 337
+                        bra = cursor;
+                        // delete, line 337
+                        slice_del();
+                        // try, line 337
+                        {
+                            int c4 = limit - cursor;
+                            // (, line 337
+                            {
+                                // call stem_suffix_chain_before_ki, line 337
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c4;
+                                        goto lab5;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab5: ; 
+                        }
+                        goto lab3;
+                    lab4: ; 
+                        cursor = limit - c3;
+                        // (, line 339
+                        {
+                            // call mark_possessives, line 339
+                            int ret = r_mark_possessives();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c2;
+                                    goto lab2;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 339
+                        bra = cursor;
+                        // delete, line 339
+                        slice_del();
+                        // try, line 339
+                        {
+                            int c5 = limit - cursor;
+                            // (, line 339
+                            // [, line 339
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 339
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c5;
+                                        goto lab6;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            // ], line 339
+                            bra = cursor;
+                            // delete, line 339
+                            slice_del();
+                            {
+                                // call stem_suffix_chain_before_ki, line 339
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c5;
+                                        goto lab6;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab6: ; 
+                        }
+                    }
+                lab3: ; 
+                lab2: ; 
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 343
+                {
+                    // call mark_nUn, line 343
+                    int ret = r_mark_nUn();
+                    if (ret == 0)
+                        goto lab7;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 343
+                bra = cursor;
+                // delete, line 343
+                slice_del();
+                // try, line 343
+                {
+                    int c6 = limit - cursor;
+                    // (, line 343
+                    // [, line 343
+                    ket = cursor;
+                    // or, line 345
+                    {
+                        int c7 = limit - cursor;
+                        // (, line 344
+                        {
+                            // call mark_lArI, line 344
+                            int ret = r_mark_lArI();
+                            if (ret == 0)
+                                goto lab10;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 344
+                        bra = cursor;
+                        // delete, line 344
+                        slice_del();
+                        goto lab9;
+                    lab10: ; 
+                        cursor = limit - c7;
+                        // (, line 346
+                        // [, line 346
+                        ket = cursor;
+                        // or, line 346
+                        {
+                            int c8 = limit - cursor;
+                            {
+                                // call mark_possessives, line 346
+                                int ret = r_mark_possessives();
+                                if (ret == 0)
+                                    goto lab13;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            goto lab12;
+                        lab13: ; 
+                            cursor = limit - c8;
+                            {
+                                // call mark_sU, line 346
+                                int ret = r_mark_sU();
+                                if (ret == 0)
+                                    goto lab11;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        }
+                    lab12: ; 
+                        // ], line 346
+                        bra = cursor;
+                        // delete, line 346
+                        slice_del();
+                        // try, line 346
+                        {
+                            int c9 = limit - cursor;
+                            // (, line 346
+                            // [, line 346
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 346
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c9;
+                                        goto lab14;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            // ], line 346
+                            bra = cursor;
+                            // delete, line 346
+                            slice_del();
+                            {
+                                // call stem_suffix_chain_before_ki, line 346
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c9;
+                                        goto lab14;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab14: ; 
+                        }
+                        goto lab9;
+                    lab11: ; 
+                        cursor = limit - c7;
+                        // (, line 348
+                        {
+                            // call stem_suffix_chain_before_ki, line 348
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c6;
+                                    goto lab8;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab9: ; 
+                lab8: ; 
+                }
+                goto lab0;
+            lab7: ; 
+                cursor = limit - c1;
+                // (, line 351
+                {
+                    // call mark_ndA, line 351
+                    int ret = r_mark_ndA();
+                    if (ret == 0)
+                        return 0;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // (, line 351
+                // or, line 353
+                {
+                    int c10 = limit - cursor;
+                    // (, line 352
+                    {
+                        // call mark_lArI, line 352
+                        int ret = r_mark_lArI();
+                        if (ret == 0)
+                            goto lab16;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 352
+                    bra = cursor;
+                    // delete, line 352
+                    slice_del();
+                    goto lab15;
+                lab16: ; 
+                    cursor = limit - c10;
+                    // (, line 354
+                    // (, line 354
+                    {
+                        // call mark_sU, line 354
+                        int ret = r_mark_sU();
+                        if (ret == 0)
+                            goto lab17;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 354
+                    bra = cursor;
+                    // delete, line 354
+                    slice_del();
+                    // try, line 354
+                    {
+                        int c11 = limit - cursor;
+                        // (, line 354
+                        // [, line 354
+                        ket = cursor;
+                        {
+                            // call mark_lAr, line 354
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c11;
+                                    goto lab18;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 354
+                        bra = cursor;
+                        // delete, line 354
+                        slice_del();
+                        {
+                            // call stem_suffix_chain_before_ki, line 354
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c11;
+                                    goto lab18;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    lab18: ; 
+                    }
+                    goto lab15;
+                lab17: ; 
+                    cursor = limit - c10;
+                    // (, line 356
+                    {
+                        // call stem_suffix_chain_before_ki, line 356
+                        int ret = r_stem_suffix_chain_before_ki();
+                        if (ret == 0)
+                            return 0;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab15: ; 
             }
-            // ], line 336
-            bra = cursor;
-            // delete, line 336
-            slice_del();
-            // try, line 336
-            v_2 = limit - cursor;
-            // (, line 336
-            // [, line 336
-            ket = cursor;
-            // or, line 338
-            v_3 = limit - cursor;
-            // (, line 337
-            // call mark_lAr, line 337
-            if (!r_mark_lAr())
-            {
-                goto lab4;
-            }
-            // ], line 337
-            bra = cursor;
-            // delete, line 337
-            slice_del();
-            // try, line 337
-            v_4 = limit - cursor;
-            // (, line 337
-            // call stem_suffix_chain_before_ki, line 337
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_4;
-                goto lab5;
-            }
-        lab5: 
-            goto lab3;
-        lab4: 
-            cursor = limit - v_3;
-            // (, line 339
-            // call mark_possessives, line 339
-            if (!r_mark_possessives())
-            {
-                cursor = limit - v_2;
-                goto lab2;
-            }
-            // ], line 339
-            bra = cursor;
-            // delete, line 339
-            slice_del();
-            // try, line 339
-            v_5 = limit - cursor;
-            // (, line 339
-            // [, line 339
-            ket = cursor;
-            // call mark_lAr, line 339
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_5;
-                goto lab6;
-            }
-            // ], line 339
-            bra = cursor;
-            // delete, line 339
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 339
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_5;
-                goto lab6;
-            }
-        lab6: 
-        lab3: 
-        lab2: 
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 343
-            // call mark_nUn, line 343
-            if (!r_mark_nUn())
-            {
-                goto lab7;
-            }
-            // ], line 343
-            bra = cursor;
-            // delete, line 343
-            slice_del();
-            // try, line 343
-            v_6 = limit - cursor;
-            // (, line 343
-            // [, line 343
-            ket = cursor;
-            // or, line 345
-            v_7 = limit - cursor;
-            // (, line 344
-            // call mark_lArI, line 344
-            if (!r_mark_lArI())
-            {
-                goto lab10;
-            }
-            // ], line 344
-            bra = cursor;
-            // delete, line 344
-            slice_del();
-            goto lab9;
-        lab10: 
-            cursor = limit - v_7;
-            // (, line 346
-            // [, line 346
-            ket = cursor;
-            // or, line 346
-            v_8 = limit - cursor;
-            // call mark_possessives, line 346
-            if (!r_mark_possessives())
-            {
-                goto lab13;
-            }
-            goto lab12;
-        lab13: 
-            cursor = limit - v_8;
-            // call mark_sU, line 346
-            if (!r_mark_sU())
-            {
-                goto lab11;
-            }
-        lab12: 
-            // ], line 346
-            bra = cursor;
-            // delete, line 346
-            slice_del();
-            // try, line 346
-            v_9 = limit - cursor;
-            // (, line 346
-            // [, line 346
-            ket = cursor;
-            // call mark_lAr, line 346
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_9;
-                goto lab14;
-            }
-            // ], line 346
-            bra = cursor;
-            // delete, line 346
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 346
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_9;
-                goto lab14;
-            }
-        lab14: 
-            goto lab9;
-        lab11: 
-            cursor = limit - v_7;
-            // (, line 348
-            // call stem_suffix_chain_before_ki, line 348
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_6;
-                goto lab8;
-            }
-        lab9: 
-        lab8: 
-            goto lab0;
-        lab7: 
-            cursor = limit - v_1;
-            // (, line 351
-            // call mark_ndA, line 351
-            if (!r_mark_ndA())
-            {
-                return false;
-            }
-            // (, line 351
-            // or, line 353
-            v_10 = limit - cursor;
-            // (, line 352
-            // call mark_lArI, line 352
-            if (!r_mark_lArI())
-            {
-                goto lab16;
-            }
-            // ], line 352
-            bra = cursor;
-            // delete, line 352
-            slice_del();
-            goto lab15;
-        lab16: 
-            cursor = limit - v_10;
-            // (, line 354
-            // (, line 354
-            // call mark_sU, line 354
-            if (!r_mark_sU())
-            {
-                goto lab17;
-            }
-            // ], line 354
-            bra = cursor;
-            // delete, line 354
-            slice_del();
-            // try, line 354
-            v_11 = limit - cursor;
-            // (, line 354
-            // [, line 354
-            ket = cursor;
-            // call mark_lAr, line 354
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_11;
-                goto lab18;
-            }
-            // ], line 354
-            bra = cursor;
-            // delete, line 354
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 354
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_11;
-                goto lab18;
-            }
-        lab18: 
-            goto lab15;
-        lab17: 
-            cursor = limit - v_10;
-            // (, line 356
-            // call stem_suffix_chain_before_ki, line 356
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                return false;
-            }
-        lab15: 
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_stem_noun_suffixes()
+        private int r_stem_noun_suffixes()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
-            int v_9;
-            int v_10;
-            int v_11;
-            int v_12;
-            int v_13;
-            int v_14;
-            int v_15;
-            int v_16;
-            int v_17;
-            int v_18;
-            int v_19;
-            int v_20;
-            int v_21;
-            int v_22;
-            int v_23;
-            int v_24;
-            int v_25;
-            int v_26;
-            int v_27;
             // (, line 361
             // or, line 363
-            v_1 = limit - cursor;
-            // (, line 362
-            // [, line 362
-            ket = cursor;
-            // call mark_lAr, line 362
-            if (!r_mark_lAr())
             {
-                goto lab1;
+                int c1 = limit - cursor;
+                // (, line 362
+                // [, line 362
+                ket = cursor;
+                {
+                    // call mark_lAr, line 362
+                    int ret = r_mark_lAr();
+                    if (ret == 0)
+                        goto lab1;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 362
+                bra = cursor;
+                // delete, line 362
+                slice_del();
+                // try, line 362
+                {
+                    int c2 = limit - cursor;
+                    // (, line 362
+                    {
+                        // call stem_suffix_chain_before_ki, line 362
+                        int ret = r_stem_suffix_chain_before_ki();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c2;
+                                goto lab2;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                lab2: ; 
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c1;
+                // (, line 364
+                // [, line 364
+                ket = cursor;
+                {
+                    // call mark_ncA, line 364
+                    int ret = r_mark_ncA();
+                    if (ret == 0)
+                        goto lab3;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 364
+                bra = cursor;
+                // delete, line 364
+                slice_del();
+                // try, line 365
+                {
+                    int c3 = limit - cursor;
+                    // (, line 365
+                    // or, line 367
+                    {
+                        int c4 = limit - cursor;
+                        // (, line 366
+                        // [, line 366
+                        ket = cursor;
+                        {
+                            // call mark_lArI, line 366
+                            int ret = r_mark_lArI();
+                            if (ret == 0)
+                                goto lab6;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 366
+                        bra = cursor;
+                        // delete, line 366
+                        slice_del();
+                        goto lab5;
+                    lab6: ; 
+                        cursor = limit - c4;
+                        // (, line 368
+                        // [, line 368
+                        ket = cursor;
+                        // or, line 368
+                        {
+                            int c5 = limit - cursor;
+                            {
+                                // call mark_possessives, line 368
+                                int ret = r_mark_possessives();
+                                if (ret == 0)
+                                    goto lab9;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            goto lab8;
+                        lab9: ; 
+                            cursor = limit - c5;
+                            {
+                                // call mark_sU, line 368
+                                int ret = r_mark_sU();
+                                if (ret == 0)
+                                    goto lab7;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        }
+                    lab8: ; 
+                        // ], line 368
+                        bra = cursor;
+                        // delete, line 368
+                        slice_del();
+                        // try, line 368
+                        {
+                            int c6 = limit - cursor;
+                            // (, line 368
+                            // [, line 368
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 368
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c6;
+                                        goto lab10;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            // ], line 368
+                            bra = cursor;
+                            // delete, line 368
+                            slice_del();
+                            {
+                                // call stem_suffix_chain_before_ki, line 368
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c6;
+                                        goto lab10;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab10: ; 
+                        }
+                        goto lab5;
+                    lab7: ; 
+                        cursor = limit - c4;
+                        // (, line 370
+                        // [, line 370
+                        ket = cursor;
+                        {
+                            // call mark_lAr, line 370
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c3;
+                                    goto lab4;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 370
+                        bra = cursor;
+                        // delete, line 370
+                        slice_del();
+                        {
+                            // call stem_suffix_chain_before_ki, line 370
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c3;
+                                    goto lab4;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab5: ; 
+                lab4: ; 
+                }
+                goto lab0;
+            lab3: ; 
+                cursor = limit - c1;
+                // (, line 374
+                // [, line 374
+                ket = cursor;
+                // (, line 374
+                // or, line 374
+                {
+                    int c7 = limit - cursor;
+                    {
+                        // call mark_ndA, line 374
+                        int ret = r_mark_ndA();
+                        if (ret == 0)
+                            goto lab13;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab12;
+                lab13: ; 
+                    cursor = limit - c7;
+                    {
+                        // call mark_nA, line 374
+                        int ret = r_mark_nA();
+                        if (ret == 0)
+                            goto lab11;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab12: ; 
+                // (, line 375
+                // or, line 377
+                {
+                    int c8 = limit - cursor;
+                    // (, line 376
+                    {
+                        // call mark_lArI, line 376
+                        int ret = r_mark_lArI();
+                        if (ret == 0)
+                            goto lab15;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 376
+                    bra = cursor;
+                    // delete, line 376
+                    slice_del();
+                    goto lab14;
+                lab15: ; 
+                    cursor = limit - c8;
+                    // (, line 378
+                    {
+                        // call mark_sU, line 378
+                        int ret = r_mark_sU();
+                        if (ret == 0)
+                            goto lab16;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 378
+                    bra = cursor;
+                    // delete, line 378
+                    slice_del();
+                    // try, line 378
+                    {
+                        int c9 = limit - cursor;
+                        // (, line 378
+                        // [, line 378
+                        ket = cursor;
+                        {
+                            // call mark_lAr, line 378
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c9;
+                                    goto lab17;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 378
+                        bra = cursor;
+                        // delete, line 378
+                        slice_del();
+                        {
+                            // call stem_suffix_chain_before_ki, line 378
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c9;
+                                    goto lab17;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    lab17: ; 
+                    }
+                    goto lab14;
+                lab16: ; 
+                    cursor = limit - c8;
+                    // (, line 380
+                    {
+                        // call stem_suffix_chain_before_ki, line 380
+                        int ret = r_stem_suffix_chain_before_ki();
+                        if (ret == 0)
+                            goto lab11;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab14: ; 
+                goto lab0;
+            lab11: ; 
+                cursor = limit - c1;
+                // (, line 384
+                // [, line 384
+                ket = cursor;
+                // (, line 384
+                // or, line 384
+                {
+                    int c10 = limit - cursor;
+                    {
+                        // call mark_ndAn, line 384
+                        int ret = r_mark_ndAn();
+                        if (ret == 0)
+                            goto lab20;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab19;
+                lab20: ; 
+                    cursor = limit - c10;
+                    {
+                        // call mark_nU, line 384
+                        int ret = r_mark_nU();
+                        if (ret == 0)
+                            goto lab18;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab19: ; 
+                // (, line 384
+                // or, line 384
+                {
+                    int c11 = limit - cursor;
+                    // (, line 384
+                    {
+                        // call mark_sU, line 384
+                        int ret = r_mark_sU();
+                        if (ret == 0)
+                            goto lab22;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 384
+                    bra = cursor;
+                    // delete, line 384
+                    slice_del();
+                    // try, line 384
+                    {
+                        int c12 = limit - cursor;
+                        // (, line 384
+                        // [, line 384
+                        ket = cursor;
+                        {
+                            // call mark_lAr, line 384
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c12;
+                                    goto lab23;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 384
+                        bra = cursor;
+                        // delete, line 384
+                        slice_del();
+                        {
+                            // call stem_suffix_chain_before_ki, line 384
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c12;
+                                    goto lab23;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    lab23: ; 
+                    }
+                    goto lab21;
+                lab22: ; 
+                    cursor = limit - c11;
+                    // (, line 384
+                    {
+                        // call mark_lArI, line 384
+                        int ret = r_mark_lArI();
+                        if (ret == 0)
+                            goto lab18;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab21: ; 
+                goto lab0;
+            lab18: ; 
+                cursor = limit - c1;
+                // (, line 386
+                // [, line 386
+                ket = cursor;
+                {
+                    // call mark_DAn, line 386
+                    int ret = r_mark_DAn();
+                    if (ret == 0)
+                        goto lab24;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 386
+                bra = cursor;
+                // delete, line 386
+                slice_del();
+                // try, line 386
+                {
+                    int c13 = limit - cursor;
+                    // (, line 386
+                    // [, line 386
+                    ket = cursor;
+                    // (, line 387
+                    // or, line 389
+                    {
+                        int c14 = limit - cursor;
+                        // (, line 388
+                        {
+                            // call mark_possessives, line 388
+                            int ret = r_mark_possessives();
+                            if (ret == 0)
+                                goto lab27;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 388
+                        bra = cursor;
+                        // delete, line 388
+                        slice_del();
+                        // try, line 388
+                        {
+                            int c15 = limit - cursor;
+                            // (, line 388
+                            // [, line 388
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 388
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c15;
+                                        goto lab28;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            // ], line 388
+                            bra = cursor;
+                            // delete, line 388
+                            slice_del();
+                            {
+                                // call stem_suffix_chain_before_ki, line 388
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c15;
+                                        goto lab28;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab28: ; 
+                        }
+                        goto lab26;
+                    lab27: ; 
+                        cursor = limit - c14;
+                        // (, line 390
+                        {
+                            // call mark_lAr, line 390
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                goto lab29;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 390
+                        bra = cursor;
+                        // delete, line 390
+                        slice_del();
+                        // try, line 390
+                        {
+                            int c16 = limit - cursor;
+                            // (, line 390
+                            {
+                                // call stem_suffix_chain_before_ki, line 390
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c16;
+                                        goto lab30;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab30: ; 
+                        }
+                        goto lab26;
+                    lab29: ; 
+                        cursor = limit - c14;
+                        // (, line 392
+                        {
+                            // call stem_suffix_chain_before_ki, line 392
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c13;
+                                    goto lab25;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab26: ; 
+                lab25: ; 
+                }
+                goto lab0;
+            lab24: ; 
+                cursor = limit - c1;
+                // (, line 396
+                // [, line 396
+                ket = cursor;
+                // or, line 396
+                {
+                    int c17 = limit - cursor;
+                    {
+                        // call mark_nUn, line 396
+                        int ret = r_mark_nUn();
+                        if (ret == 0)
+                            goto lab33;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab32;
+                lab33: ; 
+                    cursor = limit - c17;
+                    {
+                        // call mark_ylA, line 396
+                        int ret = r_mark_ylA();
+                        if (ret == 0)
+                            goto lab31;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab32: ; 
+                // ], line 396
+                bra = cursor;
+                // delete, line 396
+                slice_del();
+                // try, line 397
+                {
+                    int c18 = limit - cursor;
+                    // (, line 397
+                    // or, line 399
+                    {
+                        int c19 = limit - cursor;
+                        // (, line 398
+                        // [, line 398
+                        ket = cursor;
+                        {
+                            // call mark_lAr, line 398
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                goto lab36;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 398
+                        bra = cursor;
+                        // delete, line 398
+                        slice_del();
+                        {
+                            // call stem_suffix_chain_before_ki, line 398
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                goto lab36;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        goto lab35;
+                    lab36: ; 
+                        cursor = limit - c19;
+                        // (, line 400
+                        // [, line 400
+                        ket = cursor;
+                        // or, line 400
+                        {
+                            int c20 = limit - cursor;
+                            {
+                                // call mark_possessives, line 400
+                                int ret = r_mark_possessives();
+                                if (ret == 0)
+                                    goto lab39;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            goto lab38;
+                        lab39: ; 
+                            cursor = limit - c20;
+                            {
+                                // call mark_sU, line 400
+                                int ret = r_mark_sU();
+                                if (ret == 0)
+                                    goto lab37;
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        }
+                    lab38: ; 
+                        // ], line 400
+                        bra = cursor;
+                        // delete, line 400
+                        slice_del();
+                        // try, line 400
+                        {
+                            int c21 = limit - cursor;
+                            // (, line 400
+                            // [, line 400
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 400
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c21;
+                                        goto lab40;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                            // ], line 400
+                            bra = cursor;
+                            // delete, line 400
+                            slice_del();
+                            {
+                                // call stem_suffix_chain_before_ki, line 400
+                                int ret = r_stem_suffix_chain_before_ki();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c21;
+                                        goto lab40;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab40: ; 
+                        }
+                        goto lab35;
+                    lab37: ; 
+                        cursor = limit - c19;
+                        {
+                            // call stem_suffix_chain_before_ki, line 402
+                            int ret = r_stem_suffix_chain_before_ki();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c18;
+                                    goto lab34;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab35: ; 
+                lab34: ; 
+                }
+                goto lab0;
+            lab31: ; 
+                cursor = limit - c1;
+                // (, line 406
+                // [, line 406
+                ket = cursor;
+                {
+                    // call mark_lArI, line 406
+                    int ret = r_mark_lArI();
+                    if (ret == 0)
+                        goto lab41;
+                    else if (ret < 0)
+                        return ret;
+                }
+                // ], line 406
+                bra = cursor;
+                // delete, line 406
+                slice_del();
+                goto lab0;
+            lab41: ; 
+                cursor = limit - c1;
+                // (, line 408
+                {
+                    // call stem_suffix_chain_before_ki, line 408
+                    int ret = r_stem_suffix_chain_before_ki();
+                    if (ret == 0)
+                        goto lab42;
+                    else if (ret < 0)
+                        return ret;
+                }
+                goto lab0;
+            lab42: ; 
+                cursor = limit - c1;
+                // (, line 410
+                // [, line 410
+                ket = cursor;
+                // or, line 410
+                {
+                    int c22 = limit - cursor;
+                    {
+                        // call mark_DA, line 410
+                        int ret = r_mark_DA();
+                        if (ret == 0)
+                            goto lab45;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab44;
+                lab45: ; 
+                    cursor = limit - c22;
+                    {
+                        // call mark_yU, line 410
+                        int ret = r_mark_yU();
+                        if (ret == 0)
+                            goto lab46;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab44;
+                lab46: ; 
+                    cursor = limit - c22;
+                    {
+                        // call mark_yA, line 410
+                        int ret = r_mark_yA();
+                        if (ret == 0)
+                            goto lab43;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab44: ; 
+                // ], line 410
+                bra = cursor;
+                // delete, line 410
+                slice_del();
+                // try, line 410
+                {
+                    int c23 = limit - cursor;
+                    // (, line 410
+                    // [, line 410
+                    ket = cursor;
+                    // (, line 410
+                    // or, line 410
+                    {
+                        int c24 = limit - cursor;
+                        // (, line 410
+                        {
+                            // call mark_possessives, line 410
+                            int ret = r_mark_possessives();
+                            if (ret == 0)
+                                goto lab49;
+                            else if (ret < 0)
+                                return ret;
+                        }
+                        // ], line 410
+                        bra = cursor;
+                        // delete, line 410
+                        slice_del();
+                        // try, line 410
+                        {
+                            int c25 = limit - cursor;
+                            // (, line 410
+                            // [, line 410
+                            ket = cursor;
+                            {
+                                // call mark_lAr, line 410
+                                int ret = r_mark_lAr();
+                                if (ret == 0)
+                                    {
+                                        cursor = limit - c25;
+                                        goto lab50;
+                                    }
+                                else if (ret < 0)
+                                    return ret;
+                            }
+                        lab50: ; 
+                        }
+                        goto lab48;
+                    lab49: ; 
+                        cursor = limit - c24;
+                        {
+                            // call mark_lAr, line 410
+                            int ret = r_mark_lAr();
+                            if (ret == 0)
+                                {
+                                    cursor = limit - c23;
+                                    goto lab47;
+                                }
+                            else if (ret < 0)
+                                return ret;
+                        }
+                    }
+                lab48: ; 
+                    // ], line 410
+                    bra = cursor;
+                    // delete, line 410
+                    slice_del();
+                    // [, line 410
+                    ket = cursor;
+                    {
+                        // call stem_suffix_chain_before_ki, line 410
+                        int ret = r_stem_suffix_chain_before_ki();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c23;
+                                goto lab47;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                lab47: ; 
+                }
+                goto lab0;
+            lab43: ; 
+                cursor = limit - c1;
+                // (, line 412
+                // [, line 412
+                ket = cursor;
+                // or, line 412
+                {
+                    int c26 = limit - cursor;
+                    {
+                        // call mark_possessives, line 412
+                        int ret = r_mark_possessives();
+                        if (ret == 0)
+                            goto lab52;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    goto lab51;
+                lab52: ; 
+                    cursor = limit - c26;
+                    {
+                        // call mark_sU, line 412
+                        int ret = r_mark_sU();
+                        if (ret == 0)
+                            return 0;
+                        else if (ret < 0)
+                            return ret;
+                    }
+                }
+            lab51: ; 
+                // ], line 412
+                bra = cursor;
+                // delete, line 412
+                slice_del();
+                // try, line 412
+                {
+                    int c27 = limit - cursor;
+                    // (, line 412
+                    // [, line 412
+                    ket = cursor;
+                    {
+                        // call mark_lAr, line 412
+                        int ret = r_mark_lAr();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c27;
+                                goto lab53;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                    // ], line 412
+                    bra = cursor;
+                    // delete, line 412
+                    slice_del();
+                    {
+                        // call stem_suffix_chain_before_ki, line 412
+                        int ret = r_stem_suffix_chain_before_ki();
+                        if (ret == 0)
+                            {
+                                cursor = limit - c27;
+                                goto lab53;
+                            }
+                        else if (ret < 0)
+                            return ret;
+                    }
+                lab53: ; 
+                }
             }
-            // ], line 362
-            bra = cursor;
-            // delete, line 362
-            slice_del();
-            // try, line 362
-            v_2 = limit - cursor;
-            // (, line 362
-            // call stem_suffix_chain_before_ki, line 362
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_2;
-                goto lab2;
-            }
-        lab2: 
-            goto lab0;
-        lab1: 
-            cursor = limit - v_1;
-            // (, line 364
-            // [, line 364
-            ket = cursor;
-            // call mark_ncA, line 364
-            if (!r_mark_ncA())
-            {
-                goto lab3;
-            }
-            // ], line 364
-            bra = cursor;
-            // delete, line 364
-            slice_del();
-            // try, line 365
-            v_3 = limit - cursor;
-            // (, line 365
-            // or, line 367
-            v_4 = limit - cursor;
-            // (, line 366
-            // [, line 366
-            ket = cursor;
-            // call mark_lArI, line 366
-            if (!r_mark_lArI())
-            {
-                goto lab6;
-            }
-            // ], line 366
-            bra = cursor;
-            // delete, line 366
-            slice_del();
-            goto lab5;
-        lab6: 
-            cursor = limit - v_4;
-            // (, line 368
-            // [, line 368
-            ket = cursor;
-            // or, line 368
-            v_5 = limit - cursor;
-            // call mark_possessives, line 368
-            if (!r_mark_possessives())
-            {
-                goto lab9;
-            }
-            goto lab8;
-        lab9: 
-            cursor = limit - v_5;
-            // call mark_sU, line 368
-            if (!r_mark_sU())
-            {
-                goto lab7;
-            }
-        lab8: 
-            // ], line 368
-            bra = cursor;
-            // delete, line 368
-            slice_del();
-            // try, line 368
-            v_6 = limit - cursor;
-            // (, line 368
-            // [, line 368
-            ket = cursor;
-            // call mark_lAr, line 368
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_6;
-                goto lab10;
-            }
-            // ], line 368
-            bra = cursor;
-            // delete, line 368
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 368
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_6;
-                goto lab10;
-            }
-        lab10: 
-            goto lab5;
-        lab7: 
-            cursor = limit - v_4;
-            // (, line 370
-            // [, line 370
-            ket = cursor;
-            // call mark_lAr, line 370
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_3;
-                goto lab4;
-            }
-            // ], line 370
-            bra = cursor;
-            // delete, line 370
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 370
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_3;
-                goto lab4;
-            }
-        lab5: 
-        lab4: 
-            goto lab0;
-        lab3: 
-            cursor = limit - v_1;
-            // (, line 374
-            // [, line 374
-            ket = cursor;
-            // (, line 374
-            // or, line 374
-            v_7 = limit - cursor;
-            // call mark_ndA, line 374
-            if (!r_mark_ndA())
-            {
-                goto lab13;
-            }
-            goto lab12;
-        lab13: 
-            cursor = limit - v_7;
-            // call mark_nA, line 374
-            if (!r_mark_nA())
-            {
-                goto lab11;
-            }
-        lab12: 
-            // (, line 375
-            // or, line 377
-            v_8 = limit - cursor;
-            // (, line 376
-            // call mark_lArI, line 376
-            if (!r_mark_lArI())
-            {
-                goto lab15;
-            }
-            // ], line 376
-            bra = cursor;
-            // delete, line 376
-            slice_del();
-            goto lab14;
-        lab15: 
-            cursor = limit - v_8;
-            // (, line 378
-            // call mark_sU, line 378
-            if (!r_mark_sU())
-            {
-                goto lab16;
-            }
-            // ], line 378
-            bra = cursor;
-            // delete, line 378
-            slice_del();
-            // try, line 378
-            v_9 = limit - cursor;
-            // (, line 378
-            // [, line 378
-            ket = cursor;
-            // call mark_lAr, line 378
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_9;
-                goto lab17;
-            }
-            // ], line 378
-            bra = cursor;
-            // delete, line 378
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 378
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_9;
-                goto lab17;
-            }
-        lab17: 
-            goto lab14;
-        lab16: 
-            cursor = limit - v_8;
-            // (, line 380
-            // call stem_suffix_chain_before_ki, line 380
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                goto lab11;
-            }
-        lab14: 
-            goto lab0;
-        lab11: 
-            cursor = limit - v_1;
-            // (, line 384
-            // [, line 384
-            ket = cursor;
-            // (, line 384
-            // or, line 384
-            v_10 = limit - cursor;
-            // call mark_ndAn, line 384
-            if (!r_mark_ndAn())
-            {
-                goto lab20;
-            }
-            goto lab19;
-        lab20: 
-            cursor = limit - v_10;
-            // call mark_nU, line 384
-            if (!r_mark_nU())
-            {
-                goto lab18;
-            }
-        lab19: 
-            // (, line 384
-            // or, line 384
-            v_11 = limit - cursor;
-            // (, line 384
-            // call mark_sU, line 384
-            if (!r_mark_sU())
-            {
-                goto lab22;
-            }
-            // ], line 384
-            bra = cursor;
-            // delete, line 384
-            slice_del();
-            // try, line 384
-            v_12 = limit - cursor;
-            // (, line 384
-            // [, line 384
-            ket = cursor;
-            // call mark_lAr, line 384
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_12;
-                goto lab23;
-            }
-            // ], line 384
-            bra = cursor;
-            // delete, line 384
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 384
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_12;
-                goto lab23;
-            }
-        lab23: 
-            goto lab21;
-        lab22: 
-            cursor = limit - v_11;
-            // (, line 384
-            // call mark_lArI, line 384
-            if (!r_mark_lArI())
-            {
-                goto lab18;
-            }
-        lab21: 
-            goto lab0;
-        lab18: 
-            cursor = limit - v_1;
-            // (, line 386
-            // [, line 386
-            ket = cursor;
-            // call mark_DAn, line 386
-            if (!r_mark_DAn())
-            {
-                goto lab24;
-            }
-            // ], line 386
-            bra = cursor;
-            // delete, line 386
-            slice_del();
-            // try, line 386
-            v_13 = limit - cursor;
-            // (, line 386
-            // [, line 386
-            ket = cursor;
-            // (, line 387
-            // or, line 389
-            v_14 = limit - cursor;
-            // (, line 388
-            // call mark_possessives, line 388
-            if (!r_mark_possessives())
-            {
-                goto lab27;
-            }
-            // ], line 388
-            bra = cursor;
-            // delete, line 388
-            slice_del();
-            // try, line 388
-            v_15 = limit - cursor;
-            // (, line 388
-            // [, line 388
-            ket = cursor;
-            // call mark_lAr, line 388
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_15;
-                goto lab28;
-            }
-            // ], line 388
-            bra = cursor;
-            // delete, line 388
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 388
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_15;
-                goto lab28;
-            }
-        lab28: 
-            goto lab26;
-        lab27: 
-            cursor = limit - v_14;
-            // (, line 390
-            // call mark_lAr, line 390
-            if (!r_mark_lAr())
-            {
-                goto lab29;
-            }
-            // ], line 390
-            bra = cursor;
-            // delete, line 390
-            slice_del();
-            // try, line 390
-            v_16 = limit - cursor;
-            // (, line 390
-            // call stem_suffix_chain_before_ki, line 390
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_16;
-                goto lab30;
-            }
-        lab30: 
-            goto lab26;
-        lab29: 
-            cursor = limit - v_14;
-            // (, line 392
-            // call stem_suffix_chain_before_ki, line 392
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_13;
-                goto lab25;
-            }
-        lab26: 
-        lab25: 
-            goto lab0;
-        lab24: 
-            cursor = limit - v_1;
-            // (, line 396
-            // [, line 396
-            ket = cursor;
-            // or, line 396
-            v_17 = limit - cursor;
-            // call mark_nUn, line 396
-            if (!r_mark_nUn())
-            {
-                goto lab33;
-            }
-            goto lab32;
-        lab33: 
-            cursor = limit - v_17;
-            // call mark_ylA, line 396
-            if (!r_mark_ylA())
-            {
-                goto lab31;
-            }
-        lab32: 
-            // ], line 396
-            bra = cursor;
-            // delete, line 396
-            slice_del();
-            // try, line 397
-            v_18 = limit - cursor;
-            // (, line 397
-            // or, line 399
-            v_19 = limit - cursor;
-            // (, line 398
-            // [, line 398
-            ket = cursor;
-            // call mark_lAr, line 398
-            if (!r_mark_lAr())
-            {
-                goto lab36;
-            }
-            // ], line 398
-            bra = cursor;
-            // delete, line 398
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 398
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                goto lab36;
-            }
-            goto lab35;
-        lab36: 
-            cursor = limit - v_19;
-            // (, line 400
-            // [, line 400
-            ket = cursor;
-            // or, line 400
-            v_20 = limit - cursor;
-            // call mark_possessives, line 400
-            if (!r_mark_possessives())
-            {
-                goto lab39;
-            }
-            goto lab38;
-        lab39: 
-            cursor = limit - v_20;
-            // call mark_sU, line 400
-            if (!r_mark_sU())
-            {
-                goto lab37;
-            }
-        lab38: 
-            // ], line 400
-            bra = cursor;
-            // delete, line 400
-            slice_del();
-            // try, line 400
-            v_21 = limit - cursor;
-            // (, line 400
-            // [, line 400
-            ket = cursor;
-            // call mark_lAr, line 400
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_21;
-                goto lab40;
-            }
-            // ], line 400
-            bra = cursor;
-            // delete, line 400
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 400
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_21;
-                goto lab40;
-            }
-        lab40: 
-            goto lab35;
-        lab37: 
-            cursor = limit - v_19;
-            // call stem_suffix_chain_before_ki, line 402
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_18;
-                goto lab34;
-            }
-        lab35: 
-        lab34: 
-            goto lab0;
-        lab31: 
-            cursor = limit - v_1;
-            // (, line 406
-            // [, line 406
-            ket = cursor;
-            // call mark_lArI, line 406
-            if (!r_mark_lArI())
-            {
-                goto lab41;
-            }
-            // ], line 406
-            bra = cursor;
-            // delete, line 406
-            slice_del();
-            goto lab0;
-        lab41: 
-            cursor = limit - v_1;
-            // (, line 408
-            // call stem_suffix_chain_before_ki, line 408
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                goto lab42;
-            }
-            goto lab0;
-        lab42: 
-            cursor = limit - v_1;
-            // (, line 410
-            // [, line 410
-            ket = cursor;
-            // or, line 410
-            v_22 = limit - cursor;
-            // call mark_DA, line 410
-            if (!r_mark_DA())
-            {
-                goto lab45;
-            }
-            goto lab44;
-        lab45: 
-            cursor = limit - v_22;
-            // call mark_yU, line 410
-            if (!r_mark_yU())
-            {
-                goto lab46;
-            }
-            goto lab44;
-        lab46: 
-            cursor = limit - v_22;
-            // call mark_yA, line 410
-            if (!r_mark_yA())
-            {
-                goto lab43;
-            }
-        lab44: 
-            // ], line 410
-            bra = cursor;
-            // delete, line 410
-            slice_del();
-            // try, line 410
-            v_23 = limit - cursor;
-            // (, line 410
-            // [, line 410
-            ket = cursor;
-            // (, line 410
-            // or, line 410
-            v_24 = limit - cursor;
-            // (, line 410
-            // call mark_possessives, line 410
-            if (!r_mark_possessives())
-            {
-                goto lab49;
-            }
-            // ], line 410
-            bra = cursor;
-            // delete, line 410
-            slice_del();
-            // try, line 410
-            v_25 = limit - cursor;
-            // (, line 410
-            // [, line 410
-            ket = cursor;
-            // call mark_lAr, line 410
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_25;
-                goto lab50;
-            }
-        lab50: 
-            goto lab48;
-        lab49: 
-            cursor = limit - v_24;
-            // call mark_lAr, line 410
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_23;
-                goto lab47;
-            }
-        lab48: 
-            // ], line 410
-            bra = cursor;
-            // delete, line 410
-            slice_del();
-            // [, line 410
-            ket = cursor;
-            // call stem_suffix_chain_before_ki, line 410
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_23;
-                goto lab47;
-            }
-        lab47: 
-            goto lab0;
-        lab43: 
-            cursor = limit - v_1;
-            // (, line 412
-            // [, line 412
-            ket = cursor;
-            // or, line 412
-            v_26 = limit - cursor;
-            // call mark_possessives, line 412
-            if (!r_mark_possessives())
-            {
-                goto lab52;
-            }
-            goto lab51;
-        lab52: 
-            cursor = limit - v_26;
-            // call mark_sU, line 412
-            if (!r_mark_sU())
-            {
-                return false;
-            }
-        lab51: 
-            // ], line 412
-            bra = cursor;
-            // delete, line 412
-            slice_del();
-            // try, line 412
-            v_27 = limit - cursor;
-            // (, line 412
-            // [, line 412
-            ket = cursor;
-            // call mark_lAr, line 412
-            if (!r_mark_lAr())
-            {
-                cursor = limit - v_27;
-                goto lab53;
-            }
-            // ], line 412
-            bra = cursor;
-            // delete, line 412
-            slice_del();
-            // call stem_suffix_chain_before_ki, line 412
-            if (!r_stem_suffix_chain_before_ki())
-            {
-                cursor = limit - v_27;
-                goto lab53;
-            }
-        lab53: 
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_post_process_last_consonants()
+        private int r_post_process_last_consonants()
         {
             int among_var;
             // (, line 415
@@ -2624,496 +3012,464 @@ namespace Snowball
             among_var = find_among_b(a_23);
             if (among_var == 0)
             {
-                return false;
+                return 0;
             }
             // ], line 416
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
-                    break;
+                    {
+                        return 0;
+                    }
                 case 1:
                     // (, line 417
                     // <-, line 417
-                    slice_from(UTF16("p"));
+                    slice_from("p");
                     break;
                 case 2:
                     // (, line 418
                     // <-, line 418
-                    slice_from(UTF16("\u00C3\u00A7"));
+                    slice_from("\u00E7");
                     break;
                 case 3:
                     // (, line 419
                     // <-, line 419
-                    slice_from(UTF16("t"));
+                    slice_from("t");
                     break;
                 case 4:
                     // (, line 420
                     // <-, line 420
-                    slice_from(UTF16("k"));
+                    slice_from("k");
                     break;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_append_U_to_stems_ending_with_d_or_g()
+        private int r_append_U_to_stems_ending_with_d_or_g()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
-            int v_9;
-            int v_10;
-            int v_11;
-            int v_12;
-            int v_13;
-            int v_14;
-            int v_15;
             // (, line 430
             // test, line 431
-            v_1 = limit - cursor;
-            // (, line 431
-            // or, line 431
-            v_2 = limit - cursor;
-            // literal, line 431
-            if (!(eq_s_b(UTF16("d"))))
             {
-                goto lab1;
+                int c1 = limit - cursor;
+                // (, line 431
+                // or, line 431
+                {
+                    int c2 = limit - cursor;
+                    // literal, line 431
+                    if (!(eq_s_b("d")))
+                    {
+                        goto lab1;
+                    }
+                    goto lab0;
+                lab1: ; 
+                    cursor = limit - c2;
+                    // literal, line 431
+                    if (!(eq_s_b("g")))
+                    {
+                        return 0;
+                    }
+                }
+            lab0: ; 
+                cursor = limit - c1;
             }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 431
-            if (!(eq_s_b(UTF16("g"))))
-            {
-                return false;
-            }
-        lab0: 
-            cursor = limit - v_1;
             // or, line 433
-            v_3 = limit - cursor;
-            // (, line 432
-            // test, line 432
-            v_4 = limit - cursor;
-            // (, line 432
-            // (, line 432
-            while (true) 
             {
-                // goto, line 432
-                v_5 = limit - cursor;
-                if (!(in_grouping_b(g_vowel, 97, 305)))
+                int c3 = limit - cursor;
+                // (, line 432
+                // test, line 432
                 {
-                    goto lab4;
+                    int c4 = limit - cursor;
+                    // (, line 432
+                    // (, line 432
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                        goto lab3;
+                    }
+ /* goto */                    // or, line 432
+                    {
+                        int c6 = limit - cursor;
+                        // literal, line 432
+                        if (!(eq_s_b("a")))
+                        {
+                            goto lab5;
+                        }
+                        goto lab4;
+                    lab5: ; 
+                        cursor = limit - c6;
+                        // literal, line 432
+                        if (!(eq_s_b("\u0131")))
+                        {
+                            goto lab3;
+                        }
+                    }
+                lab4: ; 
+                    cursor = limit - c4;
                 }
-                cursor = limit - v_5;
-                break;
-            lab4: 
-                cursor = limit - v_5;
-                if (cursor <= limit_backward)
+                // <+, line 432
                 {
-                    goto lab3;
+                    int c = cursor;
+                    insert(cursor, cursor, "\u0131");
+                    cursor = c;
                 }
-                cursor--;
+                goto lab2;
+            lab3: ; 
+                cursor = limit - c3;
+                // (, line 434
+                // test, line 434
+                {
+                    int c7 = limit - cursor;
+                    // (, line 434
+                    // (, line 434
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                        goto lab6;
+                    }
+ /* goto */                    // or, line 434
+                    {
+                        int c9 = limit - cursor;
+                        // literal, line 434
+                        if (!(eq_s_b("e")))
+                        {
+                            goto lab8;
+                        }
+                        goto lab7;
+                    lab8: ; 
+                        cursor = limit - c9;
+                        // literal, line 434
+                        if (!(eq_s_b("i")))
+                        {
+                            goto lab6;
+                        }
+                    }
+                lab7: ; 
+                    cursor = limit - c7;
+                }
+                // <+, line 434
+                {
+                    int c = cursor;
+                    insert(cursor, cursor, "i");
+                    cursor = c;
+                }
+                goto lab2;
+            lab6: ; 
+                cursor = limit - c3;
+                // (, line 436
+                // test, line 436
+                {
+                    int c10 = limit - cursor;
+                    // (, line 436
+                    // (, line 436
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                        goto lab9;
+                    }
+ /* goto */                    // or, line 436
+                    {
+                        int c12 = limit - cursor;
+                        // literal, line 436
+                        if (!(eq_s_b("o")))
+                        {
+                            goto lab11;
+                        }
+                        goto lab10;
+                    lab11: ; 
+                        cursor = limit - c12;
+                        // literal, line 436
+                        if (!(eq_s_b("u")))
+                        {
+                            goto lab9;
+                        }
+                    }
+                lab10: ; 
+                    cursor = limit - c10;
+                }
+                // <+, line 436
+                {
+                    int c = cursor;
+                    insert(cursor, cursor, "u");
+                    cursor = c;
+                }
+                goto lab2;
+            lab9: ; 
+                cursor = limit - c3;
+                // (, line 438
+                // test, line 438
+                {
+                    int c13 = limit - cursor;
+                    // (, line 438
+                    // (, line 438
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                        return 0;
+                    }
+ /* goto */                    // or, line 438
+                    {
+                        int c15 = limit - cursor;
+                        // literal, line 438
+                        if (!(eq_s_b("\u00F6")))
+                        {
+                            goto lab13;
+                        }
+                        goto lab12;
+                    lab13: ; 
+                        cursor = limit - c15;
+                        // literal, line 438
+                        if (!(eq_s_b("\u00FC")))
+                        {
+                            return 0;
+                        }
+                    }
+                lab12: ; 
+                    cursor = limit - c13;
+                }
+                // <+, line 438
+                {
+                    int c = cursor;
+                    insert(cursor, cursor, "\u00FC");
+                    cursor = c;
+                }
             }
-            // or, line 432
-            v_6 = limit - cursor;
-            // literal, line 432
-            if (!(eq_s_b(UTF16("a"))))
-            {
-                goto lab6;
-            }
-            goto lab5;
-        lab6: 
-            cursor = limit - v_6;
-            // literal, line 432
-            if (!(eq_s_b(UTF16("\u00C4\u00B1"))))
-            {
-                goto lab3;
-            }
-        lab5: 
-            cursor = limit - v_4;
-            // <+, line 432
+        lab2: ; 
 
-            {
-                int c = cursor;
-                insert(cursor, cursor, UTF16("\u00C4\u00B1"));
-                cursor = c;
-            }
-            goto lab2;
-        lab3: 
-            cursor = limit - v_3;
-            // (, line 434
-            // test, line 434
-            v_7 = limit - cursor;
-            // (, line 434
-            // (, line 434
-            while (true) 
-            {
-                // goto, line 434
-                v_8 = limit - cursor;
-                if (!(in_grouping_b(g_vowel, 97, 305)))
-                {
-                    goto lab8;
-                }
-                cursor = limit - v_8;
-                break;
-            lab8: 
-                cursor = limit - v_8;
-                if (cursor <= limit_backward)
-                {
-                    goto lab7;
-                }
-                cursor--;
-            }
-            // or, line 434
-            v_9 = limit - cursor;
-            // literal, line 434
-            if (!(eq_s_b(UTF16("e"))))
-            {
-                goto lab10;
-            }
-            goto lab9;
-        lab10: 
-            cursor = limit - v_9;
-            // literal, line 434
-            if (!(eq_s_b(UTF16("i"))))
-            {
-                goto lab7;
-            }
-        lab9: 
-            cursor = limit - v_7;
-            // <+, line 434
-
-            {
-                int c = cursor;
-                insert(cursor, cursor, UTF16("i"));
-                cursor = c;
-            }
-            goto lab2;
-        lab7: 
-            cursor = limit - v_3;
-            // (, line 436
-            // test, line 436
-            v_10 = limit - cursor;
-            // (, line 436
-            // (, line 436
-            while (true) 
-            {
-                // goto, line 436
-                v_11 = limit - cursor;
-                if (!(in_grouping_b(g_vowel, 97, 305)))
-                {
-                    goto lab12;
-                }
-                cursor = limit - v_11;
-                break;
-            lab12: 
-                cursor = limit - v_11;
-                if (cursor <= limit_backward)
-                {
-                    goto lab11;
-                }
-                cursor--;
-            }
-            // or, line 436
-            v_12 = limit - cursor;
-            // literal, line 436
-            if (!(eq_s_b(UTF16("o"))))
-            {
-                goto lab14;
-            }
-            goto lab13;
-        lab14: 
-            cursor = limit - v_12;
-            // literal, line 436
-            if (!(eq_s_b(UTF16("u"))))
-            {
-                goto lab11;
-            }
-        lab13: 
-            cursor = limit - v_10;
-            // <+, line 436
-
-            {
-                int c = cursor;
-                insert(cursor, cursor, UTF16("u"));
-                cursor = c;
-            }
-            goto lab2;
-        lab11: 
-            cursor = limit - v_3;
-            // (, line 438
-            // test, line 438
-            v_13 = limit - cursor;
-            // (, line 438
-            // (, line 438
-            while (true) 
-            {
-                // goto, line 438
-                v_14 = limit - cursor;
-                if (!(in_grouping_b(g_vowel, 97, 305)))
-                {
-                    goto lab15;
-                }
-                cursor = limit - v_14;
-                break;
-            lab15: 
-                cursor = limit - v_14;
-                if (cursor <= limit_backward)
-                {
-                    return false;
-                }
-                cursor--;
-            }
-            // or, line 438
-            v_15 = limit - cursor;
-            // literal, line 438
-            if (!(eq_s_b(UTF16("\u00C3\u00B6"))))
-            {
-                goto lab17;
-            }
-            goto lab16;
-        lab17: 
-            cursor = limit - v_15;
-            // literal, line 438
-            if (!(eq_s_b(UTF16("\u00C3\u00BC"))))
-            {
-                return false;
-            }
-        lab16: 
-            cursor = limit - v_13;
-            // <+, line 438
-
-            {
-                int c = cursor;
-                insert(cursor, cursor, UTF16("\u00C3\u00BC"));
-                cursor = c;
-            }
-        lab2: 
-
-            return true;
+            return 1;
         }
 
-        private bool r_more_than_one_syllable_word()
+        private int r_more_than_one_syllable_word()
         {
-            int v_1;
-            int v_3;
             // (, line 445
             // test, line 446
-            v_1 = cursor;
-            // (, line 446
-            // atleast, line 446
-
             {
-                int v_2 = 2;
+                int c1 = cursor;
+                // (, line 446
                 // atleast, line 446
-                while (true)
                 {
-                    v_3 = cursor;
-                    // (, line 446
-                    while (true) 
+                    int c2 = 2;
+                    // atleast, line 446
+                    while (true)
                     {
-                        // gopast, line 446
-                        if (!(in_grouping(g_vowel, 97, 305)))
+                        int c3 = cursor;
+                        // (, line 446
+                        {
+                            /* gopast */ 
+                            int ret = out_grouping(g_vowel, 97, 305, true);
+                            if (ret < 0)
+                            {
+                                goto lab0;
+                            }
+
+                            cursor += ret;
+                        }
+                        c2--;
+                        continue;
+                    lab0: ; 
+                        cursor = c3;
+                        break;
+                    }
+                    if (c2 > 0)
+                    {
+                        return 0;
+                    }
+                }
+                cursor = c1;
+            }
+
+            return 1;
+        }
+
+        private int r_is_reserved_word()
+        {
+            // (, line 449
+            // or, line 451
+            {
+                int c1 = cursor;
+                // test, line 450
+                {
+                    int c2 = cursor;
+                    // (, line 450
+                    while (true)
+                    {
+                        // gopast, line 450
+                        // literal, line 450
+                        if (!(eq_s("ad")))
+                        {
+                            goto lab2;
+                        }
+                        break;
+                    lab2: ; 
+                        // gopast, line 450
+                        if (cursor >= limit)
                         {
                             goto lab1;
                         }
+                        cursor++;
+                    }
+                    // (, line 450
+                    I_strlen = 2;
+                    // (, line 450
+                    if (!(I_strlen == limit))
+                    {
+                        goto lab1;
+                    }
+                    cursor = c2;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = c1;
+                // test, line 452
+                {
+                    int c4 = cursor;
+                    // (, line 452
+                    while (true)
+                    {
+                        // gopast, line 452
+                        // literal, line 452
+                        if (!(eq_s("soyad")))
+                        {
+                            goto lab3;
+                        }
                         break;
-                    lab1: 
+                    lab3: ; 
+                        // gopast, line 452
                         if (cursor >= limit)
                         {
-                            goto lab0;
+                            return 0;
                         }
                         cursor++;
                     }
-                    v_2--;
-                    continue;
-                lab0: 
-                    cursor = v_3;
-                    break;
-                }
-                if (v_2 > 0)
-                {
-                    return false;
+                    // (, line 452
+                    I_strlen = 5;
+                    // (, line 452
+                    if (!(I_strlen == limit))
+                    {
+                        return 0;
+                    }
+                    cursor = c4;
                 }
             }
-            cursor = v_1;
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_is_reserved_word()
+        private int r_postlude()
         {
-            int v_1;
-            int v_2;
-            int v_4;
-            // (, line 449
-            // or, line 451
-            v_1 = cursor;
-            // test, line 450
-            v_2 = cursor;
-            // (, line 450
-            while (true) 
-            {
-                // gopast, line 450
-                // literal, line 450
-                if (!(eq_s(UTF16("ad"))))
-                {
-                    goto lab2;
-                }
-                break;
-            lab2: 
-                if (cursor >= limit)
-                {
-                    goto lab1;
-                }
-                cursor++;
-            }
-            // (, line 450
-            I_strlen = 2;
-            // (, line 450
-            if (!(I_strlen == limit))
-            {
-                goto lab1;
-            }
-            cursor = v_2;
-            goto lab0;
-        lab1: 
-            cursor = v_1;
-            // test, line 452
-            v_4 = cursor;
-            // (, line 452
-            while (true) 
-            {
-                // gopast, line 452
-                // literal, line 452
-                if (!(eq_s(UTF16("soyad"))))
-                {
-                    goto lab3;
-                }
-                break;
-            lab3: 
-                if (cursor >= limit)
-                {
-                    return false;
-                }
-                cursor++;
-            }
-            // (, line 452
-            I_strlen = 5;
-            // (, line 452
-            if (!(I_strlen == limit))
-            {
-                return false;
-            }
-            cursor = v_4;
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_postlude()
-        {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 455
             // not, line 456
-
             {
-                v_1 = cursor;
+                int c1 = cursor;
                 // (, line 456
-                // call is_reserved_word, line 456
-                if (!r_is_reserved_word())
                 {
-                    goto lab0;
+                    // call is_reserved_word, line 456
+                    int ret = r_is_reserved_word();
+                    if (ret == 0)
+                        goto lab0;
+                    else if (ret < 0)
+                        return ret;
                 }
-                return false;
-            lab0: 
-                cursor = v_1;
+                return 0;
+            lab0: ; 
+                cursor = c1;
             }
             // backwards, line 457
             limit_backward = cursor; cursor = limit;
             // (, line 457
             // do, line 458
-            v_2 = limit - cursor;
-            // call append_U_to_stems_ending_with_d_or_g, line 458
-            if (!r_append_U_to_stems_ending_with_d_or_g())
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                {
+                    // call append_U_to_stems_ending_with_d_or_g, line 458
+                    int ret = r_append_U_to_stems_ending_with_d_or_g();
+                    if (ret == 0)
+                        goto lab1;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab1: ; 
+                cursor = limit - c2;
             }
-        lab1: 
-            cursor = limit - v_2;
             // do, line 459
-            v_3 = limit - cursor;
-            // call post_process_last_consonants, line 459
-            if (!r_post_process_last_consonants())
             {
-                goto lab2;
+                int c3 = limit - cursor;
+                {
+                    // call post_process_last_consonants, line 459
+                    int ret = r_post_process_last_consonants();
+                    if (ret == 0)
+                        goto lab2;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab2: ; 
+                cursor = limit - c3;
             }
-        lab2: 
-            cursor = limit - v_3;
             cursor = limit_backward;
 
-            return true;
+            return 1;
         }
 
-        private bool stem()
+        private int stem()
         {
-            int v_1;
-            int v_2;
             // (, line 464
             // (, line 465
-            // call more_than_one_syllable_word, line 465
-            if (!r_more_than_one_syllable_word())
             {
-                return false;
+                // call more_than_one_syllable_word, line 465
+                int ret = r_more_than_one_syllable_word();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
             // (, line 466
             // backwards, line 467
             limit_backward = cursor; cursor = limit;
             // (, line 467
             // do, line 468
-            v_1 = limit - cursor;
-            // call stem_nominal_verb_suffixes, line 468
-            if (!r_stem_nominal_verb_suffixes())
             {
-                goto lab0;
+                int c1 = limit - cursor;
+                {
+                    // call stem_nominal_verb_suffixes, line 468
+                    int ret = r_stem_nominal_verb_suffixes();
+                    if (ret == 0)
+                        goto lab0;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab0: ; 
+                cursor = limit - c1;
             }
-        lab0: 
-            cursor = limit - v_1;
             // Boolean test continue_stemming_noun_suffixes, line 469
-            if (!(B_continue_stemming_noun_suffixes))
+            if (!(B_continue_stemming_noun_suffixes)
+)
             {
-                return false;
+                return 0;
             }
             // do, line 470
-            v_2 = limit - cursor;
-            // call stem_noun_suffixes, line 470
-            if (!r_stem_noun_suffixes())
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                {
+                    // call stem_noun_suffixes, line 470
+                    int ret = r_stem_noun_suffixes();
+                    if (ret == 0)
+                        goto lab1;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab1: ; 
+                cursor = limit - c2;
             }
-        lab1: 
-            cursor = limit - v_2;
             cursor = limit_backward;
-            // call postlude, line 473
-            if (!r_postlude())
             {
-                return false;
+                // call postlude, line 473
+                int ret = r_postlude();
+                if (ret == 0)
+                    return 0;
+                else if (ret < 0)
+                    return ret;
             }
 
-            return true;
+            return 1;
         }
 
         protected override bool Process()
         {
-            return this.stem();
+            return this.stem() > 0;
         }
 
     }

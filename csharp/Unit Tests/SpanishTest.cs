@@ -15,6 +15,7 @@ namespace Unit_Tests
         {
             var stemmer = new SpanishStemmer();
 
+            Assert.AreEqual("acerqu", stemmer.Stem("acerquen"));
             Assert.AreEqual("Vision", stemmer.Stem("Visionado"));
             Assert.AreEqual("algu", stemmer.Stem("algue"));
         }

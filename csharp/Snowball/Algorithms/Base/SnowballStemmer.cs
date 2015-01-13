@@ -83,135 +83,155 @@ namespace Snowball
 
 
 
-        protected bool in_grouping(int[] s, int min, int max)
+        protected int in_grouping(string s, int min, int max, bool repeat)
         {
-            if (cursor >= limit)
-                return false;
-
-            byte ch = (byte)current[cursor];
-            if (ch > max || ch < min)
-                return false;
-
-            ch = (byte)(ch - min);
-            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
-                return false;
-
-            cursor++;
-            return true;
-        }
-
-        protected bool in_grouping_b(int[] s, int min, int max)
-        {
-            if (cursor <= limit_backward)
-                return false;
-
-            byte ch = (byte)current[cursor - 1];
-            if (ch > max || ch < min)
-                return false;
-
-            ch = (byte)(ch - min);
-            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
-                return false;
-
-            cursor--;
-            return true;
-        }
-
-        protected bool out_grouping(int[] s, int min, int max)
-        {
-            if (cursor >= limit)
-                return false;
-
-            byte ch = (byte)current[cursor];
-            if (ch > max || ch < min)
+            do
             {
+                if (cursor >= limit)
+                    return -1;
+
+                char ch = current[cursor];
+                if (ch > max || ch < min)
+                    return 1;
+
+                if (!s.Contains(ch))
+                    return 1;
+
                 cursor++;
-                return true;
             }
+            while (repeat);
 
-            ch = (byte)(ch - min);
-            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
-            {
-                cursor++;
-                return true;
-            }
-            return false;
+            return 0;
         }
 
-        protected bool out_grouping_b(int[] s, int min, int max)
+        protected int in_grouping_b(string s, int min, int max, bool repeat)
         {
-            if (cursor <= limit_backward)
-                return false;
-
-            byte ch = (byte)current[cursor - 1];
-            if (ch > max || ch < min)
+            do
             {
+                if (cursor <= limit_backward)
+                    return -1;
+
+                char ch = current[cursor - 1];
+                if (ch > max || ch < min)
+                    return 1;
+
+                if (!s.Contains(ch))
+                    return 1;
+
                 cursor--;
-                return true;
-            }
+            } while (repeat);
 
-            ch = (byte)(ch - min);
-            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+            return 0;
+        }
+
+        protected int out_grouping(string s, int min, int max, bool repeat)
+        {
+            do
             {
-                cursor--;
-                return true;
+                if (cursor >= limit)
+                    return -1;
+
+                char ch = current[cursor];
+                if (ch > max || ch < min)
+                {
+                    cursor++;
+                    continue;
+                }
+
+                if (!s.Contains(ch))
+                {
+                    cursor++;
+                    continue;
+                }
+
+                return 1;
+
+            } while (repeat);
+
+            return 0;
+        }
+
+        protected int out_grouping_b(string s, int min, int max, bool repeat)
+        {
+            do
+            {
+                if (cursor <= limit_backward)
+                    return -1;
+
+                char ch = current[cursor - 1];
+                if (ch > max || ch < min)
+                {
+                    cursor--;
+                    continue;
+                }
+
+                if (!s.Contains(ch))
+                {
+                    cursor--;
+                    continue;
+                }
+
+                return 1;
             }
-            return false;
+            while (repeat);
+
+            return 0;
         }
 
-        protected bool in_range(int min, int max)
-        {
-            if (cursor >= limit) 
-                return false;
+        /*
+                protected bool in_range(int min, int max)
+                {
+                    if (cursor >= limit)
+                        return false;
 
-            byte ch = (byte)current[cursor];
+                    byte ch = (byte)current[cursor];
 
-            if (ch > max || ch < min) 
-                return false;
+                    if (ch > max || ch < min)
+                        return false;
 
-            cursor++;
-            return true;
-        }
+                    cursor++;
+                    return true;
+                }
 
-        protected bool in_range_b(int min, int max)
-        {
-            if (cursor <= limit_backward)
-                return false;
+                protected bool in_range_b(int min, int max)
+                {
+                    if (cursor <= limit_backward)
+                        return false;
 
-            byte ch = (byte)current[cursor - 1];
-            if (ch > max || ch < min)
-                return false;
+                    byte ch = (byte)current[cursor - 1];
+                    if (ch > max || ch < min)
+                        return false;
 
-            cursor--;
-            return true;
-        }
+                    cursor--;
+                    return true;
+                }
 
-        protected bool out_range(int min, int max)
-        {
-            if (cursor >= limit)
-                return false;
+                protected bool out_range(int min, int max)
+                {
+                    if (cursor >= limit)
+                        return false;
 
-            byte ch = (byte)current[cursor];
-            if (!(ch > max || ch < min))
-                return false;
+                    byte ch = (byte)current[cursor];
+                    if (!(ch > max || ch < min))
+                        return false;
 
-            cursor++;
-            return true;
-        }
+                    cursor++;
+                    return true;
+                }
 
-        protected bool out_range_b(int min, int max)
-        {
-            if (cursor <= limit_backward)
-                return false;
+                protected bool out_range_b(int min, int max)
+                {
+                    if (cursor <= limit_backward)
+                        return false;
 
-            byte ch = (byte)current[cursor - 1];
-            if (!(ch > max || ch < min))
-                return false;
+                    byte ch = (byte)current[cursor - 1];
+                    if (!(ch > max || ch < min))
+                        return false;
 
-            cursor--;
-            return true;
-        }
-
+                    cursor--;
+                    return true;
+                }
+        */
 
         protected bool eq_s(String s)
         {
@@ -261,6 +281,9 @@ namespace Snowball
 
         protected int find_among(Among[] v)
         {
+            // Array.Sort(v);
+            // string lookup = current.ToString(cursor, limit - cursor);
+
             int i = 0;
             int j = v.Length;
 
@@ -277,20 +300,25 @@ namespace Snowball
                 int k = i + ((j - i) >> 1);
                 int diff = 0;
                 int common = common_i < common_j ? common_i : common_j; // smaller
+
                 Among w = v[k];
-                int i2;
-                for (i2 = common; i2 < w.s.Length; i2++)
+
+                for (int i2 = common; i2 < w.s.Length; i2++)
                 {
                     if (c + common == l)
                     {
                         diff = -1;
                         break;
                     }
+
                     diff = current[c + common] - w.s[i2];
+
                     if (diff != 0)
                         break;
+
                     common++;
                 }
+
                 if (diff < 0)
                 {
                     j = k;
@@ -301,22 +329,29 @@ namespace Snowball
                     i = k;
                     common_i = common;
                 }
+
                 if (j - i <= 1)
                 {
-                    if (i > 0) break; // v->s has been inspected
-                    if (j == i) break; // only one item in v
+                    if (i > 0)
+                        break; // v->s has been inspected
+
+                    if (j == i)
+                        break; // only one item in v
 
                     // - but now we need to go round once more to get
                     // v->s inspected. This looks messy, but is actually
                     // the optimal approach.
 
-                    if (first_key_inspected) break;
+                    if (first_key_inspected)
+                        break;
                     first_key_inspected = true;
                 }
             }
+
             while (true)
             {
                 Among w = v[i];
+
                 if (common_i >= w.s.Length)
                 {
                     cursor = c + w.s.Length;
@@ -324,23 +359,26 @@ namespace Snowball
                     if (w.action == null)
                         return w.result;
 
-                    bool res = false;
-
-                    res = w.action();
-
+                    int res = w.action();
                     cursor = c + w.s.Length;
 
-                    if (res)
+                    if (res != 0)
                         return w.result;
                 }
+
                 i = w.substring_i;
-                if (i < 0) return 0;
+
+                if (i < 0)
+                    return 0;
             }
         }
 
         // find_among_b is for backwards processing. Same comments apply
         protected int find_among_b(Among[] v)
         {
+            // Array.Sort(v);
+            // string lookup = current.ToString(limit_backward, cursor);
+
             int i = 0;
             int j = v.Length;
 
@@ -358,18 +396,23 @@ namespace Snowball
                 int diff = 0;
                 int common = common_i < common_j ? common_i : common_j;
                 Among w = v[k];
-                int i2;
-                for (i2 = w.s.Length - 1 - common; i2 >= 0; i2--)
+
+                for (int i2 = w.s.Length - 1 - common; i2 >= 0; i2--)
                 {
                     if (c - common == lb)
                     {
                         diff = -1;
                         break;
                     }
+
                     diff = current[c - 1 - common] - w.s[i2];
-                    if (diff != 0) break;
+
+                    if (diff != 0)
+                        break;
+
                     common++;
                 }
+
                 if (diff < 0)
                 {
                     j = k;
@@ -380,31 +423,36 @@ namespace Snowball
                     i = k;
                     common_i = common;
                 }
+
                 if (j - i <= 1)
                 {
                     if (i > 0)
                         break;
+
                     if (j == i)
                         break;
+
                     if (first_key_inspected)
                         break;
+
                     first_key_inspected = true;
                 }
             }
+
             while (true)
             {
                 Among w = v[i];
+
                 if (common_i >= w.s.Length)
                 {
                     cursor = c - w.s.Length;
                     if (w.action == null)
                         return w.result;
 
-                    bool res = w.action();
-
+                    int res = w.action();
                     cursor = c - w.s.Length;
 
-                    if (res)
+                    if (res != 0)
                         return w.result;
                 }
 
@@ -485,22 +533,5 @@ namespace Snowball
             return sb;
         }
 
-
-        public static string UTF16(string utf8String)
-        {
-            // Get UTF8 bytes by reading each byte with ANSI encoding
-            char[] chars = utf8String.ToCharArray();
-            byte[] utf8Bytes = new byte[chars.Length];
-            for (int i = 0; i < chars.Length; i++)
-                utf8Bytes[i] = (byte)chars[i];
-
-            // Convert UTF8 bytes to UTF16 bytes
-            byte[] utf16Bytes = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, utf8Bytes);
-
-            // Return UTF16 bytes as UTF16 string
-            string result = Encoding.Unicode.GetString(utf16Bytes);
-
-            return result;
-        }
     }
 }

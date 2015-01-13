@@ -13,7 +13,7 @@ namespace Snowball
     ///  It implements the stemming algorithm defined by a snowball script.
     ///</summary>
     /// 
-    [System.CodeDom.Compiler.GeneratedCode("Snowball", "0.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("Snowball", "1.0.0")]
     public partial class LovinsStemmer : SnowballStemmer
     {
 
@@ -26,1577 +26,1530 @@ namespace Snowball
         {
             a_0 = new[] 
             {
-                new Among(UTF16("d"), -1, -1),
-                new Among(UTF16("f"), -1, -1),
-                new Among(UTF16("ph"), -1, -1),
-                new Among(UTF16("th"), -1, -1),
-                new Among(UTF16("l"), -1, -1),
-                new Among(UTF16("er"), -1, -1),
-                new Among(UTF16("or"), -1, -1),
-                new Among(UTF16("es"), -1, -1),
-                new Among(UTF16("t"), -1, -1)
+                new Among("d", -1, -1),
+                new Among("f", -1, -1),
+                new Among("ph", -1, -1),
+                new Among("th", -1, -1),
+                new Among("l", -1, -1),
+                new Among("er", -1, -1),
+                new Among("or", -1, -1),
+                new Among("es", -1, -1),
+                new Among("t", -1, -1)
             };
 
             a_1 = new[] 
             {
-                new Among(UTF16("s'"), -1, 1, r_A),
-                new Among(UTF16("a"), -1, 1, r_A),
-                new Among(UTF16("ia"), 1, 1, r_A),
-                new Among(UTF16("ata"), 1, 1, r_A),
-                new Among(UTF16("ic"), -1, 1, r_A),
-                new Among(UTF16("aic"), 4, 1, r_A),
-                new Among(UTF16("allic"), 4, 1, r_BB),
-                new Among(UTF16("aric"), 4, 1, r_A),
-                new Among(UTF16("atic"), 4, 1, r_B),
-                new Among(UTF16("itic"), 4, 1, r_H),
-                new Among(UTF16("antic"), 4, 1, r_C),
-                new Among(UTF16("istic"), 4, 1, r_A),
-                new Among(UTF16("alistic"), 11, 1, r_B),
-                new Among(UTF16("aristic"), 11, 1, r_A),
-                new Among(UTF16("ivistic"), 11, 1, r_A),
-                new Among(UTF16("ed"), -1, 1, r_E),
-                new Among(UTF16("anced"), 15, 1, r_B),
-                new Among(UTF16("enced"), 15, 1, r_A),
-                new Among(UTF16("ished"), 15, 1, r_A),
-                new Among(UTF16("ied"), 15, 1, r_A),
-                new Among(UTF16("ened"), 15, 1, r_E),
-                new Among(UTF16("ioned"), 15, 1, r_A),
-                new Among(UTF16("ated"), 15, 1, r_I),
-                new Among(UTF16("ented"), 15, 1, r_C),
-                new Among(UTF16("ized"), 15, 1, r_F),
-                new Among(UTF16("arized"), 24, 1, r_A),
-                new Among(UTF16("oid"), -1, 1, r_A),
-                new Among(UTF16("aroid"), 26, 1, r_A),
-                new Among(UTF16("hood"), -1, 1, r_A),
-                new Among(UTF16("ehood"), 28, 1, r_A),
-                new Among(UTF16("ihood"), 28, 1, r_A),
-                new Among(UTF16("elihood"), 30, 1, r_E),
-                new Among(UTF16("ward"), -1, 1, r_A),
-                new Among(UTF16("e"), -1, 1, r_A),
-                new Among(UTF16("ae"), 33, 1, r_A),
-                new Among(UTF16("ance"), 33, 1, r_B),
-                new Among(UTF16("icance"), 35, 1, r_A),
-                new Among(UTF16("ence"), 33, 1, r_A),
-                new Among(UTF16("ide"), 33, 1, r_L),
-                new Among(UTF16("icide"), 38, 1, r_A),
-                new Among(UTF16("otide"), 38, 1, r_A),
-                new Among(UTF16("age"), 33, 1, r_B),
-                new Among(UTF16("able"), 33, 1, r_A),
-                new Among(UTF16("atable"), 42, 1, r_A),
-                new Among(UTF16("izable"), 42, 1, r_E),
-                new Among(UTF16("arizable"), 44, 1, r_A),
-                new Among(UTF16("ible"), 33, 1, r_A),
-                new Among(UTF16("encible"), 46, 1, r_A),
-                new Among(UTF16("ene"), 33, 1, r_E),
-                new Among(UTF16("ine"), 33, 1, r_M),
-                new Among(UTF16("idine"), 49, 1, r_I),
-                new Among(UTF16("one"), 33, 1, r_R),
-                new Among(UTF16("ature"), 33, 1, r_E),
-                new Among(UTF16("eature"), 52, 1, r_Z),
-                new Among(UTF16("ese"), 33, 1, r_A),
-                new Among(UTF16("wise"), 33, 1, r_A),
-                new Among(UTF16("ate"), 33, 1, r_A),
-                new Among(UTF16("entiate"), 56, 1, r_A),
-                new Among(UTF16("inate"), 56, 1, r_A),
-                new Among(UTF16("ionate"), 56, 1, r_D),
-                new Among(UTF16("ite"), 33, 1, r_AA),
-                new Among(UTF16("ive"), 33, 1, r_A),
-                new Among(UTF16("ative"), 61, 1, r_A),
-                new Among(UTF16("ize"), 33, 1, r_F),
-                new Among(UTF16("alize"), 63, 1, r_A),
-                new Among(UTF16("icalize"), 64, 1, r_A),
-                new Among(UTF16("ialize"), 64, 1, r_A),
-                new Among(UTF16("entialize"), 66, 1, r_A),
-                new Among(UTF16("ionalize"), 64, 1, r_A),
-                new Among(UTF16("arize"), 63, 1, r_A),
-                new Among(UTF16("ing"), -1, 1, r_N),
-                new Among(UTF16("ancing"), 70, 1, r_B),
-                new Among(UTF16("encing"), 70, 1, r_A),
-                new Among(UTF16("aging"), 70, 1, r_B),
-                new Among(UTF16("ening"), 70, 1, r_E),
-                new Among(UTF16("ioning"), 70, 1, r_A),
-                new Among(UTF16("ating"), 70, 1, r_I),
-                new Among(UTF16("enting"), 70, 1, r_C),
-                new Among(UTF16("ying"), 70, 1, r_B),
-                new Among(UTF16("izing"), 70, 1, r_F),
-                new Among(UTF16("arizing"), 79, 1, r_A),
-                new Among(UTF16("ish"), -1, 1, r_C),
-                new Among(UTF16("yish"), 81, 1, r_A),
-                new Among(UTF16("i"), -1, 1, r_A),
-                new Among(UTF16("al"), -1, 1, r_BB),
-                new Among(UTF16("ical"), 84, 1, r_A),
-                new Among(UTF16("aical"), 85, 1, r_A),
-                new Among(UTF16("istical"), 85, 1, r_A),
-                new Among(UTF16("oidal"), 84, 1, r_A),
-                new Among(UTF16("eal"), 84, 1, r_Y),
-                new Among(UTF16("ial"), 84, 1, r_A),
-                new Among(UTF16("ancial"), 90, 1, r_A),
-                new Among(UTF16("arial"), 90, 1, r_A),
-                new Among(UTF16("ential"), 90, 1, r_A),
-                new Among(UTF16("ional"), 84, 1, r_A),
-                new Among(UTF16("ational"), 94, 1, r_B),
-                new Among(UTF16("izational"), 95, 1, r_A),
-                new Among(UTF16("ental"), 84, 1, r_A),
-                new Among(UTF16("ful"), -1, 1, r_A),
-                new Among(UTF16("eful"), 98, 1, r_A),
-                new Among(UTF16("iful"), 98, 1, r_A),
-                new Among(UTF16("yl"), -1, 1, r_R),
-                new Among(UTF16("ism"), -1, 1, r_B),
-                new Among(UTF16("icism"), 102, 1, r_A),
-                new Among(UTF16("oidism"), 102, 1, r_A),
-                new Among(UTF16("alism"), 102, 1, r_B),
-                new Among(UTF16("icalism"), 105, 1, r_A),
-                new Among(UTF16("ionalism"), 105, 1, r_A),
-                new Among(UTF16("inism"), 102, 1, r_J),
-                new Among(UTF16("ativism"), 102, 1, r_A),
-                new Among(UTF16("um"), -1, 1, r_U),
-                new Among(UTF16("ium"), 110, 1, r_A),
-                new Among(UTF16("ian"), -1, 1, r_A),
-                new Among(UTF16("ician"), 112, 1, r_A),
-                new Among(UTF16("en"), -1, 1, r_F),
-                new Among(UTF16("ogen"), 114, 1, r_A),
-                new Among(UTF16("on"), -1, 1, r_S),
-                new Among(UTF16("ion"), 116, 1, r_Q),
-                new Among(UTF16("ation"), 117, 1, r_B),
-                new Among(UTF16("ication"), 118, 1, r_G),
-                new Among(UTF16("entiation"), 118, 1, r_A),
-                new Among(UTF16("ination"), 118, 1, r_A),
-                new Among(UTF16("isation"), 118, 1, r_A),
-                new Among(UTF16("arisation"), 122, 1, r_A),
-                new Among(UTF16("entation"), 118, 1, r_A),
-                new Among(UTF16("ization"), 118, 1, r_F),
-                new Among(UTF16("arization"), 125, 1, r_A),
-                new Among(UTF16("action"), 117, 1, r_G),
-                new Among(UTF16("o"), -1, 1, r_A),
-                new Among(UTF16("ar"), -1, 1, r_X),
-                new Among(UTF16("ear"), 129, 1, r_Y),
-                new Among(UTF16("ier"), -1, 1, r_A),
-                new Among(UTF16("ariser"), -1, 1, r_A),
-                new Among(UTF16("izer"), -1, 1, r_F),
-                new Among(UTF16("arizer"), 133, 1, r_A),
-                new Among(UTF16("or"), -1, 1, r_T),
-                new Among(UTF16("ator"), 135, 1, r_A),
-                new Among(UTF16("s"), -1, 1, r_W),
-                new Among(UTF16("'s"), 137, 1, r_A),
-                new Among(UTF16("as"), 137, 1, r_B),
-                new Among(UTF16("ics"), 137, 1, r_A),
-                new Among(UTF16("istics"), 140, 1, r_A),
-                new Among(UTF16("es"), 137, 1, r_E),
-                new Among(UTF16("ances"), 142, 1, r_B),
-                new Among(UTF16("ences"), 142, 1, r_A),
-                new Among(UTF16("ides"), 142, 1, r_L),
-                new Among(UTF16("oides"), 145, 1, r_A),
-                new Among(UTF16("ages"), 142, 1, r_B),
-                new Among(UTF16("ies"), 142, 1, r_P),
-                new Among(UTF16("acies"), 148, 1, r_A),
-                new Among(UTF16("ancies"), 148, 1, r_A),
-                new Among(UTF16("encies"), 148, 1, r_A),
-                new Among(UTF16("aries"), 148, 1, r_A),
-                new Among(UTF16("ities"), 148, 1, r_A),
-                new Among(UTF16("alities"), 153, 1, r_A),
-                new Among(UTF16("ivities"), 153, 1, r_A),
-                new Among(UTF16("ines"), 142, 1, r_M),
-                new Among(UTF16("nesses"), 142, 1, r_A),
-                new Among(UTF16("ates"), 142, 1, r_A),
-                new Among(UTF16("atives"), 142, 1, r_A),
-                new Among(UTF16("ings"), 137, 1, r_N),
-                new Among(UTF16("is"), 137, 1, r_A),
-                new Among(UTF16("als"), 137, 1, r_BB),
-                new Among(UTF16("ials"), 162, 1, r_A),
-                new Among(UTF16("entials"), 163, 1, r_A),
-                new Among(UTF16("ionals"), 162, 1, r_A),
-                new Among(UTF16("isms"), 137, 1, r_B),
-                new Among(UTF16("ians"), 137, 1, r_A),
-                new Among(UTF16("icians"), 167, 1, r_A),
-                new Among(UTF16("ions"), 137, 1, r_B),
-                new Among(UTF16("ations"), 169, 1, r_B),
-                new Among(UTF16("arisations"), 170, 1, r_A),
-                new Among(UTF16("entations"), 170, 1, r_A),
-                new Among(UTF16("izations"), 170, 1, r_A),
-                new Among(UTF16("arizations"), 173, 1, r_A),
-                new Among(UTF16("ars"), 137, 1, r_O),
-                new Among(UTF16("iers"), 137, 1, r_A),
-                new Among(UTF16("izers"), 137, 1, r_F),
-                new Among(UTF16("ators"), 137, 1, r_A),
-                new Among(UTF16("less"), 137, 1, r_A),
-                new Among(UTF16("eless"), 179, 1, r_A),
-                new Among(UTF16("ness"), 137, 1, r_A),
-                new Among(UTF16("eness"), 181, 1, r_E),
-                new Among(UTF16("ableness"), 182, 1, r_A),
-                new Among(UTF16("eableness"), 183, 1, r_E),
-                new Among(UTF16("ibleness"), 182, 1, r_A),
-                new Among(UTF16("ateness"), 182, 1, r_A),
-                new Among(UTF16("iteness"), 182, 1, r_A),
-                new Among(UTF16("iveness"), 182, 1, r_A),
-                new Among(UTF16("ativeness"), 188, 1, r_A),
-                new Among(UTF16("ingness"), 181, 1, r_A),
-                new Among(UTF16("ishness"), 181, 1, r_A),
-                new Among(UTF16("iness"), 181, 1, r_A),
-                new Among(UTF16("ariness"), 192, 1, r_E),
-                new Among(UTF16("alness"), 181, 1, r_A),
-                new Among(UTF16("icalness"), 194, 1, r_A),
-                new Among(UTF16("antialness"), 194, 1, r_A),
-                new Among(UTF16("entialness"), 194, 1, r_A),
-                new Among(UTF16("ionalness"), 194, 1, r_A),
-                new Among(UTF16("fulness"), 181, 1, r_A),
-                new Among(UTF16("lessness"), 181, 1, r_A),
-                new Among(UTF16("ousness"), 181, 1, r_A),
-                new Among(UTF16("eousness"), 201, 1, r_A),
-                new Among(UTF16("iousness"), 201, 1, r_A),
-                new Among(UTF16("itousness"), 201, 1, r_A),
-                new Among(UTF16("entness"), 181, 1, r_A),
-                new Among(UTF16("ants"), 137, 1, r_B),
-                new Among(UTF16("ists"), 137, 1, r_A),
-                new Among(UTF16("icists"), 207, 1, r_A),
-                new Among(UTF16("us"), 137, 1, r_V),
-                new Among(UTF16("ous"), 209, 1, r_A),
-                new Among(UTF16("eous"), 210, 1, r_A),
-                new Among(UTF16("aceous"), 211, 1, r_A),
-                new Among(UTF16("antaneous"), 211, 1, r_A),
-                new Among(UTF16("ious"), 210, 1, r_A),
-                new Among(UTF16("acious"), 214, 1, r_B),
-                new Among(UTF16("itous"), 210, 1, r_A),
-                new Among(UTF16("ant"), -1, 1, r_B),
-                new Among(UTF16("icant"), 217, 1, r_A),
-                new Among(UTF16("ent"), -1, 1, r_C),
-                new Among(UTF16("ement"), 219, 1, r_A),
-                new Among(UTF16("izement"), 220, 1, r_A),
-                new Among(UTF16("ist"), -1, 1, r_A),
-                new Among(UTF16("icist"), 222, 1, r_A),
-                new Among(UTF16("alist"), 222, 1, r_A),
-                new Among(UTF16("icalist"), 224, 1, r_A),
-                new Among(UTF16("ialist"), 224, 1, r_A),
-                new Among(UTF16("ionist"), 222, 1, r_A),
-                new Among(UTF16("entist"), 222, 1, r_A),
-                new Among(UTF16("y"), -1, 1, r_B),
-                new Among(UTF16("acy"), 229, 1, r_A),
-                new Among(UTF16("ancy"), 229, 1, r_B),
-                new Among(UTF16("ency"), 229, 1, r_A),
-                new Among(UTF16("ly"), 229, 1, r_B),
-                new Among(UTF16("ealy"), 233, 1, r_Y),
-                new Among(UTF16("ably"), 233, 1, r_A),
-                new Among(UTF16("ibly"), 233, 1, r_A),
-                new Among(UTF16("edly"), 233, 1, r_E),
-                new Among(UTF16("iedly"), 237, 1, r_A),
-                new Among(UTF16("ely"), 233, 1, r_E),
-                new Among(UTF16("ately"), 239, 1, r_A),
-                new Among(UTF16("ively"), 239, 1, r_A),
-                new Among(UTF16("atively"), 241, 1, r_A),
-                new Among(UTF16("ingly"), 233, 1, r_B),
-                new Among(UTF16("atingly"), 243, 1, r_A),
-                new Among(UTF16("ily"), 233, 1, r_A),
-                new Among(UTF16("lily"), 245, 1, r_A),
-                new Among(UTF16("arily"), 245, 1, r_A),
-                new Among(UTF16("ally"), 233, 1, r_B),
-                new Among(UTF16("ically"), 248, 1, r_A),
-                new Among(UTF16("aically"), 249, 1, r_A),
-                new Among(UTF16("allically"), 249, 1, r_C),
-                new Among(UTF16("istically"), 249, 1, r_A),
-                new Among(UTF16("alistically"), 252, 1, r_B),
-                new Among(UTF16("oidally"), 248, 1, r_A),
-                new Among(UTF16("ially"), 248, 1, r_A),
-                new Among(UTF16("entially"), 255, 1, r_A),
-                new Among(UTF16("ionally"), 248, 1, r_A),
-                new Among(UTF16("ationally"), 257, 1, r_B),
-                new Among(UTF16("izationally"), 258, 1, r_B),
-                new Among(UTF16("entally"), 248, 1, r_A),
-                new Among(UTF16("fully"), 233, 1, r_A),
-                new Among(UTF16("efully"), 261, 1, r_A),
-                new Among(UTF16("ifully"), 261, 1, r_A),
-                new Among(UTF16("enly"), 233, 1, r_E),
-                new Among(UTF16("arly"), 233, 1, r_K),
-                new Among(UTF16("early"), 265, 1, r_Y),
-                new Among(UTF16("lessly"), 233, 1, r_A),
-                new Among(UTF16("ously"), 233, 1, r_A),
-                new Among(UTF16("eously"), 268, 1, r_A),
-                new Among(UTF16("iously"), 268, 1, r_A),
-                new Among(UTF16("ently"), 233, 1, r_A),
-                new Among(UTF16("ary"), 229, 1, r_F),
-                new Among(UTF16("ery"), 229, 1, r_E),
-                new Among(UTF16("icianry"), 229, 1, r_A),
-                new Among(UTF16("atory"), 229, 1, r_A),
-                new Among(UTF16("ity"), 229, 1, r_A),
-                new Among(UTF16("acity"), 276, 1, r_A),
-                new Among(UTF16("icity"), 276, 1, r_A),
-                new Among(UTF16("eity"), 276, 1, r_A),
-                new Among(UTF16("ality"), 276, 1, r_A),
-                new Among(UTF16("icality"), 280, 1, r_A),
-                new Among(UTF16("iality"), 280, 1, r_A),
-                new Among(UTF16("antiality"), 282, 1, r_A),
-                new Among(UTF16("entiality"), 282, 1, r_A),
-                new Among(UTF16("ionality"), 280, 1, r_A),
-                new Among(UTF16("elity"), 276, 1, r_A),
-                new Among(UTF16("ability"), 276, 1, r_A),
-                new Among(UTF16("izability"), 287, 1, r_A),
-                new Among(UTF16("arizability"), 288, 1, r_A),
-                new Among(UTF16("ibility"), 276, 1, r_A),
-                new Among(UTF16("inity"), 276, 1, r_CC),
-                new Among(UTF16("arity"), 276, 1, r_B),
-                new Among(UTF16("ivity"), 276, 1, r_A)
+                new Among("s'", -1, 1, r_A),
+                new Among("a", -1, 1, r_A),
+                new Among("ia", 1, 1, r_A),
+                new Among("ata", 1, 1, r_A),
+                new Among("ic", -1, 1, r_A),
+                new Among("aic", 4, 1, r_A),
+                new Among("allic", 4, 1, r_BB),
+                new Among("aric", 4, 1, r_A),
+                new Among("atic", 4, 1, r_B),
+                new Among("itic", 4, 1, r_H),
+                new Among("antic", 4, 1, r_C),
+                new Among("istic", 4, 1, r_A),
+                new Among("alistic", 11, 1, r_B),
+                new Among("aristic", 11, 1, r_A),
+                new Among("ivistic", 11, 1, r_A),
+                new Among("ed", -1, 1, r_E),
+                new Among("anced", 15, 1, r_B),
+                new Among("enced", 15, 1, r_A),
+                new Among("ished", 15, 1, r_A),
+                new Among("ied", 15, 1, r_A),
+                new Among("ened", 15, 1, r_E),
+                new Among("ioned", 15, 1, r_A),
+                new Among("ated", 15, 1, r_I),
+                new Among("ented", 15, 1, r_C),
+                new Among("ized", 15, 1, r_F),
+                new Among("arized", 24, 1, r_A),
+                new Among("oid", -1, 1, r_A),
+                new Among("aroid", 26, 1, r_A),
+                new Among("hood", -1, 1, r_A),
+                new Among("ehood", 28, 1, r_A),
+                new Among("ihood", 28, 1, r_A),
+                new Among("elihood", 30, 1, r_E),
+                new Among("ward", -1, 1, r_A),
+                new Among("e", -1, 1, r_A),
+                new Among("ae", 33, 1, r_A),
+                new Among("ance", 33, 1, r_B),
+                new Among("icance", 35, 1, r_A),
+                new Among("ence", 33, 1, r_A),
+                new Among("ide", 33, 1, r_L),
+                new Among("icide", 38, 1, r_A),
+                new Among("otide", 38, 1, r_A),
+                new Among("age", 33, 1, r_B),
+                new Among("able", 33, 1, r_A),
+                new Among("atable", 42, 1, r_A),
+                new Among("izable", 42, 1, r_E),
+                new Among("arizable", 44, 1, r_A),
+                new Among("ible", 33, 1, r_A),
+                new Among("encible", 46, 1, r_A),
+                new Among("ene", 33, 1, r_E),
+                new Among("ine", 33, 1, r_M),
+                new Among("idine", 49, 1, r_I),
+                new Among("one", 33, 1, r_R),
+                new Among("ature", 33, 1, r_E),
+                new Among("eature", 52, 1, r_Z),
+                new Among("ese", 33, 1, r_A),
+                new Among("wise", 33, 1, r_A),
+                new Among("ate", 33, 1, r_A),
+                new Among("entiate", 56, 1, r_A),
+                new Among("inate", 56, 1, r_A),
+                new Among("ionate", 56, 1, r_D),
+                new Among("ite", 33, 1, r_AA),
+                new Among("ive", 33, 1, r_A),
+                new Among("ative", 61, 1, r_A),
+                new Among("ize", 33, 1, r_F),
+                new Among("alize", 63, 1, r_A),
+                new Among("icalize", 64, 1, r_A),
+                new Among("ialize", 64, 1, r_A),
+                new Among("entialize", 66, 1, r_A),
+                new Among("ionalize", 64, 1, r_A),
+                new Among("arize", 63, 1, r_A),
+                new Among("ing", -1, 1, r_N),
+                new Among("ancing", 70, 1, r_B),
+                new Among("encing", 70, 1, r_A),
+                new Among("aging", 70, 1, r_B),
+                new Among("ening", 70, 1, r_E),
+                new Among("ioning", 70, 1, r_A),
+                new Among("ating", 70, 1, r_I),
+                new Among("enting", 70, 1, r_C),
+                new Among("ying", 70, 1, r_B),
+                new Among("izing", 70, 1, r_F),
+                new Among("arizing", 79, 1, r_A),
+                new Among("ish", -1, 1, r_C),
+                new Among("yish", 81, 1, r_A),
+                new Among("i", -1, 1, r_A),
+                new Among("al", -1, 1, r_BB),
+                new Among("ical", 84, 1, r_A),
+                new Among("aical", 85, 1, r_A),
+                new Among("istical", 85, 1, r_A),
+                new Among("oidal", 84, 1, r_A),
+                new Among("eal", 84, 1, r_Y),
+                new Among("ial", 84, 1, r_A),
+                new Among("ancial", 90, 1, r_A),
+                new Among("arial", 90, 1, r_A),
+                new Among("ential", 90, 1, r_A),
+                new Among("ional", 84, 1, r_A),
+                new Among("ational", 94, 1, r_B),
+                new Among("izational", 95, 1, r_A),
+                new Among("ental", 84, 1, r_A),
+                new Among("ful", -1, 1, r_A),
+                new Among("eful", 98, 1, r_A),
+                new Among("iful", 98, 1, r_A),
+                new Among("yl", -1, 1, r_R),
+                new Among("ism", -1, 1, r_B),
+                new Among("icism", 102, 1, r_A),
+                new Among("oidism", 102, 1, r_A),
+                new Among("alism", 102, 1, r_B),
+                new Among("icalism", 105, 1, r_A),
+                new Among("ionalism", 105, 1, r_A),
+                new Among("inism", 102, 1, r_J),
+                new Among("ativism", 102, 1, r_A),
+                new Among("um", -1, 1, r_U),
+                new Among("ium", 110, 1, r_A),
+                new Among("ian", -1, 1, r_A),
+                new Among("ician", 112, 1, r_A),
+                new Among("en", -1, 1, r_F),
+                new Among("ogen", 114, 1, r_A),
+                new Among("on", -1, 1, r_S),
+                new Among("ion", 116, 1, r_Q),
+                new Among("ation", 117, 1, r_B),
+                new Among("ication", 118, 1, r_G),
+                new Among("entiation", 118, 1, r_A),
+                new Among("ination", 118, 1, r_A),
+                new Among("isation", 118, 1, r_A),
+                new Among("arisation", 122, 1, r_A),
+                new Among("entation", 118, 1, r_A),
+                new Among("ization", 118, 1, r_F),
+                new Among("arization", 125, 1, r_A),
+                new Among("action", 117, 1, r_G),
+                new Among("o", -1, 1, r_A),
+                new Among("ar", -1, 1, r_X),
+                new Among("ear", 129, 1, r_Y),
+                new Among("ier", -1, 1, r_A),
+                new Among("ariser", -1, 1, r_A),
+                new Among("izer", -1, 1, r_F),
+                new Among("arizer", 133, 1, r_A),
+                new Among("or", -1, 1, r_T),
+                new Among("ator", 135, 1, r_A),
+                new Among("s", -1, 1, r_W),
+                new Among("'s", 137, 1, r_A),
+                new Among("as", 137, 1, r_B),
+                new Among("ics", 137, 1, r_A),
+                new Among("istics", 140, 1, r_A),
+                new Among("es", 137, 1, r_E),
+                new Among("ances", 142, 1, r_B),
+                new Among("ences", 142, 1, r_A),
+                new Among("ides", 142, 1, r_L),
+                new Among("oides", 145, 1, r_A),
+                new Among("ages", 142, 1, r_B),
+                new Among("ies", 142, 1, r_P),
+                new Among("acies", 148, 1, r_A),
+                new Among("ancies", 148, 1, r_A),
+                new Among("encies", 148, 1, r_A),
+                new Among("aries", 148, 1, r_A),
+                new Among("ities", 148, 1, r_A),
+                new Among("alities", 153, 1, r_A),
+                new Among("ivities", 153, 1, r_A),
+                new Among("ines", 142, 1, r_M),
+                new Among("nesses", 142, 1, r_A),
+                new Among("ates", 142, 1, r_A),
+                new Among("atives", 142, 1, r_A),
+                new Among("ings", 137, 1, r_N),
+                new Among("is", 137, 1, r_A),
+                new Among("als", 137, 1, r_BB),
+                new Among("ials", 162, 1, r_A),
+                new Among("entials", 163, 1, r_A),
+                new Among("ionals", 162, 1, r_A),
+                new Among("isms", 137, 1, r_B),
+                new Among("ians", 137, 1, r_A),
+                new Among("icians", 167, 1, r_A),
+                new Among("ions", 137, 1, r_B),
+                new Among("ations", 169, 1, r_B),
+                new Among("arisations", 170, 1, r_A),
+                new Among("entations", 170, 1, r_A),
+                new Among("izations", 170, 1, r_A),
+                new Among("arizations", 173, 1, r_A),
+                new Among("ars", 137, 1, r_O),
+                new Among("iers", 137, 1, r_A),
+                new Among("izers", 137, 1, r_F),
+                new Among("ators", 137, 1, r_A),
+                new Among("less", 137, 1, r_A),
+                new Among("eless", 179, 1, r_A),
+                new Among("ness", 137, 1, r_A),
+                new Among("eness", 181, 1, r_E),
+                new Among("ableness", 182, 1, r_A),
+                new Among("eableness", 183, 1, r_E),
+                new Among("ibleness", 182, 1, r_A),
+                new Among("ateness", 182, 1, r_A),
+                new Among("iteness", 182, 1, r_A),
+                new Among("iveness", 182, 1, r_A),
+                new Among("ativeness", 188, 1, r_A),
+                new Among("ingness", 181, 1, r_A),
+                new Among("ishness", 181, 1, r_A),
+                new Among("iness", 181, 1, r_A),
+                new Among("ariness", 192, 1, r_E),
+                new Among("alness", 181, 1, r_A),
+                new Among("icalness", 194, 1, r_A),
+                new Among("antialness", 194, 1, r_A),
+                new Among("entialness", 194, 1, r_A),
+                new Among("ionalness", 194, 1, r_A),
+                new Among("fulness", 181, 1, r_A),
+                new Among("lessness", 181, 1, r_A),
+                new Among("ousness", 181, 1, r_A),
+                new Among("eousness", 201, 1, r_A),
+                new Among("iousness", 201, 1, r_A),
+                new Among("itousness", 201, 1, r_A),
+                new Among("entness", 181, 1, r_A),
+                new Among("ants", 137, 1, r_B),
+                new Among("ists", 137, 1, r_A),
+                new Among("icists", 207, 1, r_A),
+                new Among("us", 137, 1, r_V),
+                new Among("ous", 209, 1, r_A),
+                new Among("eous", 210, 1, r_A),
+                new Among("aceous", 211, 1, r_A),
+                new Among("antaneous", 211, 1, r_A),
+                new Among("ious", 210, 1, r_A),
+                new Among("acious", 214, 1, r_B),
+                new Among("itous", 210, 1, r_A),
+                new Among("ant", -1, 1, r_B),
+                new Among("icant", 217, 1, r_A),
+                new Among("ent", -1, 1, r_C),
+                new Among("ement", 219, 1, r_A),
+                new Among("izement", 220, 1, r_A),
+                new Among("ist", -1, 1, r_A),
+                new Among("icist", 222, 1, r_A),
+                new Among("alist", 222, 1, r_A),
+                new Among("icalist", 224, 1, r_A),
+                new Among("ialist", 224, 1, r_A),
+                new Among("ionist", 222, 1, r_A),
+                new Among("entist", 222, 1, r_A),
+                new Among("y", -1, 1, r_B),
+                new Among("acy", 229, 1, r_A),
+                new Among("ancy", 229, 1, r_B),
+                new Among("ency", 229, 1, r_A),
+                new Among("ly", 229, 1, r_B),
+                new Among("ealy", 233, 1, r_Y),
+                new Among("ably", 233, 1, r_A),
+                new Among("ibly", 233, 1, r_A),
+                new Among("edly", 233, 1, r_E),
+                new Among("iedly", 237, 1, r_A),
+                new Among("ely", 233, 1, r_E),
+                new Among("ately", 239, 1, r_A),
+                new Among("ively", 239, 1, r_A),
+                new Among("atively", 241, 1, r_A),
+                new Among("ingly", 233, 1, r_B),
+                new Among("atingly", 243, 1, r_A),
+                new Among("ily", 233, 1, r_A),
+                new Among("lily", 245, 1, r_A),
+                new Among("arily", 245, 1, r_A),
+                new Among("ally", 233, 1, r_B),
+                new Among("ically", 248, 1, r_A),
+                new Among("aically", 249, 1, r_A),
+                new Among("allically", 249, 1, r_C),
+                new Among("istically", 249, 1, r_A),
+                new Among("alistically", 252, 1, r_B),
+                new Among("oidally", 248, 1, r_A),
+                new Among("ially", 248, 1, r_A),
+                new Among("entially", 255, 1, r_A),
+                new Among("ionally", 248, 1, r_A),
+                new Among("ationally", 257, 1, r_B),
+                new Among("izationally", 258, 1, r_B),
+                new Among("entally", 248, 1, r_A),
+                new Among("fully", 233, 1, r_A),
+                new Among("efully", 261, 1, r_A),
+                new Among("ifully", 261, 1, r_A),
+                new Among("enly", 233, 1, r_E),
+                new Among("arly", 233, 1, r_K),
+                new Among("early", 265, 1, r_Y),
+                new Among("lessly", 233, 1, r_A),
+                new Among("ously", 233, 1, r_A),
+                new Among("eously", 268, 1, r_A),
+                new Among("iously", 268, 1, r_A),
+                new Among("ently", 233, 1, r_A),
+                new Among("ary", 229, 1, r_F),
+                new Among("ery", 229, 1, r_E),
+                new Among("icianry", 229, 1, r_A),
+                new Among("atory", 229, 1, r_A),
+                new Among("ity", 229, 1, r_A),
+                new Among("acity", 276, 1, r_A),
+                new Among("icity", 276, 1, r_A),
+                new Among("eity", 276, 1, r_A),
+                new Among("ality", 276, 1, r_A),
+                new Among("icality", 280, 1, r_A),
+                new Among("iality", 280, 1, r_A),
+                new Among("antiality", 282, 1, r_A),
+                new Among("entiality", 282, 1, r_A),
+                new Among("ionality", 280, 1, r_A),
+                new Among("elity", 276, 1, r_A),
+                new Among("ability", 276, 1, r_A),
+                new Among("izability", 287, 1, r_A),
+                new Among("arizability", 288, 1, r_A),
+                new Among("ibility", 276, 1, r_A),
+                new Among("inity", 276, 1, r_CC),
+                new Among("arity", 276, 1, r_B),
+                new Among("ivity", 276, 1, r_A)
             };
 
             a_2 = new[] 
             {
-                new Among(UTF16("bb"), -1, -1),
-                new Among(UTF16("dd"), -1, -1),
-                new Among(UTF16("gg"), -1, -1),
-                new Among(UTF16("ll"), -1, -1),
-                new Among(UTF16("mm"), -1, -1),
-                new Among(UTF16("nn"), -1, -1),
-                new Among(UTF16("pp"), -1, -1),
-                new Among(UTF16("rr"), -1, -1),
-                new Among(UTF16("ss"), -1, -1),
-                new Among(UTF16("tt"), -1, -1)
+                new Among("bb", -1, -1),
+                new Among("dd", -1, -1),
+                new Among("gg", -1, -1),
+                new Among("ll", -1, -1),
+                new Among("mm", -1, -1),
+                new Among("nn", -1, -1),
+                new Among("pp", -1, -1),
+                new Among("rr", -1, -1),
+                new Among("ss", -1, -1),
+                new Among("tt", -1, -1)
             };
 
             a_3 = new[] 
             {
-                new Among(UTF16("uad"), -1, 18),
-                new Among(UTF16("vad"), -1, 19),
-                new Among(UTF16("cid"), -1, 20),
-                new Among(UTF16("lid"), -1, 21),
-                new Among(UTF16("erid"), -1, 22),
-                new Among(UTF16("pand"), -1, 23),
-                new Among(UTF16("end"), -1, 24),
-                new Among(UTF16("ond"), -1, 25),
-                new Among(UTF16("lud"), -1, 26),
-                new Among(UTF16("rud"), -1, 27),
-                new Among(UTF16("ul"), -1, 9),
-                new Among(UTF16("her"), -1, 28),
-                new Among(UTF16("metr"), -1, 7),
-                new Among(UTF16("istr"), -1, 6),
-                new Among(UTF16("urs"), -1, 5),
-                new Among(UTF16("uct"), -1, 2),
-                new Among(UTF16("et"), -1, 32),
-                new Among(UTF16("mit"), -1, 29),
-                new Among(UTF16("ent"), -1, 30),
-                new Among(UTF16("umpt"), -1, 3),
-                new Among(UTF16("rpt"), -1, 4),
-                new Among(UTF16("ert"), -1, 31),
-                new Among(UTF16("yt"), -1, 33),
-                new Among(UTF16("iev"), -1, 1),
-                new Among(UTF16("olv"), -1, 8),
-                new Among(UTF16("ax"), -1, 14),
-                new Among(UTF16("ex"), -1, 15),
-                new Among(UTF16("bex"), 26, 10),
-                new Among(UTF16("dex"), 26, 11),
-                new Among(UTF16("pex"), 26, 12),
-                new Among(UTF16("tex"), 26, 13),
-                new Among(UTF16("ix"), -1, 16),
-                new Among(UTF16("lux"), -1, 17),
-                new Among(UTF16("yz"), -1, 34)
+                new Among("uad", -1, 18),
+                new Among("vad", -1, 19),
+                new Among("cid", -1, 20),
+                new Among("lid", -1, 21),
+                new Among("erid", -1, 22),
+                new Among("pand", -1, 23),
+                new Among("end", -1, 24),
+                new Among("ond", -1, 25),
+                new Among("lud", -1, 26),
+                new Among("rud", -1, 27),
+                new Among("ul", -1, 9),
+                new Among("her", -1, 28),
+                new Among("metr", -1, 7),
+                new Among("istr", -1, 6),
+                new Among("urs", -1, 5),
+                new Among("uct", -1, 2),
+                new Among("et", -1, 32),
+                new Among("mit", -1, 29),
+                new Among("ent", -1, 30),
+                new Among("umpt", -1, 3),
+                new Among("rpt", -1, 4),
+                new Among("ert", -1, 31),
+                new Among("yt", -1, 33),
+                new Among("iev", -1, 1),
+                new Among("olv", -1, 8),
+                new Among("ax", -1, 14),
+                new Among("ex", -1, 15),
+                new Among("bex", 26, 10),
+                new Among("dex", 26, 11),
+                new Among("pex", 26, 12),
+                new Among("tex", 26, 13),
+                new Among("ix", -1, 16),
+                new Among("lux", -1, 17),
+                new Among("yz", -1, 34)
             };
 
         }
 
 
 
-        private bool r_A()
+        private int r_A()
         {
             // (, line 21
             // hop, line 21
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int ret = cursor - 2;
+                if (limit_backward > ret || ret > limit)
                 {
-                    return false;
+                    return 0;
                 }
-                cursor = c;
+                cursor = ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_B()
+        private int r_B()
         {
             // (, line 22
             // hop, line 22
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int ret = cursor - 3;
+                if (limit_backward > ret || ret > limit)
                 {
-                    return false;
+                    return 0;
                 }
-                cursor = c;
+                cursor = ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_C()
+        private int r_C()
         {
             // (, line 23
             // hop, line 23
-
             {
-                int c = cursor - 4;
-                if (limit_backward > c || c > limit)
+                int ret = cursor - 4;
+                if (limit_backward > ret || ret > limit)
                 {
-                    return false;
+                    return 0;
                 }
-                cursor = c;
+                cursor = ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_D()
+        private int r_D()
         {
             // (, line 24
             // hop, line 24
-
             {
-                int c = cursor - 5;
-                if (limit_backward > c || c > limit)
+                int ret = cursor - 5;
+                if (limit_backward > ret || ret > limit)
                 {
-                    return false;
+                    return 0;
                 }
-                cursor = c;
+                cursor = ret;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_E()
+        private int r_E()
         {
-            int v_1;
-            int v_2;
             // (, line 25
             // test, line 25
-            v_1 = limit - cursor;
-            // hop, line 25
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 25
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 25
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 25
-                if (!(eq_s_b(UTF16("e"))))
+                if (!(eq_s_b("e")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_F()
+        private int r_F()
         {
-            int v_1;
-            int v_2;
             // (, line 26
             // test, line 26
-            v_1 = limit - cursor;
-            // hop, line 26
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 26
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 26
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 26
-                if (!(eq_s_b(UTF16("e"))))
+                if (!(eq_s_b("e")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_G()
+        private int r_G()
         {
-            int v_1;
             // (, line 27
             // test, line 27
-            v_1 = limit - cursor;
-            // hop, line 27
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 27
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // literal, line 27
-            if (!(eq_s_b(UTF16("f"))))
+            if (!(eq_s_b("f")))
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_H()
+        private int r_H()
         {
-            int v_1;
-            int v_2;
             // (, line 28
             // test, line 28
-            v_1 = limit - cursor;
-            // hop, line 28
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 28
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // or, line 28
-            v_2 = limit - cursor;
-            // literal, line 28
-            if (!(eq_s_b(UTF16("t"))))
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                // literal, line 28
+                if (!(eq_s_b("t")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 28
+                if (!(eq_s_b("ll")))
+                {
+                    return 0;
+                }
             }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 28
-            if (!(eq_s_b(UTF16("ll"))))
-            {
-                return false;
-            }
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_I()
+        private int r_I()
         {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 29
             // test, line 29
-            v_1 = limit - cursor;
-            // hop, line 29
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 29
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 29
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 29
-                if (!(eq_s_b(UTF16("o"))))
+                if (!(eq_s_b("o")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
             // not, line 29
-
             {
-                v_3 = limit - cursor;
+                int c3 = limit - cursor;
                 // literal, line 29
-                if (!(eq_s_b(UTF16("e"))))
+                if (!(eq_s_b("e")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_J()
+        private int r_J()
         {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 30
             // test, line 30
-            v_1 = limit - cursor;
-            // hop, line 30
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 30
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 30
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 30
-                if (!(eq_s_b(UTF16("a"))))
+                if (!(eq_s_b("a")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
             // not, line 30
-
             {
-                v_3 = limit - cursor;
+                int c3 = limit - cursor;
                 // literal, line 30
-                if (!(eq_s_b(UTF16("e"))))
+                if (!(eq_s_b("e")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_K()
+        private int r_K()
         {
-            int v_1;
-            int v_2;
             // (, line 31
             // test, line 31
-            v_1 = limit - cursor;
-            // hop, line 31
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 31
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // or, line 31
-            v_2 = limit - cursor;
-            // literal, line 31
-            if (!(eq_s_b(UTF16("l"))))
             {
-                goto lab1;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 31
-            if (!(eq_s_b(UTF16("i"))))
-            {
-                goto lab2;
-            }
-            goto lab0;
-        lab2: 
-            cursor = limit - v_2;
-            // (, line 31
-            // literal, line 31
-            if (!(eq_s_b(UTF16("e"))))
-            {
-                return false;
-            }
-            // next, line 31
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // literal, line 31
-            if (!(eq_s_b(UTF16("u"))))
-            {
-                return false;
-            }
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_L()
-        {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            // (, line 32
-            // test, line 32
-            v_1 = limit - cursor;
-            // hop, line 32
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // not, line 32
-
-            {
-                v_2 = limit - cursor;
-                // literal, line 32
-                if (!(eq_s_b(UTF16("u"))))
-                {
-                    goto lab0;
-                }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
-            }
-            // not, line 32
-
-            {
-                v_3 = limit - cursor;
-                // literal, line 32
-                if (!(eq_s_b(UTF16("x"))))
+                int c2 = limit - cursor;
+                // literal, line 31
+                if (!(eq_s_b("l")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 31
+                if (!(eq_s_b("i")))
+                {
+                    goto lab2;
+                }
+                goto lab0;
+            lab2: ; 
+                cursor = limit - c2;
+                // (, line 31
+                // literal, line 31
+                if (!(eq_s_b("e")))
+                {
+                    return 0;
+                }
+                // next, line 31
+                if (cursor <= limit_backward)
+                {
+                    return 0;
+                }
+                cursor--;
+                // literal, line 31
+                if (!(eq_s_b("u")))
+                {
+                    return 0;
+                }
+            }
+        lab0: ; 
+
+            return 1;
+        }
+
+        private int r_L()
+        {
+            // (, line 32
+            // test, line 32
+            {
+                int c1 = limit - cursor;
+                // hop, line 32
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
             }
             // not, line 32
-
             {
-                v_4 = limit - cursor;
+                int c2 = limit - cursor;
+                // literal, line 32
+                if (!(eq_s_b("u")))
+                {
+                    goto lab0;
+                }
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
+            }
+            // not, line 32
+            {
+                int c3 = limit - cursor;
+                // literal, line 32
+                if (!(eq_s_b("x")))
+                {
+                    goto lab1;
+                }
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
+            }
+            // not, line 32
+            {
+                int c4 = limit - cursor;
                 // (, line 32
                 // literal, line 32
-                if (!(eq_s_b(UTF16("s"))))
+                if (!(eq_s_b("s")))
                 {
                     goto lab2;
                 }
                 // not, line 32
-
                 {
-                    v_5 = limit - cursor;
+                    int c5 = limit - cursor;
                     // literal, line 32
-                    if (!(eq_s_b(UTF16("o"))))
+                    if (!(eq_s_b("o")))
                     {
                         goto lab3;
                     }
                     goto lab2;
-                lab3: 
-                    cursor = limit - v_5;
+                lab3: ; 
+                    cursor = limit - c5;
                 }
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                return 0;
+            lab2: ; 
+                cursor = limit - c4;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_M()
+        private int r_M()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
             // (, line 33
             // test, line 33
-            v_1 = limit - cursor;
-            // hop, line 33
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 33
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 33
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 33
-                if (!(eq_s_b(UTF16("a"))))
+                if (!(eq_s_b("a")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
             // not, line 33
-
             {
-                v_3 = limit - cursor;
+                int c3 = limit - cursor;
                 // literal, line 33
-                if (!(eq_s_b(UTF16("c"))))
+                if (!(eq_s_b("c")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
             }
             // not, line 33
-
             {
-                v_4 = limit - cursor;
+                int c4 = limit - cursor;
                 // literal, line 33
-                if (!(eq_s_b(UTF16("e"))))
+                if (!(eq_s_b("e")))
                 {
                     goto lab2;
                 }
-                return false;
-            lab2: 
-                cursor = limit - v_4;
+                return 0;
+            lab2: ; 
+                cursor = limit - c4;
             }
             // not, line 33
-
             {
-                v_5 = limit - cursor;
+                int c5 = limit - cursor;
                 // literal, line 33
-                if (!(eq_s_b(UTF16("m"))))
+                if (!(eq_s_b("m")))
                 {
                     goto lab3;
                 }
-                return false;
-            lab3: 
-                cursor = limit - v_5;
+                return 0;
+            lab3: ; 
+                cursor = limit - c5;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_N()
+        private int r_N()
         {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 34
             // test, line 34
-            v_1 = limit - cursor;
-            // hop, line 34
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 34
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // (, line 34
             // hop, line 34
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int ret = cursor - 2;
+                if (limit_backward > ret || ret > limit)
                 {
-                    return false;
+                    return 0;
                 }
-                cursor = c;
+                cursor = ret;
             }
             // or, line 34
-            v_2 = limit - cursor;
-            // not, line 34
-
             {
-                v_3 = limit - cursor;
-                // literal, line 34
-                if (!(eq_s_b(UTF16("s"))))
+                int c2 = limit - cursor;
+                // not, line 34
                 {
-                    goto lab2;
+                    int c3 = limit - cursor;
+                    // literal, line 34
+                    if (!(eq_s_b("s")))
+                    {
+                        goto lab2;
+                    }
+                    goto lab1;
+                lab2: ; 
+                    cursor = limit - c3;
                 }
-                goto lab1;
-            lab2: 
-                cursor = limit - v_3;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // hop, line 34
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // hop, line 34
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
             }
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_O()
+        private int r_O()
         {
-            int v_1;
-            int v_2;
             // (, line 35
             // test, line 35
-            v_1 = limit - cursor;
-            // hop, line 35
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 35
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // or, line 35
-            v_2 = limit - cursor;
-            // literal, line 35
-            if (!(eq_s_b(UTF16("l"))))
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                // literal, line 35
+                if (!(eq_s_b("l")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 35
+                if (!(eq_s_b("i")))
+                {
+                    return 0;
+                }
             }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 35
-            if (!(eq_s_b(UTF16("i"))))
-            {
-                return false;
-            }
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_P()
+        private int r_P()
         {
-            int v_1;
-            int v_2;
             // (, line 36
             // test, line 36
-            v_1 = limit - cursor;
-            // hop, line 36
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 36
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 36
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 36
-                if (!(eq_s_b(UTF16("c"))))
+                if (!(eq_s_b("c")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_Q()
+        private int r_Q()
         {
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
             // (, line 37
             // test, line 37
-            v_1 = limit - cursor;
-            // hop, line 37
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 37
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // test, line 37
-            v_2 = limit - cursor;
-            // hop, line 37
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c2 = limit - cursor;
+                // hop, line 37
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c2;
             }
-            cursor = limit - v_2;
             // not, line 37
-
             {
-                v_3 = limit - cursor;
+                int c3 = limit - cursor;
                 // literal, line 37
-                if (!(eq_s_b(UTF16("l"))))
+                if (!(eq_s_b("l")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_3;
+                return 0;
+            lab0: ; 
+                cursor = limit - c3;
             }
             // not, line 37
-
             {
-                v_4 = limit - cursor;
+                int c4 = limit - cursor;
                 // literal, line 37
-                if (!(eq_s_b(UTF16("n"))))
+                if (!(eq_s_b("n")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_4;
+                return 0;
+            lab1: ; 
+                cursor = limit - c4;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_R()
+        private int r_R()
         {
-            int v_1;
-            int v_2;
             // (, line 38
             // test, line 38
-            v_1 = limit - cursor;
-            // hop, line 38
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 38
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // or, line 38
-            v_2 = limit - cursor;
-            // literal, line 38
-            if (!(eq_s_b(UTF16("n"))))
             {
-                goto lab1;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 38
-            if (!(eq_s_b(UTF16("r"))))
-            {
-                return false;
-            }
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_S()
-        {
-            int v_1;
-            int v_2;
-            int v_3;
-            // (, line 39
-            // test, line 39
-            v_1 = limit - cursor;
-            // hop, line 39
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // or, line 39
-            v_2 = limit - cursor;
-            // literal, line 39
-            if (!(eq_s_b(UTF16("dr"))))
-            {
-                goto lab1;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // (, line 39
-            // literal, line 39
-            if (!(eq_s_b(UTF16("t"))))
-            {
-                return false;
-            }
-            // not, line 39
-
-            {
-                v_3 = limit - cursor;
-                // literal, line 39
-                if (!(eq_s_b(UTF16("t"))))
-                {
-                    goto lab2;
-                }
-                return false;
-            lab2: 
-                cursor = limit - v_3;
-            }
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_T()
-        {
-            int v_1;
-            int v_2;
-            int v_3;
-            // (, line 40
-            // test, line 40
-            v_1 = limit - cursor;
-            // hop, line 40
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // or, line 40
-            v_2 = limit - cursor;
-            // literal, line 40
-            if (!(eq_s_b(UTF16("s"))))
-            {
-                goto lab1;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // (, line 40
-            // literal, line 40
-            if (!(eq_s_b(UTF16("t"))))
-            {
-                return false;
-            }
-            // not, line 40
-
-            {
-                v_3 = limit - cursor;
-                // literal, line 40
-                if (!(eq_s_b(UTF16("o"))))
-                {
-                    goto lab2;
-                }
-                return false;
-            lab2: 
-                cursor = limit - v_3;
-            }
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_U()
-        {
-            int v_1;
-            int v_2;
-            // (, line 41
-            // test, line 41
-            v_1 = limit - cursor;
-            // hop, line 41
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // or, line 41
-            v_2 = limit - cursor;
-            // literal, line 41
-            if (!(eq_s_b(UTF16("l"))))
-            {
-                goto lab1;
-            }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 41
-            if (!(eq_s_b(UTF16("m"))))
-            {
-                goto lab2;
-            }
-            goto lab0;
-        lab2: 
-            cursor = limit - v_2;
-            // literal, line 41
-            if (!(eq_s_b(UTF16("n"))))
-            {
-                goto lab3;
-            }
-            goto lab0;
-        lab3: 
-            cursor = limit - v_2;
-            // literal, line 41
-            if (!(eq_s_b(UTF16("r"))))
-            {
-                return false;
-            }
-        lab0: 
-
-            return true;
-        }
-
-        private bool r_V()
-        {
-            int v_1;
-            // (, line 42
-            // test, line 42
-            v_1 = limit - cursor;
-            // hop, line 42
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // literal, line 42
-            if (!(eq_s_b(UTF16("c"))))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool r_W()
-        {
-            int v_1;
-            int v_2;
-            int v_3;
-            // (, line 43
-            // test, line 43
-            v_1 = limit - cursor;
-            // hop, line 43
-
-            {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
-                {
-                    return false;
-                }
-                cursor = c;
-            }
-            cursor = limit - v_1;
-            // not, line 43
-
-            {
-                v_2 = limit - cursor;
-                // literal, line 43
-                if (!(eq_s_b(UTF16("s"))))
-                {
-                    goto lab0;
-                }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
-            }
-            // not, line 43
-
-            {
-                v_3 = limit - cursor;
-                // literal, line 43
-                if (!(eq_s_b(UTF16("u"))))
+                int c2 = limit - cursor;
+                // literal, line 38
+                if (!(eq_s_b("n")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 38
+                if (!(eq_s_b("r")))
+                {
+                    return 0;
+                }
             }
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_X()
+        private int r_S()
         {
-            int v_1;
-            int v_2;
-            // (, line 44
-            // test, line 44
-            v_1 = limit - cursor;
-            // hop, line 44
-
+            // (, line 39
+            // test, line 39
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 39
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
-            // or, line 44
-            v_2 = limit - cursor;
-            // literal, line 44
-            if (!(eq_s_b(UTF16("l"))))
+            // or, line 39
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                // literal, line 39
+                if (!(eq_s_b("dr")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // (, line 39
+                // literal, line 39
+                if (!(eq_s_b("t")))
+                {
+                    return 0;
+                }
+                // not, line 39
+                {
+                    int c3 = limit - cursor;
+                    // literal, line 39
+                    if (!(eq_s_b("t")))
+                    {
+                        goto lab2;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c3;
+                }
             }
-            goto lab0;
-        lab1: 
-            cursor = limit - v_2;
-            // literal, line 44
-            if (!(eq_s_b(UTF16("i"))))
-            {
-                goto lab2;
-            }
-            goto lab0;
-        lab2: 
-            cursor = limit - v_2;
-            // (, line 44
-            // literal, line 44
-            if (!(eq_s_b(UTF16("e"))))
-            {
-                return false;
-            }
-            // next, line 44
-            if (cursor <= limit_backward)
-            {
-                return false;
-            }
-            cursor--;
-            // literal, line 44
-            if (!(eq_s_b(UTF16("u"))))
-            {
-                return false;
-            }
-        lab0: 
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_Y()
+        private int r_T()
         {
-            int v_1;
-            // (, line 45
-            // test, line 45
-            v_1 = limit - cursor;
-            // hop, line 45
-
+            // (, line 40
+            // test, line 40
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 40
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
-            // literal, line 45
-            if (!(eq_s_b(UTF16("in"))))
+            // or, line 40
             {
-                return false;
+                int c2 = limit - cursor;
+                // literal, line 40
+                if (!(eq_s_b("s")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // (, line 40
+                // literal, line 40
+                if (!(eq_s_b("t")))
+                {
+                    return 0;
+                }
+                // not, line 40
+                {
+                    int c3 = limit - cursor;
+                    // literal, line 40
+                    if (!(eq_s_b("o")))
+                    {
+                        goto lab2;
+                    }
+                    return 0;
+                lab2: ; 
+                    cursor = limit - c3;
+                }
             }
+        lab0: ; 
 
-            return true;
+            return 1;
         }
 
-        private bool r_Z()
+        private int r_U()
         {
-            int v_1;
-            int v_2;
-            // (, line 46
-            // test, line 46
-            v_1 = limit - cursor;
-            // hop, line 46
-
+            // (, line 41
+            // test, line 41
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 41
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
-            // not, line 46
-
+            // or, line 41
             {
-                v_2 = limit - cursor;
-                // literal, line 46
-                if (!(eq_s_b(UTF16("f"))))
+                int c2 = limit - cursor;
+                // literal, line 41
+                if (!(eq_s_b("l")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 41
+                if (!(eq_s_b("m")))
+                {
+                    goto lab2;
+                }
+                goto lab0;
+            lab2: ; 
+                cursor = limit - c2;
+                // literal, line 41
+                if (!(eq_s_b("n")))
+                {
+                    goto lab3;
+                }
+                goto lab0;
+            lab3: ; 
+                cursor = limit - c2;
+                // literal, line 41
+                if (!(eq_s_b("r")))
+                {
+                    return 0;
+                }
+            }
+        lab0: ; 
+
+            return 1;
+        }
+
+        private int r_V()
+        {
+            // (, line 42
+            // test, line 42
+            {
+                int c1 = limit - cursor;
+                // hop, line 42
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
+            }
+            // literal, line 42
+            if (!(eq_s_b("c")))
+            {
+                return 0;
+            }
+
+            return 1;
+        }
+
+        private int r_W()
+        {
+            // (, line 43
+            // test, line 43
+            {
+                int c1 = limit - cursor;
+                // hop, line 43
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
+            }
+            // not, line 43
+            {
+                int c2 = limit - cursor;
+                // literal, line 43
+                if (!(eq_s_b("s")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
+            }
+            // not, line 43
+            {
+                int c3 = limit - cursor;
+                // literal, line 43
+                if (!(eq_s_b("u")))
+                {
+                    goto lab1;
+                }
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_AA()
+        private int r_X()
         {
-            int v_1;
+            // (, line 44
+            // test, line 44
+            {
+                int c1 = limit - cursor;
+                // hop, line 44
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
+            }
+            // or, line 44
+            {
+                int c2 = limit - cursor;
+                // literal, line 44
+                if (!(eq_s_b("l")))
+                {
+                    goto lab1;
+                }
+                goto lab0;
+            lab1: ; 
+                cursor = limit - c2;
+                // literal, line 44
+                if (!(eq_s_b("i")))
+                {
+                    goto lab2;
+                }
+                goto lab0;
+            lab2: ; 
+                cursor = limit - c2;
+                // (, line 44
+                // literal, line 44
+                if (!(eq_s_b("e")))
+                {
+                    return 0;
+                }
+                // next, line 44
+                if (cursor <= limit_backward)
+                {
+                    return 0;
+                }
+                cursor--;
+                // literal, line 44
+                if (!(eq_s_b("u")))
+                {
+                    return 0;
+                }
+            }
+        lab0: ; 
+
+            return 1;
+        }
+
+        private int r_Y()
+        {
+            // (, line 45
+            // test, line 45
+            {
+                int c1 = limit - cursor;
+                // hop, line 45
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
+            }
+            // literal, line 45
+            if (!(eq_s_b("in")))
+            {
+                return 0;
+            }
+
+            return 1;
+        }
+
+        private int r_Z()
+        {
+            // (, line 46
+            // test, line 46
+            {
+                int c1 = limit - cursor;
+                // hop, line 46
+                {
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
+                }
+                cursor = limit - c1;
+            }
+            // not, line 46
+            {
+                int c2 = limit - cursor;
+                // literal, line 46
+                if (!(eq_s_b("f")))
+                {
+                    goto lab0;
+                }
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
+            }
+
+            return 1;
+        }
+
+        private int r_AA()
+        {
             // (, line 47
             // test, line 47
-            v_1 = limit - cursor;
-            // hop, line 47
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 47
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // among, line 47
             if (find_among_b(a_0) == 0)
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_BB()
+        private int r_BB()
         {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 49
             // test, line 49
-            v_1 = limit - cursor;
-            // hop, line 49
-
             {
-                int c = cursor - 3;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 49
                 {
-                    return false;
+                    int ret = cursor - 3;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // not, line 49
-
             {
-                v_2 = limit - cursor;
+                int c2 = limit - cursor;
                 // literal, line 49
-                if (!(eq_s_b(UTF16("met"))))
+                if (!(eq_s_b("met")))
                 {
                     goto lab0;
                 }
-                return false;
-            lab0: 
-                cursor = limit - v_2;
+                return 0;
+            lab0: ; 
+                cursor = limit - c2;
             }
             // not, line 49
-
             {
-                v_3 = limit - cursor;
+                int c3 = limit - cursor;
                 // literal, line 49
-                if (!(eq_s_b(UTF16("ryst"))))
+                if (!(eq_s_b("ryst")))
                 {
                     goto lab1;
                 }
-                return false;
-            lab1: 
-                cursor = limit - v_3;
+                return 0;
+            lab1: ; 
+                cursor = limit - c3;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_CC()
+        private int r_CC()
         {
-            int v_1;
             // (, line 50
             // test, line 50
-            v_1 = limit - cursor;
-            // hop, line 50
-
             {
-                int c = cursor - 2;
-                if (limit_backward > c || c > limit)
+                int c1 = limit - cursor;
+                // hop, line 50
                 {
-                    return false;
+                    int ret = cursor - 2;
+                    if (limit_backward > ret || ret > limit)
+                    {
+                        return 0;
+                    }
+                    cursor = ret;
                 }
-                cursor = c;
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // literal, line 50
-            if (!(eq_s_b(UTF16("l"))))
+            if (!(eq_s_b("l")))
             {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_endings()
+        private int r_endings()
         {
             int among_var;
             // (, line 55
@@ -1606,14 +1559,16 @@ namespace Snowball
             among_var = find_among_b(a_1);
             if (among_var == 0)
             {
-                return false;
+                return 0;
             }
             // ], line 56
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
-                    break;
+                    {
+                        return 0;
+                    }
                 case 1:
                     // (, line 145
                     // delete, line 145
@@ -1621,27 +1576,28 @@ namespace Snowball
                     break;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool r_undouble()
+        private int r_undouble()
         {
-            int v_1;
             // (, line 151
             // test, line 152
-            v_1 = limit - cursor;
-            // substring, line 152
-            if (find_among_b(a_2) == 0)
             {
-                return false;
+                int c1 = limit - cursor;
+                // substring, line 152
+                if (find_among_b(a_2) == 0)
+                {
+                    return 0;
+                }
+                cursor = limit - c1;
             }
-            cursor = limit - v_1;
             // [, line 154
             ket = cursor;
             // next, line 154
             if (cursor <= limit_backward)
             {
-                return false;
+                return 0;
             }
             cursor--;
             // ], line 154
@@ -1649,20 +1605,12 @@ namespace Snowball
             // delete, line 154
             slice_del();
 
-            return true;
+            return 1;
         }
 
-        private bool r_respell()
+        private int r_respell()
         {
             int among_var;
-            int v_1;
-            int v_2;
-            int v_3;
-            int v_4;
-            int v_5;
-            int v_6;
-            int v_7;
-            int v_8;
             // (, line 159
             // [, line 160
             ket = cursor;
@@ -1670,337 +1618,343 @@ namespace Snowball
             among_var = find_among_b(a_3);
             if (among_var == 0)
             {
-                return false;
+                return 0;
             }
             // ], line 160
             bra = cursor;
             switch (among_var) 
             {
                 case 0:
-                    break;
+                    {
+                        return 0;
+                    }
                 case 1:
                     // (, line 161
                     // <-, line 161
-                    slice_from(UTF16("ief"));
+                    slice_from("ief");
                     break;
                 case 2:
                     // (, line 162
                     // <-, line 162
-                    slice_from(UTF16("uc"));
+                    slice_from("uc");
                     break;
                 case 3:
                     // (, line 163
                     // <-, line 163
-                    slice_from(UTF16("um"));
+                    slice_from("um");
                     break;
                 case 4:
                     // (, line 164
                     // <-, line 164
-                    slice_from(UTF16("rb"));
+                    slice_from("rb");
                     break;
                 case 5:
                     // (, line 165
                     // <-, line 165
-                    slice_from(UTF16("ur"));
+                    slice_from("ur");
                     break;
                 case 6:
                     // (, line 166
                     // <-, line 166
-                    slice_from(UTF16("ister"));
+                    slice_from("ister");
                     break;
                 case 7:
                     // (, line 167
                     // <-, line 167
-                    slice_from(UTF16("meter"));
+                    slice_from("meter");
                     break;
                 case 8:
                     // (, line 168
                     // <-, line 168
-                    slice_from(UTF16("olut"));
+                    slice_from("olut");
                     break;
                 case 9:
                     // (, line 169
                     // not, line 169
-
                     {
-                        v_1 = limit - cursor;
+                        int c1 = limit - cursor;
                         // literal, line 169
-                        if (!(eq_s_b(UTF16("a"))))
+                        if (!(eq_s_b("a")))
                         {
                             goto lab0;
                         }
-                        return false;
-                    lab0: 
-                        cursor = limit - v_1;
+                        return 0;
+                    lab0: ; 
+                        cursor = limit - c1;
                     }
                     // not, line 169
-
                     {
-                        v_2 = limit - cursor;
+                        int c2 = limit - cursor;
                         // literal, line 169
-                        if (!(eq_s_b(UTF16("i"))))
+                        if (!(eq_s_b("i")))
                         {
                             goto lab1;
                         }
-                        return false;
-                    lab1: 
-                        cursor = limit - v_2;
+                        return 0;
+                    lab1: ; 
+                        cursor = limit - c2;
                     }
                     // not, line 169
-
                     {
-                        v_3 = limit - cursor;
+                        int c3 = limit - cursor;
                         // literal, line 169
-                        if (!(eq_s_b(UTF16("o"))))
+                        if (!(eq_s_b("o")))
                         {
                             goto lab2;
                         }
-                        return false;
-                    lab2: 
-                        cursor = limit - v_3;
+                        return 0;
+                    lab2: ; 
+                        cursor = limit - c3;
                     }
                     // <-, line 169
-                    slice_from(UTF16("l"));
+                    slice_from("l");
                     break;
                 case 10:
                     // (, line 170
                     // <-, line 170
-                    slice_from(UTF16("bic"));
+                    slice_from("bic");
                     break;
                 case 11:
                     // (, line 171
                     // <-, line 171
-                    slice_from(UTF16("dic"));
+                    slice_from("dic");
                     break;
                 case 12:
                     // (, line 172
                     // <-, line 172
-                    slice_from(UTF16("pic"));
+                    slice_from("pic");
                     break;
                 case 13:
                     // (, line 173
                     // <-, line 173
-                    slice_from(UTF16("tic"));
+                    slice_from("tic");
                     break;
                 case 14:
                     // (, line 174
                     // <-, line 174
-                    slice_from(UTF16("ac"));
+                    slice_from("ac");
                     break;
                 case 15:
                     // (, line 175
                     // <-, line 175
-                    slice_from(UTF16("ec"));
+                    slice_from("ec");
                     break;
                 case 16:
                     // (, line 176
                     // <-, line 176
-                    slice_from(UTF16("ic"));
+                    slice_from("ic");
                     break;
                 case 17:
                     // (, line 177
                     // <-, line 177
-                    slice_from(UTF16("luc"));
+                    slice_from("luc");
                     break;
                 case 18:
                     // (, line 178
                     // <-, line 178
-                    slice_from(UTF16("uas"));
+                    slice_from("uas");
                     break;
                 case 19:
                     // (, line 179
                     // <-, line 179
-                    slice_from(UTF16("vas"));
+                    slice_from("vas");
                     break;
                 case 20:
                     // (, line 180
                     // <-, line 180
-                    slice_from(UTF16("cis"));
+                    slice_from("cis");
                     break;
                 case 21:
                     // (, line 181
                     // <-, line 181
-                    slice_from(UTF16("lis"));
+                    slice_from("lis");
                     break;
                 case 22:
                     // (, line 182
                     // <-, line 182
-                    slice_from(UTF16("eris"));
+                    slice_from("eris");
                     break;
                 case 23:
                     // (, line 183
                     // <-, line 183
-                    slice_from(UTF16("pans"));
+                    slice_from("pans");
                     break;
                 case 24:
                     // (, line 184
                     // not, line 184
-
                     {
-                        v_4 = limit - cursor;
+                        int c4 = limit - cursor;
                         // literal, line 184
-                        if (!(eq_s_b(UTF16("s"))))
+                        if (!(eq_s_b("s")))
                         {
                             goto lab3;
                         }
-                        return false;
-                    lab3: 
-                        cursor = limit - v_4;
+                        return 0;
+                    lab3: ; 
+                        cursor = limit - c4;
                     }
                     // <-, line 184
-                    slice_from(UTF16("ens"));
+                    slice_from("ens");
                     break;
                 case 25:
                     // (, line 185
                     // <-, line 185
-                    slice_from(UTF16("ons"));
+                    slice_from("ons");
                     break;
                 case 26:
                     // (, line 186
                     // <-, line 186
-                    slice_from(UTF16("lus"));
+                    slice_from("lus");
                     break;
                 case 27:
                     // (, line 187
                     // <-, line 187
-                    slice_from(UTF16("rus"));
+                    slice_from("rus");
                     break;
                 case 28:
                     // (, line 188
                     // not, line 188
-
                     {
-                        v_5 = limit - cursor;
+                        int c5 = limit - cursor;
                         // literal, line 188
-                        if (!(eq_s_b(UTF16("p"))))
+                        if (!(eq_s_b("p")))
                         {
                             goto lab4;
                         }
-                        return false;
-                    lab4: 
-                        cursor = limit - v_5;
+                        return 0;
+                    lab4: ; 
+                        cursor = limit - c5;
                     }
                     // not, line 188
-
                     {
-                        v_6 = limit - cursor;
+                        int c6 = limit - cursor;
                         // literal, line 188
-                        if (!(eq_s_b(UTF16("t"))))
+                        if (!(eq_s_b("t")))
                         {
                             goto lab5;
                         }
-                        return false;
-                    lab5: 
-                        cursor = limit - v_6;
+                        return 0;
+                    lab5: ; 
+                        cursor = limit - c6;
                     }
                     // <-, line 188
-                    slice_from(UTF16("hes"));
+                    slice_from("hes");
                     break;
                 case 29:
                     // (, line 189
                     // <-, line 189
-                    slice_from(UTF16("mis"));
+                    slice_from("mis");
                     break;
                 case 30:
                     // (, line 190
                     // not, line 190
-
                     {
-                        v_7 = limit - cursor;
+                        int c7 = limit - cursor;
                         // literal, line 190
-                        if (!(eq_s_b(UTF16("m"))))
+                        if (!(eq_s_b("m")))
                         {
                             goto lab6;
                         }
-                        return false;
-                    lab6: 
-                        cursor = limit - v_7;
+                        return 0;
+                    lab6: ; 
+                        cursor = limit - c7;
                     }
                     // <-, line 190
-                    slice_from(UTF16("ens"));
+                    slice_from("ens");
                     break;
                 case 31:
                     // (, line 192
                     // <-, line 192
-                    slice_from(UTF16("ers"));
+                    slice_from("ers");
                     break;
                 case 32:
                     // (, line 193
                     // not, line 193
-
                     {
-                        v_8 = limit - cursor;
+                        int c8 = limit - cursor;
                         // literal, line 193
-                        if (!(eq_s_b(UTF16("n"))))
+                        if (!(eq_s_b("n")))
                         {
                             goto lab7;
                         }
-                        return false;
-                    lab7: 
-                        cursor = limit - v_8;
+                        return 0;
+                    lab7: ; 
+                        cursor = limit - c8;
                     }
                     // <-, line 193
-                    slice_from(UTF16("es"));
+                    slice_from("es");
                     break;
                 case 33:
                     // (, line 194
                     // <-, line 194
-                    slice_from(UTF16("ys"));
+                    slice_from("ys");
                     break;
                 case 34:
                     // (, line 195
                     // <-, line 195
-                    slice_from(UTF16("ys"));
+                    slice_from("ys");
                     break;
             }
 
-            return true;
+            return 1;
         }
 
-        private bool stem()
+        private int stem()
         {
-            int v_1;
-            int v_2;
-            int v_3;
             // (, line 200
             // backwards, line 202
             limit_backward = cursor; cursor = limit;
             // (, line 202
             // do, line 203
-            v_1 = limit - cursor;
-            // call endings, line 203
-            if (!r_endings())
             {
-                goto lab0;
+                int c1 = limit - cursor;
+                {
+                    // call endings, line 203
+                    int ret = r_endings();
+                    if (ret == 0)
+                        goto lab0;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab0: ; 
+                cursor = limit - c1;
             }
-        lab0: 
-            cursor = limit - v_1;
             // do, line 204
-            v_2 = limit - cursor;
-            // call undouble, line 204
-            if (!r_undouble())
             {
-                goto lab1;
+                int c2 = limit - cursor;
+                {
+                    // call undouble, line 204
+                    int ret = r_undouble();
+                    if (ret == 0)
+                        goto lab1;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab1: ; 
+                cursor = limit - c2;
             }
-        lab1: 
-            cursor = limit - v_2;
             // do, line 205
-            v_3 = limit - cursor;
-            // call respell, line 205
-            if (!r_respell())
             {
-                goto lab2;
+                int c3 = limit - cursor;
+                {
+                    // call respell, line 205
+                    int ret = r_respell();
+                    if (ret == 0)
+                        goto lab2;
+                    else if (ret < 0)
+                        return ret;
+                }
+            lab2: ; 
+                cursor = limit - c3;
             }
-        lab2: 
-            cursor = limit - v_3;
             cursor = limit_backward;
 
-            return true;
+            return 1;
         }
 
         protected override bool Process()
         {
-            return this.stem();
+            return this.stem() > 0;
         }
 
     }

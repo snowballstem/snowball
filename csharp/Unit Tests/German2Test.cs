@@ -12,7 +12,7 @@ namespace Unit_Tests
         {
             var german = new German2Stemmer();
 
-            Assert.AreEqual("amtsgeheimniss", german.Stem("amtsgeheimnisse"));
+            Assert.AreEqual("amtsgeheimnis", german.Stem("amtsgeheimnisse"));
         }
 
         [TestMethod]
