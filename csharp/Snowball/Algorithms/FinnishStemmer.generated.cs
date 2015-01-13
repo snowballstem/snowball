@@ -175,7 +175,8 @@ namespace Snowball
             // (, line 41
             I_p1 = limit;
             I_p2 = limit;
-            if (out_grouping(g_V1, 97, 246, true) < 0)            {
+            if (out_grouping(g_V1, 97, 246, true) < 0)
+            {
                 return 0;
             }
  /* goto */            {
@@ -190,7 +191,8 @@ namespace Snowball
             }
             // setmark p1, line 46
             I_p1 = cursor;
-            if (out_grouping(g_V1, 97, 246, true) < 0)            {
+            if (out_grouping(g_V1, 97, 246, true) < 0)
+            {
                 return 0;
             }
  /* goto */            {
@@ -891,7 +893,8 @@ namespace Snowball
                 cursor = limit - c8;
             }
             limit_backward = c2;
-            if (in_grouping_b(g_V1, 97, 246, true) < 0)            {
+            if (in_grouping_b(g_V1, 97, 246, true) < 0)
+            {
                 return 0;
             }
  /* goto */            // [, line 179
@@ -1000,8 +1003,7 @@ namespace Snowball
                 int c6 = limit - cursor;
                 // (, line 192
                 // Boolean test ending_removed, line 192
-                if (!(B_ending_removed)
-)
+                if (!(B_ending_removed))
                 {
                     goto lab6;
                 }

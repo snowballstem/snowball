@@ -113,7 +113,8 @@ namespace Snowball
                 I_x = cursor;
                 cursor = c1;
             }
-            if (out_grouping(g_v, 97, 246, true) < 0)            {
+            if (out_grouping(g_v, 97, 246, true) < 0)
+            {
                 return 0;
             }
  /* goto */            {

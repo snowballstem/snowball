@@ -920,8 +920,7 @@ namespace Snowball
                 int c18 = cursor;
                 // (, line 137
                 // Boolean test Y_found, line 137
-                if (!(B_Y_found)
-)
+                if (!(B_Y_found))
                 {
                     goto lab13;
                 }

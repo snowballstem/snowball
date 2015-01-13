@@ -717,12 +717,12 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
 	g->I[0] = q->smallest_ch;
 	g->I[1] = q->largest_ch;
 	if (is_goto) {
-		w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, true) < 0)~N~f /* goto */", p);
+		w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, true) < 0)~N~f /* goto */");
 	}
 	else {
 		w(g, "~{~M/* gopast */ ~N"
 			"~Mint ret = ~S1_grouping~S0(~V0, ~I0, ~I1, true);~N"
-			"~Mif (ret < 0)~N~f~N", p);
+			"~Mif (ret < 0)~N~f~N");
 		if (p->mode == m_forward)
 			w(g, "~Mcursor += ret;~N");
 		else
@@ -1110,7 +1110,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 	g->V[0] = p->name;
 	g->I[0] = q->smallest_ch;
 	g->I[1] = q->largest_ch;
-	w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, false) != 0)~N~f", p);
+	w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, false) != 0)~N~f");
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1145,7 +1145,7 @@ static void generate_define(struct generator * g, struct node * p) {
 	g->next_label = 0;
 	g->var_number = 0;
 	if (p->amongvar_needed)
-		w(g, "~Mint among_var;~N", p);
+		w(g, "~Mint among_var;~N");
 	str_clear(g->failure_str);
 	g->failure_label = x_return;
 	g->label_used = 0;

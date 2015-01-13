@@ -282,7 +282,8 @@ namespace Snowball
                 int c1 = limit - cursor;
                 // (, line 113
                 // (, line 114
-                if (out_grouping_b(g_vowel, 97, 305, true) < 0)                {
+                if (out_grouping_b(g_vowel, 97, 305, true) < 0)
+                {
                     return 0;
                 }
  /* goto */                // (, line 115
@@ -295,7 +296,8 @@ namespace Snowball
                     {
                         goto lab1;
                     }
-                    if (out_grouping_b(g_vowel1, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel1, 97, 305, true) < 0)
+                    {
                         goto lab1;
                     }
  /* goto */                    goto lab0;
@@ -307,7 +309,8 @@ namespace Snowball
                     {
                         goto lab2;
                     }
-                    if (out_grouping_b(g_vowel2, 101, 252, true) < 0)                    {
+                    if (out_grouping_b(g_vowel2, 101, 252, true) < 0)
+                    {
                         goto lab2;
                     }
  /* goto */                    goto lab0;
@@ -319,7 +322,8 @@ namespace Snowball
                     {
                         goto lab3;
                     }
-                    if (out_grouping_b(g_vowel3, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel3, 97, 305, true) < 0)
+                    {
                         goto lab3;
                     }
  /* goto */                    goto lab0;
@@ -331,7 +335,8 @@ namespace Snowball
                     {
                         goto lab4;
                     }
-                    if (out_grouping_b(g_vowel4, 101, 105, true) < 0)                    {
+                    if (out_grouping_b(g_vowel4, 101, 105, true) < 0)
+                    {
                         goto lab4;
                     }
  /* goto */                    goto lab0;
@@ -343,7 +348,8 @@ namespace Snowball
                     {
                         goto lab5;
                     }
-                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)                    {
+                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)
+                    {
                         goto lab5;
                     }
  /* goto */                    goto lab0;
@@ -355,7 +361,8 @@ namespace Snowball
                     {
                         goto lab6;
                     }
-                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)                    {
+                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)
+                    {
                         goto lab6;
                     }
  /* goto */                    goto lab0;
@@ -367,7 +374,8 @@ namespace Snowball
                     {
                         goto lab7;
                     }
-                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)                    {
+                    if (out_grouping_b(g_vowel5, 111, 117, true) < 0)
+                    {
                         goto lab7;
                     }
  /* goto */                    goto lab0;
@@ -379,7 +387,8 @@ namespace Snowball
                     {
                         return 0;
                     }
-                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)                    {
+                    if (out_grouping_b(g_vowel6, 246, 252, true) < 0)
+                    {
                         return 0;
                     }
  /* goto */                }
@@ -3083,7 +3092,8 @@ namespace Snowball
                     int c4 = limit - cursor;
                     // (, line 432
                     // (, line 432
-                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)
+                    {
                         goto lab3;
                     }
  /* goto */                    // or, line 432
@@ -3121,7 +3131,8 @@ namespace Snowball
                     int c7 = limit - cursor;
                     // (, line 434
                     // (, line 434
-                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)
+                    {
                         goto lab6;
                     }
  /* goto */                    // or, line 434
@@ -3159,7 +3170,8 @@ namespace Snowball
                     int c10 = limit - cursor;
                     // (, line 436
                     // (, line 436
-                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)
+                    {
                         goto lab9;
                     }
  /* goto */                    // or, line 436
@@ -3197,7 +3209,8 @@ namespace Snowball
                     int c13 = limit - cursor;
                     // (, line 438
                     // (, line 438
-                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)                    {
+                    if (out_grouping_b(g_vowel, 97, 305, true) < 0)
+                    {
                         return 0;
                     }
  /* goto */                    // or, line 438
@@ -3435,8 +3448,7 @@ namespace Snowball
                 cursor = limit - c1;
             }
             // Boolean test continue_stemming_noun_suffixes, line 469
-            if (!(B_continue_stemming_noun_suffixes)
-)
+            if (!(B_continue_stemming_noun_suffixes))
             {
                 return 0;
             }

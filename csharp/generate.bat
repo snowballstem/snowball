@@ -4,7 +4,7 @@ setlocal enableextensions,enabledelayedexpansion
 set LOCAL=%~d0%~p0
 
 set ALGORITHMS=..\algorithms\
-set SNOWBALL=%LOCAL%snowball.exe
+set SNOWBALL=%LOCAL%..\snowball
 set TARGET=%LOCAL%Snowball\Algorithms\
 
 
@@ -41,15 +41,15 @@ call :Compile German2        german2\stem_ISO_8859_1.sbl
 call :Compile Hungarian      hungarian\stem_Unicode.sbl     
 call :Compile Italian        italian\stem_ISO_8859_1.sbl
 call :Compile KraaijPohlmann kraaij_pohlmann\stem_ISO_8859_1.sbl
-call :Compile Lovins         Lovins\stem_ISO_8859_1.sbl
-call :Compile Norwegian      Norwegian\stem_ISO_8859_1.sbl
-call :Compile Porter         Porter\stem_ISO_8859_1.sbl
-call :Compile Portuguese     Portuguese\stem_ISO_8859_1.sbl
-call :Compile Romanian       Romanian\stem_Unicode.sbl
-call :Compile Russian        Russian\stem_Unicode.sbl
-call :Compile Spanish        Spanish\stem_ISO_8859_1.sbl
-call :Compile Swedish        Swedish\stem_ISO_8859_1.sbl
-call :Compile Turkish        Turkish\stem_Unicode.sbl
+call :Compile Lovins         lovins\stem_ISO_8859_1.sbl
+call :Compile Norwegian      norwegian\stem_ISO_8859_1.sbl
+call :Compile Porter         porter\stem_ISO_8859_1.sbl
+call :Compile Portuguese     portuguese\stem_ISO_8859_1.sbl
+call :Compile Romanian       romanian\stem_Unicode.sbl
+call :Compile Russian        russian\stem_Unicode.sbl
+call :Compile Spanish        spanish\stem_ISO_8859_1.sbl
+call :Compile Swedish        swedish\stem_ISO_8859_1.sbl
+call :Compile Turkish        turkish\stem_Unicode.sbl
 
 echo.
 rem pause
@@ -65,9 +65,8 @@ setlocal EnableDelayedExpansion
   set CompletePath=%ALGORITHMS%!RelativePath!
   set ClassName=!Language!Stemmer
   set OutputPath=%TARGET%\!ClassName!.generated
-  set Unicode=%~3
 
   echo   - Processing !Language! (!RelativePath!)
-  %SNOWBALL% !CompletePath! -cs -o !OutputPath! -name !ClassName! !Unicode!
+  %SNOWBALL% !CompletePath! -cs -o !OutputPath! -name !ClassName!
 
 goto :EOF

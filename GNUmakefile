@@ -23,7 +23,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
-		   compiler/generator_java.c
+		   compiler/generator_java.c \
+		   compiler/generator_csharp.c
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \
 		   compiler/syswords2.h

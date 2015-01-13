@@ -1852,10 +1852,12 @@ namespace Snowball
                 cursor = c1;
             }
             // (, line 190
-            if (out_grouping(g_v, 97, 121, true) < 0)            {
+            if (out_grouping(g_v, 97, 121, true) < 0)
+            {
                 return 0;
             }
- /* goto */            if (in_grouping(g_v, 97, 121, true) < 0)            {
+ /* goto */            if (in_grouping(g_v, 97, 121, true) < 0)
+            {
                 return 0;
             }
  /* goto */            // set GE_removed, line 191
@@ -1912,10 +1914,12 @@ namespace Snowball
                 cursor = c2;
             }
             // (, line 197
-            if (out_grouping(g_v, 97, 121, true) < 0)            {
+            if (out_grouping(g_v, 97, 121, true) < 0)
+            {
                 return 0;
             }
- /* goto */            if (in_grouping(g_v, 97, 121, true) < 0)            {
+ /* goto */            if (in_grouping(g_v, 97, 121, true) < 0)
+            {
                 return 0;
             }
  /* goto */            // set GE_removed, line 198
@@ -2249,8 +2253,7 @@ namespace Snowball
                 int c11 = limit - cursor;
                 // (, line 232
                 // Boolean test GE_removed, line 232
-                if (!(B_GE_removed)
-)
+                if (!(B_GE_removed))
                 {
                     goto lab9;
                 }
@@ -2302,8 +2305,7 @@ namespace Snowball
                 int c14 = limit - cursor;
                 // (, line 237
                 // Boolean test GE_removed, line 237
-                if (!(B_GE_removed)
-)
+                if (!(B_GE_removed))
                 {
                     goto lab11;
                 }
@@ -2345,16 +2347,14 @@ namespace Snowball
                 // (, line 241
                 // or, line 241
                 // Boolean test stemmed, line 241
-                if (!(B_stemmed)
-)
+                if (!(B_stemmed))
                 {
                     goto lab15;
                 }
                 goto lab14;
             lab15: ; 
                 // Boolean test GE_removed, line 241
-                if (!(B_GE_removed)
-)
+                if (!(B_GE_removed))
                 {
                     goto lab13;
                 }
@@ -2376,8 +2376,7 @@ namespace Snowball
                 int c18 = cursor;
                 // (, line 243
                 // Boolean test Y_found, line 243
-                if (!(B_Y_found)
-)
+                if (!(B_Y_found))
                 {
                     goto lab16;
                 }

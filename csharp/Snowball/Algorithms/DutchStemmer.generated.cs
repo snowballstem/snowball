@@ -792,8 +792,7 @@ namespace Snowball
                                 return ret;
                         }
                         // Boolean test e_found, line 142
-                        if (!(B_e_found)
-)
+                        if (!(B_e_found))
                         {
                             goto lab4;
                         }

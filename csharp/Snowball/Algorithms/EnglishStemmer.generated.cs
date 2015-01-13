@@ -1162,8 +1162,7 @@ namespace Snowball
         {
             // (, line 203
             // Boolean test Y_found, line 203
-            if (!(B_Y_found)
-)
+            if (!(B_Y_found))
             {
                 return 0;
             }

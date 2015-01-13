@@ -1011,8 +1011,7 @@ namespace Snowball
                 {
                     int c6 = limit - cursor;
                     // Boolean test standard_suffix_removed, line 231
-                    if (!(B_standard_suffix_removed)
-)
+                    if (!(B_standard_suffix_removed))
                     {
                         goto lab6;
                     }

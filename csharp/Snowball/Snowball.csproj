@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Snowball</RootNamespace>
     <AssemblyName>Stemmer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -52,7 +52,7 @@
     <Compile Include="Algorithms\GermanStemmer.generated.cs" />
     <Compile Include="Algorithms\HungarianStemmer.generated.cs" />
     <Compile Include="Algorithms\ItalianStemmer.generated.cs" />
-    <Compile Include="Algorithms\KraaijpohlmannStemmer.generated.cs" />
+    <Compile Include="Algorithms\KraaijPohlmannStemmer.generated.cs" />
     <Compile Include="Algorithms\LovinsStemmer.generated.cs" />
     <Compile Include="Algorithms\NorwegianStemmer.generated.cs" />
     <Compile Include="Algorithms\PorterStemmer.generated.cs" />
@@ -63,8 +63,7 @@
     <Compile Include="Algorithms\SwedishStemmer.generated.cs" />
     <Compile Include="Algorithms\TurkishStemmer.generated.cs" />
     <Compile Include="Among.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Algorithms\Base\SnowballStemmer.cs" />
+    <Compile Include="Stemmer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

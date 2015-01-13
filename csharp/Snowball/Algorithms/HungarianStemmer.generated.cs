@@ -280,7 +280,8 @@ namespace Snowball
                 {
                     goto lab1;
                 }
-                if (in_grouping(g_v, 97, 369, true) < 0)                {
+                if (in_grouping(g_v, 97, 369, true) < 0)
+                {
                     goto lab1;
                 }
  /* goto */                // or, line 49
