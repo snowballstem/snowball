@@ -15,7 +15,7 @@ namespace Unit_Tests
         {
             string snowballPath = Path.GetFullPath(Environment.CurrentDirectory);
             for (int i = 0; i < 5; i++)
-               snowballPath = Directory.GetParent(snowballPath).FullName;
+                snowballPath = Directory.GetParent(snowballPath).FullName;
 
             string dataPath = Path.GetFullPath(Path.Combine(snowballPath, "snowball-data"));
 
@@ -38,7 +38,7 @@ namespace Unit_Tests
 
             for (int i = 0; i < inputLines.Length; i++)
             {
-                string word = inputLines[i]; 
+                string word = inputLines[i];
                 string expected = outputLines[i];
                 string actual = stemmer.Stem(word);
 

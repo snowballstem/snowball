@@ -2,7 +2,7 @@
 sudo apt-get -y install mono-complete nunit-console
 
 # Use snowball to generate .cs files
-./generate
+sh generate.sh
 
 # Build the .NET solution
 xbuild /p:Configuration=Release Snowball.sln

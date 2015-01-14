@@ -727,6 +727,11 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 		printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
 		generate_GO_grouping(g, p->left, style, p->left->type == c_non);
+
+		g->failure_label = a0;
+		str_delete(g->failure_str);
+		g->failure_str = a1;
+		str_delete(savevar);
 		return;
 	}
 
@@ -990,36 +995,37 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 	write_savecursor(g, p, savevar);
 	generate(g, p->left);
 
-	if (!g->unreachable) {
-		g->B[0] = str_data(varname);
-		if (p->mode == m_forward) {
-			w(g, "~Mint ~B0 = limit - cursor;~N");
-			w(g, "~Mlimit = cursor;~N");
-		}
-		else {
-			w(g, "~Mint ~B0 = limit_backward;~N");
-			w(g, "~Mlimit_backward = cursor;~N");
-		}
-		write_restore(g, p, savevar);
-
-		if (p->mode == m_forward) {
-			str_assign(g->failure_str, "limit += ");
-			str_append(g->failure_str, varname);
-			str_append_ch(g->failure_str, ';');
-		}
-		else {
-			str_assign(g->failure_str, "limit_backward = ");
-			str_append(g->failure_str, varname);
-			str_append_ch(g->failure_str, ';');
-		}
-		generate(g, p->aux);
-
-		if (!g->unreachable) {
-			write_margin(g);
-			write_str(g, g->failure_str);
-			write_newline(g);
-		}
+	
+	g->B[0] = str_data(varname);
+	if (p->mode == m_forward) {
+		w(g, "~Mint ~B0 = limit - cursor;~N");
+		w(g, "~Mlimit = cursor;~N");
 	}
+	else {
+		w(g, "~Mint ~B0 = limit_backward;~N");
+		w(g, "~Mlimit_backward = cursor;~N");
+	}
+	write_restore(g, p, savevar);
+
+	if (p->mode == m_forward) {
+		str_assign(g->failure_str, "limit += ");
+		str_append(g->failure_str, varname);
+		str_append_ch(g->failure_str, ';');
+	}
+	else {
+		str_assign(g->failure_str, "limit_backward = ");
+		str_append(g->failure_str, varname);
+		str_append_ch(g->failure_str, ';');
+	}
+
+	generate(g, p->aux);
+
+	
+	write_margin(g);
+	write_str(g, g->failure_str);
+	write_newline(g);
+	
+	
 	str_delete(varname);
 	str_delete(savevar);
 }
@@ -1066,7 +1072,6 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
 	write_block_start(g);
 	write_failure(g);
 	write_block_end(g);
-	g->unreachable = false;
 }
 
 static void generate_call(struct generator * g, struct node * p) {
