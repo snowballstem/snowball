@@ -13,11 +13,11 @@ namespace Unit_Tests
     {
         public static void Test(Stemmer stemmer, string language)
         {
-            string snowballPath = Path.GetFullPath(
-                Path.Combine(Environment.CurrentDirectory, @"..\..\..\..\"));
+            string snowballPath = Path.GetFullPath(Environment.CurrentDirectory);
+            for (int i = 0; i < 5; i++)
+               snowballPath = Directory.GetParent(snowballPath).FullName;
 
-            string dataPath = Path.GetFullPath(
-                Path.Combine(snowballPath, @"..\snowball-data"));
+            string dataPath = Path.GetFullPath(Path.Combine(snowballPath, "snowball-data"));
 
             string langPath = Path.Combine(dataPath, language);
 
@@ -32,9 +32,9 @@ namespace Unit_Tests
 
         public static void Test(Stemmer stemmer, string input, string output)
         {
-            var crlf = new[] { "\r\n" };
-            var inputLines = input.Split(crlf, StringSplitOptions.None);
-            var outputLines = output.Split(crlf, StringSplitOptions.None);
+            var newline = new[] { Environment.NewLine };
+            var inputLines = input.Split(newline, StringSplitOptions.None);
+            var outputLines = output.Split(newline, StringSplitOptions.None);
 
             for (int i = 0; i < inputLines.Length; i++)
             {
