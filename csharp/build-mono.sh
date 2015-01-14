@@ -1,5 +1,5 @@
 # install required packages
-apt-get install mono-complete nunit-console
+sudo apt-get -y install mono-complete nunit-console
 
 # Use snowball to generate .cs files
 ./generate
