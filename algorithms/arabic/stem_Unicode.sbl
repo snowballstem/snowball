@@ -103,8 +103,11 @@ define Prefix_Step3_Verb as (
 backwardmode (
 
         define Suffix_Noun_Step1 as (
+
+                $word_size = size
+                
                 [substring] among (
-                        '{a}{n}' (<- '{a}') // size >= 5 
+                        '{a}{n}' ($word_size > 4 <- '{a}') // size >= 5 
                         '{w}{n}' (<- '{w}') // size >= 5 
                         '{y}{n}' (<- '{y}') // size >= 5 
                         '{y}' '{k}' '{e}' (not is_defined delete set is_genitive) // size >= 4 
