@@ -2,7 +2,8 @@
 /*
 * TODO detect and process_vocalized texts
 * TODO add conditons: noun or verb
-*
+* TODO Ignore some predefined words based on khoja lists
+* 
 */
 stringescapes {}
 
@@ -159,28 +160,40 @@ backwardmode (
 
 )
 
-// Implementation here
-
 define stem as (
-        // guess type and properties
-        
-        
+    // guess type and properties
+    // here
+
+
+    do (
         // suffixes
         backwards (
-         Suffix_Noun_Step1 // TODO: should be applied on nouns only
-         Suffix_Noun_Step2
-         Suffix_Verb_Step1a // TODO: should be applied on verbs only
-         Suffix_Verb_Step1b
-         Suffix_Verb_Step2
-         Suffix_Verb_Step3 
+            (   // TODO: should be applied on nouns only
+                do Suffix_Noun_Step1 
+                do Suffix_Noun_Step2
         )
-        
+        or
+            (   // TODO: should be applied on verbs only
+                do Suffix_Verb_Step1a 
+                do Suffix_Verb_Step1b
+                do Suffix_Verb_Step2
+                do Suffix_Verb_Step3 
+            )
+         )
+    )
+
+    do (
         // prefixes
-        Prefix_Step1
-        Prefix_Step2
-        Prefix_Step3_Noun // TODO: should be applied on nouns only
-        Prefix_Step3_Verb // TODO: should be applied on verbs only
-        
-        // flections
+        do Prefix_Step1
+        do Prefix_Step2
+        (
+            Prefix_Step3_Noun // TODO: should be applied on nouns only
+            or
+            Prefix_Step3_Verb // TODO: should be applied on verbs only
+        )
+    )
+
+    // flections
+    // here
 
 )
