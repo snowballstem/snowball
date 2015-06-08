@@ -134,7 +134,7 @@ ELSE(ENABLE_STATIC MATCHES "ON")
 ENDIF(ENABLE_STATIC MATCHES "ON")
 
 # End of configuration
-SET(LIBSTEM_ALGORITHMS danish dutch english finnish french german hungarian
+SET(LIBSTEM_ALGORITHMS arabic danish dutch english finnish french german hungarian
 	italian norwegian porter portuguese romanian
 	russian spanish swedish turkish)
 SET(KOI8_ALGORITHMS russian)

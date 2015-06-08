@@ -1,0 +1,199 @@
+// Alias: ar
+/*
+* TODO detect and process_vocalized texts
+* TODO add conditons: noun or verb
+* TODO Ignore some predefined words based on khoja lists
+* 
+*/
+stringescapes {}
+
+/* the Arabic letters in Unicode */
+
+// Hamza
+stringdef o     hex '621' // Hamza
+stringdef ao    hex '623' // Hamza above Alef
+
+// Letters
+stringdef a     hex '627' // Alef
+stringdef b     hex '628' // Beh
+stringdef t_    hex '629' // Teh_Marbuta
+stringdef t     hex '62a' // Teh
+stringdef th    hex '62b' // Theh
+stringdef g     hex '62c' // Jeem
+stringdef h     hex '62d' // Hah 
+stringdef x     hex '62e' // Khah
+stringdef d     hex '62f' // Dal
+stringdef dz    hex '630' // Thal
+stringdef r     hex '631' // Reh
+stringdef z     hex '632' // Zain
+stringdef s     hex '633' // Seen
+stringdef sh    hex '634' // Sheen
+stringdef c     hex '635' // Sad
+stringdef dh    hex '636' // Dad
+stringdef tt    hex '637' // Tah
+stringdef zh    hex '638' // Zah
+stringdef i     hex '639' // Ain
+stringdef gh    hex '63a' // Ghain
+stringdef f     hex '641' // Feh
+stringdef q     hex '642' // Qaf
+stringdef k     hex '643' // Kaf
+stringdef l     hex '644' // Lam
+stringdef m     hex '645' // Meem
+stringdef n     hex '646' // Noon
+stringdef e     hex '647' // Heh
+stringdef w     hex '648' // Waw
+stringdef a_    hex '649' // Alef Maksura
+stringdef y     hex '64a' // Yeh
+
+// Diacritics
+stringdef aan   hex '64b' // FatHatan
+stringdef uun   hex '64c' // Dammatan
+stringdef iin   hex '64d' // Kasratan
+stringdef aa    hex '64e' // FatHa
+stringdef uu    hex '64f' // Damma
+stringdef ii    hex '650' // Kasra
+stringdef oo    hex '652' // Sukun
+stringdef shadda  hex '651' // Shadda
+
+
+
+integers (  word_size )
+booleans ( is_noun is_verb is_defined is_genitive )
+
+routines (
+    Prefix_Step1 Prefix_Step2 Prefix_Step3_Noun Prefix_Step3_Verb
+    Suffix_Noun_Step1 Suffix_Noun_Step2 Suffix_Verb_Step1a Suffix_Verb_Step1b Suffix_Verb_Step2 Suffix_Verb_Step3
+)
+
+externals ( stem )
+
+groupings ( conjunctions prepositions   )
+
+define conjunctions '{w}{f}'
+define prepositions '{b}{k}' // except {l}, it has special processing
+
+
+//prefixes
+define Prefix_Step1 as (
+        [substring] among (
+            '{ao}' (delete) // size > 3
+        )
+)
+
+define Prefix_Step2 as (
+        [substring] among ( 
+            '{f}' (delete) // size > 3 
+            '{w}' (delete) // size > 3 
+        )
+)
+
+define Prefix_Step3_Noun as (
+        [substring] among (
+            '{b}{a}{l}' '{k}{a}{l}' '{l}{l}' '{a}{l}' (delete set is_noun set is_defined) // size > 4 
+            '{b}' '{k}' '{l}' (delete set is_noun) // size > 3 
+        )
+)
+
+define Prefix_Step3_Verb as (
+        [substring] among (
+            '{s}' (delete set is_verb) // size > 4 
+        )
+)
+
+// suffixes
+backwardmode (
+
+        define Suffix_Noun_Step1 as (
+
+                $word_size = size
+                
+                [substring] among (
+                        '{a}{n}' ($word_size > 4 <- '{a}') // size >= 5 
+                        '{w}{n}' (<- '{w}') // size >= 5 
+                        '{y}{n}' (<- '{y}') // size >= 5 
+                        '{y}' '{k}' '{e}' (not is_defined delete set is_genitive) // size >= 4 
+                        '{n}{a}' '{k}{m}' '{e}{a}' '{e}{n}' '{e}{m}' (not is_defined delete set is_genitive) // size >= 5
+                        '{k}{m}{a}' '{e}{m}{a}' (not is_defined delete set is_genitive) // size >= 6
+                )
+            )
+
+        define Suffix_Noun_Step2 as (
+                [substring] among (
+                        '{a}{t}' ( delete) // size >= 5
+                        '{a}' '{y}' '{w}' (not is_defined delete set is_genitive ) // size >= 4 
+                )
+            )
+
+       define Suffix_Verb_Step1a as (
+                [substring] among (
+                        '{t}{m}{w}{e}' '{t}{m}{w}{k}' (delete) // size >= 7
+                        '{t}{m}{w}{n}{y}' '{t}{m}{w}{n}{a}' '{t}{m}{w}{e}{a}' '{t}{m}{w}{e}{m}' '{t}{m}{w}{e}{n}' '{t}{m}{w}{k}{m}' '{t}{m}{w}{k}{n}' (delete) // size >= 8 
+                        '{t}{m}{w}{e}{m}{a}' '{t}{m}{w}{k}{m}{a}' (delete) // size <= 9 
+                )
+            )
+
+        define Suffix_Verb_Step1b as (
+                [substring] among (
+                        '{w}{e}' '{w}{k}' (delete) // size >= 5
+                        '{w}{n}{y}' '{w}{n}{a}' '{w}{e}{a}' '{w}{e}{m}' '{w}{e}{n}' '{w}{k}{m}' '{w}{k}{n}' (delete) // size >= 6 
+                        '{w}{e}{m}{a}' '{w}{k}{m}{a}' (delete) // size <= 7
+                )
+            )
+
+
+
+        define Suffix_Verb_Step2 as (
+                [substring] among (
+                        '{e}' '{k}' ( delete) // size >= 4
+                        '{n}{y}' '{n}{a}' '{e}{a}' '{e}{m}' '{e}{n}' '{k}{m}' '{k}{n}' (delete) // size >= 5 
+                        '{e}{m}{a}' '{k}{m}{a}' (delete) // size <= 6 
+                )
+            )
+            
+        define Suffix_Verb_Step3 as (
+                [substring] among (
+                        '{t}' '{a}' '{n}' '{y}' (delete) // size >= 4
+                        '{n}{a}' '{a}{n}' '{t}{a}' '{w}{n}' '{y}{n}' (delete) // size >= 5
+                        '{t}{m}{a}' (delete) // size <= 6 
+                )
+            )
+
+)
+
+define stem as (
+    // guess type and properties
+    // here
+
+
+    do (
+        // suffixes
+        backwards (
+            (   // TODO: should be applied on nouns only
+                do Suffix_Noun_Step1 
+                do Suffix_Noun_Step2
+        )
+        or
+            (   // TODO: should be applied on verbs only
+                do Suffix_Verb_Step1a 
+                do Suffix_Verb_Step1b
+                do Suffix_Verb_Step2
+                do Suffix_Verb_Step3 
+            )
+         )
+    )
+
+    do (
+        // prefixes
+        do Prefix_Step1
+        do Prefix_Step2
+        (
+            Prefix_Step3_Noun // TODO: should be applied on nouns only
+            or
+            Prefix_Step3_Verb // TODO: should be applied on verbs only
+        )
+    )
+
+    // flections
+    // here
+
+)
