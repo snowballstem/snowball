@@ -163,34 +163,23 @@ backwardmode (
 define stem as (
     // guess type and properties
     // here
-
-
-    do (
-        // suffixes
-        backwards (
-            (   // TODO: should be applied on nouns only
-                do Suffix_Noun_Step1 
-                do Suffix_Noun_Step2
-        )
-        or
-            (   // TODO: should be applied on verbs only
-                do Suffix_Verb_Step1a 
-                do Suffix_Verb_Step1b
-                do Suffix_Verb_Step2
-                do Suffix_Verb_Step3 
-            )
-         )
-    )
-
-    do (
-        // prefixes
-        do Prefix_Step1
-        do Prefix_Step2
-        (
-            Prefix_Step3_Noun // TODO: should be applied on nouns only
-            or
-            Prefix_Step3_Verb // TODO: should be applied on verbs only
-        )
+    
+    //Prefixes
+    do Prefix_Step1
+    do Prefix_Step2
+    do Prefix_Step3_Noun
+    do Prefix_Step3_Verb
+        
+    backwards (
+        //Suffixes for nouns 
+        do Suffix_Noun_Step1 
+        do Suffix_Noun_Step2
+        
+        //Suffixes for verbs
+        do Suffix_Verb_Step1a 
+        do Suffix_Verb_Step1b
+        do Suffix_Verb_Step2
+        do Suffix_Verb_Step3
     )
 
     // flections
