@@ -305,13 +305,13 @@ static void generate_AE(struct generator * g, struct node * p) {
             ws(g, s); generate_AE(g, p->right); wch(g, ')'); break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "SIZE(~V0)"); break;
+            w(g, "len(~V0)"); break;
         case c_cursor:
             w(g, "z->c"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "z->l" : "z->lb"); break;
         case c_size:
-            w(g, "SIZE(z->p)"); break;
+            w(g, "len(z->p)"); break;
     }
 }
 

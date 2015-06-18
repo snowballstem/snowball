@@ -24,3 +24,6 @@ extern void SN_close_env(struct SN_env * z, int S_size);
 
 extern int SN_set_current(struct SN_env * z, int size, const symbol * s);
 
+// This function is intended to calculate the number of symbols in UTF-8 encoding
+extern int len(const symbol * p);
+

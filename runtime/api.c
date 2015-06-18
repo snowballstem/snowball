@@ -64,3 +64,15 @@ extern int SN_set_current(struct SN_env * z, int size, const symbol * s)
     return err;
 }
 
+// This function is intended to calculate the number of symbols in UTF-8 encoding
+extern int len(const symbol * p)
+{
+    char * i ;
+    int nbrChar = 0;
+   
+    for (i = p; *i; i++){
+        if ((*i & 0xc0) != 0x80) nbrChar++;
+    }
+   
+    return nbrChar;
+}
