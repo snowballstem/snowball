@@ -75,28 +75,36 @@ define prepositions '{b}{k}' // except {l}, it has special processing
 
 //prefixes
 define Prefix_Step1 as (
+        $word_size = size
+        
         [substring] among (
-            '{ao}' (delete) // size > 3
+            '{ao}' ($word_size > 3 delete) // size > 3
         )
 )
 
 define Prefix_Step2 as (
+        $word_size = size
+        
         [substring] among ( 
-            '{f}' (delete) // size > 3 
-            '{w}' (delete) // size > 3 
+            '{f}' ($word_size > 3 delete) // size > 3 
+            '{w}' ($word_size > 3 delete) // size > 3 
         )
 )
 
 define Prefix_Step3_Noun as (
+        $word_size = size
+        
         [substring] among (
-            '{b}{a}{l}' '{k}{a}{l}' '{l}{l}' '{a}{l}' (delete set is_noun set is_defined) // size > 4 
-            '{b}' '{k}' '{l}' (delete set is_noun) // size > 3 
+            '{b}{a}{l}' '{k}{a}{l}' '{l}{l}' '{a}{l}' ($word_size > 4 delete set is_noun set is_defined) // size > 4 
+            '{b}' '{k}' '{l}' ($word_size > 3 delete set is_noun) // size > 3 
         )
 )
 
 define Prefix_Step3_Verb as (
+        $word_size = size
+        
         [substring] among (
-            '{s}' (delete set is_verb) // size > 4 
+            '{s}' ($word_size > 4 delete set is_verb) // size > 4 
         )
 )
 
@@ -108,53 +116,63 @@ backwardmode (
                 $word_size = size
                 
                 [substring] among (
-                        '{a}{n}' ($word_size > 4 <- '{a}') // size >= 5 
-                        '{w}{n}' (<- '{w}') // size >= 5 
-                        '{y}{n}' (<- '{y}') // size >= 5 
-                        '{y}' '{k}' '{e}' (not is_defined delete set is_genitive) // size >= 4 
-                        '{n}{a}' '{k}{m}' '{e}{a}' '{e}{n}' '{e}{m}' (not is_defined delete set is_genitive) // size >= 5
-                        '{k}{m}{a}' '{e}{m}{a}' (not is_defined delete set is_genitive) // size >= 6
+                        '{a}{n}' ($word_size >= 5 <- '{a}') // size >= 5 
+                        '{w}{n}' ($word_size >= 5 <- '{w}') // size >= 5 
+                        '{y}{n}' ($word_size >= 5 <- '{y}') // size >= 5 
+                        '{y}' '{k}' '{e}' ($word_size >= 4 not is_defined delete set is_genitive) // size >= 4 
+                        '{n}{a}' '{k}{m}' '{e}{a}' '{e}{n}' '{e}{m}' ($word_size >= 5 not is_defined delete set is_genitive) // size >= 5
+                        '{k}{m}{a}' '{e}{m}{a}' ($word_size >= 6 not is_defined delete set is_genitive) // size >= 6
                 )
             )
 
         define Suffix_Noun_Step2 as (
+                $word_size = size
+                
                 [substring] among (
-                        '{a}{t}' ( delete) // size >= 5
-                        '{a}' '{y}' '{w}' (not is_defined delete set is_genitive ) // size >= 4 
+                        '{a}{t}' ($word_size >= 5 delete) // size >= 5
+                        '{a}' '{y}' '{w}' ($word_size >= 4 not is_defined delete set is_genitive ) // size >= 4 
                 )
             )
 
        define Suffix_Verb_Step1a as (
+                $word_size = size
+                
                 [substring] among (
-                        '{t}{m}{w}{e}' '{t}{m}{w}{k}' (delete) // size >= 7
-                        '{t}{m}{w}{n}{y}' '{t}{m}{w}{n}{a}' '{t}{m}{w}{e}{a}' '{t}{m}{w}{e}{m}' '{t}{m}{w}{e}{n}' '{t}{m}{w}{k}{m}' '{t}{m}{w}{k}{n}' (delete) // size >= 8 
-                        '{t}{m}{w}{e}{m}{a}' '{t}{m}{w}{k}{m}{a}' (delete) // size <= 9 
+                        '{t}{m}{w}{e}' '{t}{m}{w}{k}' ($word_size >= 7 delete) // size >= 7
+                        '{t}{m}{w}{n}{y}' '{t}{m}{w}{n}{a}' '{t}{m}{w}{e}{a}' '{t}{m}{w}{e}{m}' '{t}{m}{w}{e}{n}' '{t}{m}{w}{k}{m}' '{t}{m}{w}{k}{n}' ($word_size >= 8 delete) // size >= 8 
+                        '{t}{m}{w}{e}{m}{a}' '{t}{m}{w}{k}{m}{a}' ($word_size <= 9 delete) // size <= 9 
                 )
             )
 
         define Suffix_Verb_Step1b as (
+                $word_size = size
+                
                 [substring] among (
-                        '{w}{e}' '{w}{k}' (delete) // size >= 5
-                        '{w}{n}{y}' '{w}{n}{a}' '{w}{e}{a}' '{w}{e}{m}' '{w}{e}{n}' '{w}{k}{m}' '{w}{k}{n}' (delete) // size >= 6 
-                        '{w}{e}{m}{a}' '{w}{k}{m}{a}' (delete) // size <= 7
+                        '{w}{e}' '{w}{k}' ($word_size >= 5 delete) // size >= 5
+                        '{w}{n}{y}' '{w}{n}{a}' '{w}{e}{a}' '{w}{e}{m}' '{w}{e}{n}' '{w}{k}{m}' '{w}{k}{n}' ($word_size >= 6 delete) // size >= 6 
+                        '{w}{e}{m}{a}' '{w}{k}{m}{a}' ($word_size <= 7 delete) // size <= 7
                 )
             )
 
 
 
         define Suffix_Verb_Step2 as (
+                $word_size = size
+                
                 [substring] among (
-                        '{e}' '{k}' ( delete) // size >= 4
-                        '{n}{y}' '{n}{a}' '{e}{a}' '{e}{m}' '{e}{n}' '{k}{m}' '{k}{n}' (delete) // size >= 5 
-                        '{e}{m}{a}' '{k}{m}{a}' (delete) // size <= 6 
+                        '{e}' '{k}' ($word_size >= 4 delete) // size >= 4
+                        '{n}{y}' '{n}{a}' '{e}{a}' '{e}{m}' '{e}{n}' '{k}{m}' '{k}{n}' ($word_size >= 5 delete) // size >= 5 
+                        '{e}{m}{a}' '{k}{m}{a}' ($word_size <= 6 delete) // size <= 6 
                 )
             )
             
         define Suffix_Verb_Step3 as (
+                $word_size = size
+                
                 [substring] among (
-                        '{t}' '{a}' '{n}' '{y}' (delete) // size >= 4
-                        '{n}{a}' '{a}{n}' '{t}{a}' '{w}{n}' '{y}{n}' (delete) // size >= 5
-                        '{t}{m}{a}' (delete) // size <= 6 
+                        '{t}' '{a}' '{n}' '{y}' ($word_size >= 4 delete) // size >= 4
+                        '{n}{a}' '{a}{n}' '{t}{a}' '{w}{n}' '{y}{n}' ($word_size >= 5 delete) // size >= 5
+                        '{t}{m}{a}' ($word_size <= 6 delete) // size <= 6 
                 )
             )
 
