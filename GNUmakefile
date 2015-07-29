@@ -3,6 +3,10 @@
 c_src_dir = src_c
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
+python ?= python3
+python_output_dir = python_out
+python_runtime_dir = snowballstemmer
+python_sample_dir = sample
 
 libstemmer_algorithms = danish dutch english finnish french german hungarian \
 			italian \
@@ -23,7 +27,9 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
-		   compiler/generator_java.c
+		   compiler/generator_java.c \
+		   compiler/generator_python.c
+
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \
 		   compiler/syswords2.h
@@ -38,12 +44,23 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
 
+PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
+		         python/snowballstemmer/among.py
+
+PYTHON_SAMPLE_SOURCES = python/testapp.py \
+		        python/stemwords.py
+
+PYTHON_PACKAGE_FILES = python/MANIFEST.in \
+		       python/setup.py
+
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
 LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
+
+PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
 ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
@@ -57,6 +74,8 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
+		 $(python_output_dir)/__init__.py
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -83,10 +102,12 @@ clean:
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+	      $(PYTHON_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
 	rm -rf dist
 	rmdir $(c_src_dir) || true
+	rmdir $(python_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
@@ -154,12 +175,23 @@ $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
 	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
 
+$(python_output_dir)/%_stemmer.py: algorithms/%/stem_Unicode.sbl snowball
+	@mkdir -p $(python_output_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(python_output_dir)/$${l}_stemmer"; \
+	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
+	./snowball $< -py -o $${o} -p "BaseStemmer" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer
+
+$(python_output_dir)/__init__.py:
+	@mkdir -p $(python_output_dir)
+	$(python) python/create_init.py $(python_output_dir)
+
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_java
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_java dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -250,6 +282,23 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
+dist_libstemmer_python: $(PYTHON_SOURCES)
+	destname=snowballstemmer; \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
+	echo "a1" && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/src/$(python_runtime_dir) && \
+	mkdir -p $${dest}/src/$(python_sample_dir) && \
+	cp doc/libstemmer_python_README $${dest}/README.rst && \
+	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
+	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
+	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
+	cp -a $(PYTHON_PACKAGE_FILES) $${dest} && \
+	(cd $${dest} && $(python) setup.py sdist && cp dist/*.tar.gz ..) && \
+	rm -rf $${dest}
+
 check: check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
@@ -293,3 +342,19 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords
 	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("koi8_r"))' | \
 	    diff -u - tmp.txt
 	@rm tmp.txt
+
+check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
+
+check_python_%: $(STEMMING_DATA)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
+	(cd python_check && \
+	$(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i ../$</voc.txt -o tmp.txt && \
+	diff -u ../$</output.txt tmp.txt && \
+	rm tmp.txt)
+
+check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
+	mkdir -p python_check && \
+	mkdir -p python_check/snowballstemmer && \
+	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer && \
+	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer && \
+	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/

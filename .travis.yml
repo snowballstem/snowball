@@ -13,3 +13,4 @@ before_install:
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make && make check STEMMING_DATA=snowball-data
+  - make check_python python=python2.7 STEMMING_DATA=snowball-data

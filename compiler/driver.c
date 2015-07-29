@@ -22,6 +22,9 @@ static void print_arglist(void) {
                     "             [-j[ava]]\n"
 #endif
                     "             [-c++]\n"
+#ifndef DISABLE_PYTHON
+                    "             [-py[thon]]\n"
+#endif
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -105,6 +108,13 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->make_lang = LANG_CPLUSPLUS;
                 continue;
             }
+#ifndef DISABLE_PYTHON
+            if (eq(s, "-py") || eq(s, "-python")) {
+                o->make_lang = LANG_PYTHON;
+                o->widechars = true;
+                continue;
+            }
+#endif
             if (eq(s, "-w") || eq(s, "-widechars")) {
                 o->widechars = true;
                 o->utf8 = false;
@@ -236,6 +246,18 @@ extern int main(int argc, char * argv[]) {
                     generate_program_java(g);
                     close_generator_java(g);
                     fclose(o->output_java);
+                }
+#endif
+#ifndef DISABLE_PYTHON
+                if (o->make_lang == LANG_PYTHON) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".py");
+                    o->output_python = get_output(b);
+                    lose_b(b);
+                    g = create_generator_python(a, o);
+                    generate_program_python(g);
+                    close_generator_python(g);
+                    fclose(o->output_python);
                 }
 #endif
             }

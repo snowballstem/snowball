@@ -259,11 +259,14 @@ struct generator {
     struct str * outbuf;       /* temporary str to store output */
     struct str * declarations; /* str storing variable declarations */
     int next_label;
+#ifndef DISABLE_PYTHON
+    int max_label;
+#endif
     int margin;
 
     const char * failure_string;     /* String to output in case of a failure. */
-#ifndef DISABLE_JAVA
-    struct str * failure_str;  /* This is used by the java generator instead of failure_string */
+#if !defined(DISABLE_JAVA) && !defined(DISABLE_PYTHON)
+    struct str * failure_str;  /* This is used by some generators instead of failure_string */
 #endif
 
     int label_used;     /* Keep track of whether the failure label is used. */
@@ -294,9 +297,12 @@ struct options {
 #ifndef DISABLE_JAVA
     FILE * output_java;
 #endif
+#ifndef DISABLE_PYTHON
+    FILE * output_python;
+#endif
     byte syntax_tree;
     byte widechars;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON } make_lang;
     char * externals_prefix;
     char * variables_prefix;
     char * runtime_path;
@@ -321,4 +327,12 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
 extern void close_generator_java(struct generator * g);
 
 extern void generate_program_java(struct generator * g);
+#endif
+
+#ifndef DISABLE_PYTHON
+/* Generator for Python code. */
+extern struct generator * create_generator_python(struct analyser * a, struct options * o);
+extern void close_generator_python(struct generator * g);
+
+extern void generate_program_python(struct generator * g);
 #endif
