@@ -268,11 +268,6 @@ check_utf8_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
 	@./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
 	@diff -u $</output.txt tmp.txt
-	@if [ -e $</diffs.txt ] ; \
-	then \
-	  ./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt -p2 && \
-	  diff -u $</diffs.txt tmp.txt; \
-	fi
 	@rm tmp.txt
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords
