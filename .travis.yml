@@ -5,8 +5,11 @@ compiler:
   - gcc
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
-# CI tested.  If that fails, just clone the standard repo.
+# CI tested easily.
+#
+# If that fails, just clone the standard snowball-data repo with the same
+# branch name, falling back to the default branch.
 before_install:
-  - git submodule add --depth=1 -b "`git branch --color=never --contains|cut -d' ' -f2-`" "`git config remote.origin.url|sed 's,\(.*/snowball\>\),\1-data,'`" snowball-data || git submodule add --depth=1 https://github.com/snowballstem/snowball-data.git
+  - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make && make check STEMMING_DATA=snowball-data
