@@ -7,6 +7,6 @@ compiler:
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested.  If that fails, just clone the standard repo.
 before_install:
-  - git submodule add --depth=1 "`git config remote.origin.url|sed 's,\(.*/snowball\>\),\1-data,'`" -b "`git branch --color=never --contains|cut -d' ' -f2-`" snowball-data || git submodule add --depth=1 git@github.com:snowballstem/snowball-data.git
+  - git submodule add --depth=1 -b "`git branch --color=never --contains|cut -d' ' -f2-`" "`git config remote.origin.url|sed 's,\(.*/snowball\>\),\1-data,'`" snowball-data || git submodule add --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make && make check STEMMING_DATA=snowball-data
