@@ -7,8 +7,9 @@ def usage():
     print('''usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]
 
 The input file consists of a list of words to be stemmed, one per
-line. The words are automatically converted to lower-case.
-If omitted, stdin is used.
+line. Words should be in lower case, but (for English) A-Z letters
+are mapped to their a-z equivalents anyway. If omitted, stdin is
+used.
 
 If -c is given, the argument is the character encoding of the input
 and output files.  If it is omitted, the UTF-8 encoding is used.
@@ -78,7 +79,9 @@ def stemming(lang, input, output, encoding, pretty):
     result = []
     stemmer = snowballstemmer.stemmer(lang)
     for original in codecs.open(input, "r", encoding).readlines():
-        original = original.strip().lower()
+        original = original.strip()
+        # Convert only ASCII-letters to lowercase, to match C behavior
+        original = ''.join((lower_(c) if 'A' <= c <= 'Z' else c for c in original))
         stemmed = stemmer.stemWord(original)
         if result:
             result.append('\n')
