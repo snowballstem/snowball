@@ -2,7 +2,11 @@ language: c
 sudo: false
 compiler:
   - clang
+    env: python=python2.7
   - gcc
+    env: python=python2.7
+  - gcc
+    env: python=python3
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested easily.
@@ -13,4 +17,4 @@ before_install:
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make && make check STEMMING_DATA=snowball-data
-  - make check_python python=python2.7 STEMMING_DATA=snowball-data
+  - make check_python STEMMING_DATA=snowball-data
