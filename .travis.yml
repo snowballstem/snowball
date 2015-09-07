@@ -1,12 +1,13 @@
 language: c
 sudo: false
-compiler:
-  - clang
-    env: python=python2.7
-  - gcc
-    env: python=python2.7
-  - gcc
-    env: python=python3
+matrix:
+  include:
+    - compiler: clang
+      env: python=python2.7
+    - compiler: gcc
+      env: python=python2.7
+    - compiler: gcc
+      env: python=python3
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested easily.
