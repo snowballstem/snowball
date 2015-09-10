@@ -7,6 +7,8 @@ python ?= python3
 python_output_dir = python_out
 python_runtime_dir = snowballstemmer
 python_sample_dir = sample
+ICONV = iconv
+#ICONV = python ./iconv.py
 
 libstemmer_algorithms = danish dutch english finnish french german hungarian \
 			italian \
@@ -321,25 +323,25 @@ check_utf8_%: $(STEMMING_DATA)/% stemwords
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
-	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-1"))' | \
+	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("iso8859-1"))' | \
+	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
 check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
-	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("iso8859-2"))' | \
+	@$(ICONV) -fUTF8 -tISO8859-2 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("iso8859-2"))' | \
+	@$(ICONV) -fUTF8 -tISO8859-2 '$</output.txt' |\
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
 check_koi8r_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with KOI8R"
-	@python -c 'print(open("$</voc.txt").read().decode("utf8").encode("koi8_r"))' | \
+	@$(ICONV) -fUTF8 -tKOI8-R '$</voc.txt' |\
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@python -c 'print(open("$</output.txt").read().decode("utf8").encode("koi8_r"))' | \
+	@$(ICONV) -fUTF8 -tKOI8-R '$</output.txt' |\
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
