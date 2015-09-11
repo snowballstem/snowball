@@ -1,7 +1,7 @@
 language: c
 sudo: false
 # Can't currently test Python 3 easily as >= 3.3 is required, which isn't in
-# trusty, and for travis is seemingly only obtainable with `language: python`,
+# precise, and for travis is seemingly only obtainable with `language: python`,
 # but then we can't test with GCC and clang.
 matrix:
   include:
