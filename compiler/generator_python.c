@@ -1262,15 +1262,6 @@ static void generate_class_begin(struct generator * g) {
          "~N");
 }
 
-static void generate_equals(struct generator * g) {
-
-    w(g, "~N"
-         "~Mdef equals(self, o):~N"
-         "~+~Mreturn isinstance(o, ");
-    w(g, g->options->name);
-    w(g, ")~N~-");
-}
-
 static void generate_among_table(struct generator * g, struct among * x) {
 
     struct amongvec * v = x->b;
@@ -1425,7 +1416,6 @@ extern void generate_program_python(struct generator * g) {
     generate_members(g);
     generate_copyfrom(g);
     generate_methods(g);
-    generate_equals(g);
 
     generate_label_classes(g);
 
