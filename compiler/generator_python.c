@@ -978,11 +978,11 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
     g->S[0] = s;
     if (p->AE->type == c_name)
     {
-        w(g, "~Mself.~V0 ~S0 self."); generate_AE(g, p->AE); w(g, ";~N");
+        w(g, "~Mself.~V0 ~S0 self."); generate_AE(g, p->AE); w(g, "~N");
     }
     else
     {
-        w(g, "~Mself.~V0 ~S0 "); generate_AE(g, p->AE); w(g, ";~N");
+        w(g, "~Mself.~V0 ~S0 "); generate_AE(g, p->AE); w(g, "~N");
     }
 }
 
@@ -1156,7 +1156,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mself.debug(~I0, ~I1);~N", p);
+    writef(g, "~Mself.debug(~I0, ~I1)~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1388,8 +1388,7 @@ static void generate_copyfrom(struct generator * g) {
                 break;
         }
     }
-    w(g, "~Msuper.copy_from(other)~N");
-    w(g, "~-~M~N");
+    w(g, "~Msuper.copy_from(other)~N~-");
 }
 
 static void generate_methods(struct generator * g) {
@@ -1408,7 +1407,7 @@ static void generate_label_classes(struct generator * g)
     for (i = 0; i <= g->max_label; i++)
     {
         g->I[0] = i;
-        w(g, "class lab~I0(BaseException): pass~N");
+        w(g, "~N~Nclass lab~I0(BaseException): pass~N");
     }
 }
 
