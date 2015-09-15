@@ -1073,33 +1073,14 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_define(struct generator * g, struct node * p) {
 
     struct name * q = p->name;
-    symbol stem[] = {'s', 't', 'e', 'm'};
-    int find = 0;
-    int i = 0;
-    if (SIZE(q->b) == 4)
-    {
-        find = 1;
-        for (i = 0; i < 4; i++)
-        {
-            if (q->b[i] != stem[i])
-            {
-                find = 0;
-                break;
-            }
-        }
-    }
+
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
 
+    g->S[0] = q->type == t_routine ? "" : "override ";
     g->V[0] = q;
-    if (find == 1)
-    {
-        w(g, "~N~Moverride function ~V0 () : boolean~N~M{~+~N");
-    }
-    else
-    {
-        w(g, "~N~Mfunction ~V0 () : boolean~N~M{~+~N");
-    }
+    w(g, "~N~M~S0function ~V0 () : boolean~N~M{~+~N");
+
     g->outbuf = str_new();
     g->declarations = str_new();
 
