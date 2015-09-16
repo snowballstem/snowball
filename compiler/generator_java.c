@@ -234,6 +234,7 @@ static void write_failure(struct generator * g) {
     {
         case x_return:
             write_string(g, "return false;");
+            g->unreachable = true;
             break;
         default:
             write_string(g, "break lab");
