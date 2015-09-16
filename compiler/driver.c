@@ -25,6 +25,9 @@ static void print_arglist(void) {
 #ifndef DISABLE_PYTHON
                     "             [-py[thon]]\n"
 #endif
+#ifndef DISABLE_JSX
+                    "             [-jsx]\n"
+#endif
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -97,6 +100,13 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->name = argv[i++];
                 continue;
             }
+#ifndef DISABLE_JSX
+            if (eq(s, "-jsx")) {
+                o->make_lang = LANG_JSX;
+                o->widechars = true;
+                continue;
+            }
+#endif
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
@@ -258,6 +268,18 @@ extern int main(int argc, char * argv[]) {
                     generate_program_python(g);
                     close_generator_python(g);
                     fclose(o->output_python);
+                }
+#endif
+#ifndef DISABLE_JSX
+                if (o->make_lang == LANG_JSX) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".jsx");
+                    o->output_jsx = get_output(b);
+                    lose_b(b);
+                    g = create_generator_jsx(a, o);
+                    generate_program_jsx(g);
+                    close_generator_jsx(g);
+                    fclose(o->output_jsx);
                 }
 #endif
             }

@@ -265,7 +265,7 @@ struct generator {
     int margin;
 
     const char * failure_string;     /* String to output in case of a failure. */
-#if !defined(DISABLE_JAVA) && !defined(DISABLE_PYTHON)
+#if !defined(DISABLE_JAVA) && !defined(DISABLE_JSX) && !defined(DISABLE_PYTHON)
     struct str * failure_str;  /* This is used by some generators instead of failure_string */
 #endif
 
@@ -300,9 +300,12 @@ struct options {
 #ifndef DISABLE_PYTHON
     FILE * output_python;
 #endif
+#ifndef DISABLE_JSX
+    FILE * output_jsx;
+#endif
     byte syntax_tree;
     byte widechars;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX } make_lang;
     char * externals_prefix;
     char * variables_prefix;
     char * runtime_path;
@@ -335,4 +338,11 @@ extern struct generator * create_generator_python(struct analyser * a, struct op
 extern void close_generator_python(struct generator * g);
 
 extern void generate_program_python(struct generator * g);
+#endif
+
+#ifndef DISABLE_JSX
+extern struct generator * create_generator_jsx(struct analyser * a, struct options * o);
+extern void close_generator_jsx(struct generator * g);
+
+extern void generate_program_jsx(struct generator * g);
 #endif

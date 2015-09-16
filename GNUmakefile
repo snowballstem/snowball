@@ -7,6 +7,10 @@ python ?= python3
 python_output_dir = python_out
 python_runtime_dir = snowballstemmer
 python_sample_dir = sample
+jsx_output_dir = jsx_out
+jsx_runtime_src_dir = jsx
+jsx_runtime_dir = lib
+jsx_sample_dir = sample
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -30,6 +34,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
 		   compiler/generator_java.c \
+		   compiler/generator_jsx.c \
 		   compiler/generator_python.c
 
 COMPILER_HEADERS = compiler/header.h \
@@ -38,6 +43,7 @@ COMPILER_HEADERS = compiler/header.h \
 
 RUNTIME_SOURCES  = runtime/api.c \
 		   runtime/utilities.c
+
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
@@ -45,6 +51,13 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
+
+JSX_RUNTIME_SOURCES = jsx/among.jsx \
+		      jsx/base-stemmer.jsx \
+		      jsx/stemmer.jsx
+
+JSX_SAMPLE_SOURCES = jsx/testapp.jsx \
+		     jsx/stemwords.jsx
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -62,6 +75,8 @@ LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
+JSX_STEMWORDS_SOURCE = jsx/stemwords.jsx
+
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
 ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
@@ -78,6 +93,7 @@ C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
+JSX_SOURCES = $(libstemmer_algorithms:%=$(jsx_output_dir)/%-stemmer.jsx)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -105,11 +121,13 @@ clean:
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(PYTHON_SOURCES) \
+	      $(JSX_SOURCES) jsx_stemwords \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
 	rm -rf dist
 	rmdir $(c_src_dir) || true
 	rmdir $(python_output_dir) || true
+	rmdir $(jsx_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
@@ -135,6 +153,9 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
+
+jsx_stemwords: $(JSX_STEMWORDS_SOURCE) $(JSX_SOURCES)
+	jsx --executable node --output $@ --add-search-path $(jsx_output_dir) --add-search-path $(jsx_runtime_src_dir) $(JSX_STEMWORDS_SOURCE)
 
 algorithms/%/stem_Unicode.sbl: algorithms/%/stem_ISO_8859_1.sbl
 	cp $^ $@
@@ -188,12 +209,19 @@ $(python_output_dir)/__init__.py:
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
 
+$(jsx_output_dir)/%-stemmer.jsx: algorithms/%/stem_Unicode.sbl snowball
+	@mkdir -p $(jsx_output_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(jsx_output_dir)/$${l}-stemmer"; \
+	echo "./snowball $< -jsx -o $${o} -p \"SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
+	./snowball $< -jsx -o $${o} -p "BaseStemmer" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer
+
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_java dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_java dist_libstemmer_jsx dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -301,6 +329,25 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	(cd $${dest} && $(python) setup.py sdist && cp dist/*.tar.gz ..) && \
 	rm -rf $${dest}
 
+dist_libstemmer_jsx: $(JSX_SOURCES)
+	destname=jsxstemmer; \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(jsx_runtime_dir) && \
+	mkdir -p $${dest}/$(jsx_sample_dir) && \
+	cp -a doc/libstemmer_jsx_README $${dest}/README && \
+	cp -a $(JSX_RUNTIME_SOURCES) $${dest}/$(jsx_runtime_dir) && \
+	cp -a $(JSX_SAMPLE_SOURCES) $${dest}/$(jsx_sample_dir) && \
+	cp -a $(JSX_SOURCES) $${dest}/$(jsx_runtime_dir) && \
+	(cd $${dest} && \
+	 echo "README" >> MANIFEST && \
+	 ls $(jsx_runtime_dir)/*.jsx >> MANIFEST && \
+	 ls $(jsx_sample_dir)/*.jsx >> MANIFEST) && \
+	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	rm -rf $${dest}
+
 check: check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
@@ -343,6 +390,14 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
 	@$(ICONV) -fUTF8 -tKOI8-R '$</output.txt' |\
 	    diff -u - tmp.txt
+	@rm tmp.txt
+
+check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
+
+check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
+	@./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
+	@diff -u $</output.txt tmp.txt
 	@rm tmp.txt
 
 check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
