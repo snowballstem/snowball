@@ -40,7 +40,7 @@ extern symbol * get_input(symbol * p, char ** p_file) {
     }
 }
 
-static void error(struct tokeniser * t, char * s1, int n, symbol * p, char * s2) {
+static void error(struct tokeniser * t, const char * s1, int n, symbol * p, const char * s2) {
     if (t->error_count == 20) { fprintf(stderr, "... etc\n"); exit(1); }
     fprintf(stderr, "%s:%d: ", t->file, t->line_number);
     unless (s1 == 0) fprintf(stderr, "%s", s1);
@@ -53,11 +53,11 @@ static void error(struct tokeniser * t, char * s1, int n, symbol * p, char * s2)
     t->error_count++;
 }
 
-static void error1(struct tokeniser * t, char * s) {
+static void error1(struct tokeniser * t, const char * s) {
     error(t, s, 0,0, 0);
 }
 
-static void error2(struct tokeniser * t, char * s) {
+static void error2(struct tokeniser * t, const char * s) {
     error(t, "unexpected end of text after ", 0,0, s);
 }
 
@@ -91,7 +91,7 @@ static int get_number(int n, symbol * p) {
     return x;
 }
 
-static int eq_s(struct tokeniser * t, char * s) {
+static int eq_s(struct tokeniser * t, const char * s) {
     int l = strlen(s);
     if (SIZE(t->p) - t->c < l) return false;
     {
