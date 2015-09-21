@@ -256,9 +256,9 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
         if (c == SIZE(p)) break;
         {
             int number = 0;
-            repeat {
+            while (c != SIZE(p)) {
                 int ch = p[c];
-                if (c == SIZE(p) || ch == ' ') break;
+                if (ch == ' ') break;
                 if (base == 10) {
                     ch = decimal_to_num(ch);
                     if (ch < 0) {
