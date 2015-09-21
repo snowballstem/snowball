@@ -87,8 +87,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 
     /* read options: */
 
-    repeat {
-        if (i >= argc) break;
+    while (i < argc) {
         s = argv[i++];
         {   if (eq(s, "-o") || eq(s, "-output")) {
                 check_lim(i, argc);

@@ -180,19 +180,17 @@ static int get_token(struct analyser * a, int code) {
 }
 
 static struct name * look_for_name(struct analyser * a) {
-    struct name * p = a->names;
     symbol * q = a->tokeniser->b;
-    repeat {
-        if (p == 0) return 0;
-        {   symbol * b = p->b;
-            int n = SIZE(b);
-            if (n == SIZE(q) && memcmp(q, b, n * sizeof(symbol)) == 0) {
-                p->referenced = true;
-                return p;
-            }
+    struct name * p;
+    for (p = a->names; p; p = p->next) {
+        symbol * b = p->b;
+        int n = SIZE(b);
+        if (n == SIZE(q) && memcmp(q, b, n * sizeof(symbol)) == 0) {
+            p->referenced = true;
+            return p;
         }
-        p = p->next;
     }
+    return 0;
 }
 
 static struct name * find_name(struct analyser * a) {
@@ -222,8 +220,7 @@ static void check_name_type(struct analyser * a, struct name * p, int type) {
 static void read_names(struct analyser * a, int type) {
     struct tokeniser * t = a->tokeniser;
     unless (get_token(a, c_bra)) return;
-    repeat {
-        if (read_token(t) != c_name) break;
+    while (read_token(t) == c_name) {
         if (look_for_name(a) != 0) error(a, 30); else {
             NEW(name, p);
             p->b = copy_b(t->b);
@@ -341,14 +338,11 @@ static struct node * read_C_connection(struct analyser * a, struct node * q, int
     struct node * p = new_node(a, op);
     struct node * p_end = q;
     p->left = q;
-    repeat {
+    do {
         q = read_C(a);
         p_end->right = q; p_end = q;
-        if (read_token(t) != op) {
-            t->token_held = true;
-            break;
-        }
-    }
+    } while (read_token(t) == op);
+    t->token_held = true;
     return p;
 }
 
