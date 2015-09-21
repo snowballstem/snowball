@@ -147,6 +147,11 @@ static void error3(struct analyser * a, struct node * p, symbol * b) {
     fprintf(stderr, "'\n");
 }
 
+static void error3a(struct analyser * a, struct node * p) {
+    count_error(a);
+    fprintf(stderr, "%s:%d: previously seen here\n", a->tokeniser->file, p->line_number);
+}
+
 static void error4(struct analyser * a, struct name * q) {
     count_error(a);
     report_b(stderr, q->b);
@@ -424,7 +429,9 @@ static int compare_amongvec(const void *pv, const void *qv) {
     int i;
     for (i = 0; i < smaller_size; i++)
         if (b_p[i] != b_q[i]) return b_p[i] - b_q[i];
-    return p_size - q_size;
+    if (p_size - q_size)
+	return p_size - q_size;
+    return p->p->line_number - q->p->line_number;
 }
 
 static void make_among(struct analyser * a, struct node * p, struct node * substring) {
@@ -452,7 +459,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
         if (q->type == c_literalstring) {
             symbol * b = q->literalstring;
             w1->b = b;           /* pointer to case string */
-            w1->p = 0;           /* pointer to corresponding case expression */
+            w1->p = q;           /* pointer to corresponding node */
             w1->size = SIZE(b);  /* number of characters in string */
             w1->i = -1;          /* index of longest substring */
             w1->result = -1;     /* number of corresponding case expression */
@@ -495,7 +502,10 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
 
     for (w0 = v; w0 < w1 - 1; w0++)
         if (w0->size == (w0 + 1)->size &&
-            memcmp(w0->b, (w0 + 1)->b, w0->size * sizeof(symbol)) == 0) error3(a, p, w0->b);
+            memcmp(w0->b, (w0 + 1)->b, w0->size * sizeof(symbol)) == 0) {
+	    error3(a, (w0 + 1)->p, (w0 + 1)->b);
+	    error3a(a, w0->p);
+	}
 
     x->literalstring_count = p->number;
     x->command_count = result - 1;

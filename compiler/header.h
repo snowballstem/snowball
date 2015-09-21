@@ -149,7 +149,7 @@ struct amongvec {
 
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
-    struct node * p; /* the corresponding command */
+    struct node * p; /* the corresponding node for this string */
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
     struct name * function;
