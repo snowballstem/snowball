@@ -1104,7 +1104,7 @@ static void generate_among(struct generator * g, struct node * p) {
     if (x->substring == 0) generate_substring(g, p);
     if (x->command_count == 0 && x->starter == 0) return;
 
-    unless (x->starter == 0) generate(g, x->starter);
+    if (x->starter) generate(g, x->starter);
 
     p = p->left;
     if (p != 0 && p->type != c_literalstring) p = p->right;
@@ -1270,7 +1270,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->I[1] = i;
             g->I[2] = v->size;
             g->L[0] = v->b;
-            unless (v->size == 0)
+            if (v->size)
                 w(g, "static const symbol s_~I0_~I1[~I2] = ~A0;~N");
             v++;
         }

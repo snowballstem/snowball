@@ -1340,9 +1340,9 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     q->no_gaps = true;
-    for (i = 0; i < range; i++) unless (bit_is_set(map, i)) q->no_gaps = false;
+    for (i = 0; i < range; i++) if (!bit_is_set(map, i)) q->no_gaps = false;
 
-    unless (q->no_gaps) {
+    if (!q->no_gaps) {
         g->V[0] = q->name;
 
         w(g, "~Mstatic const ~V0 = [");

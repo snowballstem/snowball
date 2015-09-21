@@ -219,11 +219,11 @@ extern int main(int argc, char * argv[]) {
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
             close_tokeniser(t);
-            unless (o->syntax_tree) {
+            if (!o->syntax_tree) {
                 struct generator * g;
 
                 char * s = o->output_file;
-                unless (s) {
+                if (!s) {
                     fprintf(stderr, "Please include the -o option\n");
                     print_arglist();
                     exit(1);
@@ -294,7 +294,7 @@ extern int main(int argc, char * argv[]) {
         }
     }
     FREE(o);
-    unless (space_count == 0) fprintf(stderr, "%d blocks unfreed\n", space_count);
+    if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);
     return 0;
 }
 

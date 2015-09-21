@@ -43,12 +43,12 @@ extern symbol * get_input(symbol * p, char ** p_file) {
 static void error(struct tokeniser * t, const char * s1, int n, symbol * p, const char * s2) {
     if (t->error_count == 20) { fprintf(stderr, "... etc\n"); exit(1); }
     fprintf(stderr, "%s:%d: ", t->file, t->line_number);
-    unless (s1 == 0) fprintf(stderr, "%s", s1);
-    unless (p == 0) {
+    if (s1) fprintf(stderr, "%s", s1);
+    if (p) {
         int i;
         for (i = 0; i < n; i++) fprintf(stderr, "%c", p[i]);
     }
-    unless (s2 == 0) fprintf(stderr, "%s", s2);
+    if (s2) fprintf(stderr, "%s", s2);
     fprintf(stderr, "\n");
     t->error_count++;
 }
@@ -62,11 +62,11 @@ static void error2(struct tokeniser * t, const char * s) {
 }
 
 static int compare_words(int m, symbol * p, int n, const byte * q) {
-    unless (m == n) return m - n;
+    if (m != n) return m - n;
     {
         int i; for (i = 0; i < n; i++) {
             int diff = p[i] - q[i];
-            unless (diff == 0) return diff;
+            if (diff) return diff;
         }
     }
     return 0;
@@ -140,14 +140,14 @@ static int read_literal_string(struct tokeniser * t, int c) {
                 if (c >= SIZE(p)) { error2(t, "'"); return c; }
                 ch = p[c]; c++;
                 if (ch == t->m_end) break;
-                unless (white_space(t, ch)) black_found = true;
+                if (!white_space(t, ch)) black_found = true;
                 if (ch == '\n') newlines = true;
                 if (newlines && black_found) {
                     error1(t, "string not terminated");
                     return c;
                 }
             }
-            unless (newlines) {
+            if (!newlines) {
                 int n = c - c0 - 1;    /* macro size */
                 int firstch = p[c0];
                 symbol * q = find_in_m(t, n, p + c0);
@@ -276,12 +276,12 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                 c++;
             }
             if (t->widechars || t->utf8) {
-                unless (0 <= number && number <= 0xffff) {
+                if (number < 0 || number > 0xffff) {
                     error1(t, "character values exceed 64K");
                     return;
                 }
             } else {
-                unless (0 <= number && number <= 0xff) {
+                if (number < 0 || number > 0xff) {
                     error1(t, "character values exceed 256");
                     return;
                 }
@@ -337,7 +337,7 @@ extern int read_token(struct tokeniser * t) {
                    code = read_token(t);
                    if (code == c_hex) { base = 16; code = read_token(t); } else
                    if (code == c_decimal) { base = 10; code = read_token(t); }
-                   unless (code == c_literalstring)
+                   if (code != c_literalstring)
                        { error1(t, "string omitted after stringdef"); continue; }
                    if (base > 0) convert_numeric_string(t, t->b, base);
                    {   NEW(m_pair, q);
@@ -350,7 +350,7 @@ extern int read_token(struct tokeniser * t) {
                continue;
             case c_get:
                code = read_token(t);
-               unless (code == c_literalstring) {
+               if (code != c_literalstring) {
                    error1(t, "string omitted after get"); continue;
                }
                t->get_depth++;
@@ -369,7 +369,7 @@ extern int read_token(struct tokeniser * t) {
                            b = add_to_b(b, SIZE(t->b), t->b);
                            u = get_input(b, &file);
                            lose_b(b);
-                           unless (u == 0) break;
+                           if (u != 0) break;
                            r = r->next;
                        }
                    }
@@ -387,7 +387,7 @@ extern int read_token(struct tokeniser * t) {
                p = t->p;
                continue;
             case -1:
-               unless (t->next == 0) {
+               if (t->next) {
                    lose_b(p);
                    {
                        struct input * q = t->next;

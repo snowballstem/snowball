@@ -5,8 +5,6 @@
 
 #include "header.h"
 
-#define unless(C) if(!(C))
-
 #define CREATE_SIZE 1
 
 extern symbol * create_s(void) {
@@ -97,7 +95,7 @@ extern int in_grouping_U(struct SN_env * z, const unsigned char * s, int min, in
     do {
 	int ch;
 	int w = get_utf8(z->p, z->c, z->l, & ch);
-	unless (w) return -1;
+	if (!w) return -1;
 	if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
 	    return w;
 	z->c += w;
@@ -109,7 +107,7 @@ extern int in_grouping_b_U(struct SN_env * z, const unsigned char * s, int min, 
     do {
 	int ch;
 	int w = get_b_utf8(z->p, z->c, z->lb, & ch);
-	unless (w) return -1;
+	if (!w) return -1;
 	if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
 	    return w;
 	z->c -= w;
@@ -121,8 +119,8 @@ extern int out_grouping_U(struct SN_env * z, const unsigned char * s, int min, i
     do {
 	int ch;
 	int w = get_utf8(z->p, z->c, z->l, & ch);
-	unless (w) return -1;
-	unless (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+	if (!w) return -1;
+	if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
 	    return w;
 	z->c += w;
     } while (repeat);
@@ -133,8 +131,8 @@ extern int out_grouping_b_U(struct SN_env * z, const unsigned char * s, int min,
     do {
 	int ch;
 	int w = get_b_utf8(z->p, z->c, z->lb, & ch);
-	unless (w) return -1;
-	unless (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+	if (!w) return -1;
+	if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
 	    return w;
 	z->c -= w;
     } while (repeat);
@@ -172,7 +170,7 @@ extern int out_grouping(struct SN_env * z, const unsigned char * s, int min, int
 	int ch;
 	if (z->c >= z->l) return -1;
 	ch = z->p[z->c];
-	unless (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+	if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
 	    return 1;
 	z->c++;
     } while (repeat);
@@ -184,7 +182,7 @@ extern int out_grouping_b(struct SN_env * z, const unsigned char * s, int min, i
 	int ch;
 	if (z->c <= z->lb) return -1;
 	ch = z->p[z->c - 1];
-	unless (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+	if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
 	    return 1;
 	z->c--;
     } while (repeat);
@@ -371,7 +369,7 @@ extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const 
             if (z->c > c_bra)
                 z->c = c_bra;
     }
-    unless (s_size == 0) memmove(z->p + c_bra, s, s_size * sizeof(symbol));
+    if (s_size) memmove(z->p + c_bra, s, s_size * sizeof(symbol));
     if (adjptr != NULL)
         *adjptr = adjustment;
     return 0;
