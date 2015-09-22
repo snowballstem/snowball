@@ -363,14 +363,13 @@ extern int read_token(struct tokeniser * t) {
                    NEW(input, q);
                    symbol * u = get_input(t->b, &file);
                    if (u == 0) {
-                       struct include * r = t->includes;
-                       until (r == 0) {
+                       struct include * r;
+                       for (r = t->includes; r; r = r->next) {
                            symbol * b = copy_b(r->b);
                            b = add_to_b(b, SIZE(t->b), t->b);
                            u = get_input(b, &file);
                            lose_b(b);
                            if (u != 0) break;
-                           r = r->next;
                        }
                    }
                    if (u == 0) {
@@ -449,7 +448,7 @@ extern void close_tokeniser(struct tokeniser * t) {
     lose_b(t->b2);
     {
         struct m_pair * q = t->m_pairs;
-        until (q == 0) {
+        while (q) {
             struct m_pair * q_next = q->next;
             lose_b(q->name);
             lose_b(q->value);
@@ -459,7 +458,7 @@ extern void close_tokeniser(struct tokeniser * t) {
     }
     {
         struct input * q = t->next;
-        until (q == 0) {
+        while (q) {
             struct input * q_next = q->next;
             FREE(q);
             q = q_next;

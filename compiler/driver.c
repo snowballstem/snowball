@@ -288,8 +288,8 @@ extern int main(int argc, char * argv[]) {
         lose_b(filename);
     }
     {   struct include * p = o->includes;
-        until (p == 0)
-        {   struct include * q = p->next;
+        while (p) {
+            struct include * q = p->next;
             lose_b(p->b); FREE(p); p = q;
         }
     }

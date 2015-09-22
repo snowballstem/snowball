@@ -408,7 +408,7 @@ static struct node * read_literalstring(struct analyser * a) {
 
 static void reverse_b(symbol * b) {
     int i = 0; int j = SIZE(b) - 1;
-    until (i >= j) {
+    while (i < j) {
         int ch1 = b[i]; int ch2 = b[j];
         b[i++] = ch2; b[j--] = ch1;
     }
@@ -449,7 +449,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
 
     if (q->type == c_bra) { x->starter = q; q = q->right; }
 
-    until (q == 0) {
+    while (q) {
         if (q->type == c_literalstring) {
             symbol * b = q->literalstring;
             w1->b = b;           /* pointer to case string */
@@ -466,7 +466,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
         if (q->left == 0)  /* empty command: () */
             w0 = w1;
         else {
-            until (w0 == w1) {
+            while (w0 != w1) {
                 w0->p = q;
                 w0->result = result;
                 w0++;
@@ -856,7 +856,7 @@ extern void read_program(struct analyser * a) {
     read_program_(a, -1);
     {
         struct name * q = a->names;
-        until (q == 0) {
+        while (q) {
             switch(q->type) {
                 case t_external: case t_routine:
                     if (q->used && q->definition == 0) error4(a, q); break;
@@ -870,7 +870,7 @@ extern void read_program(struct analyser * a) {
     if (a->tokeniser->error_count == 0) {
         struct name * q = a->names;
         int warned = false;
-        until (q == 0) {
+        while (q) {
             if (!q->referenced) {
                 if (!warned) {
                     fprintf(stderr, "Declared but not used:");
@@ -884,7 +884,7 @@ extern void read_program(struct analyser * a) {
 
         q = a->names;
         warned = false;
-        until (q == 0) {
+        while (q) {
             if (! q->used && (q->type == t_routine ||
                               q->type == t_grouping)) {
                 if (!warned) {
@@ -919,7 +919,7 @@ extern struct analyser * create_analyser(struct tokeniser * t) {
 extern void close_analyser(struct analyser * a) {
     {
         struct node * q = a->nodes;
-        until (q == 0) {
+        while (q) {
             struct node * q_next = q->next;
             FREE(q);
             q = q_next;
@@ -927,7 +927,7 @@ extern void close_analyser(struct analyser * a) {
     }
     {
         struct name * q = a->names;
-        until (q == 0) {
+        while (q) {
             struct name * q_next = q->next;
             lose_b(q->b); FREE(q);
             q = q_next;
@@ -935,7 +935,7 @@ extern void close_analyser(struct analyser * a) {
     }
     {
         struct literalstring * q = a->literalstrings;
-        until (q == 0) {
+        while (q) {
             struct literalstring * q_next = q->next;
             lose_b(q->b); FREE(q);
             q = q_next;
@@ -943,7 +943,7 @@ extern void close_analyser(struct analyser * a) {
     }
     {
         struct among * q = a->amongs;
-        until (q == 0) {
+        while (q) {
             struct among * q_next = q->next;
             FREE(q->b); FREE(q);
             q = q_next;
@@ -951,7 +951,7 @@ extern void close_analyser(struct analyser * a) {
     }
     {
         struct grouping * q = a->groupings;
-        until (q == 0) {
+        while (q) {
             struct grouping * q_next = q->next;
             lose_b(q->b); FREE(q);
             q = q_next;

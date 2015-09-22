@@ -1352,17 +1352,16 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q = g->analyser->groupings;
-    until (q == 0) {
+    struct grouping * q;
+    for (q = g->analyser->groupings; q; q = q->next) {
         generate_grouping_table(g, q);
-        q = q->next;
     }
 }
 
 static void generate_members(struct generator * g) {
 
-    struct name * q = g->analyser->names;
-    until (q == 0) {
+    struct name * q;
+    for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
@@ -1379,7 +1378,6 @@ static void generate_members(struct generator * g) {
                 w(g, "        private boolean ~W0;~N");
                 break;
         }
-        q = q->next;
     }
     w(g, "~N");
 }
@@ -1404,11 +1402,10 @@ static void generate_copyfrom(struct generator * g) {
 
 static void generate_methods(struct generator * g) {
 
-    struct node * p = g->analyser->program;
-    while (p != 0) {
+    struct node * p;
+    for (p = g->analyser->program; p; p = p->right) {
         generate(g, p);
         g->unreachable = false;
-        p = p->right;
     }
 }
 

@@ -238,7 +238,7 @@ static void wlim(struct generator * g, struct node * p) {     /* if at limit fai
 static void wp(struct generator * g, const char * s, struct node * p) { /* formatted write */
     int i = 0;
     int l = strlen(s);
-    until (i >= l) {
+    while (i < l) {
         int ch = s[i++];
         if (ch != '~') wch(g, ch); else
         switch(s[i++]) {
@@ -321,7 +321,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 */
 
 static int K_needed(struct generator * g, struct node * p) {
-    until (p == 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -360,8 +360,7 @@ static int K_needed(struct generator * g, struct node * p) {
 
 static int repeat_score(struct generator * g, struct node * p) {
     int score = 0;
-    until (p == 0)
-    {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -412,7 +411,7 @@ static int repeat_restore(struct generator * g, struct node * p) {
 
 static void generate_bra(struct generator * g, struct node * p) {
     p = p->left;
-    until (p == 0) { generate(g, p); p = p->right; }
+    while (p) { generate(g, p); p = p->right; }
 }
 
 static void generate_and(struct generator * g, struct node * p) {
@@ -424,7 +423,7 @@ static void generate_and(struct generator * g, struct node * p) {
         wp(g, "~M~C", p);
     }
     p = p->left;
-    until (p == 0) {
+    while (p) {
         generate(g, p);
         if (keep_c && p->right != 0) {
             w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
@@ -451,7 +450,7 @@ static void generate_or(struct generator * g, struct node * p) {
     }
     p = p->left;
     g->failure_string = 0;
-    until (p->right == 0) {
+    while (p->right) {
         g->failure_label = new_label(g);
         g->label_used = 0;
         generate(g, p);
@@ -1111,7 +1110,7 @@ static void generate_among(struct generator * g, struct node * p) {
     w(g, "~Mswitch(among_var) {~N~+"
              "~Mcase 0: ~f~N");
 
-    until (p == 0) {
+    while (p) {
          if (p->type == c_bra && p->left != 0) {
              g->I[0] = case_number++;
              w(g, "~Mcase ~I0:~N~+"); generate(g, p); w(g, "~Mbreak;~N~-");
@@ -1235,8 +1234,8 @@ static void generate_head(struct generator * g) {
 }
 
 static void generate_routine_headers(struct generator * g) {
-    struct name * q = g->analyser->names;
-    until (q == 0) {
+    struct name * q;
+    for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_routine:
@@ -1254,7 +1253,6 @@ static void generate_routine_headers(struct generator * g) {
                   );
                 break;
         }
-        q = q->next;
     }
 }
 
@@ -1303,10 +1301,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x = g->analyser->amongs;
-    until (x == 0) {
+    struct among * x;
+    for (x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
-        x = x->next;
     }
 }
 
@@ -1337,10 +1334,9 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q = g->analyser->groupings;
-    until (q == 0) {
+    struct grouping * q;
+    for (q = g->analyser->groupings; q; q = q->next) {
         generate_grouping_table(g, q);
-        q = q->next;
     }
 }
 
@@ -1371,7 +1367,7 @@ static void generate_create_and_close_templates(struct generator * g) {
 
 static void generate_header_file(struct generator * g) {
 
-    struct name * q = g->analyser->names;
+    struct name * q;
     char * vp = g->options->variables_prefix;
     g->S[0] = vp;
 
@@ -1381,7 +1377,7 @@ static void generate_header_file(struct generator * g) {
          "#endif~N");            /* for C++ */
 
     generate_create_and_close_templates(g);
-    until (q == 0) {
+    for (q= g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type)
         {
@@ -1400,7 +1396,6 @@ static void generate_header_file(struct generator * g) {
                 }
                 break;
         }
-        q = q->next;
     }
 
     w(g, "~N"
@@ -1433,7 +1428,7 @@ extern void generate_program_c(struct generator * g) {
     g->literalstring_count = 0;
     {
         struct node * p = g->analyser->program;
-        until (p == 0) { generate(g, p); p = p->right; }
+        while (p) { generate(g, p); p = p->right; }
     }
     generate_create(g);
     generate_close(g);
