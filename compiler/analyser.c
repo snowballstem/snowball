@@ -4,6 +4,30 @@
 #include <string.h>  /* memmove */
 #include "header.h"
 
+typedef enum {
+    e_token_omitted = 0,
+    e_unexpected_token = 1,
+    e_string_omitted = 2,
+    e_unexpected_token_in_among = 3,
+    // For codes above here, report "after " t->previous_token after the error.
+    e_unresolved_substring = 14,
+    e_not_allowed_inside_reverse = 15,
+    e_empty_grouping = 16,
+    e_already_backwards = 17,
+    e_empty_among = 18,
+    e_adjacent_bracketed_in_among = 19,
+    e_substring_preceded_by_substring = 20,
+    // For codes below here, tokeniser->b is printed before the error.
+    e_redeclared = 30,
+    e_undeclared = 31,
+    e_declared_as_different_mode = 32,
+    e_not_of_type_x = 33,
+    e_not_of_type_string_or_integer = 34,
+    e_misplaced = 35,
+    e_redefined = 36,
+    e_misused = 37
+} error_code;
+
 /* recursive usage: */
 
 static void read_program_(struct analyser * a, int terminator);
@@ -76,69 +100,66 @@ static void count_error(struct analyser * a) {
     t->error_count++;
 }
 
-static void error2(struct analyser * a, int n, int x) {
+static void error2(struct analyser * a, error_code n, int x) {
     struct tokeniser * t = a->tokeniser;
     count_error(a);
     fprintf(stderr, "%s:%d: ", t->file, t->line_number);
-    if (n >= 30) report_b(stderr, t->b);
+    if ((int)n >= (int)e_redeclared) report_b(stderr, t->b);
     switch (n) {
-        case 0:
+        case e_token_omitted:
             fprintf(stderr, "%s omitted", name_of_token(t->omission)); break;
-        case 3:
+        case e_unexpected_token_in_among:
             fprintf(stderr, "in among(...), ");
-        case 1:
+        case e_unexpected_token:
             fprintf(stderr, "unexpected %s", name_of_token(t->token));
             if (t->token == c_number) fprintf(stderr, " %d", t->number);
             if (t->token == c_name) {
                 fprintf(stderr, " ");
                 report_b(stderr, t->b);
             } break;
-        case 2:
+        case e_string_omitted:
             fprintf(stderr, "string omitted"); break;
 
-        case 14:
+        case e_unresolved_substring:
             fprintf(stderr, "unresolved substring on line %d", x); break;
-        case 15:
+        case e_not_allowed_inside_reverse:
             fprintf(stderr, "%s not allowed inside reverse(...)", name_of_token(t->token)); break;
-        case 16:
+        case e_empty_grouping:
             fprintf(stderr, "empty grouping"); break;
-        case 17:
+        case e_already_backwards:
             fprintf(stderr, "backwards used when already in this mode"); break;
-        case 18:
+        case e_empty_among:
             fprintf(stderr, "empty among(...)"); break;
-        case 19:
+        case e_adjacent_bracketed_in_among:
             fprintf(stderr, "two adjacent bracketed expressions in among(...)"); break;
-        case 20:
+        case e_substring_preceded_by_substring:
             fprintf(stderr, "substring preceded by another substring on line %d", x); break;
 
-        case 30:
+        case e_redeclared:
             fprintf(stderr, " re-declared"); break;
-        case 31:
+        case e_undeclared:
             fprintf(stderr, " undeclared"); break;
-        case 32:
+        case e_declared_as_different_mode:
             fprintf(stderr, " declared as %s mode; used as %s mode",
                             name_of_mode(a->mode), name_of_mode(x)); break;
-        case 33:
+        case e_not_of_type_x:
             fprintf(stderr, " not of type %s", name_of_type(x)); break;
-        case 34:
+        case e_not_of_type_string_or_integer:
             fprintf(stderr, " not of type string or integer"); break;
-        case 35:
+        case e_misplaced:
             fprintf(stderr, " misplaced"); break;
-        case 36:
+        case e_redefined:
             fprintf(stderr, " redefined"); break;
-        case 37:
+        case e_misused:
             fprintf(stderr, " mis-used as %s mode",
                             name_of_mode(x)); break;
-        default:
-            fprintf(stderr, " error %d", n); break;
-
     }
-    if (n <= 13 && t->previous_token > 0)
+    if ((int)n < (int)e_unresolved_substring && t->previous_token > 0)
         fprintf(stderr, " after %s", name_of_token(t->previous_token));
     fprintf(stderr, "\n");
 }
 
-static void error(struct analyser * a, int n) { error2(a, n, 0); }
+static void error(struct analyser * a, error_code n) { error2(a, n, 0); }
 
 static void error3(struct analyser * a, struct node * p, symbol * b) {
     count_error(a);
@@ -160,7 +181,7 @@ static void error4(struct analyser * a, struct name * q) {
 
 static void omission_error(struct analyser * a, int n) {
     a->tokeniser->omission = n;
-    error(a, 0);
+    error(a, e_token_omitted);
 }
 
 static int check_token(struct analyser * a, int code) {
@@ -195,13 +216,13 @@ static struct name * look_for_name(struct analyser * a) {
 
 static struct name * find_name(struct analyser * a) {
     struct name * p = look_for_name(a);
-    if (p == 0) error(a, 31);
+    if (p == 0) error(a, e_undeclared);
     return p;
 }
 
 static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
     if (p->mode < 0) p->mode = mode; else
-    if (p->mode != mode) error2(a, 37, mode);
+    if (p->mode != mode) error2(a, e_misused, mode);
 }
 
 static void check_name_type(struct analyser * a, struct name * p, int type) {
@@ -214,14 +235,14 @@ static void check_name_type(struct analyser * a, struct name * p, int type) {
                       p->type == t_external) return; break;
         case 'g': if (p->type == t_grouping) return; break;
     }
-    error2(a, 33, type);
+    error2(a, e_not_of_type_x, type);
 }
 
 static void read_names(struct analyser * a, int type) {
     struct tokeniser * t = a->tokeniser;
     if (!get_token(a, c_bra)) return;
     while (read_token(t) == c_name) {
-        if (look_for_name(a) != 0) error(a, 30); else {
+        if (look_for_name(a) != 0) error(a, e_redeclared); else {
             NEW(name, p);
             p->b = copy_b(t->b);
             p->type = type;
@@ -262,7 +283,7 @@ static int read_AE_test(struct analyser * a) {
         case c_ge:
         case c_ls:
         case c_le: return t->token;
-        default: error(a, 1); t->token_held = true; return c_eq;
+        default: error(a, e_unexpected_token); t->token_held = true; return c_eq;
     }
 }
 
@@ -315,7 +336,7 @@ static struct node * read_AE(struct analyser * a, int B) {
             p = C_style(a, "s", c_sizeof);
             break;
         default:
-            error(a, 1);
+            error(a, e_unexpected_token);
             t->token_held = true;
             return 0;
     }
@@ -388,7 +409,7 @@ static struct node * C_style(struct analyser * a, char * s, int token) {
                 int str_token = read_token(a->tokeniser);
                 if (str_token == c_name) name_to_node(a, p, 's'); else
                 if (str_token == c_literalstring) p->literalstring = new_literalstring(a);
-                else error(a, 2);
+                else error(a, e_string_omitted);
             }
             continue;
         case 'b':
@@ -534,12 +555,12 @@ static struct node * read_among(struct analyser * a) {
                 else t->token_held = true;
                 p->number++; break;
             case c_bra:
-                if (previous_token == c_bra) error(a, 19);
+                if (previous_token == c_bra) error(a, e_adjacent_bracketed_in_among);
                 q = read_C_list(a); break;
             default:
-                error(a, 3);
+                error(a, e_unexpected_token_in_among);
             case c_ket:
-                if (p->number == 0) error(a, 18);
+                if (p->number == 0) error(a, e_empty_among);
                 if (t->error_count == 0) make_among(a, p, substring);
                 return p;
         }
@@ -552,13 +573,13 @@ static struct node * read_among(struct analyser * a) {
 static struct node * read_substring(struct analyser * a) {
 
     struct node * p = new_node(a, c_substring);
-    if (a->substring != 0) error2(a, 20, a->substring->line_number);
+    if (a->substring != 0) error2(a, e_substring_preceded_by_substring, a->substring->line_number);
     a->substring = p;
     return p;
 }
 
 static void check_modifyable(struct analyser * a) {
-    if (!a->modifyable) error(a, 15);
+    if (!a->modifyable) error(a, e_not_allowed_inside_reverse);
 }
 
 static struct node * read_C(struct analyser * a) {
@@ -570,7 +591,7 @@ static struct node * read_C(struct analyser * a) {
         case c_backwards:
             {
                 int mode = a->mode;
-                if (a->mode == m_backward) error(a, 17); else a->mode = m_backward;
+                if (a->mode == m_backward) error(a, e_already_backwards); else a->mode = m_backward;
                 {   struct node * p = C_style(a, "C", token);
                     a->mode = mode;
                     return p;
@@ -643,7 +664,7 @@ static struct node * read_C(struct analyser * a) {
                 switch (q ? q->type : t_string)
                     /* above line was: switch (q->type) - bug #1 fix 7/2/2003 */
                 {
-                    default: error(a, 34);
+                    default: error(a, e_not_of_type_string_or_integer);
                     case t_string:
                         a->mode = m_forward;
                         a->modifyable = true;
@@ -669,7 +690,7 @@ static struct node * read_C(struct analyser * a) {
                         case t_boolean:
                             p->type = c_booltest; break;
                         case t_integer:
-                            error(a, 35); /* integer name misplaced */
+                            error(a, e_misplaced); /* integer name misplaced */
                         case t_string:
                             break;
                         case t_routine:
@@ -697,7 +718,7 @@ static struct node * read_C(struct analyser * a) {
             return read_literalstring(a);
         case c_among: return read_among(a);
         case c_substring: return read_substring(a);
-        default: error(a, 1); return 0;
+        default: error(a, e_unexpected_token); return 0;
     }
 }
 
@@ -763,7 +784,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                 case c_literalstring:
                     p->b = alter_grouping(p->b, t->b, style, a->utf8);
                     break;
-                default: error(a, 1); return;
+                default: error(a, e_unexpected_token); return;
             }
             switch (read_token(t)) {
                 case c_plus:
@@ -782,7 +803,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             }
             p->largest_ch = max;
             p->smallest_ch = min;
-            if (min == 1<<16) error(a, 16);
+            if (min == 1<<16) error(a, e_empty_grouping);
         }
         t->token_held = true; return;
     }
@@ -793,9 +814,9 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     a->amongvar_needed = false;
     if (q) {
         check_name_type(a, q, 'R');
-        if (q->definition != 0) error(a, 36);
+        if (q->definition != 0) error(a, e_redefined);
         if (q->mode < 0) q->mode = a->mode; else
-        if (q->mode != a->mode) error2(a, 32, q->mode);
+        if (q->mode != a->mode) error2(a, e_declared_as_different_mode, q->mode);
     }
     p->name = q;
     if (a->program == 0) a->program = p; else a->program_end->right = p;
@@ -805,7 +826,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     if (q) q->definition = p->left;
 
     if (a->substring != 0) {
-         error2(a, 14, a->substring->line_number);
+         error2(a, e_unresolved_substring, a->substring->line_number);
          a->substring = 0;
     }
     p->amongvar_needed = a->amongvar_needed;
@@ -844,7 +865,7 @@ static void read_program_(struct analyser * a, int terminator) {
             case c_ket:
                 if (terminator == c_ket) return;
             default:
-                error(a, 1); break;
+                error(a, e_unexpected_token); break;
             case -1:
                 if (terminator >= 0) omission_error(a, c_ket);
                 return;
