@@ -175,6 +175,7 @@ static void error3a(struct analyser * a, struct node * p) {
 
 static void error4(struct analyser * a, struct name * q) {
     count_error(a);
+    fprintf(stderr, "%s:%d: ", a->tokeniser->file, q->used->line_number);
     report_b(stderr, q->b);
     fprintf(stderr, " undefined\n");
 }
@@ -249,7 +250,7 @@ static void read_names(struct analyser * a, int type) {
             p->mode = -1; /* routines, externals */
             p->count = a->name_count[type];
             p->referenced = false;
-            p->used = false;
+            p->used = 0;
             p->grouping = 0;
             p->definition = 0;
             a->name_count[type] ++;
@@ -299,7 +300,7 @@ static void name_to_node(struct analyser * a, struct node * p, int type) {
     struct name * q = find_name(a);
     if (q) {
         check_name_type(a, q, type);
-        q->used = true;
+        if (!q->used) q->used = p;
     }
     p->name = q;
 }
@@ -685,7 +686,7 @@ static struct node * read_C(struct analyser * a) {
                 struct name * q = find_name(a);
                 struct node * p = new_node(a, c_name);
                 if (q) {
-                    q->used = true;
+                    if (!q->used) q->used = p;
                     switch (q->type) {
                         case t_boolean:
                             p->type = c_booltest; break;

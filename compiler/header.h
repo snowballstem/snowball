@@ -132,7 +132,7 @@ struct name {
     int count;                  /* 0, 1, 2 for each type */
     struct grouping * grouping; /* for grouping names */
     byte referenced;
-    byte used;
+    struct node * used;         /* First use, or NULL if not used */
 
 };
 
