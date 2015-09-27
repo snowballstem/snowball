@@ -288,8 +288,8 @@ struct options {
 
     /* for the command line: */
 
-    char * output_file;
-    char * name;
+    const char * output_file;
+    const char * name;
     FILE * output_c;
     FILE * output_h;
 #ifndef DISABLE_JAVA
@@ -304,13 +304,13 @@ struct options {
     byte syntax_tree;
     byte widechars;
     enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX } make_lang;
-    char * externals_prefix;
-    char * variables_prefix;
-    char * runtime_path;
-    char * parent_class_name;
-    char * package;
-    char * string_class;
-    char * among_class;
+    const char * externals_prefix;
+    const char * variables_prefix;
+    const char * runtime_path;
+    const char * parent_class_name;
+    const char * package;
+    const char * string_class;
+    const char * among_class;
     struct include * includes;
     struct include * includes_end;
     byte utf8;

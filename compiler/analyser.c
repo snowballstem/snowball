@@ -32,7 +32,7 @@ typedef enum {
 
 static void read_program_(struct analyser * a, int terminator);
 static struct node * read_C(struct analyser * a);
-static struct node * C_style(struct analyser * a, char * s, int token);
+static struct node * C_style(struct analyser * a, const char * s, int token);
 
 
 static void fault(int n) { fprintf(stderr, "fault %d\n", n); exit(1); }
@@ -393,7 +393,7 @@ static struct node * read_C_list(struct analyser * a) {
     }
 }
 
-static struct node * C_style(struct analyser * a, char * s, int token) {
+static struct node * C_style(struct analyser * a, const char * s, int token) {
     int i;
     struct node * p = new_node(a, token);
     for (i = 0; s[i] != 0; i++) switch(s[i]) {

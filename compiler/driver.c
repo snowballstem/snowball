@@ -222,7 +222,7 @@ extern int main(int argc, char * argv[]) {
             if (!o->syntax_tree) {
                 struct generator * g;
 
-                char * s = o->output_file;
+                const char * s = o->output_file;
                 if (!s) {
                     fprintf(stderr, "Please include the -o option\n");
                     print_arglist();

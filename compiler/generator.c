@@ -1368,7 +1368,7 @@ static void generate_create_and_close_templates(struct generator * g) {
 static void generate_header_file(struct generator * g) {
 
     struct name * q;
-    char * vp = g->options->variables_prefix;
+    const char * vp = g->options->variables_prefix;
     g->S[0] = vp;
 
     w(g, "~N"
