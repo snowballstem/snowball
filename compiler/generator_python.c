@@ -1021,10 +1021,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    if (q->no_gaps)
-        write_failure_if(g, "not self.~S1_range~S0(~I0, ~I1)", p);
-    else
-        write_failure_if(g, "not self.~S1_grouping~S0(~n.~V0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.~S1_grouping~S0(~n.~V0, ~I0, ~I1)", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1305,8 +1302,6 @@ static void generate_amongs(struct generator * g) {
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
 
-static int bit_is_set(symbol * b, int i) { return b[i/8] & 1 << i%8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     int range = q->largest_ch - q->smallest_ch + 1;
@@ -1320,19 +1315,14 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    q->no_gaps = true;
-    for (i = 0; i < range; i++) if (!bit_is_set(map, i)) q->no_gaps = false;
+    g->V[0] = q->name;
 
-    if (!q->no_gaps) {
-        g->V[0] = q->name;
-
-        w(g, "~M~V0 = [");
-        for (i = 0; i < size; i++) {
-             write_int(g, map[i]);
-             if (i < size - 1) w(g, ", ");
-        }
-        w(g, "]~N~N");
+    w(g, "~M~V0 = [");
+    for (i = 0; i < size; i++) {
+        write_int(g, map[i]);
+        if (i < size - 1) w(g, ", ");
     }
+    w(g, "]~N~N");
     lose_b(map);
 }
 

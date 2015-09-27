@@ -111,42 +111,6 @@ public class SnowballProgram {
 	return false;
     }
 
-    protected boolean in_range(int min, int max)
-    {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (ch > max || ch < min) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean in_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if (ch > max || ch < min) return false;
-	cursor--;
-	return true;
-    }
-
-    protected boolean out_range(int min, int max)
-    {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (!(ch > max || ch < min)) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean out_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if(!(ch > max || ch < min)) return false;
-	cursor--;
-	return true;
-    }
-
     protected boolean eq_s(int s_size, String s)
     {
 	if (limit - cursor < s_size) return false;

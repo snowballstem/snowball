@@ -172,7 +172,6 @@ struct grouping {
     symbol * b;               /* the characters of this group */
     int largest_ch;           /* character with max code */
     int smallest_ch;          /* character with min code */
-    byte no_gaps;             /* not used in generator.c after 11/5/05 */
     struct name * name;       /* so g->name->grouping == g */
 };
 

@@ -104,42 +104,6 @@ class BaseStemmer extends Stemmer
 	return false;
     }
 
-    __noexport__ function in_range (min : int, max : int) : boolean
-    {
-	if (this.cursor >= this.limit) return false;
-	var ch = this.current.charCodeAt(this.cursor);
-	if (ch > max || ch < min) return false;
-	this.cursor++;
-	return true;
-    }
-
-    __noexport__ function in_range_b (min : int, max : int) : boolean
-    {
-	if (this.cursor <= this.limit_backward) return false;
-	var ch = this.current.charCodeAt(this.cursor - 1);
-	if (ch > max || ch < min) return false;
-	this.cursor--;
-	return true;
-    }
-
-    __noexport__ function out_range (min : int, max : int) : boolean
-    {
-	if (this.cursor >= this.limit) return false;
-	var ch = this.current.charCodeAt(this.cursor);
-	if (!(ch > max || ch < min)) return false;
-	this.cursor++;
-	return true;
-    }
-
-    __noexport__ function out_range_b (min : int, max : int) : boolean
-    {
-	if (this.cursor <= this.limit_backward) return false;
-	var ch = this.current.charCodeAt(this.cursor - 1);
-	if(!(ch > max || ch < min)) return false;
-	this.cursor--;
-	return true;
-    }
-
     __noexport__ function eq_s (s_size : int, s : string) : boolean
     {
 	if (this.limit - this.cursor < s_size) return false;

@@ -80,42 +80,6 @@ class BaseStemmer(object):
             return True
         return False
 
-    def in_range(self, min, max):
-        if self.cursor >= self.limit:
-            return False
-        ch = ord(self.current[self.cursor])
-        if ch > max or ch < min:
-            return False
-        self.cursor += 1
-        return True
-
-    def in_range_b(self, min, max):
-        if self.cursor <= self.limit_backward:
-            return False
-        ch = ord(self.current[self.cursor - 1])
-        if ch > max or ch < min:
-            return False
-        self.cursor -= 1
-        return True
-
-    def out_range(self, min, max):
-        if self.cursor >= self.limit:
-            return False
-        ch = ord(self.current[self.cursor])
-        if not (ch > max or ch < min):
-            return False
-        self.cursor += 1
-        return True
-
-    def out_range_b(self, min, max):
-        if self.cursor <= self.limit_backward:
-            return False
-        ch = ord(self.current[self.cursor - 1])
-        if not (ch > max or ch < min):
-            return False
-        self.cursor -= 1
-        return True
-
     def eq_s(self, s_size, s):
         if self.limit - self.cursor < s_size:
             return False
