@@ -884,10 +884,10 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     g->V[0] = p->name;
     wp(g, "~{struct SN_env env = * z;~C"
-             "~Mint failure = 1; /* assume failure */~N"
-             "~Mz->p = ~V0;~N"
-             "~Mz->lb = z->c = 0;~N"
-             "~Mz->l = SIZE(z->p);~N", p);
+          "~Mint failure = 1; /* assume failure */~N"
+          "~Mz->p = ~V0;~N"
+          "~Mz->lb = z->c = 0;~N"
+          "~Mz->l = SIZE(z->p);~N", p);
     generate(g, p->left);
     w(g, "~Mfailure = 0; /* mark success */~N");
     if (g->label_used)
@@ -1020,17 +1020,17 @@ static void generate_substring(struct generator * g, struct node * p) {
         if (block == -1) {
             if (ch == cases[0]) continue;
             if (n_cases < 2) {
-            cases[n_cases++] = ch;
+                cases[n_cases++] = ch;
             } else if (ch != cases[1]) {
-            ++n_cases;
-            break;
+                ++n_cases;
+                break;
             }
         } else {
             if ((bitmap & (1u << (ch & 0x1f))) == 0) {
-            bitmap |= 1u << (ch & 0x1f);
-            if (n_cases < 2)
-                cases[n_cases] = ch;
-            ++n_cases;
+                bitmap |= 1u << (ch & 0x1f);
+                if (n_cases < 2)
+                    cases[n_cases] = ch;
+                ++n_cases;
             }
         }
     }
@@ -1377,7 +1377,7 @@ static void generate_header_file(struct generator * g) {
          "#endif~N");            /* for C++ */
 
     generate_create_and_close_templates(g);
-    for (q= g->analyser->names; q; q = q->next) {
+    for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type)
         {
