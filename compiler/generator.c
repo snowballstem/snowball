@@ -960,7 +960,9 @@ static void generate_define(struct generator * g, struct node * p) {
     g->S[0] = q->type == t_routine ? "static" : "extern";
     g->V[0] = q;
 
-    w(g, "~N~S0 int ~V0(struct SN_env * z) {~N~+");
+    w(g, "~N~S0 int ~V0(struct SN_env * z) {");
+    ws(g, p->mode == m_forward ? " /* forwardmode */" : " /* backwardmode */");
+    w(g, "~N~+");
     if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     g->failure_string = 0;
     g->failure_label = x_return;
