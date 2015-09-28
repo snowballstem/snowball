@@ -43,6 +43,14 @@ static void ws(struct generator * g, const char * s) {
     str_append_string(g->outbuf, s); /* string */
 }
 
+/* Write a space if the preceding character was not whitespace */
+static void ws_opt_space(struct generator * g, const char * s) {
+    int ch = str_back(g->outbuf);
+    if (ch != ' ' && ch != '\n' && ch != '\t' && ch != -1)
+	wch(g, ' ');
+    ws(g, s);
+}
+
 static void wi(struct generator * g, int i) {
     str_append_int(g->outbuf, i); /* integer */
 }
@@ -129,7 +137,7 @@ static void wm(struct generator * g) {       /* margin */
 
 static void wc(struct generator * g, struct node * p) { /* comment */
 
-    ws(g, " /* ");
+    ws_opt_space(g, "/* ");
     switch (p->type) {
         case c_mathassign:
         case c_plusassign:

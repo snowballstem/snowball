@@ -40,6 +40,7 @@ extern void str_assign(struct str * str, char * s);
 extern struct str * str_copy(struct str * old);
 extern symbol * str_data(struct str * str);
 extern int str_len(struct str * str);
+extern int str_back(struct str *str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 
