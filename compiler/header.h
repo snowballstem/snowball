@@ -289,17 +289,8 @@ struct options {
 
     const char * output_file;
     const char * name;
-    FILE * output_c;
+    FILE * output_src;
     FILE * output_h;
-#ifndef DISABLE_JAVA
-    FILE * output_java;
-#endif
-#ifndef DISABLE_PYTHON
-    FILE * output_python;
-#endif
-#ifndef DISABLE_JSX
-    FILE * output_jsx;
-#endif
     byte syntax_tree;
     byte widechars;
     enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX } make_lang;

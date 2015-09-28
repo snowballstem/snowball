@@ -1432,9 +1432,9 @@ extern void generate_program_c(struct generator * g) {
     }
     generate_create(g);
     generate_close(g);
-    output_str(g->options->output_c, g->declarations);
+    output_str(g->options->output_src, g->declarations);
     str_delete(g->declarations);
-    output_str(g->options->output_c, g->outbuf);
+    output_str(g->options->output_src, g->outbuf);
     str_clear(g->outbuf);
 
     generate_start_comment(g);

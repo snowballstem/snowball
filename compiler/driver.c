@@ -236,49 +236,49 @@ extern int main(int argc, char * argv[]) {
                     if (o->make_lang == LANG_CPLUSPLUS) {
                         b = add_s_to_b(b, "c");
                     }
-                    o->output_c = get_output(b);
+                    o->output_src = get_output(b);
                     lose_b(b);
 
                     g = create_generator_c(a, o);
                     generate_program_c(g);
                     close_generator_c(g);
-                    fclose(o->output_c);
+                    fclose(o->output_src);
                     fclose(o->output_h);
                 }
 #ifndef DISABLE_JAVA
                 if (o->make_lang == LANG_JAVA) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".java");
-                    o->output_java = get_output(b);
+                    o->output_src = get_output(b);
                     lose_b(b);
                     g = create_generator_java(a, o);
                     generate_program_java(g);
                     close_generator_java(g);
-                    fclose(o->output_java);
+                    fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_PYTHON
                 if (o->make_lang == LANG_PYTHON) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".py");
-                    o->output_python = get_output(b);
+                    o->output_src = get_output(b);
                     lose_b(b);
                     g = create_generator_python(a, o);
                     generate_program_python(g);
                     close_generator_python(g);
-                    fclose(o->output_python);
+                    fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_JSX
                 if (o->make_lang == LANG_JSX) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".jsx");
-                    o->output_jsx = get_output(b);
+                    o->output_src = get_output(b);
                     lose_b(b);
                     g = create_generator_jsx(a, o);
                     generate_program_jsx(g);
                     close_generator_jsx(g);
-                    fclose(o->output_jsx);
+                    fclose(o->output_src);
                 }
 #endif
             }

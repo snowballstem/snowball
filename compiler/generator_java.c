@@ -1417,7 +1417,7 @@ extern void generate_program_java(struct generator * g) {
 
     generate_class_end(g);
 
-    output_str(g->options->output_java, g->outbuf);
+    output_str(g->options->output_src, g->outbuf);
     str_delete(g->failure_str);
     str_delete(g->outbuf);
 }

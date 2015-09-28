@@ -1407,7 +1407,7 @@ extern void generate_program_python(struct generator * g) {
 
     generate_label_classes(g);
 
-    output_str(g->options->output_python, g->outbuf);
+    output_str(g->options->output_src, g->outbuf);
     str_delete(g->failure_str);
     str_delete(g->outbuf);
 }
