@@ -275,7 +275,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
     while (i < l) {
         int ch = input[i++];
         if (ch == '~') {
-            switch(input[i++]) {
+            switch (input[i++]) {
                 default: write_char(g, input[i - 1]); continue;
                 case 'C': write_comment(g, p); continue;
                 case 'f': write_block_start(g);
@@ -1104,7 +1104,7 @@ static void generate_among(struct generator * g, struct node * p) {
 
     p = p->left;
     if (p != 0 && p->type != c_literalstring) p = p->right;
-    w(g, "~Mswitch(among_var) {~N~+");
+    w(g, "~Mswitch (among_var) {~N~+");
     w(g, "~Mcase 0:~N~+");
     write_failure(g);
     g->unreachable = false;

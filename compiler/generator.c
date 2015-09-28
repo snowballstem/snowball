@@ -241,7 +241,7 @@ static void wp(struct generator * g, const char * s, struct node * p) { /* forma
     while (i < l) {
         int ch = s[i++];
         if (ch != '~') wch(g, ch); else
-        switch(s[i++]) {
+        switch (s[i++]) {
             default:  wch(g, s[i - 1]); continue;
             case 'C': wc(g, p); continue;
             case 'k': wk(g, p); continue;
@@ -1107,7 +1107,7 @@ static void generate_among(struct generator * g, struct node * p) {
 
     p = p->left;
     if (p != 0 && p->type != c_literalstring) p = p->right;
-    w(g, "~Mswitch(among_var) {~N~+"
+    w(g, "~Mswitch (among_var) {~N~+"
              "~Mcase 0: ~f~N");
 
     while (p) {
