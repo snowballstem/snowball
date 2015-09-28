@@ -262,9 +262,12 @@ struct generator {
 #endif
     int margin;
 
-    const char * failure_string;     /* String to output in case of a failure. */
+    /* if > 0, keep_count to restore in case of a failure;
+     * if < 0, the negated keep_count for the limit to restore in case of
+     * failure. */
+    int failure_keep_count;
 #if !defined(DISABLE_JAVA) && !defined(DISABLE_JSX) && !defined(DISABLE_PYTHON)
-    struct str * failure_str;  /* This is used by some generators instead of failure_string */
+    struct str * failure_str;  /* This is used by some generators instead of failure_keep_count */
 #endif
 
     int label_used;     /* Keep track of whether the failure label is used. */
