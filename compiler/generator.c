@@ -794,7 +794,7 @@ static void generate_hop(struct generator * g, struct node * p) {
         generate_AE(g, p->AE); wp(g, ";~C", p);
         wp(g, "~Mif (~S1 > ret || ret > z->l) ~f~N", p);
     }
-    wp(g, "~Mz->c = ret;~C"
+    wp(g, "~Mz->c = ret;~N"
           "~}", p);
 }
 
