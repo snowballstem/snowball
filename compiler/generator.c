@@ -91,24 +91,28 @@ static void wv(struct generator * g, struct name * p) {  /* reference to variabl
     wvn(g, p);
 }
 
+/* write character literal */
+static void wlitch(struct generator * g, int ch) {
+    if (32 <= ch && ch < 127) {
+        wch(g, '\'');
+        switch (ch) {
+            case '\'':
+            case '\\': wch(g, '\\');
+            default:   wch(g, ch);
+        }
+        wch(g, '\'');
+    }  else {
+        wch(g, '0'); wch(g, 'x'); wh(g, ch);
+    }
+}
+
 static void wlitarray(struct generator * g, symbol * p) {  /* write literal array */
 
     ws(g, "{ ");
     {
         int i;
         for (i = 0; i < SIZE(p); i++) {
-            int ch = p[i];
-            if (32 <= ch && ch < 127) {
-                wch(g, '\'');
-                switch (ch) {
-                    case '\'':
-                    case '\\': wch(g, '\\');
-                    default:   wch(g, ch);
-                }
-                wch(g, '\'');
-            }  else {
-                wch(g, '0'); wch(g, 'x'); wh(g, ch);
-            }
+            wlitch(g, p[i]);
             if (i < SIZE(p) - 1) ws(g, ", ");
         }
     }
@@ -304,6 +308,7 @@ static void wp(struct generator * g, const char * s, struct node * p) { /* forma
             case 'W': wvn(g, g->V[s[i++] - '0']); continue;
             case 'L': wlitref(g, g->L[s[i++] - '0']); continue;
             case 'A': wlitarray(g, g->L[s[i++] - '0']); continue;
+            case 'c': wlitch(g, g->I[s[i++] - '0']); continue;
             case 'a': write_data_address(g, p); continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
@@ -987,11 +992,31 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 
 static void generate_literalstring(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
-    g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->I[0] = SIZE(b);
-    g->L[0] = b;
+    if (SIZE(b) == 1) {
+        /* It's quite common to compare with a single character literal string,
+         * so just inline the simpler code for this case rather than making a
+         * function call.  In UTF-8 mode, only do this for the ASCII subset,
+         * since multi-byte characters are more complex to text against.
+         */
+        if (g->options->utf8 && *b >= 128) {
+            printf("single byte %d\n", *b);
+            exit(1);
+        }
+        g->I[0] = *b;
+        if (p->mode == m_forward) {
+            wp(g, "~Mif (z->c == z->l || z->p[z->c] != ~c0) ~f~C"
+                  "~Mz->c++;~N", p);
+        } else {
+            wp(g, "~Mif (z->c <= z->lb || z->p[z->c - 1] != ~c0) ~f~C"
+                  "~Mz->c--;~N", p);
+        }
+    } else {
+        g->S[0] = p->mode == m_forward ? "" : "_b";
+        g->I[0] = SIZE(b);
+        g->L[0] = b;
 
-    wp(g, "~Mif (!(eq_s~S0(z, ~I0, ~L0))) ~f~C", p);
+        wp(g, "~Mif (!(eq_s~S0(z, ~I0, ~L0))) ~f~C", p);
+    }
 }
 
 static void generate_define(struct generator * g, struct node * p) {
