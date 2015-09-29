@@ -871,7 +871,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     wp(g, "~{int ret;~N", p);
     if (keep_c) wp(g, "~{int saved_c = z->c;~N", p);
     w(g, "~Mret =");
-    wp(g, keep_c ? "insert_~$(z, z->c, z->l, " : "insert_~$(z, z->lb, z->c, ~a);~C", p);
+    wp(g, keep_c ? "insert_~$(z, z->c, z->l, ~a);~C" : "insert_~$(z, z->lb, z->c, ~a);~C", p);
     if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
