@@ -262,6 +262,16 @@ static void wlim(struct generator * g, struct node * p) {     /* if at limit fai
     wf(g, p);
 }
 
+static void write_data_address(struct generator * g, struct node * p) {
+    symbol * b = p->literalstring;
+    if (b != 0) {
+        wi(g, SIZE(b)); w(g, ", ");
+        wlitref(g, b);
+    } else {
+        wv(g, p->name);
+    }
+}
+
 static void wp(struct generator * g, const char * s, struct node * p) { /* formatted write */
     int i = 0;
     int l = strlen(s);
@@ -294,6 +304,7 @@ static void wp(struct generator * g, const char * s, struct node * p) { /* forma
             case 'W': wvn(g, g->V[s[i++] - '0']); continue;
             case 'L': wlitref(g, g->L[s[i++] - '0']); continue;
             case 'A': wlitarray(g, g->L[s[i++] - '0']); continue;
+            case 'a': write_data_address(g, p); continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case '$': /* insert_s, insert_v etc */
@@ -837,25 +848,13 @@ static void generate_sliceto(struct generator * g, struct node * p) {
           "~Mif (~V0 == 0) return -1;~C", p);
 }
 
-static void generate_data_address(struct generator * g, struct node * p) {
-
-    symbol * b = p->literalstring;
-    if (b != 0) {
-        wi(g, SIZE(b)); w(g, ", ");
-        wlitref(g, b);
-    } else
-        wv(g, p->name);
-}
-
 static void generate_insert(struct generator * g, struct node * p, int style) {
 
     int keep_c = style == c_attach;
     if (p->mode == m_backward) keep_c = !keep_c;
     wp(g, "~{int ret;~N", p);
     if (keep_c) w(g, "~{int saved_c = z->c;~N");
-    wp(g, "~Mret = insert_~$(z, z->c, z->c, ", p);
-    generate_data_address(g, p);
-    wp(g, ");~C", p);
+    wp(g, "~Mret = insert_~$(z, z->c, z->c, ~a);~C", p);
     if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
@@ -867,9 +866,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     wp(g, "~{int ret;~N", p);
     if (keep_c) wp(g, "~{int saved_c = z->c;~N", p);
     w(g, "~Mret =");
-    wp(g, keep_c ? "insert_~$(z, z->c, z->l, " : "insert_~$(z, z->lb, z->c, ", p);
-    generate_data_address(g, p);
-    wp(g, ");~C", p);
+    wp(g, keep_c ? "insert_~$(z, z->c, z->l, " : "insert_~$(z, z->lb, z->c, ~a);~C", p);
     if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
@@ -880,9 +877,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
 /*  w(g, "~Mslice_from_s(z, ");   <============= bug! should be: */
-    wp(g, "~{int ret = slice_from_~$(z, ", p);
-    generate_data_address(g, p);
-    wp(g, ");~C", p);
+    wp(g, "~{int ret = slice_from_~$(z, ~a);~C", p);
     wp(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
