@@ -1286,7 +1286,7 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_start_comment(struct generator * g) {
 
-    w(g, "~N/* This file was generated automatically by the Snowball to ANSI C compiler */~N");
+    w(g, "~N/* This file was generated automatically by the Snowball to ISO C compiler */~N");
 }
 
 static void generate_head(struct generator * g) {

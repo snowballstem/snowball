@@ -281,7 +281,7 @@ struct generator {
     symbol * L[5];       /* literals, used in formatted write */
 
     int line_count;      /* counts number of lines output */
-    int line_labelled;   /* in ANSI C, will need extra ';' if it is a block end */
+    int line_labelled;   /* in ISO C, will need extra ';' if it is a block end */
     int literalstring_count;
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
