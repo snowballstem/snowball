@@ -102,7 +102,7 @@ static void wlitch(struct generator * g, int ch) {
         }
         wch(g, '\'');
     }  else {
-        wch(g, '0'); wch(g, 'x'); wh(g, ch);
+        ws(g, "0x"); wh(g, ch);
     }
 }
 
@@ -121,7 +121,7 @@ static void wlitarray(struct generator * g, symbol * p) {  /* write literal arra
 
 static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal array */
 
-    if (SIZE(p) == 0) ws(g, "0"); else {
+    if (SIZE(p) == 0) wch(g, '0'); else {
         struct str * s = g->outbuf;
         g->outbuf = g->declarations;
         ws(g, "static const symbol s_"); wi(g, g->literalstring_count); ws(g, "[] = ");
@@ -196,7 +196,7 @@ static void wk(struct generator * g, struct node * p) {     /* keep c */
         ws(g, "int c"); wi(g, g->keep_count); ws(g, " = z->c;");
     } else {
         ws(g, "int m"); wi(g, g->keep_count); ws(g, " = z->l - z->c; (void)m");
-        wi(g, g->keep_count); ws(g, ";");
+        wi(g, g->keep_count); wch(g, ';');
     }
 }
 
@@ -206,7 +206,7 @@ static void wrestore(struct generator * g, struct node * p, int keep_token) {   
     } else {
         ws(g, "z->c = z->l - m");
     }
-    wi(g, keep_token); ws(g, ";");
+    wi(g, keep_token); wch(g, ';');
 }
 
 static void wrestorelimit(struct generator * g, struct node * p, int keep_token) {     /* restore limit */
@@ -1359,7 +1359,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             if (v->size == 0) w(g, "0,");
                          else w(g, "s_~I0_~I1,");
             w(g, " ~I3, ~I4, ");
-            if (v->function == 0) w(g, "0"); else
+            if (v->function == 0) wch(g, '0'); else
                                   wvn(g, v->function);
             w(g, "}~S0~N");
             v++;
