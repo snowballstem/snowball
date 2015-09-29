@@ -1173,10 +1173,11 @@ static void generate_among(struct generator * g, struct node * p) {
 
     if (x->starter) generate(g, x->starter);
 
+    wp(g, "~Mswitch (among_var) {~C~+"
+              "~Mcase 0: ~f~N", p);
+
     p = p->left;
     if (p != 0 && p->type != c_literalstring) p = p->right;
-    wp(g, "~Mswitch (among_var) {~N~+"
-              "~Mcase 0: ~f~N", p);
 
     while (p) {
          if (p->type == c_bra && p->left != 0) {
