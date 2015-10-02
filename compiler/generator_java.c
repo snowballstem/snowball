@@ -1231,6 +1231,7 @@ static void generate_start_comment(struct generator * g) {
 }
 
 static void generate_class_begin(struct generator * g) {
+    struct among * x;
 
     w(g, "package " );
     w(g, g->options->package);
@@ -1251,9 +1252,15 @@ static void generate_class_begin(struct generator * g) {
     w(g, " {~+~N"
          "~N"
          "~Mprivate static final long serialVersionUID = 1L;~N"
-         "~N"
-         "~Mprivate final static ~n methodObject = new ~n ();~N"
          "~N");
+
+    for (x = g->analyser->amongs; x; x = x->next) {
+        if (x->function_count > 0) {
+            w(g, "~Mprivate final static ~n methodObject = new ~n ();~N"
+                 "~N");
+            break;
+        }
+    }
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1295,11 +1302,13 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among ( ~L0, ~I1, ~I2, \"");
+            w(g, "~Mnew Among ( ~L0, ~I1, ~I2");
             if (v->function != 0) {
+                w(g, ", \"");
                 write_varname(g, v->function);
+                w(g, "\", methodObject");
             }
-            w(g, "\", methodObject )~S0~N");
+            w(g, " )~S0~N");
             v++;
         }
     }
