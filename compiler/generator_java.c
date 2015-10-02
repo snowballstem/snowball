@@ -133,7 +133,7 @@ static void write_declare(struct generator * g,
 
     struct str * temp = g->outbuf;
     g->outbuf = g->declarations;
-    write_string(g, "            ");
+    write_string(g, "        ");
     writef(g, declaration, p);
     write_string(g, ";");
     write_newline(g);
@@ -1050,7 +1050,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     g->S[0] = q->type == t_routine ? "private" : "public";
     g->V[0] = q;
-    w(g, "~+~+~N~M~S0 boolean ~V0() {~+~N");
+    w(g, "~N~M~S0 boolean ~V0() {~+~N");
 
     g->outbuf = str_new();
     g->declarations = str_new();
@@ -1064,7 +1064,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->unreachable = false;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~Mreturn true;~N");
-    w(g, "~}~-~-");
+    w(g, "~}");
 
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
@@ -1248,11 +1248,11 @@ static void generate_class_begin(struct generator * g) {
          "public class ~n extends ");
 
     w(g, g->options->parent_class_name);
-    w(g, " {~N"
+    w(g, " {~+~N"
          "~N"
-         "private static final long serialVersionUID = 1L;~N"
+         "~Mprivate static final long serialVersionUID = 1L;~N"
          "~N"
-         "~+~+~Mprivate final static ~n methodObject = new ~n ();~N"
+         "~Mprivate final static ~n methodObject = new ~n ();~N"
          "~N");
 }
 
@@ -1285,7 +1285,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    w(g, "~+~+~Mprivate final static Among a_~I0[] = {~N~+");
+    w(g, "~Mprivate final static Among a_~I0[] = {~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1303,7 +1303,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             v++;
         }
     }
-    w(g, "~-~M};~-~-~N~N");
+    w(g, "~-~M};~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -1332,12 +1332,12 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~+~+~Mprivate static final char ~V0[] = {");
+    w(g, "~Mprivate static final char ~V0[] = {");
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, " };~N~-~-~N");
+    w(g, " };~N~N");
     lose_b(map);
 }
 
@@ -1355,17 +1355,17 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "        private ");
+                w(g, "    private ");
                 w(g, g->options->string_class );
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
                 break;
             case t_integer:
-                w(g, "        private int ~W0;~N");
+                w(g, "    private int ~W0;~N");
                 break;
             case t_boolean:
-                w(g, "        private boolean ~W0;~N");
+                w(g, "    private boolean ~W0;~N");
                 break;
         }
     }
@@ -1375,7 +1375,7 @@ static void generate_members(struct generator * g) {
 static void generate_copyfrom(struct generator * g) {
 
     struct name * q;
-    w(g, "~+~+~Mprivate void copy_from(~n other) {~+~N");
+    w(g, "~Mprivate void copy_from(~n other) {~+~N");
     for (q = g->analyser->names; q != 0; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
@@ -1387,7 +1387,7 @@ static void generate_copyfrom(struct generator * g) {
         }
     }
     w(g, "~Msuper.copy_from(other);~N");
-    w(g, "~-~M}~-~-~N");
+    w(g, "~-~M}~N");
 }
 
 static void generate_methods(struct generator * g) {
