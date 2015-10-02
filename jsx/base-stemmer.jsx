@@ -200,7 +200,7 @@ class BaseStemmer extends Stemmer
                 {
                     return w.result;
                 }
-		var res = w.method(w.instance);
+		var res = w.method(this);
 		this.cursor = c + w.s_size;
 		if (res)
                 {

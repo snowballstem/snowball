@@ -1268,9 +1268,7 @@ static void generate_class_begin(struct generator * g) {
          "~N"
          "class ~n extends ");
     w(g, g->options->parent_class_name);
-    w(g, "~N{~N"
-         "~+~Mstatic const methodObject = new ~n();~N"
-         "~N");
+    w(g, "~N{~N");
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1301,7 +1299,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             {
                 w(g, ", ((instance : BaseStemmer) : boolean -> (instance as ~n).");
                 write_varname(g, v->function);
-                w(g, "()), ~n.methodObject");
+                w(g, "())");
             }
             w(g, ")~S0~N");
             v++;
