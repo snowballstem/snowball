@@ -1247,12 +1247,12 @@ static void generate_class_begin(struct generator * g) {
          "~N"
          "public class ~n extends ");
 
-     w(g, g->options->parent_class_name);
-     w(g, " {~N"
-          "~N"
-	  "private static final long serialVersionUID = 1L;~N"
-	  "~N"
-	  "~+~+~Mprivate final static ~n methodObject = new ~n ();~N"
+    w(g, g->options->parent_class_name);
+    w(g, " {~N"
+         "~N"
+         "private static final long serialVersionUID = 1L;~N"
+         "~N"
+         "~+~+~Mprivate final static ~n methodObject = new ~n ();~N"
          "~N");
 }
 

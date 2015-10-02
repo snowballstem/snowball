@@ -1267,9 +1267,9 @@ static void generate_class_begin(struct generator * g) {
          "  */~N"
          "~N"
          "class ~n extends ");
-     w(g, g->options->parent_class_name);
-     w(g, "~N{~N"
-	  "~+~Mstatic const methodObject = new ~n();~N"
+    w(g, g->options->parent_class_name);
+    w(g, "~N{~N"
+         "~+~Mstatic const methodObject = new ~n();~N"
          "~N");
 }
 
