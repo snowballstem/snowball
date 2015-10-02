@@ -479,9 +479,13 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
             w1->size = SIZE(b);  /* number of characters in string */
             w1->i = -1;          /* index of longest substring */
             w1->result = -1;     /* number of corresponding case expression */
-            w1->function = q->left == 0 ? 0 : q->left->name;
-            if (w1->function)
+            if (q->left) {
+                w1->function = q->left->name;
                 check_routine_mode(a, w1->function, direction);
+                x->function_count++;
+            } else {
+                w1->function = 0;
+            }
             w1++;
         }
         else
