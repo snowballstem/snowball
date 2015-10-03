@@ -153,7 +153,7 @@ struct str {
 };
 
 /* Create a new string. */
-extern struct str * str_new() {
+extern struct str * str_new(void) {
 
     struct str * output = (struct str *) malloc(sizeof(struct str));
     output->data = create_b(0);
