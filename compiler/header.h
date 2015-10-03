@@ -17,13 +17,13 @@ typedef unsigned short symbol;
 #define CAPACITY(p) ((int *)(p))[-2]
 
 extern symbol * create_b(int n);
-extern void report_b(FILE * out, symbol * p);
+extern void report_b(FILE * out, const symbol * p);
 extern void lose_b(symbol * p);
 extern symbol * increase_capacity(symbol * p, int n);
-extern symbol * move_to_b(symbol * p, int n, symbol * q);
-extern symbol * add_to_b(symbol * p, int n, symbol * q);
-extern symbol * copy_b(symbol * p);
-extern char * b_to_s(symbol * p);
+extern symbol * move_to_b(symbol * p, int n, const symbol * q);
+extern symbol * add_to_b(symbol * p, int n, const symbol * q);
+extern symbol * copy_b(const symbol * p);
+extern char * b_to_s(const symbol * p);
 extern symbol * add_s_to_b(symbol * p, const char * s);
 
 struct str; /* defined in space.c */
