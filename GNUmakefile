@@ -358,7 +358,7 @@ check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)
 
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
-# Where the data files are located - assumed their repo is checked out as
+# Where the data files are located - assumes their repo is checked out as
 # a sibling to this one.
 STEMMING_DATA = ../snowball-data
 
