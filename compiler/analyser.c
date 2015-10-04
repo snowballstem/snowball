@@ -682,7 +682,6 @@ static struct node * read_C(struct analyser * a) {
                 struct name * q = find_name(a);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
-                if (q) mark_used_in(a, q, p);
                 switch (q ? q->type : t_string)
                     /* above line was: switch (q->type) - bug #1 fix 7/2/2003 */
                 {
@@ -697,6 +696,7 @@ static struct node * read_C(struct analyser * a) {
                         p = new_node(a, read_AE_test(a));
                         p->AE = read_AE(a, 0); break;
                 }
+                if (q) mark_used_in(a, q, p);
                 p->name = q;
                 a->mode = mode;
                 a->modifyable = modifyable;
