@@ -250,6 +250,7 @@ static void read_names(struct analyser * a, int type) {
             p->mode = -1; /* routines, externals */
             p->count = a->name_count[type];
             p->referenced = false;
+            p->used_in_among = false;
             p->used = 0;
             p->local_to = 0;
             p->grouping = 0;
@@ -493,8 +494,10 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
             w1->i = -1;          /* index of longest substring */
             w1->result = -1;     /* number of corresponding case expression */
             if (q->left) {
-                w1->function = q->left->name;
-                check_routine_mode(a, w1->function, direction);
+                struct name * function = q->left->name;
+                w1->function = function;
+                function->used_in_among = true;
+                check_routine_mode(a, function, direction);
                 x->function_count++;
             } else {
                 w1->function = 0;

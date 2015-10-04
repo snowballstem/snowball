@@ -1048,7 +1048,15 @@ static void generate_define(struct generator * g, struct node * p) {
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
 
-    g->S[0] = q->type == t_routine ? "private" : "public";
+    /* We currently make functions used in among public as this seems to
+     * be required to allow the SnowballProgram base class to invoke them.
+     * FIXME: Is this avoidable?
+     */
+    if (q->type == t_routine && !q->used_in_among) {
+        g->S[0] = "private";
+    } else {
+        g->S[0] = "public";
+    }
     g->V[0] = q;
     w(g, "~N~M~S0 boolean ~V0() {~+~N");
 
@@ -1231,7 +1239,6 @@ static void generate_start_comment(struct generator * g) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    struct among * x;
 
     w(g, "package " );
     w(g, g->options->package);
@@ -1253,14 +1260,6 @@ static void generate_class_begin(struct generator * g) {
          "~N"
          "~Mprivate static final long serialVersionUID = 1L;~N"
          "~N");
-
-    for (x = g->analyser->amongs; x; x = x->next) {
-        if (x->function_count > 0) {
-            w(g, "~Mprivate final static ~n methodObject = new ~n ();~N"
-                 "~N");
-            break;
-        }
-    }
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1306,7 +1305,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             if (v->function != 0) {
                 w(g, ", \"");
                 write_varname(g, v->function);
-                w(g, "\", methodObject");
+                w(g, "\", ~n.class");
             }
             w(g, " )~S0~N");
             v++;

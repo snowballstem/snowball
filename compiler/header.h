@@ -133,6 +133,7 @@ struct name {
     int count;                  /* 0, 1, 2 for each type */
     struct grouping * grouping; /* for grouping names */
     byte referenced;
+    byte used_in_among;         /* Function used in among? */
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
 
