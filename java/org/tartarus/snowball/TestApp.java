@@ -54,7 +54,6 @@ public class TestApp {
 	    repeat = Integer.parseInt(args[4]);
 	}
 
-	Object [] emptyArgs = new Object[0];
 	int character;
 	while ((character = reader.read()) != -1) {
 	    char ch = (char) character;
