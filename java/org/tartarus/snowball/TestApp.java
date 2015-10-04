@@ -69,7 +69,7 @@ public class TestApp {
 		    input.delete(0, input.length());
 		}
 	    } else {
-		input.append(Character.toLowerCase(ch));
+		input.append(ch < 127 ? Character.toLowerCase(ch) : ch);
 	    }
 	}
 	output.flush();
