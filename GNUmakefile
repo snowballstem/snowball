@@ -405,10 +405,10 @@ check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
-	(cd python_check && \
-	$(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt && \
-	diff -u $</output.txt tmp.txt && \
-	rm tmp.txt)
+	@cd python_check && \
+	    $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt
+	@diff -u $</output.txt tmp.txt
+	@rm tmp.txt
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	mkdir -p python_check && \
