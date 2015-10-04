@@ -37,7 +37,7 @@ public class TestApp {
         OutputStream outstream;
 
 	if (args.length > 2) {
-            if (args.length >= 4 && args[2].equals("-o")) {
+            if (args.length == 4 && args[2].equals("-o")) {
                 outstream = new FileOutputStream(args[3]);
             } else {
                 usage();
@@ -49,19 +49,12 @@ public class TestApp {
 	Writer output = new OutputStreamWriter(outstream);
 	output = new BufferedWriter(output);
 
-	int repeat = 1;
-	if (args.length > 4) {
-	    repeat = Integer.parseInt(args[4]);
-	}
-
 	int character;
 	while ((character = reader.read()) != -1) {
 	    char ch = (char) character;
 	    if (Character.isWhitespace(ch)) {
 		stemmer.setCurrent(input.toString());
-		for (int i = repeat; i != 0; i--) {
-		    stemmer.stem();
-		}
+		stemmer.stem();
 		output.write(stemmer.getCurrent());
 		output.write('\n');
 		input.delete(0, input.length());
