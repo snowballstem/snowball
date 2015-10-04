@@ -395,7 +395,7 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords
 check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
 
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JSX"
 	@./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
 	@diff -u $</output.txt tmp.txt
 	@rm tmp.txt
@@ -403,7 +403,7 @@ check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
 check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA)/%
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
 	(cd python_check && \
 	$(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i ../$</voc.txt -o tmp.txt && \
 	diff -u ../$</output.txt tmp.txt && \
