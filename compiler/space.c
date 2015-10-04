@@ -59,7 +59,7 @@ extern symbol * create_b(int n) {
 
 extern void report_b(FILE * out, const symbol * p) {
     int i;
-    for (i = 0; i < SIZE(p); i++) fprintf(out, "%c", p[i]);
+    for (i = 0; i < SIZE(p); i++) putc(p[i], out);
 }
 
 extern void lose_b(symbol * p) {
