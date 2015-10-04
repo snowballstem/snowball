@@ -360,7 +360,8 @@ check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
 # Where the data files are located - assumes their repo is checked out as
 # a sibling to this one.
-STEMMING_DATA = ../snowball-data
+STEMMING_DATA ?= ../snowball-data
+STEMMING_DATA_ABS := $(abspath $(STEMMING_DATA))
 
 check_utf8_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
@@ -402,11 +403,11 @@ check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
 
 check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 
-check_python_%: $(STEMMING_DATA)/%
+check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
 	(cd python_check && \
-	$(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i ../$</voc.txt -o tmp.txt && \
-	diff -u ../$</output.txt tmp.txt && \
+	$(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt && \
+	diff -u $</output.txt tmp.txt && \
 	rm tmp.txt)
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
