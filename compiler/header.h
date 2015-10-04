@@ -134,6 +134,7 @@ struct name {
     struct grouping * grouping; /* for grouping names */
     byte referenced;
     struct node * used;         /* First use, or NULL if not used */
+    struct name * local_to;     /* Local to one routine/external */
 
 };
 

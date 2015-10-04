@@ -251,6 +251,7 @@ static void read_names(struct analyser * a, int type) {
             p->count = a->name_count[type];
             p->referenced = false;
             p->used = 0;
+            p->local_to = 0;
             p->grouping = 0;
             p->definition = 0;
             a->name_count[type] ++;
@@ -296,11 +297,23 @@ static int binding(int t) {
     }
 }
 
+static void mark_used_in(struct analyser * a, struct name * q, struct node * p) {
+    if (!q->used) {
+        q->used = p;
+        q->local_to = a->program_end->name;
+    } else if (q->local_to) {
+        if (q->local_to != a->program_end->name) {
+            /* Used in more than one routine/external. */
+            q->local_to = NULL;
+        }
+    }
+}
+
 static void name_to_node(struct analyser * a, struct node * p, int type) {
     struct name * q = find_name(a);
     if (q) {
         check_name_type(a, q, type);
-        if (!q->used) q->used = p;
+        mark_used_in(a, q, p);
     }
     p->name = q;
 }
@@ -666,6 +679,7 @@ static struct node * read_C(struct analyser * a) {
                 struct name * q = find_name(a);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
+                if (q) mark_used_in(a, q, p);
                 switch (q ? q->type : t_string)
                     /* above line was: switch (q->type) - bug #1 fix 7/2/2003 */
                 {
@@ -690,7 +704,7 @@ static struct node * read_C(struct analyser * a) {
                 struct name * q = find_name(a);
                 struct node * p = new_node(a, c_name);
                 if (q) {
-                    if (!q->used) q->used = p;
+                    mark_used_in(a, q, p);
                     switch (q->type) {
                         case t_boolean:
                             p->type = c_booltest; break;
