@@ -1,16 +1,22 @@
 # -*- makefile -*-
 
 c_src_dir = src_c
+
+JAVAC ?= javac
+JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
+
 python ?= python3
 python_output_dir = python_out
 python_runtime_dir = snowballstemmer
 python_sample_dir = sample
+
 jsx_output_dir = jsx_out
 jsx_runtime_src_dir = jsx
 jsx_runtime_dir = lib
 jsx_sample_dir = sample
+
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -393,6 +399,21 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords
 	    diff -u - tmp.txt
 	@rm tmp.txt
 
+.java.class:
+	cd java && $(JAVAC) `echo "$<"|sed 's,^java/,,'`
+
+check_java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
+	$(MAKE) do_check_java
+
+do_check_java: $(libstemmer_algorithms:%=check_java_%)
+
+check_java_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Java"
+	@cd java && \
+	    $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` $</voc.txt -o $(PWD)/tmp.txt
+	@diff -u $</output.txt tmp.txt
+	@rm tmp.txt
+
 check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
 
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
@@ -416,3 +437,5 @@ check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
+
+.SUFFIXES: .class .java
