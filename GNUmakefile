@@ -411,8 +411,8 @@ check_python_%: $(STEMMING_DATA_ABS)/%
 	@rm tmp.txt
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
-	mkdir -p python_check && \
-	mkdir -p python_check/snowballstemmer && \
-	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer && \
-	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer && \
+	mkdir -p python_check
+	mkdir -p python_check/snowballstemmer
+	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer
+	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
