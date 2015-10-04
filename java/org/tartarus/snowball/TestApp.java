@@ -58,15 +58,13 @@ public class TestApp {
 	while ((character = reader.read()) != -1) {
 	    char ch = (char) character;
 	    if (Character.isWhitespace(ch)) {
-		if (input.length() > 0) {
-		    stemmer.setCurrent(input.toString());
-		    for (int i = repeat; i != 0; i--) {
-			stemmer.stem();
-		    }
-		    output.write(stemmer.getCurrent());
-		    output.write('\n');
-		    input.delete(0, input.length());
+		stemmer.setCurrent(input.toString());
+		for (int i = repeat; i != 0; i--) {
+		    stemmer.stem();
 		}
+		output.write(stemmer.getCurrent());
+		output.write('\n');
+		input.delete(0, input.length());
 	    } else {
 		input.append(ch < 127 ? Character.toLowerCase(ch) : ch);
 	    }
