@@ -1112,16 +1112,16 @@ static void generate_substring(struct generator * g, struct node * p) {
             sprintf(buf, "z->p[z->c + %d]", shortest_size - 1);
             g->S[1] = buf;
             if (shortest_size == 1) {
-                wp(g, "~Mif (z->c >= z->l || ", p);
+                wp(g, "~Mif (z->c >= z->l", p);
             } else {
-                wp(g, "~Mif (z->c + ~I4 >= z->l || ", p);
+                wp(g, "~Mif (z->c + ~I4 >= z->l", p);
             }
         } else {
             g->S[1] = "z->p[z->c - 1]";
             if (shortest_size == 1) {
-                wp(g, "~Mif (z->c <= z->lb || ", p);
+                wp(g, "~Mif (z->c <= z->lb", p);
             } else {
-                wp(g, "~Mif (z->c - ~I4 <= z->lb || ", p);
+                wp(g, "~Mif (z->c - ~I4 <= z->lb", p);
             }
         }
         if (n_cases == 0) {
@@ -1129,16 +1129,15 @@ static void generate_substring(struct generator * g, struct node * p) {
              * This doesn't seem to be a useful construct, but it is
              * syntactically valid.
              */
-            wp(g, "0", p);
         } else if (n_cases == 1) {
             g->I[4] = cases[0];
-            wp(g, "~S1 != ~I4", p);
+            wp(g, " || ~S1 != ~I4", p);
         } else if (n_cases == 2) {
             g->I[4] = cases[0];
             g->I[5] = cases[1];
-            wp(g, "(~S1 != ~I4 && ~S1 != ~I5)", p);
+            wp(g, " || (~S1 != ~I4 && ~S1 != ~I5)", p);
         } else {
-            wp(g, "~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
+            wp(g, " || ~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
         }
         ws(g, ") ");
         if (empty_case != -1) {
