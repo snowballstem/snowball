@@ -1049,6 +1049,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     int n_cases = 0;
     symbol cases[2];
     int shortest_size = INT_MAX;
+    int shown_comment = 0;
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
@@ -1149,17 +1150,21 @@ static void generate_substring(struct generator * g, struct node * p) {
         } else {
             wp(g, "~f~C", p);
         }
+        shown_comment = 1;
     } else {
 #ifdef OPTIMISATION_WARNINGS
         printf("Couldn't shortcut among %d\n", x->number);
 #endif
     }
 
-    if (x->command_count == 0 && x->starter == 0)
-        wp(g, "~Mif (!(find_among~S0(z, a_~I0, ~I1))) ~f~C", p);
-    else
-        wp(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1);~C"
-              "~Mif (!(among_var)) ~f~N", p);
+    if (x->command_count == 0 && x->starter == 0) {
+        wp(g, "~Mif (!(find_among~S0(z, a_~I0, ~I1))) ~f", p);
+        wp(g, shown_comment ? "~N" : "~C", p);
+    } else {
+        wp(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1);", p);
+        wp(g, shown_comment ? "~N" : "~C", p);
+        wp(g, "~Mif (!(among_var)) ~f~N", p);
+    }
 }
 
 static void generate_among(struct generator * g, struct node * p) {
