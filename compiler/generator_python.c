@@ -1045,32 +1045,13 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_define(struct generator * g, struct node * p) {
 
     struct name * q = p->name;
-    symbol stem[] = {'s', 't', 'e', 'm'};
-    int find = 0;
-    int i = 0;
-    if (SIZE(q->b) == 4)
-    {
-        find = 1;
-        for (i = 0; i < 4; i++)
-        {
-            if (q->b[i] != stem[i])
-            {
-                find = 0;
-                break;
-            }
-        }
-    }
+
     struct str * saved_output = g->outbuf;
 
-    g->V[0] = p->name;
-    if (find == 1)
-    {
-        w(g, "~N~Mdef _~V0(self):~+~N");
-    }
-    else
-    {
-        w(g, "~N~Mdef ~V0(self):~+~N");
-    }
+    g->S[0] = q->type == t_routine ? "" : "_";
+    g->V[0] = q;
+    w(g, "~N~Mdef ~S0~V0(self):~+~N");
+
     g->outbuf = str_new();
 
     g->next_label = 0;
