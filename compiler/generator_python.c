@@ -1010,7 +1010,8 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "not self.~V0()", p);
+    g->S[0] = p->name->type == t_routine ? "" : "_";
+    write_failure_if(g, "not self.~S0~V0()", p);
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
