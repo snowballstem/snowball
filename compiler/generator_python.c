@@ -1010,7 +1010,7 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    g->S[0] = p->name->type == t_routine ? "" : "_";
+    g->S[0] = p->name->type == t_routine ? "__" : "_";
     write_failure_if(g, "not self.~S0~V0()", p);
 }
 
@@ -1049,7 +1049,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     struct str * saved_output = g->outbuf;
 
-    g->S[0] = q->type == t_routine ? "" : "_";
+    g->S[0] = q->type == t_routine ? "__" : "_";
     g->V[0] = q;
     w(g, "~N~Mdef ~S0~V0(self):~+~N");
 
@@ -1263,6 +1263,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
             if (v->function != 0)
             {
                 w(g, ", \"");
+                if (v->function->type == t_routine) {
+                    /* Need to use mangled version of private name here. */
+                    w(g, "_~n__");
+                } else {
+                    w(g, "_");
+                }
                 write_varname(g, v->function);
                 w(g, "\"");
             }
