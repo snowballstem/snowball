@@ -1220,7 +1220,7 @@ static void generate(struct generator * g, struct node * p) {
 static void generate_start_comment(struct generator * g) {
 
     w(g, "# This file was generated automatically by the Snowball to Python compiler~N");
-    w(g, "~N");
+    w(g, "# http://snowballstem.org/~N~N");
 }
 
 static void generate_class_begin(struct generator * g) {
