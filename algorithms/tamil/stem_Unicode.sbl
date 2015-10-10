@@ -90,8 +90,6 @@ routines (
  has_min_length
 )
 
-integers (mark mark2)
-
 externals ( stem )
 
 groupings (
@@ -107,11 +105,9 @@ groupings (
 )
 
 booleans (
- found_vallinam_doubling
  found_a_match
  found_vetrumai_urupu
  found_wrong_ending
- was_stripped
 )
 
 integers (
@@ -127,30 +123,36 @@ define mellinam '{nga}{nya}{nna}{na}{ma}{nnna}'
 define itaiyinam '{ya}{ra}{la}{va}{zha}{lla}'
 define vowel_signs '{vs_aa}{vs_i}{vs_ii}{vs_e}{vs_ee}{vs_u}{vs_uu}{vs_ai}'
 define uyir '{a}{aa}{i}{ii}{u}{uu}{e}{ee}{ai}{o}{oo}{au}'
+
 define strlen as (
  // size in snowball returns bytes which is not very useful for utf8
  // this routine gives the number of characters
  $length = 0
  do repeat (next ($length = length+1))
 )
+
 define has_min_length as (
  strlen
  $length > 4
 )
+
 define fix_va_start as (
  (try '{va}{vs_oo}' and [ '{va}{vs_oo}' ] <- '{oo}' ) or
  (try '{va}{vs_o}' and [ '{va}{vs_o}' ] <- '{o}' ) or
  (try '{va}{vs_u}' and [ '{va}{vs_u}' ] <- '{u}' ) or
  (try '{va}{vs_uu}' and [ '{va}{vs_uu}' ] <- '{uu}' )
 )
+
 define fix_endings as (
  set found_wrong_ending
  repeat (found_wrong_ending (do fix_ending))
 )
+
 define remove_question_prefixes as (
  [ ('{e}' ) ('{ka}' or '{ca}' or '{tha}' or '{va}' or '{na}' or '{pa}' or '{ma}' or '{ya}' or '{nga}' or '{nya}') '{pulli}' ] delete
  do fix_va_start
 )
+
 define fix_ending as (
  unset found_wrong_ending
  strlen
@@ -194,12 +196,14 @@ define fix_ending as (
 
  set found_wrong_ending // If any of above test pass set the flag
 )
+
 define remove_pronoun_prefixes as (
  unset found_a_match
  [ ('{a}' or '{i}' or '{u}') ('{ka}' or '{ca}' or '{tha}' or '{va}' or '{na}' or '{pa}' or '{ma}' or '{ya}' or '{nga}' or '{nya}') '{pulli}' ] delete
  (set found_a_match)
  do fix_va_start
 )
+
 define remove_plural_suffix as (
  unset found_a_match
  backwards (
@@ -208,9 +212,9 @@ define remove_plural_suffix as (
   ( [ '{tta}{pulli}{ka}{lla}{pulli}' ] <- '{lla}{pulli}' ) or
   ( [ '{ka}{lla}{pulli}' ] delete )
   (set found_a_match)
- 
  )
 )
+
 define remove_question_suffixes as (
  has_min_length
  unset found_a_match
@@ -218,20 +222,20 @@ define remove_question_suffixes as (
   do (
    [ ( '{vs_oo}' or '{vs_ee}' or '{vs_aa}') ] <- '{pulli}'
    (set found_a_match)
-  
   )
  )
  do fix_endings
 )
+
 define remove_command_suffixes as (
  has_min_length
  unset found_a_match
  backwards (
   [ ('{pa}{vs_i}' or '{va}{vs_i}') ] delete
   (set found_a_match)
- 
  )
 )
+
 define remove_um as (
  unset found_a_match
  has_min_length
@@ -240,11 +244,11 @@ define remove_um as (
     )
  do fix_ending
 )
+
 define remove_common_word_endings as (
- // These are not suffixes actually but are 
+ // These are not suffixes actually but are
  // some words that are attached to other words
  // but can be removed for stemming
-
  unset found_a_match
  has_min_length
  backwards (
@@ -275,6 +279,7 @@ define remove_common_word_endings as (
  )
  do fix_endings
 )
+
 define remove_vetrumai_urupukal as (
  unset found_a_match
  unset found_vetrumai_urupu
@@ -287,7 +292,6 @@ define remove_vetrumai_urupukal as (
      '{vs_ai}' (test not ('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}'))) or
       ( '{vs_ai}' (test (('{ka}' or '{ca}' or '{tta}' or '{tha}' or '{pa}' or '{rra}') '{pulli}')))
     ] <- '{pulli}'
-   
     )
    or
    test ( [ '{vs_o}{tta}{vs_u}' or '{vs_oo}{tta}{vs_u}' or
@@ -300,19 +304,15 @@ define remove_vetrumai_urupukal as (
       '{vs_aa}{ma}{la}{pulli}' or
       ( '{la}{pulli}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) or
       '{vs_u}{lla}{pulli}' ] <- '{pulli}'
-   
      )
    or
    test ( [ '{ka}{nna}{pulli}' or '{ma}{vs_u}{nnna}{pulli}' or
      '{ma}{vs_ee}{la}{pulli}' or '{ma}{vs_ee}{rra}{pulli}' or
      '{ka}{vs_ii}{llla}{pulli}' or '{pa}{vs_i}{nnna}{pulli}' or
      ('{ta}{vs_u}' (test not ('{vs_aa}' or '{vs_i}' or '{vs_ii}' or '{vs_e}' or '{vs_ee}' or '{vs_u}' or '{vs_uu}' or '{vs_ai}'))) ] delete
-   
       )
    or
-   test ( [ '{vs_ii}' ] <- '{vs_i}'
-   
-      )
+   test ( [ '{vs_ii}' ] <- '{vs_i}' )
   )
   (set found_a_match)
   (set found_vetrumai_urupu)
@@ -320,10 +320,12 @@ define remove_vetrumai_urupukal as (
  )
  do fix_endings
 )
+
 define remove_tense_suffixes as (
  set found_a_match
  repeat ( found_a_match (do remove_tense_suffix) )
 )
+
 define remove_tense_suffix as (
  unset found_a_match
  has_min_length
@@ -384,8 +386,9 @@ define remove_tense_suffix as (
  )
  do fix_endings
 )
-define stem as (
 
+define stem as (
+ unset found_vetrumai_urupu
  do fix_ending
  has_min_length
  do remove_question_prefixes
