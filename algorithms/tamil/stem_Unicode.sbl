@@ -435,6 +435,7 @@ define remove_tense_suffix as (
 )
 
 define stem as (
+ unset found_vetrumai_urupu
  do fix_ending
  has_min_length
  do remove_question_prefixes
