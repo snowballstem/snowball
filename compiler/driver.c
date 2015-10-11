@@ -1,6 +1,6 @@
 #include <stdio.h>   /* for fprintf etc */
 #include <stdlib.h>  /* for free etc */
-#include <string.h>  /* for strlen */
+#include <string.h>  /* for strcmp */
 #include "header.h"
 
 #define DEFAULT_PACKAGE "org.tartarus.snowball.ext"
@@ -9,9 +9,7 @@
 #define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
 
 static int eq(const char * s1, const char * s2) {
-    int s1_len = strlen(s1);
-    int s2_len = strlen(s2);
-    return s1_len == s2_len && memcmp(s1, s2, s1_len) == 0;
+    return strcmp(s1, s2) == 0;
 }
 
 static void print_arglist(void) {
