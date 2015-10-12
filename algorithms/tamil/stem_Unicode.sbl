@@ -92,20 +92,6 @@ routines (
 
 externals ( stem )
 
-/*
-groupings (
- suttezhuthu
- q_suffixes
- q_prefixes
- word_starter
- vallinam
- mellinam
- itaiyinam
- uyir
- vowel_signs
-)
-*/
-
 booleans (
  found_a_match
  found_vetrumai_urupu
@@ -115,18 +101,6 @@ booleans (
 integers (
  length
 )
-
-/*
-define q_suffixes '{vs_aa}{vs_oo}{vs_ee}'
-define q_prefixes '{e}'
-define word_starter '{ka}{ca}{tha}{va}{na}{pa}{ma}{ya}{nga}{nya}'
-define suttezhuthu '{a}{i}{u}'
-define vallinam '{ka}{ca}{tta}{tha}{pa}{rra}'
-define mellinam '{nga}{nya}{nna}{na}{ma}{nnna}'
-define itaiyinam '{ya}{ra}{la}{va}{zha}{lla}'
-define vowel_signs '{vs_aa}{vs_i}{vs_ii}{vs_e}{vs_ee}{vs_u}{vs_uu}{vs_ai}'
-define uyir '{a}{aa}{i}{ii}{u}{uu}{e}{ee}{ai}{o}{oo}{au}'
-*/
 
 define strlen as (
  // size in snowball returns bytes which is not very useful for utf8
