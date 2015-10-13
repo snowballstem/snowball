@@ -955,11 +955,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
 
-    str_assign(g->failure_str, "self.copy_from(self, ");
+    str_assign(g->failure_str, "self.copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ")");
     g->B[0] = str_data(savevar);
-    writef(g, "~M~B0 = self~N"
+    writef(g, "~M~B0 = ~n()~N"
+              "~M~B0.copy_from(self)~N"
               "~Mself.current = self.~V0~N"
               "~Mself.cursor = 0~N"
               "~Mself.limit = len(self.current)~N", p);
@@ -1355,7 +1356,8 @@ static void generate_copyfrom(struct generator * g) {
                 break;
         }
     }
-    w(g, "~Msuper.copy_from(other)~N~-");
+    /* For Python 3, this can just be super(). */
+    w(g, "~Msuper(~n, self).copy_from(other)~N~-");
 }
 
 static void generate_methods(struct generator * g) {
