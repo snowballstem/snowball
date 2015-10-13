@@ -308,13 +308,13 @@ static void generate_AE(struct generator * g, struct node * p) {
             write_string(g, s); generate_AE(g, p->right); write_string(g, ")"); break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "(~V0.length)"); break;
+            w(g, "len(~V0)"); break;
         case c_cursor:
             w(g, "self.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "self.limit" : "self.limit_backward"); break;
         case c_size:
-            w(g, "(self.current.length)"); break;
+            w(g, "len(self.current)"); break;
     }
 }
 
@@ -962,7 +962,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~M~B0 = self~N"
               "~Mself.current = self.~V0~N"
               "~Mself.cursor = 0~N"
-              "~Mself.limit = (self.current.length)~N", p);
+              "~Mself.limit = len(self.current)~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
