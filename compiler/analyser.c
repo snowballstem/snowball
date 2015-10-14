@@ -355,7 +355,7 @@ static struct node * read_AE(struct analyser * a, int B) {
             t->token_held = true;
             return 0;
     }
-    repeat {
+    while (true) {
         int token = read_token(t);
         int b = binding(token);
         if (binding(token) <= B) {
@@ -386,14 +386,14 @@ static struct node * read_C_list(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     struct node * p = new_node(a, c_bra);
     struct node * p_end = 0;
-    repeat {
+    while (true) {
         int token = read_token(t);
         if (token == c_ket) return p;
         if (token < 0) { omission_error(a, c_ket); return p; }
         t->token_held = true;
         {
             struct node * q = read_C(a);
-            repeat {
+            while (true) {
                 token = read_token(t);
                 if (token != c_and && token != c_or) {
                     t->token_held = true;
@@ -562,7 +562,7 @@ static struct node * read_among(struct analyser * a) {
     a->substring = 0;
     p->number = 0; /* counts the number of literals */
     if (!get_token(a, c_bra)) return p;
-    repeat {
+    while (true) {
         struct node * q;
         int token = read_token(t);
         switch (token) {
@@ -792,7 +792,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         p->name = q;
         p->number = q->count;
         p->b = create_b(0);
-        repeat {
+        while (true) {
             switch (read_token(t)) {
                 case c_name:
                     {
@@ -874,7 +874,7 @@ static void read_backwardmode(struct analyser * a) {
 
 static void read_program_(struct analyser * a, int terminator) {
     struct tokeniser * t = a->tokeniser;
-    repeat {
+    while (true) {
         switch (read_token(t)) {
             case c_strings:     read_names(a, t_string); break;
             case c_booleans:    read_names(a, t_boolean); break;
