@@ -136,10 +136,10 @@ class BaseStemmer extends Stemmer
         return this.eq_s_b(s.length, s);
     }
 
-    __noexport__ function find_among (v : Among[], v_size : int) : int
+    __noexport__ /** @return {int} */ function find_among (v)
     {
 	var i = 0;
-	var j = v_size;
+	var j = v.length;
 
 	var c = this.cursor;
 	var l = this.limit;
@@ -156,14 +156,15 @@ class BaseStemmer extends Stemmer
 	    var common = common_i < common_j ? common_i : common_j; // smaller
 	    var w = v[k];
 	    var i2;
-	    for (i2 = common; i2 < w.s_size; i2++)
+/// s : string, substring_i : int, result : int, method
+	    for (i2 = common; i2 < w[0].length; i2++)
             {
 		if (c + common == l)
                 {
 		    diff = -1;
 		    break;
 		}
-		diff = this.current.charCodeAt(c + common) - w.s.charCodeAt(i2);
+		diff = this.current.charCodeAt(c + common) - w[0].charCodeAt(i2);
 		if (diff != 0) break;
 		common++;
 	    }
@@ -193,31 +194,25 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s_size)
+	    if (common_i >= w[0].length)
             {
-		this.cursor = c + w.s_size;
-		if (w.method == null)
-                {
-                    return w.result;
-                }
-		var res = w.method(this);
-		this.cursor = c + w.s_size;
-		if (res)
-                {
-                    return w.result;
-                }
+		this.cursor = c + w[0].length;
+		if (w.length < 4) return w[2];
+		var res = w[3](this);
+		this.cursor = c + w[0].length;
+		if (res) return w[2];
 	    }
-	    i = w.substring_i;
+	    i = w[1];
 	    if (i < 0) return 0;
 	}
         return -1; // not reachable
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    __noexport__ function find_among_b (v : Among[], v_size : int) : int
+    __noexport__ function find_among_b (v : any[]) : int
     {
 	var i = 0;
-	var j = v_size;
+	var j = v.length
 
 	var c = this.cursor;
 	var lb = this.limit_backward;
@@ -234,14 +229,14 @@ class BaseStemmer extends Stemmer
 	    var common = common_i < common_j ? common_i : common_j;
 	    var w = v[k];
 	    var i2;
-	    for (i2 = w.s_size - 1 - common; i2 >= 0; i2--)
+	    for (i2 = w[0].length - 1 - common; i2 >= 0; i2--)
             {
 		if (c - common == lb)
                 {
 		    diff = -1;
 		    break;
 		}
-		diff = this.current.charCodeAt(c - 1 - common) - w.s.charCodeAt(i2);
+		diff = this.current.charCodeAt(c - 1 - common) - w[0].charCodeAt(i2);
 		if (diff != 0) break;
 		common++;
 	    }
@@ -266,15 +261,15 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s_size)
+	    if (common_i >= w[0].length)
             {
-		this.cursor = c - w.s_size;
-		if (w.method == null) return w.result;
-		var res = w.method(this);
-		this.cursor = c - w.s_size;
-		if (res) return w.result;
+		this.cursor = c - w[0].length;
+		if (w.length < 4) return w[2];
+		var res = w[3](this);
+		this.cursor = c - w[0].length;
+		if (res) return w[2];
 	    }
-	    i = w.substring_i;
+	    i = w[1];
 	    if (i < 0) return 0;
 	}
         return -1; // not reachable

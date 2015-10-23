@@ -4,6 +4,8 @@
 #include <stdio.h> /* for fprintf etc */
 #include "header.h"
 
+static int jsx = false;
+
 /* prototypes */
 
 static void generate(struct generator * g, struct node * p);
@@ -125,6 +127,7 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
+#if 0
 /* Write a variable declaration. */
 static void write_declare(struct generator * g,
                           char * declaration,
@@ -138,6 +141,7 @@ static void write_declare(struct generator * g,
     write_newline(g);
     g->outbuf = temp;
 }
+#endif
 
 static void write_comment(struct generator * g, struct node * p) {
 
@@ -169,8 +173,11 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "this.limit - ";
-    write_declare(g, "~B0 : int", p);
-    writef(g, "~M~B0 = ~S1this.cursor;~N" , p);
+    if (jsx) {
+        writef(g, "~Mvar ~B0 : int = ~S1this.cursor;~N" , p);
+    } else {
+        writef(g, "~Mvar /** number */ ~B0 = ~S1this.cursor;~N" , p);
+    }
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -202,9 +209,15 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
-    w(g, "~Mvar lab~I0 = true;~N");
-    w(g, "~Mlab~I0: while (lab~I0 == true)~N~M{~N");
-    w(g, "~+~Mlab~I0 = false;~N");
+    if (jsx) {
+        // Need to work around lack of support for labelled blocks:
+        // https://github.com/jsx/JSX/issues/338
+        w(g, "~Mvar lab~I0 = true;~N");
+        w(g, "~Mlab~I0: while (lab~I0 == true)~N~M{~N");
+        w(g, "~+~Mlab~I0 = false;~N");
+    } else {
+        w(g, "~Mlab~I0: {~N~+");
+    }
 }
 
 static void wsetlab_end(struct generator * g) {
@@ -295,6 +308,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 case '+': g->margin++; continue;
                 case '-': g->margin--; continue;
                 case 'n': write_string(g, g->options->name); continue;
+                case 'P': write_string(g, g->options->parent_class_name); continue;
             }
         } else {
             write_char(g, ch);
@@ -693,8 +707,11 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    write_declare(g, "~B0 : int", p);
-    w(g, "~Mfor (var ~B0 = ");
+    if (jsx) {
+        w(g, "~Mfor (var ~B0 : int = ");
+    } else {
+        w(g, "~Mfor (var /** number */ ~B0 = ");
+    }
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
     writef(g, "; ~B0 > 0; ~B0--)~N", p);
@@ -804,7 +821,11 @@ static void generate_hop(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
-    w(g, "~{~Mvar c : int = this.cursor ~S0 ");
+    if (jsx) {
+        w(g, "~{~Mvar c : int = this.cursor ~S0 ");
+    } else {
+        w(g, "~{~Mvar /** number */ c = this.cursor ~S0 ");
+    }
     generate_AE(g, p->AE);
     w(g, ";~N");
 
@@ -895,7 +916,13 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
-    if (keep_c) w(g, "~{~Mvar c : int = this.cursor;~N");
+    if (keep_c) {
+        if (jsx) {
+            w(g, "~{~Mvar c : int = this.cursor;~N");
+        } else {
+            w(g, "~{~Mvar /** number */ c = this.cursor;~N");
+        }
+    }
     writef(g, "~Mthis.insert(this.cursor, this.cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
@@ -907,7 +934,13 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
-    if (keep_c) writef(g, "~{~Mvar c : int = this.cursor;~N", p);
+    if (keep_c) {
+        if (jsx) {
+            w(g, "~{~Mvar c : int = this.cursor;~N");
+        } else {
+            w(g, "~{~Mvar /** number */ c = this.cursor;~N");
+        }
+    }
     if (p->mode == m_forward) {
         writef(g, "~Mthis.insert(this.cursor, this.limit, ", p);
     } else {
@@ -940,12 +973,16 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
     if (!g->unreachable) {
         g->B[0] = str_data(varname);
-        write_declare(g, "~B0 : int", p);
+        if (jsx) {
+            w(g, "~Mvar ~B0 : int = ");
+        } else {
+            w(g, "~Mvar /** number */ ~B0 = ");
+        }
         if (p->mode == m_forward) {
-            w(g, "~M~B0 = this.limit - this.cursor;~N");
+            w(g, "this.limit - this.cursor;~N");
             w(g, "~Mthis.limit = this.cursor;~N");
         } else {
-            w(g, "~M~B0 = this.limit_backward;~N");
+            w(g, "this.limit_backward;~N");
             w(g, "~Mthis.limit_backward = this.cursor;~N");
         }
         write_restorecursor(g, p, savevar);
@@ -1074,9 +1111,18 @@ static void generate_define(struct generator * g, struct node * p) {
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
 
-    g->S[0] = q->type == t_routine ? "" : "override ";
     g->V[0] = q;
-    w(g, "~N~M~S0function ~V0 () : boolean~N~M{~+~N");
+    if (jsx) {
+        g->S[0] = q->type == t_routine ? "" : "override ";
+        w(g, "~N~M~S0function ~V0 () : boolean~N~M{~+~N");
+    } else {
+        if (q->type == t_routine) {
+            w(g, "~N~M/** @return {boolean} */~N"
+                 "~M~n.~V0 = function() {~+~N");
+        } else {
+            w(g, "~N~M~n.~V0 = /** @return {boolean} */ function() {~+~N");
+        }
+    }
 
     g->outbuf = str_new();
     g->declarations = str_new();
@@ -1084,13 +1130,23 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (p->amongvar_needed) write_declare(g, "among_var : int", p);
+    if (p->amongvar_needed) {
+        if (jsx) {
+            w(g, "~Mvar among_var : int;~N");
+        } else {
+            w(g, "~Mvar /** number */ among_var;~N");
+        }
+    }
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~Mreturn true;~N");
-    w(g, "~}");
+    if (jsx) {
+        w(g, "~}");
+    } else {
+        w(g, "~-~M};~N");
+    }
 
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
@@ -1108,12 +1164,11 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "this.find_among~S0(~n.a_~I0, ~I1) == 0", p);
+        write_failure_if(g, "this.find_among~S0(~n.a_~I0) == 0", p);
     } else {
-        writef(g, "~Mamong_var = this.find_among~S0(~n.a_~I0, ~I1);~N", p);
+        writef(g, "~Mamong_var = this.find_among~S0(~n.a_~I0);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1258,22 +1313,26 @@ static void generate_start_comment(struct generator * g) {
 
 static void generate_class_begin(struct generator * g) {
 
-    w(g, "import \"base-stemmer.jsx\";~N"
-         "import \"among.jsx\";~N"
-         "~N"
-         " /**~N"
-         "  * This class was automatically generated by a Snowball to JSX compiler~N"
-         "  * It implements the stemming algorithm defined by a snowball script.~N"
-         "  */~N"
-         "~N"
-         "class ~n extends ");
-    w(g, g->options->parent_class_name);
-    w(g, "~N{~N");
+    if (jsx) {
+        w(g, "import \"base-stemmer.jsx\";~N"
+             "~N"
+             " /**~N"
+             "  * This class was automatically generated by a Snowball to JSX compiler~N"
+             "  * It implements the stemming algorithm defined by a snowball script.~N"
+             "  */~N"
+             "~N"
+             "class ~n extends ~P~N{~N");
+    } else {
+        w(g, "var ~n = new ~P();~N~N");
+    }
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N}");
-    w(g, "~N~N");
+    if (jsx) {
+        w(g, "~N}");
+        w(g, "~N~N");
+    } else {
+    }
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1283,7 +1342,11 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    w(g, "~Mstatic const a_~I0 = [~N~+");
+    if (jsx) {
+        w(g, "~Mstatic const a_~I0 = [~N~+");
+    } else {
+        w(g, "~M/** @const */ ~n.a_~I0 = [~N~+");
+    }
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
@@ -1294,14 +1357,15 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among(~L0, ~I1, ~I2");
+            w(g, "~M[~L0, ~I1, ~I2");
             if (v->function != 0)
             {
+                // FIXME: if (!jsx) ...
                 w(g, ", ((instance : BaseStemmer) : boolean -> (instance as ~n).");
                 write_varname(g, v->function);
                 w(g, "())");
-            }
-            w(g, ")~S0~N");
+	    }
+            w(g, "]~S0~N");
             v++;
         }
     }
@@ -1334,12 +1398,20 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~Mstatic const ~V0 = [");
+    if (jsx) {
+        w(g, "~Mstatic const ~V0 = [");
+    } else {
+        w(g, "~M/** @const */ /** Array<int> */ ~n.~V0 = [");
+    }
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, "] : int[];~N~N");
+    if (jsx) {
+        w(g, "] : int[];~N~N");
+    } else {
+        w(g, "];~N~N");
+    }
     lose_b(map);
 }
 
@@ -1355,16 +1427,30 @@ static void generate_members(struct generator * g) {
     struct name * q;
     for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
-        switch (q->type) {
-            case t_string:
-                w(g, "    var ~W0 : string = \"\";~N");
-                break;
-            case t_integer:
-                w(g, "    var ~W0 : int = 0;~N");
-                break;
-            case t_boolean:
-                w(g, "    var ~W0 : boolean = false;~N");
-                break;
+        if (jsx) {
+            switch (q->type) {
+                case t_string:
+                    w(g, "    var ~W0 : string = \"\";~N");
+                    break;
+                case t_integer:
+                    w(g, "    var ~W0 : int = 0;~N");
+                    break;
+                case t_boolean:
+                    w(g, "    var ~W0 : boolean = false;~N");
+                    break;
+            }
+        } else {
+            switch (q->type) {
+                case t_string:
+                    w(g, "/** string */ ~n.~W0 = '';~N");
+                    break;
+                case t_integer:
+                    w(g, "/** number */ ~n.~W0 = 0;~N");
+                    break;
+                case t_boolean:
+                    w(g, "/** boolean */ ~n.~W0 = false;~N");
+                    break;
+            }
         }
     }
     w(g, "~N");
@@ -1373,7 +1459,11 @@ static void generate_members(struct generator * g) {
 static void generate_copyfrom(struct generator * g) {
 
     struct name * q;
-    w(g, "~Mfunction copy_from (other : ~n) : void~N~M{~+~N");
+    if (jsx) {
+        w(g, "~Mfunction copy_from (other : ~n) : void~N~M{~+~N");
+    } else {
+        w(g, "~M~n.copy_from = function(/** !~n */ other) {~+~N");
+    }
     for (q = g->analyser->names; q != 0; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
@@ -1384,8 +1474,13 @@ static void generate_copyfrom(struct generator * g) {
                 break;
         }
     }
-    w(g, "~Msuper.copy_from(other);~N");
-    w(g, "~-~M}~N");
+    if (jsx) {
+        w(g, "~Msuper.copy_from(other);~N");
+        w(g, "~-~M}~N");
+    } else {
+        w(g, "~M~P.copy_from(other);~N");
+        w(g, "~-~M};~N");
+    }
 }
 
 static void generate_methods(struct generator * g) {
