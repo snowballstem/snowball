@@ -87,8 +87,13 @@ static void write_varname(struct generator * g, struct name * p) {
 
 static void write_varref(struct generator * g, struct name * p) {
 
-    if (jsx && p->type != t_routine && p->type != t_external) {
-	write_string(g, "this.");
+    if (jsx) {
+        if (p->type == t_grouping) {
+            // groupings are const static.
+            w(g, "~n.");
+        } else {
+            write_string(g, "this.");
+        }
     }
     write_varname(g, p);
 }
@@ -1014,12 +1019,13 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         }
         write_restorecursor(g, p, savevar);
 
+        str_assign(g->failure_str, jsx ? "this." : "base.");
         if (p->mode == m_forward) {
-            str_assign(g->failure_str, "~t.limit += ");
+            str_append_string(g->failure_str, "limit += ");
             str_append(g->failure_str, varname);
             str_append_ch(g->failure_str, ';');
         } else {
-            str_assign(g->failure_str, "~t.limit_backward = ");
+            str_append_string(g->failure_str, "limit_backward = ");
             str_append(g->failure_str, varname);
             str_append_ch(g->failure_str, ';');
         }
@@ -1134,13 +1140,13 @@ static void generate_define(struct generator * g, struct node * p) {
     g->V[0] = q;
     if (jsx) {
         g->S[0] = q->type == t_routine ? "" : "override ";
-        w(g, "~N~M~S0function ~V0 () : boolean~N~M{~+~N");
+        w(g, "~N~M~S0function ~W0 () : boolean~N~M{~+~N");
     } else {
         if (q->type == t_routine) {
             w(g, "~N~M/** @return {boolean} */~N"
-                 "~Mfunction ~V0() {~+~N");
+                 "~Mfunction ~W0() {~+~N");
         } else {
-            w(g, "~N~Mthis.~V0 = /** @return {boolean} */ function() {~+~N");
+            w(g, "~N~Mthis.~W0 = /** @return {boolean} */ function() {~+~N");
         }
     }
 
@@ -1186,9 +1192,17 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "~t.find_among~S0(~Ta_~I0) == 0", p);
+        if (jsx) {
+            write_failure_if(g, "~t.find_among~S0(~n.a_~I0) == 0", p);
+        } else {
+            write_failure_if(g, "~t.find_among~S0(a_~I0) == 0", p);
+        }
     } else {
-        writef(g, "~Mamong_var = ~t.find_among~S0(~Ta_~I0);~N", p);
+        if (jsx) {
+            writef(g, "~Mamong_var = ~t.find_among~S0(~n.a_~I0);~N", p);
+        } else {
+            writef(g, "~Mamong_var = ~t.find_among~S0(a_~I0);~N", p);
+        }
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1341,7 +1355,7 @@ static void generate_class_begin(struct generator * g) {
              "  * It implements the stemming algorithm defined by a snowball script.~N"
              "  */~N"
              "~N"
-             "class ~n extends ~P~N{~N");
+             "class ~n extends ~P~N{~+~N");
     } else {
         w(g, "function ~n() {~+~N"
              "~Mvar base = new ~P();~N");
@@ -1350,9 +1364,9 @@ static void generate_class_begin(struct generator * g) {
 
 static void generate_class_end(struct generator * g) {
     if (jsx) {
-        w(g, "~N}~N");
+        w(g, "~}~N");
     } else {
-        w(g, "~N};~N");
+        w(g, "~-~N};~N");
     }
 }
 
@@ -1420,9 +1434,9 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     g->V[0] = q->name;
 
     if (jsx) {
-        w(g, "~Mstatic const ~V0 = [");
+        w(g, "~Mstatic const ~W0 = [");
     } else {
-        w(g, "~M/** @const */ var /** Array<int> */ ~V0 = [");
+        w(g, "~M/** @const */ var /** Array<int> */ ~W0 = [");
     }
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
