@@ -314,31 +314,22 @@ struct options {
     byte utf8;
 };
 
-/* Generator for C code. */
-extern struct generator * create_generator_c(struct analyser * a, struct options * o);
-extern void close_generator_c(struct generator * g);
+extern struct generator * create_generator(struct analyser * a, struct options * o);
+extern void close_generator(struct generator * g);
 
+/* Generator for C code. */
 extern void generate_program_c(struct generator * g);
 
 #ifndef DISABLE_JAVA
 /* Generator for Java code. */
-extern struct generator * create_generator_java(struct analyser * a, struct options * o);
-extern void close_generator_java(struct generator * g);
-
 extern void generate_program_java(struct generator * g);
 #endif
 
 #ifndef DISABLE_PYTHON
 /* Generator for Python code. */
-extern struct generator * create_generator_python(struct analyser * a, struct options * o);
-extern void close_generator_python(struct generator * g);
-
 extern void generate_program_python(struct generator * g);
 #endif
 
 #ifndef DISABLE_JSX
-extern struct generator * create_generator_jsx(struct analyser * a, struct options * o);
-extern void close_generator_jsx(struct generator * g);
-
 extern void generate_program_jsx(struct generator * g);
 #endif

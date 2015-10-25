@@ -1511,7 +1511,9 @@ extern void generate_program_c(struct generator * g) {
     str_delete(g->outbuf);
 }
 
-extern struct generator * create_generator_c(struct analyser * a, struct options * o) {
+/* Generator functions common to multiple languages. */
+
+extern struct generator * create_generator(struct analyser * a, struct options * o) {
     NEW(generator, g);
     g->analyser = a;
     g->options = o;
@@ -1521,11 +1523,11 @@ extern struct generator * create_generator_c(struct analyser * a, struct options
     g->line_count = 0;
     g->line_labelled = 0;
     g->failure_label = -1;
+    g->unreachable = false;
+    g->max_label = 0;
     return g;
 }
 
-extern void close_generator_c(struct generator * g) {
-
+extern void close_generator(struct generator * g) {
     FREE(g);
 }
-

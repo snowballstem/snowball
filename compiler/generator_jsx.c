@@ -1413,21 +1413,3 @@ extern void generate_program_jsx(struct generator * g) {
     str_delete(g->failure_str);
     str_delete(g->outbuf);
 }
-
-extern struct generator * create_generator_jsx(struct analyser * a, struct options * o) {
-
-    NEW(generator, g);
-    g->analyser = a;
-    g->options = o;
-    g->margin = 0;
-    g->debug_count = 0;
-    g->copy_from_count = 0;
-    g->unreachable = false;
-    return g;
-}
-
-extern void close_generator_jsx(struct generator * g) {
-
-    FREE(g);
-}
-
