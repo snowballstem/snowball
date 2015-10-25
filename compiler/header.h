@@ -275,6 +275,7 @@ struct generator {
     int label_used;     /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
+    int copy_from_count; /* count of calls to copy_from() */
 
     const char * S[10];  /* strings */
     symbol * B[10];      /* blocks */

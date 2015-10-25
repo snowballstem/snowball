@@ -1523,6 +1523,7 @@ extern struct generator * create_generator_c(struct analyser * a, struct options
     g->options = o;
     g->margin = 0;
     g->debug_count = 0;
+    g->copy_from_count = 0;
     g->line_count = 0;
     g->line_labelled = 0;
     g->failure_label = -1;

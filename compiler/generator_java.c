@@ -969,6 +969,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
 
+    ++g->copy_from_count;
     str_assign(g->failure_str, "copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
@@ -1383,6 +1384,7 @@ static void generate_members(struct generator * g) {
 static void generate_copyfrom(struct generator * g) {
 
     struct name * q;
+    if (g->copy_from_count == 0) return;
     w(g, "~Mprivate void copy_from(~n other) {~+~N");
     for (q = g->analyser->names; q != 0; q = q->next) {
         g->V[0] = q;
@@ -1437,6 +1439,7 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
     g->options = o;
     g->margin = 0;
     g->debug_count = 0;
+    g->copy_from_count = 0;
     g->unreachable = false;
     return g;
 }
