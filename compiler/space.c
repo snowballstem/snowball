@@ -59,7 +59,17 @@ extern symbol * create_b(int n) {
 
 extern void report_b(FILE * out, const symbol * p) {
     int i;
-    for (i = 0; i < SIZE(p); i++) putc(p[i], out);
+    for (i = 0; i < SIZE(p); i++) {
+        if (p[i] > 255) {
+            printf("In report_b, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
+            exit(1);
+        }
+        putc(p[i], out);
+    }
+}
+
+extern void output_str(FILE * outfile, struct str * str) {
+    report_b(outfile, str_data(str));
 }
 
 extern void lose_b(symbol * p) {

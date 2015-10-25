@@ -22,13 +22,7 @@ static int new_label(struct generator * g) {
     return g->next_label++;
 }
 
-/* Output routines */
-static void output_str(FILE * outfile, struct str * str) {
-
-    char * s = b_to_s(str_data(str));
-    fprintf(outfile, "%s", s);
-    free(s);
-}
+/* Write routines for simple entities */
 
 static void wch(struct generator * g, int ch) {
     str_append_ch(g->outbuf, ch); /* character */

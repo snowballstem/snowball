@@ -30,14 +30,6 @@ static struct str * vars_newname(struct generator * g) {
     return output;
 }
 
-/* Output routines */
-static void output_str(FILE * outfile, struct str * str) {
-
-    char * s = b_to_s(str_data(str));
-    fprintf(outfile, "%s", s);
-    free(s);
-}
-
 /* Write routines for simple entities */
 
 static void write_char(struct generator * g, int ch) {
