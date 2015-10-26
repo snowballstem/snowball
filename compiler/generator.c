@@ -383,6 +383,7 @@ static int K_needed(struct generator * g, struct node * p) {
             case c_ls:
             case c_le:
             case c_sliceto:
+            case c_booltest:
             case c_true:
             case c_false:
             case c_debug:
