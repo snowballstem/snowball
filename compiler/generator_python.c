@@ -241,31 +241,31 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 
     while (i < l) {
         int ch = input[i++];
-        if (ch == '~') {
-            switch (input[i++]) {
-                default: write_char(g, input[i - 1]); continue;
-                case 'C': write_comment(g, p); continue;
-                case 'f': write_block_start(g);
-                          write_failure(g);
-			  g->unreachable = false;
-                          write_block_end(g);
-                          continue;
-                case 'M': write_margin(g); continue;
-                case 'N': write_newline(g); continue;
-                case '{': write_block_start(g); continue;
-                case '}': write_block_end(g); continue;
-                case 'S': write_string(g, g->S[input[i++] - '0']); continue;
-                case 'B': write_b(g, g->B[input[i++] - '0']); continue;
-                case 'I': write_int(g, g->I[input[i++] - '0']); continue;
-                case 'V': write_varref(g, g->V[input[i++] - '0']); continue;
-                case 'W': write_varname(g, g->V[input[i++] - '0']); continue;
-                case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
-                case '+': g->margin++; continue;
-                case '-': g->margin--; continue;
-                case 'n': write_string(g, g->options->name); continue;
-            }
-        } else {
+        if (ch != '~') {
             write_char(g, ch);
+            continue;
+        }
+        switch (input[i++]) {
+            default: write_char(g, input[i - 1]); continue;
+            case 'C': write_comment(g, p); continue;
+            case 'f': write_block_start(g);
+                      write_failure(g);
+                      g->unreachable = false;
+                      write_block_end(g);
+                      continue;
+            case 'M': write_margin(g); continue;
+            case 'N': write_newline(g); continue;
+            case '{': write_block_start(g); continue;
+            case '}': write_block_end(g); continue;
+            case 'S': write_string(g, g->S[input[i++] - '0']); continue;
+            case 'B': write_b(g, g->B[input[i++] - '0']); continue;
+            case 'I': write_int(g, g->I[input[i++] - '0']); continue;
+            case 'V': write_varref(g, g->V[input[i++] - '0']); continue;
+            case 'W': write_varname(g, g->V[input[i++] - '0']); continue;
+            case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
+            case '+': g->margin++; continue;
+            case '-': g->margin--; continue;
+            case 'n': write_string(g, g->options->name); continue;
         }
     }
 }
