@@ -238,7 +238,9 @@ static void write_failure(struct generator * g, struct node * p) {          /* f
     if (g->failure_keep_count != 0) write_string(g, " }");
 }
 
-static void wlim(struct generator * g, struct node * p) {     /* if at limit fail */
+
+/* if at limit fail */
+static void write_check_limit(struct generator * g, struct node * p) {
 
     write_string(g, p->mode == m_forward ? "if (z->c >= z->l) " :
                                  "if (z->c <= z->lb) ");
@@ -278,7 +280,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                                              "z->c = z->l - m_test;");
                 continue;
             case 'i': winc(g, p); continue;
-            case 'l': wlim(g, p); continue;
+            case 'l': write_check_limit(g, p); continue;
             case 'f': write_failure(g, p); continue;
             case 'M': write_margin(g); continue;
             case 'N': write_newline(g); continue;
