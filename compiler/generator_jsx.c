@@ -279,7 +279,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_minint:
             write_string(g, "MININT"); break;
         case c_neg:
-            write_string(g, "-"); generate_AE(g, p->right); break;
+            write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
             s = " * "; goto label0;
         case c_plus:
@@ -289,8 +289,8 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_divide:
             s = " / ";
         label0:
-            write_string(g, "("); generate_AE(g, p->left);
-            write_string(g, s); generate_AE(g, p->right); write_string(g, ")"); break;
+            write_char(g, '('); generate_AE(g, p->left);
+            write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_sizeof:
             g->V[0] = p->name;
             w(g, "(~V0.length)"); break;
@@ -309,8 +309,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 */
 
 static int K_needed(struct generator * g, struct node * p) {
-
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -349,9 +348,8 @@ static int K_needed(struct generator * g, struct node * p) {
 }
 
 static int repeat_score(struct generator * g, struct node * p) {
-
     int score = 0;
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -400,7 +398,6 @@ static int repeat_score(struct generator * g, struct node * p) {
 /* tests if an expression requires cursor reinstatement in a repeat */
 
 static int repeat_restore(struct generator * g, struct node * p) {
-
     return repeat_score(g, p) >= 2;
 }
 
@@ -408,7 +405,7 @@ static void generate_bra(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         p = p->right;
     }
@@ -424,7 +421,7 @@ static void generate_and(struct generator * g, struct node * p) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         if (g->unreachable) break;
         if (keep_c && p->right != 0) write_restorecursor(g, p, savevar);
