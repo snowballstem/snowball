@@ -24,29 +24,12 @@ static int new_label(struct generator * g) {
 
 /* Write routines for simple entities */
 
-static void write_char(struct generator * g, int ch) {
-    str_append_ch(g->outbuf, ch); /* character */
-}
-
-static void write_newline(struct generator * g) {
-    str_append_ch(g->outbuf, '\n'); /* newline */
-    g->line_count++;
-}
-
-static void write_string(struct generator * g, const char * s) {
-    str_append_string(g->outbuf, s); /* string */
-}
-
 /* Write a space if the preceding character was not whitespace */
 static void ws_opt_space(struct generator * g, const char * s) {
     int ch = str_back(g->outbuf);
     if (ch != ' ' && ch != '\n' && ch != '\t' && ch != -1)
         write_char(g, ' ');
     write_string(g, s);
-}
-
-static void write_int(struct generator * g, int i) {
-    str_append_int(g->outbuf, i); /* integer */
 }
 
 static void wi3(struct generator * g, int i) {
@@ -1544,4 +1527,33 @@ extern struct generator * create_generator(struct analyser * a, struct options *
 
 extern void close_generator(struct generator * g) {
     FREE(g);
+}
+
+/* Write routines for simple entities */
+
+extern void write_char(struct generator * g, int ch) {
+    str_append_ch(g->outbuf, ch); /* character */
+}
+
+extern void write_newline(struct generator * g) {
+    str_append_ch(g->outbuf, '\n'); /* newline */
+    g->line_count++;
+}
+
+extern void write_string(struct generator * g, const char * s) {
+    str_append_string(g->outbuf, s);
+}
+
+extern void write_int(struct generator * g, int i) {
+    str_append_int(g->outbuf, i);
+}
+
+extern void write_b(struct generator * g, symbol * b) {
+
+    str_append_b(g->outbuf, b);
+}
+
+extern void write_str(struct generator * g, struct str * str) {
+
+    str_append(g->outbuf, str);
 }

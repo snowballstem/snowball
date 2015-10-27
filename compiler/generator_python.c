@@ -32,37 +32,6 @@ static struct str * vars_newname(struct generator * g) {
     return output;
 }
 
-/* Write routines for simple entities */
-
-static void write_char(struct generator * g, int ch) {
-
-    str_append_ch(g->outbuf, ch);
-}
-
-static void write_newline(struct generator * g) {
-
-    str_append_string(g->outbuf, "\n");
-}
-
-static void write_string(struct generator * g, const char * s) {
-    str_append_string(g->outbuf, s);
-}
-
-static void write_b(struct generator * g, symbol * b) {
-
-    str_append_b(g->outbuf, b);
-}
-
-static void write_str(struct generator * g, struct str * str) {
-
-    str_append(g->outbuf, str);
-}
-
-static void write_int(struct generator * g, int i) {
-
-    str_append_int(g->outbuf, i);
-}
-
 
 /* Write routines for items from the syntax tree */
 

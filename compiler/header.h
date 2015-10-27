@@ -314,8 +314,17 @@ struct options {
     byte utf8;
 };
 
+/* Generator functions common to several backends. */
+
 extern struct generator * create_generator(struct analyser * a, struct options * o);
 extern void close_generator(struct generator * g);
+
+extern void write_char(struct generator * g, int ch);
+extern void write_newline(struct generator * g);
+extern void write_string(struct generator * g, const char * s);
+extern void write_int(struct generator * g, int i);
+extern void write_b(struct generator * g, symbol * b);
+extern void write_str(struct generator * g, struct str * str);
 
 /* Generator for C code. */
 extern void generate_program_c(struct generator * g);
