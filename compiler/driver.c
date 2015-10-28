@@ -226,6 +226,7 @@ extern int main(int argc, char * argv[]) {
                     print_arglist();
                     exit(1);
                 }
+                g = create_generator(a, o);
                 if (o->make_lang == LANG_C || o->make_lang == LANG_CPLUSPLUS) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".h");
@@ -237,9 +238,7 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(b);
                     lose_b(b);
 
-                    g = create_generator_c(a, o);
                     generate_program_c(g);
-                    close_generator_c(g);
                     fclose(o->output_src);
                     fclose(o->output_h);
                 }
@@ -249,9 +248,7 @@ extern int main(int argc, char * argv[]) {
                     b = add_s_to_b(b, ".java");
                     o->output_src = get_output(b);
                     lose_b(b);
-                    g = create_generator_java(a, o);
                     generate_program_java(g);
-                    close_generator_java(g);
                     fclose(o->output_src);
                 }
 #endif
@@ -261,9 +258,7 @@ extern int main(int argc, char * argv[]) {
                     b = add_s_to_b(b, ".py");
                     o->output_src = get_output(b);
                     lose_b(b);
-                    g = create_generator_python(a, o);
                     generate_program_python(g);
-                    close_generator_python(g);
                     fclose(o->output_src);
                 }
 #endif
@@ -273,12 +268,11 @@ extern int main(int argc, char * argv[]) {
                     b = add_s_to_b(b, ".jsx");
                     o->output_src = get_output(b);
                     lose_b(b);
-                    g = create_generator_jsx(a, o);
                     generate_program_jsx(g);
-                    close_generator_jsx(g);
                     fclose(o->output_src);
                 }
 #endif
+                close_generator(g);
             }
             close_analyser(a);
         }

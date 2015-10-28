@@ -42,6 +42,7 @@ extern int str_len(struct str * str);
 extern int str_back(struct str *str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
+extern void output_str(FILE * outfile, struct str * str);
 
 struct m_pair {
 
@@ -275,6 +276,7 @@ struct generator {
     int label_used;     /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
+    int copy_from_count; /* count of calls to copy_from() */
 
     const char * S[10];  /* strings */
     symbol * B[10];      /* blocks */
@@ -312,31 +314,31 @@ struct options {
     byte utf8;
 };
 
-/* Generator for C code. */
-extern struct generator * create_generator_c(struct analyser * a, struct options * o);
-extern void close_generator_c(struct generator * g);
+/* Generator functions common to several backends. */
 
+extern struct generator * create_generator(struct analyser * a, struct options * o);
+extern void close_generator(struct generator * g);
+
+extern void write_char(struct generator * g, int ch);
+extern void write_newline(struct generator * g);
+extern void write_string(struct generator * g, const char * s);
+extern void write_int(struct generator * g, int i);
+extern void write_b(struct generator * g, symbol * b);
+extern void write_str(struct generator * g, struct str * str);
+
+/* Generator for C code. */
 extern void generate_program_c(struct generator * g);
 
 #ifndef DISABLE_JAVA
 /* Generator for Java code. */
-extern struct generator * create_generator_java(struct analyser * a, struct options * o);
-extern void close_generator_java(struct generator * g);
-
 extern void generate_program_java(struct generator * g);
 #endif
 
 #ifndef DISABLE_PYTHON
 /* Generator for Python code. */
-extern struct generator * create_generator_python(struct analyser * a, struct options * o);
-extern void close_generator_python(struct generator * g);
-
 extern void generate_program_python(struct generator * g);
 #endif
 
 #ifndef DISABLE_JSX
-extern struct generator * create_generator_jsx(struct analyser * a, struct options * o);
-extern void close_generator_jsx(struct generator * g);
-
 extern void generate_program_jsx(struct generator * g);
 #endif

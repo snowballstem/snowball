@@ -32,45 +32,6 @@ static struct str * vars_newname(struct generator * g) {
     return output;
 }
 
-/* Output routines */
-static void output_str(FILE * outfile, struct str * str) {
-
-    char * s = b_to_s(str_data(str));
-    fprintf(outfile, "%s", s);
-    free(s);
-}
-
-/* Write routines for simple entities */
-
-static void write_char(struct generator * g, int ch) {
-
-    str_append_ch(g->outbuf, ch);
-}
-
-static void write_newline(struct generator * g) {
-
-    str_append_string(g->outbuf, "\n");
-}
-
-static void write_string(struct generator * g, const char * s) {
-    str_append_string(g->outbuf, s);
-}
-
-static void write_b(struct generator * g, symbol * b) {
-
-    str_append_b(g->outbuf, b);
-}
-
-static void write_str(struct generator * g, struct str * str) {
-
-    str_append(g->outbuf, str);
-}
-
-static void write_int(struct generator * g, int i) {
-
-    str_append_int(g->outbuf, i);
-}
-
 
 /* Write routines for items from the syntax tree */
 
@@ -249,31 +210,31 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 
     while (i < l) {
         int ch = input[i++];
-        if (ch == '~') {
-            switch (input[i++]) {
-                default: write_char(g, input[i - 1]); continue;
-                case 'C': write_comment(g, p); continue;
-                case 'f': write_block_start(g);
-                          write_failure(g);
-			  g->unreachable = false;
-                          write_block_end(g);
-                          continue;
-                case 'M': write_margin(g); continue;
-                case 'N': write_newline(g); continue;
-                case '{': write_block_start(g); continue;
-                case '}': write_block_end(g); continue;
-                case 'S': write_string(g, g->S[input[i++] - '0']); continue;
-                case 'B': write_b(g, g->B[input[i++] - '0']); continue;
-                case 'I': write_int(g, g->I[input[i++] - '0']); continue;
-                case 'V': write_varref(g, g->V[input[i++] - '0']); continue;
-                case 'W': write_varname(g, g->V[input[i++] - '0']); continue;
-                case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
-                case '+': g->margin++; continue;
-                case '-': g->margin--; continue;
-                case 'n': write_string(g, g->options->name); continue;
-            }
-        } else {
+        if (ch != '~') {
             write_char(g, ch);
+            continue;
+        }
+        switch (input[i++]) {
+            default: write_char(g, input[i - 1]); continue;
+            case 'C': write_comment(g, p); continue;
+            case 'f': write_block_start(g);
+                      write_failure(g);
+                      g->unreachable = false;
+                      write_block_end(g);
+                      continue;
+            case 'M': write_margin(g); continue;
+            case 'N': write_newline(g); continue;
+            case '{': write_block_start(g); continue;
+            case '}': write_block_end(g); continue;
+            case 'S': write_string(g, g->S[input[i++] - '0']); continue;
+            case 'B': write_b(g, g->B[input[i++] - '0']); continue;
+            case 'I': write_int(g, g->I[input[i++] - '0']); continue;
+            case 'V': write_varref(g, g->V[input[i++] - '0']); continue;
+            case 'W': write_varname(g, g->V[input[i++] - '0']); continue;
+            case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
+            case '+': g->margin++; continue;
+            case '-': g->margin--; continue;
+            case 'n': write_string(g, g->options->name); continue;
         }
     }
 }
@@ -955,6 +916,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
 
+    ++g->copy_from_count;
     str_assign(g->failure_str, "self.copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ")");
@@ -1345,6 +1307,7 @@ static void generate_members(struct generator * g) {
 static void generate_copyfrom(struct generator * g) {
 
     struct name * q;
+    if (g->copy_from_count == 0) return;
     w(g, "~Mdef copy_from(self, other):~+~N");
     for (q = g->analyser->names; q != 0; q = q->next) {
         g->V[0] = q;
@@ -1401,21 +1364,3 @@ extern void generate_program_python(struct generator * g) {
     str_delete(g->failure_str);
     str_delete(g->outbuf);
 }
-
-extern struct generator * create_generator_python(struct analyser * a, struct options * o) {
-
-    NEW(generator, g);
-    g->analyser = a;
-    g->options = o;
-    g->margin = 0;
-    g->debug_count = 0;
-    g->unreachable = false;
-    g->max_label = 0;
-    return g;
-}
-
-extern void close_generator_python(struct generator * g) {
-
-    FREE(g);
-}
-
