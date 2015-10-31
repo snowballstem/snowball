@@ -69,7 +69,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 
     o->output_file = 0;
     o->syntax_tree = false;
-    o->externals_prefix = "";
+    o->externals_prefix = NULL;
     o->variables_prefix = 0;
     o->runtime_path = 0;
     o->parent_class_name = DEFAULT_BASE_CLASS;
@@ -192,6 +192,16 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             print_arglist();
         }
     }
+
+    if (o->make_lang != LANG_C && o->make_lang != LANG_CPLUSPLUS) {
+	if (o->runtime_path) {
+	    fprintf(stderr, "warning: -r/-runtime only meaningful for C and C++\n");
+	}
+	if (o->externals_prefix) {
+	    fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
+	}
+    }
+    if (!o->externals_prefix) o->externals_prefix = "";
 }
 
 extern int main(int argc, char * argv[]) {
