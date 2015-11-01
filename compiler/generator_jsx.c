@@ -268,7 +268,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             write_char(g, ch);
             continue;
         }
-        switch (ch) {
+        switch (input[i++]) {
             default: write_char(g, input[i - 1]); continue;
             case 'C': write_comment(g, p); continue;
             case 'f': write_block_start(g);
