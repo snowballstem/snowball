@@ -879,14 +879,14 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = ~t.assign_to(~V0);~N", p);
+    writef(g, "~M~V0 = ~t.assign_to();~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = ~t.slice_to(~V0);~N"
+    writef(g, "~M~V0 = ~t.slice_to();~N"
               "~Mif (~V0 == '')~N"
               "~M{~N"
               "~+~Mreturn false;~N~-"

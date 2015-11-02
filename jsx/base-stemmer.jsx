@@ -324,7 +324,7 @@ class BaseStemmer extends Stemmer
     }
 
     /* Copy the slice into the supplied StringBuffer */
-    __noexport__ function slice_to (s : string) : string
+    __noexport__ function slice_to () : string
     {
         var result = '';
 	if (this.slice_check())
@@ -334,7 +334,7 @@ class BaseStemmer extends Stemmer
         return result;
     }
 
-    __noexport__ function assign_to (s : string) : string
+    __noexport__ function assign_to () : string
     {
         return this.current.slice(0, this.limit);
     }
