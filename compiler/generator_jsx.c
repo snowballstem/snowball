@@ -1334,6 +1334,7 @@ static void generate_class_begin(struct generator * g) {
              "~N"
              "class ~n extends ~P~N{~+~N");
     } else {
+        w(g, "/**@constructor*/~N");
         w(g, "function ~n() {~+~N"
              "~Mvar base = new ~P();~N");
     }
