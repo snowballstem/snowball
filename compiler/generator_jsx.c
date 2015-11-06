@@ -1314,7 +1314,11 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_start_comment(struct generator * g) {
 
-    w(g, "// This file was generated automatically by the Snowball to JSX compiler~N");
+    if (jsx) {
+        w(g, "// This file was generated automatically by the Snowball to JSX compiler~N");
+    } else {
+        w(g, "// This file was generated automatically by the Snowball to Javascript compiler~N");
+    }
     w(g, "// http://snowballstem.org/~N~N");
 }
 
