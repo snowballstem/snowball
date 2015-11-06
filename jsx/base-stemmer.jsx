@@ -104,36 +104,26 @@ class BaseStemmer extends Stemmer
 	return false;
     }
 
-    __noexport__ function eq_s (s_size : int, s : string) : boolean
+    __noexport__ function eq_s (s : string) : boolean
     {
-	if (this.limit - this.cursor < s_size) return false;
-        if (this.current.slice(this.cursor, this.cursor + s_size) != s)
+	if (this.limit - this.cursor < s.length) return false;
+	if (this.current.slice(this.cursor, this.cursor + s.length) != s)
         {
             return false;
         }
-	this.cursor += s_size;
+	this.cursor += s.length;
 	return true;
     }
 
-    __noexport__ function eq_s_b (s_size : int, s : string) : boolean
+    __noexport__ function eq_s_b (s : string) : boolean
     {
-	if (this.cursor - this.limit_backward < s_size) return false;
-        if (this.current.slice(this.cursor - s_size, this.cursor) != s)
+	if (this.cursor - this.limit_backward < s.length) return false;
+	if (this.current.slice(this.cursor - s.length, this.cursor) != s)
         {
             return false;
         }
-	this.cursor -= s_size;
+	this.cursor -= s.length;
 	return true;
-    }
-
-    __noexport__ function eq_v (s : string) : boolean
-    {
-	return this.eq_s(s.length, s);
-    }
-
-    __noexport__ function eq_v_b (s : string) : boolean
-    {
-        return this.eq_s_b(s.length, s);
     }
 
     __noexport__ /** @return {int} */ function find_among (v)
