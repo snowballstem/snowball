@@ -1345,6 +1345,7 @@ static void generate_class_end(struct generator * g) {
         w(g, "~}~N");
     } else {
         w(g, "~-~N};~N");
+        w(g, "window['~n'] = ~n;~N");
     }
 }
 
