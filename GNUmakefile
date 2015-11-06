@@ -201,15 +201,15 @@ $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(java_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
-	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer"; \
-	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -eprefix $${l}_ -r ../runtime -n $${l}Stemmer
+	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -n $${l}Stemmer"; \
+	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -n $${l}Stemmer
 
 $(python_output_dir)/%_stemmer.py: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(python_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
-	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
-	./snowball $< -py -o $${o} -p "BaseStemmer" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer
+	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
+	./snowball $< -py -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
 
 $(python_output_dir)/__init__.py:
 	@mkdir -p $(python_output_dir)
@@ -219,8 +219,8 @@ $(jsx_output_dir)/%-stemmer.jsx: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(jsx_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(jsx_output_dir)/$${l}-stemmer"; \
-	echo "./snowball $< -jsx -o $${o} -p \"SnowballStemmer\" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
-	./snowball $< -jsx -o $${o} -p "BaseStemmer" -eprefix $${l}_ -r ../runtime -n `$(python) -c "print('$${l}'.title())"`Stemmer
+	echo "./snowball $< -jsx -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
+	./snowball $< -jsx -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
