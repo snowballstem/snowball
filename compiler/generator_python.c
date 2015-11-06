@@ -993,7 +993,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
-    write_failure_if(g, "not self.eq_v~S0(self.~V0)", p);
+    write_failure_if(g, "not self.eq_s~S0(self.~V0)", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1001,9 +1001,8 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->I[0] = SIZE(b);
     g->L[0] = b;
-    write_failure_if(g, "not self.eq_s~S0(~I0, ~L0)", p);
+    write_failure_if(g, "not self.eq_s~S0(~L0)", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
