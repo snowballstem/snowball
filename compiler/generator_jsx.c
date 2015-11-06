@@ -797,24 +797,26 @@ static void generate_atmark(struct generator * g, struct node * p) {
 
 
 static void generate_hop(struct generator * g, struct node * p) {
-
+    int c_count = ++g->keep_count;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
+    g->I[0] = c_count;
     if (jsx) {
-        w(g, "~{~Mvar c : int = this.cursor ~S0 ");
+        w(g, "~{~Mvar c~I0 : int = this.cursor ~S0 ");
     } else {
-        w(g, "~{~Mvar /** number */ c = ~t.cursor ~S0 ");
+        w(g, "~{~Mvar /** number */ c~I0 = ~t.cursor ~S0 ");
     }
     generate_AE(g, p->AE);
     w(g, ";~N");
 
+    g->I[0] = c_count;
     if (p->mode == m_forward) {
-        write_failure_if(g, "0 > c || c > ~t.limit", p);
+        write_failure_if(g, "0 > c~I0 || c~I0 > ~t.limit", p);
     } else {
-        write_failure_if(g, "~t.limit_backward > c || c > ~t.limit", p);
+        write_failure_if(g, "~t.limit_backward > c~I0 || c~I0 > ~t.limit", p);
     }
-    writef(g, "~M~t.cursor = c;~N", p);
+    writef(g, "~M~t.cursor = c~I0;~N", p);
     writef(g, "~}", p);
 }
 
@@ -905,33 +907,39 @@ static void generate_address(struct generator * g, struct node * p) {
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
-
+    int c_count;
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) {
+        c_count = ++g->keep_count;
+        g->I[0] = c_count;
         if (jsx) {
-            w(g, "~{~Mvar c : int = this.cursor;~N");
+            w(g, "~{~Mvar c~I0 : int = this.cursor;~N");
         } else {
-            w(g, "~{~Mvar /** number */ c = ~t.cursor;~N");
+            w(g, "~{~Mvar /** number */ c~I0 = ~t.cursor;~N");
         }
     }
     writef(g, "~M~t.insert(~t.cursor, ~t.cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) w(g, "~M~t.cursor = c;~N~}");
+    if (keep_c) {
+        g->I[0] = c_count;
+        w(g, "~M~t.cursor = c~I0;~N~}");
+    }
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-
+    int c_count;
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
     if (keep_c) {
+        g->I[0] = c_count;
         if (jsx) {
-            w(g, "~{~Mvar c : int = this.cursor;~N");
+            w(g, "~{~Mvar c~I0 : int = this.cursor;~N");
         } else {
-            w(g, "~{~Mvar /** number */ c = ~t.cursor;~N");
+            w(g, "~{~Mvar /** number */ c~I0 = ~t.cursor;~N");
         }
     }
     if (p->mode == m_forward) {
@@ -941,7 +949,10 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) w(g, "~M~t.cursor = c;~N~}");
+    if (keep_c) {
+        g->I[0] = c_count;
+        w(g, "~M~t.cursor = c~I0;~N~}");
+    }
 }
 
 
@@ -1127,6 +1138,7 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
+    g->keep_count = 0;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~Mreturn true;~N");
     if (jsx) {
