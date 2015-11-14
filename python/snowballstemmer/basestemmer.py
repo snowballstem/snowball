@@ -113,7 +113,7 @@ class BaseStemmer(object):
             diff = 0
             common = min(common_i, common_j) # smalle
             w = v[k]
-            for i2 in range(common, w.s_size):
+            for i2 in range(common, len(w.s)):
                 if c + common == l:
                     diff = -1
                     break
@@ -140,13 +140,13 @@ class BaseStemmer(object):
                 first_key_inspected = True
         while True:
             w = v[i]
-            if common_i >= w.s_size:
-                self.cursor = c + w.s_size
+            if common_i >= len(w.s):
+                self.cursor = c + len(w.s)
                 if w.method is None:
                     return w.result
                 method = getattr(self, w.method)
                 res = method()
-                self.cursor = c + w.s_size
+                self.cursor = c + len(w.s)
                 if res:
                     return w.result
             i = w.substring_i
@@ -174,7 +174,7 @@ class BaseStemmer(object):
             diff = 0
             common = min(common_i, common_j)
             w = v[k]
-            for i2 in range(w.s_size - 1 - common, -1, -1):
+            for i2 in range(len(w.s) - 1 - common, -1, -1):
                 if c - common == lb:
                     diff = -1
                     break
@@ -198,13 +198,13 @@ class BaseStemmer(object):
                 first_key_inspected = True
         while True:
             w = v[i]
-            if common_i >= w.s_size:
-                self.cursor = c - w.s_size
+            if common_i >= len(w.s):
+                self.cursor = c - len(w.s)
                 if w.method is None:
                     return w.result
                 method = getattr(self, w.method)
                 res = method()
-                self.cursor = c - w.s_size
+                self.cursor = c - len(w.s)
                 if res:
                     return w.result
             i = w.substring_i
