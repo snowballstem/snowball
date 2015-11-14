@@ -133,10 +133,10 @@ public class SnowballProgram {
 	return true;
     }
 
-    protected int find_among(Among v[], int v_size)
+    protected int find_among(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int l = limit;
@@ -205,10 +205,10 @@ public class SnowballProgram {
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    protected int find_among_b(Among v[], int v_size)
+    protected int find_among_b(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int lb = limit_backward;
