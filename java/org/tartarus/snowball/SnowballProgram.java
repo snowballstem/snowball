@@ -111,35 +111,26 @@ public class SnowballProgram {
 	return false;
     }
 
-    protected boolean eq_s(int s_size, String s)
+    protected boolean eq_s(CharSequence s)
     {
-	if (limit - cursor < s_size) return false;
+	if (limit - cursor < s.length) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
+	for (i = 0; i != s.length; i++) {
 	    if (current.charAt(cursor + i) != s.charAt(i)) return false;
 	}
-	cursor += s_size;
+	cursor += s.length;
 	return true;
     }
 
-    protected boolean eq_s_b(int s_size, String s)
+    protected boolean eq_s_b(CharSequence s)
     {
-	if (cursor - limit_backward < s_size) return false;
+	if (cursor - limit_backward < s.length) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
-	    if (current.charAt(cursor - s_size + i) != s.charAt(i)) return false;
+	for (i = 0; i != s.length; i++) {
+	    if (current.charAt(cursor - s.length + i) != s.charAt(i)) return false;
 	}
-	cursor -= s_size;
+	cursor -= s.length;
 	return true;
-    }
-
-    protected boolean eq_v(CharSequence s)
-    {
-	return eq_s(s.length(), s.toString());
-    }
-
-    protected boolean eq_v_b(CharSequence s)
-    {   return eq_s_b(s.length(), s.toString());
     }
 
     protected int find_among(Among v[], int v_size)
