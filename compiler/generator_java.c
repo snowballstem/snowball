@@ -998,7 +998,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->L[0] = b;
-    write_failure_if(g, "!(eq_s~S0(~I0))", p);
+    write_failure_if(g, "!(eq_s~S0(~L0))", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
