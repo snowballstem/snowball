@@ -113,23 +113,23 @@ public class SnowballProgram {
 
     protected boolean eq_s(CharSequence s)
     {
-	if (limit - cursor < s.length) return false;
+	if (limit - cursor < s.length()) return false;
 	int i;
-	for (i = 0; i != s.length; i++) {
+	for (i = 0; i != s.length(); i++) {
 	    if (current.charAt(cursor + i) != s.charAt(i)) return false;
 	}
-	cursor += s.length;
+	cursor += s.length();
 	return true;
     }
 
     protected boolean eq_s_b(CharSequence s)
     {
-	if (cursor - limit_backward < s.length) return false;
+	if (cursor - limit_backward < s.length()) return false;
 	int i;
-	for (i = 0; i != s.length; i++) {
-	    if (current.charAt(cursor - s.length + i) != s.charAt(i)) return false;
+	for (i = 0; i != s.length(); i++) {
+	    if (current.charAt(cursor - s.length() + i) != s.charAt(i)) return false;
 	}
-	cursor -= s.length;
+	cursor -= s.length();
 	return true;
     }
 
