@@ -252,9 +252,9 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "MAXINT"); break;
+            write_string(g, "sys.maxsize"); break;
         case c_minint:
-            write_string(g, "MININT"); break;
+            write_string(g, "(~sys.maxsize)"); break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
@@ -1346,6 +1346,10 @@ extern void generate_program_python(struct generator * g) {
     g->failure_str = str_new();
 
     generate_start_comment(g);
+    if (g->analyser->int_limits_used) {
+        /* sys.maxsize is used in the code generated for maxint and minint */
+        w(g, "import sys~N~N");
+    }
     generate_class_begin(g);
 
     generate_amongs(g);

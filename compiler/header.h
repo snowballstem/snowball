@@ -236,6 +236,7 @@ struct analyser {
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
     byte utf8;
+    byte int_limits_used;     /* are maxint or minint used? */
 };
 
 enum analyser_modes {

@@ -338,6 +338,7 @@ static struct node * read_AE(struct analyser * a, int B) {
             break;
         case c_maxint:
         case c_minint:
+            a->int_limits_used = true;
         case c_cursor:
         case c_limit:
         case c_size:
@@ -956,6 +957,7 @@ extern struct analyser * create_analyser(struct tokeniser * t) {
     a->modifyable = true;
     { int i; for (i = 0; i < t_size; i++) a->name_count[i] = 0; }
     a->substring = 0;
+    a->int_limits_used = false;
     return a;
 }
 
