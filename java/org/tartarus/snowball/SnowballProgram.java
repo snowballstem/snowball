@@ -111,77 +111,32 @@ public class SnowballProgram {
 	return false;
     }
 
-    protected boolean in_range(int min, int max)
+    protected boolean eq_s(CharSequence s)
     {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (ch > max || ch < min) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean in_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if (ch > max || ch < min) return false;
-	cursor--;
-	return true;
-    }
-
-    protected boolean out_range(int min, int max)
-    {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (!(ch > max || ch < min)) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean out_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if(!(ch > max || ch < min)) return false;
-	cursor--;
-	return true;
-    }
-
-    protected boolean eq_s(int s_size, String s)
-    {
-	if (limit - cursor < s_size) return false;
+	if (limit - cursor < s.length()) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
+	for (i = 0; i != s.length(); i++) {
 	    if (current.charAt(cursor + i) != s.charAt(i)) return false;
 	}
-	cursor += s_size;
+	cursor += s.length();
 	return true;
     }
 
-    protected boolean eq_s_b(int s_size, String s)
+    protected boolean eq_s_b(CharSequence s)
     {
-	if (cursor - limit_backward < s_size) return false;
+	if (cursor - limit_backward < s.length()) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
-	    if (current.charAt(cursor - s_size + i) != s.charAt(i)) return false;
+	for (i = 0; i != s.length(); i++) {
+	    if (current.charAt(cursor - s.length() + i) != s.charAt(i)) return false;
 	}
-	cursor -= s_size;
+	cursor -= s.length();
 	return true;
     }
 
-    protected boolean eq_v(CharSequence s)
-    {
-	return eq_s(s.length(), s.toString());
-    }
-
-    protected boolean eq_v_b(CharSequence s)
-    {   return eq_s_b(s.length(), s.toString());
-    }
-
-    protected int find_among(Among v[], int v_size)
+    protected int find_among(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int l = limit;
@@ -232,8 +187,7 @@ public class SnowballProgram {
 		if (w.method == null) return w.result;
 		boolean res;
 		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
+		    Object resobj = w.method.invoke(this);
 		    res = resobj.toString().equals("true");
 		} catch (InvocationTargetException e) {
 		    res = false;
@@ -251,10 +205,10 @@ public class SnowballProgram {
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    protected int find_among_b(Among v[], int v_size)
+    protected int find_among_b(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int lb = limit_backward;
@@ -301,8 +255,7 @@ public class SnowballProgram {
 
 		boolean res;
 		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
+		    Object resobj = w.method.invoke(this);
 		    res = resobj.toString().equals("true");
 		} catch (InvocationTargetException e) {
 		    res = false;
