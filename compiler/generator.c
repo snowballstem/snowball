@@ -333,15 +333,30 @@ static void generate_AE(struct generator * g, struct node * p) {
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "SIZE(~V0)"); break;
         case c_cursor:
             w(g, "z->c"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "z->l" : "z->lb"); break;
+        case c_len:
+            if (g->options->utf8) {
+                w(g, "len_utf8(z->p)");
+                break;
+            }
+            /* FALLTHRU */
         case c_size:
-            w(g, "SIZE(z->p)"); break;
+            w(g, "SIZE(z->p)");
+            break;
+        case c_lenof:
+            if (g->options->utf8) {
+                g->V[0] = p->name;
+                w(g, "len_utf8(~V0)");
+                break;
+            }
+            /* FALLTHRU */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "SIZE(~V0)");
+            break;
     }
 }
 
