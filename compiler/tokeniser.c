@@ -175,7 +175,7 @@ static int next_token(struct tokeniser * t) {
             int c0 = c;
             while (c < SIZE(p) && (isalnum(p[c]) || p[c] == '_')) c++;
             code = find_word(c - c0, p + c0);
-            if (code < 0) {
+            if (code < 0 || t->token_disabled[code]) {
                 t->b = move_to_b(t->b, c - c0, p + c0);
                 code = c_name;
             }
@@ -419,6 +419,10 @@ extern const char * name_of_token(int code) {
     }
 }
 
+extern void disable_token(struct tokeniser * t, int code) {
+    t->token_disabled[code] = 1;
+}
+
 extern struct tokeniser * create_tokeniser(symbol * p, char * file) {
     NEW(tokeniser, t);
     t->next = 0;
@@ -435,6 +439,7 @@ extern struct tokeniser * create_tokeniser(symbol * p, char * file) {
     t->token_held = false;
     t->token = -2;
     t->previous_token = -2;
+    memset(t->token_disabled, 0, sizeof(t->token_disabled));
     return t;
 }
 

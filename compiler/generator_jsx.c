@@ -268,7 +268,7 @@ static void w(struct generator * g, const char * s) {
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
-    char * s;
+    const char * s;
     switch (p->type) {
         case c_name:
             write_varref(g, p->name); break;
@@ -291,15 +291,19 @@ static void generate_AE(struct generator * g, struct node * p) {
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "(~V0.length)"); break;
         case c_cursor:
             w(g, "this.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "this.limit" : "this.limit_backward"); break;
+        case c_lenof: /* Same as sizeof() for Javascript. */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "(~V0.length)");
+            break;
+        case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(this.current.length)"); break;
+            w(g, "(this.current.length)");
+            break;
     }
 }
 

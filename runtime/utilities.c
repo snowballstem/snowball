@@ -453,6 +453,16 @@ extern symbol * assign_to(struct SN_env * z, symbol * p) {
     return p;
 }
 
+extern int len_utf8(const symbol * p) {
+    int size = SIZE(p);
+    int len = 0;
+    while (size--) {
+        symbol b = *p++;
+        if (b >= 0xC0 || b < 0x80) ++len;
+    }
+    return len;
+}
+
 #if 0
 extern void debug(struct SN_env * z, int number, int line_count) {
     int i;

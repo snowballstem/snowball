@@ -268,15 +268,19 @@ static void generate_AE(struct generator * g, struct node * p) {
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "len(~V0)"); break;
         case c_cursor:
             w(g, "self.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "self.limit" : "self.limit_backward"); break;
+        case c_lenof: /* Same as sizeof() for Python. */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "len(~V0)");
+            break;
+        case c_len: /* Same as size() for Python. */
         case c_size:
-            w(g, "len(self.current)"); break;
+            w(g, "len(self.current)");
+            break;
     }
 }
 

@@ -25,6 +25,9 @@ extern symbol * copy_b(const symbol * p);
 extern char * b_to_s(const symbol * p);
 extern symbol * add_s_to_b(symbol * p, const char * s);
 
+#define MOVE_TO_B(B, LIT) \
+    move_to_b(B, sizeof(LIT) / sizeof(LIT[0]), LIT)
+
 struct str; /* defined in space.c */
 
 extern struct str * str_new(void);
@@ -70,6 +73,22 @@ struct include {
 
 };
 
+enum token_codes {
+
+#include "syswords2.h"
+
+    c_mathassign,
+    c_name,
+    c_number,
+    c_literalstring,
+    c_neg,
+    c_call,
+    c_grouping,
+    c_booltest,
+
+    NUM_TOKEN_CODES
+};
+
 /* struct input must be a prefix of struct tokeniser. */
 struct tokeniser {
 
@@ -95,27 +114,15 @@ struct tokeniser {
     int omission;
     struct include * includes;
 
+    char token_disabled[NUM_TOKEN_CODES];
 };
 
 extern symbol * get_input(symbol * p, char ** p_file);
 extern struct tokeniser * create_tokeniser(symbol * b, char * file);
 extern int read_token(struct tokeniser * t);
 extern const char * name_of_token(int code);
+extern void disable_token(struct tokeniser * t, int code);
 extern void close_tokeniser(struct tokeniser * t);
-
-enum token_codes {
-
-#include "syswords2.h"
-
-    c_mathassign,
-    c_name,
-    c_number,
-    c_literalstring,
-    c_neg,
-    c_call,
-    c_grouping,
-    c_booltest
-};
 
 extern int space_count;
 extern void * check_malloc(int n);
