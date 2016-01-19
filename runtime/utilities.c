@@ -13,7 +13,7 @@ extern symbol * create_s(void) {
     if (mem == NULL) return NULL;
     p = (symbol *) (HEAD + (char *) mem);
     CAPACITY(p) = CREATE_SIZE;
-    SET_SIZE(p, CREATE_SIZE);
+    SET_SIZE(p, 0);
     return p;
 }
 
