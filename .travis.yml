@@ -27,4 +27,4 @@ script:
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$NPM" || "$NPM" install -g jsx
-  - test -z "$NPM" || make check_jsx
+  - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
