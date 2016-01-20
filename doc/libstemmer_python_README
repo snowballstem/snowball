@@ -1,6 +1,8 @@
 Snowball stemming library collection for Python
 ===============================================
 
+Both Python 2 and Python 3 (>= 3.3) are supported.
+
 How to use library
 ------------------
 

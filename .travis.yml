@@ -10,8 +10,6 @@ matrix:
     - compiler: gcc
       env: PYTHON=python3.3
     - compiler: gcc
-      env: PYTHON=python3.2
-    - compiler: gcc
       env: PYTHON=python2.6
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
