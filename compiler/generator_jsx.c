@@ -947,7 +947,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
     writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mthis.current = this.~V0.toString();~N"
+             "~Mthis.current = this.~V0;~N"
              "~Mthis.cursor = 0;~N"
              "~Mthis.limit = (this.current.length);~N", p);
     generate(g, p->left);
