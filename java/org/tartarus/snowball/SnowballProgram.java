@@ -152,7 +152,7 @@ public class SnowballProgram {
 	    int common = common_i < common_j ? common_i : common_j; // smaller
 	    Among w = v[k];
 	    int i2;
-	    for (i2 = common; i2 < w.s_size; i2++) {
+	    for (i2 = common; i2 < w.s.length; i2++) {
 		if (c + common == l) {
 		    diff = -1;
 		    break;
@@ -182,8 +182,8 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
-	    if (common_i >= w.s_size) {
-		cursor = c + w.s_size;
+	    if (common_i >= w.s.length) {
+		cursor = c + w.s.length;
 		if (w.method == null) return w.result;
 		boolean res;
 		try {
@@ -196,7 +196,7 @@ public class SnowballProgram {
 		    res = false;
 		    // FIXME - debug message
 		}
-		cursor = c + w.s_size;
+		cursor = c + w.s.length;
 		if (res) return w.result;
 	    }
 	    i = w.substring_i;
@@ -224,7 +224,7 @@ public class SnowballProgram {
 	    int common = common_i < common_j ? common_i : common_j;
 	    Among w = v[k];
 	    int i2;
-	    for (i2 = w.s_size - 1 - common; i2 >= 0; i2--) {
+	    for (i2 = w.s.length - 1 - common; i2 >= 0; i2--) {
 		if (c - common == lb) {
 		    diff = -1;
 		    break;
@@ -249,8 +249,8 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
-	    if (common_i >= w.s_size) {
-		cursor = c - w.s_size;
+	    if (common_i >= w.s.length) {
+		cursor = c - w.s.length;
 		if (w.method == null) return w.result;
 
 		boolean res;
@@ -264,7 +264,7 @@ public class SnowballProgram {
 		    res = false;
 		    // FIXME - debug message
 		}
-		cursor = c - w.s_size;
+		cursor = c - w.s.length;
 		if (res) return w.result;
 	    }
 	    i = w.substring_i;
