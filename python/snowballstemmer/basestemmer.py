@@ -96,9 +96,9 @@ class BaseStemmer(object):
         self.cursor -= len(s)
         return True
 
-    def find_among(self, v, v_size):
+    def find_among(self, v):
         i = 0
-        j = v_size
+        j = len(v)
 
         c = self.cursor
         l = self.limit
@@ -154,12 +154,12 @@ class BaseStemmer(object):
                 return 0
         return -1 # not reachable
 
-    def find_among_b(self, v, v_size):
+    def find_among_b(self, v):
         '''
         find_among_b is for backwards processing. Same comments apply
         '''
         i = 0
-        j = v_size
+        j = len(v)
 
         c = self.cursor
         lb = self.limit_backward;

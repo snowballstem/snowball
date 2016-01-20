@@ -1042,12 +1042,11 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "self.find_among~S0(~n.a_~I0, ~I1) == 0", p);
+        write_failure_if(g, "self.find_among~S0(~n.a_~I0) == 0", p);
     } else {
-        writef(g, "~Mamong_var = self.find_among~S0(~n.a_~I0, ~I1)~N", p);
+        writef(g, "~Mamong_var = self.find_among~S0(~n.a_~I0)~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
