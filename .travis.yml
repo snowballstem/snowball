@@ -18,7 +18,7 @@ matrix:
 before_install:
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
-  - [ -z "$CC" ] || make
-  - [ -z "$CC" ] || make check STEMMING_DATA=snowball-data ; fi
-  - [ -z "$PYTHON" ] || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
-  - [ -z "$JAVA" -o -z "$JAVAC" ] || make check_java STEMMING_DATA=snowball-data
+  - test -z "$CC" || make
+  - test -z "$CC" || make check STEMMING_DATA=snowball-data
+  - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
+  - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
