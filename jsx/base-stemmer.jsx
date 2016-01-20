@@ -104,42 +104,32 @@ class BaseStemmer extends Stemmer
 	return false;
     }
 
-    __noexport__ function eq_s (s_size : int, s : string) : boolean
+    __noexport__ function eq_s (s : string) : boolean
     {
-	if (this.limit - this.cursor < s_size) return false;
-        if (this.current.slice(this.cursor, this.cursor + s_size) != s)
+	if (this.limit - this.cursor < s.length) return false;
+        if (this.current.slice(this.cursor, this.cursor + s.length) != s)
         {
             return false;
         }
-	this.cursor += s_size;
+	this.cursor += s.length;
 	return true;
     }
 
-    __noexport__ function eq_s_b (s_size : int, s : string) : boolean
+    __noexport__ function eq_s_b (s : string) : boolean
     {
-	if (this.cursor - this.limit_backward < s_size) return false;
-        if (this.current.slice(this.cursor - s_size, this.cursor) != s)
+	if (this.cursor - this.limit_backward < s.length) return false;
+        if (this.current.slice(this.cursor - s.length, this.cursor) != s)
         {
             return false;
         }
-	this.cursor -= s_size;
+	this.cursor -= s.length;
 	return true;
     }
 
-    __noexport__ function eq_v (s : string) : boolean
-    {
-	return this.eq_s(s.length, s);
-    }
-
-    __noexport__ function eq_v_b (s : string) : boolean
-    {
-        return this.eq_s_b(s.length, s);
-    }
-
-    __noexport__ function find_among (v : Among[], v_size : int) : int
+    __noexport__ function find_among (v : Among[]) : int
     {
 	var i = 0;
-	var j = v_size;
+	var j = v.length;
 
 	var c = this.cursor;
 	var l = this.limit;
@@ -156,7 +146,7 @@ class BaseStemmer extends Stemmer
 	    var common = common_i < common_j ? common_i : common_j; // smaller
 	    var w = v[k];
 	    var i2;
-	    for (i2 = common; i2 < w.s_size; i2++)
+	    for (i2 = common; i2 < w.s.length; i2++)
             {
 		if (c + common == l)
                 {
@@ -193,15 +183,15 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s_size)
+	    if (common_i >= w.s.length)
             {
-		this.cursor = c + w.s_size;
+		this.cursor = c + w.s.length;
 		if (w.method == null)
                 {
                     return w.result;
                 }
 		var res = w.method(this);
-		this.cursor = c + w.s_size;
+		this.cursor = c + w.s.length;
 		if (res)
                 {
                     return w.result;
@@ -214,10 +204,10 @@ class BaseStemmer extends Stemmer
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    __noexport__ function find_among_b (v : Among[], v_size : int) : int
+    __noexport__ function find_among_b (v : Among[]) : int
     {
 	var i = 0;
-	var j = v_size;
+	var j = v.length;
 
 	var c = this.cursor;
 	var lb = this.limit_backward;
@@ -234,7 +224,7 @@ class BaseStemmer extends Stemmer
 	    var common = common_i < common_j ? common_i : common_j;
 	    var w = v[k];
 	    var i2;
-	    for (i2 = w.s_size - 1 - common; i2 >= 0; i2--)
+	    for (i2 = w.s.length - 1 - common; i2 >= 0; i2--)
             {
 		if (c - common == lb)
                 {
@@ -266,12 +256,12 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s_size)
+	    if (common_i >= w.s.length)
             {
-		this.cursor = c - w.s_size;
+		this.cursor = c - w.s.length;
 		if (w.method == null) return w.result;
 		var res = w.method(this);
-		this.cursor = c - w.s_size;
+		this.cursor = c - w.s.length;
 		if (res) return w.result;
 	    }
 	    i = w.substring_i;
