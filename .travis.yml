@@ -1,14 +1,14 @@
 language: c
-sudo: false
-# Can't currently test Python 3 easily as >= 3.3 is required, which isn't in
-# precise, and for travis is seemingly only obtainable with `language: python`,
-# but then we can't test with GCC and clang.
+sudo: required
+dist: trusty
 matrix:
   include:
     - compiler: clang
-      env: python=python2.7
+      env: CC=clang PYTHON=python2.7 JAVA=java JAVAC=javac
     - compiler: gcc
-      env: python=python2.7
+      env: CC=gcc PYTHON=python2.7
+    - compiler: gcc
+      env: CC= PYTHON=python3.5
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested easily.
@@ -18,5 +18,7 @@ matrix:
 before_install:
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
-  - make && make check STEMMING_DATA=snowball-data
-  - make check_python STEMMING_DATA=snowball-data
+  - [ -z "$CC" ] || make
+  - [ -z "$CC" ] || make check STEMMING_DATA=snowball-data ; fi
+  - [ -z "$PYTHON" ] || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
+  - [ -z "$JAVA" -o -z "$JAVAC" ] || make check_java STEMMING_DATA=snowball-data
