@@ -4,7 +4,7 @@ dist: trusty
 matrix:
   include:
     - compiler: clang
-      env: c_tests=y PYTHON=python2.7 JAVA=java JAVAC=javac
+      env: c_tests=y PYTHON=python2.7 JAVA=java JAVAC=javac NPM=npm
     - compiler: gcc
       env: c_tests=y PYTHON=python3.5
     - compiler: gcc
@@ -26,3 +26,5 @@ script:
   - test -z "$c_tests" || make check STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
+  - test -z "$NPM" || "$NPM" install -g jsx
+  - test -z "$NPM" || make check_jsx
