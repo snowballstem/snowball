@@ -20,7 +20,8 @@ jsx_sample_dir = sample
 ICONV = iconv
 #ICONV = python ./iconv.py
 
-libstemmer_algorithms = danish dutch english finnish french german hungarian \
+libstemmer_algorithms = arabic \
+			danish dutch english finnish french german hungarian \
 			italian \
 			norwegian porter portuguese romanian \
 			russian spanish swedish tamil turkish
