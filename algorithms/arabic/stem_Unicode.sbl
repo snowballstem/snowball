@@ -1,8 +1,8 @@
-/* 
- * Authors: 
+/*
+ * Authors:
  * - Assem Chelli, < assem [dot] ch [at] gmail >
  * - Abdelkrim Aries <ab [underscore] aries [at] esi [dot] dz>
- * 
+ *
 */
 
 stringescapes { }
@@ -24,7 +24,7 @@ stringdef t_    hex '629' // Teh_Marbuta
 stringdef t     hex '62a' // Teh
 stringdef th    hex '62b' // Theh
 stringdef j     hex '62c' // Jeem
-stringdef h     hex '62d' // Hah 
+stringdef h     hex '62d' // Hah
 stringdef x     hex '62e' // Khah
 stringdef d     hex '62f' // Dal
 stringdef dz    hex '630' // Thal
@@ -73,11 +73,11 @@ stringdef %     hex '066a'  // PERCENT
 stringdef .     hex '066b'  // DECIMAL
 stringdef '     hex '066c'  // THOUSANDS
 
-// Kasheeda 
+// Kasheeda
 stringdef _     hex '640' // Kasheeda, Tatweel
 
 // Ponctuation marks
-stringdef ,   hex '060C' // COMMA 
+stringdef ,   hex '060C' // COMMA
 stringdef ;   hex '061B' // SEMICOLON
 stringdef ?   hex '061F' // QUESTION
 
@@ -203,8 +203,8 @@ stringdef y4     hex  'fef2'  // YEH
 // Ligatures Lam-Alef
 stringdef la      hex  'fefb' // LAM_ALEF
 stringdef la2     hex  'fefc' // LAM_ALEF
-stringdef lao     hex  'fef7' // LAM_ALEF_HAMZA_ABOVE 
-stringdef lao2    hex  'fef8' // LAM_ALEF_HAMZA_ABOVE 
+stringdef lao     hex  'fef7' // LAM_ALEF_HAMZA_ABOVE
+stringdef lao2    hex  'fef8' // LAM_ALEF_HAMZA_ABOVE
 stringdef lao_    hex  'fef9' // LAM_ALEF_HAMZA_BELOW
 stringdef lao_2   hex  'fefa' // LAM_ALEF_HAMZA_BELOW
 stringdef la~     hex  'fef5' // LAM_ALEF_MADDA_ABOVE
@@ -217,20 +217,20 @@ integers (
          )
 
 booleans (
-            is_noun 
-            is_verb 
-            is_defined 
+            is_noun
+            is_verb
+            is_defined
          )
 
 routines (
-    Prefix_Step1 
-    Prefix_Step2 
-    Prefix_Step3a_Noun 
-    Prefix_Step3b_Noun 
-    Prefix_Step3_Verb 
+    Prefix_Step1
+    Prefix_Step2
+    Prefix_Step3a_Noun
+    Prefix_Step3b_Noun
+    Prefix_Step3_Verb
     Prefix_Step4_Verb
 
-    Suffix_All_alef_maqsura 
+    Suffix_All_alef_maqsura
     Suffix_Noun_Step1a
     Suffix_Noun_Step1b
     Suffix_Noun_Step2a
@@ -316,18 +316,18 @@ define Normalize_pre as (
                 '{w1}'  '{w2}'  ( <- '{w}' ) // WAW
                 '{a_1}' '{a_2}' ( <- '{a_}' ) // ALEF_MAKSURA
                 '{y1}' '{y2}' '{y3}' '{y4}' ( <- '{y}' ) // YEH
-                
+
                 // Ligatures Lam-Alef
-                '{la}'  '{la2}'     (<- '{l}{a}') 
-                '{lao}'  '{lao2}'   (<- '{l}{ao}') 
-                '{lao_}'  '{lao_2}' (<- '{l}{ao_}') 
-                '{la~}'  '{la~2}'    (<- '{l}{a~}') 
+                '{la}'  '{la2}'     (<- '{l}{a}')
+                '{lao}'  '{lao2}'   (<- '{l}{ao}')
+                '{lao_}'  '{lao_2}' (<- '{l}{ao_}')
+                '{la~}'  '{la~2}'    (<- '{l}{a~}')
 
             )
         )
-        or 
+        or
         next
-    ) 
+    )
 )
 
 define Normalize_post as (
@@ -336,7 +336,7 @@ define Normalize_post as (
         // normalize last hamza
         backwards (
         [substring] among (
-            '{ao}''{ao_}' '{a~}' ( <- '{o}') 
+            '{ao}''{ao_}' '{a~}' ( <- '{o}')
         '{wo}' ( <- '{o}')
         '{yo}' ( <- '{o}')
         )
@@ -344,10 +344,10 @@ define Normalize_post as (
     )
 
     do loop word_len (
-        ( 
+        (
         // normalize other hamza's
             [substring] among (
-                '{ao}''{ao_}' '{a~}' ( <- '{a}') 
+                '{ao}''{ao_}' '{a~}' ( <- '{a}')
                 '{wo}' ( <- '{w}')
                 '{yo}' ( <- '{y}')
             )
@@ -361,8 +361,8 @@ define Normalize_post as (
 define Checks1 as (
     $word_len = len
     [substring] among (
-        '{b}{a}{l}' '{k}{a}{l}' ($word_len > 4  set is_noun  unset is_verb set is_defined) 
-        '{l}{l}' '{a}{l}' ($word_len > 3  set is_noun unset is_verb set is_defined) 
+        '{b}{a}{l}' '{k}{a}{l}' ($word_len > 4  set is_noun  unset is_verb set is_defined)
+        '{l}{l}' '{a}{l}' ($word_len > 3  set is_noun unset is_verb set is_defined)
     )
 )
 
@@ -384,7 +384,7 @@ define Prefix_Step2 as (
         $word_len = len
         not '{f}{a}'
         not '{w}{a}'
-        [substring] among ( 
+        [substring] among (
             '{f}' ($word_len > 3 delete)
             '{w}' ($word_len > 3 delete)
         )
@@ -393,19 +393,19 @@ define Prefix_Step2 as (
 define Prefix_Step3a_Noun as ( // it is noun and defined
         $word_len = len
         [substring] among (
-            '{b}{a}{l}' '{k}{a}{l}' ($word_len > 5 delete) 
-            '{l}{l}' '{a}{l}' ($word_len > 4 delete) 
+            '{b}{a}{l}' '{k}{a}{l}' ($word_len > 5 delete)
+            '{l}{l}' '{a}{l}' ($word_len > 4 delete)
         )
 )
 
 define Prefix_Step3b_Noun as ( // probably  noun and defined
         $word_len = len
         not '{b}{a}' // exception
-        [substring] among ( 
+        [substring] among (
             '{b}' ($word_len > 3 delete)
             // '{k}'  '{l}' ($word_len > 3 delete) // BUG: cause confusion
-            '{b}{b}' ($word_len > 3 <-  '{b}'  ) 
-            '{k}{k}'  ($word_len > 3 <-  '{k}'  ) 
+            '{b}{b}' ($word_len > 3 <-  '{b}'  )
+            '{k}{k}'  ($word_len > 3 <-  '{k}'  )
            )
 
 )
@@ -414,7 +414,7 @@ define Prefix_Step3_Verb as (
         $word_len = len
         [substring] among (
             //'{s}' ($word_len > 4 delete)// BUG: cause confusion
-            '{s}{y}' ($word_len > 4 <- '{y}' ) 
+            '{s}{y}' ($word_len > 4 <- '{y}' )
             '{s}{t}' ($word_len > 4 <- '{t}')
             '{s}{n}' ($word_len > 4 <- '{n}')
             '{s}{ao}' ($word_len > 4 <- '{ao}')
@@ -424,7 +424,7 @@ define Prefix_Step3_Verb as (
 define Prefix_Step4_Verb as (
         $word_len = len
         [substring] among (
-            '{y}{s}{t}' '{n}{s}{t}' '{t}{s}{t}' ($word_len > 4 set is_verb unset is_noun <-  '{a}{s}{t}' ) 
+            '{y}{s}{t}' '{n}{s}{t}' '{t}{s}{t}' ($word_len > 4 set is_verb unset is_noun <-  '{a}{s}{t}' )
         )
 )
 
@@ -449,14 +449,14 @@ backwardmode (
         define Suffix_Noun_Step2a as (
                 $word_len = len
                 [substring] among (
-                        '{a}' '{y}' '{w}' ($word_len > 4 delete) 
+                        '{a}' '{y}' '{w}' ($word_len > 4 delete)
                 )
             )
 
         define Suffix_Noun_Step2b as (
             $word_len = len
             [substring] among (
-                '{a}{t}' ($word_len >= 5 delete) 
+                '{a}{t}' ($word_len >= 5 delete)
             )
         )
 
@@ -483,18 +483,18 @@ backwardmode (
                 $word_len = len
                 [substring] among (
                         '{e}' '{k}' ($word_len >= 4 delete)
-                        '{n}{y}' '{n}{a}' '{e}{a}' '{e}{m}' '{e}{n}' '{k}{m}' '{k}{n}' ($word_len >= 5 delete) 
-                        '{e}{m}{a}' '{k}{m}{a}' '{k}{m}{w}'($word_len >= 6 delete) 
+                        '{n}{y}' '{n}{a}' '{e}{a}' '{e}{m}' '{e}{n}' '{k}{m}' '{k}{n}' ($word_len >= 5 delete)
+                        '{e}{m}{a}' '{k}{m}{a}' '{k}{m}{w}'($word_len >= 6 delete)
                 )
             )
         define Suffix_Verb_Step2a as (
                 $word_len = len
                 [substring] among (
-                       '{t}' ($word_len >= 4  delete) 
-                        '{a}' '{n}' '{y}' ($word_len >= 4 delete) 
-                        '{n}{a}' '{t}{a}'  '{t}{n}'  ($word_len >= 5 delete)// past 
+                       '{t}' ($word_len >= 4  delete)
+                        '{a}' '{n}' '{y}' ($word_len >= 4 delete)
+                        '{n}{a}' '{t}{a}'  '{t}{n}'  ($word_len >= 5 delete)// past
                         '{a}{n}' '{w}{n}' '{y}{n}' ($word_len > 5 delete) // present
-                        '{t}{m}{a}' ($word_len >= 6 delete)  
+                        '{t}{m}{a}' ($word_len >= 6 delete)
                 )
             )
 
@@ -519,7 +519,7 @@ backwardmode (
             [substring] among (
                 '{a_}' ( <- '{y}' ) // spell error
                 // '{a_}' ( delete ) // if noun > 3
-                // '{a_}' ( <- '{a}') // if verb 
+                // '{a_}' ( <- '{a}') // if verb
             )
         )
 )
@@ -545,28 +545,28 @@ define stem as (
            is_verb
            (
                (
-                  (atleast 1 Suffix_Verb_Step1) 
+                  (atleast 1 Suffix_Verb_Step1)
                   ( Suffix_Verb_Step2a or Suffix_Verb_Step2c  or next)
                 )
                 or Suffix_Verb_Step2b
                 or Suffix_Verb_Step2a
             )
            )
-            //Suffixes for nouns 
+            //Suffixes for nouns
           or (
                is_noun
                 (
 
                  try (
                      Suffix_Noun_Step2c2
-                     or (not is_defined Suffix_Noun_Step1a ( 
-                            Suffix_Noun_Step2a 
-                            or Suffix_Noun_Step2b 
-                            or Suffix_Noun_Step2c1 
+                     or (not is_defined Suffix_Noun_Step1a (
+                            Suffix_Noun_Step2a
+                            or Suffix_Noun_Step2b
+                            or Suffix_Noun_Step2c1
                             or next))
-                     or (Suffix_Noun_Step1b ( 
-                            Suffix_Noun_Step2a 
-                            or Suffix_Noun_Step2b 
+                     or (Suffix_Noun_Step1b (
+                            Suffix_Noun_Step2a
+                            or Suffix_Noun_Step2b
                             or Suffix_Noun_Step2c1))
                      or (not is_defined Suffix_Noun_Step2a)
                      or (Suffix_Noun_Step2b)
@@ -583,7 +583,7 @@ define stem as (
 
     //Prefixes
     do (
-       try Prefix_Step1 
+       try Prefix_Step1
        try Prefix_Step2
        ( Prefix_Step3a_Noun
          or (is_noun Prefix_Step3b_Noun)
