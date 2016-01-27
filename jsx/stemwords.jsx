@@ -141,7 +141,7 @@ class _Main
                 result.push(original);
                 if (original.length < 30)
                 {
-                    for (var j = original.length; i < 30; j++)
+                    for (var j = original.length; j < 30; j++)
                     {
                         result.push(" ");
                     }
@@ -149,7 +149,7 @@ class _Main
                 else
                 {
                     result.push("\n");
-                    for (var j = 0; i < 30; j++)
+                    for (var j = 0; j < 30; j++)
                     {
                         result.push(" ");
                     }
