@@ -1,6 +1,7 @@
 import "js/nodejs.jsx";
 import "stemmer.jsx";
 
+import "arabic-stemmer.jsx";
 import "danish-stemmer.jsx";
 import "dutch-stemmer.jsx";
 import "english-stemmer.jsx";
@@ -156,6 +157,9 @@ class _Main
         var stemmer : Stemmer;
         switch (algorithm.toLowerCase())
         {
+        case "arabic":
+            stemmer = new ArabicStemmer();
+            break;
         case "danish":
             stemmer = new DanishStemmer();
             break;
