@@ -116,48 +116,39 @@ class _Main
     static function stemming (lang : string, input : string, output : string, encoding : string, pretty : int) : void
     {
         var lines = node.fs.readFileSync(input, encoding).split("\n");
-        var result = [] : string[];
         var stemmer = _Main.create(lang);
         for (var i in lines)
         {
             var original = lines[i];
             var stemmed = stemmer.stemWord(original);
-            if (result.length != 0)
-            {
-                result.push('\n');
-            }
             switch (pretty)
             {
             case 0:
-                if (stemmed != "")
-                {
-                    result.push(stemmed);
-                }
+                lines[i] = stemmed;
                 break;
             case 1:
-                result.push(original, " -> ", stemmed);
+                lines[i] += " -> " + stemmed;
                 break;
             case 2:
-                result.push(original);
                 if (original.length < 30)
                 {
                     for (var j = original.length; j < 30; j++)
                     {
-                        result.push(" ");
+                        lines[i] += " ";
                     }
                 }
                 else
                 {
-                    result.push("\n");
+                    lines[i] += "\n";
                     for (var j = 0; j < 30; j++)
                     {
-                        result.push(" ");
+                        lines[i] += " ";
                     }
                 }
-                result.push(stemmed);
+                lines[i] += stemmed;
             }
         }
-        node.fs.writeFileSync(output, result.join(""), encoding);
+        node.fs.writeFileSync(output, lines.join('\n'), encoding);
     }
 
     static function create (algorithm : string) : Stemmer
