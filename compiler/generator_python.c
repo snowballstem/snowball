@@ -37,18 +37,25 @@ static struct str * vars_newname(struct generator * g) {
 
 static void write_varname(struct generator * g, struct name * p) {
 
-    int ch = "SBIrxg"[p->type];
-    if (p->type != t_external)
-    {
-        write_char(g, ch);
-        write_char(g, '_');
+    switch (p->type) {
+        case t_external:
+            write_char(g, '_');
+            break;
+        case t_routine:
+            write_string(g, "__");
+            /* FALLTHRU */
+        default: {
+            int ch = "SBIrxg"[p->type];
+            write_char(g, ch);
+            write_char(g, '_');
+            break;
+        }
     }
     str_append_b(g->outbuf, p->b);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-
-    /* In python, references look just the same */
+    write_string(g, "self.");
     write_varname(g, p);
 }
 
@@ -525,14 +532,14 @@ static void generate_set(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mself.~V0 = True~N", p);
+    writef(g, "~M~V0 = True~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mself.~V0 = False~N", p);
+    writef(g, "~M~V0 = False~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -720,7 +727,7 @@ static void generate_setmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mself.~V0 = self.cursor~N", p);
+    writef(g, "~M~V0 = self.cursor~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
@@ -728,18 +735,18 @@ static void generate_tomark(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
-    w(g, "~Mif self.cursor ~S0 self."); generate_AE(g, p->AE); w(g, ":");
+    w(g, "~Mif self.cursor ~S0 "); generate_AE(g, p->AE); w(g, ":");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
     g->unreachable = false;
-    w(g, "~Mself.cursor = self."); generate_AE(g, p->AE); writef(g, "~N", p);
+    w(g, "~Mself.cursor = "); generate_AE(g, p->AE); writef(g, "~N", p);
 }
 
 static void generate_atmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    w(g, "~Mif self.cursor != self."); generate_AE(g, p->AE); writef(g, ":", p);
+    w(g, "~Mif self.cursor != "); generate_AE(g, p->AE); writef(g, ":", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -811,15 +818,15 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mself.~V0 = self.assign_to(self.~V0)~N", p);
+    writef(g, "~M~V0 = self.assign_to(~V0)~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mself.~V0 = self.slice_to(self.~V0)~N"
-              "~Mif self.~V0 == '':~N"
+    writef(g, "~M~V0 = self.slice_to(~V0)~N"
+              "~Mif ~V0 == '':~N"
               "~+~Mreturn False~N~-"
             , p);
 }
@@ -925,7 +932,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->B[0] = str_data(savevar);
     writef(g, "~M~B0 = ~n()~N"
               "~M~B0.copy_from(self)~N"
-              "~Mself.current = self.~V0~N"
+              "~Mself.current = ~V0~N"
               "~Mself.cursor = 0~N"
               "~Mself.limit = len(self.current)~N", p);
     generate(g, p->left);
@@ -941,30 +948,16 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
     g->V[0] = p->name;
     g->S[0] = s;
-    if (p->AE->type == c_name)
-    {
-        w(g, "~Mself.~V0 ~S0 self."); generate_AE(g, p->AE); w(g, "~N");
-    }
-    else
-    {
-        w(g, "~Mself.~V0 ~S0 "); generate_AE(g, p->AE); w(g, "~N");
-    }
+    w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); w(g, "~N");
 }
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
 
     g->V[0] = p->name;
     g->S[0] = s;
-    if (p->AE->type == c_name)
-    {
-        w(g, "~Mif not (self.~V0 ~S0 self."); generate_AE(g, p->AE); w(g, "):");
-    }
-    else
-    {
-        w(g, "~Mif not self.~V0 ~S0 ");
-        generate_AE(g, p->AE);
-        w(g, ":");
-    }
+    w(g, "~Mif not ~V0 ~S0 ");
+    generate_AE(g, p->AE);
+    w(g, ":");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -975,8 +968,7 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    g->S[0] = p->name->type == t_routine ? "__" : "_";
-    write_failure_if(g, "not self.~S0~V0()", p);
+    write_failure_if(g, "not ~V0()", p);
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -987,7 +979,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.~S1_grouping~S0(~n.~V0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -995,7 +987,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
-    write_failure_if(g, "not self.eq_s~S0(self.~V0)", p);
+    write_failure_if(g, "not self.eq_s~S0(~V0)", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1013,9 +1005,8 @@ static void generate_define(struct generator * g, struct node * p) {
 
     struct str * saved_output = g->outbuf;
 
-    g->S[0] = q->type == t_routine ? "__" : "_";
     g->V[0] = q;
-    w(g, "~N~Mdef ~S0~V0(self):~+~N");
+    w(g, "~N~Mdef ~W0(self):~+~N");
 
     g->outbuf = str_new();
 
@@ -1084,7 +1075,7 @@ static void generate_booltest(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "not self.~V0", p);
+    write_failure_if(g, "not ~V0", p);
 }
 
 static void generate_false(struct generator * g, struct node * p) {
@@ -1228,9 +1219,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
                 w(g, ", \"");
                 if (v->function->type == t_routine) {
                     /* Need to use mangled version of private name here. */
-                    w(g, "_~n__");
-                } else {
-                    w(g, "_");
+                    w(g, "_~n");
                 }
                 write_varname(g, v->function);
                 w(g, "\"");
@@ -1268,7 +1257,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~M~V0 = [");
+    w(g, "~M~W0 = [");
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
@@ -1315,7 +1304,7 @@ static void generate_copyfrom(struct generator * g) {
             case t_string:
             case t_integer:
             case t_boolean:
-                w(g, "~Mself.~W0 = other.~W0~N");
+                w(g, "~M~V0 = other.~W0~N");
                 break;
         }
     }
