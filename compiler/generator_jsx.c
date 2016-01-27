@@ -45,8 +45,7 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-
-    /* In jsx, references look just the same */
+    write_string(g, "this.");
     write_varname(g, p);
 }
 
@@ -545,14 +544,14 @@ static void generate_set(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mthis.~V0 = true;~N", p);
+    writef(g, "~M~V0 = true;~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mthis.~V0 = false;~N", p);
+    writef(g, "~M~V0 = false;~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -734,7 +733,7 @@ static void generate_setmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mthis.~V0 = this.cursor;~N", p);
+    writef(g, "~M~V0 = this.cursor;~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
@@ -742,18 +741,18 @@ static void generate_tomark(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
-    w(g, "~Mif (this.cursor ~S0 this."); generate_AE(g, p->AE); w(g, ")~N");
+    w(g, "~Mif (this.cursor ~S0 "); generate_AE(g, p->AE); w(g, ")~N");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
     g->unreachable = false;
-    w(g, "~Mthis.cursor = this."); generate_AE(g, p->AE); writef(g, ";~N", p);
+    w(g, "~Mthis.cursor = "); generate_AE(g, p->AE); writef(g, ";~N", p);
 }
 
 static void generate_atmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    w(g, "~Mif (this.cursor != this."); generate_AE(g, p->AE); writef(g, ")~N", p);
+    w(g, "~Mif (this.cursor != "); generate_AE(g, p->AE); writef(g, ")~N", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -827,15 +826,15 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mthis.~V0 = this.assign_to(this.~V0);~N", p);
+    writef(g, "~M~V0 = this.assign_to(~V0);~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~Mthis.~V0 = this.slice_to(this.~V0);~N"
-              "~Mif (this.~V0 == '')~N"
+    writef(g, "~M~V0 = this.slice_to(~V0);~N"
+              "~Mif (~V0 == '')~N"
               "~M{~N"
               "~+~Mreturn false;~N~-"
               "~M}~N"
@@ -947,7 +946,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
     writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mthis.current = this.~V0;~N"
+             "~Mthis.current = ~V0;~N"
              "~Mthis.cursor = 0;~N"
              "~Mthis.limit = (this.current.length);~N", p);
     generate(g, p->left);
@@ -964,30 +963,16 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
     g->V[0] = p->name;
     g->S[0] = s;
-    if (p->AE->type == c_name)
-    {
-        w(g, "~Mthis.~V0 ~S0 this."); generate_AE(g, p->AE); w(g, ";~N");
-    }
-    else
-    {
-        w(g, "~Mthis.~V0 ~S0 "); generate_AE(g, p->AE); w(g, ";~N");
-    }
+    w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); w(g, ";~N");
 }
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
 
     g->V[0] = p->name;
     g->S[0] = s;
-    if (p->AE->type == c_name)
-    {
-        w(g, "~Mif (!(this.~V0 ~S0 this."); generate_AE(g, p->AE); w(g, "))~N");
-    }
-    else
-    {
-        w(g, "~Mif (!(this.~V0 ~S0 ");
-        generate_AE(g, p->AE);
-        w(g, "))~N");
-    }
+    w(g, "~Mif (!(~V0 ~S0 ");
+    generate_AE(g, p->AE);
+    w(g, "))~N");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -998,7 +983,7 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "!this.~V0()", p);
+    write_failure_if(g, "!~V0()", p);
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -1009,7 +994,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "!(this.~S1_grouping~S0(~n.~V0, ~I0, ~I1))", p);
+    write_failure_if(g, "!(this.~S1_grouping~S0(~n.~W0, ~I0, ~I1))", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1017,7 +1002,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
-    write_failure_if(g, "!(this.eq_s~S0(this.~V0))", p);
+    write_failure_if(g, "!(this.eq_s~S0(~V0))", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1039,7 +1024,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     g->S[0] = q->type == t_routine ? "" : "override ";
     g->V[0] = q;
-    w(g, "~N~M~S0function ~V0 () : boolean~N~M{~+~N");
+    w(g, "~N~M~S0function ~W0 () : boolean~N~M{~+~N");
 
     g->outbuf = str_new();
     g->declarations = str_new();
@@ -1116,7 +1101,7 @@ static void generate_booltest(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "!(this.~V0)", p);
+    write_failure_if(g, "!~V0", p);
 }
 
 static void generate_false(struct generator * g, struct node * p) {
@@ -1296,7 +1281,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~Mstatic const ~V0 = [");
+    w(g, "~Mstatic const ~W0 = [");
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
@@ -1343,7 +1328,7 @@ static void generate_copyfrom(struct generator * g) {
             case t_string:
             case t_integer:
             case t_boolean:
-                w(g, "~Mthis.~W0 = other.~W0;~N");
+                w(g, "~M~V0 = other.~W0;~N");
                 break;
         }
     }
