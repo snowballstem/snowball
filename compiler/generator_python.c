@@ -252,7 +252,7 @@ static void w(struct generator * g, const char * s) {
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
-    char * s;
+    const char * s;
     switch (p->type) {
         case c_name:
             write_varref(g, p->name); break;
