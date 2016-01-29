@@ -434,7 +434,8 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
 
 # Command to thin out the testdata - the full arabic test data causes
-# jsx_stemwords to run out of memory.
+# jsx_stemwords to run out of memory.  Also use for Python tests, which
+# take a long time (unless you use pypy).
 THIN_TEST_DATA := awk '(FNR % 3 == 0){print}'
 
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
@@ -458,14 +459,14 @@ check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
 	@cd python_check && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
 	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
