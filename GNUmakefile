@@ -372,8 +372,16 @@ STEMMING_DATA_ABS := $(abspath $(STEMMING_DATA))
 
 check_utf8_%: $(STEMMING_DATA)/% stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
-	@./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
-	@diff -u $</output.txt tmp.txt
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz'|./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -o tmp.txt; \
+	else \
+	  ./stemwords -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
 	@rm tmp.txt
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords
@@ -410,26 +418,57 @@ do_check_java: $(libstemmer_algorithms:%=check_java_%)
 
 check_java_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Java"
-	@cd java && \
-	    $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` $</voc.txt -o $(PWD)/tmp.txt
-	@diff -u $</output.txt tmp.txt
+	@cd java && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	    $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` -o $(PWD)/tmp.txt; \
+	else \
+	  $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` $</voc.txt -o $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
 	@rm tmp.txt
 
 check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
 
+# Command to thin out the testdata - the full arabic test data causes
+# jsx_stemwords to run out of memory.
+THIN_TEST_DATA := awk '(FNR % 3 == 0){print}'
+
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JSX"
-	@./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt
-	@diff -u $</output.txt tmp.txt
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  ./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  ./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
 	@rm tmp.txt
 
 check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
-	@cd python_check && \
-	    $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt
-	@diff -u $</output.txt tmp.txt
+	@cd python_check && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
 	@rm tmp.txt
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
