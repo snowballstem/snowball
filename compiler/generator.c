@@ -271,14 +271,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             default: write_char(g, input[i - 1]); continue;
             case 'C': write_comment(g, p); continue;
             case 'k': wk(g, p); continue;
-            case 'K': /* keep for c_test */
-                write_string(g, p->mode == m_forward ? "int c_test = z->c;" :
-                                             "int m_test = z->l - z->c;");
-                continue;
-            case 'R': /* restore for c_test */
-                write_string(g, p->mode == m_forward ? "z->c = c_test;" :
-                                             "z->c = z->l - m_test;");
-                continue;
             case 'i': winc(g, p); continue;
             case 'l': write_check_limit(g, p); continue;
             case 'f': write_failure(g, p); continue;
