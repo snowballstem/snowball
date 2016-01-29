@@ -517,6 +517,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->next = 0;
     x->b = v;
     x->number = a->among_count++;
+    x->function_count = 0;
     x->starter = 0;
 
     if (q->type == c_bra) { x->starter = q; q = q->right; }
