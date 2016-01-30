@@ -13,7 +13,7 @@ extern symbol * create_s(void) {
     if (mem == NULL) return NULL;
     p = (symbol *) (HEAD + (char *) mem);
     CAPACITY(p) = CREATE_SIZE;
-    SET_SIZE(p, CREATE_SIZE);
+    SET_SIZE(p, 0);
     return p;
 }
 
@@ -451,6 +451,16 @@ extern symbol * assign_to(struct SN_env * z, symbol * p) {
     memmove(p, z->p, len * sizeof(symbol));
     SET_SIZE(p, len);
     return p;
+}
+
+extern int len_utf8(const symbol * p) {
+    int size = SIZE(p);
+    int len = 0;
+    while (size--) {
+        symbol b = *p++;
+        if (b >= 0xC0 || b < 0x80) ++len;
+    }
+    return len;
 }
 
 #if 0

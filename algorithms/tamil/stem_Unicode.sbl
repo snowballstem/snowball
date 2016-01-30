@@ -86,7 +86,6 @@ routines (
  remove_tense_suffix
  remove_tense_suffixes
  remove_common_word_endings
- strlen
  has_min_length
 )
 
@@ -102,15 +101,8 @@ integers (
  length
 )
 
-define strlen as (
- // size in snowball returns bytes which is not very useful for utf8
- // this routine gives the number of characters
- $length = 0
- do repeat (next ($length = length+1))
-)
-
 define has_min_length as (
- strlen
+ $length = len
  $length > 4
 )
 
@@ -133,7 +125,7 @@ define remove_question_prefixes as (
 
 define fix_ending as (
  unset found_wrong_ending
- strlen
+ $length = len
  $length > 3
  backwards (
   ( [among('{na}{pulli}' '{na}{pulli}{ta}' '{na}{pulli}{ta}{pulli}') ] delete )

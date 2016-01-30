@@ -47,7 +47,6 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-
     if (jsx) {
         if (p->type == t_grouping) {
             // groupings are const static.
@@ -301,18 +300,18 @@ static void w(struct generator * g, const char * s) {
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
-    char * s;
+    const char * s;
     switch (p->type) {
         case c_name:
             write_varref(g, p->name); break;
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "MAXINT"); break;
+            write_string(g, "(-1>>>1)"); break;
         case c_minint:
-            write_string(g, "MININT"); break;
+            write_string(g, "(~(-1>>>1))"); break;
         case c_neg:
-            write_string(g, "-"); generate_AE(g, p->right); break;
+            write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
             s = " * "; goto label0;
         case c_plus:
@@ -322,17 +321,21 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_divide:
             s = " / ";
         label0:
-            write_string(g, "("); generate_AE(g, p->left);
-            write_string(g, s); generate_AE(g, p->right); write_string(g, ")"); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "(~V0.length)"); break;
+            write_char(g, '('); generate_AE(g, p->left);
+            write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_cursor:
             w(g, "~t.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "~t.limit" : "~t.limit_backward"); break;
+        case c_lenof: /* Same as sizeof() for Javascript. */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "(~V0.length)");
+            break;
+        case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(~t.current.length)"); break;
+            w(g, "(~t.current.length)");
+            break;
     }
 }
 
@@ -342,8 +345,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 */
 
 static int K_needed(struct generator * g, struct node * p) {
-
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -382,9 +384,8 @@ static int K_needed(struct generator * g, struct node * p) {
 }
 
 static int repeat_score(struct generator * g, struct node * p) {
-
     int score = 0;
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -433,7 +434,6 @@ static int repeat_score(struct generator * g, struct node * p) {
 /* tests if an expression requires cursor reinstatement in a repeat */
 
 static int repeat_restore(struct generator * g, struct node * p) {
-
     return repeat_score(g, p) >= 2;
 }
 
@@ -441,7 +441,7 @@ static void generate_bra(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         p = p->right;
     }
@@ -457,7 +457,7 @@ static void generate_and(struct generator * g, struct node * p) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         if (g->unreachable) break;
         if (keep_c && p->right != 0) write_restorecursor(g, p, savevar);
@@ -1051,16 +1051,9 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
 
     g->V[0] = p->name;
     g->S[0] = s;
-    if (p->AE->type == c_name)
-    {
-        w(g, "~Mif (!(~V0 ~S0 "); generate_AE(g, p->AE); w(g, "))~N");
-    }
-    else
-    {
-        w(g, "~Mif (!(~V0 ~S0 ");
-        generate_AE(g, p->AE);
-        w(g, "))~N");
-    }
+    w(g, "~Mif (!(~V0 ~S0 ");
+    generate_AE(g, p->AE);
+    w(g, "))~N");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -1216,7 +1209,7 @@ static void generate_booltest(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "!(~V0)", p);
+    write_failure_if(g, "!~V0", p);
 }
 
 static void generate_false(struct generator * g, struct node * p) {

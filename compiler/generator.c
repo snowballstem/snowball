@@ -238,7 +238,9 @@ static void write_failure(struct generator * g, struct node * p) {          /* f
     if (g->failure_keep_count != 0) write_string(g, " }");
 }
 
-static void wlim(struct generator * g, struct node * p) {     /* if at limit fail */
+
+/* if at limit fail */
+static void write_check_limit(struct generator * g, struct node * p) {
 
     write_string(g, p->mode == m_forward ? "if (z->c >= z->l) " :
                                  "if (z->c <= z->lb) ");
@@ -269,16 +271,8 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             default: write_char(g, input[i - 1]); continue;
             case 'C': write_comment(g, p); continue;
             case 'k': wk(g, p); continue;
-            case 'K': /* keep for c_test */
-                write_string(g, p->mode == m_forward ? "int c_test = z->c;" :
-                                             "int m_test = z->l - z->c;");
-                continue;
-            case 'R': /* restore for c_test */
-                write_string(g, p->mode == m_forward ? "z->c = c_test;" :
-                                             "z->c = z->l - m_test;");
-                continue;
             case 'i': winc(g, p); continue;
-            case 'l': wlim(g, p); continue;
+            case 'l': write_check_limit(g, p); continue;
             case 'f': write_failure(g, p); continue;
             case 'M': write_margin(g); continue;
             case 'N': write_newline(g); continue;
@@ -331,15 +325,30 @@ static void generate_AE(struct generator * g, struct node * p) {
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "SIZE(~V0)"); break;
         case c_cursor:
             w(g, "z->c"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "z->l" : "z->lb"); break;
+        case c_len:
+            if (g->options->utf8) {
+                w(g, "len_utf8(z->p)");
+                break;
+            }
+            /* FALLTHRU */
         case c_size:
-            w(g, "SIZE(z->p)"); break;
+            w(g, "SIZE(z->p)");
+            break;
+        case c_lenof:
+            if (g->options->utf8) {
+                g->V[0] = p->name;
+                w(g, "len_utf8(~V0)");
+                break;
+            }
+            /* FALLTHRU */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "SIZE(~V0)");
+            break;
     }
 }
 
@@ -1521,7 +1530,9 @@ extern struct generator * create_generator(struct analyser * a, struct options *
     g->line_labelled = 0;
     g->failure_label = -1;
     g->unreachable = false;
+#ifndef DISABLE_PYTHON
     g->max_label = 0;
+#endif
     return g;
 }
 

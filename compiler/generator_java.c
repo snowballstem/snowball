@@ -275,11 +275,11 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "MAXINT"); break;
+            write_string(g, "Integer.MAX_VALUE"); break;
         case c_minint:
-            write_string(g, "MININT"); break;
+            write_string(g, "Integer.MIN_VALUE"); break;
         case c_neg:
-            write_string(g, "-"); generate_AE(g, p->right); break;
+            write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
             s = " * "; goto label0;
         case c_plus:
@@ -289,17 +289,21 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_divide:
             s = " / ";
         label0:
-            write_string(g, "("); generate_AE(g, p->left);
-            write_string(g, s); generate_AE(g, p->right); write_string(g, ")"); break;
-        case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "(~V0.length())"); break;
+            write_char(g, '('); generate_AE(g, p->left);
+            write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_cursor:
             w(g, "cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "limit" : "limit_backward"); break;
+        case c_lenof: /* Same as sizeof() for Java. */
+        case c_sizeof:
+            g->V[0] = p->name;
+            w(g, "(~V0.length())");
+            break;
+        case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(current.length())"); break;
+            w(g, "(current.length())");
+            break;
     }
 }
 
@@ -309,8 +313,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 */
 
 static int K_needed(struct generator * g, struct node * p) {
-
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -349,9 +352,8 @@ static int K_needed(struct generator * g, struct node * p) {
 }
 
 static int repeat_score(struct generator * g, struct node * p) {
-
     int score = 0;
-    while (p != 0) {
+    while (p) {
         switch (p->type) {
             case c_dollar:
             case c_leftslice:
@@ -400,7 +402,6 @@ static int repeat_score(struct generator * g, struct node * p) {
 /* tests if an expression requires cursor reinstatement in a repeat */
 
 static int repeat_restore(struct generator * g, struct node * p) {
-
     return repeat_score(g, p) >= 2;
 }
 
@@ -408,7 +409,7 @@ static void generate_bra(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         p = p->right;
     }
@@ -424,7 +425,7 @@ static void generate_and(struct generator * g, struct node * p) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     p = p->left;
-    while (p != 0) {
+    while (p) {
         generate(g, p);
         if (g->unreachable) break;
         if (keep_c && p->right != 0) write_restorecursor(g, p, savevar);
@@ -989,7 +990,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
-    write_failure_if(g, "!(eq_v~S0(~V0))", p);
+    write_failure_if(g, "!(eq_s~S0(~V0))", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -997,9 +998,8 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->I[0] = SIZE(b);
     g->L[0] = b;
-    write_failure_if(g, "!(eq_s~S0(~I0, ~L0))", p);
+    write_failure_if(g, "!(eq_s~S0(~L0))", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -1051,12 +1051,11 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "find_among~S0(a_~I0, ~I1) == 0", p);
+        write_failure_if(g, "find_among~S0(a_~I0) == 0", p);
     } else {
-        writef(g, "~Mamong_var = find_among~S0(a_~I0, ~I1);~N", p);
+        writef(g, "~Mamong_var = find_among~S0(a_~I0);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
