@@ -117,6 +117,14 @@ CPPFLAGS=-Iinclude
 
 all: snowball libstemmer.o libstemmer.so stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
+install_shared_library: libstemmer.so
+	install libstemmer.so /usr/lib/
+	install ./include/libstemmer.h /usr/include/
+
+purge_shared_library:
+	rm /usr/lib/libstemmer.so
+	rm /usr/include/libstemmer.h
+
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
