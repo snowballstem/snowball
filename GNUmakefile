@@ -120,7 +120,7 @@ all: snowball libstemmer.o libstemmer.so stemwords $(C_OTHER_SOURCES) $(C_OTHER_
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
-	      libstemmer.o stemwords \
+	      libstemmer.o libstemmer.so stemwords \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
               snowball.splint \
