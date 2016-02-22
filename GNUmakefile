@@ -115,7 +115,7 @@ JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -fPIC
 CPPFLAGS=-Iinclude
 
-all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+all: snowball libstemmer.o libstemmer.so stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
@@ -157,6 +157,10 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
 libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
+
+libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+	$(CC) --shared -fPIC -o $@  $^
+
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
