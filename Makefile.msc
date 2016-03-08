@@ -28,9 +28,23 @@ LDFLAGS = -nologo -debug -incremental:no -opt:ref
 ARFLAGS = -nologo
 RCFLAGS = /dWIN32 /r
 
-OBJS = stem_UTF_8_danish.obj stem_UTF_8_dutch.obj stem_UTF_8_english.obj stem_UTF_8_finnish.obj stem_UTF_8_french.obj \
-stem_UTF_8_german.obj stem_UTF_8_hungarian.obj stem_UTF_8_italian.obj stem_UTF_8_norwegian.obj stem_UTF_8_porter.obj \
-stem_UTF_8_portuguese.obj stem_UTF_8_romanian.obj stem_UTF_8_russian.obj stem_UTF_8_spanish.obj stem_UTF_8_swedish.obj \
+OBJS = stem_UTF_8_arabic.obj \
+stem_UTF_8_danish.obj \
+stem_UTF_8_dutch.obj \
+stem_UTF_8_english.obj \
+stem_UTF_8_finnish.obj \
+stem_UTF_8_french.obj \
+stem_UTF_8_german.obj \
+stem_UTF_8_hungarian.obj \
+stem_UTF_8_italian.obj \
+stem_UTF_8_norwegian.obj \
+stem_UTF_8_porter.obj \
+stem_UTF_8_portuguese.obj \
+stem_UTF_8_romanian.obj \
+stem_UTF_8_russian.obj \
+stem_UTF_8_spanish.obj \
+stem_UTF_8_swedish.obj \
+stem_UTF_8_tamil.obj \
 stem_UTF_8_turkish.obj
 OBJA = libstemmer_utf8.obj api.obj utilities.obj
 
@@ -52,6 +66,7 @@ $(STATICLIB): $(OBJS) $(OBJA)
 {$(TOP)/runtime}.c.obj:
 	$(CC) -c -I$(TOP) $(WFLAGS) $(CFLAGS) $<
 	
+stem_UTF_8_arabic.obj: $(TOP)/src_c/stem_UTF_8_arabic.c $(TOP)/src_c/stem_UTF_8_arabic.h
 stem_UTF_8_danish.obj: $(TOP)/src_c/stem_UTF_8_danish.c $(TOP)/src_c/stem_UTF_8_danish.h
 stem_UTF_8_dutch.obj: $(TOP)/src_c/stem_UTF_8_dutch.c $(TOP)/src_c/stem_UTF_8_dutch.h
 stem_UTF_8_english.obj: $(TOP)/src_c/stem_UTF_8_english.c $(TOP)/src_c/stem_UTF_8_english.h
@@ -67,6 +82,7 @@ stem_UTF_8_romanian.obj: $(TOP)/src_c/stem_UTF_8_romanian.c $(TOP)/src_c/stem_UT
 stem_UTF_8_russian.obj: $(TOP)/src_c/stem_UTF_8_russian.c $(TOP)/src_c/stem_UTF_8_russian.h
 stem_UTF_8_spanish.obj: $(TOP)/src_c/stem_UTF_8_spanish.c $(TOP)/src_c/stem_UTF_8_spanish.h
 stem_UTF_8_swedish.obj: $(TOP)/src_c/stem_UTF_8_swedish.c $(TOP)/src_c/stem_UTF_8_swedish.h
+stem_UTF_8_tamil.obj: $(TOP)/src_c/stem_UTF_8_tamil.c $(TOP)/src_c/stem_UTF_8_tamil.h
 stem_UTF_8_turkish.obj: $(TOP)/src_c/stem_UTF_8_turkish.c $(TOP)/src_c/stem_UTF_8_turkish.h
 libstemmer_utf8.obj: $(TOP)/libstemmer/libstemmer_utf8.c $(TOP)/include/libstemmer.h $(TOP)/runtime/api.h  $(TOP)/libstemmer/modules_utf8.h 
 api.obj: $(TOP)/runtime/api.c $(TOP)/runtime/header.h
