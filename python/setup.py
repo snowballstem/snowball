@@ -3,11 +3,12 @@
 from distutils.core import setup
 
 setup(name='snowballstemmer',
-      version='1.1.0',
-      description='This package provides 16 stemmer algorithms (15 + Porter English stemmer) generated from Snowball algorithms.',
+      version='1.2.0',
+      description='This package provides 17 stemmer algorithms (16 + Porter English stemmer) generated from Snowball algorithms.',
       long_description='''
 It includes following language algorithms:
 
+* Arabic
 * Danish
 * Dutch
 * English (Standard, Porter)
@@ -39,6 +40,7 @@ it to accelerate.
           'Intended Audience :: Developers',
           'License :: OSI Approved :: BSD License',
           'Programming Language :: Python',
+          'Natural Language :: Arabic',
           'Natural Language :: Danish',
           'Natural Language :: Dutch',
           'Natural Language :: English',
