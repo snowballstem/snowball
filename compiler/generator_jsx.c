@@ -1338,7 +1338,14 @@ static void generate_class_end(struct generator * g) {
     if (jsx) {
         w(g, "~}~N");
     } else {
-        w(g, "~-~N};~N");
+        w(g, "~N");
+        w(g, "~M/**@return{string}*/~N");
+        w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+        w(g, "~Mbase.setCurrent(word);~N");
+        w(g, "~Mthis.stem();~N");
+        w(g, "~Mreturn base.getCurrent();~N");
+        w(g, "~-~M};~N");
+        w(g, "~-};~N");
         w(g, "window['~n'] = ~n;~N");
     }
 }
