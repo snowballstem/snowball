@@ -935,6 +935,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (keep_c) {
+        c_count = ++g->keep_count;
         g->I[0] = c_count;
         if (jsx) {
             w(g, "~{~Mvar c~I0 : int = this.cursor;~N");
