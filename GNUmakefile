@@ -21,8 +21,8 @@ ICONV = iconv
 #ICONV = python ./iconv.py
 
 libstemmer_algorithms = arabic \
-			danish dutch english finnish french german hungarian \
-			italian \
+			danish dutch english finnish french german greek \
+			hungarian italian \
 			norwegian porter portuguese romanian \
 			russian spanish swedish tamil turkish
 
