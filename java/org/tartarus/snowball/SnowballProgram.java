@@ -1,13 +1,16 @@
 
 package org.tartarus.snowball;
 import java.lang.reflect.InvocationTargetException;
+import java.io.Serializable;
 
-public class SnowballProgram {
+public class SnowballProgram implements Serializable {
     protected SnowballProgram()
     {
 	current = new StringBuffer();
 	setCurrent("");
     }
+
+    static final long serialVersionUID = 2016072500L;
 
     /**
      * Set the current string.
