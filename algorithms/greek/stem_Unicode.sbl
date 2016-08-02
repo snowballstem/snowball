@@ -88,7 +88,7 @@ booleans ( test1 )
 
 groupings ( v v2 )
 
-routines ( tolower
+routines ( tolower has_min_length
            step1 step2a step2b step2c step2d step3 step4
            step5a step5b step5c step5d step5e step5f
            step5g step5h step5i
@@ -100,7 +100,14 @@ define v2 '{a}{e}{i}{y}{o}{oo}'
 
 strings ( s )
 
+integers ( length )
+
 backwardmode (
+  define has_min_length as (
+    $length = len
+    $length >= 3
+  )
+
   define tolower as (
     repeat (
       [substring] among (
@@ -480,6 +487,7 @@ backwardmode (
 define stem as (
     backwards (
       do tolower
+      has_min_length
       set test1
       do step1
       do step2a
