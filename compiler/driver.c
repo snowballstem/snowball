@@ -24,10 +24,10 @@ static void print_arglist(void) {
                     "options are: [-o[utput] file]\n"
                     "             [-s[yntax]]\n"
 #ifndef DISABLE_JAVA
-					"             [-j[ava]]\n"
+                    "             [-j[ava]]\n"
 #endif
 #ifndef DISABLE_CSHARP
-					"             [-cs[harp]]\n"
+                    "             [-cs[harp]]\n"
 #endif
                     "             [-c++]\n"
                     "             [-w[idechars]]\n"
@@ -38,10 +38,10 @@ static void print_arglist(void) {
                     "             [-i[nclude] directory]\n"
                     "             [-r[untime] path to runtime headers]\n"
 #if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
-					"             [-p[arentclassname] fully qualified parent class name]\n"
-					"             [-P[ackage] package name for stemmers]\n"
-					"             [-S[tringclass] StringBuffer-compatible class]\n"
-					"             [-a[mongclass] fully qualified name of the Among class]\n"
+                    "             [-p[arentclassname] fully qualified parent class name]\n"
+                    "             [-P[ackage] package name for stemmers]\n"
+                    "             [-S[tringclass] StringBuffer-compatible class]\n"
+                    "             [-a[mongclass] fully qualified name of the Among class]\n"
 #endif
            );
     exit(1);
@@ -76,10 +76,10 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->externals_prefix = "";
     o->variables_prefix = 0;
     o->runtime_path = 0;
-	o->parent_class_name = "";
-	o->string_class = "";
-	o->among_class = "";
-	o->package = "";
+    o->parent_class_name = "";
+    o->string_class = "";
+    o->among_class = "";
+    o->package = "";
     o->name = "";
     o->make_lang = LANG_C;
     o->widechars = false;
@@ -110,11 +110,11 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             }
 #endif
 #ifndef DISABLE_CSHARP
-			if (eq(s, "-cs") || eq(s, "-csharp")) {
-				o->make_lang = LANG_CSHARP;
-				o->widechars = true;
-				continue;
-			}
+            if (eq(s, "-cs") || eq(s, "-csharp")) {
+                o->make_lang = LANG_CSHARP;
+                o->widechars = true;
+                continue;
+            }
 #endif
             if (eq(s, "-c++")) {
                 o->make_lang = LANG_CPLUSPLUS;
@@ -165,54 +165,54 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
 #if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
-			if (eq(s, "-p") || eq(s, "-parentclassname")) {
-				check_lim(i, argc);
-				o->parent_class_name = argv[i++];
-				continue;
-			}
-			if (eq(s, "-P") || eq(s, "-Package")) {
-				check_lim(i, argc);
-				o->package = argv[i++];
-				continue;
-			}
-			if (eq(s, "-S") || eq(s, "-stringclass")) {
-				check_lim(i, argc);
-				o->string_class = argv[i++];
-				continue;
-			}
-			if (eq(s, "-a") || eq(s, "-amongclass")) {
-				check_lim(i, argc);
-				o->among_class = argv[i++];
-				continue;
-			}
+            if (eq(s, "-p") || eq(s, "-parentclassname")) {
+                check_lim(i, argc);
+                o->parent_class_name = argv[i++];
+                continue;
+            }
+            if (eq(s, "-P") || eq(s, "-Package")) {
+                check_lim(i, argc);
+                o->package = argv[i++];
+                continue;
+            }
+            if (eq(s, "-S") || eq(s, "-stringclass")) {
+                check_lim(i, argc);
+                o->string_class = argv[i++];
+                continue;
+            }
+            if (eq(s, "-a") || eq(s, "-amongclass")) {
+                check_lim(i, argc);
+                o->among_class = argv[i++];
+                continue;
+            }
 #endif
             fprintf(stderr, "'%s' misplaced\n", s);
             print_arglist();
         }
     }
 
-	if (o->make_lang == LANG_JAVA)
-	{
-		if (eq(o->parent_class_name, ""))
-			o->parent_class_name = DEFAULT_BASE_CLASS;
-		if (eq(o->string_class, ""))
-			o->string_class = DEFAULT_STRING_CLASS;
-		if (eq(o->among_class, ""))
-			o->among_class = DEFAULT_AMONG_CLASS;
-		if (eq(o->package, ""))
-			o->package = DEFAULT_PACKAGE;
-	}
-	else if (o->make_lang == LANG_CSHARP)
-	{
-		if (eq(o->parent_class_name, ""))
-			o->parent_class_name = DEFAULT_CS_BASE_CLASS;
-		if (eq(o->string_class, ""))
-			o->string_class = DEFAULT_CS_STRING_CLASS;
-		if (eq(o->among_class, ""))
-			o->among_class = DEFAULT_CS_AMONG_CLASS;
-		if (eq(o->package, ""))
-			o->package = DEFAULT_CS_NAMESPACE;
-	}
+    if (o->make_lang == LANG_JAVA)
+    {
+        if (eq(o->parent_class_name, ""))
+            o->parent_class_name = DEFAULT_BASE_CLASS;
+        if (eq(o->string_class, ""))
+            o->string_class = DEFAULT_STRING_CLASS;
+        if (eq(o->among_class, ""))
+            o->among_class = DEFAULT_AMONG_CLASS;
+        if (eq(o->package, ""))
+            o->package = DEFAULT_PACKAGE;
+    }
+    else if (o->make_lang == LANG_CSHARP)
+    {
+        if (eq(o->parent_class_name, ""))
+            o->parent_class_name = DEFAULT_CS_BASE_CLASS;
+        if (eq(o->string_class, ""))
+            o->string_class = DEFAULT_CS_STRING_CLASS;
+        if (eq(o->among_class, ""))
+            o->among_class = DEFAULT_CS_AMONG_CLASS;
+        if (eq(o->package, ""))
+            o->package = DEFAULT_CS_NAMESPACE;
+    }
 }
 
 extern int main(int argc, char * argv[]) {
@@ -265,28 +265,28 @@ extern int main(int argc, char * argv[]) {
                     fclose(o->output_h);
                 }
 #ifndef DISABLE_JAVA
-				if (o->make_lang == LANG_JAVA) {
-					symbol * b = add_s_to_b(0, s);
-					b = add_s_to_b(b, ".java");
-					o->output_java = get_output(b);
-					lose_b(b);
-					g = create_generator_java(a, o);
-					generate_program_java(g);
-					close_generator_java(g);
-					fclose(o->output_java);
-				}
+                if (o->make_lang == LANG_JAVA) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".java");
+                    o->output_java = get_output(b);
+                    lose_b(b);
+                    g = create_generator_java(a, o);
+                    generate_program_java(g);
+                    close_generator_java(g);
+                    fclose(o->output_java);
+                }
 #endif
 #ifndef DISABLE_CSHARP
-				if (o->make_lang == LANG_CSHARP) {
-					symbol * b = add_s_to_b(0, s);
-					b = add_s_to_b(b, ".cs");
-					o->output_csharp = get_output(b);
-					lose_b(b);
-					g = create_generator_csharp(a, o);
-					generate_program_csharp(g);
-					close_generator_csharp(g);
-					fclose(o->output_csharp);
-				}
+                if (o->make_lang == LANG_CSHARP) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".cs");
+                    o->output_csharp = get_output(b);
+                    lose_b(b);
+                    g = create_generator_csharp(a, o);
+                    generate_program_csharp(g);
+                    close_generator_csharp(g);
+                    fclose(o->output_csharp);
+                }
 #endif
             }
             close_analyser(a);

@@ -586,8 +586,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (g->label_used)
         wsetl(g, g->failure_label);
     if (keep_c) {
-        w(g, "~M");
-		wrestore(g, p, keep_c);
+        w(g, "~M"); wrestore(g, p, keep_c);
         w(g, "~N~}");
     }
 }
