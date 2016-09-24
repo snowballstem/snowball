@@ -4,9 +4,6 @@ typedef unsigned short symbol;
 
 #define true 1
 #define false 0
-#define repeat while(true)
-#define unless(C) if(!(C))
-#define until(C) while(!(C))
 
 #define MALLOC check_malloc
 #define FREE check_free
@@ -19,14 +16,17 @@ typedef unsigned short symbol;
 #define CAPACITY(p) ((int *)(p))[-2]
 
 extern symbol * create_b(int n);
-extern void report_b(FILE * out, symbol * p);
+extern void report_b(FILE * out, const symbol * p);
 extern void lose_b(symbol * p);
 extern symbol * increase_capacity(symbol * p, int n);
-extern symbol * move_to_b(symbol * p, int n, symbol * q);
-extern symbol * add_to_b(symbol * p, int n, symbol * q);
-extern symbol * copy_b(symbol * p);
-extern char * b_to_s(symbol * p);
+extern symbol * move_to_b(symbol * p, int n, const symbol * q);
+extern symbol * add_to_b(symbol * p, int n, const symbol * q);
+extern symbol * copy_b(const symbol * p);
+extern char * b_to_s(const symbol * p);
 extern symbol * add_s_to_b(symbol * p, const char * s);
+
+#define MOVE_TO_B(B, LIT) \
+    move_to_b(B, sizeof(LIT) / sizeof(LIT[0]), LIT)
 
 struct str; /* defined in space.c */
 
@@ -42,8 +42,10 @@ extern void str_assign(struct str * str, char * s);
 extern struct str * str_copy(struct str * old);
 extern symbol * str_data(struct str * str);
 extern int str_len(struct str * str);
+extern int str_back(struct str *str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
+extern void output_str(FILE * outfile, struct str * str);
 
 struct m_pair {
 
@@ -71,6 +73,22 @@ struct include {
 
 };
 
+enum token_codes {
+
+#include "syswords2.h"
+
+    c_mathassign,
+    c_name,
+    c_number,
+    c_literalstring,
+    c_neg,
+    c_call,
+    c_grouping,
+    c_booltest,
+
+    NUM_TOKEN_CODES
+};
+
 /* struct input must be a prefix of struct tokeniser. */
 struct tokeniser {
 
@@ -96,27 +114,15 @@ struct tokeniser {
     int omission;
     struct include * includes;
 
+    char token_disabled[NUM_TOKEN_CODES];
 };
 
 extern symbol * get_input(symbol * p, char ** p_file);
 extern struct tokeniser * create_tokeniser(symbol * b, char * file);
 extern int read_token(struct tokeniser * t);
 extern const char * name_of_token(int code);
+extern void disable_token(struct tokeniser * t, int code);
 extern void close_tokeniser(struct tokeniser * t);
-
-enum token_codes {
-
-#include "syswords2.h"
-
-    c_mathassign,
-    c_name,
-    c_number,
-    c_literalstring,
-    c_neg,
-    c_call,
-    c_grouping,
-    c_booltest
-};
 
 extern int space_count;
 extern void * check_malloc(int n);
@@ -134,7 +140,9 @@ struct name {
     int count;                  /* 0, 1, 2 for each type */
     struct grouping * grouping; /* for grouping names */
     byte referenced;
-    byte used;
+    byte used_in_among;         /* Function used in among? */
+    struct node * used;         /* First use, or NULL if not used */
+    struct name * local_to;     /* Local to one routine/external */
 
 };
 
@@ -149,7 +157,7 @@ struct amongvec {
 
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
-    struct node * p; /* the corresponding command */
+    struct node * p; /* the corresponding node for this string */
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
     struct name * function;
@@ -163,6 +171,7 @@ struct among {
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among */
+    int function_count;       /* in this among */
     struct node * starter;    /* i.e. among( (starter) 'string' ... ) */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
 };
@@ -174,7 +183,6 @@ struct grouping {
     symbol * b;               /* the characters of this group */
     int largest_ch;           /* character with max code */
     int smallest_ch;          /* character with min code */
-    byte no_gaps;             /* not used in generator.c after 11/5/05 */
     struct name * name;       /* so g->name->grouping == g */
 };
 
@@ -235,6 +243,7 @@ struct analyser {
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
     byte utf8;
+    byte int_limits_used;     /* are maxint or minint used? */
 };
 
 enum analyser_modes {
@@ -259,16 +268,23 @@ struct generator {
     struct str * outbuf;       /* temporary str to store output */
     struct str * declarations; /* str storing variable declarations */
     int next_label;
+#ifndef DISABLE_PYTHON
+    int max_label;
+#endif
     int margin;
 
-    const char * failure_string;     /* String to output in case of a failure. */
-#ifndef DISABLE_JAVA
-    struct str * failure_str;  /* This is used by the java generator instead of failure_string */
+    /* if > 0, keep_count to restore in case of a failure;
+     * if < 0, the negated keep_count for the limit to restore in case of
+     * failure. */
+    int failure_keep_count;
+#if !defined(DISABLE_JAVA) && !defined(DISABLE_JSX) && !defined(DISABLE_PYTHON) && !defined(DISABLE_CSHARP)
+    struct str * failure_str;  /* This is used by some generators instead of failure_keep_count */
 #endif
 
     int label_used;     /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
+    int copy_from_count; /* count of calls to copy_from() */
 
     const char * S[10];  /* strings */
     symbol * B[10];      /* blocks */
@@ -277,7 +293,7 @@ struct generator {
     symbol * L[5];       /* literals, used in formatted write */
 
     int line_count;      /* counts number of lines output */
-    int line_labelled;   /* in ANSI C, will need extra ';' if it is a block end */
+    int line_labelled;   /* in ISO C, will need extra ';' if it is a block end */
     int literalstring_count;
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
@@ -287,49 +303,55 @@ struct options {
 
     /* for the command line: */
 
-    char * output_file;
-    char * name;
-    FILE * output_c;
+    const char * output_file;
+    const char * name;
+    FILE * output_src;
     FILE * output_h;
-#ifndef DISABLE_JAVA
-    FILE * output_java;
-#endif
-#ifndef DISABLE_CSHARP
-	FILE * output_csharp;
-#endif
     byte syntax_tree;
     byte widechars;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP } make_lang;
-    char * externals_prefix;
-    char * variables_prefix;
-    char * runtime_path;
-	char * parent_class_name;
-	char * package;
-	char * string_class;
-	char * among_class;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_CSHARP } make_lang;
+    const char * externals_prefix;
+    const char * variables_prefix;
+    const char * runtime_path;
+    const char * parent_class_name;
+    const char * package;
+    const char * string_class;
+    const char * among_class;
     struct include * includes;
     struct include * includes_end;
     byte utf8;
 };
 
-/* Generator for C code. */
-extern struct generator * create_generator_c(struct analyser * a, struct options * o);
-extern void close_generator_c(struct generator * g);
+/* Generator functions common to several backends. */
 
+extern struct generator * create_generator(struct analyser * a, struct options * o);
+extern void close_generator(struct generator * g);
+
+extern void write_char(struct generator * g, int ch);
+extern void write_newline(struct generator * g);
+extern void write_string(struct generator * g, const char * s);
+extern void write_int(struct generator * g, int i);
+extern void write_b(struct generator * g, symbol * b);
+extern void write_str(struct generator * g, struct str * str);
+
+/* Generator for C code. */
 extern void generate_program_c(struct generator * g);
 
 #ifndef DISABLE_JAVA
 /* Generator for Java code. */
-extern struct generator * create_generator_java(struct analyser * a, struct options * o);
-extern void close_generator_java(struct generator * g);
-
 extern void generate_program_java(struct generator * g);
 #endif
 
 #ifndef DISABLE_CSHARP
-/* Generator for Csharp code. */
-extern struct generator * create_generator_csharp(struct analyser * a, struct options * o);
-extern void close_generator_csharp(struct generator * g);
-
+/* Generator for C# code. */
 extern void generate_program_csharp(struct generator * g);
+#endif
+
+#ifndef DISABLE_PYTHON
+/* Generator for Python code. */
+extern void generate_program_python(struct generator * g);
+#endif
+
+#ifndef DISABLE_JSX
+extern void generate_program_jsx(struct generator * g);
 #endif

@@ -5,6 +5,7 @@
 #include "header.h"
 
 /* prototypes */
+
 static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
@@ -27,45 +28,6 @@ static struct str * vars_newname(struct generator * g) {
 	str_append_string(output, "c");
 	str_append_int(output, g->var_number);
 	return output;
-}
-
-/* Output routines */
-static void output_str(FILE * outfile, struct str * str) {
-
-	char * s = b_to_s(str_data(str));
-	fprintf(outfile, "%s", s);
-	free(s);
-}
-
-/* Write routines for simple entities */
-static void write_char(struct generator * g, int ch) {
-
-	str_append_ch(g->outbuf, ch);
-}
-
-static void write_newline(struct generator * g) {
-
-	str_append_string(g->outbuf, "\n");
-}
-
-static void write_string(struct generator * g, const char * s) {
-
-	str_append_string(g->outbuf, s);
-}
-
-static void write_b(struct generator * g, symbol * b) {
-
-	str_append_b(g->outbuf, b);
-}
-
-static void write_str(struct generator * g, struct str * str) {
-
-	str_append(g->outbuf, str);
-}
-
-static void write_int(struct generator * g, int i) {
-
-	str_append_int(g->outbuf, i);
 }
 
 
@@ -489,9 +451,8 @@ static void generate_or(struct generator * g, struct node * p) {
 		write_savecursor(g, p, savevar);
 	}
 
-	p = p->left;
 	str_clear(g->failure_str);
-	until(p->right == 0) {
+    for (p = p->left; p->right; p = p->right) {
 		g->failure_label = new_label(g);
 		g->label_used = 0;
 		generate(g, p);
@@ -501,7 +462,6 @@ static void generate_or(struct generator * g, struct node * p) {
 		if (keep_c) {
 			write_restore(g, p, savevar);
 		}
-		p = p->right;
 	}
 
 	g->label_used = used;
@@ -1414,17 +1374,16 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-	struct grouping * q = g->analyser->groupings;
-	until(q == 0) {
-		generate_grouping_table(g, q);
-		q = q->next;
-	}
+    struct grouping * q;
+    for (q = g->analyser->groupings; q; q = q->next) {
+        generate_grouping_table(g, q);
+    }
 }
 
 static void generate_members(struct generator * g) {
 
-	struct name * q = g->analyser->names;
-	until(q == 0) {
+    struct name * q;
+    for (q = g->analyser->names; q; q = q->next) {
 		g->V[0] = q;
 		switch (q->type) {
 		case t_string:
@@ -1441,7 +1400,6 @@ static void generate_members(struct generator * g) {
 			w(g, "~Mprivate bool ~W0;~N");
 			break;
 		}
-		q = q->next;
 	}
 	w(g, "~N");
 }
@@ -1479,24 +1437,10 @@ extern void generate_program_csharp(struct generator * g) {
 
 	generate_class_end(g);
 
-	output_str(g->options->output_csharp, g->outbuf);
+	output_str(g->options->output_src, g->outbuf);
 	str_delete(g->failure_str);
 	str_delete(g->outbuf);
 }
 
-extern struct generator * create_generator_csharp(struct analyser * a, struct options * o) {
 
-	NEW(generator, g);
-	g->analyser = a;
-	g->options = o;
-	g->margin = 0;
-	g->debug_count = 0;
-	g->unreachable = false;
-	return g;
-}
-
-extern void close_generator_csharp(struct generator * g) {
-
-	FREE(g);
-}
 

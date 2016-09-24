@@ -8,6 +8,7 @@
 
 # List all the main algorithms for each language, in UTF-8.
 
+arabic          UTF_8                   arabic,ar,ara
 danish          UTF_8                   danish,da,dan
 dutch           UTF_8                   dutch,nl,dut,nld
 english         UTF_8                   english,en,eng
@@ -22,6 +23,7 @@ romanian        UTF_8                   romanian,ro,rum,ron
 russian         UTF_8                   russian,ru,rus
 spanish         UTF_8                   spanish,es,esl,spa
 swedish         UTF_8                   swedish,sv,swe
+tamil           UTF_8                   tamil,ta,tam
 turkish         UTF_8                   turkish,tr,tur
 
 # Also include the traditional porter algorithm for english.
