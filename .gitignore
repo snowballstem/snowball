@@ -3,7 +3,7 @@
 /snowball
 /src_c
 /stemwords
-/CMakeFiles
 /dist
 /jsx_out
 /python_out
+*.generated.cs

@@ -54,7 +54,6 @@
     <Compile Include="DanishTest.cs" />
     <Compile Include="HungarianTest.cs" />
     <Compile Include="German2Test.cs" />
-    <Compile Include="KraaijPohlmannTest .cs" />
     <Compile Include="LovinsTest.cs" />
     <Compile Include="NorwegianTest.cs" />
     <Compile Include="PorterTest.cs" />

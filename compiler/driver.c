@@ -80,10 +80,10 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->externals_prefix = NULL;
     o->variables_prefix = 0;
     o->runtime_path = 0;
-    o->parent_class_name = "";
-    o->string_class = "";
-    o->among_class = "";
-    o->package = "";
+    o->parent_class_name = DEFAULT_BASE_CLASS;
+    o->string_class = DEFAULT_STRING_CLASS;
+    o->among_class = DEFAULT_AMONG_CLASS;
+    o->package = DEFAULT_PACKAGE;
     o->name = "";
     o->make_lang = LANG_C;
     o->widechars = false;
@@ -123,6 +123,10 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             if (eq(s, "-cs") || eq(s, "-csharp")) {
                 o->make_lang = LANG_CSHARP;
                 o->widechars = true;
+                o->parent_class_name = DEFAULT_CS_BASE_CLASS;
+                o->string_class = DEFAULT_CS_STRING_CLASS;
+                o->among_class = DEFAULT_CS_AMONG_CLASS;
+                o->package = DEFAULT_CS_NAMESPACE;
                 continue;
             }
 #endif
