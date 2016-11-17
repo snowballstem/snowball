@@ -147,7 +147,7 @@ backwardmode (
 
     define verb_suffix as setlimit tomark pV for (
         [substring] among(
-            'ammo' 'ando' 'ano' 'are' 'arono' 'asse' 'assero' 'assi'
+            'ammo' 'ando' 'ano' 'ani' 'are' 'arono' 'asse' 'assero' 'assi'
             'assimo' 'ata' 'ate' 'ati' 'ato' 'ava' 'avamo' 'avano' 'avate'
             'avi' 'avo' 'emmo' 'enda' 'ende' 'endi' 'endo' 'er{a`}' 'erai'
             'eranno' 'ere' 'erebbe' 'erebbero' 'erei' 'eremmo' 'eremo'
