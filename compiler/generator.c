@@ -1088,7 +1088,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             if (n_cases > 2) break;
         }
         if (block == -1) {
-            if (ch == cases[0]) continue;
+            if (n_cases > 0 && ch == cases[0]) continue;
             if (n_cases < 2) {
                 cases[n_cases++] = ch;
             } else if (ch != cases[1]) {
