@@ -69,17 +69,10 @@ stringdef 6     hex '0666'
 stringdef 7     hex '0667'
 stringdef 8     hex '0668'
 stringdef 9     hex '0669'
-stringdef %     hex '066a'  // PERCENT
-stringdef .     hex '066b'  // DECIMAL
-stringdef '     hex '066c'  // THOUSANDS
+
 
 // Kasheeda
 stringdef _     hex '640' // Kasheeda, Tatweel
-
-// Ponctuation marks
-stringdef ,   hex '060C' // COMMA
-stringdef ;   hex '061B' // SEMICOLON
-stringdef ?   hex '061F' // QUESTION
 
 // Shaped forms
 stringdef o1     hex  'fe80'  // HAMZA
@@ -262,10 +255,6 @@ define Normalize_pre as (
                 '{aan}' '{uun}' '{iin}' '{aa}' '{uu}' '{ii}' '{oo}' '{~}'( delete ) // strip vocalization
                 '{_}' ( delete ) // strip kasheeda
 
-                // Ponctuation marks
-                '.' ',' ';' ':'  '?' '!' '/' '*' '%' '\' '"' ( delete) // General
-                '{,}' '{;}' '{?}'  ( delete ) // Arabic-specific
-
                 // Hindu–Arabic numerals
                 '{0}' ( <- '0')
                 '{1}' ( <- '1')
@@ -277,7 +266,6 @@ define Normalize_pre as (
                 '{7}' ( <- '7')
                 '{8}' ( <- '8')
                 '{9}' ( <- '9')
-                '{%}' '{.}' '{'}' ( delete )
 
                 // Shaped forms
                 '{o1}' ( <- '{o}' ) // HAMZA
