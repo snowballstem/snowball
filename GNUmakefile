@@ -42,7 +42,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/driver.c \
 		   compiler/generator_java.c \
 		   compiler/generator_jsx.c \
-		   compiler/generator_python.c
+		   compiler/generator_python.c \
+		   compiler/generator_rust.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \

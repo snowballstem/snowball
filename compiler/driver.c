@@ -22,10 +22,13 @@ static void print_arglist(void) {
                     "             [-c++]\n"
 #ifndef DISABLE_PYTHON
                     "             [-py[thon]]\n"
-#endif
+#endif            
 #ifndef DISABLE_JSX
                     "             [-jsx]\n"
 #endif
+#ifndef DISABLE_RUST
+                    "             [-rust]\n"
+#endif            
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -104,6 +107,13 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
 #endif
+#ifndef DISABLE_RUST
+            if (eq(s, "-rust")) {
+              o->make_lang = LANG_RUST;
+              o->utf8 = true;
+              continue;
+            }
+#endif            
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
@@ -280,6 +290,16 @@ extern int main(int argc, char * argv[]) {
                     lose_b(b);
                     generate_program_jsx(g);
                     fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_RUST
+                if (o->make_lang == LANG_RUST) {
+                  symbol * b = add_s_to_b(0, s);
+                  b = add_s_to_b(b, ".rs");
+                  o->output_src = get_output(b);
+                  lose_b(b);
+                  generate_program_rust(g);
+                  fclose(o->output_src);
                 }
 #endif
                 close_generator(g);
