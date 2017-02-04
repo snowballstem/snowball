@@ -14,6 +14,7 @@ danish          UTF_8,ISO_8859_1        danish,da,dan
 dutch           UTF_8,ISO_8859_1        dutch,nl,dut,nld
 english         UTF_8,ISO_8859_1        english,en,eng
 finnish         UTF_8,ISO_8859_1        finnish,fi,fin
+test            UTF_8,ISO_8859_1        test
 french          UTF_8,ISO_8859_1        french,fr,fre,fra
 german          UTF_8,ISO_8859_1        german,de,ger,deu
 hungarian       UTF_8,ISO_8859_2        hungarian,hu,hun

@@ -1,0 +1,18 @@
+externals ( stem )
+
+groupings ( v )
+
+stringescapes {}
+
+stringdef a"   hex 'E4'
+stringdef o"   hex 'F6'
+stringdef u"   hex 'FC'
+
+define v 'aeiouy{a"}{o"}{u"}'
+
+define stem as (
+    repeat goto (
+        v [('u'] v <- 'U']
+    )
+)
+ 

@@ -110,7 +110,6 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_RUST
             if (eq(s, "-rust")) {
               o->make_lang = LANG_RUST;
-              o->utf8 = true;
               continue;
             }
 #endif            
