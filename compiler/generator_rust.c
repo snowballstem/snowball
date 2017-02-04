@@ -938,9 +938,9 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
 
     g->V[0] = p->name;
     g->S[0] = s;
-    w(g, "~Mif !~V0 ~S0 ");
+    w(g, "~Mif !(~V0 ~S0 ");
     generate_AE(g, p->AE);
-    //    w(g, "");
+        w(g, ")");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
