@@ -273,12 +273,17 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "env.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "env.limit;" : "env.limit_backward;"); break;
-        case c_lenof: /* Same as sizeof() for Python. */
+        case c_lenof: 
+            g->V[0] = p->name;
+            w(g, "~V0.chars().count()");
+            break;            
         case c_sizeof:
             g->V[0] = p->name;
             w(g, "~V0.len()");
             break;
-        case c_len: /* Same as size() for Python. */
+        case c_len: 
+            w(g, "env.current.chars().count()");
+            break;
         case c_size:
             w(g, "env.current.len()");
             break;
@@ -632,16 +637,14 @@ static void generate_loop(struct generator * g, struct node * p) {
 
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
-    g->B[0] = str_data(loopvar);
-    w(g, "~Mfor ~B0 in range (");
+    w(g, "~Mfor _ in 0..");
     generate_AE(g, p->AE);
-    g->B[0] = str_data(loopvar);
-    writef(g, ", 0, -1):~N", p);
-    writef(g, "~{", p);
+    writef(g, "~N", p);
+    writef(g, "~M{", p);
 
     generate(g, p->left);
 
-    w(g, "~}~N");
+    w(g, "~M}~N");
     str_delete(loopvar);
     g->unreachable = false;
 }
@@ -678,7 +681,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
     if (keep_c) write_restorecursor(g, p, savevar);
 
     g->I[0] = replab;
-    w(g, "~Mbreak 'replab~I0;~N~}");
+    w(g, "~Mbreak 'replab~I0;~N~M}");
     str_delete(savevar);
 }
 
@@ -756,7 +759,7 @@ static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~Mif !env.slice_del(){~N"
               "~+~Mreturn false;~N~-"
-              "}~N", p);
+              "~M}~N", p);
 }
 
 
@@ -809,7 +812,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.slice_to(~V0);~N"
               "~Mif ~V0 == ''{~N"
-              "~+~Mreturn false;~N~-}~N"
+              "~+~Mreturn false;~N~-~M}~N"
             , p);
 }
 
@@ -1034,7 +1037,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->unreachable = false;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~Mreturn true;~N");
-    w(g, "~-}~N");
+    w(g, "~-~M}~N");
 
     str_append(saved_output, g->outbuf);
     str_delete(g->outbuf);
@@ -1073,7 +1076,7 @@ static void generate_among(struct generator * g, struct node * p) {
     w(g, "~Mif among_var == 0{~N~+");
     write_failure(g);
     g->unreachable = false;
-    w(g, "~-}~N~N");
+    w(g, "~-~M}~N~N");
 
     while (p != 0) {
         if (p->type == c_bra && p->left != 0) {
