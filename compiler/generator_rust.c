@@ -687,7 +687,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    w(g, "~M~B0 = ");
+    w(g, "~Mlet mut ~B0 = ");
     generate_AE(g, p->AE);
     w(g, ";~N");
     {
@@ -717,7 +717,7 @@ static void generate_tomark(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
-    w(g, "~Mif env.cursor ~S0 "); generate_AE(g, p->AE); w(g, ":");
+    w(g, "~Mif env.cursor ~S0 "); generate_AE(g, p->AE);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -873,10 +873,10 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     if (!g->unreachable) {
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
-            w(g, "~M~B0 = env.limit - env.cursor;~N");
+            w(g, "~Mlet ~B0 = env.limit - env.cursor;~N");
             w(g, "~Menv.limit = env.cursor;~N");
         } else {
-            w(g, "~M~B0 = env.limit_backward;~N");
+            w(g, "~Mlet ~B0 = env.limit_backward;~N");
             w(g, "~Menv.limit_backward = env.cursor;~N");
         }
         write_restorecursor(g, p, savevar);
@@ -884,10 +884,14 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "env.limit += ");
             str_append(g->failure_str, varname);
+            str_append_string(g->failure_str, ";");
         } else {
             str_assign(g->failure_str, "env.limit_backward = ");
             str_append(g->failure_str, varname);
+            str_append_string(g->failure_str, ";");
         }
+        
+        
         generate(g, p->aux);
 
         if (!g->unreachable) {
