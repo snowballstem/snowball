@@ -175,7 +175,7 @@ static void write_failure(struct generator * g) {
     switch (g->failure_label)
     {
         case x_return:
-            w(g, "~Mreturn false~N");
+            w(g, "~Mreturn false;~N");
             g->unreachable = true;
             break;
         default:
@@ -728,7 +728,7 @@ static void generate_tomark(struct generator * g, struct node * p) {
 static void generate_atmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    w(g, "~Mif env.cursor != "); generate_AE(g, p->AE); writef(g, ":", p);
+    w(g, "~Mif env.cursor != "); generate_AE(g, p->AE);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -828,8 +828,9 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
-    if (keep_c) w(g, "~Mc = env.cursor;~N");
-    writef(g, "~Menv.insert(env.cursor, env.cursor, ", p);
+    if (keep_c) w(g, "~Mlet c = env.cursor;~N");
+    w(g, "~Mlet (bra, ket) = (env.cursor, env.cursor);~N");
+    writef(g, "~Menv.insert(bra, ket, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) w(g, "~Menv.cursor = c;~N");
@@ -1046,7 +1047,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "env.find_among~S0(~n.a_~I0) == 0", p);
+        write_failure_if(g, "env.find_among~S0(~a_~I0) == 0", p);
     } else {
         writef(g, "~Mlet among_var = env.find_among~S0(~a_~I0);~N", p);
         write_failure_if(g, "among_var == 0", p);
