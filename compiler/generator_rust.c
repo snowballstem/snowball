@@ -739,16 +739,16 @@ static void generate_atmark(struct generator * g, struct node * p) {
 static void generate_hop(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    g->S[0] = p->mode == m_forward ? "+" : "-";
+    g->S[0] = p->mode == m_forward ? "" : "-";
 
-    w(g, "~Mlet c = env.cursor ~S0");
+    w(g, "~Mlet c = env.byte_index_for_hop(~S0");
     generate_AE(g, p->AE);
-    w(g, ";~N");
+    w(g, ");~N");
 
     g->S[0] = p->mode == m_forward ? "0" : "env.limit_backward";
 
-    write_failure_if(g, "~S0 > c || c > env.limit", p);
-    writef(g, "~Menv.cursor = c;~N", p);
+    write_failure_if(g, "~S0 as i32 > c || c > env.limit as i32", p);
+    writef(g, "~Menv.cursor = c as usize;~N", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -1017,7 +1017,7 @@ static void generate_define(struct generator * g, struct node * p) {
         w(g, "~N~Mpub fn ~W0(env: &mut SnowballEnv) -> bool{~+~N");
         generate_setup_context(g);
     }
-    w(g, "~Mprintln!(\"~W0: \t\t{:?}\", env);~N");
+    // w(g, "~Mprintln!(\"~W0: \\t\\t\\t{:?}\", env);~N");
 
     g->outbuf = str_new();
 
