@@ -1197,8 +1197,8 @@ static void generate_start_comment(struct generator * g) {
 }
 
 static void generate_class_begin(struct generator * g) {
-  w(g, "use SnowballEnv;~N");
-  w(g, "use Among;~N~N");  
+  w(g, "use snowball::SnowballEnv;~N");
+  w(g, "use snowball::Among;~N~N");  
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
