@@ -611,7 +611,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         w(g, "~Mbreak 'golab~I0;~N");
     }
     g->unreachable = false;
-    wsetlab_end(g, g->failure_label);
+    w(g, "~-~M}~N");
     if (keep_c) write_restorecursor(g, p, savevar);
 
     g->failure_label = a0;
