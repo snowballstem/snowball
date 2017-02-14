@@ -1047,9 +1047,9 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "env.find_among~S0(~a_~I0) == 0", p);
+        write_failure_if(g, "env.find_among~S0(~A_~I0) == 0", p);
     } else {
-        writef(g, "~Mlet among_var = env.find_among~S0(~a_~I0);~N", p);
+        writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1201,7 +1201,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    w(g, "~Mstatic a_~I0: &'static [Among; ~I1] = &[~N~+");
+    w(g, "~Mstatic A_~I0: &'static [Among; ~I1] = &[~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
