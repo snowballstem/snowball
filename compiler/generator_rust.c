@@ -38,7 +38,7 @@ static void write_varname(struct generator * g, struct name * p) {
         case t_external:
             break;
         default: {
-            int ch = "SBirxg"[p->type];
+            int ch = "SBirxG"[p->type];
             write_char(g, ch);
             write_char(g, '_');
             break;
