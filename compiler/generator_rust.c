@@ -655,7 +655,8 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
     g->failure_label = new_label(g);
     str_clear(g->failure_str);
-    wsetlab_begin(g, g->failure_label);
+    g->I[0] = g->failure_label;
+    w(g, "~M'lab~I0: for _ in 0..1 {~N~+");
     generate(g, p->left);
 
     if (!g->unreachable) {
@@ -667,8 +668,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
         g->I[0] = replab;
         w(g, "~Mcontinue 'replab~I0;~N");
     }
-
-    wsetlab_end(g, g->failure_label);
+    w(g, "~-~M}~N");
     g->unreachable = false;
 
     if (keep_c) write_restorecursor(g, p, savevar);
