@@ -439,7 +439,7 @@ static void generate_or(struct generator * g, struct node * p) {
         wsetlab_begin(g, label);
         generate(g, p);
         if (!g->unreachable) wgotol(g, out_lab);
-        wsetlab_end(g, label);
+        w(g, "~-~M}~N");
         g->unreachable = false;
         if (keep_c) write_restorecursor(g, p, savevar);
         p = p->right;
