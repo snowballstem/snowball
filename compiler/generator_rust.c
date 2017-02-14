@@ -16,10 +16,7 @@ enum special_labels {
 };
 
 static int new_label(struct generator * g) {
-
-    int next_label = g->next_label++;
-    g->max_label = (next_label > g->max_label) ? next_label : g->max_label;
-    return next_label;
+    return g->next_label++;
 }
 
 static struct str * vars_newname(struct generator * g) {
