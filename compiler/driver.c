@@ -22,13 +22,13 @@ static void print_arglist(void) {
                     "             [-c++]\n"
 #ifndef DISABLE_PYTHON
                     "             [-py[thon]]\n"
-#endif            
+#endif
 #ifndef DISABLE_JSX
                     "             [-jsx]\n"
 #endif
 #ifndef DISABLE_RUST
                     "             [-rust]\n"
-#endif            
+#endif
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -113,7 +113,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
               o->widechars = true;
               continue;
             }
-#endif            
+#endif
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;

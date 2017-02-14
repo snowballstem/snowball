@@ -309,7 +309,7 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     byte widechars;
-  enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -352,5 +352,5 @@ extern void generate_program_jsx(struct generator * g);
 #endif
 
 #ifndef DISABLE_RUST
-extern void generate_program_rust(struct generator * g);                                   
+extern void generate_program_rust(struct generator * g);
 #endif
