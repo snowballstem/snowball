@@ -837,14 +837,18 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
-    if (keep_c) writef(g, "~Mc = env.cursor;~N", p);
+    if (keep_c) writef(g, "~Mlet c = env.cursor;~N", p);
+    //Copying limits and cursors is necessary here because the rust borrowchecker does not like
+    //taking something from someone you are about to mutate...
     if (p->mode == m_forward) {
-        writef(g, "~Menv.insert(env.cursor, env.limit, ", p);
+        writef(g, "~Mlet (bra, ket) = (env.cursor, env.limit);~N", p);
+        writef(g, "~Menv.insert(bra, ket, ", p);
     } else {
-        writef(g, "~Menv.insert(env.limit_backward, env.cursor, ", p);
+        writef(g, "~Mlet (bra, ket) = (env.limit_backward, env.cursor);~N", p);
+        writef(g, "~Menv.insert(bra, ket, ", p);
     }
     generate_address(g, p);
-    writef(g, ")~N", p);
+    writef(g, ");~N", p);
     if (keep_c) w(g, "~Menv.cursor = c;~N");
 }
 
