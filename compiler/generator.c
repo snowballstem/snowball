@@ -517,7 +517,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
 static void generate_backwards(struct generator * g, struct node * p) {
 
-    writef(g,"~Mz->lb = z->c; z->c = z->l;~C~N", p);
+    writef(g, "~Mz->lb = z->c; z->c = z->l;~C~N", p);
     generate(g, p->left);
     w(g, "~Mz->c = z->lb;~N");
 }

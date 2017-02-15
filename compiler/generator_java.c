@@ -1200,12 +1200,12 @@ static void generate_start_comment(struct generator * g) {
 
 static void generate_class_begin(struct generator * g) {
 
-    w(g, "package " );
+    w(g, "package ");
     w(g, g->options->package);
-    w(g, ";~N~N" );
+    w(g, ";~N~N");
 
     w(g, "import ");
-    w(g, g->options->among_class );
+    w(g, g->options->among_class);
     w(g, ";~N"
          "~N"
          " /**~N"
@@ -1261,13 +1261,13 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among ( ~L0, ~I1, ~I2");
+            w(g, "~Mnew Among(~L0, ~I1, ~I2");
             if (v->function != 0) {
                 w(g, ", \"");
                 write_varname(g, v->function);
                 w(g, "\", ~n.class");
             }
-            w(g, " )~S0~N");
+            w(g, ")~S0~N");
             v++;
         }
     }
@@ -1324,7 +1324,7 @@ static void generate_members(struct generator * g) {
         switch (q->type) {
             case t_string:
                 w(g, "    private ");
-                w(g, g->options->string_class );
+                w(g, g->options->string_class);
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
