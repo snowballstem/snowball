@@ -714,6 +714,7 @@ static void generate_tomark(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
     w(g, "~Mif env.cursor ~S0 "); generate_AE(g, p->AE);
+    writef(g, " ", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -725,6 +726,7 @@ static void generate_atmark(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     w(g, "~Mif env.cursor != "); generate_AE(g, p->AE);
+    writef(g, " ", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -890,8 +892,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append(g->failure_str, varname);
             str_append_string(g->failure_str, ";");
         }
-        
-        
+                
         generate(g, p->aux);
 
         if (!g->unreachable) {
