@@ -308,7 +308,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
-   the command does not touch the cursor. This and repeat_score() could be
+   command does not touch the cursor. This and repeat_score() could be
    elaborated almost indefinitely.
 */
 
