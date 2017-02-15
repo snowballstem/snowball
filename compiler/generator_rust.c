@@ -674,7 +674,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
     if (keep_c) write_restorecursor(g, p, savevar);
 
     g->I[0] = replab;
-    w(g, "~Mbreak 'replab~I0;~N~M}");
+    w(g, "~Mbreak 'replab~I0;~N~-~M}~N");
     str_delete(savevar);
 }
 
