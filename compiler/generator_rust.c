@@ -264,7 +264,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_cursor:
             w(g, "env.cursor"); break;
         case c_limit:
-            w(g, p->mode == m_forward ? "env.limit;" : "env.limit_backward;"); break;
+            w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
         case c_lenof: 
             g->V[0] = p->name;
             w(g, "~V0.chars().count()");
