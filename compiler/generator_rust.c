@@ -131,7 +131,6 @@ static void write_restorecursor(struct generator * g, struct node * p,
     write_margin(g);
     restore_string(p, temp, savevar);
     write_str(g, temp);
-    w(g, ";");
     write_newline(g);
     str_delete(temp);
 }
