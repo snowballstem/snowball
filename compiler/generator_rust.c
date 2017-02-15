@@ -907,15 +907,13 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     write_comment(g, p);
     g->V[0] = p->name;
-
     ++g->copy_from_count;
-    str_assign(g->failure_str, "env.copy_from(");
+    str_assign(g->failure_str, "*env = ");
     str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ")");
+    str_append_string(g->failure_str, ";");
     g->B[0] = str_data(savevar);
-    writef(g, "~M~B0 = ~n();~N"
-              "~M~B0.copy_from(env);~N"
-              "~Menv.current = ~V0;~N"
+    writef(g, "~Mlet ~B0 = env.clone();~N"
+              "~Menv.set_current(~V0);~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len();~N", p);
     generate(g, p->left);
