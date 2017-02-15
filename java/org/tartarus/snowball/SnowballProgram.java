@@ -92,7 +92,7 @@ public class SnowballProgram implements Serializable {
 	}
 	ch -= min;
 	if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) {
-	    cursor ++;
+	    cursor++;
 	    return true;
 	}
 	return false;

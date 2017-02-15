@@ -25,7 +25,7 @@ static int new_label(struct generator * g) {
 static struct str * vars_newname(struct generator * g) {
 
     struct str * output;
-    g->var_number ++;
+    g->var_number++;
     output = str_new();
     str_append_string(output, "v_");
     str_append_int(output, g->var_number);

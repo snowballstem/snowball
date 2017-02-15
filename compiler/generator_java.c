@@ -23,7 +23,7 @@ static int new_label(struct generator * g) {
 static struct str * vars_newname(struct generator * g) {
 
     struct str * output;
-    g->var_number ++;
+    g->var_number++;
     output = str_new();
     str_append_string(output, "v_");
     str_append_int(output, g->var_number);
@@ -480,7 +480,7 @@ static void generate_or(struct generator * g, struct node * p) {
 static void generate_backwards(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    writef(g,"~Mlimit_backward = cursor; cursor = limit;~N", p);
+    writef(g, "~Mlimit_backward = cursor; cursor = limit;~N", p);
     generate(g, p->left);
     w(g, "~Mcursor = limit_backward;");
 }

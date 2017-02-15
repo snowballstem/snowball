@@ -281,7 +281,7 @@ handle_as_name:
                     p->local_to = 0;
                     p->grouping = 0;
                     p->definition = 0;
-                    a->name_count[type] ++;
+                    a->name_count[type]++;
                     p->next = a->names;
                     a->names = p;
                     if (token != c_name) {
