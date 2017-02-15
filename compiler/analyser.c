@@ -228,13 +228,24 @@ static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
 
 static void check_name_type(struct analyser * a, struct name * p, int type) {
     switch (type) {
-        case 's': if (p->type == t_string) return; break;
-        case 'i': if (p->type == t_integer) return; break;
-        case 'b': if (p->type == t_boolean) return; break;
-        case 'R': if (p->type == t_grouping) return;
-        case 'r': if (p->type == t_routine ||
-                      p->type == t_external) return; break;
-        case 'g': if (p->type == t_grouping) return; break;
+        case 's':
+            if (p->type == t_string) return;
+            break;
+        case 'i':
+            if (p->type == t_integer) return;
+            break;
+        case 'b':
+            if (p->type == t_boolean) return;
+            break;
+        case 'R':
+            if (p->type == t_grouping) return;
+            /* FALLTHRU */
+        case 'r':
+            if (p->type == t_routine || p->type == t_external) return;
+            break;
+        case 'g':
+            if (p->type == t_grouping) return;
+            break;
     }
     error2(a, e_not_of_type_x, type);
 }
@@ -939,9 +950,11 @@ extern void read_program(struct analyser * a) {
         while (q) {
             switch (q->type) {
                 case t_external: case t_routine:
-                    if (q->used && q->definition == 0) error4(a, q); break;
+                    if (q->used && q->definition == 0) error4(a, q);
+                    break;
                 case t_grouping:
-                    if (q->used && q->grouping == 0) error4(a, q); break;
+                    if (q->used && q->grouping == 0) error4(a, q);
+                    break;
             }
             q = q->next;
         }
