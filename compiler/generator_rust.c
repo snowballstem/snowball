@@ -893,7 +893,6 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         if (!g->unreachable) {
             write_margin(g);
             write_str(g, g->failure_str);
-            w(g, ";");
             write_newline(g);
         }
     }
