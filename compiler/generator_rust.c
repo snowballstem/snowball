@@ -172,7 +172,7 @@ static void write_failure(struct generator * g) {
             break;
         default:
             g->I[0] = g->failure_label;
-            w(g, "~M break 'lab~I0;~N");
+            w(g, "~Mbreak 'lab~I0;~N");
             g->unreachable = true;
     }
 }
@@ -1103,7 +1103,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Menv.debug(~I0, ~I1)~N", p);
+    writef(g, "~Menv.debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1251,8 +1251,6 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     symbol * map = create_b(size);
     int i;
     for (i = 0; i < size; i++) map[i] = 0;
-
-    /* Using unicode would require revision here */
 
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
