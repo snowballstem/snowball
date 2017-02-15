@@ -181,6 +181,7 @@ static void write_failure_if(struct generator * g, char * s, struct node * p) {
 
     writef(g, "~Mif ", p);
     writef(g, s, p);
+    writef(g, " ", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
