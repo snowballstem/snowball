@@ -143,7 +143,7 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
-    w(g, "~M'lab~I0: loop{~N~+");
+    w(g, "~M'lab~I0: loop {~N~+");
 }
 
 static void wsetlab_end(struct generator * g, int n) {
@@ -593,7 +593,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int golab = new_label(g);
     g->I[0] = golab;
     write_comment(g, p);
-    w(g, "~M'golab~I0: loop{~N~+");
+    w(g, "~M'golab~I0: loop {~N~+");
     if (keep_c) write_savecursor(g, p, savevar);
 
     g->failure_label = new_label(g);
@@ -752,7 +752,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 static void generate_delete(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    writef(g, "~Mif !env.slice_del(){~N"
+    writef(g, "~Mif !env.slice_del() {~N"
               "~+~Mreturn false;~N~-"
               "~M}~N", p);
 }
@@ -860,7 +860,7 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~Mif !env.slice_from(");
     generate_address(g, p);
-    writef(g, "){~N"
+    writef(g, ") {~N"
               "~+~Mreturn false;~N~-~M}~N", p);
 }
 
@@ -987,7 +987,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 
 static void generate_setup_context(struct generator * g) {
   struct name * q;
-  w(g, "~Mlet mut context = &mut Context{~+~N");
+  w(g, "~Mlet mut context = &mut Context {~+~N");
   for (q = g->analyser->names; q; q = q->next) {
     g->V[0] = q;
     switch (q->type) {
@@ -1015,9 +1015,9 @@ static void generate_define(struct generator * g, struct node * p) {
     g->V[0] = q;
 
     if (q->type == t_routine) {
-        w(g, "~N~Mfn ~W0(env: &mut SnowballEnv, context: &mut Context) -> bool{~+~N");
+        w(g, "~N~Mfn ~W0(env: &mut SnowballEnv, context: &mut Context) -> bool {~+~N");
     } else {
-        w(g, "~N~Mpub fn ~W0(env: &mut SnowballEnv) -> bool{~+~N");
+        w(g, "~N~Mpub fn ~W0(env: &mut SnowballEnv) -> bool {~+~N");
         generate_setup_context(g);
     }
     // w(g, "~Mprintln!(\"~W0: \\t\\t\\t{:?}\", env);~N");
@@ -1068,7 +1068,7 @@ static void generate_among(struct generator * g, struct node * p) {
 
     p = p->left;
     if (p != 0 && p->type != c_literalstring) p = p->right;
-    w(g, "~Mif among_var == 0{~N~+");
+    w(g, "~Mif among_var == 0 {~N~+");
     write_failure(g);
     g->unreachable = false;
     w(g, "~-~M}~N~N");
