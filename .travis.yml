@@ -4,7 +4,7 @@ dist: trusty
 matrix:
   include:
     - compiler: clang
-      env: c_tests=y PYTHON=pypy JAVA=java JAVAC=javac NPM=npm RUST=rust
+      env: c_tests=y PYTHON=pypy JAVA=java JAVAC=javac NPM=npm
     - compiler: gcc
       env: c_tests=y PYTHON=python3.5
     - compiler: gcc
@@ -13,6 +13,8 @@ matrix:
       env: PYTHON=python2.7
     - compiler: gcc
       env: PYTHON=python2.6
+    - rust: stable
+      env: CARGO=cargo
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested easily.
@@ -28,4 +30,5 @@ script:
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$NPM" || "$NPM" install -g jsx
   - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
-  - test -z "$RUST" || make check_rust
+  - test -z "$CARGO" || make check_rust cargo=cargo
+  - test -z "$CARGO" || make check_rust cargo=cargo cargoflags=--release  
