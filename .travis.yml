@@ -6,13 +6,13 @@ matrix:
     - compiler: clang
       env: c_tests=y PYTHON=pypy JAVA=java JAVAC=javac NPM=npm
     - compiler: gcc
-      env: c_tests=y PYTHON=python3.5
+      env: c_tests=y PYTHON=python3.5 THIN_FACTOR=10
     - compiler: gcc
-      env: PYTHON=python3.3
+      env: PYTHON=python3.3 THIN_FACTOR=10
     - compiler: gcc
-      env: PYTHON=python2.7
+      env: PYTHON=python2.7 THIN_FACTOR=10
     - compiler: gcc
-      env: PYTHON=python2.6
+      env: PYTHON=python2.6 THIN_FACTOR=10
     - rust: stable
       env: CARGO=cargo
 # Try to check out a branch of the same name from the snowball-data repo

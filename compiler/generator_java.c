@@ -23,7 +23,7 @@ static int new_label(struct generator * g) {
 static struct str * vars_newname(struct generator * g) {
 
     struct str * output;
-    g->var_number ++;
+    g->var_number++;
     output = str_new();
     str_append_string(output, "v_");
     str_append_int(output, g->var_number);
@@ -308,7 +308,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
-   the command does not touch the cursor. This and repeat_score() could be
+   command does not touch the cursor. This and repeat_score() could be
    elaborated almost indefinitely.
 */
 
@@ -480,7 +480,7 @@ static void generate_or(struct generator * g, struct node * p) {
 static void generate_backwards(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    writef(g,"~Mlimit_backward = cursor; cursor = limit;~N", p);
+    writef(g, "~Mlimit_backward = cursor; cursor = limit;~N", p);
     generate(g, p->left);
     w(g, "~Mcursor = limit_backward;");
 }
@@ -1200,12 +1200,12 @@ static void generate_start_comment(struct generator * g) {
 
 static void generate_class_begin(struct generator * g) {
 
-    w(g, "package " );
+    w(g, "package ");
     w(g, g->options->package);
-    w(g, ";~N~N" );
+    w(g, ";~N~N");
 
     w(g, "import ");
-    w(g, g->options->among_class );
+    w(g, g->options->among_class);
     w(g, ";~N"
          "~N"
          " /**~N"
@@ -1261,13 +1261,13 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among ( ~L0, ~I1, ~I2");
+            w(g, "~Mnew Among(~L0, ~I1, ~I2");
             if (v->function != 0) {
                 w(g, ", \"");
                 write_varname(g, v->function);
                 w(g, "\", ~n.class");
             }
-            w(g, " )~S0~N");
+            w(g, ")~S0~N");
             v++;
         }
     }
@@ -1324,7 +1324,7 @@ static void generate_members(struct generator * g) {
         switch (q->type) {
             case t_string:
                 w(g, "    private ");
-                w(g, g->options->string_class );
+                w(g, g->options->string_class);
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
