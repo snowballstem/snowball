@@ -806,7 +806,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = env.slice_to(~V0);~N"
+    writef(g, "~M~V0 = env.slice_to();~N"
               "~Mif ~V0.is_empty() {~N"
               "~+~Mreturn false;~N~-~M}~N"
             , p);
@@ -974,7 +974,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
-    write_failure_if(g, "!env.eq_s~S0(~V0)", p);
+    write_failure_if(g, "!env.eq_s~S0(&~V0)", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -983,7 +983,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->L[0] = b;
-    write_failure_if(g, "!env.eq_s~S0(~L0)", p);
+    write_failure_if(g, "!env.eq_s~S0(&~L0)", p);
 }
 
 static void generate_setup_context(struct generator * g) {
@@ -993,7 +993,7 @@ static void generate_setup_context(struct generator * g) {
     g->V[0] = q;
     switch (q->type) {
     case t_string:
-      w(g, "~M~W0: \"\",~N");
+      w(g, "~M~W0: String::new(),~N");
       break;
     case t_integer:
       w(g, "~M~W0: 0,~N");
@@ -1050,9 +1050,9 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->command_count == 0 && x->starter == 0) {
-        write_failure_if(g, "env.find_among~S0(~A_~I0) == 0", p);
+        write_failure_if(g, "env.find_among~S0(~A_~I0, context) == 0", p);
     } else {
-        writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0);~N", p);
+        writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0, context);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1204,7 +1204,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    w(g, "~Mstatic A_~I0: &'static [Among; ~I1] = &[~N~+");
+    w(g, "~Mstatic A_~I0: &'static [Among<Context>; ~I1] = &[~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
@@ -1215,16 +1215,14 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~MAmong(~L0, ~I1, ~I2, None");
+            w(g, "~MAmong(~L0, ~I1, ~I2, ");
             if (v->function != 0)
             {
-                w(g, ", \"");
-                if (v->function->type == t_routine) {
-                    /* Need to use mangled version of private name here. */
-                    w(g, "_~n");
-                }
+                w(g, "Some(&");
                 write_varname(g, v->function);
-                w(g, "\"");
+                w(g, ")");
+            } else {
+              w(g, "None");
             }
             w(g, ")~S0~N");
             v++;
@@ -1282,7 +1280,7 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "~M~W0: &'static str,~N");
+                w(g, "~M~W0: String,~N");
                 break;
             case t_integer:
                 w(g, "~M~W0: usize,~N");
