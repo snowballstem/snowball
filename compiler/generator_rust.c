@@ -1071,14 +1071,14 @@ static void generate_among(struct generator * g, struct node * p) {
     w(g, "~Mif among_var == 0 {~N~+");
     write_failure(g);
     g->unreachable = false;
-    w(g, "~-~M} ");
+    w(g, "~-~M}");
 
     while (p != 0) {
         if (p->type == c_bra && p->left != 0) {
             g->I[0] = case_number++;
-            w(g, "else if among_var == ~I0 {~N~+");
+            w(g, " else if among_var == ~I0 {~N~+");
             generate(g, p);
-            w(g, "~-~M} ");
+            w(g, "~-~M}");
             g->unreachable = false;
         }
         p = p->right;
