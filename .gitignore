@@ -6,3 +6,5 @@
 /dist
 /jsx_out
 /python_out
+/rust/Cargo.lock
+/rust/target/
