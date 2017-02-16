@@ -807,7 +807,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.slice_to(~V0);~N"
-              "~Mif ~V0 == ''{~N"
+              "~Mif ~V0.is_empty() {~N"
               "~+~Mreturn false;~N~-~M}~N"
             , p);
 }
