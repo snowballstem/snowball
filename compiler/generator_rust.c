@@ -633,12 +633,11 @@ static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~Mfor _ in 0..");
     generate_AE(g, p->AE);
-    writef(g, "~N", p);
-    writef(g, "~M{", p);
+    writef(g, " {~+~N", p);
 
     generate(g, p->left);
 
-    w(g, "~M}~N");
+    w(g, "~-~M}~N");
     str_delete(loopvar);
     g->unreachable = false;
 }
@@ -1213,7 +1212,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->I[1] = v->i;
             g->I[2] = v->result;
             g->L[0] = v->b;
-            g->S[0] = i < x->literalstring_count - 1 ? "," : "";
+            g->S[0] = ",";
 
             w(g, "~MAmong(~L0, ~I1, ~I2, ");
             if (v->function != 0)
@@ -1329,7 +1328,7 @@ extern void generate_program_rust(struct generator * g) {
 
     generate_start_comment(g);
     if (g->analyser->int_limits_used) {
-        /* sys.maxsize is used in the code generated for maxint and minint */
+        /* std::usize is used in the code generated for usize::MAX and usize::MIN */
         w(g, "use std::usize;~N~N");
     }
     generate_class_begin(g);
