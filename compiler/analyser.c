@@ -369,8 +369,18 @@ static struct node * read_AE(struct analyser * a, int B) {
     struct node * q;
     switch (read_token(t)) {
         case c_minus: /* monadic */
+            q = read_AE(a, 100);
+            if (q->type == c_neg) {
+                /* Optimise away double negation, which avoids generators
+                 * having to worry about generating "--" (decrement operator
+                 * in many languages).
+                 */
+                p = q->right;
+                /* Don't free q, it's in the linked list a->nodes. */
+                break;
+            }
             p = new_node(a, c_neg);
-            p->right = read_AE(a, 100);
+            p->right = q;
             break;
         case c_bra:
             p = read_AE(a, 0);
