@@ -75,7 +75,7 @@ backwardmode (
         [substring] among (
             'eed' 'eedly'
                 (R1 <-'ee')
-            'ed' 'edly' 'ing' 'ingly'
+            'ed' 'edly' 'ing' 'ingly' 'est' 'eth' 'edst'
                 (
                 test gopast v  delete
                 test substring among(
@@ -139,7 +139,7 @@ backwardmode (
 
     define Step_4 as (
         [substring] R2 among (
-            'al' 'ance' 'ence' 'er' 'ic' 'able' 'ible' 'ant' 'ement'
+            'al' 'ance' 'ence' 'er' 'ess' 'ic' 'able' 'ible' 'ant' 'ement'
             'ment' 'ent' 'ism' 'ate' 'iti' 'ous' 'ive' 'ize'
                       (delete)
             'ion'     ('s' or 't' delete)

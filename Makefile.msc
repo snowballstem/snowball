@@ -1,0 +1,91 @@
+# Makefile for snowball using Microsoft (Visual) C
+
+# The toplevel directory of the source tree.
+#
+TOP = .
+
+# optional build flags
+LOC =
+
+# variables
+STATICLIB = libstemmer.lib
+
+CC = cl
+AS = ml
+LD = link
+AR = lib
+RC = rc
+
+!if $(USE_CRT_DLL)
+CFLAGS  = -nologo -MD -W3 -O2 -Oy- -Zi -Fd"libstemmer" $(LOC)
+!else
+CFLAGS  = -nologo -MT -W3 -O2 -Oy- -Zi -Fd"libstemmer" $(LOC)
+!endif
+
+WFLAGS  = -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
+ASFLAGS = -coff -Zi $(LOC)
+LDFLAGS = -nologo -debug -incremental:no -opt:ref
+ARFLAGS = -nologo
+RCFLAGS = /dWIN32 /r
+
+OBJS = stem_UTF_8_arabic.obj \
+stem_UTF_8_danish.obj \
+stem_UTF_8_dutch.obj \
+stem_UTF_8_english.obj \
+stem_UTF_8_finnish.obj \
+stem_UTF_8_french.obj \
+stem_UTF_8_german.obj \
+stem_UTF_8_hungarian.obj \
+stem_UTF_8_italian.obj \
+stem_UTF_8_norwegian.obj \
+stem_UTF_8_porter.obj \
+stem_UTF_8_portuguese.obj \
+stem_UTF_8_romanian.obj \
+stem_UTF_8_russian.obj \
+stem_UTF_8_spanish.obj \
+stem_UTF_8_swedish.obj \
+stem_UTF_8_tamil.obj \
+stem_UTF_8_turkish.obj
+OBJA = libstemmer_utf8.obj api.obj utilities.obj
+
+# targets
+all: $(STATICLIB)
+
+$(STATICLIB): $(OBJS) $(OBJA)
+	$(AR) $(ARFLAGS) -out:$@ $(OBJS) $(OBJA)
+	
+{$(TOP)}.c.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) $<
+
+{$(TOP)/src_c}.c.obj:
+	$(CC) -c -I$(TOP) $(WFLAGS) $(CFLAGS) $<
+
+{$(TOP)/libstemmer}.c.obj:
+	$(CC) -c -I$(TOP) $(WFLAGS) $(CFLAGS) $<
+
+{$(TOP)/runtime}.c.obj:
+	$(CC) -c -I$(TOP) $(WFLAGS) $(CFLAGS) $<
+	
+stem_UTF_8_arabic.obj: $(TOP)/src_c/stem_UTF_8_arabic.c $(TOP)/src_c/stem_UTF_8_arabic.h
+stem_UTF_8_danish.obj: $(TOP)/src_c/stem_UTF_8_danish.c $(TOP)/src_c/stem_UTF_8_danish.h
+stem_UTF_8_dutch.obj: $(TOP)/src_c/stem_UTF_8_dutch.c $(TOP)/src_c/stem_UTF_8_dutch.h
+stem_UTF_8_english.obj: $(TOP)/src_c/stem_UTF_8_english.c $(TOP)/src_c/stem_UTF_8_english.h
+stem_UTF_8_finnish.obj: $(TOP)/src_c/stem_UTF_8_finnish.c $(TOP)/src_c/stem_UTF_8_finnish.h
+stem_UTF_8_french.obj: $(TOP)/src_c/stem_UTF_8_french.c $(TOP)/src_c/stem_UTF_8_french.h
+stem_UTF_8_german.obj: $(TOP)/src_c/stem_UTF_8_german.c $(TOP)/src_c/stem_UTF_8_german.h
+stem_UTF_8_hungarian.obj: $(TOP)/src_c/stem_UTF_8_hungarian.c $(TOP)/src_c/stem_UTF_8_hungarian.h
+stem_UTF_8_italian.obj: $(TOP)/src_c/stem_UTF_8_italian.c $(TOP)/src_c/stem_UTF_8_italian.h
+stem_UTF_8_norwegian.obj: $(TOP)/src_c/stem_UTF_8_norwegian.c $(TOP)/src_c/stem_UTF_8_norwegian.h
+stem_UTF_8_porter.obj: $(TOP)/src_c/stem_UTF_8_porter.c $(TOP)/src_c/stem_UTF_8_porter.h
+stem_UTF_8_portuguese.obj: $(TOP)/src_c/stem_UTF_8_portuguese.c $(TOP)/src_c/stem_UTF_8_portuguese.h
+stem_UTF_8_romanian.obj: $(TOP)/src_c/stem_UTF_8_romanian.c $(TOP)/src_c/stem_UTF_8_romanian.h
+stem_UTF_8_russian.obj: $(TOP)/src_c/stem_UTF_8_russian.c $(TOP)/src_c/stem_UTF_8_russian.h
+stem_UTF_8_spanish.obj: $(TOP)/src_c/stem_UTF_8_spanish.c $(TOP)/src_c/stem_UTF_8_spanish.h
+stem_UTF_8_swedish.obj: $(TOP)/src_c/stem_UTF_8_swedish.c $(TOP)/src_c/stem_UTF_8_swedish.h
+stem_UTF_8_tamil.obj: $(TOP)/src_c/stem_UTF_8_tamil.c $(TOP)/src_c/stem_UTF_8_tamil.h
+stem_UTF_8_turkish.obj: $(TOP)/src_c/stem_UTF_8_turkish.c $(TOP)/src_c/stem_UTF_8_turkish.h
+libstemmer_utf8.obj: $(TOP)/libstemmer/libstemmer_utf8.c $(TOP)/include/libstemmer.h $(TOP)/runtime/api.h  $(TOP)/libstemmer/modules_utf8.h 
+api.obj: $(TOP)/runtime/api.c $(TOP)/runtime/header.h
+
+clean:
+	del *.obj

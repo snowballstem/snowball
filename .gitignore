@@ -6,3 +6,6 @@
 /dist
 /jsx_out
 /python_out
+
+# mac files
+.DS_Store
