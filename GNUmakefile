@@ -446,6 +446,16 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
+check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
+
+# Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
+THIN_FACTOR ?= 3
+
+# Command to thin out the testdata - the full arabic test data causes
+# jsx_stemwords to run out of memory.  Also use for Python tests, which
+# take a long time (unless you use pypy).
+THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
+
 check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
 
 check_rust_%: $(STEMMING_DATA_ABS)/% 
@@ -463,16 +473,6 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	  diff -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
-
-check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
-
-# Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
-THIN_FACTOR ?= 3
-
-# Command to thin out the testdata - the full arabic test data causes
-# jsx_stemwords to run out of memory.  Also use for Python tests, which
-# take a long time (unless you use pypy).
-THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
 
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JSX"
