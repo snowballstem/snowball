@@ -6,6 +6,8 @@ matrix:
     - compiler: clang
       env: c_tests=y PYTHON=pypy JAVA=java JAVAC=javac NPM=npm
     - compiler: gcc
+      env: RUST=rust
+    - compiler: gcc
       env: c_tests=y PYTHON=python3.5 THIN_FACTOR=10
     - compiler: gcc
       env: PYTHON=python3.3 THIN_FACTOR=10
@@ -13,16 +15,21 @@ matrix:
       env: PYTHON=python2.7 THIN_FACTOR=10
     - compiler: gcc
       env: PYTHON=python2.6 THIN_FACTOR=10
-    - rust: stable
-      env: CARGO=cargo
 # Try to check out a branch of the same name from the snowball-data repo
 # sibling of this snowball repo, so that PRs requiring changes to both can be
 # CI tested easily.
 #
 # If that fails, just clone the standard snowball-data repo with the same
 # branch name, falling back to the default branch.
+#
+# Also, install rust using rustup.rs
 before_install:
-  - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+- curl https://sh.rustup.rs -sSf -o rustup.sh
+- chmod ugo+x rustup.sh
+- ./rustup.sh -y
+- source "$HOME/.cargo/env"
+- rm rustup.sh
+- git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - test -z "$c_tests" || make
   - test -z "$c_tests" || make check STEMMING_DATA=snowball-data
@@ -30,5 +37,5 @@ script:
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$NPM" || "$NPM" install -g jsx
   - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
-  - test -z "$CARGO" || make check_rust cargo=cargo
-  - test -z "$CARGO" || make check_rust cargo=cargo cargoflags=--release  
+  - test -z "$RUST" || make check_rust
+  - test -z "$RUST" || make check_rust cargoflags=--release  
