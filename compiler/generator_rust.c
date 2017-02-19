@@ -1201,6 +1201,7 @@ static void generate_allow_warnings(struct generator * g) {
     w(g, "#![allow(non_upper_case_globals)]~N");
     w(g, "#![allow(non_snake_case)]~N");
     w(g, "#![allow(unused_variables)]~N");
+    w(g, "#![allow(unused_mut)]~N");
 }
 
 static void generate_class_begin(struct generator * g) {
