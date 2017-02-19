@@ -1021,7 +1021,7 @@ static void generate_define(struct generator * g, struct node * p) {
         generate_setup_context(g);
     }
     // w(g, "~Mprintln!(\"~W0: \\t\\t\\t{:?}\", env);~N");
-
+    if (p->amongvar_needed) w(g, "~Mlet mut among_var;~N");
     g->outbuf = str_new();
 
     g->next_label = 0;
@@ -1051,7 +1051,8 @@ static void generate_substring(struct generator * g, struct node * p) {
     if (x->command_count == 0 && x->starter == 0) {
         write_failure_if(g, "env.find_among~S0(~A_~I0, context) == 0", p);
     } else {
-        writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0, context);~N", p);
+        writef(g, "~Mamong_var = env.find_among~S0(~A_~I0, context);~N", p);
+        //  writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0, context);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
