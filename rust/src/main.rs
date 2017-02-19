@@ -103,7 +103,7 @@ impl Stemmer {
             "swedish" => Stemmer { stemmer: Box::new(algorithms::swedish_stemmer::stem) },
             "tamil" => Stemmer { stemmer: Box::new(algorithms::tamil_stemmer::stem) },
             "turkish" => Stemmer { stemmer: Box::new(algorithms::turkish_stemmer::stem) },
-            x => panic!("Unkown algorithm '{}'", x)
+            x => panic!("Unknown algorithm '{}'", x)
         }
     }
 
