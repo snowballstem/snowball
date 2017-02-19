@@ -226,24 +226,6 @@ impl<'a> SnowballEnv<'a> {
         self.slice_from("")
     }
 
-    pub fn get_next_char_boundry(data: &str, mut index: usize) -> usize {
-        loop {
-            if index > data.len() || data.is_char_boundary(index) {
-                return index;
-            }
-            index += 1;
-        }
-    }
-
-    pub fn get_next_char_boundry_b(data: &str, mut index: usize) -> usize {
-        loop {
-            if data.is_char_boundary(index) {
-                return index;
-            }
-            index -= 1;
-        }
-    }
-
     pub fn insert(&mut self, bra: usize, ket: usize, s: &str) {
         let adjustment = self.replace_s(bra, ket, s);
         if bra <= self.bra {
