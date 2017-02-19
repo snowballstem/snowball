@@ -38,7 +38,7 @@ static void write_varname(struct generator * g, struct name * p) {
         case t_external:
             break;
         default: {
-            int ch = "SBirxG"[p->type];
+            int ch = "SbirxG"[p->type];
             write_char(g, ch);
             write_char(g, '_');
             break;
@@ -1188,14 +1188,23 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_start_comment(struct generator * g) {
-
     w(g, "//! This file was generated automatically by the Snowball to Rust compiler~N");
     w(g, "//! http://snowballstem.org/~N~N");
 }
 
+// rustc emmits warnings if variables don't match the style guide
+// (i.e. upper-case for globals, snake case for fields etc.)
+// To allow warning free compilation of generated code and
+// consistency with snowball variable namings we allow some kind of warnings here
+static void generate_allow_warnings(struct generator * g) {
+    w(g, "#![allow(non_upper_case_globals)]~N");
+    w(g, "#![allow(non_snake_case)]~N");
+    w(g, "#![allow(unused_variables)]~N");
+}
+
 static void generate_class_begin(struct generator * g) {
-  w(g, "use snowball::SnowballEnv;~N");
-  w(g, "use snowball::Among;~N~N");  
+    w(g, "use snowball::SnowballEnv;~N");
+    w(g, "use snowball::Among;~N~N");  
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1329,6 +1338,7 @@ extern void generate_program_rust(struct generator * g) {
     g->failure_str = str_new();
 
     generate_start_comment(g);
+    generate_allow_warnings(g);
     if (g->analyser->int_limits_used) {
         /* std::usize is used in the code generated for usize::MAX and usize::MIN */
         w(g, "use std::usize;~N~N");
