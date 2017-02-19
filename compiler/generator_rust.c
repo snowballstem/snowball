@@ -490,11 +490,9 @@ static void generate_not(struct generator * g, struct node * p) {
     str_delete(g->failure_str);
     g->failure_str = a1;
 
-    if (!g->unreachable) {
-        wsetlab_end(g, label);
-    } else {
-        w(g, "~-~M}~N");
-    }
+    if (!g->unreachable) write_failure(g);
+    w(g, "~-~M}~N");
+
     g->unreachable = false;
 
     if (keep_c) write_restorecursor(g, p, savevar);
