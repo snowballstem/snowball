@@ -109,10 +109,10 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_RUST
             if (eq(s, "-rust")) {
-              o->make_lang = LANG_RUST;
-              o->widechars = false;
-              o->utf8 = true;
-              continue;
+                o->make_lang = LANG_RUST;
+                o->widechars = false;
+                o->utf8 = true;
+                continue;
             }
 #endif
 #ifndef DISABLE_JAVA
@@ -295,12 +295,12 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_RUST
                 if (o->make_lang == LANG_RUST) {
-                  symbol * b = add_s_to_b(0, s);
-                  b = add_s_to_b(b, ".rs");
-                  o->output_src = get_output(b);
-                  lose_b(b);
-                  generate_program_rust(g);
-                  fclose(o->output_src);
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".rs");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_rust(g);
+                    fclose(o->output_src);
                 }
 #endif
                 close_generator(g);
