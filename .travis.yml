@@ -24,12 +24,12 @@ matrix:
 #
 # Also, install rust using rustup.rs
 before_install:
-- curl https://sh.rustup.rs -sSf -o rustup.sh
-- chmod ugo+x rustup.sh
-- ./rustup.sh -y
-- source "$HOME/.cargo/env"
-- rm rustup.sh
-- git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+  - [ -z "$RUST" ] ||  curl https://sh.rustup.rs -sSf -o rustup.sh
+  - [ -z "$RUST" ] || chmod ugo+x rustup.sh
+  - [ -z "$RUST" ] || ./rustup.sh -y
+  - [ -z "$RUST" ] || source "$HOME/.cargo/env"
+  - [ -z "$RUST" ] || rm rustup.sh
+  - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - test -z "$c_tests" || make
   - test -z "$c_tests" || make check STEMMING_DATA=snowball-data
