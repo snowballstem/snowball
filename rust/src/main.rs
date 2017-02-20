@@ -75,7 +75,7 @@ fn main() {
 }
 
 
-/// Wrapps a usable interface around the actual stemmer implementation
+/// Wraps a usable interface around the actual stemmer implementation
 pub struct Stemmer {
     stemmer: Box<Fn(&mut SnowballEnv) -> bool>,
 }

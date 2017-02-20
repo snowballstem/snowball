@@ -75,7 +75,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
     while (i < SIZE(p)) {
         int ch;
         i += get_utf8(p + i, &ch);
-        if (32 <= ch && ch <= 127) {
+        if (32 <= ch && ch < 127) {
             if (ch == '\"' || ch == '\\') write_string(g, "\\");
             write_char(g, ch);
         } else {
@@ -297,7 +297,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
-   the command does not touch the cursor. This and repeat_score() could be
+   command does not touch the cursor. This and repeat_score() could be
    elaborated almost indefinitely.
 */
 
@@ -633,7 +633,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->failure_str = a1;
 
     write_check_limit(g, p);
-    write_inc_cursor(g, p);    
+    write_inc_cursor(g, p);
     write_block_end(g);
 
     str_delete(savevar);
@@ -657,7 +657,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 
 static void generate_repeat(struct generator * g, struct node * p, struct str * loopvar) {
 
-     struct str * savevar = vars_newname(g);
+    struct str * savevar = vars_newname(g);
     int keep_c = repeat_restore(g, p->left);
     int replab = new_label(g);
     g->I[0] = replab;
@@ -853,8 +853,8 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (keep_c) writef(g, "~Mlet c = env.cursor;~N", p);
-    //Copying limits and cursors is necessary here because the rust borrowchecker does not like
-    //taking something from someone you are about to mutate...
+    /* Copying limits and cursors is necessary here because the rust borrowchecker does not like */
+    /* taking something from someone you are about to mutate... */
     if (p->mode == m_forward) {
         writef(g, "~Mlet (bra, ket) = (env.cursor, env.limit);~N", p);
         writef(g, "~Menv.insert(bra, ket, ", p);
@@ -956,7 +956,7 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
     g->S[0] = s;
     w(g, "~Mif !(~V0 ~S0 ");
     generate_AE(g, p->AE);
-        w(g, ")");
+    w(g, ")");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -1034,7 +1034,6 @@ static void generate_define(struct generator * g, struct node * p) {
         w(g, "~N~Mpub fn ~W0(env: &mut SnowballEnv) -> bool {~+~N");
         generate_setup_context(g);
     }
-    // w(g, "~Mprintln!(\"~W0: \\t\\t\\t{:?}\", env);~N");
     if (p->amongvar_needed) w(g, "~Mlet mut among_var;~N");
     g->outbuf = str_new();
 
@@ -1066,7 +1065,6 @@ static void generate_substring(struct generator * g, struct node * p) {
         write_failure_if(g, "env.find_among~S0(~A_~I0, context) == 0", p);
     } else {
         writef(g, "~Mamong_var = env.find_among~S0(~A_~I0, context);~N", p);
-        //  writef(g, "~Mlet among_var = env.find_among~S0(~A_~I0, context);~N", p);
         write_failure_if(g, "among_var == 0", p);
     }
 }
@@ -1207,10 +1205,10 @@ static void generate_start_comment(struct generator * g) {
     w(g, "//! http://snowballstem.org/~N~N");
 }
 
-// rustc emmits warnings if variables don't match the style guide
-// (i.e. upper-case for globals, snake case for fields etc.)
-// To allow warning free compilation of generated code and
-// consistency with snowball variable namings we allow some kind of warnings here
+/* rustc emmits warnings if variables don't match the style guide */
+/* (i.e. upper-case for globals, snake case for fields etc.) */
+/* To allow warning free compilation of generated code and */
+/* consistency with snowball variable namings we allow some kind of warnings here */
 static void generate_allow_warnings(struct generator * g) {
 
     w(g, "#![allow(non_upper_case_globals)]~N");
