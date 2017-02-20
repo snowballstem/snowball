@@ -16,6 +16,7 @@ enum special_labels {
 };
 
 static int new_label(struct generator * g) {
+
     return g->next_label++;
 }
 
@@ -53,10 +54,12 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_hexdigit(struct generator * g, int n) {
+
     write_char(g, n < 10 ? n + '0' : n - 10 + 'A');
 }
 
 static void write_hex(struct generator * g, int ch) {
+
     write_string(g, "\\u{");
     {
         int i;
@@ -66,6 +69,7 @@ static void write_hex(struct generator * g, int ch) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
+
     int i = 0;
     write_string(g, "\"");
     while (i < SIZE(p)) {
@@ -83,11 +87,13 @@ static void write_literal_string(struct generator * g, symbol * p) {
 
 
 static void write_margin(struct generator * g) {
+
     int i;
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 static void write_comment(struct generator * g, struct node * p) {
+
     write_margin(g);
     write_string(g, "// ");
     write_string(g, name_of_token(p->type));
@@ -101,10 +107,12 @@ static void write_comment(struct generator * g, struct node * p) {
 }
 
 static void write_block_start(struct generator * g) {
+
     w(g, "~+{~N");
 }
 
 static void write_block_end(struct generator * g)    /* block end */ {
+
     w(g, "~-~M}~N");
 }
 
@@ -118,6 +126,7 @@ static void write_savecursor(struct generator * g, struct node * p,
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
+
     str_clear(out);
     str_append_string(out, "env.cursor = ");
     if (p->mode != m_forward) str_append_string(out, "env.limit - ");
@@ -137,20 +146,22 @@ static void write_restorecursor(struct generator * g, struct node * p,
 }
 
 static void write_inc_cursor(struct generator * g, struct node * p) {
+
     write_margin(g);
     write_string(g, p->mode == m_forward ? "env.next_char();" : "env.previous_char();");
     write_newline(g);
 }
 
 static void wsetlab_begin(struct generator * g, int n) {
+
     g->I[0] = n;
     w(g, "~M'lab~I0: loop {~N~+");
 }
 
 static void wsetlab_end(struct generator * g, int n) {
-   g->I[0] = n;                   
-   w(g, "~Mbreak 'lab~I0;~N");
-   w(g, "~-~M}~N");
+    g->I[0] = n;
+    w(g, "~Mbreak 'lab~I0;~N");
+    w(g, "~-~M}~N");
 }
 
 static void wgotol(struct generator * g, int n) {
@@ -191,6 +202,7 @@ static void write_failure_if(struct generator * g, char * s, struct node * p) {
 
 /* if at limit fail */
 static void write_check_limit(struct generator * g, struct node * p) {
+
     if (p->mode == m_forward) {
         write_failure_if(g, "env.cursor >= env.limit", p);
     } else {
@@ -987,23 +999,24 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 }
 
 static void generate_setup_context(struct generator * g) {
-  struct name * q;
-  w(g, "~Mlet mut context = &mut Context {~+~N");
-  for (q = g->analyser->names; q; q = q->next) {
-    g->V[0] = q;
-    switch (q->type) {
-    case t_string:
-      w(g, "~M~W0: String::new(),~N");
-      break;
-    case t_integer:
-      w(g, "~M~W0: 0,~N");
-      break;
-    case t_boolean:
-      w(g, "~M~W0: false,~N");
-      break;
+
+    struct name * q;
+    w(g, "~Mlet mut context = &mut Context {~+~N");
+    for (q = g->analyser->names; q; q = q->next) {
+        g->V[0] = q;
+        switch (q->type) {
+            case t_string:
+                w(g, "~M~W0: String::new(),~N");
+                break;
+            case t_integer:
+                w(g, "~M~W0: 0,~N");
+                break;
+            case t_boolean:
+                w(g, "~M~W0: false,~N");
+                break;
+        }
     }
-  }
-  w(g, "~-~M};~N");
+    w(g, "~-~M};~N");
 }
 
 
@@ -1189,6 +1202,7 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_start_comment(struct generator * g) {
+
     w(g, "//! This file was generated automatically by the Snowball to Rust compiler~N");
     w(g, "//! http://snowballstem.org/~N~N");
 }
@@ -1198,6 +1212,7 @@ static void generate_start_comment(struct generator * g) {
 // To allow warning free compilation of generated code and
 // consistency with snowball variable namings we allow some kind of warnings here
 static void generate_allow_warnings(struct generator * g) {
+
     w(g, "#![allow(non_upper_case_globals)]~N");
     w(g, "#![allow(non_snake_case)]~N");
     w(g, "#![allow(unused_variables)]~N");
@@ -1205,6 +1220,7 @@ static void generate_allow_warnings(struct generator * g) {
 }
 
 static void generate_class_begin(struct generator * g) {
+
     w(g, "use snowball::SnowballEnv;~N");
     w(g, "use snowball::Among;~N~N");  
 }
