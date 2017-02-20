@@ -94,6 +94,18 @@ static const char * name_of_type(int n) {
     }
 }
 
+static const char * name_of_name_type(int code) {
+    switch (code) {
+         default: fault(2);
+         case t_string: return "string";
+         case t_boolean: return "boolean";
+         case t_integer: return "integer";
+         case t_routine: return "routine";
+         case t_external: return "external";
+         case t_grouping: return "grouping";
+    }
+}
+
 static void count_error(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     if (t->error_count >= 20) { fprintf(stderr, "... etc\n"); exit(1); }
@@ -292,6 +304,7 @@ handle_as_name:
                     p->local_to = 0;
                     p->grouping = 0;
                     p->definition = 0;
+                    p->declaration_line_number = t->line_number;
                     a->name_count[type]++;
                     p->next = a->names;
                     a->names = p;
@@ -849,6 +862,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         p->next = 0;
         p->name = q;
         p->number = q ? q->count : 0;
+        p->line_number = a->tokeniser->line_number;
         p->b = create_b(0);
         while (true) {
             switch (read_token(t)) {
@@ -990,33 +1004,37 @@ extern void read_program(struct analyser * a) {
 
     if (a->tokeniser->error_count == 0) {
         struct name * q = a->names;
-        int warned = false;
         while (q) {
             if (!q->referenced) {
-                if (!warned) {
-                    fprintf(stderr, "Declared but not used:");
-                    warned = true;
+                fprintf(stderr, "%s:%d: warning: %s '",
+                        a->tokeniser->file,
+                        q->declaration_line_number,
+                        name_of_name_type(q->type));
+                report_b(stderr, q->b);
+                if (q->type == t_routine ||
+                    q->type == t_external ||
+                    q->type == t_grouping) {
+                    fprintf(stderr, "' declared but not defined\n");
+                } else {
+                    fprintf(stderr, "' defined but not used\n");
                 }
-                fprintf(stderr, " "); report_b(stderr, q->b);
+            } else if (!q->used &&
+                       (q->type == t_routine || q->type == t_grouping)) {
+                int line_num;
+                if (q->type == t_routine) {
+                    line_num = q->definition->line_number;
+                } else {
+                    line_num = q->grouping->line_number;
+                }
+                fprintf(stderr, "%s:%d: warning: %s '",
+                        a->tokeniser->file,
+                        line_num,
+                        name_of_name_type(q->type));
+                report_b(stderr, q->b);
+                fprintf(stderr, "' defined but not used\n");
             }
             q = q->next;
         }
-        if (warned) fprintf(stderr, "\n");
-
-        q = a->names;
-        warned = false;
-        while (q) {
-            if (! q->used && (q->type == t_routine ||
-                              q->type == t_grouping)) {
-                if (!warned) {
-                    fprintf(stderr, "Declared and defined but not used:");
-                    warned = true;
-                }
-                fprintf(stderr, " "); report_b(stderr, q->b);
-            }
-            q = q->next;
-        }
-        if (warned) fprintf(stderr, "\n");
     }
 }
 

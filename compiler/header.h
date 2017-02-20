@@ -143,6 +143,7 @@ struct name {
     byte used_in_among;         /* Function used in among? */
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
+    int declaration_line_number;/* Line number of declaration */
 
 };
 
@@ -184,6 +185,7 @@ struct grouping {
     int largest_ch;           /* character with max code */
     int smallest_ch;          /* character with min code */
     struct name * name;       /* so g->name->grouping == g */
+    int line_number;
 };
 
 struct node {
