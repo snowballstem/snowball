@@ -311,7 +311,7 @@ impl<'a> SnowballEnv<'a> {
                     self.cursor = c + w.0.len();
                     if res {
                         return w.2;
-                    };
+                    }
                 } else {
                     return w.2;
                 }
@@ -319,7 +319,7 @@ impl<'a> SnowballEnv<'a> {
             i = w.1;
             if i < 0 {
                 return 0;
-            };
+            }
         }
     }
 
@@ -385,7 +385,7 @@ impl<'a> SnowballEnv<'a> {
                     self.cursor = c - w.0.len();
                     if res {
                         return w.2;
-                    };
+                    }
                 } else {
                     return w.2;
                 }
@@ -393,7 +393,7 @@ impl<'a> SnowballEnv<'a> {
             i = w.1;
             if i < 0 {
                 return 0;
-            };
+            }
         }
     }
 }
