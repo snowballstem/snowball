@@ -1319,25 +1319,6 @@ static void generate_members(struct generator * g) {
     w(g, "~-}~N");
 }
 
-static void generate_copyfrom(struct generator * g) {
-
-    struct name * q;
-    if (g->copy_from_count == 0) return;
-    w(g, "~Mdef copy_from(self, other):~+~N");
-    for (q = g->analyser->names; q != 0; q = q->next) {
-        g->V[0] = q;
-        switch (q->type) {
-            case t_string:
-            case t_integer:
-            case t_boolean:
-                w(g, "~M~V0 = other.~W0~N");
-                break;
-        }
-    }
-    /* For Python 3, this can just be super(). */
-    w(g, "~Msuper(~n, self).copy_from(other)~N~-");
-}
-
 static void generate_methods(struct generator * g) {
 
     struct node * p = g->analyser->program;
@@ -1365,7 +1346,6 @@ extern void generate_program_rust(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
-    generate_copyfrom(g);
     generate_methods(g);
 
     output_str(g->options->output_src, g->outbuf);
