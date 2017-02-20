@@ -79,7 +79,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "u\"");
     for (i = 0; i < SIZE(p); i++) {
         int ch = p[i];
-        if (32 <= ch && ch <= 127) {
+        if (32 <= ch && ch < 127) {
             if (ch == '\"' || ch == '\\') write_string(g, "\\");
             write_char(g, ch);
         } else {
