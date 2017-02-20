@@ -6,3 +6,4 @@
 /dist
 /jsx_out
 /python_out
+*.generated.cs
