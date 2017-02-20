@@ -83,28 +83,13 @@ pub struct Stemmer {
 impl Stemmer {
     /// Create a new stemmer from an algorithm
     pub fn create(lang: String) -> Self {
-        use snowball::algorithms;
-        match lang.as_str() {
-            "arabic" => Stemmer { stemmer: Box::new(algorithms::arabic_stemmer::stem) },
-            "danish" => Stemmer { stemmer: Box::new(algorithms::danish_stemmer::stem) },
-            "dutch" => Stemmer { stemmer: Box::new(algorithms::dutch_stemmer::stem) },
-            "english" => Stemmer { stemmer: Box::new(algorithms::english_stemmer::stem) },
-            "finnish" => Stemmer { stemmer: Box::new(algorithms::finnish_stemmer::stem) },
-            "french" => Stemmer { stemmer: Box::new(algorithms::french_stemmer::stem) },
-            "german" => Stemmer { stemmer: Box::new(algorithms::german_stemmer::stem) },
-            "hungarian" => Stemmer { stemmer: Box::new(algorithms::hungarian_stemmer::stem) },
-            "italian" => Stemmer { stemmer: Box::new(algorithms::italian_stemmer::stem) },
-            "norwegian" => Stemmer { stemmer: Box::new(algorithms::norwegian_stemmer::stem) },
-            "porter" => Stemmer { stemmer: Box::new(algorithms::porter_stemmer::stem) },
-            "portuguese" => Stemmer { stemmer: Box::new(algorithms::portuguese_stemmer::stem) },
-            "romanian" => Stemmer { stemmer: Box::new(algorithms::romanian_stemmer::stem) },
-            "russian" => Stemmer { stemmer: Box::new(algorithms::russian_stemmer::stem) },
-            "spanish" => Stemmer { stemmer: Box::new(algorithms::spanish_stemmer::stem) },
-            "swedish" => Stemmer { stemmer: Box::new(algorithms::swedish_stemmer::stem) },
-            "tamil" => Stemmer { stemmer: Box::new(algorithms::tamil_stemmer::stem) },
-            "turkish" => Stemmer { stemmer: Box::new(algorithms::turkish_stemmer::stem) },
-            x => panic!("Unknown algorithm '{}'", x)
-        }
+        // Have a look at ../build.rs
+        // There we generate a file that is rust code for a closure that returns a stemmer.
+        // We match against all the algorithms in src/snowball/algoritms/ folder.
+        // Alas, this canp not be included as a match statment or function because of rusts
+        // hygenic macros.
+        let match_language = include!(concat!(env!("OUT_DIR"), "/lang_matches.rs"));
+        match_language(lang)
     }
 
     /// Stem a single word
