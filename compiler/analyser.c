@@ -845,10 +845,10 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         NEW(grouping, p);
         if (a->groupings == 0) a->groupings = p; else a->groupings_end->next = p;
         a->groupings_end = p;
-        q->grouping = p;
+        if (q) q->grouping = p;
         p->next = 0;
         p->name = q;
-        p->number = q->count;
+        p->number = q ? q->count : 0;
         p->b = create_b(0);
         while (true) {
             switch (read_token(t)) {
@@ -915,8 +915,26 @@ static void read_define_routine(struct analyser * a, struct name * q) {
 static void read_define(struct analyser * a) {
     if (get_token(a, c_name)) {
         struct name * q = find_name(a);
-        if (q != 0 && q->type == t_grouping) read_define_grouping(a, q);
-            else read_define_routine(a, q);
+        int type;
+        if (q) {
+            type = q->type;
+        } else {
+            /* No declaration, so sniff next token - if it is 'as' then parse
+             * as a routine, otherwise as a grouping.
+             */
+            if (read_token(a->tokeniser) == c_as) {
+                type = t_routine;
+            } else {
+                type = t_grouping;
+            }
+            a->tokeniser->token_held = true;
+        }
+
+        if (type == t_grouping) {
+            read_define_grouping(a, q);
+        } else {
+            read_define_routine(a, q);
+        }
     }
 }
 
