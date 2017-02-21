@@ -929,15 +929,15 @@ static void generate_dollar(struct generator * g, struct node * p) {
     ++g->copy_from_count;
     str_assign(g->failure_str, "*env = ");
     str_append(g->failure_str, savevar_env);
-    str_append_string(g->failure_str, ";~N");
-    str_assign(g->failure_str, "*context = ");
+    str_append_string(g->failure_str, ";");
+    str_append_string(g->failure_str, "*context = ");
     str_append(g->failure_str, savevar_context);
-    str_append_string(g->failure_str, ";~N");
+    str_append_string(g->failure_str, ";");
     g->B[0] = str_data(savevar_env);
     g->B[1] = str_data(savevar_context);
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Mlet ~B1 = context.clone();~N"
-              "~Menv.set_current(~V0);~N"
+              "~Menv.set_current_s(~V0.clone());~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len();~N", p);
     generate(g, p->left);
