@@ -922,15 +922,21 @@ static void generate_setlimit(struct generator * g, struct node * p) {
  * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
 
-    struct str * savevar = vars_newname(g);
+    struct str * savevar_env = vars_newname(g);
+    struct str * savevar_context = vars_newname(g);
     write_comment(g, p);
     g->V[0] = p->name;
     ++g->copy_from_count;
     str_assign(g->failure_str, "*env = ");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ";");
-    g->B[0] = str_data(savevar);
+    str_append(g->failure_str, savevar_env);
+    str_append_string(g->failure_str, ";~N");
+    str_assign(g->failure_str, "*context = ");
+    str_append(g->failure_str, savevar_context);
+    str_append_string(g->failure_str, ";~N");
+    g->B[0] = str_data(savevar_env);
+    g->B[1] = str_data(savevar_context);
     writef(g, "~Mlet ~B0 = env.clone();~N"
+              "~Mlet ~B1 = context.clone();~N"
               "~Menv.set_current(~V0);~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len();~N", p);
@@ -940,7 +946,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
         write_str(g, g->failure_str);
         write_newline(g);
     }
-    str_delete(savevar);
+    str_delete(savevar_env);
+    str_delete(savevar_context);
 }
 
 static void generate_integer_assign(struct generator * g, struct node * p, char * s) {
@@ -1301,6 +1308,7 @@ static void generate_groupings(struct generator * g) {
 static void generate_members(struct generator * g) {
   
     struct name * q;
+    w(g, "#[derive(Clone)]~N");
     w(g, "struct Context {~+~N");
     for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
