@@ -5,7 +5,7 @@ use std::io::Write;
 use std::path::Path;
 
 
-// This build script makes the code independend from the algorithms declared
+// This build script makes the code independent from the algorithms declared
 // in the makefile.
 // We check which stemmers were generated and then produce the corresponding
 // includes for src/algorithms/mod.rs and a closure for src/main.rs to match

@@ -86,7 +86,7 @@ impl Stemmer {
         // Have a look at ../build.rs
         // There we generate a file that is rust code for a closure that returns a stemmer.
         // We match against all the algorithms in src/snowball/algoritms/ folder.
-        // Alas, this canp not be included as a match statment or function because of rusts
+        // Alas, this can not be included as a match statment or function because of rust's
         // hygenic macros.
         let match_language = include!(concat!(env!("OUT_DIR"), "/lang_matches.rs"));
         match_language(lang)

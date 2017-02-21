@@ -1205,7 +1205,7 @@ static void generate_start_comment(struct generator * g) {
     w(g, "//! http://snowballstem.org/~N~N");
 }
 
-/* rustc emmits warnings if variables don't match the style guide */
+/* rustc emits warnings if variables don't match the style guide */
 /* (i.e. upper-case for globals, snake case for fields etc.) */
 /* To allow warning free compilation of generated code and */
 /* consistency with snowball variable namings we allow some kind of warnings here */
