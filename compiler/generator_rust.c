@@ -926,7 +926,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar_context = vars_newname(g);
     write_comment(g, p);
     g->V[0] = p->name;
-    ++g->copy_from_count;
     str_assign(g->failure_str, "*env = ");
     str_append(g->failure_str, savevar_env);
     str_append_string(g->failure_str, ";");
