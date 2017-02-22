@@ -871,7 +871,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    w(g, "~Mif !env.slice_from(");
+    w(g, "~Mif !env.slice_from(&");
     generate_address(g, p);
     writef(g, ") {~N"
               "~+~Mreturn false;~N~-~M}~N", p);
@@ -923,30 +923,21 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar_env = vars_newname(g);
-    struct str * savevar_context = vars_newname(g);
     write_comment(g, p);
     g->V[0] = p->name;
-    str_assign(g->failure_str, "*env = ");
-    str_append(g->failure_str, savevar_env);
-    str_append_string(g->failure_str, ";");
-    str_append_string(g->failure_str, "*context = ");
-    str_append(g->failure_str, savevar_context);
-    str_append_string(g->failure_str, ";");
     g->B[0] = str_data(savevar_env);
-    g->B[1] = str_data(savevar_context);
     writef(g, "~Mlet ~B0 = env.clone();~N"
-              "~Mlet ~B1 = context.clone();~N"
               "~Menv.set_current_s(~V0.clone());~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+        //Update variable.
+        w(g, "~M~V0 = env.current.clone().into_owned();~N");
+        //Reset env
+        w(g, "~M*env = ~B0;~N");
     }
     str_delete(savevar_env);
-    str_delete(savevar_context);
 }
 
 static void generate_integer_assign(struct generator * g, struct node * p, char * s) {
