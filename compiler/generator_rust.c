@@ -857,10 +857,16 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     /* taking something from someone you are about to mutate... */
     if (p->mode == m_forward) {
         writef(g, "~Mlet (bra, ket) = (env.cursor, env.limit);~N", p);
-        writef(g, "~Menv.insert(bra, ket, ", p);
     } else {
         writef(g, "~Mlet (bra, ket) = (env.limit_backward, env.cursor);~N", p);
+    }
+    /*If we deal with a string variable which is of type String*/
+    /*We need to pass it by referene not by value*/
+    /*Literalstrings on the other hand are of type &'static str we can pass them by value*/
+    if (p->literalstring) {
         writef(g, "~Menv.insert(bra, ket, ", p);
+    } else {
+        writef(g, "~Menv.insert(bra, ket, &", p);
     }
     generate_address(g, p);
     writef(g, ");~N", p);
@@ -939,6 +945,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~Menv.limit = env.current.len();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
+        g->V[0] = p->name;
         /* Update string variable. */
         w(g, "~M~V0 = env.current.clone().into_owned();~N");
         /* Reset env */
