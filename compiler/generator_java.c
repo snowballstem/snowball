@@ -480,9 +480,10 @@ static void generate_or(struct generator * g, struct node * p) {
 static void generate_backwards(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    writef(g, "~Mlimit_backward = cursor; cursor = limit;~N", p);
+    writef(g, "~Mlimit_backward = cursor;~N"
+              "~Mcursor = limit;~N", p);
     generate(g, p->left);
-    w(g, "~Mcursor = limit_backward;");
+    w(g, "~Mcursor = limit_backward;~N");
 }
 
 
