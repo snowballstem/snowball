@@ -268,7 +268,7 @@ static void w(struct generator * g, const char * s) {
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
-    char * s;
+    const char * s;
     switch (p->type) {
         case c_name:
             write_varref(g, p->name); break;
@@ -1380,8 +1380,8 @@ extern void generate_program_java(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
-    generate_copyfrom(g);
     generate_methods(g);
+    generate_copyfrom(g);
     generate_equals(g);
 
     generate_class_end(g);
