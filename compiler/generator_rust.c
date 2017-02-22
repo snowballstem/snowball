@@ -871,7 +871,14 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    w(g, "~Mif !env.slice_from(&");
+    /*If we deal with a string variable which is of type String*/
+    /*We need to pass it by referene not by value*/
+    /*Literalstrings on the other hand are of type &'static str we can pass them by value*/
+    if (p->literalstring) {
+        w(g, "~Mif !env.slice_from(");
+    } else {
+        w(g, "~Mif !env.slice_from(&");
+    }
     generate_address(g, p);
     writef(g, ") {~N"
               "~+~Mreturn false;~N~-~M}~N", p);
@@ -932,9 +939,9 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~Menv.limit = env.current.len();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
-        //Update variable.
+        /* Update string variable. */
         w(g, "~M~V0 = env.current.clone().into_owned();~N");
-        //Reset env
+        /* Reset env */
         w(g, "~M*env = ~B0;~N");
     }
     str_delete(savevar_env);
