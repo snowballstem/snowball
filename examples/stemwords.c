@@ -27,8 +27,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
         {
             int i = 0;
 	    int inlen = 0;
-            while(1) {
-                if (ch == '\n' || ch == EOF) break;
+            while (ch != '\n' && ch != EOF) {
                 if (i == lim) {
                     sb_symbol * newb;
 		    newb = (sb_symbol *)
@@ -54,29 +53,27 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                     fprintf(stderr, "Out of memory");
                     exit(1);
                 }
-                else
-		{
-		    if (pretty == 1) {
-			fwrite(b, i, 1, f_out);
-			fputs(" -> ", f_out);
-		    } else if (pretty == 2) {
-			fwrite(b, i, 1, f_out);
-			if (sb_stemmer_length(stemmer) > 0) {
-			    int j;
-			    if (inlen < 30) {
-				for (j = 30 - inlen; j > 0; j--)
-				    fputs(" ", f_out);
-			    } else {
-				fputs("\n", f_out);
-				for (j = 30; j > 0; j--)
-				    fputs(" ", f_out);
-			    }
-			}
-		    }
 
-		    fputs((const char *)stemmed, f_out);
-		    putc('\n', f_out);
-		}
+                if (pretty == 1) {
+                    fwrite(b, i, 1, f_out);
+                    fputs(" -> ", f_out);
+                } else if (pretty == 2) {
+                    fwrite(b, i, 1, f_out);
+                    if (sb_stemmer_length(stemmer) > 0) {
+                        int j;
+                        if (inlen < 30) {
+                            for (j = 30 - inlen; j > 0; j--)
+                                fputs(" ", f_out);
+                        } else {
+                            fputs("\n", f_out);
+                            for (j = 30; j > 0; j--)
+                                fputs(" ", f_out);
+                        }
+                    }
+                }
+
+                fputs((const char *)stemmed, f_out);
+                putc('\n', f_out);
             }
         }
     }
