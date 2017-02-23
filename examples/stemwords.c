@@ -114,23 +114,22 @@ usage(int n)
 int
 main(int argc, char * argv[])
 {
-    char * in = 0;
-    char * out = 0;
+    const char * in = 0;
+    const char * out = 0;
     FILE * f_in;
     FILE * f_out;
     struct sb_stemmer * stemmer;
 
-    char * language = "english";
-    char * charenc = NULL;
+    const char * language = "english";
+    const char * charenc = NULL;
 
-    char * s;
     int i = 1;
     pretty = 0;
 
     progname = argv[0];
 
     while(i < argc) {
-	s = argv[i++];
+        const char * s = argv[i++];
 	if (s[0] == '-') {
 	    if (strcmp(s, "-o") == 0) {
 		if (i >= argc) {
