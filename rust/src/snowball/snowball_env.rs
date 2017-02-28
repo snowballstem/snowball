@@ -82,7 +82,7 @@ impl<'a> SnowballEnv<'a> {
     pub fn eq_s_b(&mut self, s: &str) -> bool {
         if (self.cursor as i32 - self.limit_backward as i32) < s.len() as i32 {
             false
-            // Check if cursor -s.len is a char boundry. if not well... return false obv
+            // Check if cursor -s.len is a char boundary. if not well... return false obv
         } else if !self.current.is_char_boundary(self.cursor - s.len()) ||
                   !self.current[self.cursor - s.len()..].starts_with(s) {
             false
@@ -99,7 +99,7 @@ impl<'a> SnowballEnv<'a> {
         true
     }
 
-    /// Move cursor to next charater
+    /// Move cursor to next character
     pub fn next_char(&mut self) {
         self.cursor += 1;
         while !self.current.is_char_boundary(self.cursor) {
