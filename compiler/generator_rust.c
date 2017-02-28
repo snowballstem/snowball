@@ -853,16 +853,18 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (keep_c) writef(g, "~Mlet c = env.cursor;~N", p);
-    /* Copying limits and cursors is necessary here because the rust borrowchecker does not like */
-    /* taking something from someone you are about to mutate... */
+    /* Copying limits and cursors is necessary here because the rust
+     * borrowchecker does not like taking something from someone you are about
+     * to mutate... */
     if (p->mode == m_forward) {
         writef(g, "~Mlet (bra, ket) = (env.cursor, env.limit);~N", p);
     } else {
         writef(g, "~Mlet (bra, ket) = (env.limit_backward, env.cursor);~N", p);
     }
-    /*If we deal with a string variable which is of type String*/
-    /*We need to pass it by referene not by value*/
-    /*Literalstrings on the other hand are of type &'static str we can pass them by value*/
+    /* If we deal with a string variable which is of type String we need to
+     * pass it by reference not by value.  Literalstrings on the other hand are
+     * of type &'static str so we can pass them by value.
+     */
     if (p->literalstring) {
         writef(g, "~Menv.insert(bra, ket, ", p);
     } else {
@@ -877,9 +879,10 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    /*If we deal with a string variable which is of type String*/
-    /*We need to pass it by referene not by value*/
-    /*Literalstrings on the other hand are of type &'static str we can pass them by value*/
+    /* If we deal with a string variable which is of type String we need to
+     * pass it by reference not by value.  Literalstrings on the other hand are
+     * of type &'static str so we can pass them by value.
+     */
     if (p->literalstring) {
         w(g, "~Mif !env.slice_from(");
     } else {
