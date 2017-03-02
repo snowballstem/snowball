@@ -17,6 +17,11 @@ jsx_runtime_src_dir = jsx
 jsx_runtime_dir = lib
 jsx_sample_dir = sample
 
+cargo ?= cargo
+cargoflags ?= 
+rust_src_main_dir = rust/src
+rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
+
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -42,7 +47,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/driver.c \
 		   compiler/generator_java.c \
 		   compiler/generator_jsx.c \
-		   compiler/generator_python.c
+		   compiler/generator_python.c \
+		   compiler/generator_rust.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \
@@ -101,6 +107,7 @@ JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JSX_SOURCES = $(libstemmer_algorithms:%=$(jsx_output_dir)/%-stemmer.jsx)
+RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -129,6 +136,7 @@ clean:
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(PYTHON_SOURCES) \
 	      $(JSX_SOURCES) jsx_stemwords \
+	      $(RUST_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
 	rm -rf dist
@@ -215,6 +223,13 @@ $(python_output_dir)/%_stemmer.py: algorithms/%/stem_Unicode.sbl snowball
 $(python_output_dir)/__init__.py:
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
+
+$(rust_src_dir)/%_stemmer.rs: algorithms/%/stem_Unicode.sbl snowball
+	@mkdir -p $(rust_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(rust_src_dir)/$${l}_stemmer"; \
+	echo "./snowball $< -rust -o $${o}"; \
+	./snowball $< -rust -o $${o}
 
 $(jsx_output_dir)/%-stemmer.jsx: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(jsx_output_dir)
@@ -440,6 +455,24 @@ THIN_FACTOR ?= 3
 # jsx_stemwords to run out of memory.  Also use for Python tests, which
 # take a long time (unless you use pypy).
 THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
+
+check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
+
+check_rust_%: $(STEMMING_DATA_ABS)/% 
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Rust"
+	@cd rust && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
 
 check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JSX"
