@@ -357,7 +357,7 @@ static void generate_AE(struct generator * g, struct node * p) {
    elaborated almost indefinitely.
 */
 
-static int K_needed(struct generator * g, struct node * p) {
+extern int K_needed(struct generator * g, struct node * p) {
     while (p) {
         switch (p->type) {
             case c_dollar:
@@ -446,7 +446,7 @@ static int repeat_score(struct generator * g, struct node * p) {
 
 /* tests if an expression requires cursor reinstatement in a repeat */
 
-static int repeat_restore(struct generator * g, struct node * p) {
+extern int repeat_restore(struct generator * g, struct node * p) {
     return repeat_score(g, p) >= 2;
 }
 

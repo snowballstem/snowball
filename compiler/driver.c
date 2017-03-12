@@ -26,6 +26,9 @@ static void print_arglist(void) {
 #ifndef DISABLE_JSX
                     "             [-jsx]\n"
 #endif
+#ifndef DISABLE_RUST
+                    "             [-rust]\n"
+#endif
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -101,6 +104,14 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             if (eq(s, "-jsx")) {
                 o->make_lang = LANG_JSX;
                 o->widechars = true;
+                continue;
+            }
+#endif
+#ifndef DISABLE_RUST
+            if (eq(s, "-rust")) {
+                o->make_lang = LANG_RUST;
+                o->widechars = false;
+                o->utf8 = true;
                 continue;
             }
 #endif
@@ -279,6 +290,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_jsx(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_RUST
+                if (o->make_lang == LANG_RUST) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".rs");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_rust(g);
                     fclose(o->output_src);
                 }
 #endif

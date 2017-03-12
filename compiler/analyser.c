@@ -9,7 +9,7 @@ typedef enum {
     e_unexpected_token = 1,
     e_string_omitted = 2,
     e_unexpected_token_in_among = 3,
-    // For codes above here, report "after " t->previous_token after the error.
+    /* For codes above here, report "after " t->previous_token after the error. */
     e_unresolved_substring = 14,
     e_not_allowed_inside_reverse = 15,
     e_empty_grouping = 16,
@@ -17,7 +17,7 @@ typedef enum {
     e_empty_among = 18,
     e_adjacent_bracketed_in_among = 19,
     e_substring_preceded_by_substring = 20,
-    // For codes below here, tokeniser->b is printed before the error.
+    /* For codes below here, tokeniser->b is printed before the error. */
     e_redeclared = 30,
     e_undeclared = 31,
     e_declared_as_different_mode = 32,
