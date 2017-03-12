@@ -94,6 +94,18 @@ static const char * name_of_type(int n) {
     }
 }
 
+static const char * name_of_name_type(int code) {
+    switch (code) {
+         default: fault(2);
+         case t_string: return "string";
+         case t_boolean: return "boolean";
+         case t_integer: return "integer";
+         case t_routine: return "routine";
+         case t_external: return "external";
+         case t_grouping: return "grouping";
+    }
+}
+
 static void count_error(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     if (t->error_count >= 20) { fprintf(stderr, "... etc\n"); exit(1); }
@@ -228,13 +240,24 @@ static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
 
 static void check_name_type(struct analyser * a, struct name * p, int type) {
     switch (type) {
-        case 's': if (p->type == t_string) return; break;
-        case 'i': if (p->type == t_integer) return; break;
-        case 'b': if (p->type == t_boolean) return; break;
-        case 'R': if (p->type == t_grouping) return;
-        case 'r': if (p->type == t_routine ||
-                      p->type == t_external) return; break;
-        case 'g': if (p->type == t_grouping) return; break;
+        case 's':
+            if (p->type == t_string) return;
+            break;
+        case 'i':
+            if (p->type == t_integer) return;
+            break;
+        case 'b':
+            if (p->type == t_boolean) return;
+            break;
+        case 'R':
+            if (p->type == t_grouping) return;
+            /* FALLTHRU */
+        case 'r':
+            if (p->type == t_routine || p->type == t_external) return;
+            break;
+        case 'g':
+            if (p->type == t_grouping) return;
+            break;
     }
     error2(a, e_not_of_type_x, type);
 }
@@ -281,7 +304,8 @@ handle_as_name:
                     p->local_to = 0;
                     p->grouping = 0;
                     p->definition = 0;
-                    a->name_count[type] ++;
+                    p->declaration_line_number = t->line_number;
+                    a->name_count[type]++;
                     p->next = a->names;
                     a->names = p;
                     if (token != c_name) {
@@ -358,8 +382,18 @@ static struct node * read_AE(struct analyser * a, int B) {
     struct node * q;
     switch (read_token(t)) {
         case c_minus: /* monadic */
+            q = read_AE(a, 100);
+            if (q->type == c_neg) {
+                /* Optimise away double negation, which avoids generators
+                 * having to worry about generating "--" (decrement operator
+                 * in many languages).
+                 */
+                p = q->right;
+                /* Don't free q, it's in the linked list a->nodes. */
+                break;
+            }
             p = new_node(a, c_neg);
-            p->right = read_AE(a, 100);
+            p->right = q;
             break;
         case c_bra:
             p = read_AE(a, 0);
@@ -824,10 +858,11 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         NEW(grouping, p);
         if (a->groupings == 0) a->groupings = p; else a->groupings_end->next = p;
         a->groupings_end = p;
-        q->grouping = p;
+        if (q) q->grouping = p;
         p->next = 0;
         p->name = q;
-        p->number = q->count;
+        p->number = q ? q->count : 0;
+        p->line_number = a->tokeniser->line_number;
         p->b = create_b(0);
         while (true) {
             switch (read_token(t)) {
@@ -894,8 +929,26 @@ static void read_define_routine(struct analyser * a, struct name * q) {
 static void read_define(struct analyser * a) {
     if (get_token(a, c_name)) {
         struct name * q = find_name(a);
-        if (q != 0 && q->type == t_grouping) read_define_grouping(a, q);
-            else read_define_routine(a, q);
+        int type;
+        if (q) {
+            type = q->type;
+        } else {
+            /* No declaration, so sniff next token - if it is 'as' then parse
+             * as a routine, otherwise as a grouping.
+             */
+            if (read_token(a->tokeniser) == c_as) {
+                type = t_routine;
+            } else {
+                type = t_grouping;
+            }
+            a->tokeniser->token_held = true;
+        }
+
+        if (type == t_grouping) {
+            read_define_grouping(a, q);
+        } else {
+            read_define_routine(a, q);
+        }
     }
 }
 
@@ -939,9 +992,11 @@ extern void read_program(struct analyser * a) {
         while (q) {
             switch (q->type) {
                 case t_external: case t_routine:
-                    if (q->used && q->definition == 0) error4(a, q); break;
+                    if (q->used && q->definition == 0) error4(a, q);
+                    break;
                 case t_grouping:
-                    if (q->used && q->grouping == 0) error4(a, q); break;
+                    if (q->used && q->grouping == 0) error4(a, q);
+                    break;
             }
             q = q->next;
         }
@@ -949,33 +1004,37 @@ extern void read_program(struct analyser * a) {
 
     if (a->tokeniser->error_count == 0) {
         struct name * q = a->names;
-        int warned = false;
         while (q) {
             if (!q->referenced) {
-                if (!warned) {
-                    fprintf(stderr, "Declared but not used:");
-                    warned = true;
+                fprintf(stderr, "%s:%d: warning: %s '",
+                        a->tokeniser->file,
+                        q->declaration_line_number,
+                        name_of_name_type(q->type));
+                report_b(stderr, q->b);
+                if (q->type == t_routine ||
+                    q->type == t_external ||
+                    q->type == t_grouping) {
+                    fprintf(stderr, "' declared but not defined\n");
+                } else {
+                    fprintf(stderr, "' defined but not used\n");
                 }
-                fprintf(stderr, " "); report_b(stderr, q->b);
+            } else if (!q->used &&
+                       (q->type == t_routine || q->type == t_grouping)) {
+                int line_num;
+                if (q->type == t_routine) {
+                    line_num = q->definition->line_number;
+                } else {
+                    line_num = q->grouping->line_number;
+                }
+                fprintf(stderr, "%s:%d: warning: %s '",
+                        a->tokeniser->file,
+                        line_num,
+                        name_of_name_type(q->type));
+                report_b(stderr, q->b);
+                fprintf(stderr, "' defined but not used\n");
             }
             q = q->next;
         }
-        if (warned) fprintf(stderr, "\n");
-
-        q = a->names;
-        warned = false;
-        while (q) {
-            if (! q->used && (q->type == t_routine ||
-                              q->type == t_grouping)) {
-                if (!warned) {
-                    fprintf(stderr, "Declared and defined but not used:");
-                    warned = true;
-                }
-                fprintf(stderr, " "); report_b(stderr, q->b);
-            }
-            q = q->next;
-        }
-        if (warned) fprintf(stderr, "\n");
     }
 }
 

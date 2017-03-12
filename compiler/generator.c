@@ -353,7 +353,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
-   the command does not touch the cursor. This and repeat_score() could be
+   command does not touch the cursor. This and repeat_score() could be
    elaborated almost indefinitely.
 */
 
@@ -517,7 +517,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
 static void generate_backwards(struct generator * g, struct node * p) {
 
-    writef(g,"~Mz->lb = z->c; z->c = z->l;~C~N", p);
+    writef(g, "~Mz->lb = z->c; z->c = z->l;~C~N", p);
     generate(g, p->left);
     w(g, "~Mz->c = z->lb;~N");
 }
@@ -1088,7 +1088,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             if (n_cases > 2) break;
         }
         if (block == -1) {
-            if (ch == cases[0]) continue;
+            if (n_cases > 0 && ch == cases[0]) continue;
             if (n_cases < 2) {
                 cases[n_cases++] = ch;
             } else if (ch != cases[1]) {
