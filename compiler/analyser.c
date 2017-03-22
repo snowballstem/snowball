@@ -76,33 +76,33 @@ static struct node * new_node(struct analyser * a, int type) {
 
 static const char * name_of_mode(int n) {
     switch (n) {
-         default: fault(0);
-         case m_backward: return "string backward";
-         case m_forward:  return "string forward";
-    /*   case m_integer:  return "integer";  */
+        default: fault(0);
+        case m_backward: return "string backward";
+        case m_forward:  return "string forward";
+    /*  case m_integer:  return "integer";  */
     }
 }
 
 static const char * name_of_type(int n) {
     switch (n) {
-         default: fault(1);
-         case 's': return "string";
-         case 'i': return "integer";
-         case 'r': return "routine";
-         case 'R': return "routine or grouping";
-         case 'g': return "grouping";
+        default: fault(1);
+        case 's': return "string";
+        case 'i': return "integer";
+        case 'r': return "routine";
+        case 'R': return "routine or grouping";
+        case 'g': return "grouping";
     }
 }
 
 static const char * name_of_name_type(int code) {
     switch (code) {
-         default: fault(2);
-         case t_string: return "string";
-         case t_boolean: return "boolean";
-         case t_integer: return "integer";
-         case t_routine: return "routine";
-         case t_external: return "external";
-         case t_grouping: return "grouping";
+        default: fault(2);
+        case t_string: return "string";
+        case t_boolean: return "boolean";
+        case t_integer: return "integer";
+        case t_routine: return "routine";
+        case t_external: return "external";
+        case t_grouping: return "grouping";
     }
 }
 
@@ -920,8 +920,8 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     if (q) q->definition = p->left;
 
     if (a->substring != 0) {
-         error2(a, e_unresolved_substring, a->substring->line_number);
-         a->substring = 0;
+        error2(a, e_unresolved_substring, a->substring->line_number);
+        a->substring = 0;
     }
     p->amongvar_needed = a->amongvar_needed;
 }

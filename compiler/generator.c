@@ -261,6 +261,7 @@ static void write_data_address(struct generator * g, struct node * p) {
 static void writef(struct generator * g, const char * input, struct node * p) {
     int i = 0;
     int l = strlen(input);
+
     while (i < l) {
         int ch = input[i++];
         if (ch != '~') {
@@ -302,7 +303,7 @@ static void w(struct generator * g, const char * s) {
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
-    char * s;
+    const char * s;
     switch (p->type) {
         case c_name:
             write_varref(g, p->name); break;
@@ -910,6 +911,8 @@ static void generate_setlimit(struct generator * g, struct node * p) {
       "~}");
 }
 
+/* dollar sets snowball up to operate on a string variable as if it were the
+ * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
 
     int used = g->label_used;
@@ -1176,7 +1179,7 @@ static void generate_among(struct generator * g, struct node * p) {
     if (x->substring == 0) generate_substring(g, p);
     if (x->command_count == 0 && x->starter == 0) return;
 
-    if (x->starter) generate(g, x->starter);
+    if (x->starter != 0) generate(g, x->starter);
 
     writef(g, "~Mswitch (among_var) {~C~+"
               "~Mcase 0: ~f~N", p);
@@ -1395,16 +1398,14 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    {
-        g->V[0] = q->name;
+    g->V[0] = q->name;
 
-        w(g, "static const unsigned char ~V0[] = { ");
-        for (i = 0; i < size; i++) {
-             write_int(g, map[i]);
-             if (i < size - 1) w(g, ", ");
-        }
-        w(g, " };~N~N");
+    w(g, "static const unsigned char ~V0[] = { ");
+    for (i = 0; i < size; i++) {
+        write_int(g, map[i]);
+        if (i < size - 1) w(g, ", ");
     }
+    w(g, " };~N~N");
     lose_b(map);
 }
 

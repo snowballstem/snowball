@@ -212,7 +212,6 @@ static void write_check_limit(struct generator * g, struct node * p) {
 
 /* Formatted write. */
 static void writef(struct generator * g, const char * input, struct node * p) {
-
     int i = 0;
     int l = strlen(input);
 
@@ -655,7 +654,6 @@ static void generate_atmark(struct generator * g, struct node * p) {
     g->unreachable = false;
 }
 
-
 static void generate_hop(struct generator * g, struct node * p) {
 
     write_comment(g, p);
@@ -782,7 +780,6 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
-
     struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
     write_comment(g, p);
@@ -893,7 +890,6 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
-
     symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
@@ -902,7 +898,6 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 }
 
 static void generate_define(struct generator * g, struct node * p) {
-
     struct name * q = p->name;
 
     struct str * saved_output = g->outbuf;
@@ -961,7 +956,7 @@ static void generate_among(struct generator * g, struct node * p) {
     g->unreachable = false;
     w(g, "~-");
 
-    while (p != 0) {
+    while (p) {
         if (p->type == c_bra && p->left != 0) {
             g->I[0] = case_number++;
             w(g, "~Melif among_var == ~I0:~N~+");
@@ -1134,11 +1129,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
 }
 
 static void generate_amongs(struct generator * g) {
-
-    struct among * x = g->analyser->amongs;
-    while (x != 0) {
+    struct among * x;
+    for (x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
-        x = x->next;
     }
 }
 
