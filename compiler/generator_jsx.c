@@ -130,7 +130,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "this.limit - ";
     write_declare(g, "~B0 : int", p);
-    writef(g, "~M~B0 = ~S1this.cursor;~N" , p);
+    writef(g, "~M~B0 = ~S1this.cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -737,8 +737,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
               "~Mif (~V0 == '')~N"
               "~M{~N"
               "~+~Mreturn false;~N~-"
-              "~M}~N"
-            , p);
+              "~M}~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {

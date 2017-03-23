@@ -125,7 +125,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "self.limit - ";
-    writef(g, "~M~B0 = ~S1self.cursor~N" , p);
+    writef(g, "~M~B0 = ~S1self.cursor~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -727,8 +727,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~M~V0 = self.slice_to(~V0)~N"
               "~Mif ~V0 == '':~N"
-              "~+~Mreturn False~N~-"
-            , p);
+              "~+~Mreturn False~N~-", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {

@@ -116,7 +116,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "limit - ";
-    writef(g, "~Mint ~B0 = ~S1cursor;~N" , p);
+    writef(g, "~Mint ~B0 = ~S1cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
