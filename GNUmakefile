@@ -18,7 +18,7 @@ jsx_runtime_dir = lib
 jsx_sample_dir = sample
 
 cargo ?= cargo
-cargoflags ?= 
+cargoflags ?=
 rust_src_main_dir = rust/src
 rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
 
@@ -458,7 +458,7 @@ THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
 
 check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
 
-check_rust_%: $(STEMMING_DATA_ABS)/% 
+check_rust_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Rust"
 	@cd rust && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
