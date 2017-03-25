@@ -4,11 +4,11 @@ dist: trusty
 matrix:
   include:
     - compiler: clang
-      env: c_tests=y PYTHON=pypy JAVA=java JAVAC=javac NPM=npm
+      env: c_tests=y cc_append=' -std=c90' PYTHON=pypy JAVA=java JAVAC=javac NPM=npm
     - compiler: gcc
       env: RUST=rust
     - compiler: gcc
-      env: c_tests=y PYTHON=python3.5 THIN_FACTOR=10
+      env: c_tests=y cc_append=' -std=c90' PYTHON=python3.5 THIN_FACTOR=10
     - compiler: gcc
       env: PYTHON=python3.3 THIN_FACTOR=10
     - compiler: gcc
@@ -31,8 +31,8 @@ before_install:
   - test -z "$RUST" || rm rustup.sh
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
-  - test -z "$c_tests" || make
-  - test -z "$c_tests" || make check STEMMING_DATA=snowball-data
+  - make CC="$CC$cc_append"
+  - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$NPM" || "$NPM" install -g jsx
