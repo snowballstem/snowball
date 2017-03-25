@@ -169,13 +169,29 @@ static void write_block_end(struct generator * g) {    /* block end */
 
 static void w(struct generator * g, const char * s);
 
-static void wk(struct generator * g, struct node * p) {     /* keep c */
+/* keep c */
+static void wk(struct generator * g, struct node * p, int keep_limit) {
     ++g->keep_count;
     if (p->mode == m_forward) {
-        write_string(g, "int c"); write_int(g, g->keep_count); write_string(g, " = z->c;");
+        write_string(g, "int c");
+        write_int(g, g->keep_count);
+        write_string(g, " = z->c");
+	if (keep_limit) {
+            write_string(g, ", mlimit");
+            write_int(g, g->keep_count);
+        }
+        write_char(g, ';');
     } else {
-        write_string(g, "int m"); write_int(g, g->keep_count); write_string(g, " = z->l - z->c; (void)m");
-        write_int(g, g->keep_count); write_char(g, ';');
+        write_string(g, "int m");
+        write_int(g, g->keep_count);
+        write_string(g, " = z->l - z->c");
+	if (keep_limit) {
+            write_string(g, ", mlimit");
+            write_int(g, g->keep_count);
+        }
+        write_string(g, "; (void)m");
+        write_int(g, g->keep_count);
+        write_char(g, ';');
     }
 }
 
@@ -271,7 +287,8 @@ static void writef(struct generator * g, const char * input, struct node * p) {
         switch (input[i++]) {
             default: write_char(g, input[i - 1]); continue;
             case 'C': write_comment(g, p); continue;
-            case 'k': wk(g, p); continue;
+            case 'k': wk(g, p, false); continue;
+            case 'K': wk(g, p, true); continue;
             case 'i': winc(g, p); continue;
             case 'l': write_check_limit(g, p); continue;
             case 'f': write_failure(g, p); continue;
@@ -891,11 +908,8 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 
 static void generate_setlimit(struct generator * g, struct node * p) {
     int keep_c;
-    writef(g, "~{~k~C", p);
+    writef(g, "~{~K~C", p);
     keep_c = g->keep_count;
-    w(g, "~Mint mlimit");
-    write_int(g, keep_c);
-    w(g, ";~N");
     generate(g, p->left);
 
     w(g, "~Mmlimit");
