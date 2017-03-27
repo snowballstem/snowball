@@ -85,20 +85,6 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
-/* Write a variable declaration. */
-static void write_declare(struct generator * g,
-                          char * declaration,
-                          struct node * p) {
-
-    struct str * temp = g->outbuf;
-    g->outbuf = g->declarations;
-    write_string(g, "        var ");
-    writef(g, declaration, p);
-    write_string(g, ";");
-    write_newline(g);
-    g->outbuf = temp;
-}
-
 static void write_comment(struct generator * g, struct node * p) {
 
     write_margin(g);
@@ -129,8 +115,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "this.limit - ";
-    write_declare(g, "~B0 : int", p);
-    writef(g, "~M~B0 = ~S1this.cursor;~N", p);
+    writef(g, "~Mvar ~B0 : int = ~S1this.cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -555,8 +540,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    write_declare(g, "~B0 : int", p);
-    w(g, "~Mfor (var ~B0 = ");
+    w(g, "~Mfor (var ~B0 : int = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
     writef(g, "; ~B0 > 0; ~B0--)~N", p);
@@ -799,12 +783,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
     if (!g->unreachable) {
         g->B[0] = str_data(varname);
-        write_declare(g, "~B0 : int", p);
         if (p->mode == m_forward) {
-            w(g, "~M~B0 = this.limit - this.cursor;~N");
+            w(g, "~Mvar ~B0 : int = this.limit - this.cursor;~N");
             w(g, "~Mthis.limit = this.cursor;~N");
         } else {
-            w(g, "~M~B0 = this.limit_backward;~N");
+            w(g, "~Mvar ~B0 : int = this.limit_backward;~N");
             w(g, "~Mthis.limit_backward = this.cursor;~N");
         }
         write_restorecursor(g, p, savevar);
@@ -928,7 +911,9 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (p->amongvar_needed) write_declare(g, "among_var : int", p);
+    if (p->amongvar_needed) {
+        w(g, "~Mvar among_var : int;~N");
+    }
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
