@@ -1144,13 +1144,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
         {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = ",";
 
-            w(g, "~MAmong(~L0, ~I1, ~I2, ");
+            w(g, "~MAmong(~L0, ~I0, ~I1, ");
             if (v->function != 0)
             {
                 w(g, "Some(&");

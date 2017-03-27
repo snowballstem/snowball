@@ -890,7 +890,6 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->I[0] = SIZE(b);
     g->L[0] = b;
     write_failure_if(g, "!(this.eq_s~S0(~L0))", p);
 }
@@ -1109,20 +1108,18 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     w(g, "~Mstatic const a_~I0 = [~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
         {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among(~L0, ~I1, ~I2");
+            w(g, "~Mnew Among(~L0, ~I0, ~I1");
             if (v->function != 0)
             {
                 w(g, ", ((instance : BaseStemmer) : boolean -> (instance as ~n).");
