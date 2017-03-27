@@ -1101,12 +1101,11 @@ static void generate_class_begin(struct generator * g) {
          "  * It implements the stemming algorithm defined by a snowball script.~N"
          "  */~N"
          "~N"
-         "class ~n extends ~P~N{~N");
+         "class ~n extends ~P~N{~+~N");
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N}");
-    w(g, "~N~N");
+    w(g, "~}~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1186,13 +1185,13 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "    var ~W0 : string = \"\";~N");
+                w(g, "~Mvar ~W0 : string = \"\";~N");
                 break;
             case t_integer:
-                w(g, "    var ~W0 : int = 0;~N");
+                w(g, "~Mvar ~W0 : int = 0;~N");
                 break;
             case t_boolean:
-                w(g, "    var ~W0 : boolean = false;~N");
+                w(g, "~Mvar ~W0 : boolean = false;~N");
                 break;
         }
     }
