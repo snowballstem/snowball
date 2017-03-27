@@ -244,6 +244,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
+            case 'P': write_string(g, g->options->parent_class_name); continue;
         }
     }
 }
@@ -1095,9 +1096,7 @@ static void generate_class_begin(struct generator * g) {
          "  * It implements the stemming algorithm defined by a snowball script.~N"
          "  */~N"
          "~N"
-         "class ~n extends ");
-    w(g, g->options->parent_class_name);
-    w(g, "~N{~N");
+         "class ~n extends ~P~N{~N");
 }
 
 static void generate_class_end(struct generator * g) {
