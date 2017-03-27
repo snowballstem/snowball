@@ -147,6 +147,8 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
+    // Need to work around lack of support for labelled blocks:
+    // https://github.com/jsx/JSX/issues/338
     w(g, "~Mvar lab~I0 = true;~N");
     w(g, "~Mlab~I0: while (lab~I0 == true)~N~M{~N");
     w(g, "~+~Mlab~I0 = false;~N");
