@@ -282,11 +282,11 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_lenof: /* Same as sizeof() for Java. */
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "(~V0.length())");
+            w(g, "~V0.length()");
             break;
         case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(current.length())");
+            w(g, "current.length()");
             break;
     }
 }
@@ -821,7 +821,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~{~M~n ~B0 = this;~N"
              "~Mcurrent = new StringBuffer(~V0.toString());~N"
              "~Mcursor = 0;~N"
-             "~Mlimit = (current.length());~N", p);
+             "~Mlimit = current.length();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
