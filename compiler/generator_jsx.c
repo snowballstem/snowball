@@ -49,7 +49,7 @@ static void write_varname(struct generator * g, struct name * p) {
 static void write_varref(struct generator * g, struct name * p) {
     if (jsx) {
         if (p->type == t_grouping) {
-            // groupings are const static.
+            /* groupings are const static. */
             w(g, "~n.");
         } else {
             write_string(g, "this.");
@@ -94,22 +94,6 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
-#if 0
-/* Write a variable declaration. */
-static void write_declare(struct generator * g,
-                          char * declaration,
-                          struct node * p) {
-
-    struct str * temp = g->outbuf;
-    g->outbuf = g->declarations;
-    write_string(g, "        var ");
-    writef(g, declaration, p);
-    write_string(g, ";");
-    write_newline(g);
-    g->outbuf = temp;
-}
-#endif
-
 static void write_comment(struct generator * g, struct node * p) {
 
     write_margin(g);
@@ -141,10 +125,10 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->S[1] = "";
     if (jsx) {
         if (p->mode != m_forward) g->S[1] = "this.limit - ";
-        writef(g, "~Mvar ~B0 : int = ~S1this.cursor;~N" , p);
+        writef(g, "~Mvar ~B0 : int = ~S1this.cursor;~N", p);
     } else {
         if (p->mode != m_forward) g->S[1] = "base.limit - ";
-        writef(g, "~Mvar /** number */ ~B0 = ~S1base.cursor;~N" , p);
+        writef(g, "~Mvar /** number */ ~B0 = ~S1base.cursor;~N", p);
     }
 }
 
@@ -187,8 +171,8 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
     if (jsx) {
-        // Need to work around lack of support for labelled blocks:
-        // https://github.com/jsx/JSX/issues/338
+        /* Need to work around lack of support for labelled blocks:
+         * https://github.com/jsx/JSX/issues/338 */
         w(g, "~Mvar lab~I0 = true;~N");
         w(g, "~Mlab~I0: while (lab~I0 == true)~N~M{~N");
         w(g, "~+~Mlab~I0 = false;~N");
@@ -329,11 +313,11 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_lenof: /* Same as sizeof() for Javascript. */
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "(~V0.length)");
+            w(g, "~V0.length");
             break;
         case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(~t.current.length)");
+            w(g, "~t.current.length");
             break;
     }
 }
@@ -415,7 +399,7 @@ static void generate_backwards(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~M~t.limit_backward = ~t.cursor; ~t.cursor = ~t.limit;~N", p);
     generate(g, p->left);
-    w(g, "~M~t.cursor = ~t.limit_backward;");
+    w(g, "~M~t.cursor = ~t.limit_backward;~N");
 }
 
 
@@ -792,8 +776,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
               "~Mif (~V0 == '')~N"
               "~M{~N"
               "~+~Mreturn false;~N~-"
-              "~M}~N"
-            , p);
+              "~M}~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -927,7 +910,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
     writef(g, "~{~M~n ~B0 = this;~N"
-             "~M~t.current = ~V0 + '';~N"
+             "~M~t.current = ~V0 /* ? + ''*/;~N"
              "~M~t.cursor = 0;~N"
              "~M~t.limit = ~t.current.length;~N", p);
     generate(g, p->left);
@@ -1252,7 +1235,6 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     if (jsx) {
         w(g, "~Mstatic const a_~I0 = [~N~+");
@@ -1263,13 +1245,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
         {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~M[~L0, ~I1, ~I2");
+            w(g, "~M[~L0, ~I0, ~I1");
             if (v->function != 0)
             {
                 if (jsx) {

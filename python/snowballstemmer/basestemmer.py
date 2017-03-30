@@ -111,7 +111,7 @@ class BaseStemmer(object):
         while True:
             k = i + ((j - i) >> 1)
             diff = 0
-            common = min(common_i, common_j) # smalle
+            common = min(common_i, common_j) # smaller
             w = v[k]
             for i2 in range(common, len(w.s)):
                 if c + common == l:
@@ -133,7 +133,7 @@ class BaseStemmer(object):
                 if j == i:
                     break # only one item in v
                 # - but now we need to go round once more to get
-                # v->s inspected. self looks messy, but is actually
+                # v->s inspected. This looks messy, but is actually
                 # the optimal approach.
                 if first_key_inspected:
                     break

@@ -86,20 +86,6 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
-/* Write a variable declaration. */
-static void write_declare(struct generator * g,
-                          char * declaration,
-                          struct node * p) {
-
-    struct str * temp = g->outbuf;
-    g->outbuf = g->declarations;
-    write_string(g, "        ");
-    writef(g, declaration, p);
-    write_string(g, ";");
-    write_newline(g);
-    g->outbuf = temp;
-}
-
 static void write_comment(struct generator * g, struct node * p) {
 
     write_margin(g);
@@ -130,8 +116,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "limit - ";
-    write_declare(g, "int ~B0", p);
-    writef(g, "~M~B0 = ~S1cursor;~N" , p);
+    writef(g, "~Mint ~B0 = ~S1cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -297,11 +282,11 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_lenof: /* Same as sizeof() for Java. */
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "(~V0.length())");
+            w(g, "~V0.length()");
             break;
         case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "(current.length())");
+            w(g, "current.length()");
             break;
     }
 }
@@ -557,8 +542,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    write_declare(g, "int ~B0", p);
-    w(g, "~Mfor (~B0 = ");
+    w(g, "~Mfor (int ~B0 = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
     writef(g, "; ~B0 > 0; ~B0--)~N", p);
@@ -791,12 +775,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
     if (!g->unreachable) {
         g->B[0] = str_data(varname);
-        write_declare(g, "int ~B0", p);
         if (p->mode == m_forward) {
-            w(g, "~M~B0 = limit - cursor;~N");
+            w(g, "~Mint ~B0 = limit - cursor;~N");
             w(g, "~Mlimit = cursor;~N");
         } else {
-            w(g, "~M~B0 = limit_backward;~N");
+            w(g, "~Mint ~B0 = limit_backward;~N");
             w(g, "~Mlimit_backward = cursor;~N");
         }
         write_restorecursor(g, p, savevar);
@@ -838,7 +821,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~{~M~n ~B0 = this;~N"
              "~Mcurrent = new StringBuffer(~V0.toString());~N"
              "~Mcursor = 0;~N"
-             "~Mlimit = (current.length());~N", p);
+             "~Mlimit = current.length();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
@@ -905,7 +888,6 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
 
     struct str * saved_output = g->outbuf;
-    struct str * saved_declarations = g->declarations;
 
     /* We currently make functions used in among public as this seems to
      * be required to allow the SnowballProgram base class to invoke them.
@@ -920,12 +902,11 @@ static void generate_define(struct generator * g, struct node * p) {
     w(g, "~N~M~S0 boolean ~V0() {~+~N");
 
     g->outbuf = str_new();
-    g->declarations = str_new();
 
     g->next_label = 0;
     g->var_number = 0;
 
-    if (p->amongvar_needed) write_declare(g, "int among_var", p);
+    if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
@@ -933,11 +914,8 @@ static void generate_define(struct generator * g, struct node * p) {
     if (!g->unreachable) w(g, "~Mreturn true;~N");
     w(g, "~}");
 
-    str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
-    str_delete(g->declarations);
     str_delete(g->outbuf);
-    g->declarations = saved_declarations;
     g->outbuf = saved_output;
 }
 
@@ -1147,19 +1125,17 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     w(g, "~Mprivate final static Among a_~I0[] = {~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~Mnew Among(~L0, ~I1, ~I2");
+            w(g, "~Mnew Among(~L0, ~I0, ~I1");
             if (v->function != 0) {
                 w(g, ", \"");
                 write_varname(g, v->function);

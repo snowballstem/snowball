@@ -122,7 +122,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "env.limit - ";
-    writef(g, "~Mlet ~B0 = ~S1env.cursor;~N" , p);
+    writef(g, "~Mlet ~B0 = ~S1env.cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -720,8 +720,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.slice_to();~N"
               "~Mif ~V0.is_empty() {~N"
-              "~+~Mreturn false;~N~-~M}~N"
-            , p);
+              "~+~Mreturn false;~N~-~M}~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -1145,13 +1144,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
         {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = ",";
 
-            w(g, "~MAmong(~L0, ~I1, ~I2, ");
+            w(g, "~MAmong(~L0, ~I0, ~I1, ");
             if (v->function != 0)
             {
                 w(g, "Some(&");

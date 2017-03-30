@@ -125,7 +125,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "self.limit - ";
-    writef(g, "~M~B0 = ~S1self.cursor~N" , p);
+    writef(g, "~M~B0 = ~S1self.cursor~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -503,7 +503,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     struct str * a1 = str_copy(g->failure_str);
 
     int golab = new_label(g);
-    g->I[0] = golab;
     write_comment(g, p);
     w(g, "~Mtry:~N~+"
              "~Mwhile True:~N~+");
@@ -727,8 +726,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~M~V0 = self.slice_to(~V0)~N"
               "~Mif ~V0 == '':~N"
-              "~+~Mreturn False~N~-"
-            , p);
+              "~+~Mreturn False~N~-", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -1097,20 +1095,18 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     w(g, "~Ma_~I0 = [~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++)
         {
-            g->I[0] = i;
-            g->I[1] = v->i;
-            g->I[2] = v->result;
+            g->I[0] = v->i;
+            g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~MAmong(~L0, ~I1, ~I2");
+            w(g, "~MAmong(~L0, ~I0, ~I1");
             if (v->function != 0)
             {
                 w(g, ", \"");
