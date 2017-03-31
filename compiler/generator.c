@@ -1383,8 +1383,11 @@ static void generate_among_table(struct generator * g, struct among * x) {
             if (v->size == 0) w(g, "0,");
                          else w(g, "s_~I0_~I1,");
             w(g, " ~I3, ~I4, ");
-            if (v->function == 0) write_char(g, '0'); else
-                                  write_varname(g, v->function);
+            if (v->function == 0) {
+                write_char(g, '0');
+            } else {
+                write_varname(g, v->function);
+            }
             w(g, "}~S0~N");
             v++;
         }
