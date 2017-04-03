@@ -1398,6 +1398,7 @@ static void generate_methods(struct generator * g) {
 }
 
 extern void generate_program_jsx(struct generator * g) {
+    jsx = (g->options->make_lang == LANG_JSX);
 
     g->outbuf = str_new();
     g->failure_str = str_new();
