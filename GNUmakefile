@@ -22,13 +22,13 @@ ICONV = iconv
 
 libstemmer_algorithms = arabic \
 			danish dutch english finnish french german hungarian \
-			italian irish \
+			irish italian \
 			norwegian porter portuguese romanian \
 			russian spanish swedish tamil turkish
 
 KOI8_R_algorithms = russian
-ISO_8859_1_algorithms = danish dutch english finnish french german italian \
-			irish norwegian porter portuguese spanish swedish
+ISO_8859_1_algorithms = danish dutch english finnish french german irish \
+			italian norwegian porter portuguese spanish swedish
 ISO_8859_2_algorithms = hungarian romanian
 
 other_algorithms = german2 kraaij_pohlmann lovins
