@@ -22,6 +22,12 @@ cargoflags ?=
 rust_src_main_dir = rust/src
 rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
 
+go ?= go
+goflags ?= stemwords/algorithms.go stemwords/main.go
+gofmt ?= gofmt
+go_src_main_dir = go
+go_src_dir = $(go_src_main_dir)/algorithms
+
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -48,7 +54,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_java.c \
 		   compiler/generator_jsx.c \
 		   compiler/generator_python.c \
-		   compiler/generator_rust.c
+		   compiler/generator_rust.c \
+		   compiler/generator_go.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \
@@ -108,6 +115,8 @@ PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JSX_SOURCES = $(libstemmer_algorithms:%=$(jsx_output_dir)/%-stemmer.jsx)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
+GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
+	$(go_src_main_dir)/stemwords/algorithms.go
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -230,6 +239,23 @@ $(rust_src_dir)/%_stemmer.rs: algorithms/%/stem_Unicode.sbl snowball
 	o="$(rust_src_dir)/$${l}_stemmer"; \
 	echo "./snowball $< -rust -o $${o}"; \
 	./snowball $< -rust -o $${o}
+
+$(go_src_main_dir)/stemwords/algorithms.go:
+	@echo "Generating algorithms.go"
+	@cd go/stemwords && go generate && cd ../..
+
+$(go_src_dir)/%_stemmer.go: algorithms/%/stem_Unicode.sbl snowball
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
+	mkdir -p $(go_src_dir)/$${l}
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
+	echo "./snowball $< -go -o $${o}"; \
+	./snowball $< -go -o $${o} -gop $${l}
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
+	echo "$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go"; \
+	$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go
 
 $(jsx_output_dir)/%-stemmer.jsx: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(jsx_output_dir)
@@ -466,6 +492,24 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	  rm tmp.in; \
 	else \
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+check_go: $(GO_SOURCES) $(libstemmer_algorithms:%=check_go_%)
+
+check_go_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Go"
+	@cd go && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
