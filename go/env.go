@@ -9,11 +9,11 @@ import (
 // Env represents the Snowball execution environment
 type Env struct {
 	current       string
-	Cursor        uint
-	Limit         uint
-	LimitBackward uint
-	Bra           uint
-	Ket           uint
+	Cursor        int
+	Limit         int
+	LimitBackward int
+	Bra           int
+	Ket           int
 }
 
 // NewEnv creates a new Snowball execution environment on the provided string
@@ -21,10 +21,10 @@ func NewEnv(val string) *Env {
 	return &Env{
 		current:       val,
 		Cursor:        0,
-		Limit:         uint(len(val)),
+		Limit:         len(val),
 		LimitBackward: 0,
 		Bra:           0,
-		Ket:           uint(len(val)),
+		Ket:           len(val),
 	}
 }
 
@@ -36,20 +36,23 @@ func (env *Env) SetCurrent(s string) {
 	env.current = s
 }
 
-func (env *Env) ReplaceS(bra, ket uint, s string) int32 {
+func (env *Env) ReplaceS(bra, ket int, s string) int32 {
 	adjustment := int32(len(s)) - (int32(ket) - int32(bra))
-
 	result, _ := splitAt(env.current, bra)
-	_, rhs := splitAt(env.current, ket)
+	rsplit := ket
+	if ket < bra {
+		rsplit = bra
+	}
+	_, rhs := splitAt(env.current, rsplit)
 	result += s
 	result += rhs
 
 	newLim := int32(env.Limit) + adjustment
-	env.Limit = uint(newLim)
+	env.Limit = int(newLim)
 
 	if env.Cursor >= ket {
 		newCur := int32(env.Cursor) + adjustment
-		env.Cursor = uint(newCur)
+		env.Cursor = int(newCur)
 	} else if env.Cursor > bra {
 		env.Cursor = bra
 	}
@@ -64,7 +67,7 @@ func (env *Env) EqS(s string) bool {
 	}
 
 	if strings.HasPrefix(env.current[env.Cursor:], s) {
-		env.Cursor += uint(len(s))
+		env.Cursor += len(s)
 		for !onCharBoundary(env.current, env.Cursor) {
 			env.Cursor++
 		}
@@ -76,11 +79,11 @@ func (env *Env) EqS(s string) bool {
 func (env *Env) EqSB(s string) bool {
 	if int32(env.Cursor)-int32(env.LimitBackward) < int32(len(s)) {
 		return false
-	} else if !onCharBoundary(env.current, env.Cursor-uint(len(s))) ||
-		!strings.HasPrefix(env.current[env.Cursor-uint(len(s)):], s) {
+	} else if !onCharBoundary(env.current, env.Cursor-len(s)) ||
+		!strings.HasPrefix(env.current[env.Cursor-len(s):], s) {
 		return false
 	} else {
-		env.Cursor -= uint(len(s))
+		env.Cursor -= len(s)
 		return true
 	}
 }
@@ -111,7 +114,7 @@ func (env *Env) ByteIndexForHop(delta int32) int32 {
 		for delta > 0 {
 			res++
 			delta--
-			for res <= uint(len(env.current)) && !onCharBoundary(env.current, res) {
+			for res <= len(env.current) && !onCharBoundary(env.current, res) {
 				res++
 			}
 		}
@@ -216,13 +219,13 @@ func (env *Env) SliceDel() bool {
 	return env.SliceFrom("")
 }
 
-func (env *Env) Insert(bra, ket uint, s string) {
+func (env *Env) Insert(bra, ket int, s string) {
 	adjustment := env.ReplaceS(bra, ket, s)
 	if bra <= env.Bra {
-		env.Bra = uint(int32(env.Bra) + adjustment)
+		env.Bra = int(int32(env.Bra) + adjustment)
 	}
 	if bra <= env.Ket {
-		env.Ket = uint(int32(env.Ket) + adjustment)
+		env.Ket = int(int32(env.Ket) + adjustment)
 	}
 }
 
@@ -231,22 +234,21 @@ func (env *Env) SliceTo() string {
 }
 
 func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
-	i := int32(0)
+	var i int32
 	j := int32(len(amongs))
 
 	c := env.Cursor
 	l := env.Limit
 
-	commonI := uint(0)
-	commonJ := uint(0)
+	var commonI, commonJ int
 
 	firstKeyInspected := false
 	for {
 		k := i + ((j - i) >> 1)
-		diff := int32(0)
+		var diff int32
 		common := min(commonI, commonJ)
-		w := amongs[uint(k)]
-		for lvar := common; lvar < uint(len(w.Str)); lvar++ {
+		w := amongs[k]
+		for lvar := common; lvar < len(w.Str); lvar++ {
 			if c+common == l {
 				diff--
 				break
@@ -279,12 +281,12 @@ func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
 	}
 
 	for {
-		w := amongs[uint(i)]
-		if commonI >= uint(len(w.Str)) {
-			env.Cursor = c + uint(len(w.Str))
+		w := amongs[i]
+		if commonI >= len(w.Str) {
+			env.Cursor = c + len(w.Str)
 			if w.F != nil {
 				res := w.F(env, ctx)
-				env.Cursor = c + uint(len(w.Str))
+				env.Cursor = c + len(w.Str)
 				if res {
 					return w.B
 				}
@@ -300,14 +302,13 @@ func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
 }
 
 func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
-	i := int32(0)
+	var i int32
 	j := int32(len(amongs))
 
 	c := env.Cursor
 	lb := env.LimitBackward
 
-	commonI := uint(0)
-	commonJ := uint(0)
+	var commonI, commonJ int
 
 	firstKeyInspected := false
 
@@ -315,7 +316,7 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 		k := i + ((j - i) >> 1)
 		diff := int32(0)
 		common := min(commonI, commonJ)
-		w := amongs[uint(k)]
+		w := amongs[k]
 		for lvar := len(w.Str) - int(common) - 1; lvar >= 0; lvar-- {
 			if c-common == lb {
 				diff--
@@ -349,12 +350,12 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 		}
 	}
 	for {
-		w := amongs[uint(i)]
-		if commonI >= uint(len(w.Str)) {
-			env.Cursor = c - uint(len(w.Str))
+		w := amongs[i]
+		if commonI >= len(w.Str) {
+			env.Cursor = c - len(w.Str)
 			if w.F != nil {
 				res := w.F(env, ctx)
-				env.Cursor = c - uint(len(w.Str))
+				env.Cursor = c - len(w.Str)
 				if res {
 					return w.B
 				}

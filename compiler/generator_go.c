@@ -260,9 +260,9 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "1<<32 - 1"); break;
+            write_string(g, "(1<<31) - 1"); break;
         case c_minint:
-            write_string(g, "0"); break;
+            write_string(g, "-1 << 31"); break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
@@ -286,13 +286,13 @@ static void generate_AE(struct generator * g, struct node * p) {
             break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "uint(len(~V0))");
+            w(g, "len(~V0)");
             break;
         case c_len:
             w(g, "snowballRuntime.RuneCountInString(env.Current())");
             break;
         case c_size:
-            w(g, "uint(len(env.Current()))");
+            w(g, "len(env.Current())");
             break;
     }
 }
@@ -662,7 +662,7 @@ static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "0" : "env.LimitBackward";
 
     write_failure_if(g, "int32(~S0) > c || c > int32(env.Limit)", p);
-    writef(g, "~Menv.Cursor = uint(c)~N", p);
+    writef(g, "~Menv.Cursor = int(c)~N", p);
     write_block_end(g);
 }
 
@@ -831,7 +831,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~Mvar ~B0 = env.Clone()~N"
               "~Menv.SetCurrent(~V0)~N"
               "~Menv.Cursor = 0~N"
-              "~Menv.Limit = uint(len(env.Current()))~N", p);
+              "~Menv.Limit = len(env.Current())~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
@@ -1197,7 +1197,7 @@ static void generate_members(struct generator * g) {
                 w(g, "~M~W0 string~N");
                 break;
             case t_integer:
-                w(g, "~M~W0 uint~N");
+                w(g, "~M~W0 int~N");
                 break;
             case t_boolean:
                 w(g, "~M~W0 bool~N");
