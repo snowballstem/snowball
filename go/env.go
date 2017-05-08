@@ -377,3 +377,7 @@ func (env *Env) Clone() *Env {
 	clone := *env
 	return &clone
 }
+
+func (env *Env) AssignTo() string {
+	return env.Current()
+}

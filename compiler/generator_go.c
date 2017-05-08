@@ -651,17 +651,19 @@ static void generate_atmark(struct generator * g, struct node * p) {
 
 static void generate_hop(struct generator * g, struct node * p) {
 
+    write_block_start(g);
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "-";
 
-    w(g, "~Mvar c = env.ByteIndexForHop(~S0");
+    w(g, "~Mvar c = env.ByteIndexForHop(~S0(");
     generate_AE(g, p->AE);
-    w(g, ")~N");
+    w(g, "))~N");
 
     g->S[0] = p->mode == m_forward ? "0" : "env.LimitBackward";
 
     write_failure_if(g, "int32(~S0) > c || c > int32(env.Limit)", p);
     writef(g, "~Menv.Cursor = uint(c)~N", p);
+    write_block_end(g);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -713,7 +715,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = env.assign_to(~V0)~N", p);
+    writef(g, "~M~V0 = env.AssignTo()~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
@@ -738,6 +740,8 @@ static void generate_address(struct generator * g, struct node * p) {
 static void generate_insert(struct generator * g, struct node * p, int style) {
 
     int keep_c = style == c_attach;
+
+    write_block_start(g);
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) w(g, "~Mvar c = env.Cursor~N");
@@ -746,49 +750,32 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) w(g, "~Menv.Cursor = c~N");
+    write_block_end(g);
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
 
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
+    write_block_start(g);
     write_comment(g, p);
     if (keep_c) writef(g, "~Mvar c = env.Cursor~N", p);
-    /* Copying limits and cursors is necessary here because the rust
-     * borrowchecker does not like taking something from someone you are about
-     * to mutate... */
     if (p->mode == m_forward) {
-        writef(g, "~Mbra, ket := env.Cursor, env.Limit~N", p);
+        writef(g, "~Menv.Insert(env.Cursor, env.Limit, ", p);
     } else {
-        writef(g, "~Mbra, ket := env.LimitBackward, env.Cursor~N", p);
-    }
-    /* If we deal with a string variable which is of type String we need to
-     * pass it by reference not by value.  Literalstrings on the other hand are
-     * of type &'static str so we can pass them by value.
-     */
-    if (p->literalstring) {
-        writef(g, "~Menv.Insert(bra, ket, ", p);
-    } else {
-        writef(g, "~Menv.Insert(bra, ket, &", p);
+        writef(g, "~Menv.Insert(env.LimitBackward, env.Cursor, ", p);
     }
     generate_address(g, p);
     writef(g, ")~N", p);
     if (keep_c) w(g, "~Menv.Cursor = c~N");
+    write_block_end(g);
 }
 
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    /* If we deal with a string variable which is of type String we need to
-     * pass it by reference not by value.  Literalstrings on the other hand are
-     * of type &'static str so we can pass them by value.
-     */
-    if (p->literalstring) {
-        w(g, "~Mif !env.SliceFrom(");
-    } else {
-        w(g, "~Mif !env.SliceFrom(&");
-    }
+    w(g, "~Mif !env.SliceFrom(");
     generate_address(g, p);
     writef(g, ") {~N"
               "~+~Mreturn false~N~-~M}~N", p);
@@ -844,14 +831,14 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~Mvar ~B0 = env.Clone()~N"
               "~Menv.SetCurrent(~V0)~N"
               "~Menv.Cursor = 0~N"
-              "~Menv.Limit = len(env.Current()~N", p);
+              "~Menv.Limit = uint(len(env.Current()))~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
         /* Update string variable. */
         w(g, "~M~V0 = env.Current()~N");
         /* Reset env */
-        w(g, "~M*env = ~B0~N");
+        w(g, "~M*env = *~B0~N");
     }
     str_delete(savevar_env);
 }
@@ -929,6 +916,7 @@ static void generate_setup_context(struct generator * g) {
         }
     }
     w(g, "~-~M}~N");
+    w(g, "  _ = context~N");
 }
 
 static void generate_define(struct generator * g, struct node * p) {
