@@ -1,6 +1,12 @@
 package snowball
 
-import "unicode/utf8"
+import (
+	"math"
+	"unicode/utf8"
+)
+
+const MaxInt = math.MaxInt32
+const MinInt = math.MinInt32
 
 func splitAt(str string, mid int) (string, string) {
 	return str[:mid], str[mid:]

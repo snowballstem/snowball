@@ -260,9 +260,9 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "(1<<31) - 1"); break;
+            write_string(g, "snowballRuntime.MaxInt"); break;
         case c_minint:
-            write_string(g, "-1 << 31"); break;
+            write_string(g, "snowballRuntime.MinInt"); break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
