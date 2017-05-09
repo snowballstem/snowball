@@ -47,8 +47,9 @@ Run:
 $ make check_go
 ```
 
+An initial pass of fuzz-testing has been performed on the generated stemmers for the algorithms in this repo.  Each ran for 5 minutes and used an initial corpus seeded with 10k words from the algorithm's snowballstem-data voc.txt file.
+
 ## Known Limitations
 
 - Code going through generate_dollar production has not been tested
 - Code going through generate_debug production has not been tested
-- Has NOT yet been fuzz-tested to gain confidence with untrusted inputs.

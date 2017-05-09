@@ -20,7 +20,7 @@ func min(a, b int) int {
 }
 
 func onCharBoundary(s string, pos int) bool {
-	if pos >= len(s) {
+	if pos <= 0 || pos >= len(s) {
 		return true
 	}
 	return utf8.RuneStart(s[pos])
