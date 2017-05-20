@@ -8,6 +8,8 @@ matrix:
     - compiler: gcc
       env: RUST=rust
     - compiler: gcc
+      env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
+    - compiler: gcc
       env: c_tests=y cc_append=' -std=c90' PYTHON=python3.5 THIN_FACTOR=10
     - compiler: gcc
       env: PYTHON=python3.3 THIN_FACTOR=10
@@ -29,6 +31,14 @@ before_install:
   - test -z "$RUST" || ./rustup.sh -y
   - test -z "$RUST" || source "$HOME/.cargo/env"
   - test -z "$RUST" || rm rustup.sh
+  # install go into $HOME/goroot
+  - test -z "$GO" || curl -sLO https://storage.googleapis.com/golang/go1.8.1.linux-amd64.tar.gz
+  - test -z "$GO" || tar -C $HOME -xzf go1.8.1.linux-amd64.tar.gz
+  - test -z "$GO" || rm go1.8.1.linux-amd64.tar.gz
+  - test -z "$GO" || mv $HOME/go $HOME/goroot
+  # now create gopath that points to this repo
+  - test -z "$GO" || mkdir -p $HOME/gopath/src/github.com/
+  - test -z "$GO" || ln -s $HOME/build/snowballstem $HOME/gopath/src/github.com/snowballstem
   - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make CC="$CC$cc_append"
@@ -39,3 +49,4 @@ script:
   - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust cargoflags=--release STEMMING_DATA=snowball-data
+  - test -z "$GO" || make check_go STEMMING_DATA=snowball-data
