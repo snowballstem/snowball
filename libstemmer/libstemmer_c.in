@@ -67,9 +67,10 @@ void
 sb_stemmer_delete(struct sb_stemmer * stemmer)
 {
     if (stemmer == 0) return;
-    if (stemmer->close == 0) return;
-    stemmer->close(stemmer->env);
-    stemmer->close = 0;
+    if (stemmer->close) {
+        stemmer->close(stemmer->env);
+        stemmer->close = 0;
+    }
     free(stemmer);
 }
 
