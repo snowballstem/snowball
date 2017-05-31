@@ -270,7 +270,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_minint:
             write_string(g, "(~(-1>>>1))"); break;
         case c_neg:
-            write_char(g, '-'); generate_AE(g, p->right); break;
+            write_string(g, "- "); generate_AE(g, p->right); break;
         case c_multiply:
             s = " * "; goto label0;
         case c_plus:
