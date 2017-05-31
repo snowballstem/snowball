@@ -119,15 +119,23 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
-CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -fPIC
 CPPFLAGS=-Iinclude
 
-all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+all: snowball libstemmer.o libstemmer.so stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+
+install_shared_library: libstemmer.so
+	install libstemmer.so /usr/lib/
+	install ./include/libstemmer.h /usr/include/
+
+purge_shared_library:
+	rm /usr/lib/libstemmer.so
+	rm /usr/include/libstemmer.h
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
-	      libstemmer.o stemwords \
+	      libstemmer.o libstemmer.so stemwords \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
               snowball.splint \
@@ -165,6 +173,10 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
 libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
+
+libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+	$(CC) --shared -fPIC -o $@  $^
+
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
