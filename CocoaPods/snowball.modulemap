@@ -1,0 +1,6 @@
+framework module snowball {
+    umbrella header "snowball-umbrella.h"
+
+    export *
+    module * { export * }
+}
