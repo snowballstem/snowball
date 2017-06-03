@@ -4,7 +4,7 @@
 /src_c
 /stemwords
 /dist
-/jsx_out
+/js_out
 /python_out
 /rust/Cargo.lock
 /rust/target/

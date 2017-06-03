@@ -23,9 +23,8 @@ static void print_arglist(void) {
 #ifndef DISABLE_PYTHON
                     "             [-py[thon]]\n"
 #endif
-#ifndef DISABLE_JSX
+#ifndef DISABLE_JS
                     "             [-js]\n"
-                    "             [-jsx]\n"
 #endif
 #ifndef DISABLE_RUST
                     "             [-rust]\n"
@@ -101,14 +100,9 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->name = argv[i++];
                 continue;
             }
-#ifndef DISABLE_JSX
+#ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->widechars = true;
-                continue;
-            }
-            if (eq(s, "-jsx")) {
-                o->make_lang = LANG_JSX;
                 o->widechars = true;
                 continue;
             }
@@ -289,21 +283,13 @@ extern int main(int argc, char * argv[]) {
                     fclose(o->output_src);
                 }
 #endif
-#ifndef DISABLE_JSX
+#ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
                     symbol * b = add_s_to_b(0, s);
                     b = add_s_to_b(b, ".js");
                     o->output_src = get_output(b);
                     lose_b(b);
-                    generate_program_jsx(g);
-                    fclose(o->output_src);
-                }
-                if (o->make_lang == LANG_JSX) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".jsx");
-                    o->output_src = get_output(b);
-                    lose_b(b);
-                    generate_program_jsx(g);
+                    generate_program_js(g);
                     fclose(o->output_src);
                 }
 #endif

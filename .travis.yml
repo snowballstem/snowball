@@ -35,7 +35,6 @@ script:
   - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
-  - test -z "$NPM" || "$NPM" install -g jsx
-  - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
+  - test -z "$NPM" || make check_js STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust cargoflags=--release STEMMING_DATA=snowball-data
