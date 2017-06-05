@@ -4,7 +4,7 @@ The initial implementation was built as a port of the Rust target.  The initial 
 
 ## Usage
 
-Until this PR is accepted, don't use `go get` to get the runtime library in place.  Instead, clone the mschoch repo into `$GOPATH/src/github.com/snowballestem/snowball`.
+Until this PR is accepted, don't use `go get` to get the runtime library in place.  Instead, clone the mschoch repo into `$GOPATH/src/github.com/snowballstem/snowball`.
 
 To generate Go source for a Snowball algorithm:
 ```
