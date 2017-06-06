@@ -35,7 +35,7 @@ english.Stem(env)
 fmt.Printf("stemmed word is: %s", env.Current())
 ```
 
-NOTE: you can use the env.Reset("new_word") to reuse the env on subsequent calls to the stemmer.
+NOTE: you can use the env.SetCurrent("new_word") to reuse the env on subsequent calls to the stemmer.
 
 ## Testing
 
