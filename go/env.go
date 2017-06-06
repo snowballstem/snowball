@@ -28,6 +28,15 @@ func NewEnv(val string) *Env {
 	}
 }
 
+func (env *Env) Reset(val string) {
+	env.current = val
+	env.Cursor = 0
+	env.Limit = len(val)
+	env.LimitBackward = 0
+	env.Bra = 0
+	env.Ket = len(val)
+}
+
 func (env *Env) Current() string {
 	return env.current
 }

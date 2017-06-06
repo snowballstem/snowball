@@ -242,7 +242,7 @@ $(rust_src_dir)/%_stemmer.rs: algorithms/%/stem_Unicode.sbl snowball
 
 $(go_src_main_dir)/stemwords/algorithms.go:
 	@echo "Generating algorithms.go"
-	@cd go/stemwords && go generate && cd ../..
+	@cd go/stemwords && go generate
 
 $(go_src_dir)/%_stemmer.go: algorithms/%/stem_Unicode.sbl snowball
 	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \

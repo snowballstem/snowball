@@ -1,10 +1,8 @@
 # Go Target for Snowball
 
-The initial implementation was built as a port of the Rust target.  The initial focus has been on getting it to function, and making it work correctly.  No attempt has been made to beautify the implementation, generate code, or address performance issues.
+The initial implementation was built as a port of the Rust target.  The initial focus has been on getting it to function, and making it work correctly.  No attempt has been made to beautify the implementation, generated code, or address performance issues.
 
 ## Usage
-
-Until this PR is accepted, don't use `go get` to get the runtime library in place.  Instead, clone the mschoch repo into `$GOPATH/src/github.com/snowballstem/snowball`.
 
 To generate Go source for a Snowball algorithm:
 ```
@@ -36,6 +34,8 @@ env := snowball.NewEnv("beautiful")
 english.Stem(env)
 fmt.Printf("stemmed word is: %s", env.Current())
 ```
+
+NOTE: you can use the env.Reset("new_word") to reuse the env on subsequent calls to the stemmer.
 
 ## Testing
 
