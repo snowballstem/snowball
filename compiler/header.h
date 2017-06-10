@@ -311,12 +311,14 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     byte widechars;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST, LANG_GO } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
     const char * parent_class_name;
     const char * package;
+    const char * go_package;
+    const char * go_snowball_runtime;
     const char * string_class;
     const char * among_class;
     struct include * includes;
@@ -358,4 +360,8 @@ extern void generate_program_jsx(struct generator * g);
 
 #ifndef DISABLE_RUST
 extern void generate_program_rust(struct generator * g);
+#endif
+
+#ifndef DISABLE_GO
+extern void generate_program_go(struct generator * g);
 #endif
