@@ -1,5 +1,5 @@
 /**@constructor*/
-function BaseStemmer() {
+BaseStemmer = function() {
     this.setCurrent = function(value) {
         this.current = value;
 	this.cursor = 0;

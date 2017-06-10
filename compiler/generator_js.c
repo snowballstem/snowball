@@ -1119,7 +1119,7 @@ static void generate_start_comment(struct generator * g) {
 static void generate_class_begin(struct generator * g) {
 
     w(g, "/**@constructor*/~N");
-    w(g, "function ~n() {~+~N"
+    w(g, "~n = function() {~+~N"
          "~Mvar base = new ~P();~N");
 }
 
@@ -1132,7 +1132,7 @@ static void generate_class_end(struct generator * g) {
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
     w(g, "~-};~N");
-    w(g, "window['~n'] = ~n;~N");
+    //w(g, "window['~n'] = ~n;~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1153,10 +1153,6 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
             w(g, "~M[~L0, ~I0, ~I1");
             if (v->function != 0) {
-                w(g, ", ((instance : BaseStemmer) : boolean -> (instance as ~n).");
-                write_varname(g, v->function);
-                w(g, "())");
-            } else {
                 w(g, ", ");
                 write_varname(g, v->function);
             }
@@ -1196,7 +1192,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, "] : int[];~N~N");
+    w(g, "];~N~N");
     lose_b(map);
 }
 

@@ -13,9 +13,9 @@ python_runtime_dir = snowballstemmer
 python_sample_dir = sample
 
 js_output_dir = js_out
-js_runtime_src_dir = js
-js_runtime_dir = lib
+js_runtime_dir = javascript
 js_sample_dir = sample
+NODE ?= nodejs
 
 cargo ?= cargo
 cargoflags ?=
@@ -443,7 +443,7 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_js: $(libstemmer_algorithms:%=check_js_%)
+check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
 
 # Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
 THIN_FACTOR ?= 3
@@ -471,16 +471,16 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-export NODE_PATH = $(js_output_dir):$(js_runtime_src_dir)
+export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
 
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
-	  $(NODE) stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  $(NODE) stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
