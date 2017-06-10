@@ -126,7 +126,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
 #endif
-#ifndef DISABLE_Go
+#ifndef DISABLE_GO
             if (eq(s, "-go")) {
                 o->make_lang = LANG_GO;
                 o->widechars = false;
