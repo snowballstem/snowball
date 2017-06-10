@@ -916,7 +916,7 @@ static void generate_setup_context(struct generator * g) {
         }
     }
     w(g, "~-~M}~N");
-    w(g, "  _ = context~N");
+    w(g, "~M_ = context~N");
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -928,8 +928,8 @@ static void generate_define(struct generator * g, struct node * p) {
 
     if (q->type == t_routine) {
         w(g, "~N~Mfunc ~W0(env *snowballRuntime.Env, ctx interface{}) bool {~+~N");
-        w(g, "  context := ctx.(*Context)~N");
-        w(g, "  _ = context~N");
+        w(g, "~Mcontext := ctx.(*Context)~N");
+        w(g, "~M_ = context~N");
     } else {
         w(g, "~N~Mfunc ~W0(env *snowballRuntime.Env) bool {~+~N");
         generate_setup_context(g);
