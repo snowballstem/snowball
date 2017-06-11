@@ -329,6 +329,8 @@ static void generate_or(struct generator * g, struct node * p) {
     struct str * a1 = str_copy(g->failure_str);
 
     int out_lab = new_label(g);
+    int end_unreachable = true;
+
     write_comment(g, p);
     wsetlab_begin(g, out_lab);
 
@@ -347,7 +349,10 @@ static void generate_or(struct generator * g, struct node * p) {
         g->failure_label = new_label(g);
         wsetlab_begin(g, g->failure_label);
         generate(g, p);
-        if (!g->unreachable) wgotol(g, out_lab);
+        if (!g->unreachable) {
+            wgotol(g, out_lab);
+            end_unreachable = false;
+        }
         wsetlab_end(g);
         g->unreachable = false;
         if (keep_c) write_restorecursor(g, p, savevar);
@@ -360,6 +365,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
     wsetlab_end(g);
+    g->unreachable = end_unreachable;
     str_delete(savevar);
 }
 
