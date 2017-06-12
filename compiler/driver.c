@@ -92,10 +92,9 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
     o->name = "";
     o->make_lang = LANG_C;
-    o->widechars = false;
     o->includes = 0;
     o->includes_end = 0;
-    o->utf8 = false;
+    o->encoding = ENC_SINGLEBYTE;
 
     /* read options: */
 
@@ -114,30 +113,28 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JSX
             if (eq(s, "-jsx")) {
                 o->make_lang = LANG_JSX;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
 #ifndef DISABLE_RUST
             if (eq(s, "-rust")) {
                 o->make_lang = LANG_RUST;
-                o->widechars = false;
-                o->utf8 = true;
+                o->encoding = ENC_UTF8;
                 continue;
             }
 #endif
 #ifndef DISABLE_GO
             if (eq(s, "-go")) {
                 o->make_lang = LANG_GO;
-                o->widechars = false;
-                o->utf8 = true;
+                o->encoding = ENC_UTF8;
                 continue;
             }
 #endif
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
@@ -148,13 +145,12 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_PYTHON
             if (eq(s, "-py") || eq(s, "-python")) {
                 o->make_lang = LANG_PYTHON;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
             if (eq(s, "-w") || eq(s, "-widechars")) {
-                o->widechars = true;
-                o->utf8 = false;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
             if (eq(s, "-s") || eq(s, "-syntax")) {
@@ -192,8 +188,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
             if (eq(s, "-u") || eq(s, "-utf8")) {
-                o->utf8 = true;
-                o->widechars = false;
+                o->encoding = ENC_UTF8;
                 continue;
             }
 #ifndef DISABLE_JAVA
@@ -262,9 +257,8 @@ extern int main(int argc, char * argv[]) {
         {
             struct tokeniser * t = create_tokeniser(u, file);
             struct analyser * a = create_analyser(t);
-            t->widechars = o->widechars;
+            a->encoding = t->encoding = o->encoding;
             t->includes = o->includes;
-            a->utf8 = t->utf8 = o->utf8;
             read_program(a);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);

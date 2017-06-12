@@ -270,18 +270,18 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                 number = base * number + ch;
                 c++;
             }
-            if (t->widechars || t->utf8) {
-                if (number < 0 || number > 0xffff) {
-                    error1(t, "character values exceed 64K");
-                    return;
-                }
-            } else {
+            if (t->encoding == ENC_SINGLEBYTE) {
                 if (number < 0 || number > 0xff) {
                     error1(t, "character values exceed 256");
                     return;
                 }
+            } else {
+                if (number < 0 || number > 0xffff) {
+                    error1(t, "character values exceed 64K");
+                    return;
+                }
             }
-            if (t->utf8)
+            if (t->encoding == ENC_UTF8)
                 d += put_utf8(number, p + d);
             else
                 p[d++] = number;

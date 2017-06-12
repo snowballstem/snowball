@@ -348,7 +348,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "z->l" : "z->lb"); break;
         case c_len:
-            if (g->options->utf8) {
+            if (g->options->encoding == ENC_UTF8) {
                 w(g, "len_utf8(z->p)");
                 break;
             }
@@ -357,7 +357,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "SIZE(z->p)");
             break;
         case c_lenof:
-            if (g->options->utf8) {
+            if (g->options->encoding == ENC_UTF8) {
                 g->V[0] = p->name;
                 w(g, "len_utf8(~V0)");
                 break;
@@ -658,7 +658,7 @@ static void generate_do(struct generator * g, struct node * p) {
 }
 
 static void generate_next(struct generator * g, struct node * p) {
-    if (g->options->utf8) {
+    if (g->options->encoding == ENC_UTF8) {
         if (p->mode == m_forward)
             w(g, "~{int ret = skip_utf8(z->p, z->c, 0, z->l, 1");
         else
@@ -677,7 +677,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
-    g->S[2] = g->options->utf8 ? "_U" : "";
+    g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
@@ -820,7 +820,7 @@ static void generate_atmark(struct generator * g, struct node * p) {
 static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "+" : "-";
     g->S[1] = p->mode == m_forward ? "0" : "z->lb";
-    if (g->options->utf8) {
+    if (g->options->encoding == ENC_UTF8) {
         w(g, "~{int ret = skip_utf8(z->p, z->c, ~S1, z->l, ~S0 ");
         generate_AE(g, p->AE); writef(g, ");~C", p);
         writef(g, "~Mif (ret < 0) ~f~N", p);
@@ -994,7 +994,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
-    g->S[2] = g->options->utf8 ? "_U" : "";
+    g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
@@ -1016,7 +1016,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
          * function call.  In UTF-8 mode, only do this for the ASCII subset,
          * since multi-byte characters are more complex to text against.
          */
-        if (g->options->utf8 && *b >= 128) {
+        if (g->options->encoding == ENC_UTF8 && *b >= 128) {
             printf("single byte %d\n", *b);
             exit(1);
         }

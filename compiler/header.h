@@ -48,6 +48,8 @@ extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 extern void output_str(FILE * outfile, struct str * str);
 
+typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
+
 struct m_pair {
 
     struct m_pair * next;
@@ -109,8 +111,7 @@ struct tokeniser {
     int token;
     int previous_token;
     byte token_held;
-    byte widechars;
-    byte utf8;
+    enc encoding;
 
     int omission;
     struct include * includes;
@@ -245,7 +246,7 @@ struct analyser {
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
-    byte utf8;
+    enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
 };
 
@@ -311,7 +312,7 @@ struct options {
     FILE * output_src;
     FILE * output_h;
     byte syntax_tree;
-    byte widechars;
+    enc encoding;
     enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST, LANG_GO } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
@@ -324,7 +325,6 @@ struct options {
     const char * among_class;
     struct include * includes;
     struct include * includes_end;
-    byte utf8;
 };
 
 /* Generator functions common to several backends. */
