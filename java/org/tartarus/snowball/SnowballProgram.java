@@ -6,18 +6,13 @@ import java.io.Serializable;
 public class SnowballProgram implements Serializable {
     protected SnowballProgram()
     {
-	current = new StringBuffer();
-	setCurrent("");
+	current = new StringBuilder();
+	init();
     }
 
     static final long serialVersionUID = 2016072500L;
 
-    /**
-     * Set the current string.
-     */
-    public void setCurrent(String value)
-    {
-	current.replace(0, current.length(), value);
+    private void init() {
 	cursor = 0;
 	limit = current.length();
 	limit_backward = 0;
@@ -26,29 +21,45 @@ public class SnowballProgram implements Serializable {
     }
 
     /**
-     * Get the current string.
+     * Set the current string.
      */
-    public String getCurrent()
+    public void setCurrent(String value)
     {
-        String result = current.toString();
-        // Make a new StringBuffer.  If we reuse the old one, and a user of
+        // Make a new StringBuilder.  If we reuse the old one, and a user of
         // the library keeps a reference to the buffer returned (for example,
         // by converting it to a String in a way which doesn't force a copy),
         // the buffer size will not decrease, and we will risk wasting a large
         // amount of memory.
         // Thanks to Wolfram Esser for spotting this problem.
-        current = new StringBuffer();
-        return result;
+        current = new StringBuilder(value);
+	init();
+    }
+
+    /**
+     * Get the current string.
+     */
+    public String getCurrent()
+    {
+        return current.toString();
     }
 
     // current string
-    protected StringBuffer current;
+    protected StringBuilder current;
 
     protected int cursor;
     protected int limit;
     protected int limit_backward;
     protected int bra;
     protected int ket;
+
+    public SnowballProgram(SnowballProgram other) {
+	current          = other.current;
+	cursor           = other.cursor;
+	limit            = other.limit;
+	limit_backward   = other.limit_backward;
+	bra              = other.bra;
+	ket              = other.ket;
+    }
 
     protected void copy_from(SnowballProgram other)
     {
@@ -333,27 +344,12 @@ public class SnowballProgram implements Serializable {
 	insert(c_bra, c_ket, s.toString());
     }
 
-    /* Copy the slice into the supplied StringBuffer */
-    protected StringBuffer slice_to(StringBuffer s)
-    {
-	slice_check();
-	int len = ket - bra;
-	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
-    }
-
     /* Copy the slice into the supplied StringBuilder */
     protected StringBuilder slice_to(StringBuilder s)
     {
 	slice_check();
 	int len = ket - bra;
 	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
-    }
-
-    protected StringBuffer assign_to(StringBuffer s)
-    {
-	s.replace(0, s.length(), current.substring(0, limit));
 	return s;
     }
 
