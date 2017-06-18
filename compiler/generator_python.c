@@ -825,17 +825,24 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
-    write_comment(g, p);
-    g->V[0] = p->name;
-
-    ++g->copy_from_count;
-    str_assign(g->failure_str, "self.copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ")");
     g->B[0] = str_data(savevar);
-    writef(g, "~M~B0 = ~n()~N"
-              "~M~B0.copy_from(self)~N"
-              "~Mself.current = ~V0~N"
+    write_comment(g, p);
+    writef(g, "~M~B0 = BaseStemmer()~N"
+              "~M~B0.copy_from(self)~N", p);
+
+    {
+        struct str * saved_output = g->outbuf;
+        str_clear(g->failure_str);
+        g->outbuf = g->failure_str;
+        g->V[0] = p->name;
+        writef(g, "~V0 = self.current; ", p);
+        /* For Python 3, this can just be: super().copy_from(~B0) */
+        writef(g, "super(~n, self).copy_from(~B0)", p);
+        g->failure_str = g->outbuf;
+        g->outbuf = saved_output;
+    }
+
+    writef(g, "~Mself.current = ~V0~N"
               "~Mself.cursor = 0~N"
               "~Mself.limit = len(self.current)~N", p);
     generate(g, p->left);
@@ -1190,25 +1197,6 @@ static void generate_members(struct generator * g) {
     w(g, "~N");
 }
 
-static void generate_copyfrom(struct generator * g) {
-
-    struct name * q;
-    if (g->copy_from_count == 0) return;
-    w(g, "~Mdef copy_from(self, other):~+~N");
-    for (q = g->analyser->names; q != 0; q = q->next) {
-        g->V[0] = q;
-        switch (q->type) {
-            case t_string:
-            case t_integer:
-            case t_boolean:
-                w(g, "~M~V0 = other.~W0~N");
-                break;
-        }
-    }
-    /* For Python 3, this can just be super(). */
-    w(g, "~Msuper(~n, self).copy_from(other)~N~-");
-}
-
 static void generate_methods(struct generator * g) {
 
     struct node * p = g->analyser->program;
@@ -1245,7 +1233,6 @@ extern void generate_program_python(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
-    generate_copyfrom(g);
     generate_methods(g);
 
     generate_label_classes(g);
