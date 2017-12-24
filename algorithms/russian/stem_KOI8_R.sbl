@@ -1,6 +1,6 @@
 stringescapes {}
 
-/* the 32 Cyrillic letters in the KOI8-R coding scheme, and represented
+/* the 33 Cyrillic letters in the KOI8-R coding scheme, and represented
    in Latin characters following the conventions of the standard Library
    of Congress transliteration: */
 
@@ -10,6 +10,7 @@ stringdef v    hex 'D7'
 stringdef g    hex 'C7'
 stringdef d    hex 'C4'
 stringdef e    hex 'C5'
+stringdef yo   hex 'A3'
 stringdef zh   hex 'D6'
 stringdef z    hex 'DA'
 stringdef i    hex 'C9'
@@ -54,7 +55,7 @@ integers ( pV p2 )
 
 groupings ( v )
 
-define v '{a}{e}{i}{o}{u}{y}{e`}{iu}{ia}'
+define v '{a}{e}{yo}{i}{o}{u}{y}{e`}{iu}{ia}'
 
 define mark_regions as (
 

@@ -1,6 +1,6 @@
 stringescapes {}
 
-/* the 32 Cyrillic letters in Unicode */
+/* the 33 Cyrillic letters in Unicode */
 
 stringdef a    hex '430'
 stringdef b    hex '431'
@@ -8,6 +8,7 @@ stringdef v    hex '432'
 stringdef g    hex '433'
 stringdef d    hex '434'
 stringdef e    hex '435'
+stringdef yo   hex '451'
 stringdef zh   hex '436'
 stringdef z    hex '437'
 stringdef i    hex '438'
@@ -52,7 +53,7 @@ integers ( pV p2 )
 
 groupings ( v )
 
-define v '{a}{e}{i}{o}{u}{y}{e`}{iu}{ia}'
+define v '{a}{e}{yo}{i}{o}{u}{y}{e`}{iu}{ia}'
 
 define mark_regions as (
 
