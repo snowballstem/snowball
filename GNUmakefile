@@ -34,7 +34,7 @@ ICONV = iconv
 libstemmer_algorithms = arabic \
 			danish dutch english finnish french german hungarian \
 			irish italian \
-			norwegian porter portuguese romanian \
+			nepali norwegian porter portuguese romanian \
 			russian spanish swedish tamil turkish
 
 KOI8_R_algorithms = russian

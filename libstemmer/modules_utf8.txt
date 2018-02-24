@@ -18,6 +18,7 @@ german          UTF_8                   german,de,ger,deu
 hungarian       UTF_8                   hungarian,hu,hun
 irish           UTF_8                   irish,ga,gle
 italian         UTF_8                   italian,it,ita
+nepali          UTF_8                   nepali,ne,nep
 norwegian       UTF_8                   norwegian,no,nor
 portuguese      UTF_8                   portuguese,pt,por
 romanian        UTF_8                   romanian,ro,rum,ron

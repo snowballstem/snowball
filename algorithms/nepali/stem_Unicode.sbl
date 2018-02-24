@@ -1,0 +1,55 @@
+/*
+ * Authors:
+ * - Ingroj Shrestha <ing.stha@gmail.com>, Nepali NLP Group
+ * - Oleg Bartunov <obartunov@gmail.com>, Postgres Professional Ltd.
+*/
+
+routines (
+	remove_category_1
+	check_category_2
+    remove_category_2
+	remove_category_3
+)
+
+externals ( stem )
+backwardmode (
+	define remove_category_1 as(
+		[substring] among (
+			'मार्फत' 'द्वारा' 'सँगै' 'संग'
+			'सँग' 'लाइ' 'लाई' 'पछि' 
+			'ले' 'रत' 'मै' 'मा' 	
+			(delete)
+			'को' 'का' 'कि' 'की' 'कै'(('ए' or 'े' ()) or delete)
+        	)
+	)
+
+	define check_category_2 as(
+		[substring] among(
+			'ँ' 'ं' 'ै'
+		)
+	)
+	
+	define remove_category_2 as (
+		[substring] among(
+		'ँ' 'ं' ('यौ' or 'छौ' or 'नौ' or 'थे' delete)
+		'ै' ('त्र' delete)  
+		)
+	)
+
+	define remove_category_3 as(
+		[substring] among(
+			'थिइस्' 'हुनेछ' 'हुन्छ' 'नेछस्' 'नेछन्' 'इएकी' 'इएका' 'इएको' 'िएकी' 'िएका' 'िएको' 'इछन्' 'िछन्' 'इछस्' 'िछस्' 'एछन्' 'ेछन्' 'एछस्' 'ेछस्' 'छिन्' 'छेस्' 'छ्यौ' 'थिन्' 'थियो' 'थियौ' 'थिस्' 'थ्यो' 'थ्यौ' 'दियो' 'देखि' 'देखी' 'लान्' 'माथि' 'नेकै' 'नेका' 'नेको' 'नेछौ' 'होस्' 'इन्छ' 'िन्छ' 'नेछु' 'इछौ' 'िछौ' 			'इस्' 'िस्' 'ियो' 'इयो' 'एका' 'ेका' 'एकी' 'ेकी' 'एकै' 'ेकै' 'एको' 'ेको' 'एछु' 'ेछु' 'एछौ' 'ेछौ' 'छन्' 'छस्' 'थिए' 'पर्' 'भयो' 'हरु' 'हरू' 'िदा' 'इदा' 'िदो' 'इदो' 'िदै' 'इदै' 'नेछ' 'इछ' 'िछ' 'एछ' 'ेछ' 'छु' 'छे' 'छौ' 'थी' 'थे' 'दा' 'दी' 'दै' 'दो' 'नु' 'ने' 'यो' 'यौ' 'छ'
+			(delete)
+		)
+	)
+
+)
+				
+define stem as (
+    backwards (
+    		do remove_category_1
+			do (
+				repeat (check_category_2 and remove_category_2 and remove_category_3 or remove_category_3)
+			)
+	)
+)

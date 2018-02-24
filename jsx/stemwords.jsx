@@ -11,6 +11,7 @@ import "german-stemmer.jsx";
 import "hungarian-stemmer.jsx";
 import "irish-stemmer.jsx";
 import "italian-stemmer.jsx";
+import "nepali-stemmer.jsx";
 import "norwegian-stemmer.jsx";
 import "porter-stemmer.jsx";
 import "portuguese-stemmer.jsx";
@@ -187,6 +188,9 @@ class _Main
             break;
         case "italian":
             stemmer = new ItalianStemmer();
+            break;
+        case "nepali":
+            stemmer = new NepaliStemmer();
             break;
         case "norwegian":
             stemmer = new NorwegianStemmer();
