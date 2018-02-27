@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name='snowballstemmer',
       version='1.2.0',
-      description='This package provides 19 stemmer algorithms (17 + Porter English stemmer) generated from Snowball algorithms.',
+      description='This package provides 19 stemmer algorithms (18 + Porter English stemmer) generated from Snowball algorithms.',
       long_description='''
 It includes following language algorithms:
 
