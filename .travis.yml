@@ -39,7 +39,8 @@ before_install:
   # now create gopath that points to this repo
   - test -z "$GO" || mkdir -p $HOME/gopath/src/github.com/
   - test -z "$GO" || ln -s $HOME/build/snowballstem $HOME/gopath/src/github.com/snowballstem
-  - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com:"${TRAVIS_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+  - GH_REPO_SLUG=${TRAVIS_PULL_REQUEST_SLUG:-TRAVIS_REPO_SLUG}
+  - git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/"${GH_REPO_SLUG%%/*}"/snowball-data.git || git clone --depth=1 -b "$TRAVIS_BRANCH" https://github.com/snowballstem/snowball-data.git || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
   - make CC="$CC$cc_append"
   - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
