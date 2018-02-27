@@ -2,6 +2,7 @@
  * Authors:
  * - Ingroj Shrestha <ing.stha@gmail.com>, Nepali NLP Group
  * - Oleg Bartunov <obartunov@gmail.com>, Postgres Professional Ltd.
+ * - Shreeya Singh Dhakal, Nepali NLP Group
 */
 
 routines (
