@@ -3,12 +3,12 @@
  * - Ingroj Shrestha <ing.stha@gmail.com>, Nepali NLP Group
  * - Oleg Bartunov <obartunov@gmail.com>, Postgres Professional Ltd.
  * - Shreeya Singh Dhakal, Nepali NLP Group
-*/
+ */
 
 routines (
 	remove_category_1
 	check_category_2
-    remove_category_2
+	remove_category_2
 	remove_category_3
 )
 
@@ -17,11 +17,11 @@ backwardmode (
 	define remove_category_1 as(
 		[substring] among (
 			'मार्फत' 'द्वारा' 'सँगै' 'संग'
-			'सँग' 'लाइ' 'लाई' 'पछि' 
-			'ले' 'रत' 'मै' 'मा' 	
+			'सँग' 'लाइ' 'लाई' 'पछि'
+			'ले' 'रत' 'मै' 'मा'
 			(delete)
 			'को' 'का' 'कि' 'की' 'कै'(('ए' or 'े' ()) or delete)
-        	)
+		)
 	)
 
 	define check_category_2 as(
@@ -29,11 +29,11 @@ backwardmode (
 			'ँ' 'ं' 'ै'
 		)
 	)
-	
+
 	define remove_category_2 as (
 		[substring] among(
 		'ँ' 'ं' ('यौ' or 'छौ' or 'नौ' or 'थे' delete)
-		'ै' ('त्र' delete)  
+		'ै' ('त्र' delete)
 		)
 	)
 
@@ -45,10 +45,10 @@ backwardmode (
 	)
 
 )
-				
+
 define stem as (
-    backwards (
-    		do remove_category_1
+	backwards (
+		do remove_category_1
 			do (
 				repeat (check_category_2 and remove_category_2 and remove_category_3 or remove_category_3)
 			)
