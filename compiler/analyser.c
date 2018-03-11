@@ -35,8 +35,6 @@ static struct node * read_C(struct analyser * a);
 static struct node * C_style(struct analyser * a, const char * s, int token);
 
 
-static void fault(int n) { fprintf(stderr, "fault %d\n", n); exit(1); }
-
 static void print_node_(struct node * p, int n, const char * s) {
 
     int i;
@@ -76,27 +74,28 @@ static struct node * new_node(struct analyser * a, int type) {
 
 static const char * name_of_mode(int n) {
     switch (n) {
-        default: fault(0);
         case m_backward: return "string backward";
         case m_forward:  return "string forward";
     /*  case m_integer:  return "integer";  */
     }
+    fprintf(stderr, "Invalid mode %d in name_of_mode()\n", n);
+    exit(1);
 }
 
 static const char * name_of_type(int n) {
     switch (n) {
-        default: fault(1);
         case 's': return "string";
         case 'i': return "integer";
         case 'r': return "routine";
         case 'R': return "routine or grouping";
         case 'g': return "grouping";
     }
+    fprintf(stderr, "Invalid type %d in name_of_type()\n", n);
+    exit(1);
 }
 
 static const char * name_of_name_type(int code) {
     switch (code) {
-        default: fault(2);
         case t_string: return "string";
         case t_boolean: return "boolean";
         case t_integer: return "integer";
@@ -104,6 +103,8 @@ static const char * name_of_name_type(int code) {
         case t_external: return "external";
         case t_grouping: return "grouping";
     }
+    fprintf(stderr, "Invalid type code %d in name_of_name_type()\n", code);
+    exit(1);
 }
 
 static void count_error(struct analyser * a) {
@@ -122,6 +123,7 @@ static void error2(struct analyser * a, error_code n, int x) {
             fprintf(stderr, "%s omitted", name_of_token(t->omission)); break;
         case e_unexpected_token_in_among:
             fprintf(stderr, "in among(...), ");
+            /* fall through */
         case e_unexpected_token:
             fprintf(stderr, "unexpected %s", name_of_token(t->token));
             if (t->token == c_number) fprintf(stderr, " %d", t->number);
@@ -406,6 +408,7 @@ static struct node * read_AE(struct analyser * a, int B) {
         case c_maxint:
         case c_minint:
             a->int_limits_used = true;
+            /* fall through */
         case c_cursor:
         case c_limit:
         case c_len:
@@ -723,6 +726,7 @@ static struct node * read_C(struct analyser * a) {
             return C_style(a, "A", token);
         case c_delete:
             check_modifyable(a);
+            /* fall through */
         case c_next:
         case c_tolimit:
         case c_atlimit:
@@ -757,7 +761,12 @@ static struct node * read_C(struct analyser * a) {
                 switch (q ? q->type : t_string)
                     /* above line was: switch (q->type) - bug #1 fix 7/2/2003 */
                 {
-                    default: error(a, e_not_of_type_string_or_integer);
+                    default:
+                        error(a, e_not_of_type_string_or_integer);
+                        /* Handle $foo for unknown 'foo' as string since
+                         * that's more common and so less likely to cause
+                         * an error avalanche. */
+                        /* fall through */
                     case t_string:
                         a->mode = m_forward;
                         a->modifyable = true;
@@ -977,6 +986,7 @@ static void read_program_(struct analyser * a, int terminator) {
             case c_backwardmode:read_backwardmode(a); break;
             case c_ket:
                 if (terminator == c_ket) return;
+                /* fall through */
             default:
                 error(a, e_unexpected_token); break;
             case -1:

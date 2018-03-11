@@ -102,10 +102,13 @@ static int eq_s(struct tokeniser * t, const char * s) {
 
 static int white_space(struct tokeniser * t, int ch) {
     switch (ch) {
-        case '\n': t->line_number++;
+        case '\n':
+            t->line_number++;
+            /* fall through */
         case '\r':
         case '\t':
-        case ' ': return true;
+        case ' ':
+            return true;
     }
     return false;
 }
@@ -391,7 +394,7 @@ extern int read_token(struct tokeniser * t) {
                    t->get_depth--;
                    continue;
                }
-               /* drop through */
+               /* fall through */
             default:
                 t->previous_token = t->token;
                 t->token = code;

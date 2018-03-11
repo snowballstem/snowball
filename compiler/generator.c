@@ -75,11 +75,10 @@ static void write_hex(struct generator * g, int i) {
 static void wlitch(struct generator * g, int ch) {
     if (32 <= ch && ch < 127) {
         write_char(g, '\'');
-        switch (ch) {
-            case '\'':
-            case '\\': write_char(g, '\\');
-            default:   write_char(g, ch);
+        if (ch == '\'' || ch == '\\') {
+            write_char(g, '\\');
         }
+        write_char(g, ch);
         write_char(g, '\'');
     }  else {
         write_string(g, "0x"); write_hex(g, ch);
