@@ -1,6 +1,6 @@
 stringescapes {}
 
-/* the 32 Cyrillic letters in the KOI8-R coding scheme, and represented
+/* the 33 Cyrillic letters in the KOI8-R coding scheme, and represented
    in Latin characters following the conventions of the standard Library
    of Congress transliteration: */
 
@@ -10,6 +10,7 @@ stringdef v    hex 'D7'
 stringdef g    hex 'C7'
 stringdef d    hex 'C4'
 stringdef e    hex 'C5'
+stringdef e"   hex 'A3'
 stringdef zh   hex 'D6'
 stringdef z    hex 'DA'
 stringdef i    hex 'C9'
@@ -199,6 +200,10 @@ backwardmode (
 )
 
 define stem as (
+
+    // Normalise {e"} to {e}.  The documentation has long suggested the user
+    // should do this before calling the stemmer - we now do it for them.
+    do repeat ( goto ['{e"}'] <- '{e}' )
 
     do mark_regions
     backwards setlimit tomark pV for (
