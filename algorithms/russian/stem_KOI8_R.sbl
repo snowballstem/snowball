@@ -203,7 +203,7 @@ define stem as (
 
     // Normalise {e"} to {e}.  The documentation has long suggested the user
     // should do this before calling the stemmer - we now do it for them.
-    do repeat ( goto ['{e"}'] <- '{e}' )
+    do repeat ( goto (['{e"}']) <- '{e}' )
 
     do mark_regions
     backwards setlimit tomark pV for (
