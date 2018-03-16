@@ -654,7 +654,8 @@ static struct node * read_among(struct analyser * a) {
                 q = read_C_list(a); break;
             default:
                 error(a, e_unexpected_token_in_among);
-                break;
+                previous_token = token;
+                continue;
             case c_ket:
                 if (p->number == 0) error(a, e_empty_among);
                 if (t->error_count == 0) make_among(a, p, substring);
