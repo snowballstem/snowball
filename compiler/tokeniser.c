@@ -244,6 +244,7 @@ static int decimal_to_num(int ch) {
 static int hex_to_num(int ch) {
     if ('0' <= ch && ch <= '9') return ch - '0';
     if ('a' <= ch && ch <= 'f') return ch - 'a' + 10;
+    if ('A' <= ch && ch <= 'F') return ch - 'A' + 10;
     return -1;
 }
 
@@ -264,7 +265,7 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                         return;
                     }
                 } else {
-                    ch = hex_to_num(tolower(ch));
+                    ch = hex_to_num(ch);
                     if (ch < 0) {
                         error1(t, "hex string contains non-hex characters");
                         return;
