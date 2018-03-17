@@ -16,6 +16,8 @@ struct system_word {
 
 #include "syswords.h"
 
+static int hex_to_num(int ch);
+
 static int smaller(int a, int b) { return a < b ? a : b; }
 
 extern symbol * get_input(symbol * p, char ** p_file) {
@@ -132,6 +134,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
         if (ch == '\n') { error1(t, "string not terminated"); return c; }
         c++;
         if (ch == t->m_start) {
+            /* Inside insert characters. */
             int c0 = c;
             int newlines = false; /* no newlines as yet */
             int black_found = false; /* no printing chars as yet */
@@ -153,7 +156,53 @@ static int read_literal_string(struct tokeniser * t, int c) {
                 if (q == 0) {
                     if (n == 1 && (firstch == '\'' || firstch == t->m_start))
                         t->b = add_to_b(t->b, 1, p + c0);
-                    else
+                    else if (n >= 3 && firstch == 'U' && p[c0 + 1] == '+') {
+                        int codepoint = 0;
+                        int x;
+                        if (t->uplusmode == UPLUS_DEFINED) {
+                            error1(t, "Some U+xxxx stringdefs seen but not this one");
+                        } else {
+                            t->uplusmode = UPLUS_UNICODE;
+                        }
+                        for (x = c0 + 2; x != c - 1; ++x) {
+                            int hex = hex_to_num(p[x]);
+                            if (hex < 0) {
+                                error1(t, "Bad hex digit following U+");
+                                break;
+                            }
+                            codepoint = (codepoint << 4) | hex;
+                        }
+                        if (t->encoding == ENC_UTF8) {
+                            if (codepoint < 0 || codepoint > 0x01ffff) {
+                                error1(t, "character values exceed 0x01ffff");
+                            }
+                            /* Ensure there's enough space for a max length
+                             * UTF-8 sequence. */
+                            if (CAPACITY(t->b) < SIZE(t->b) + 3) {
+                                t->b = increase_capacity(t->b, 3);
+                            }
+                            SIZE(t->b) += put_utf8(codepoint, t->b + SIZE(t->b));
+                        } else {
+                            if (t->encoding == ENC_SINGLEBYTE) {
+                                /* Only ISO-8859-1 is handled this way - for
+                                 * other single-byte character sets you need
+                                 * stringdef all the U+xxxx codes you use
+                                 * like - e.g.:
+                                 *
+                                 * stringdef U+0171   hex 'FB'
+                                 */
+                                if (codepoint < 0 || codepoint > 0xff) {
+                                    error1(t, "character values exceed 256");
+                                }
+                            } else {
+                                if (codepoint < 0 || codepoint > 0xffff) {
+                                    error1(t, "character values exceed 64K");
+                                }
+                            }
+                            symbol sym = codepoint;
+                            t->b = add_to_b(t->b, 1, &sym);
+                        }
+                    } else
                         error(t, "string macro '", n, p + c0, "' undeclared");
                 } else
                     t->b = add_to_b(t->b, SIZE(q), q);
@@ -344,6 +393,14 @@ extern int read_token(struct tokeniser * t) {
                        q->name = copy_b(t->b2);
                        q->value = copy_b(t->b);
                        t->m_pairs = q;
+                       if (t->uplusmode != UPLUS_DEFINED &&
+                           (SIZE(t->b2) >= 3 && t->b2[0] == 'U' && t->b2[1] == '+')) {
+                           if (t->uplusmode == UPLUS_UNICODE) {
+                               error1(t, "U+xxxx already used with implicit meaning");
+                           } else {
+                               t->uplusmode = UPLUS_DEFINED;
+                           }
+                       }
                    }
                }
                continue;
@@ -443,6 +500,7 @@ extern struct tokeniser * create_tokeniser(symbol * p, char * file) {
     t->token_held = false;
     t->token = -2;
     t->previous_token = -2;
+    t->uplusmode = UPLUS_NONE;
     memset(t->token_disabled, 0, sizeof(t->token_disabled));
     return t;
 }

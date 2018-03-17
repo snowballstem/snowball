@@ -92,6 +92,12 @@ enum token_codes {
     NUM_TOKEN_CODES
 };
 
+enum uplus_modes {
+    UPLUS_NONE,
+    UPLUS_DEFINED,
+    UPLUS_UNICODE
+};
+
 /* struct input must be a prefix of struct tokeniser. */
 struct tokeniser {
 
@@ -115,6 +121,13 @@ struct tokeniser {
 
     int omission;
     struct include * includes;
+
+    /* Mode in which U+ has been used:
+     * UPLUS_NONE - not used yet
+     * UPLUS_DEFINED - stringdef U+xxxx ....
+     * UPLUS_UNICODE - {U+xxxx} used with implicit meaning
+     */
+    int uplusmode;
 
     char token_disabled[NUM_TOKEN_CODES];
 };
