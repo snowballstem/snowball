@@ -102,10 +102,13 @@ static int eq_s(struct tokeniser * t, const char * s) {
 
 static int white_space(struct tokeniser * t, int ch) {
     switch (ch) {
-        case '\n': t->line_number++;
+        case '\n':
+            t->line_number++;
+            /* fall through */
         case '\r':
         case '\t':
-        case ' ': return true;
+        case ' ':
+            return true;
     }
     return false;
 }
@@ -241,6 +244,7 @@ static int decimal_to_num(int ch) {
 static int hex_to_num(int ch) {
     if ('0' <= ch && ch <= '9') return ch - '0';
     if ('a' <= ch && ch <= 'f') return ch - 'a' + 10;
+    if ('A' <= ch && ch <= 'F') return ch - 'A' + 10;
     return -1;
 }
 
@@ -261,7 +265,7 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                         return;
                     }
                 } else {
-                    ch = hex_to_num(tolower(ch));
+                    ch = hex_to_num(ch);
                     if (ch < 0) {
                         error1(t, "hex string contains non-hex characters");
                         return;
@@ -270,18 +274,18 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                 number = base * number + ch;
                 c++;
             }
-            if (t->widechars || t->utf8) {
-                if (number < 0 || number > 0xffff) {
-                    error1(t, "character values exceed 64K");
-                    return;
-                }
-            } else {
+            if (t->encoding == ENC_SINGLEBYTE) {
                 if (number < 0 || number > 0xff) {
                     error1(t, "character values exceed 256");
                     return;
                 }
+            } else {
+                if (number < 0 || number > 0xffff) {
+                    error1(t, "character values exceed 64K");
+                    return;
+                }
             }
-            if (t->utf8)
+            if (t->encoding == ENC_UTF8)
                 d += put_utf8(number, p + d);
             else
                 p[d++] = number;
@@ -391,7 +395,7 @@ extern int read_token(struct tokeniser * t) {
                    t->get_depth--;
                    continue;
                }
-               /* drop through */
+               /* fall through */
             default:
                 t->previous_token = t->token;
                 t->token = code;

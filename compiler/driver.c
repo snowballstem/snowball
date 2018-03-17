@@ -7,6 +7,8 @@
 #define DEFAULT_BASE_CLASS "org.tartarus.snowball.SnowballProgram"
 #define DEFAULT_AMONG_CLASS "org.tartarus.snowball.Among"
 #define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
+#define DEFAULT_GO_PACKAGE "snowball"
+#define DEFAULT_GO_SNOWBALL_RUNTIME "github.com/snowballstem/snowball/go"
 
 static int eq(const char * s1, const char * s2) {
     return strcmp(s1, s2) == 0;
@@ -29,6 +31,9 @@ static void print_arglist(void) {
 #ifndef DISABLE_RUST
                     "             [-rust]\n"
 #endif
+#ifndef DISABLE_GO
+                    "             [-go]\n"
+#endif
                     "             [-w[idechars]]\n"
                     "             [-u[tf8]]\n"
                     "             [-n[ame] class name]\n"
@@ -41,6 +46,10 @@ static void print_arglist(void) {
                     "             [-P[ackage] package name for stemmers]\n"
                     "             [-S[tringclass] StringBuffer-compatible class]\n"
                     "             [-a[mongclass] fully qualified name of the Among class]\n"
+#endif
+#ifndef DISABLE_GO
+                    "             [-gop[ackage] Go package name for stemmers]\n"
+                    "             [-gor[untime] Go snowball runtime package]\n"
 #endif
            );
     exit(1);
@@ -79,12 +88,13 @@ static void read_options(struct options * o, int argc, char * argv[]) {
     o->string_class = DEFAULT_STRING_CLASS;
     o->among_class = DEFAULT_AMONG_CLASS;
     o->package = DEFAULT_PACKAGE;
+    o->go_package = DEFAULT_GO_PACKAGE;
+    o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
     o->name = "";
     o->make_lang = LANG_C;
-    o->widechars = false;
     o->includes = 0;
     o->includes_end = 0;
-    o->utf8 = false;
+    o->encoding = ENC_SINGLEBYTE;
 
     /* read options: */
 
@@ -103,22 +113,28 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
 #ifndef DISABLE_RUST
             if (eq(s, "-rust")) {
                 o->make_lang = LANG_RUST;
-                o->widechars = false;
-                o->utf8 = true;
+                o->encoding = ENC_UTF8;
+                continue;
+            }
+#endif
+#ifndef DISABLE_GO
+            if (eq(s, "-go")) {
+                o->make_lang = LANG_GO;
+                o->encoding = ENC_UTF8;
                 continue;
             }
 #endif
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
@@ -129,13 +145,12 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_PYTHON
             if (eq(s, "-py") || eq(s, "-python")) {
                 o->make_lang = LANG_PYTHON;
-                o->widechars = true;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
             if (eq(s, "-w") || eq(s, "-widechars")) {
-                o->widechars = true;
-                o->utf8 = false;
+                o->encoding = ENC_WIDECHARS;
                 continue;
             }
             if (eq(s, "-s") || eq(s, "-syntax")) {
@@ -173,8 +188,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
             if (eq(s, "-u") || eq(s, "-utf8")) {
-                o->utf8 = true;
-                o->widechars = false;
+                o->encoding = ENC_UTF8;
                 continue;
             }
 #ifndef DISABLE_JAVA
@@ -196,6 +210,18 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             if (eq(s, "-a") || eq(s, "-amongclass")) {
                 check_lim(i, argc);
                 o->among_class = argv[i++];
+                continue;
+            }
+#endif
+#ifndef DISABLE_GO
+            if (eq(s, "-gop") || eq(s, "-gopackage")) {
+                check_lim(i, argc);
+                o->go_package = argv[i++];
+                continue;
+            }
+            if (eq(s, "-gor") || eq(s, "-goruntime")) {
+                check_lim(i, argc);
+                o->go_snowball_runtime = argv[i++];
                 continue;
             }
 #endif
@@ -231,9 +257,8 @@ extern int main(int argc, char * argv[]) {
         {
             struct tokeniser * t = create_tokeniser(u, file);
             struct analyser * a = create_analyser(t);
-            t->widechars = o->widechars;
+            a->encoding = t->encoding = o->encoding;
             t->includes = o->includes;
-            a->utf8 = t->utf8 = o->utf8;
             read_program(a);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
@@ -303,6 +328,16 @@ extern int main(int argc, char * argv[]) {
                     fclose(o->output_src);
                 }
 #endif
+#ifndef DISABLE_GO
+                if (o->make_lang == LANG_GO) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".go");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_go(g);
+                    fclose(o->output_src);
+                }
+#endif
                 close_generator(g);
             }
             close_analyser(a);
@@ -320,4 +355,3 @@ extern int main(int argc, char * argv[]) {
     if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);
     return 0;
 }
-

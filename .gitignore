@@ -8,3 +8,5 @@
 /python_out
 /rust/Cargo.lock
 /rust/target/
+/go/algorithms/
+/go/stemwords/algorithms.go

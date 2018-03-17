@@ -415,12 +415,7 @@ extern int insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbo
 }
 
 extern int insert_v(struct SN_env * z, int bra, int ket, const symbol * p) {
-    int adjustment;
-    if (replace_s(z, bra, ket, SIZE(p), p, &adjustment))
-        return -1;
-    if (bra <= z->bra) z->bra += adjustment;
-    if (bra <= z->ket) z->ket += adjustment;
-    return 0;
+    return insert_s(z, bra, ket, SIZE(p), p);
 }
 
 extern symbol * slice_to(struct SN_env * z, symbol * p) {
