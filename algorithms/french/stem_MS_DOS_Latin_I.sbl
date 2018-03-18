@@ -30,6 +30,7 @@ stringdef e`   hex '8A'  // e-grave
 stringdef i"   hex '8B'  // i-diaeresis
 stringdef i^   hex '8C'  // i-circumflex
 stringdef o^   hex '93'  // o-circumflex
+stringdef u"   hex '81'  // u-diaeresis
 stringdef u^   hex '96'  // u-circumflex
 stringdef u`   hex '97'  // u-grave
 
@@ -45,6 +46,8 @@ define prelude as repeat goto (
     (  ['y'] v <- 'Y' )
     or
     (  'q' ['u'] <- 'U' )
+    or
+    ( 'g' ['{u"}'] v <- 'u' )
 )
 
 define mark_regions as (
@@ -197,13 +200,13 @@ backwardmode (
 
     define residual_suffix as (
         try(['s'] test non-keep_with_s delete)
+        try(['{e"}'] test 'gu' delete)
         setlimit tomark pV for (
             [substring] among(
                 'ion'           (R2 's' or 't' delete)
                 'ier' 'i{e`}re'
                 'Ier' 'I{e`}re' (<-'i')
                 'e'             (delete)
-                '{e"}'          ('gu' delete)
             )
         )
     )
