@@ -6,6 +6,7 @@
 /dist
 /js_out
 /python_out
+*.generated.cs
 /rust/Cargo.lock
 /rust/target/
 /go/algorithms/

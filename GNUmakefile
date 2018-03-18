@@ -7,6 +7,12 @@ JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
+MONO ?= mono
+MCS ?= mcs
+csharp_src_main_dir = csharp/Snowball
+csharp_src_dir = $(csharp_src_main_dir)/Algorithms
+csharp_sample_dir = csharp/Stemwords
+
 python ?= python3
 python_output_dir = python_out
 python_runtime_dir = snowballstemmer
@@ -51,6 +57,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
+		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
 		   compiler/generator_js.c \
 		   compiler/generator_python.c \
@@ -71,6 +78,12 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
+
+CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
+			 csharp/Snowball/Stemmer.cs \
+			 csharp/Snowball/AssemblyInfo.cs
+
+CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 
 JS_RUNTIME_SOURCES = js/among.js \
 		     js/base-stemmer.js \
@@ -111,6 +124,7 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
@@ -143,6 +157,7 @@ clean:
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+	      $(CSHARP_SOURCES) \
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
@@ -177,6 +192,9 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
+
+csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
 algorithms/%/stem_Unicode.sbl: algorithms/%/stem_ISO_8859_1.sbl
 	cp $^ $@
@@ -218,6 +236,14 @@ $(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
 	o="$(java_src_dir)/$${l}Stemmer"; \
 	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -n $${l}Stemmer"; \
 	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -n $${l}Stemmer
+
+$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%/stem_Unicode.sbl snowball
+	@mkdir -p $(csharp_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
+	o="$(csharp_src_dir)/$${l}Stemmer.generated"; \
+	echo "./snowball $< -cs -o $${o} -p \"Stemmer\" -n $${t}Stemmer"; \
+	./snowball $< -cs -o $${o} -p "Stemmer" -n $${t}Stemmer
 
 $(python_output_dir)/%_stemmer.py: algorithms/%/stem_Unicode.sbl snowball
 	@mkdir -p $(python_output_dir)
@@ -266,7 +292,7 @@ snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -354,6 +380,25 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
+	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	rm -rf $${dest}
+
+# Make a distribution of all the sources required to compile the C# library.
+dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+            $(LIBSTEMMER_EXTRA) \
+	    $(CSHARP_SOURCES)
+	destname=libstemmer_csharp; \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
+	mkdir -p $${dest} && \
+	cp -a doc/libstemmer_csharp_README $${dest}/README && \
+	mkdir -p $${dest}/$(csharp_src_dir) && \
+	cp -a $(CSHARP_SOURCES) $${dest}/$(csharp_src_dir) && \
+	mkdir -p $${dest}/$(csharp_src_main_dir) && \
+	cp -a $(CSHARP_RUNTIME_SOURCES) $${dest}/$(csharp_src_main_dir) && \
+	mkdir -p $${dest}/$(csharp_sample_dir) && \
+	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
@@ -461,6 +506,26 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	    $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` -o $(PWD)/tmp.txt; \
 	else \
 	  $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` $</voc.txt -o $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+check_csharp: csharp_stemwords
+	$(MAKE) do_check_csharp
+
+do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
+
+check_csharp_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for C#"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	    $(MONO) csharp_stemwords -l `echo $<|sed 's!.*/!!'` -i /dev/stdin -o tmp.txt; \
+	else \
+	  $(MONO) csharp_stemwords -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \

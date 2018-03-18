@@ -10,6 +10,11 @@
 #define DEFAULT_GO_PACKAGE "snowball"
 #define DEFAULT_GO_SNOWBALL_RUNTIME "github.com/snowballstem/snowball/go"
 
+#define DEFAULT_CS_NAMESPACE "Snowball"
+#define DEFAULT_CS_BASE_CLASS "Stemmer"
+#define DEFAULT_CS_AMONG_CLASS "Among"
+#define DEFAULT_CS_STRING_CLASS "StringBuilder"
+
 static int eq(const char * s1, const char * s2) {
     return strcmp(s1, s2) == 0;
 }
@@ -20,6 +25,9 @@ static void print_arglist(void) {
                     "             [-s[yntax]]\n"
 #ifndef DISABLE_JAVA
                     "             [-j[ava]]\n"
+#endif
+#ifndef DISABLE_CSHARP
+                    "             [-cs[harp]]\n"
 #endif
                     "             [-c++]\n"
 #ifndef DISABLE_PYTHON
@@ -41,7 +49,7 @@ static void print_arglist(void) {
                     "             [-vp[refix] string]\n"
                     "             [-i[nclude] directory]\n"
                     "             [-r[untime] path to runtime headers]\n"
-#ifndef DISABLE_JAVA
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
                     "             [-p[arentclassname] fully qualified parent class name]\n"
                     "             [-P[ackage] package name for stemmers]\n"
                     "             [-S[tringclass] StringBuffer-compatible class]\n"
@@ -138,6 +146,17 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
 #endif
+#ifndef DISABLE_CSHARP
+            if (eq(s, "-cs") || eq(s, "-csharp")) {
+                o->make_lang = LANG_CSHARP;
+		o->encoding = ENC_WIDECHARS;
+                o->parent_class_name = DEFAULT_CS_BASE_CLASS;
+                o->string_class = DEFAULT_CS_STRING_CLASS;
+                o->among_class = DEFAULT_CS_AMONG_CLASS;
+                o->package = DEFAULT_CS_NAMESPACE;
+                continue;
+            }
+#endif
             if (eq(s, "-c++")) {
                 o->make_lang = LANG_CPLUSPLUS;
                 continue;
@@ -191,7 +210,7 @@ static void read_options(struct options * o, int argc, char * argv[]) {
                 o->encoding = ENC_UTF8;
                 continue;
             }
-#ifndef DISABLE_JAVA
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
             if (eq(s, "-p") || eq(s, "-parentclassname")) {
                 check_lim(i, argc);
                 o->parent_class_name = argv[i++];
@@ -315,6 +334,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_js(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_CSHARP
+                if (o->make_lang == LANG_CSHARP) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".cs");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_csharp(g);
                     fclose(o->output_src);
                 }
 #endif
