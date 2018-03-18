@@ -1138,7 +1138,7 @@ static void generate_class_end(struct generator * g) {
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
     w(g, "~-};~N");
-    //w(g, "window['~n'] = ~n;~N");
+    /* w(g, "window['~n'] = ~n;~N"); */
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
