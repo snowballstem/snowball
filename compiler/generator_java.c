@@ -1201,17 +1201,17 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "    private ");
+                w(g, "~Mprivate ");
                 w(g, g->options->string_class);
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
                 break;
             case t_integer:
-                w(g, "    private int ~W0;~N");
+                w(g, "~Mprivate int ~W0;~N");
                 break;
             case t_boolean:
-                w(g, "    private boolean ~W0;~N");
+                w(g, "~Mprivate boolean ~W0;~N");
                 break;
         }
     }
