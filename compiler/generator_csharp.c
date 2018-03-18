@@ -1187,7 +1187,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 static void generate_amongs(struct generator * g) {
     struct among * x;
 
-    // Generate declarations
+    /* Generate declarations. */
     x = g->analyser->amongs;
     while (x != 0) {
         generate_among_declaration(g, x);
