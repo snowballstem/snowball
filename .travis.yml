@@ -9,7 +9,9 @@ matrix:
       env: c_tests=y cc_append=' -std=c90'
     - env: JAVA=java JAVAC=javac
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
-    - env: NPM=npm
+    - language: node_js
+      node_js: "node"
+      env: NODEJS=nodejs
     - env: RUST=rust
     # The pure Python versions run slowly so we need to thin the testdata
     # for languages such as Arabic where there's a lot, or else the build
@@ -63,7 +65,7 @@ script:
   - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
-  - test -z "$NPM" || make check_js STEMMING_DATA=snowball-data
+  - test -z "$NODEJS" || make check_js STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust cargoflags=--release STEMMING_DATA=snowball-data
   - test -z "$GO" || make check_go STEMMING_DATA=snowball-data
