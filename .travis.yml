@@ -11,7 +11,7 @@ matrix:
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
     - language: node_js
       node_js: "node"
-      env: NODEJS=nodejs
+      env: CC=gcc NODEJS=nodejs
     - env: RUST=rust
     # The pure Python versions run slowly so we need to thin the testdata
     # for languages such as Arabic where there's a lot, or else the build
