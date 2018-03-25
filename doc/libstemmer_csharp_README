@@ -1,0 +1,26 @@
+libstemmer_csharp
+=================
+
+This document pertains to the C# version of the libstemmer distribution,
+available for download from:
+
+http://snowballstem.org/dist/libstemmer_csharp.tgz
+
+
+Compiling the library
+=====================
+
+Simply run xbuild on the Snowball.sln solution file in the csharp/Snowball
+directory.  For example, this can be done under unix by changing directory into
+the csharp directory, and running:
+
+ xbuild /p:Configuration=Release Snowball.sln
+
+
+Using the library
+=================
+
+There is currently no formal documentation on the use of the C# version
+of the library. Additionally, its interface is not guaranteed to be
+stable.
+

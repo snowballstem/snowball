@@ -281,7 +281,7 @@ struct generator {
      * if < 0, the negated keep_count for the limit to restore in case of
      * failure. */
     int failure_keep_count;
-#if !defined(DISABLE_JAVA) && !defined(DISABLE_JSX) && !defined(DISABLE_PYTHON)
+#if !defined(DISABLE_JAVA) && !defined(DISABLE_JS) && !defined(DISABLE_PYTHON) && !defined(DISABLE_CSHARP)
     struct str * failure_str;  /* This is used by some generators instead of failure_keep_count */
 #endif
 
@@ -313,7 +313,7 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_PYTHON, LANG_JSX, LANG_RUST, LANG_GO } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -350,13 +350,18 @@ extern void generate_program_c(struct generator * g);
 extern void generate_program_java(struct generator * g);
 #endif
 
+#ifndef DISABLE_CSHARP
+/* Generator for C# code. */
+extern void generate_program_csharp(struct generator * g);
+#endif
+
 #ifndef DISABLE_PYTHON
 /* Generator for Python code. */
 extern void generate_program_python(struct generator * g);
 #endif
 
-#ifndef DISABLE_JSX
-extern void generate_program_jsx(struct generator * g);
+#ifndef DISABLE_JS
+extern void generate_program_js(struct generator * g);
 #endif
 
 #ifndef DISABLE_RUST
