@@ -852,18 +852,19 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
-    write_comment(g, p);
-    g->V[0] = p->name;
+    g->B[0] = str_data(savevar);
+    writef(g, "~{~C~N"
+              "~Mvar /** !Object */ ~B0 = new BaseStemmer();~N", p);
+    writef(g, "~M~B0.copy_from(base);~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
-    g->B[0] = str_data(savevar);
-    writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mbase.current = ~V0 /* ? + ''*/;~N"
-             "~Mbase.cursor = 0;~N"
-             "~Mbase.limit = base.current.length;~N", p);
+    g->V[0] = p->name;
+    writef(g, "~Mbase.current = ~V0;~N"
+              "~Mbase.cursor = 0;~N"
+              "~Mbase.limit = base.current.length;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
@@ -1229,25 +1230,6 @@ static void generate_members(struct generator * g) {
     w(g, "~N");
 }
 
-static void generate_copyfrom(struct generator * g) {
-
-    struct name * q;
-    if (g->copy_from_count == 0) return;
-    w(g, "~Mthis.copy_from = function(/** !~n */ other) {~+~N");
-    for (q = g->analyser->names; q != 0; q = q->next) {
-        g->V[0] = q;
-        switch (q->type) {
-            case t_string:
-            case t_integer:
-            case t_boolean:
-                w(g, "~M~V0 = other.~W0;~N");
-                break;
-        }
-    }
-    w(g, "~Mbase.copy_from(other);~N");
-    w(g, "~-~M};~N");
-}
-
 static void generate_methods(struct generator * g) {
 
     struct node * p = g->analyser->program;
@@ -1270,7 +1252,6 @@ extern void generate_program_js(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
-    generate_copyfrom(g);
     generate_methods(g);
 
     generate_class_end(g);
