@@ -160,6 +160,18 @@ static int read_literal_string(struct tokeniser * t, int c) {
                         int codepoint = 0;
                         int x;
                         if (t->uplusmode == UPLUS_DEFINED) {
+                            /* See if found with xxxx upper-cased. */
+                            symbol * uc = create_b(n);
+                            int i;
+                            for (i = 0; i != n; ++i) {
+                                uc[i] = toupper(p[c0 + i]);
+                            }
+                            q = find_in_m(t, n, uc);
+                            lose_b(uc);
+                            if (q != 0) {
+                                t->b = add_to_b(t->b, SIZE(q), q);
+                                continue;
+                            }
                             error1(t, "Some U+xxxx stringdefs seen but not this one");
                         } else {
                             t->uplusmode = UPLUS_UNICODE;
