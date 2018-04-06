@@ -20,7 +20,7 @@ static int eq(const char * s1, const char * s2) {
 }
 
 static void print_arglist(void) {
-    fprintf(stderr, "Usage: snowball <file> [options]\n\n"
+    fprintf(stderr, "Usage: snowball <file>... [options]\n\n"
                     "options are: [-o[utput] file]\n"
                     "             [-s[yntax]]\n"
 #ifndef DISABLE_JAVA
@@ -81,9 +81,10 @@ static FILE * get_output(symbol * b) {
     return output;
 }
 
-static void read_options(struct options * o, int argc, char * argv[]) {
+static int read_options(struct options * o, int argc, char * argv[]) {
     char * s;
-    int i = 2;
+    int i = 1;
+    int new_argc = 1;
 
     /* set defaults: */
 
@@ -108,8 +109,15 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 
     while (i < argc) {
         s = argv[i++];
-        {   if (eq(s, "-o") || eq(s, "-output")) {
-                check_lim(i, argc);
+        if (s[0] != '-') {
+            // Non-option argument - shuffle down.
+            argv[new_argc++] = s;
+            continue;
+        }
+
+        {
+            if (eq(s, "-o") || eq(s, "-output")) {
+               check_lim(i, argc);
                 o->output_file = argv[i++];
                 continue;
             }
@@ -248,6 +256,11 @@ static void read_options(struct options * o, int argc, char * argv[]) {
             print_arglist();
         }
     }
+    if (new_argc == 1) {
+        fprintf(stderr, "no source files specified\n");
+        print_arglist();
+    }
+    argv[new_argc] = NULL;
 
     if (o->make_lang != LANG_C && o->make_lang != LANG_CPLUSPLUS) {
 	if (o->runtime_path) {
@@ -258,17 +271,19 @@ static void read_options(struct options * o, int argc, char * argv[]) {
 	}
     }
     if (!o->externals_prefix) o->externals_prefix = "";
+    return new_argc;
 }
 
 extern int main(int argc, char * argv[]) {
 
+    int i;
     NEW(options, o);
-    if (argc == 1) print_arglist();
-    read_options(o, argc, argv);
+    argc = read_options(o, argc, argv);
     {
         symbol * filename = add_s_to_b(0, argv[1]);
         char * file;
         symbol * u = get_input(filename, &file);
+        lose_b(filename);
         if (u == 0) {
             fprintf(stderr, "Can't open input %s\n", argv[1]);
             exit(1);
@@ -276,8 +291,29 @@ extern int main(int argc, char * argv[]) {
         {
             struct tokeniser * t = create_tokeniser(u, file);
             struct analyser * a = create_analyser(t);
+            struct input ** next_input_ptr = &(t->next);
             a->encoding = t->encoding = o->encoding;
             t->includes = o->includes;
+            /* If multiple source files are specified, set up the others to be
+             * read after the first in order, using the same mechanism as
+             * 'get' uses. */
+            for (i = 2; i != argc; ++i) {
+                NEW(input, q);
+                filename = add_s_to_b(0, argv[i]);
+                u = get_input(filename, &file);
+                lose_b(filename);
+                if (u == 0) {
+                    fprintf(stderr, "Can't open input %s\n", argv[i]);
+                    exit(1);
+                }
+                q->p = u;
+                q->c = 0;
+                q->file = file;
+                q->line_number = 1;
+                *next_input_ptr = q;
+                next_input_ptr = &(q->next);
+            }
+            *next_input_ptr = NULL;
             read_program(a);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
@@ -372,7 +408,6 @@ extern int main(int argc, char * argv[]) {
             close_analyser(a);
         }
         lose_b(u);
-        lose_b(filename);
     }
     {   struct include * p = o->includes;
         while (p) {
