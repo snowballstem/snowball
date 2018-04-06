@@ -46,9 +46,9 @@ define initial_morph as (
     (delete)
 
     // verbs
-    'd{'}' 
+    'd{'}'
     (delete)
-    'd{'}fh' 
+    'd{'}fh'
     (<- 'f')
     // other contractions
     'm{'}' 'b{'}'
@@ -128,11 +128,11 @@ backwardmode (
   )
   define verb_sfx as (
     [substring] among (
-      'imid' 'aimid' '{i'}mid' 'a{i'}mid' 
+      'imid' 'aimid' '{i'}mid' 'a{i'}mid'
       'faidh' 'fidh'
       (RV delete)
       'ain'
-      'eadh' 'adh' 
+      'eadh' 'adh'
       '{a'}il'
       'tear' 'tar'
       (R1 delete)
