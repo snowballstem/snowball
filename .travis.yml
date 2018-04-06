@@ -9,8 +9,11 @@ matrix:
       env: c_tests=y cc_append=' -std=c90'
     - env: JAVA=java JAVAC=javac
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
-    - env: NPM=npm
+    - language: node_js
+      node_js: "node"
+      env: CC=gcc NODE=node
     - env: RUST=rust
+    - env: MCS=mcs
     # The pure Python versions run slowly so we need to thin the testdata
     # for languages such as Arabic where there's a lot, or else the build
     # hits the travis time limit.  With pypy, it's enough faster than we
@@ -44,6 +47,8 @@ before_install:
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
   - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+  - test -z "$MCS" || sudo apt-get update -qq
+  - test -z "$MCS" || sudo apt-get install -qq mono-complete
   # Install rust using rustup.rs
   - test -z "$RUST" || curl https://sh.rustup.rs -sSf -o rustup.sh
   - test -z "$RUST" || chmod ugo+x rustup.sh
@@ -63,8 +68,8 @@ script:
   - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
-  - test -z "$NPM" || "$NPM" install -g jsx
-  - test -z "$NPM" || make check_jsx STEMMING_DATA=snowball-data
+  - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
+  - test -z "$NODE" || make check_js STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust cargoflags=--release STEMMING_DATA=snowball-data
   - test -z "$GO" || make check_go STEMMING_DATA=snowball-data

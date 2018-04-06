@@ -1,57 +1,28 @@
-import "stemmer.jsx";
-import "among.jsx";
-
-class BaseStemmer extends Stemmer
-{
-    // this.current string
-    var current : string;
-    var cursor : int;
-    var limit : int;
-    var limit_backward : int;
-    var bra : int;
-    var ket : int;
-    var cache : Map.<string>;
-
-    __noexport__ function constructor ()
-    {
-        this.cache = {} : Map.<string>;
-	this.setCurrent("");
-    }
-
-    /**
-     * Set the this.current string.
-     */
-    __noexport__ function setCurrent (value : string) : void
-    {
+/**@constructor*/
+BaseStemmer = function() {
+    this.setCurrent = function(value) {
         this.current = value;
 	this.cursor = 0;
 	this.limit = this.current.length;
 	this.limit_backward = 0;
 	this.bra = this.cursor;
 	this.ket = this.limit;
-    }
+    };
 
-    /**
-     * Get the this.current string.
-     */
-    __noexport__ function getCurrent () : string
-    {
+    this.getCurrent = function() {
         return this.current;
-    }
+    };
 
-
-    __noexport__ function copy_from (other : BaseStemmer) : void
-    {
+    this.copy_from = function(other) {
 	this.current          = other.current;
 	this.cursor           = other.cursor;
 	this.limit            = other.limit;
 	this.limit_backward   = other.limit_backward;
 	this.bra              = other.bra;
 	this.ket              = other.ket;
-    }
+    };
 
-    __noexport__ function in_grouping (s : int[], min : int, max : int) : boolean
-    {
+    this.in_grouping = function(s, min, max) {
 	if (this.cursor >= this.limit) return false;
 	var ch = this.current.charCodeAt(this.cursor);
 	if (ch > max || ch < min) return false;
@@ -59,10 +30,9 @@ class BaseStemmer extends Stemmer
 	if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return false;
 	this.cursor++;
 	return true;
-    }
+    };
 
-    __noexport__ function in_grouping_b (s : int[], min : int, max : int) : boolean
-    {
+    this.in_grouping_b = function(s, min, max) {
 	if (this.cursor <= this.limit_backward) return false;
 	var ch = this.current.charCodeAt(this.cursor - 1);
 	if (ch > max || ch < min) return false;
@@ -70,10 +40,9 @@ class BaseStemmer extends Stemmer
 	if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return false;
 	this.cursor--;
 	return true;
-    }
+    };
 
-    __noexport__ function out_grouping (s : int[], min : int, max : int) : boolean
-    {
+    this.out_grouping = function(s, min, max) {
 	if (this.cursor >= this.limit) return false;
 	var ch = this.current.charCodeAt(this.cursor);
 	if (ch > max || ch < min) {
@@ -86,10 +55,9 @@ class BaseStemmer extends Stemmer
 	    return true;
 	}
 	return false;
-    }
+    };
 
-    __noexport__ function out_grouping_b (s : int[], min : int, max : int) : boolean
-    {
+    this.out_grouping_b = function(s, min, max) {
 	if (this.cursor <= this.limit_backward) return false;
 	var ch = this.current.charCodeAt(this.cursor - 1);
 	if (ch > max || ch < min) {
@@ -102,9 +70,9 @@ class BaseStemmer extends Stemmer
 	    return true;
 	}
 	return false;
-    }
+    };
 
-    __noexport__ function eq_s (s : string) : boolean
+    this.eq_s = function(s)
     {
 	if (this.limit - this.cursor < s.length) return false;
         if (this.current.slice(this.cursor, this.cursor + s.length) != s)
@@ -113,9 +81,9 @@ class BaseStemmer extends Stemmer
         }
 	this.cursor += s.length;
 	return true;
-    }
+    };
 
-    __noexport__ function eq_s_b (s : string) : boolean
+    this.eq_s_b = function(s)
     {
 	if (this.cursor - this.limit_backward < s.length) return false;
         if (this.current.slice(this.cursor - s.length, this.cursor) != s)
@@ -124,9 +92,9 @@ class BaseStemmer extends Stemmer
         }
 	this.cursor -= s.length;
 	return true;
-    }
+    };
 
-    __noexport__ function find_among (v : Among[]) : int
+    /** @return {number} */ this.find_among = function(v)
     {
 	var i = 0;
 	var j = v.length;
@@ -144,16 +112,17 @@ class BaseStemmer extends Stemmer
 	    var k = i + ((j - i) >>> 1);
 	    var diff = 0;
 	    var common = common_i < common_j ? common_i : common_j; // smaller
+	    // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
 	    var w = v[k];
 	    var i2;
-	    for (i2 = common; i2 < w.s.length; i2++)
+	    for (i2 = common; i2 < w[0].length; i2++)
             {
 		if (c + common == l)
                 {
 		    diff = -1;
 		    break;
 		}
-		diff = this.current.charCodeAt(c + common) - w.s.charCodeAt(i2);
+		diff = this.current.charCodeAt(c + common) - w[0].charCodeAt(i2);
 		if (diff != 0) break;
 		common++;
 	    }
@@ -183,31 +152,24 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s.length)
+	    if (common_i >= w[0].length)
             {
-		this.cursor = c + w.s.length;
-		if (w.method == null)
-                {
-                    return w.result;
-                }
-		var res = w.method(this);
-		this.cursor = c + w.s.length;
-		if (res)
-                {
-                    return w.result;
-                }
+		this.cursor = c + w[0].length;
+		if (w.length < 4) return w[2];
+		var res = w[3](this);
+		this.cursor = c + w[0].length;
+		if (res) return w[2];
 	    }
-	    i = w.substring_i;
+	    i = w[1];
 	    if (i < 0) return 0;
 	}
-        return -1; // not reachable
-    }
+    };
 
     // find_among_b is for backwards processing. Same comments apply
-    __noexport__ function find_among_b (v : Among[]) : int
+    this.find_among_b = function(v)
     {
 	var i = 0;
-	var j = v.length;
+	var j = v.length
 
 	var c = this.cursor;
 	var lb = this.limit_backward;
@@ -224,14 +186,14 @@ class BaseStemmer extends Stemmer
 	    var common = common_i < common_j ? common_i : common_j;
 	    var w = v[k];
 	    var i2;
-	    for (i2 = w.s.length - 1 - common; i2 >= 0; i2--)
+	    for (i2 = w[0].length - 1 - common; i2 >= 0; i2--)
             {
 		if (c - common == lb)
                 {
 		    diff = -1;
 		    break;
 		}
-		diff = this.current.charCodeAt(c - 1 - common) - w.s.charCodeAt(i2);
+		diff = this.current.charCodeAt(c - 1 - common) - w[0].charCodeAt(i2);
 		if (diff != 0) break;
 		common++;
 	    }
@@ -256,24 +218,23 @@ class BaseStemmer extends Stemmer
 	while (true)
         {
 	    var w = v[i];
-	    if (common_i >= w.s.length)
+	    if (common_i >= w[0].length)
             {
-		this.cursor = c - w.s.length;
-		if (w.method == null) return w.result;
-		var res = w.method(this);
-		this.cursor = c - w.s.length;
-		if (res) return w.result;
+		this.cursor = c - w[0].length;
+		if (w.length < 4) return w[2];
+		var res = w[3](this);
+		this.cursor = c - w[0].length;
+		if (res) return w[2];
 	    }
-	    i = w.substring_i;
+	    i = w[1];
 	    if (i < 0) return 0;
 	}
-        return -1; // not reachable
-    }
+    };
 
     /* to replace chars between c_bra and c_ket in this.current by the
      * chars in s.
      */
-    __noexport__ function replace_s (c_bra : int, c_ket : int, s : string) : int
+    this.replace_s = function(c_bra, c_ket, s)
     {
 	var adjustment = s.length - (c_ket - c_bra);
 	this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
@@ -281,9 +242,9 @@ class BaseStemmer extends Stemmer
 	if (this.cursor >= c_ket) this.cursor += adjustment;
 	else if (this.cursor > c_bra) this.cursor = c_bra;
 	return adjustment;
-    }
+    };
 
-    __noexport__ function slice_check () : boolean
+    this.slice_check = function()
     {
         if (this.bra < 0 ||
             this.bra > this.ket ||
@@ -293,9 +254,9 @@ class BaseStemmer extends Stemmer
             return false;
         }
         return true;
-    }
+    };
 
-    __noexport__ function slice_from (s : string) : boolean
+    this.slice_from = function(s)
     {
         var result = false;
 	if (this.slice_check())
@@ -304,22 +265,21 @@ class BaseStemmer extends Stemmer
             result = true;
         }
         return result;
-    }
+    };
 
-    __noexport__ function slice_del () : boolean
+    this.slice_del = function()
     {
 	return this.slice_from("");
-    }
+    };
 
-    __noexport__ function insert (c_bra : int, c_ket : int, s : string) : void
+    this.insert = function(c_bra, c_ket, s)
     {
         var adjustment = this.replace_s(c_bra, c_ket, s);
 	if (c_bra <= this.bra) this.bra += adjustment;
 	if (c_bra <= this.ket) this.ket += adjustment;
-    }
+    };
 
-    /* Copy the slice into the supplied StringBuffer */
-    __noexport__ function slice_to () : string
+    this.slice_to = function()
     {
         var result = '';
 	if (this.slice_check())
@@ -327,47 +287,10 @@ class BaseStemmer extends Stemmer
             result = this.current.slice(this.bra, this.ket);
         }
         return result;
-    }
+    };
 
-    __noexport__ function assign_to () : string
+    this.assign_to = function()
     {
         return this.current.slice(0, this.limit);
-    }
-
-    __noexport__ function stem () : boolean
-    {
-        return false;
-    }
-
-    override function stemWord (word : string) : string
-    {
-        var result = this.cache['.' + word];
-        if (result == null)
-        {
-            this.setCurrent(word);
-            this.stem();
-            result = this.getCurrent();
-            this.cache['.' + word] = result;
-        }
-        return result;
-    }
-
-    override function stemWords (words : string[]) : string[]
-    {
-        var results = [] : string[];
-        for (var i = 0; i < words.length; i++)
-        {
-            var word = words[i];
-            var result = this.cache['.' + word];
-            if (result == null)
-            {
-                this.setCurrent(word);
-                this.stem();
-                result = this.getCurrent();
-                this.cache['.' + word] = result;
-            }
-            results.push(result);
-        }
-        return results;
-    }
-}
+    };
+};

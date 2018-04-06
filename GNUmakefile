@@ -7,15 +7,21 @@ JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
+MONO ?= mono
+MCS ?= mcs
+csharp_src_main_dir = csharp/Snowball
+csharp_src_dir = $(csharp_src_main_dir)/Algorithms
+csharp_sample_dir = csharp/Stemwords
+
 python ?= python3
 python_output_dir = python_out
 python_runtime_dir = snowballstemmer
 python_sample_dir = sample
 
-jsx_output_dir = jsx_out
-jsx_runtime_src_dir = jsx
-jsx_runtime_dir = lib
-jsx_sample_dir = sample
+js_output_dir = js_out
+js_runtime_dir = javascript
+js_sample_dir = sample
+NODE ?= nodejs
 
 cargo ?= cargo
 cargoflags ?=
@@ -51,8 +57,9 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
+		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
-		   compiler/generator_jsx.c \
+		   compiler/generator_js.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
 		   compiler/generator_go.c
@@ -72,12 +79,18 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
 
-JSX_RUNTIME_SOURCES = jsx/among.jsx \
-		      jsx/base-stemmer.jsx \
-		      jsx/stemmer.jsx
+CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
+			 csharp/Snowball/Stemmer.cs \
+			 csharp/Snowball/AssemblyInfo.cs
 
-JSX_SAMPLE_SOURCES = jsx/testapp.jsx \
-		     jsx/stemwords.jsx
+CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
+
+JS_RUNTIME_SOURCES = js/among.js \
+		     js/base-stemmer.js \
+		     js/stemmer.js
+
+JS_SAMPLE_SOURCES = js/testapp.js \
+		    js/stemwords.js
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -95,7 +108,7 @@ LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
-JSX_STEMWORDS_SOURCE = jsx/stemwords.jsx
+JS_STEMWORDS_SOURCE = js/stemwords.js
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
@@ -111,9 +124,10 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
-JSX_SOURCES = $(libstemmer_algorithms:%=$(jsx_output_dir)/%-stemmer.jsx)
+JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -143,15 +157,16 @@ clean:
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+	      $(CSHARP_SOURCES) \
 	      $(PYTHON_SOURCES) \
-	      $(JSX_SOURCES) jsx_stemwords \
+	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
 	rm -rf dist
 	rmdir $(c_src_dir) || true
 	rmdir $(python_output_dir) || true
-	rmdir $(jsx_output_dir) || true
+	rmdir $(js_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) -o $@ $^
@@ -178,8 +193,8 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) -o $@ $^
 
-jsx_stemwords: $(JSX_STEMWORDS_SOURCE) $(JSX_SOURCES)
-	jsx --executable node --output $@ --add-search-path $(jsx_output_dir) --add-search-path $(jsx_runtime_src_dir) $(JSX_STEMWORDS_SOURCE)
+csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
@@ -219,9 +234,17 @@ $(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball
 	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -n $${l}Stemmer"; \
 	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -n $${l}Stemmer
 
+$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
+	@mkdir -p $(csharp_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
+	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
+	o="$(csharp_src_dir)/$${l}Stemmer.generated"; \
+	echo "./snowball $< -cs -o $${o} -p \"Stemmer\" -n $${t}Stemmer"; \
+	./snowball $< -cs -o $${o} -p "Stemmer" -n $${t}Stemmer
+
 $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	@mkdir -p $(python_output_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/\.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
 	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
 	./snowball $< -py -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
@@ -254,19 +277,19 @@ $(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball
 	echo "$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go"; \
 	$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go
 
-$(jsx_output_dir)/%-stemmer.jsx: algorithms/%.sbl snowball
-	@mkdir -p $(jsx_output_dir)
+$(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
+	@mkdir -p $(js_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
-	o="$(jsx_output_dir)/$${l}-stemmer"; \
-	echo "./snowball $< -jsx -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
-	./snowball $< -jsx -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
+	o="$(js_output_dir)/$${l}-stemmer"; \
+	echo "./snowball $< -js -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
+	./snowball $< -js -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
 	splint $^ >$@ -weak
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_java dist_libstemmer_jsx dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -357,6 +380,25 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
+# Make a distribution of all the sources required to compile the C# library.
+dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+            $(LIBSTEMMER_EXTRA) \
+	    $(CSHARP_SOURCES)
+	destname=libstemmer_csharp; \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}.tgz && \
+	mkdir -p $${dest} && \
+	cp -a doc/libstemmer_csharp_README $${dest}/README && \
+	mkdir -p $${dest}/$(csharp_src_dir) && \
+	cp -a $(CSHARP_SOURCES) $${dest}/$(csharp_src_dir) && \
+	mkdir -p $${dest}/$(csharp_src_main_dir) && \
+	cp -a $(CSHARP_RUNTIME_SOURCES) $${dest}/$(csharp_src_main_dir) && \
+	mkdir -p $${dest}/$(csharp_sample_dir) && \
+	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
+	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	rm -rf $${dest}
+
 dist_libstemmer_python: $(PYTHON_SOURCES)
 	destname=snowballstemmer; \
 	dest=dist/$${destname}; \
@@ -374,22 +416,22 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	(cd $${dest} && $(python) setup.py sdist && cp dist/*.tar.gz ..) && \
 	rm -rf $${dest}
 
-dist_libstemmer_jsx: $(JSX_SOURCES)
-	destname=jsxstemmer; \
+dist_libstemmer_js: $(JS_SOURCES)
+	destname=jsstemmer; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
 	mkdir -p $${dest} && \
-	mkdir -p $${dest}/$(jsx_runtime_dir) && \
-	mkdir -p $${dest}/$(jsx_sample_dir) && \
-	cp -a doc/libstemmer_jsx_README $${dest}/README && \
-	cp -a $(JSX_RUNTIME_SOURCES) $${dest}/$(jsx_runtime_dir) && \
-	cp -a $(JSX_SAMPLE_SOURCES) $${dest}/$(jsx_sample_dir) && \
-	cp -a $(JSX_SOURCES) $${dest}/$(jsx_runtime_dir) && \
+	mkdir -p $${dest}/$(js_runtime_dir) && \
+	mkdir -p $${dest}/$(js_sample_dir) && \
+	cp -a doc/libstemmer_js_README $${dest}/README && \
+	cp -a $(JS_RUNTIME_SOURCES) $${dest}/$(js_runtime_dir) && \
+	cp -a $(JS_SAMPLE_SOURCES) $${dest}/$(js_sample_dir) && \
+	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
 	 echo "README" >> MANIFEST && \
-	 ls $(jsx_runtime_dir)/*.jsx >> MANIFEST && \
-	 ls $(jsx_sample_dir)/*.jsx >> MANIFEST) && \
+	 ls $(js_runtime_dir)/*.js >> MANIFEST && \
+	 ls $(js_sample_dir)/*.js >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
@@ -469,13 +511,33 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_jsx: $(libstemmer_algorithms:%=check_jsx_%)
+check_csharp: csharp_stemwords
+	$(MAKE) do_check_csharp
+
+do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
+
+check_csharp_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for C#"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	    $(MONO) csharp_stemwords -l `echo $<|sed 's!.*/!!'` -i /dev/stdin -o tmp.txt; \
+	else \
+	  $(MONO) csharp_stemwords -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
 
 # Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
 THIN_FACTOR ?= 3
 
 # Command to thin out the testdata - the full arabic test data causes
-# jsx_stemwords to run out of memory.  Also use for Python tests, which
+# stemwords.js to run out of memory.  Also use for Python tests, which
 # take a long time (unless you use pypy).
 THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
 
@@ -515,14 +577,16 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_jsx_%: $(STEMMING_DATA)/% jsx_stemwords
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JSX"
+export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
+
+check_js_%: $(STEMMING_DATA)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
-	  ./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  ./jsx_stemwords -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
