@@ -78,11 +78,11 @@ routines (
 stringescapes 	{ }
 
 /* Special characters in Unicode Latin-1 and Latin Extended-A */
-stringdef c.   	'{U+00E7}'	// LATIN SMALL LETTER C WITH CEDILLA
+stringdef c,   	'{U+00E7}'	// LATIN SMALL LETTER C WITH CEDILLA
 stringdef g~   	'{U+011F}'	// LATIN SMALL LETTER G WITH BREVE
 stringdef i'   	'{U+0131}'	// LATIN SMALL LETTER I WITHOUT DOT
 stringdef o"  	'{U+00F6}'	// LATIN SMALL LETTER O WITH DIAERESIS
-stringdef s.	'{U+015F}'	// LATIN SMALL LETTER S WITH CEDILLA
+stringdef s,	'{U+015F}'	// LATIN SMALL LETTER S WITH CEDILLA
 stringdef u"  	'{U+00FC}'	// LATIN SMALL LETTER U WITH DIAERESIS
 
 integers 	( strlen )	// length of a string
@@ -300,7 +300,7 @@ backwardmode (
 
 	define mark_ymUs_ as (
 		check_vowel_harmony
-		among ('m{i'}{s.}' 'mi{s.}' 'mu{s.}' 'm{u"}{s.}')
+		among ('m{i'}{s,}' 'mi{s,}' 'mu{s,}' 'm{u"}{s,}')
 		(mark_suffix_with_optional_y_consonant)
 	)
 
@@ -415,7 +415,7 @@ backwardmode (
 	define post_process_last_consonants as (
 		[substring] among (
 			'b' (<- 'p')
-			'c' (<- '{c.}')
+			'c' (<- '{c,}')
 			'd' (<- 't')
 			'{g~}' (<- 'k')
 		)
