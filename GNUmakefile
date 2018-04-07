@@ -112,7 +112,7 @@ JS_STEMWORDS_SOURCE = js/stemwords.js
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
-ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%/stem*.sbl)
+ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
 		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c) \
@@ -196,58 +196,55 @@ stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
-algorithms/%/stem_Unicode.sbl: algorithms/%/stem_ISO_8859_1.sbl
-	cp $^ $@
-
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%/stem_Unicode.sbl snowball
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_UTF_8_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u"; \
 	./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u
 
-$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%/stem_KOI8_R.sbl snowball
+$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_KOI8_R.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_KOI8_R_$${l}"; \
-	echo "./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime"; \
-	./snowball $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime
+	echo "./snowball charsets/KOI8-R.sbl $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime"; \
+	./snowball charsets/KOI8-R.sbl $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%/stem_ISO_8859_1.sbl snowball
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_ISO_8859_1.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_ISO_8859_1_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%/stem_ISO_8859_2.sbl snowball
+$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_ISO_8859_2.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_ISO_8859_2_$${l}"; \
-	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime"; \
-	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
+	echo "./snowball charsets/ISO-8859-2.sbl $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime"; \
+	./snowball charsets/ISO-8859-2.sbl $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-$(java_src_dir)/%Stemmer.java: algorithms/%/stem_Unicode.sbl snowball
+$(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball
 	@mkdir -p $(java_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
 	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -n $${l}Stemmer"; \
 	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -n $${l}Stemmer
 
-$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%/stem_Unicode.sbl snowball
+$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
 	@mkdir -p $(csharp_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
 	o="$(csharp_src_dir)/$${l}Stemmer.generated"; \
 	echo "./snowball $< -cs -o $${o} -p \"Stemmer\" -n $${t}Stemmer"; \
 	./snowball $< -cs -o $${o} -p "Stemmer" -n $${t}Stemmer
 
-$(python_output_dir)/%_stemmer.py: algorithms/%/stem_Unicode.sbl snowball
+$(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	@mkdir -p $(python_output_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
 	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
 	./snowball $< -py -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
@@ -256,9 +253,9 @@ $(python_output_dir)/__init__.py:
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
 
-$(rust_src_dir)/%_stemmer.rs: algorithms/%/stem_Unicode.sbl snowball
+$(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball
 	@mkdir -p $(rust_src_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(rust_src_dir)/$${l}_stemmer"; \
 	echo "./snowball $< -rust -o $${o}"; \
 	./snowball $< -rust -o $${o}
@@ -267,22 +264,22 @@ $(go_src_main_dir)/stemwords/algorithms.go:
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
-$(go_src_dir)/%_stemmer.go: algorithms/%/stem_Unicode.sbl snowball
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+$(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
 	mkdir -p $(go_src_dir)/$${l}
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
 	echo "./snowball $< -go -o $${o}"; \
 	./snowball $< -go -o $${o} -gop $${l}
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
 	echo "$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go"; \
 	$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go
 
-$(js_output_dir)/%-stemmer.js: algorithms/%/stem_Unicode.sbl snowball
+$(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	@mkdir -p $(js_output_dir)
-	@l=`echo "$<" | sed 's!\(.*\)/stem_Unicode.sbl$$!\1!;s!^.*/!!'`; \
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(js_output_dir)/$${l}-stemmer"; \
 	echo "./snowball $< -js -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
 	./snowball $< -js -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
