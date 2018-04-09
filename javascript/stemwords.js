@@ -149,49 +149,15 @@ function stemming (lang, input, output, encoding, pretty) {
         fs.writeFileSync(output, lines.join('\n'), encoding);
 }
 
-function create (algorithm) {
-        switch (algorithm.toLowerCase())
-        {
-        case "arabic":
-            return new ArabicStemmer();
-        case "danish":
-            return new DanishStemmer();
-        case "dutch":
-            return new DutchStemmer();
-        case "english":
-            return new EnglishStemmer();
-        case "finnish":
-            return new FinnishStemmer();
-        case "french":
-            return new FrenchStemmer();
-        case "german":
-            return new GermanStemmer();
-        case "hungarian":
-            return new HungarianStemmer();
-        case "irish":
-            return new IrishStemmer();
-        case "italian":
-            return new ItalianStemmer();
-        case "norwegian":
-            return new NorwegianStemmer();
-        case "porter":
-            return new PorterStemmer();
-        case "portuguese":
-            return new PortugueseStemmer();
-        case "romanian":
-            return new RomanianStemmer();
-        case "russian":
-            return new RussianStemmer();
-        case "spanish":
-            return new SpanishStemmer();
-        case "swedish":
-            return new SwedishStemmer();
-        case "tamil":
-            return new TamilStemmer();
-        case "turkish":
-            return new TurkishStemmer();
-        default:
-	    usage();
-	    process.exit(1);
+function create (name) {
+    var algo = name.substr(0, 1).toUpperCase() + name.substr(1).toLowerCase();
+    if (algo != 'Base') {
+	try {
+	    return Function('"use strict";return new ' + algo + 'Stemmer()')();
+	} catch (error) {
+	    console.log(error)
 	}
+    }
+    usage();
+    process.exit(1);
 }
