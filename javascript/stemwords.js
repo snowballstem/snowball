@@ -3,17 +3,15 @@ const stemmer = require('base-stemmer.js');
 const fs = require('fs');
 
 function usage() {
-    console.log("usage: jsx_stemwords [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]\n");
+    console.log("usage: stemwords.js [-l <language>] -i <input file> -o <output file> [-c <character encoding>] [-p[2]] [-h]\n");
     console.log("The input file consists of a list of words to be stemmed, one per");
-    console.log("line. Words should be in lower case, but (for English) A-Z letters");
-    console.log("are mapped to their a-z equivalents anyway. If omitted, stdin is");
-    console.log("used.\n");
+    console.log("line. Words should be in lower case.\n");
     console.log("If -c is given, the argument is the character encoding of the input");
     console.log("and output files.  If it is omitted, the UTF-8 encoding is used.\n");
     console.log("If -p is given the output file consists of each word of the input");
     console.log("file followed by \"->\" followed by its stemmed equivalent.");
     console.log("If -p2 is given the output file is a two column layout containing");
-    console.log( "the input words in the first column and the stemmed eqivalents in");
+    console.log("the input words in the first column and the stemmed eqivalents in");
     console.log("the second column.\n");
     console.log("Otherwise, the output file consists of the stemmed words, one per");
     console.log("line.\n");
