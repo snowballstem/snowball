@@ -1,25 +1,5 @@
 const stemmer = require('base-stemmer.js');
 
-const arabic_stemmer = require('arabic-stemmer.js');
-const danish_stemmer = require('danish-stemmer.js');
-const dutch_stemmer = require('dutch-stemmer.js');
-const english_stemmer = require('english-stemmer.js');
-const finnish_stemmer = require('finnish-stemmer.js');
-const french_stemmer = require('french-stemmer.js');
-const german_stemmer = require('german-stemmer.js');
-const hungarian_stemmer = require('hungarian-stemmer.js');
-const irish_stemmer = require('irish-stemmer.js');
-const italian_stemmer = require('italian-stemmer.js');
-const norwegian_stemmer = require('norwegian-stemmer.js');
-const porter_stemmer = require('porter-stemmer.js');
-const portuguese_stemmer = require('portuguese-stemmer.js');
-const romanian_stemmer = require('romanian-stemmer.js');
-const russian_stemmer = require('russian-stemmer.js');
-const spanish_stemmer = require('spanish-stemmer.js');
-const swedish_stemmer = require('swedish-stemmer.js');
-const tamil_stemmer = require('tamil-stemmer.js');
-const turkish_stemmer = require('turkish-stemmer.js');
-
 const fs = require('fs');
 
 function usage() {
@@ -150,14 +130,16 @@ function stemming (lang, input, output, encoding, pretty) {
 }
 
 function create (name) {
-    var algo = name.substr(0, 1).toUpperCase() + name.substr(1).toLowerCase();
-    if (algo != 'Base') {
+    var lc_name = name.toLowerCase();
+    if (!lc_name.match('\\W') && lc_name != 'base') {
+	var algo = lc_name.substr(0, 1).toUpperCase() + lc_name.substr(1);
 	try {
-	    return Function('"use strict";return new ' + algo + 'Stemmer()')();
+	    const stemmer = require(lc_name + '-stemmer.js');
+	    return Function('return new ' + algo + 'Stemmer()')();
 	} catch (error) {
-	    console.log(error)
 	}
     }
+    console.log('Unknown stemming language: ' + name + '\n');
     usage();
     process.exit(1);
 }
