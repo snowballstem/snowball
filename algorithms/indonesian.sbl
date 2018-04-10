@@ -1,0 +1,106 @@
+integers ( measure prefix )
+groupings ( vowel )
+
+routines (
+    remove_particle
+    remove_possessive_pronoun
+    remove_first_order_prefix
+    remove_second_order_prefix
+    remove_suffix
+    AJAR
+    KER
+    SUFFIX_KAN_OK
+    SUFFIX_AN_OK
+    SUFFIX_I_OK
+    VOWEL
+)
+
+externals ( stem )
+
+stringescapes {}
+
+backwardmode (
+
+    define remove_particle as (
+        [substring] among (
+            'kah' 'lah' 'pun' (delete $measure-=1)
+        )
+    )
+
+    define remove_possessive_pronoun as (
+        [substring] among (
+            'ku' 'mu' 'nya' (delete $measure-=1)
+        )
+    )
+
+    define SUFFIX_KAN_OK as ( $prefix != 2 )
+
+    define SUFFIX_AN_OK as ( $prefix != 1 )
+
+    define SUFFIX_I_OK as (
+        $prefix <= 1
+        ( not 's' next not 'i' ) or ( tomark 1 vowel )
+    )
+
+    define remove_suffix as (
+        [substring] among (
+            'kan' SUFFIX_KAN_OK 'an' SUFFIX_AN_OK 'i' SUFFIX_I_OK
+                (delete $measure-=1)
+        )
+    )
+)
+
+define vowel 'aeiou'
+
+define VOWEL as ( vowel )
+
+define AJAR as ( 'ajar' atlimit )
+
+define KER as ( non-vowel 'er' )
+
+define remove_first_order_prefix as (
+    // prefix values:
+    // 0 other/none
+    // 1 'di' or 'meng' or 'ter'
+    // 2 'ke' or 'peng'
+    // 3 'ber' (see remove_second_order_prefix below)
+    [substring] among (
+        'di' 'meng' 'men' 'me' 'ter' (delete $prefix=1 $measure-=1)
+        'ke' 'peng' 'pen' (delete $prefix=2 $measure-=1)
+        'meny' VOWEL ($prefix=1 <-'s' $measure-=1)
+        'peny' VOWEL ($prefix=2 <-'s' $measure-=1)
+        'mem' ($prefix=1 $measure-=1 vowel and <-'p' or delete)
+        'pem' ($prefix=2 $measure-=1 vowel and <-'p' or delete)
+    )
+)
+
+define remove_second_order_prefix as (
+    [substring] among (
+        'per' 'pe' 'pel' AJAR (delete $measure-=1)
+        'bel' AJAR 'be' KER (delete $prefix=3 $measure-=1)
+        'ber' (delete $prefix=3 $measure-=1)
+    )
+)
+
+define stem as (
+    $prefix = 0
+    $measure = 0
+    do ( repeat ( gopast vowel $measure += 1 ) )
+    $measure > 2
+    backwards (
+        do remove_particle
+        $measure > 2
+        do remove_possessive_pronoun
+    )
+    $measure > 2
+    test (
+        remove_first_order_prefix
+        do (
+            test ($measure > 2 backwards remove_suffix)
+            $measure > 2 remove_second_order_prefix
+        )
+    ) or (
+        do remove_second_order_prefix
+        do ($measure > 2 backwards remove_suffix)
+    )
+)
