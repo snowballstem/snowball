@@ -5,6 +5,7 @@
 /src_c
 /stemwords
 /dist
+/java/org/tartarus/snowball/ext/
 /js_out
 /python_out
 *.generated.cs
