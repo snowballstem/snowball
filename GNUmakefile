@@ -407,6 +407,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
+	cp libstemmer/modules.txt $${dest} && \
 	cp doc/libstemmer_python_README $${dest}/README.rst && \
 	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
