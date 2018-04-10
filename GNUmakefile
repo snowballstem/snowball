@@ -583,10 +583,10 @@ check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
-	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
