@@ -404,7 +404,6 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
-	echo "a1" && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
