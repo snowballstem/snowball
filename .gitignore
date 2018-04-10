@@ -1,4 +1,5 @@
 *.o
+/algorithms.mk
 /libstemmer
 /snowball
 /src_c

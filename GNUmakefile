@@ -37,16 +37,12 @@ go_src_dir = $(go_src_main_dir)/algorithms
 ICONV = iconv
 #ICONV = python ./iconv.py
 
-libstemmer_algorithms = arabic \
-			danish dutch english finnish french german hungarian \
-			irish italian \
-			norwegian porter portuguese romanian \
-			russian spanish swedish tamil turkish
-
-KOI8_R_algorithms = russian
-ISO_8859_1_algorithms = danish dutch english finnish french german irish \
-			italian norwegian porter portuguese spanish swedish
-ISO_8859_2_algorithms = hungarian romanian
+# algorithms.mk is generated from libstemmer/modules.txt and defines:
+# * libstemmer_algorithms
+# * ISO_8859_1_algorithms
+# * ISO_8859_2_algorithms
+# * KOI8_R_algorithms
+include algorithms.mk $(shell libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt >/dev/null)
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -162,7 +158,8 @@ clean:
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
-              libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
+              libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
+	      algorithms.mk
 	rm -rf dist
 	rmdir $(c_src_dir) || true
 	rmdir $(python_output_dir) || true
