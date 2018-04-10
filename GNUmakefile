@@ -104,7 +104,7 @@ PYTHON_PACKAGE_FILES = python/MANIFEST.in \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer/libstemmer_c.in
+LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
@@ -182,8 +182,8 @@ libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
 libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
 	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
 
-libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules_utf8.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules_utf8.txt libstemmer/mkinc_utf8.mak utf8
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
+	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
