@@ -334,33 +334,27 @@ public class SnowballProgram implements Serializable {
     }
 
     /* Copy the slice into the supplied StringBuffer */
-    protected StringBuffer slice_to(StringBuffer s)
+    protected void slice_to(StringBuffer s)
     {
 	slice_check();
-	int len = ket - bra;
 	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
     }
 
     /* Copy the slice into the supplied StringBuilder */
-    protected StringBuilder slice_to(StringBuilder s)
+    protected void slice_to(StringBuilder s)
     {
 	slice_check();
-	int len = ket - bra;
 	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
     }
 
-    protected StringBuffer assign_to(StringBuffer s)
+    protected void assign_to(StringBuffer s)
     {
 	s.replace(0, s.length(), current.substring(0, limit));
-	return s;
     }
 
-    protected StringBuilder assign_to(StringBuilder s)
+    protected void assign_to(StringBuilder s)
     {
 	s.replace(0, s.length(), current.substring(0, limit));
-	return s;
     }
 
 /*
