@@ -592,21 +592,19 @@ namespace Snowball
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
         /// 
-        protected StringBuilder slice_to(StringBuilder s)
+        protected void slice_to(StringBuilder s)
         {
             slice_check();
             Replace(s, 0, s.Length, current.ToString(bra, ket - bra));
-            return s;
         }
 
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
         /// 
-        protected StringBuilder assign_to(StringBuilder s)
+        protected void assign_to(StringBuilder s)
         {
             Replace(s, 0, s.Length, current.ToString(0, limit));
-            return s;
         }
 
 
