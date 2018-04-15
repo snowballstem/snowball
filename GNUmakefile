@@ -37,16 +37,12 @@ go_src_dir = $(go_src_main_dir)/algorithms
 ICONV = iconv
 #ICONV = python ./iconv.py
 
-libstemmer_algorithms = arabic \
-			danish dutch english finnish french german hungarian \
-			irish italian \
-			norwegian porter portuguese romanian \
-			russian spanish swedish tamil turkish
-
-KOI8_R_algorithms = russian
-ISO_8859_1_algorithms = danish dutch english finnish french german irish \
-			italian norwegian porter portuguese spanish swedish
-ISO_8859_2_algorithms = hungarian romanian
+# algorithms.mk is generated from libstemmer/modules.txt and defines:
+# * libstemmer_algorithms
+# * ISO_8859_1_algorithms
+# * ISO_8859_2_algorithms
+# * KOI8_R_algorithms
+include algorithms.mk $(shell libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt >/dev/null)
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -104,7 +100,7 @@ PYTHON_PACKAGE_FILES = python/MANIFEST.in \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/modules_utf8.txt libstemmer/libstemmer_c.in
+LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 
@@ -162,7 +158,8 @@ clean:
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
-              libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c
+              libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
+	      algorithms.mk
 	rm -rf dist
 	rmdir $(c_src_dir) || true
 	rmdir $(python_output_dir) || true
@@ -182,8 +179,8 @@ libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
 libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
 	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
 
-libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules_utf8.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules_utf8.txt libstemmer/mkinc_utf8.mak utf8
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
+	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
@@ -404,10 +401,10 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}.tgz && \
-	echo "a1" && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
+	cp libstemmer/modules.txt $${dest} && \
 	cp doc/libstemmer_python_README $${dest}/README.rst && \
 	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
@@ -583,10 +580,10 @@ check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
-	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  $(NODE) javascript/stemwords.js -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \

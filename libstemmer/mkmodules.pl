@@ -6,7 +6,7 @@ use warnings;
 my $progname = $0;
 
 if (scalar @ARGV < 4 || scalar @ARGV > 5) {
-  print "Usage: $progname <outfile> <C source directory> <modules description file> <source list file> [<extn>]\n";
+  print "Usage: $progname <outfile> <C source directory> <modules description file> <source list file> [<enc>]\n";
   exit 1;
 }
 
@@ -14,9 +14,11 @@ my $outname = shift(@ARGV);
 my $c_src_dir = shift(@ARGV);
 my $descfile = shift(@ARGV);
 my $srclistfile = shift(@ARGV);
+my $enc_only;
 my $extn = '';
 if (@ARGV) {
-  $extn = '_'.shift(@ARGV);
+  $enc_only = shift(@ARGV);
+  $extn = '_'.$enc_only;
 }
 
 my %aliases = ();
@@ -28,6 +30,14 @@ my %encs = ();
 sub addalgenc($$) {
   my $alg = shift();
   my $enc = shift();
+
+  if (defined $enc_only) {
+      my $norm_enc = lc $enc;
+      $norm_enc =~ s/_//g;
+      if ($norm_enc ne $enc_only) {
+	  return;
+      }
+  }
 
   if (defined $algorithm_encs{$alg}) {
       my $hashref = $algorithm_encs{$alg};

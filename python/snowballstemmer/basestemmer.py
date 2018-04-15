@@ -260,20 +260,18 @@ class BaseStemmer(object):
         if c_bra <= self.ket:
             self.ket += adjustment
 
-    def slice_to(self, s):
+    def slice_to(self):
         '''
-        Copy the slice into the supplied StringBuffer
-
-        @type s: string
+        Return the slice as a string.
         '''
         result = ''
         if self.slice_check():
             result = self.current[self.bra:self.ket]
         return result
 
-    def assign_to(self, s):
+    def assign_to(self):
         '''
-        @type s: string
+        Return the current string up to the limit.
         '''
         return self.current[0:self.limit]
 

@@ -760,14 +760,14 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = assign_to(~V0);~N", p);
+    writef(g, "~Massign_to(~V0);~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = slice_to(~V0);~N", p);
+    writef(g, "~Mslice_to(~V0);~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {

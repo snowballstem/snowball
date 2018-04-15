@@ -1,39 +1,17 @@
 const stemmer = require('base-stemmer.js');
 
-const arabic_stemmer = require('arabic-stemmer.js');
-const danish_stemmer = require('danish-stemmer.js');
-const dutch_stemmer = require('dutch-stemmer.js');
-const english_stemmer = require('english-stemmer.js');
-const finnish_stemmer = require('finnish-stemmer.js');
-const french_stemmer = require('french-stemmer.js');
-const german_stemmer = require('german-stemmer.js');
-const hungarian_stemmer = require('hungarian-stemmer.js');
-const irish_stemmer = require('irish-stemmer.js');
-const italian_stemmer = require('italian-stemmer.js');
-const norwegian_stemmer = require('norwegian-stemmer.js');
-const porter_stemmer = require('porter-stemmer.js');
-const portuguese_stemmer = require('portuguese-stemmer.js');
-const romanian_stemmer = require('romanian-stemmer.js');
-const russian_stemmer = require('russian-stemmer.js');
-const spanish_stemmer = require('spanish-stemmer.js');
-const swedish_stemmer = require('swedish-stemmer.js');
-const tamil_stemmer = require('tamil-stemmer.js');
-const turkish_stemmer = require('turkish-stemmer.js');
-
 const fs = require('fs');
 
 function usage() {
-    console.log("usage: jsx_stemwords [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]\n");
+    console.log("usage: stemwords.js [-l <language>] -i <input file> -o <output file> [-c <character encoding>] [-p[2]] [-h]\n");
     console.log("The input file consists of a list of words to be stemmed, one per");
-    console.log("line. Words should be in lower case, but (for English) A-Z letters");
-    console.log("are mapped to their a-z equivalents anyway. If omitted, stdin is");
-    console.log("used.\n");
+    console.log("line. Words should be in lower case.\n");
     console.log("If -c is given, the argument is the character encoding of the input");
     console.log("and output files.  If it is omitted, the UTF-8 encoding is used.\n");
     console.log("If -p is given the output file consists of each word of the input");
     console.log("file followed by \"->\" followed by its stemmed equivalent.");
     console.log("If -p2 is given the output file is a two column layout containing");
-    console.log( "the input words in the first column and the stemmed eqivalents in");
+    console.log("the input words in the first column and the stemmed eqivalents in");
     console.log("the second column.\n");
     console.log("Otherwise, the output file consists of the stemmed words, one per");
     console.log("line.\n");
@@ -149,49 +127,17 @@ function stemming (lang, input, output, encoding, pretty) {
         fs.writeFileSync(output, lines.join('\n'), encoding);
 }
 
-function create (algorithm) {
-        switch (algorithm.toLowerCase())
-        {
-        case "arabic":
-            return new ArabicStemmer();
-        case "danish":
-            return new DanishStemmer();
-        case "dutch":
-            return new DutchStemmer();
-        case "english":
-            return new EnglishStemmer();
-        case "finnish":
-            return new FinnishStemmer();
-        case "french":
-            return new FrenchStemmer();
-        case "german":
-            return new GermanStemmer();
-        case "hungarian":
-            return new HungarianStemmer();
-        case "irish":
-            return new IrishStemmer();
-        case "italian":
-            return new ItalianStemmer();
-        case "norwegian":
-            return new NorwegianStemmer();
-        case "porter":
-            return new PorterStemmer();
-        case "portuguese":
-            return new PortugueseStemmer();
-        case "romanian":
-            return new RomanianStemmer();
-        case "russian":
-            return new RussianStemmer();
-        case "spanish":
-            return new SpanishStemmer();
-        case "swedish":
-            return new SwedishStemmer();
-        case "tamil":
-            return new TamilStemmer();
-        case "turkish":
-            return new TurkishStemmer();
-        default:
-	    usage();
-	    process.exit(1);
+function create (name) {
+    var lc_name = name.toLowerCase();
+    if (!lc_name.match('\\W') && lc_name != 'base') {
+	var algo = lc_name.substr(0, 1).toUpperCase() + lc_name.substr(1);
+	try {
+	    const stemmer = require(lc_name + '-stemmer.js');
+	    return Function('return new ' + algo + 'Stemmer()')();
+	} catch (error) {
 	}
+    }
+    console.log('Unknown stemming language: ' + name + '\n');
+    usage();
+    process.exit(1);
 }
