@@ -858,7 +858,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~M~B0.copy_from(base);~N", p);
 
     ++g->copy_from_count;
-    str_assign(g->failure_str, "copy_from(");
+    str_assign(g->failure_str, "base.copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
     g->V[0] = p->name;
