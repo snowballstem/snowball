@@ -864,9 +864,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~Mbase.current = ~V0;~N"
               "~Mbase.cursor = 0;~N"
+              "~Mbase.limit_backward = 0;~N"
               "~Mbase.limit = base.current.length;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
+        g->V[0] = p->name;
+        writef(g, "~M~V0 = base.current;~N", p);
         write_margin(g);
         write_str(g, g->failure_str);
         write_newline(g);
