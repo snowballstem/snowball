@@ -92,6 +92,9 @@ else
 // function stemming (lang : string, input : string, output : string, encoding : string, pretty : int) {
 function stemming (lang, input, output, encoding, pretty) {
         var lines = fs.readFileSync(input, encoding).split("\n");
+        if (lines[lines.length - 1] == "") {
+            lines.pop();
+        }
         var stemmer = create(lang);
         for (var i in lines)
         {
@@ -124,6 +127,7 @@ function stemming (lang, input, output, encoding, pretty) {
                 lines[i] += stemmed;
             }
         }
+        lines.push("");
         fs.writeFileSync(output, lines.join('\n'), encoding);
 }
 
