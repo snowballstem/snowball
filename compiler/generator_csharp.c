@@ -867,10 +867,10 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
     g->B[0] = str_data(savevar);
-    writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mcurrent = new StringBuilder(~V0.ToString());~N"
+    writef(g, "~{~MEnv ~B0 = new Env(this);~N"
+             "~Mcurrent = ~V0;~N"
              "~Mcursor = 0;~N"
-             "~Mlimit = (current.Length);~N", p);
+             "~Mlimit = current.Length;~N", p);
     generate(g, p->left);
 
     write_margin(g);
