@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2001, Dr Martin Porter
 // Copyright (c) 2002, Richard Boulton
 // Copyright (c) 2015, Cesar Souza
+// Copyright (c) 2018, Olly Betts
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
@@ -33,11 +34,19 @@ namespace Snowball
     using System.Text;
 
     /// <summary>
-    ///   Base class for Snowball's stemmer algorithms.
+    ///   Class holding current state.
     /// </summary>
     /// 
-    public abstract class Stemmer
+    public class Env
     {
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="Env"/> class.
+        /// </summary>
+        /// 
+        protected Env()
+        {
+        }
+
         /// <summary>
         ///   Gets the current string.
         /// </summary>
@@ -74,9 +83,37 @@ namespace Snowball
         /// 
         protected int ket;
 
+        /// <summary>
+        ///   Copy another Env object.
+        /// </summary>
+        /// 
+        public Env(Env other)
+        {
+            copy_from(other);
+        }
+
+        /// <summary>
+        ///   Copy another Env object.
+        /// </summary>
+        /// 
+        protected void copy_from(Env other)
+        {
+            current          = other.current;
+            cursor           = other.cursor;
+            limit            = other.limit;
+            limit_backward   = other.limit_backward;
+            bra              = other.bra;
+            ket              = other.ket;
+        }
+    }
 
 
-
+    /// <summary>
+    ///   Base class for Snowball's stemmer algorithms.
+    /// </summary>
+    /// 
+    public abstract class Stemmer : Env
+    {
         /// <summary>
         ///   Initializes a new instance of the <see cref="Stemmer"/> class.
         /// </summary>
