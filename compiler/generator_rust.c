@@ -731,10 +731,15 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 
 static void generate_address(struct generator * g, struct node * p) {
 
+    /* If we deal with a string variable which is of type String we need to
+     * pass it by reference not by value.  Literalstrings on the other hand are
+     * of type &'static str so we can pass them by value.
+     */
     symbol * b = p->literalstring;
     if (b != 0) {
         write_literal_string(g, b);
     } else {
+        write_char(g, '&');
         write_varref(g, p->name);
     }
 }
@@ -766,15 +771,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     } else {
         writef(g, "~Mlet (bra, ket) = (env.limit_backward, env.cursor);~N", p);
     }
-    /* If we deal with a string variable which is of type String we need to
-     * pass it by reference not by value.  Literalstrings on the other hand are
-     * of type &'static str so we can pass them by value.
-     */
-    if (p->literalstring) {
-        writef(g, "~Menv.insert(bra, ket, ", p);
-    } else {
-        writef(g, "~Menv.insert(bra, ket, &", p);
-    }
+    writef(g, "~Menv.insert(bra, ket, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) w(g, "~Menv.cursor = c;~N");
@@ -784,15 +781,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    /* If we deal with a string variable which is of type String we need to
-     * pass it by reference not by value.  Literalstrings on the other hand are
-     * of type &'static str so we can pass them by value.
-     */
-    if (p->literalstring) {
-        w(g, "~Mif !env.slice_from(");
-    } else {
-        w(g, "~Mif !env.slice_from(&");
-    }
+    w(g, "~Mif !env.slice_from(");
     generate_address(g, p);
     writef(g, ") {~N"
               "~+~Mreturn false;~N~-~M}~N", p);
