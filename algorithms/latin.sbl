@@ -1,0 +1,80 @@
+strings ( noun_form  verb_form )
+
+routines (
+
+   map_letters
+   que_word
+)
+
+externals ( stem )
+
+stringescapes {}
+
+stringdef tab '{U+0009}'
+
+define map_letters as (
+
+    do repeat ( goto ( ['j'] ) <- 'i' )
+    do repeat ( goto ( ['v'] ) <- 'u' )
+)
+
+backwardmode (
+
+    define que_word as (
+
+        ['que'] (
+            among (
+                'at' 'quo' 'ne' 'ita' 'abs' 'aps' 'abus' 'adae' 'adus'
+                'deni' 'de' 'sus' 'obli' 'perae' 'plenis' 'quando' 'quis'
+                'quae' 'cuius' 'cui' 'quem' 'quam' 'qua' 'qui'
+                'quorum' 'quarum' 'quibus' 'quos' 'quas' 'quotusquis'
+                'quous' 'ubi' 'undi' 'us' 'uter' 'uti' 'utro' 'utribi'
+                'tor' 'co' 'conco' 'contor' 'detor' 'deco' 'exco' 'extor'
+                'obtor' 'optor' 'retor' 'reco' 'attor' 'inco' 'intor'
+                'praetor'
+            ) atlimit ]
+            => noun_form
+            => verb_form
+        ) or fail(delete)
+    )
+)
+
+define stem as (
+
+    map_letters
+
+    backwards (
+        que_word or (
+            => noun_form
+            => verb_form
+
+            $noun_form backwards try (
+                [substring] hop 2
+                among (
+                    'ibus' 'ius' 'ae' 'am' 'as' 'em' 'es' 'ia' 'is' 'nt'
+                    'os' 'ud' 'um' 'us' 'a' 'e' 'i' 'o' 'u'
+                        (delete)
+                )
+            )
+
+            $verb_form backwards try (
+                [substring] hop 2
+                among (
+                    'iuntur' 'erunt' 'untur' 'iunt' 'unt'
+                         (<-'i')
+                    'beris' 'bor' 'bo'
+                         (<-'bi')
+                    'ero'
+                         (<-'eri')
+                    'mini' 'ntur' 'stis' 'mur' 'mus' 'ris' 'sti' 'tis'
+                    'tur' 'ns' 'nt' 'ri' 'm' 'r' 's' 't'
+                         (delete)
+                )
+            )
+        )
+    )
+
+    = noun_form
+    tolimit <+'{tab}'
+    <+verb_form
+)
