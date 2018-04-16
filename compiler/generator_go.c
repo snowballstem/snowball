@@ -841,6 +841,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
+        g->B[0] = str_data(savevar_env);
         /* Update string variable. */
         w(g, "~M~V0 = env.Current()~N");
         /* Reset env */
