@@ -159,8 +159,10 @@ static void wsetlab_begin(struct generator * g, int n) {
 }
 
 static void wsetlab_end(struct generator * g, int n) {
-    g->I[0] = n;
-    w(g, "~Mbreak 'lab~I0;~N");
+    if (!g->unreachable) {
+        g->I[0] = n;
+        w(g, "~Mbreak 'lab~I0;~N");
+    }
     w(g, "~-~M}~N");
 }
 
