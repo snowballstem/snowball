@@ -253,6 +253,10 @@ impl<'a> SnowballEnv<'a> {
         }
     }
 
+    pub fn assign_to(&mut self) -> String {
+        self.current[0..self.limit].to_string()
+    }
+
     pub fn slice_to(&mut self) -> String {
         self.current[self.bra..self.ket].to_string()
     }
