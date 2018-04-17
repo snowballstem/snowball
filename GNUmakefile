@@ -352,7 +352,7 @@ dist_libstemmer_c: \
 	echo 'stemwords: examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
 	echo '	$$(CC) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f stemwords *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	echo '	rm -f stemwords *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
