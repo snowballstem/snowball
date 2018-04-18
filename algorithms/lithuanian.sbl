@@ -3,7 +3,7 @@ externals ( stem )
 // escape symbols for substituting lithuanian characters
 stringescapes { }
 
-/* Special characters in Unicode Latin-1 and Latin Extended-A */
+/* Special characters in Unicode Latin Extended-A */
 // ' nosine
 stringdef a'   '{U+0105}'  // ą a + ogonek
 stringdef e'   '{U+0119}'  // ę e + ogonek
