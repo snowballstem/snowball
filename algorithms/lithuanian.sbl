@@ -1,21 +1,25 @@
 externals ( stem )
+
+// escape symbols for substituting lithuanian characters
+stringescapes { }
+
 /* Special characters in Unicode Latin-1 and Latin Extended-A */
 // ' nosine
-stringdef a'   decimal '261'  // ą a + ogonek
-stringdef e'   decimal '281'  // ę e + ogonek
-stringdef i'   decimal '303'  // į i + ogonek
-stringdef u'   decimal '371'  // ų u + ogonek
+stringdef a'   '{U+0105}'  // ą a + ogonek
+stringdef e'   '{U+0119}'  // ę e + ogonek
+stringdef i'   '{U+012F}'  // į i + ogonek
+stringdef u'   '{U+0173}'  // ų u + ogonek
 
 // . taskas
-stringdef e.   decimal '279'  // ė e + dot
+stringdef e.   '{U+0117}'  // ė e + dot
 
 // - ilgoji
-stringdef u-   decimal '363'  // ū u + macron
+stringdef u-   '{U+016B}'  // ū u + macron
 
 // * varnele
-stringdef c*   decimal '269'  // č c + caron (haček)
-stringdef s*   decimal '353'  // š s + caron (haček)
-stringdef z*   decimal '382'  // ž z + caron (haček)
+stringdef c*   '{U+010D}'  // č c + caron (haček)
+stringdef s*   '{U+0161}'  // š s + caron (haček)
+stringdef z*   '{U+017E}'  // ž z + caron (haček)
 
 // [C](VC)^m[V|C]
 // definitions of variables for
@@ -26,9 +30,6 @@ integers ( p1 p2 s)
 // booleans - to be commented
 // CHANGE
 booleans ( CHANGE )
-
-// escape symbols for substituting lithuanian characters
-stringescapes { }
 
 // groupings
 // v - lithuanian vowels
