@@ -27,10 +27,6 @@ stringdef z*   '{U+017E}'  // ž z + caron (haček)
 // p2 - position of m = 1
 integers ( p1 p2 s)
 
-// booleans - to be commented
-// CHANGE
-booleans ( CHANGE )
-
 // groupings
 // v - lithuanian vowels
 groupings ( v )
@@ -311,45 +307,45 @@ backwardmode(
   define fix_conflicts as (
     [substring] among (
       // 'lietuvaite' -> 'lietuvaitė', konfliktas su 'myl-ite'
-      'aite' (<-'ait{e.}' set CHANGE)
+      'aite' (<-'ait{e.}')
       // 'lietuvaitės' -> 'lietuvaitė', konfliktas su 'myl-itės'
-      'ait{e.}s' (<-'ait{e.}' set CHANGE)
+      'ait{e.}s' (<-'ait{e.}')
 
       // ''ūs-uotės' -> 'ūs-uotė', konfliktas 'mokotės'
-      'uot{e.}s' (<-'uot{e.}' set CHANGE)
+      'uot{e.}s' (<-'uot{e.}')
       // ''ūs-uote' -> 'ūs-uotė', konfliktas 'mokote'
-      'uote' (<-'uot{e.}' set CHANGE)
+      'uote' (<-'uot{e.}')
 
       // 'žerėjime' -> 'žėrėjimas', konfliktas su 'žais-ime'
-      '{e.}jime' (<-'{e.}jimas' set CHANGE)
+      '{e.}jime' (<-'{e.}jimas')
 
       // 'žvilgesiu' -> 'žvilgesys', konfliktas su 'dirb-siu'
-      'esiu' (<-'esys' set CHANGE)
+      'esiu' (<-'esys')
       // 'duobkasiu' -> 'duobkasys', konfliktas su 'pakasiu'
-      'asius' (<-'asys' set CHANGE)
+      'asius' (<-'asys')
 
       // 'žioravime' -> 'žioravimas', konfliktas su 'myl-ime'
-      'avime' (<-'avimas' set CHANGE)
-      'ojime' (<-'ojimas' set CHANGE)
+      'avime' (<-'avimas')
+      'ojime' (<-'ojimas')
 
       // 'advokatės' -> 'advokatė', konfliktas su 'dirb-atės'
-      'okat{e.}s' (<-'okat{e.}' set CHANGE)
+      'okat{e.}s' (<-'okat{e.}')
       // 'advokate' -> 'advokatė', konfliktas su 'dirb-ate'
-      'okate' (<-'okat{e.}' set CHANGE)
+      'okate' (<-'okat{e.}')
     )
   )
 
   define fix_chdz as (
     [substring] among (
-      '{c*}' (<-'t' set CHANGE)
-      'd{z*}' (<-'d' set CHANGE)
+      '{c*}' (<-'t')
+      'd{z*}' (<-'d')
     )
   )
 
  define fix_gd as (
     [substring] among (
-      'gd' (<-'g' set CHANGE)
-      //'{e.}k' (<-'{e.}g' set CHANGE)
+      'gd' (<-'g')
+      //'{e.}k' (<-'{e.}g')
     )
   )
 
