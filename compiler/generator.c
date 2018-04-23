@@ -378,7 +378,7 @@ static void generate_AE(struct generator * g, struct node * p) {
    elaborated almost indefinitely.
 */
 
-extern int K_needed(struct generator * g, struct node * p) {
+static int K_needed_(struct generator * g, struct node * p, int call_depth) {
     while (p) {
         switch (p->type) {
             case c_dollar:
@@ -403,11 +403,18 @@ extern int K_needed(struct generator * g, struct node * p) {
                 break;
 
             case c_call:
-                if (K_needed(g, p->name->definition)) return true;
+                // Recursive function aren't typical in snowball programs, so
+                // make the pessimistic assumption that keep is needed if we
+                // hit a generous limit on recursion.  It's not likely to make
+                // a difference to any real world program, but means we won't
+                // recurse until we run out of stack for pathological cases.
+                if (call_depth >= 100) return true;
+                if (K_needed_(g, p->name->definition, call_depth + 1))
+                    return true;
                 break;
 
             case c_bra:
-                if (K_needed(g, p->left)) return true;
+                if (K_needed_(g, p->left, call_depth)) return true;
                 break;
 
             default: return true;
@@ -417,7 +424,11 @@ extern int K_needed(struct generator * g, struct node * p) {
     return false;
 }
 
-static int repeat_score(struct generator * g, struct node * p) {
+extern int K_needed(struct generator * g, struct node * p) {
+    return K_needed_(g, p, 0);
+}
+
+static int repeat_score(struct generator * g, struct node * p, int call_depth) {
     int score = 0;
     while (p) {
         switch (p->type) {
@@ -440,11 +451,24 @@ static int repeat_score(struct generator * g, struct node * p) {
                 break;
 
             case c_call:
-                score += repeat_score(g, p->name->definition);
+                // Recursive function aren't typical in snowball programs, so
+                // make the pessimistic assumption that repeat requires cursor
+                // reinstatement if we hit a generous limit on recursion.  It's
+                // not likely to make a difference to any real world program,
+                // but means we won't recurse until we run out of stack for
+                // pathological cases.
+                if (call_depth >= 100) {
+                    return 2;
+                }
+                score += repeat_score(g, p->name->definition, call_depth + 1);
+                if (score >= 2)
+                    return score;
                 break;
 
             case c_bra:
-                score += repeat_score(g, p->left);
+                score += repeat_score(g, p->left, call_depth);
+                if (score >= 2)
+                    return score;
                 break;
 
             case c_name:
@@ -453,12 +477,12 @@ static int repeat_score(struct generator * g, struct node * p) {
             case c_grouping:
             case c_non:
             case c_hop:
-                score = score + 1;
+                if (++score >= 2)
+                    return score;
                 break;
 
             default:
-                score = 2;
-                break;
+                return 2;
         }
         p = p->right;
     }
@@ -468,7 +492,7 @@ static int repeat_score(struct generator * g, struct node * p) {
 /* tests if an expression requires cursor reinstatement in a repeat */
 
 extern int repeat_restore(struct generator * g, struct node * p) {
-    return repeat_score(g, p) >= 2;
+    return repeat_score(g, p, 0) >= 2;
 }
 
 static void generate_bra(struct generator * g, struct node * p) {
