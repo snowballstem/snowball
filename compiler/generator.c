@@ -45,12 +45,16 @@ static void write_varname(struct generator * g, struct name * p) {
 
     int ch = "SBIrxg"[p->type];
     switch (p->type) {
+        case t_external:
+            write_string(g, g->options->externals_prefix); break;
         case t_string:
         case t_boolean:
         case t_integer:
-            write_char(g, ch); write_char(g, '['); write_int(g, p->count); write_char(g, ']'); return;
-        case t_external:
-            write_string(g, g->options->externals_prefix); break;
+            write_char(g, ch);
+            write_char(g, '[');
+            write_int(g, p->count);
+            write_char(g, ']');
+            return;
         default:
             write_char(g, ch); write_char(g, '_');
     }
