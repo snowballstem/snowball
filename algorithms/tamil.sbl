@@ -94,7 +94,6 @@ externals ( stem )
 booleans (
  found_a_match
  found_vetrumai_urupu
- found_wrong_ending
 )
 
 integers (
@@ -114,8 +113,7 @@ define fix_va_start as (
 )
 
 define fix_endings as (
- set found_wrong_ending
- repeat (found_wrong_ending (do fix_ending))
+ do repeat fix_ending
 )
 
 define remove_question_prefixes as (
@@ -123,8 +121,8 @@ define remove_question_prefixes as (
  do fix_va_start
 )
 
+// Gives signal t if an ending was fixed, signal f otherwise.
 define fix_ending as (
- unset found_wrong_ending
  $length = len
  $length > 3
  backwards (
@@ -163,8 +161,6 @@ define fix_ending as (
   or
   ( [ '{pulli}' (test (among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}') or '{pulli}')) ] delete )
   )
-
- set found_wrong_ending // If any of above test pass set the flag
 )
 
 define remove_pronoun_prefixes as (
