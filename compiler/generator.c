@@ -452,12 +452,13 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
                 break;
 
             case c_call:
-                // Recursive function aren't typical in snowball programs, so
-                // make the pessimistic assumption that repeat requires cursor
-                // reinstatement if we hit a generous limit on recursion.  It's
-                // not likely to make a difference to any real world program,
-                // but means we won't recurse until we run out of stack for
-                // pathological cases.
+                /* Recursive functions aren't typical in snowball programs, so
+                 * make the pessimistic assumption that repeat requires cursor
+                 * reinstatement if we hit a generous limit on recursion.  It's
+                 * not likely to make a difference to any real world program,
+                 * but means we won't recurse until we run out of stack for
+                 * pathological cases.
+                 */
                 if (call_depth >= 100) {
                     return 2;
                 }
