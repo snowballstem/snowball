@@ -1041,7 +1041,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
         /* It's quite common to compare with a single character literal string,
          * so just inline the simpler code for this case rather than making a
          * function call.  In UTF-8 mode, only do this for the ASCII subset,
-         * since multi-byte characters are more complex to text against.
+         * since multi-byte characters are more complex to test against.
          */
         if (g->options->encoding == ENC_UTF8 && *b >= 128) {
             printf("single byte %d\n", *b);
