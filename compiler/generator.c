@@ -381,6 +381,8 @@ static void generate_AE(struct generator * g, struct node * p) {
 static int K_needed_(struct generator * g, struct node * p, int call_depth) {
     while (p) {
         switch (p->type) {
+            case c_atlimit:
+            case c_do:
             case c_dollar:
             case c_leftslice:
             case c_rightslice:
@@ -397,6 +399,8 @@ static int K_needed_(struct generator * g, struct node * p, int call_depth) {
             case c_le:
             case c_sliceto:
             case c_booltest:
+            case c_set:
+            case c_unset:
             case c_true:
             case c_false:
             case c_debug:
