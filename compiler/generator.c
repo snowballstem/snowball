@@ -941,15 +941,49 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 
 static void generate_setlimit(struct generator * g, struct node * p) {
     int keep_c;
-    writef(g, "~{~K~C", p);
-    keep_c = g->keep_count;
-    generate(g, p->left);
+    if (p->left && p->left->type == c_tomark && !p->left->right) {
+        /* Special case for:
+         *
+         *   setlimit tomark AE for C
+         *
+         * All uses of setlimit in the current stemmers we ship follow this
+         * pattern, and by special-casing we can avoid having to save and
+         * restore c.
+         */
+        struct node * q = p->left;
 
-    w(g, "~Mmlimit");
-    write_int(g, keep_c);
-    if (p->mode == m_forward) w(g, " = z->l - z->c; z->l = z->c;~N");
-                         else w(g, " = z->lb; z->lb = z->c;~N");
-    w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+        ++g->keep_count;
+        writef(g, "~N~{int mlimit", p);
+        write_int(g, g->keep_count);
+        writef(g, ";~C", p);
+        keep_c = g->keep_count;
+
+        g->S[0] = q->mode == m_forward ? ">" : "<";
+
+        w(g, "~Mif (z->c ~S0 "); generate_AE(g, q->AE); writef(g, ") ~f~N", q);
+        w(g, "~Mmlimit");
+        write_int(g, keep_c);
+        if (p->mode == m_forward) {
+            w(g, " = z->l - z->c; z->l = ");
+        } else {
+            w(g, " = z->lb; z->lb = ");
+        }
+        generate_AE(g, q->AE);
+        w(g, ";~N");
+    } else {
+        writef(g, "~{~K~C", p);
+        keep_c = g->keep_count;
+        generate(g, p->left);
+
+        w(g, "~Mmlimit");
+        write_int(g, keep_c);
+        if (p->mode == m_forward)
+            w(g, " = z->l - z->c; z->l = z->c;~N");
+        else
+            w(g, " = z->lb; z->lb = z->c;~N");
+        w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
+    }
+
     g->failure_keep_count = -keep_c;
     generate(g, p->aux);
     w(g, "~M");
