@@ -228,23 +228,23 @@ $(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball
 	@mkdir -p $(java_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
-	echo "./snowball $< -j -o $${o} -p \"org.tartarus.snowball.SnowballStemmer\" -n $${l}Stemmer"; \
-	./snowball $< -j -o $${o} -p "org.tartarus.snowball.SnowballStemmer" -n $${l}Stemmer
+	echo "./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer"; \
+	./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer
 
 $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
 	@mkdir -p $(csharp_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
 	o="$(csharp_src_dir)/$${l}Stemmer.generated"; \
-	echo "./snowball $< -cs -o $${o} -p \"Stemmer\" -n $${t}Stemmer"; \
-	./snowball $< -cs -o $${o} -p "Stemmer" -n $${t}Stemmer
+	echo "./snowball $< -cs -o $${o} -p Stemmer"; \
+	./snowball $< -cs -o $${o} -p Stemmer
 
 $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	@mkdir -p $(python_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
-	echo "./snowball $< -py -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
-	./snowball $< -py -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
+	echo "./snowball $< -py -o $${o} -p BaseStemmer"; \
+	./snowball $< -py -o $${o} -p BaseStemmer
 
 $(python_output_dir)/__init__.py:
 	@mkdir -p $(python_output_dir)
@@ -278,8 +278,8 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	@mkdir -p $(js_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(js_output_dir)/$${l}-stemmer"; \
-	echo "./snowball $< -js -o $${o} -p \"SnowballStemmer\" -n `$(python) -c "print('$${l}'.title())"`Stemmer"; \
-	./snowball $< -js -o $${o} -p "BaseStemmer" -n `$(python) -c "print('$${l}'.title())"`Stemmer
+	echo "./snowball $< -js -o $${o} -p BaseStemmer"; \
+	./snowball $< -js -o $${o} -p BaseStemmer
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
