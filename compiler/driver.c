@@ -1,3 +1,4 @@
+#include <ctype.h>   /* for toupper etc */
 #include <stdio.h>   /* for fprintf etc */
 #include <stdlib.h>  /* for free etc */
 #include <string.h>  /* for strcmp */
@@ -302,7 +303,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                      * underscore+letter or hyphen+letter to an upper case
                      * letter.
                      */
-                    int i, j = 0;
+                    size_t i, j = 0;
                     int uc_next = true;
                     for (i = 0; i != len; ++i) {
 			unsigned char ch = leaf[i];
