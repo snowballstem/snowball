@@ -10,7 +10,7 @@ typedef unsigned short symbol;
 #define FREE check_free
 
 #define NEW(type, p) struct type * p = (struct type *) MALLOC(sizeof(struct type))
-#define NEWVEC(type, p, n) struct type * p = (struct type *) MALLOC(sizeof(struct type) * n)
+#define NEWVEC(type, p, n) struct type * p = (struct type *) MALLOC(sizeof(struct type) * (n))
 
 #define STARTSIZE   10
 #define SIZE(p)     ((int *)(p))[-1]
