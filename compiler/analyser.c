@@ -580,11 +580,10 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
                 w1->function = 0;
             }
             w1++;
-        }
-        else
-        if (q->left == 0)  /* empty command: () */
+        } else if (q->left == 0) {
+            /* empty command: () */
             w0 = w1;
-        else {
+        } else {
             while (w0 != w1) {
                 w0->p = q;
                 w0->result = result;
