@@ -551,7 +551,7 @@ static int compare_amongvec(const void *pv, const void *qv) {
 static int compare_node(const struct node *p, const struct node *q) {
     PTR_NULL_CHECK(p, q);
     if (q == NULL) {
-        // p must be NULL too.
+        /* p must be NULL too. */
         return 0;
     }
 
