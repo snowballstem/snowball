@@ -540,6 +540,71 @@ static int compare_amongvec(const void *pv, const void *qv) {
     return p->p->line_number - q->p->line_number;
 }
 
+#define PTR_NULL_CHECK(P, Q) do {\
+        if ((Q) == NULL) {\
+            if ((P) != NULL) return 1;\
+        } else {\
+            if ((P) == NULL) return -1;\
+        }\
+    } while (0)
+
+static int compare_node(const struct node *p, const struct node *q) {
+    PTR_NULL_CHECK(p, q);
+    if (q == NULL) {
+        // p must be NULL too.
+        return 0;
+    }
+
+    if (p->type != q->type) return p->type > q->type ? 1 : -1;
+    if (p->mode != q->mode) return p->mode > q->mode ? 1 : -1;
+    if (p->type == c_number) {
+        if (p->number != q->number)
+            return p->number > q->number ? 1 : -1;
+    }
+
+    PTR_NULL_CHECK(p->left, q->left);
+    if (p->left) {
+        int r = compare_node(p->left, q->left);
+        if (r != 0) return r;
+    }
+
+    PTR_NULL_CHECK(p->AE, q->AE);
+    if (p->AE) {
+        int r = compare_node(p->AE, q->AE);
+        if (r != 0) return r;
+    }
+
+    PTR_NULL_CHECK(p->aux, q->aux);
+    if (p->aux) {
+        int r = compare_node(p->aux, q->aux);
+        if (r != 0) return r;
+    }
+
+    PTR_NULL_CHECK(p->name, q->name);
+    if (p->name) {
+        int r;
+        if (SIZE(p->name->b) != SIZE(q->name->b)) {
+            return SIZE(p->name->b) - SIZE(q->name->b);
+        }
+        r = memcmp(p->name->b, q->name->b,
+                   SIZE(p->name->b) * sizeof(symbol));
+        if (r != 0) return r;
+    }
+
+    PTR_NULL_CHECK(p->literalstring, q->literalstring);
+    if (p->literalstring) {
+        int r;
+        if (SIZE(p->literalstring) != SIZE(q->literalstring)) {
+            return SIZE(p->literalstring) - SIZE(q->literalstring);
+        }
+        r = memcmp(p->literalstring, q->literalstring,
+                   SIZE(p->literalstring) * sizeof(symbol));
+        if (r != 0) return r;
+    }
+
+    return compare_node(p->right, q->right);
+}
+
 static void make_among(struct analyser * a, struct node * p, struct node * substring) {
 
     NEW(among, x);
@@ -584,17 +649,52 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
             /* empty command: () */
             w0 = w1;
         } else {
+            /* Check for previous action which is the same as this one and use
+             * the same action code if we find one.
+             */
+            int among_result = -1;
+            struct amongvec * w;
+            for (w = v; w < w0; ++w) {
+                if (compare_node(w->p->left, q->left) == 0) {
+                    if (w->result <= 0) {
+                        printf("Among code %d isn't positive\n", w->result);
+                        exit(1);
+                    }
+                    among_result = w->result;
+                    break;
+                }
+            }
+            if (among_result < 0) {
+                among_result = result++;
+            }
+
             while (w0 != w1) {
                 w0->p = q;
-                w0->result = result;
+                w0->result = among_result;
                 w0++;
             }
-            result++;
         }
         q = q->right;
     }
     if (w1-v != p->number) { fprintf(stderr, "oh! %d %d\n", (int)(w1-v), p->number); exit(1); }
-    if (backward) for (w0 = v; w0 < w1; w0++) reverse_b(w0->b);
+    x->command_count = result - 1;
+    {
+        NEWVEC(node*, commands, x->command_count);
+        memset(commands, 0, x->command_count * sizeof(struct node*));
+        for (w0 = v; w0 < w1; w0++) {
+            if (w0->result > 0) {
+                /* result == -1 when there's no command. */
+                if (w0->result > x->command_count) {
+                    fprintf(stderr, "More among codes than expected\n");
+                    exit(1);
+                }
+                if (!commands[w0->result - 1])
+                    commands[w0->result - 1] = w0->p;
+            }
+            if (backward) reverse_b(w0->b);
+        }
+        x->commands = commands;
+    }
     qsort(v, w1 - v, sizeof(struct amongvec), compare_amongvec);
 
     /* the following loop is O(n squared) */
@@ -620,7 +720,6 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
 	}
 
     x->literalstring_count = p->number;
-    x->command_count = result - 1;
     p->among = x;
 
     x->substring = substring;

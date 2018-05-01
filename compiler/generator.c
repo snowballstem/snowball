@@ -1255,7 +1255,6 @@ static void generate_substring(struct generator * g, struct node * p) {
 static void generate_among(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
-    int case_number = 1;
 
     if (x->substring == 0) generate_substring(g, p);
     if (x->command_count == 0 && x->starter == 0) return;
@@ -1265,16 +1264,16 @@ static void generate_among(struct generator * g, struct node * p) {
     writef(g, "~Mswitch (among_var) {~C~+"
               "~Mcase 0: ~f~N", p);
 
-    p = p->left;
-    if (p != 0 && p->type != c_literalstring) p = p->right;
-
-    while (p) {
-        if (p->type == c_bra && p->left != 0) {
-            g->I[0] = case_number++;
-            w(g, "~Mcase ~I0:~N~+"); generate(g, p); w(g, "~Mbreak;~N~-");
+    {
+        int i;
+        for (i = 1; i <= x->command_count; i++) {
+            g->I[0] = i;
+            w(g, "~Mcase ~I0:~N~+");
+            generate(g, x->commands[i - 1]);
+            w(g, "~Mbreak;~N~-");
         }
-        p = p->right;
     }
+
     w(g, "~}");
 }
 

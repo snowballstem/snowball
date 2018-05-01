@@ -192,6 +192,7 @@ struct among {
     int function_count;       /* in this among */
     struct node * starter;    /* i.e. among( (starter) 'string' ... ) */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
+    struct node ** commands;  /* array with command_count entries */
 };
 
 struct grouping {
