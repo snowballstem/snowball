@@ -75,86 +75,101 @@ stringdef R  '{U+0937}'
 stringdef s  '{U+0938}'
 stringdef h  '{U+0939}'
 
+integers ( p )
+
 define stem as (
-    backwards ( [substring] among (
-        // The list below is taken from figure 3 in the paper, with the
-        // addition of '{a}' which is needed for the example given right at
-        // the end of section 5 to work (conflating BarawIya and BarawIyawA).
-        // and which 3.1 a.iv strongly suggests should be in the list:
-        //
-        //     Thus, the following suffix deletions (longest possible match)
-        //     are required to reduce inflected forms of masculine nouns to a
-        //     common stem:
-        //     a A i [...]
-        //
-        // We've assumed that Mh in that list always means {Mh} and never
-        // {M}{h}.
-        '{a}'
-        '{A}'
-        '{i}'
-        '{I}'
-        '{u}'
-        '{U}'
-        '{e}'
-        '{o}'
-        '{e}{M}'
-        '{o}{M}'
-        '{A}{M}'
-        '{u}{A}{M}'
-        '{u}{e}{M}'
-        '{u}{o}{M}'
-        '{A}{e}{M}'
-        '{A}{o}{M}'
-        '{i}{y}{A}{M}'
-        '{i}{y}{o}{M}'
-        '{A}{i}{y}{A}{M}'
-        '{A}{i}{y}{o}{M}'
-        '{A}{Mh}'
-        '{i}{y}{A}{Mh}'
-        '{A}{i}{y}{A}{Mh}'
-        '{a}{w}{A}{e}{M}'
-        '{a}{w}{A}{o}{M}'
-        '{a}{n}{A}{e}{M}'
-        '{a}{n}{A}{o}{M}'
-        '{a}{w}{A}'
-        '{a}{w}{I}'
-        '{I}{M}'
-        '{a}{w}{I}{M}'
-        '{a}{w}{e}'
-        '{A}{w}{A}'
-        '{A}{w}{I}'
-        '{A}{w}{I}{M}'
-        '{A}{w}{e}'
-        '{a}{n}{A}'
-        '{a}{n}{I}'
-        '{a}{n}{e}'
-        '{A}{n}{A}'
-        '{A}{n}{e}'
-        '{U}{M}{g}{A}'
-        '{U}{M}{g}{I}'
-        '{A}{U}{M}{g}{A}'
-        '{A}{U}{M}{g}{I}'
-        '{e}{M}{g}{e}'
-        '{e}{M}{g}{I}'
-        '{A}{e}{M}{g}{e}'
-        '{A}{e}{M}{g}{I}'
-        '{o}{g}{e}'
-        '{o}{g}{I}'
-        '{A}{o}{g}{e}'
-        '{A}{o}{g}{I}'
-        '{e}{g}{A}'
-        '{e}{g}{I}'
-        '{A}{e}{g}{A}'
-        '{A}{e}{g}{I}'
-        '{A}{y}{A}'
-        '{A}{e}'
-        '{A}{I}'
-        '{A}{I}{M}'
-        '{i}{e}'
-        '{A}{o}'
-        '{A}{i}{e}'
-        '{a}{k}{a}{r}{a}'
-        '{A}{k}{a}{r}{a}'
-            (delete)
+    test ( next setmark p )
+    backwards (
+        // We assume in this implementation that the whole word doesn't count
+        // as a valid suffix to remove, so we remove the longest suffix from
+        // the list which leaves at least one character.  This change affects
+        // 18 words out of the 65,140 in the sample vocabulary from Hindi
+        // wikipedia.
+        setlimit tomark p for ([substring])
+        among (
+            // The list below is taken from figure 3 in the paper, with the
+            // addition of '{a}' which is needed for the example given right at
+            // the end of section 5 to work (conflating BarawIya and
+            // BarawIyawA), and which 3.1 a.iv strongly suggests should be in
+            // the list:
+            //
+            //     Thus, the following suffix deletions (longest possible
+            //     match) are required to reduce inflected forms of masculine
+            //     nouns to a common stem:
+            //     a A i [...]
+            //
+            // Adding '{a}' to the list only affect 2 words out of the 65,140
+            // in the sample vocabulary.
+            //
+            // We've also assumed that Mh in that list always means {Mh} and
+            // never {M}{h}.  None of the 65,140 words in the sample vocabulary
+            // stem differently due to this (none of them end {A}{M}{h}).
+            '{a}'
+            '{A}'
+            '{i}'
+            '{I}'
+            '{u}'
+            '{U}'
+            '{e}'
+            '{o}'
+            '{e}{M}'
+            '{o}{M}'
+            '{A}{M}'
+            '{u}{A}{M}'
+            '{u}{e}{M}'
+            '{u}{o}{M}'
+            '{A}{e}{M}'
+            '{A}{o}{M}'
+            '{i}{y}{A}{M}'
+            '{i}{y}{o}{M}'
+            '{A}{i}{y}{A}{M}'
+            '{A}{i}{y}{o}{M}'
+            '{A}{Mh}'
+            '{i}{y}{A}{Mh}'
+            '{A}{i}{y}{A}{Mh}'
+            '{a}{w}{A}{e}{M}'
+            '{a}{w}{A}{o}{M}'
+            '{a}{n}{A}{e}{M}'
+            '{a}{n}{A}{o}{M}'
+            '{a}{w}{A}'
+            '{a}{w}{I}'
+            '{I}{M}'
+            '{a}{w}{I}{M}'
+            '{a}{w}{e}'
+            '{A}{w}{A}'
+            '{A}{w}{I}'
+            '{A}{w}{I}{M}'
+            '{A}{w}{e}'
+            '{a}{n}{A}'
+            '{a}{n}{I}'
+            '{a}{n}{e}'
+            '{A}{n}{A}'
+            '{A}{n}{e}'
+            '{U}{M}{g}{A}'
+            '{U}{M}{g}{I}'
+            '{A}{U}{M}{g}{A}'
+            '{A}{U}{M}{g}{I}'
+            '{e}{M}{g}{e}'
+            '{e}{M}{g}{I}'
+            '{A}{e}{M}{g}{e}'
+            '{A}{e}{M}{g}{I}'
+            '{o}{g}{e}'
+            '{o}{g}{I}'
+            '{A}{o}{g}{e}'
+            '{A}{o}{g}{I}'
+            '{e}{g}{A}'
+            '{e}{g}{I}'
+            '{A}{e}{g}{A}'
+            '{A}{e}{g}{I}'
+            '{A}{y}{A}'
+            '{A}{e}'
+            '{A}{I}'
+            '{A}{I}{M}'
+            '{i}{e}'
+            '{A}{o}'
+            '{A}{i}{e}'
+            '{a}{k}{a}{r}{a}'
+            '{A}{k}{a}{r}{a}'
+                (delete)
     ))
 )
