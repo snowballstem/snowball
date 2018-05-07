@@ -1,0 +1,160 @@
+// An implementation of "A Lightweight Stemmer for Hindi":
+// http://www.kbcs.in/downloads/papers/StmmerHindi.pdf
+
+externals ( stem )
+
+stringescapes {}
+
+// The transliteration scheme used for our stringdefs matches that used in the
+// paper, as documented in the appendix.  It appears to match the WX notation
+// (https://en.wikipedia.org/wiki/WX_notation) except that WX apparently
+// uses 'z' fpr Anunasika whereas the paper uses Mh.
+
+// Vowels and sonorants:
+stringdef a  '{U+0905}'
+stringdef A  '{U+0906}'
+stringdef i  '{U+0907}'
+stringdef I  '{U+0908}'
+stringdef u  '{U+0909}'
+stringdef U  '{U+090A}'
+stringdef q  '{U+090B}'
+stringdef e  '{U+090F}'
+stringdef E  '{U+0910}'
+stringdef o  '{U+0913}'
+stringdef O  '{U+0914}'
+
+// Diacritics:
+stringdef M  '{U+0902}'
+stringdef H  '{U+0903}'
+stringdef Mh '{U+0901}'
+
+// Velar consonants:
+stringdef k  '{U+0915}'
+stringdef K  '{U+0916}'
+stringdef g  '{U+0917}'
+stringdef G  '{U+0918}'
+stringdef f  '{U+0919}'
+
+// Palatal consonants:
+stringdef c  '{U+091A}'
+stringdef C  '{U+091B}'
+stringdef j  '{U+091C}'
+stringdef J  '{U+091D}'
+stringdef F  '{U+091E}'
+
+// Retroflex consonants:
+stringdef t  '{U+091F}'
+stringdef T  '{U+0920}'
+stringdef d  '{U+0921}'
+stringdef D  '{U+0922}'
+stringdef N  '{U+0923}'
+
+// Dental consonants:
+stringdef w  '{U+0924}'
+stringdef W  '{U+0925}'
+stringdef x  '{U+0926}'
+stringdef X  '{U+0927}'
+stringdef n  '{U+0928}'
+
+// Labial consonants:
+stringdef p  '{U+092A}'
+stringdef P  '{U+092B}'
+stringdef b  '{U+092C}'
+stringdef B  '{U+092D}'
+stringdef m  '{U+092E}'
+
+// Semi-vowels:
+stringdef y  '{U+092F}'
+stringdef r  '{U+0930}'
+stringdef l  '{U+0932}'
+stringdef v  '{U+0935}'
+
+// Fricatives:
+stringdef S  '{U+0936}'
+stringdef R  '{U+0937}'
+stringdef s  '{U+0938}'
+stringdef h  '{U+0939}'
+
+define stem as (
+    backwards ( [substring] among (
+        // The list below is taken from figure 3 in the paper, with the
+        // addition of '{a}' which is needed for the example given right at
+        // the end of section 5 to work (conflating BarawIya and BarawIyawA).
+        // and which 3.1 a.iv strongly suggests should be in the list:
+        //
+        //     Thus, the following suffix deletions (longest possible match)
+        //     are required to reduce inflected forms of masculine nouns to a
+        //     common stem:
+        //     a A i [...]
+        //
+        // We've assumed that Mh in that list always means {Mh} and never
+        // {M}{h}.
+        '{a}'
+        '{A}'
+        '{i}'
+        '{I}'
+        '{u}'
+        '{U}'
+        '{e}'
+        '{o}'
+        '{e}{M}'
+        '{o}{M}'
+        '{A}{M}'
+        '{u}{A}{M}'
+        '{u}{e}{M}'
+        '{u}{o}{M}'
+        '{A}{e}{M}'
+        '{A}{o}{M}'
+        '{i}{y}{A}{M}'
+        '{i}{y}{o}{M}'
+        '{A}{i}{y}{A}{M}'
+        '{A}{i}{y}{o}{M}'
+        '{A}{Mh}'
+        '{i}{y}{A}{Mh}'
+        '{A}{i}{y}{A}{Mh}'
+        '{a}{w}{A}{e}{M}'
+        '{a}{w}{A}{o}{M}'
+        '{a}{n}{A}{e}{M}'
+        '{a}{n}{A}{o}{M}'
+        '{a}{w}{A}'
+        '{a}{w}{I}'
+        '{I}{M}'
+        '{a}{w}{I}{M}'
+        '{a}{w}{e}'
+        '{A}{w}{A}'
+        '{A}{w}{I}'
+        '{A}{w}{I}{M}'
+        '{A}{w}{e}'
+        '{a}{n}{A}'
+        '{a}{n}{I}'
+        '{a}{n}{e}'
+        '{A}{n}{A}'
+        '{A}{n}{e}'
+        '{U}{M}{g}{A}'
+        '{U}{M}{g}{I}'
+        '{A}{U}{M}{g}{A}'
+        '{A}{U}{M}{g}{I}'
+        '{e}{M}{g}{e}'
+        '{e}{M}{g}{I}'
+        '{A}{e}{M}{g}{e}'
+        '{A}{e}{M}{g}{I}'
+        '{o}{g}{e}'
+        '{o}{g}{I}'
+        '{A}{o}{g}{e}'
+        '{A}{o}{g}{I}'
+        '{e}{g}{A}'
+        '{e}{g}{I}'
+        '{A}{e}{g}{A}'
+        '{A}{e}{g}{I}'
+        '{A}{y}{A}'
+        '{A}{e}'
+        '{A}{I}'
+        '{A}{I}{M}'
+        '{i}{e}'
+        '{A}{o}'
+        '{A}{i}{e}'
+        '{a}{k}{a}{r}{a}'
+        '{A}{k}{a}{r}{a}'
+            (delete)
+    ))
+)
