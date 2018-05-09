@@ -8,7 +8,7 @@ stringescapes {}
 // The transliteration scheme used for our stringdefs matches that used in the
 // paper, as documented in the appendix.  It appears to match the WX notation
 // (https://en.wikipedia.org/wiki/WX_notation) except that WX apparently
-// uses 'z' fpr Anunasika whereas the paper uses Mh.
+// uses 'z' for Anunasika whereas the paper uses Mh.
 
 // Vowels and sonorants:
 stringdef a  '{U+0905}'
