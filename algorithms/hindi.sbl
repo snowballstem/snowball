@@ -23,6 +23,18 @@ stringdef E  '{U+0910}'
 stringdef o  '{U+0913}'
 stringdef O  '{U+0914}'
 
+// Vowel signs:
+stringdef _A '{U+093E}'
+stringdef _i '{U+093F}'
+stringdef _I '{U+0940}'
+stringdef _u '{U+0941}'
+stringdef _U '{U+0942}'
+stringdef _q '{U+0943}'
+stringdef _e '{U+0947}'
+stringdef _E '{U+0948}'
+stringdef _o '{U+094B}'
+stringdef _O '{U+094C}'
+
 // Diacritics:
 stringdef M  '{U+0902}'
 stringdef H  '{U+0903}'
@@ -83,93 +95,97 @@ define stem as (
         // We assume in this implementation that the whole word doesn't count
         // as a valid suffix to remove, so we remove the longest suffix from
         // the list which leaves at least one character.  This change affects
-        // 18 words out of the 65,140 in the sample vocabulary from Hindi
-        // wikipedia.
+        // 10 words out of the 65,140 in the sample vocabulary from Hindi
+        // wikipedia.  FIXME: Recalculate after changes finalised.
         setlimit tomark p for ([substring])
         among (
-            // The list below is taken from figure 3 in the paper, with the
-            // addition of '{a}' which is needed for the example given right at
-            // the end of section 5 to work (conflating BarawIya and
-            // BarawIyawA), and which 3.1 a.iv strongly suggests should be in
-            // the list:
+            // The list below is taken from figure 3 in the paper.  We perform
+            // the stemming on the Devanagari characters rather than
+            // transliterating to Latin, so we have adapted the list below to
+            // reflect this:
             //
-            //     Thus, the following suffix deletions (longest possible
-            //     match) are required to reduce inflected forms of masculine
-            //     nouns to a common stem:
-            //     a A i [...]
-            //
-            // Adding '{a}' to the list only affect 2 words out of the 65,140
-            // in the sample vocabulary.
+            // * within the suffixes, "a" after a consonant is dropped since
+            //   consonants have an implicit "a".
+            // * within the suffixes, a vowel other than "a" after a consonant
+            //   is a dependent vowel (vowel sign); a vowel (including "a")
+            //   after a non-consonant is an independent vowel.
+            // * at the start of the suffix, "a" is dropped and other vowels
+            //   are dependent vowels (assuming that the suffix follows a
+            //   consonant - FIXME: Should we also include each suffix with the
+            //   initial vowel as an independent vowel?  Doing so affects 633
+            //   of the 65,140 words in the sample vocabulary, so under 1%)
             //
             // We've also assumed that Mh in that list always means {Mh} and
-            // never {M}{h}.  None of the 65,140 words in the sample vocabulary
-            // stem differently due to this (none of them end {A}{M}{h}).
-            '{a}'
-            '{A}'
-            '{i}'
-            '{I}'
-            '{u}'
-            '{U}'
-            '{e}'
-            '{o}'
-            '{e}{M}'
-            '{o}{M}'
-            '{A}{M}'
-            '{u}{A}{M}'
-            '{u}{e}{M}'
-            '{u}{o}{M}'
-            '{A}{e}{M}'
-            '{A}{o}{M}'
-            '{i}{y}{A}{M}'
-            '{i}{y}{o}{M}'
-            '{A}{i}{y}{A}{M}'
-            '{A}{i}{y}{o}{M}'
-            '{A}{Mh}'
-            '{i}{y}{A}{Mh}'
-            '{A}{i}{y}{A}{Mh}'
-            '{a}{w}{A}{e}{M}'
-            '{a}{w}{A}{o}{M}'
-            '{a}{n}{A}{e}{M}'
-            '{a}{n}{A}{o}{M}'
-            '{a}{w}{A}'
-            '{a}{w}{I}'
-            '{I}{M}'
-            '{a}{w}{I}{M}'
-            '{a}{w}{e}'
-            '{A}{w}{A}'
-            '{A}{w}{I}'
-            '{A}{w}{I}{M}'
-            '{A}{w}{e}'
-            '{a}{n}{A}'
-            '{a}{n}{I}'
-            '{a}{n}{e}'
-            '{A}{n}{A}'
-            '{A}{n}{e}'
-            '{U}{M}{g}{A}'
-            '{U}{M}{g}{I}'
-            '{A}{U}{M}{g}{A}'
-            '{A}{U}{M}{g}{I}'
-            '{e}{M}{g}{e}'
-            '{e}{M}{g}{I}'
-            '{A}{e}{M}{g}{e}'
-            '{A}{e}{M}{g}{I}'
-            '{o}{g}{e}'
-            '{o}{g}{I}'
-            '{A}{o}{g}{e}'
-            '{A}{o}{g}{I}'
-            '{e}{g}{A}'
-            '{e}{g}{I}'
-            '{A}{e}{g}{A}'
-            '{A}{e}{g}{I}'
-            '{A}{y}{A}'
-            '{A}{e}'
-            '{A}{I}'
-            '{A}{I}{M}'
-            '{i}{e}'
-            '{A}{o}'
-            '{A}{i}{e}'
-            '{a}{k}{a}{r}{a}'
-            '{A}{k}{a}{r}{a}'
+            // never {M}{h}<VIRAMA>.  Only one of the 65,140 words in the sample
+            // vocabulary stems differently due to this (and that word seems to
+            // be a typo).
+            //
+            // FIXME: Handle U+094D DEVANAGARI SIGN VIRAMA?
+            '{_A}'
+            '{_i}'
+            '{_I}'
+            '{_u}'
+            '{_U}'
+            '{_e}'
+            '{_o}'
+            '{_e}{M}'
+            '{_o}{M}'
+            '{_A}{M}'
+            '{_u}{A}{M}'
+            '{_u}{e}{M}'
+            '{_u}{o}{M}'
+            '{_A}{e}{M}'
+            '{_A}{o}{M}'
+            '{_i}{y}{_A}{M}'
+            '{_i}{y}{_o}{M}'
+            '{_A}{i}{y}{_A}{M}'
+            '{_A}{i}{y}{_o}{M}'
+            '{_A}{Mh}'
+            '{_i}{y}{_A}{Mh}'
+            '{_A}{i}{y}{_A}{Mh}'
+            /* '{a}' */ '{w}{_A}{e}{M}'
+            /* '{a}' */ '{w}{_A}{o}{M}'
+            /* '{a}' */ '{n}{_A}{e}{M}'
+            /* '{a}' */ '{n}{_A}{o}{M}'
+            /* '{a}' */ '{w}{_A}'
+            /* '{a}' */ '{w}{_I}'
+            '{_I}{M}'
+            /* '{a}' */ '{w}{_I}{M}'
+            /* '{a}' */ '{w}{_e}'
+            '{_A}{w}{_A}'
+            '{_A}{w}{_I}'
+            '{_A}{w}{_I}{M}'
+            '{_A}{w}{_e}'
+            /* '{a}' */ '{n}{_A}'
+            /* '{a}' */ '{n}{_I}'
+            /* '{a}' */ '{n}{_e}'
+            '{_A}{n}{_A}'
+            '{_A}{n}{_e}'
+            '{_U}{M}{g}{_A}'
+            '{_U}{M}{g}{_I}'
+            '{_A}{U}{M}{g}{_A}'
+            '{_A}{U}{M}{g}{_I}'
+            '{_e}{M}{g}{_e}'
+            '{_e}{M}{g}{_I}'
+            '{_A}{e}{M}{g}{_e}'
+            '{_A}{e}{M}{g}{_I}'
+            '{_o}{g}{_e}'
+            '{_o}{g}{_I}'
+            '{_A}{o}{g}{_e}'
+            '{_A}{o}{g}{_I}'
+            '{_e}{g}{_A}'
+            '{_e}{g}{_I}'
+            '{_A}{e}{g}{_A}'
+            '{_A}{e}{g}{_I}'
+            '{_A}{y}{_A}'
+            '{_A}{e}'
+            '{_A}{I}'
+            '{_A}{I}{M}'
+            '{_i}{e}'
+            '{_A}{o}'
+            '{_A}{i}{e}'
+            /* '{a}' */ '{k}{r}'
+            '{_A}{k}{r}'
                 (delete)
     ))
 )
