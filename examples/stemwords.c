@@ -39,7 +39,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
 		/* Update count of utf-8 characters. */
 		if (ch < 0x80 || ch > 0xBF) inlen += 1;
                 /* force lower case: */
-                if (isupper(ch)) ch = tolower(ch);
+                ch = tolower(ch);
 
                 b[i] = ch;
 		i++;
