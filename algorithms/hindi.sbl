@@ -9,6 +9,10 @@ stringescapes {}
 // paper, as documented in the appendix.  It appears to match the WX notation
 // (https://en.wikipedia.org/wiki/WX_notation) except that WX apparently
 // uses 'z' for Anunasika whereas the paper uses Mh.
+//
+// We discriminate dependent vowels by adding a leading "_" to their stringdef
+// names (mnemonic: the _ signifies removing the implicit a from the preceding
+// character).
 
 // Vowels and sonorants:
 stringdef a  '{U+0905}'
@@ -39,6 +43,7 @@ stringdef _O '{U+094C}'
 stringdef M  '{U+0902}'
 stringdef H  '{U+0903}'
 stringdef Mh '{U+0901}'
+stringdef virama '{U+094D}'
 
 // Velar consonants:
 stringdef k  '{U+0915}'
@@ -95,32 +100,117 @@ define stem as (
         // We assume in this implementation that the whole word doesn't count
         // as a valid suffix to remove, so we remove the longest suffix from
         // the list which leaves at least one character.  This change affects
-        // 10 words out of the 65,140 in the sample vocabulary from Hindi
-        // wikipedia.  FIXME: Recalculate after changes finalised.
+        // 47 words out of the 65,140 in the sample vocabulary from Hindi
+        // wikipedia.
         setlimit tomark p for ([substring])
         among (
-            // The list below is taken from figure 3 in the paper.  We perform
-            // the stemming on the Devanagari characters rather than
+            // The list below is derived from figure 3 in the paper.
+            //
+            // We perform the stemming on the Devanagari characters rather than
             // transliterating to Latin, so we have adapted the list below to
-            // reflect this:
+            // reflect this by converting suffixes back to Devanagari as
+            // follows:
             //
             // * within the suffixes, "a" after a consonant is dropped since
             //   consonants have an implicit "a".
             // * within the suffixes, a vowel other than "a" after a consonant
             //   is a dependent vowel (vowel sign); a vowel (including "a")
             //   after a non-consonant is an independent vowel.
-            // * at the start of the suffix, "a" is dropped and other vowels
-            //   are dependent vowels (assuming that the suffix follows a
-            //   consonant - FIXME: Should we also include each suffix with the
-            //   initial vowel as an independent vowel?  Doing so affects 633
-            //   of the 65,140 words in the sample vocabulary, so under 1%)
+            // * to allow the vowel at the start of each suffix being dependent
+            //   or independent, we include each suffix twice.  For the
+            //   dependent version, a leading "a" is dropped (since it's
+            //   implicitly there on the consonant which should precede it).
+            // * we add '{a}', which is needed for the example given right at
+            //   the end of section 5 to work (conflating BarawIya and
+            //   BarawIyawA), and which 3.1 a.iv strongly suggests should be in
+            //   the list:
             //
-            // We've also assumed that Mh in that list always means {Mh} and
-            // never {M}{h}<VIRAMA>.  Only one of the 65,140 words in the sample
-            // vocabulary stems differently due to this (and that word seems to
-            // be a typo).
+            //     Thus, the following suffix deletions (longest possible
+            //     match) are required to reduce inflected forms of masculine
+            //     nouns to a common stem:
+            //     a A i [...]
             //
-            // FIXME: Handle U+094D DEVANAGARI SIGN VIRAMA?
+            //   Adding '{a}' only affect 2 words out of the 65,140 in the
+            //   sample vocabulary.
+            // * The transliterations of our stems would end with "a" when our
+            //   stems end in a consonant, so we also include {virama} in the
+            //   list of suffixes to remove (this affects 222 words from the
+            //   sample vocabulary).
+            //
+            // We've also assumed that Mh in the suffix list always means {Mh}
+            // and never {M}{h}{virama}.  Only one of the 65,140 words in the
+            // sample vocabulary stems differently due to this (and that word
+            // seems to be a typo).
+
+            '{virama}'
+
+            '{a}'
+            '{A}'
+            '{i}'
+            '{I}'
+            '{u}'
+            '{U}'
+            '{e}'
+            '{o}'
+            '{e}{M}'
+            '{o}{M}'
+            '{A}{M}'
+            '{u}{A}{M}'
+            '{u}{e}{M}'
+            '{u}{o}{M}'
+            '{A}{e}{M}'
+            '{A}{o}{M}'
+            '{i}{y}{_A}{M}'
+            '{i}{y}{_o}{M}'
+            '{A}{i}{y}{_A}{M}'
+            '{A}{i}{y}{_o}{M}'
+            '{A}{Mh}'
+            '{i}{y}{_A}{Mh}'
+            '{A}{i}{y}{_A}{Mh}'
+            '{a}{w}{_A}{e}{M}'
+            '{a}{w}{_A}{o}{M}'
+            '{a}{n}{_A}{e}{M}'
+            '{a}{n}{_A}{o}{M}'
+            '{a}{w}{_A}'
+            '{a}{w}{_I}'
+            '{I}{M}'
+            '{a}{w}{_I}{M}'
+            '{a}{w}{_e}'
+            '{A}{w}{_A}'
+            '{A}{w}{_I}'
+            '{A}{w}{_I}{M}'
+            '{A}{w}{_e}'
+            '{a}{n}{_A}'
+            '{a}{n}{_I}'
+            '{a}{n}{_e}'
+            '{A}{n}{_A}'
+            '{A}{n}{_e}'
+            '{U}{M}{g}{_A}'
+            '{U}{M}{g}{_I}'
+            '{A}{U}{M}{g}{_A}'
+            '{A}{U}{M}{g}{_I}'
+            '{e}{M}{g}{_e}'
+            '{e}{M}{g}{_I}'
+            '{A}{e}{M}{g}{_e}'
+            '{A}{e}{M}{g}{_I}'
+            '{o}{g}{_e}'
+            '{o}{g}{_I}'
+            '{A}{o}{g}{_e}'
+            '{A}{o}{g}{_I}'
+            '{e}{g}{_A}'
+            '{e}{g}{_I}'
+            '{A}{e}{g}{_A}'
+            '{A}{e}{g}{_I}'
+            '{A}{y}{_A}'
+            '{A}{e}'
+            '{A}{I}'
+            '{A}{I}{M}'
+            '{i}{e}'
+            '{A}{o}'
+            '{A}{i}{e}'
+            '{a}{k}{r}'
+            '{A}{k}{r}'
+
             '{_A}'
             '{_i}'
             '{_I}'
