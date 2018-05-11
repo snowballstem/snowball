@@ -282,7 +282,9 @@ struct options {
     FILE * output_c;
     FILE * output_h;
     FILE * output_java;
+    FILE * output_delphi;
     byte syntax_tree;
+    byte make_delphi;
     byte make_java;
     byte make_c;
     byte widechars;
@@ -305,4 +307,10 @@ extern struct generator * create_generator_java(struct analyser * a, struct opti
 extern void close_generator_java(struct generator * g);
 
 extern void generate_program_java(struct generator * g);
+
+/* Generator for Delphi code. */
+extern struct generator * create_generator_delphi(struct analyser * a, struct options * o);
+extern void close_generator_delphi(struct generator * g);
+
+extern void generate_program_delphi(struct generator * g);
 

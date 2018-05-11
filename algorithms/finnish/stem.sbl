@@ -24,7 +24,7 @@ externals ( stem )
 integers ( p1 p2 )
 strings ( x )
 booleans ( ending_removed )
-groupings ( AEI v V particle_end )
+groupings ( AEI v V2 particle_end )
 
 stringescapes {}
 
@@ -35,7 +35,7 @@ stringdef o"   hex 'F6'
 
 define AEI 'a{a"}ei'
 define v 'aeiouy{a"}{o"}'
-define V 'aeiou{a"}{o"}'
+define V2 'aeiou{a"}{o"}'
 define particle_end v + 'nt'
 
 define mark_regions as (
@@ -90,7 +90,7 @@ backwardmode (
     define LONG as
         among('aa' 'ee' 'ii' 'oo' 'uu' '{a"}{a"}' '{o"}{o"}')
 
-    define VI as ('i' V)
+    define VI as ('i' V2)
 
     define case as (
         setlimit tomark p1 for ([substring])

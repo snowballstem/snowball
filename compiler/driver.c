@@ -24,6 +24,7 @@ static void print_arglist(void)
 {   fprintf(stderr, "options are: file [-o[utput] file] \n"
                     "                  [-s[yntax]]\n"
                     "                  [-j[ava]]\n"
+                    "                  [-d[delphi]]\n"
                     "                  [-w[idechars]]\n"
                     "                  [-n[ame] class name]\n"
                     "                  [-ep[refix] string]\n"
@@ -66,6 +67,7 @@ static void read_options(struct options * o, int argc, char * argv[])
     o->name = "";
     o->make_c = true;
     o->make_java = false;
+    o->make_delphi = false;
     o->widechars = false;
     o->includes = 0;
     o->includes_end = 0;
@@ -89,6 +91,13 @@ static void read_options(struct options * o, int argc, char * argv[])
             {   o->make_java = true;
                 o->widechars = true;
                 o->make_c = false;
+                o->make_delphi = false;
+                continue;
+            }
+            if (eq(s, "-d") || eq(s, "-delphi"))
+            {   o->make_delphi = true;
+                o->make_c = false;
+                o->make_java = false;
                 continue;
             }
             if (eq(s, "-w") || eq(s, "-widechars"))
@@ -185,6 +194,17 @@ extern int main(int argc, char * argv[])
                     generate_program_java(g);
                     close_generator_java(g);
                     fclose(o->output_java);
+                }
+                if (o->make_delphi) {
+                    symbol *b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".pas");
+                    o->output_delphi = get_output(b);
+                    lose_b(b);
+                    o->name = o->output_file;
+                    g = create_generator_delphi(a, o);
+                    generate_program_delphi(g);
+                    close_generator_delphi(g);
+                    fclose(o->output_delphi);
                 }
             }
             close_analyser(a);

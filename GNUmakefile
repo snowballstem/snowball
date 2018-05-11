@@ -25,7 +25,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/analyser.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
-		   compiler/generator_java.c
+		   compiler/generator_java.c \
+		   compiler/generator_delphi.c
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords \
 		   compiler/syswords2
@@ -51,7 +52,7 @@ STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 C_OBJECTS = $(C_SOURCES:.c=.o)
 
 CFLAGS=-Iinclude
-CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations -Werror
+CPPFLAGS=-W -Wall -Wmissing-prototypes -Wmissing-declarations
 
 all: snowball libstemmer.o stemwords
 
