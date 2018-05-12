@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-my @sources = qw(Danish Dutch English Finnish French German German2 Italian
-                 Lovins Norwegian Porter Portuguese Russian Spanish Swedish Dos2Latin);
+my @sources = qw(danish dutch english finnish french german german2 italian
+                 lovins norwegian porter portuguese russian spanish swedish);
 
 my $snowball = "../snowball";
 
@@ -10,11 +10,11 @@ foreach my $source(@sources)
 {
     # Compile stemmer.
     my $name   = $source."Stemmer";
-    my $ifile  = "../algorithms/".$source."/stem.sbl";
+    my $ifile  = "../algorithms/$source.sbl";
     my $prefix = $source."_";
 
     # Generate Delphi source.
-    system("$snowball $ifile -d -o $name");
+    system($snowball, $ifile, '-delphi', '-o', $name);
 
     # Generate Delphi project file.
     my $src_file = "Test.dpr";
@@ -33,7 +33,7 @@ foreach my $source(@sources)
     close(SRC) or warn($!);
     
     # Compile Delphi project.
-    system("dcc32 -Q $dst_file");
+    system("fpc", "-Mdelphi", $dst_file);
 
 
     # Generate C source.

@@ -1,20 +1,18 @@
 
-package net.sf.snowball;
+package org.tartarus.snowball;
 import java.lang.reflect.InvocationTargetException;
+import java.io.Serializable;
 
-public class SnowballProgram {
+public class SnowballProgram implements Serializable {
     protected SnowballProgram()
     {
-	current = new StringBuffer();
-	setCurrent("");
+	current = new StringBuilder();
+	init();
     }
 
-    /**
-     * Set the current string.
-     */
-    public void setCurrent(String value)
-    {
-	current.replace(0, current.length(), value);
+    static final long serialVersionUID = 2016072500L;
+
+    private void init() {
 	cursor = 0;
 	limit = current.length();
 	limit_backward = 0;
@@ -23,29 +21,45 @@ public class SnowballProgram {
     }
 
     /**
-     * Get the current string.
+     * Set the current string.
      */
-    public String getCurrent()
+    public void setCurrent(String value)
     {
-        String result = current.toString();
-        // Make a new StringBuffer.  If we reuse the old one, and a user of
+        // Make a new StringBuilder.  If we reuse the old one, and a user of
         // the library keeps a reference to the buffer returned (for example,
         // by converting it to a String in a way which doesn't force a copy),
         // the buffer size will not decrease, and we will risk wasting a large
         // amount of memory.
         // Thanks to Wolfram Esser for spotting this problem.
-        current = new StringBuffer();
-        return result;
+        current = new StringBuilder(value);
+	init();
+    }
+
+    /**
+     * Get the current string.
+     */
+    public String getCurrent()
+    {
+        return current.toString();
     }
 
     // current string
-    protected StringBuffer current;
+    protected StringBuilder current;
 
     protected int cursor;
     protected int limit;
     protected int limit_backward;
     protected int bra;
     protected int ket;
+
+    public SnowballProgram(SnowballProgram other) {
+	current          = other.current;
+	cursor           = other.cursor;
+	limit            = other.limit;
+	limit_backward   = other.limit_backward;
+	bra              = other.bra;
+	ket              = other.ket;
+    }
 
     protected void copy_from(SnowballProgram other)
     {
@@ -89,7 +103,7 @@ public class SnowballProgram {
 	}
 	ch -= min;
 	if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) {
-	    cursor ++;
+	    cursor++;
 	    return true;
 	}
 	return false;
@@ -111,77 +125,32 @@ public class SnowballProgram {
 	return false;
     }
 
-    protected boolean in_range(int min, int max)
+    protected boolean eq_s(CharSequence s)
     {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (ch > max || ch < min) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean in_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if (ch > max || ch < min) return false;
-	cursor--;
-	return true;
-    }
-
-    protected boolean out_range(int min, int max)
-    {
-	if (cursor >= limit) return false;
-	char ch = current.charAt(cursor);
-	if (!(ch > max || ch < min)) return false;
-	cursor++;
-	return true;
-    }
-
-    protected boolean out_range_b(int min, int max)
-    {
-	if (cursor <= limit_backward) return false;
-	char ch = current.charAt(cursor - 1);
-	if(!(ch > max || ch < min)) return false;
-	cursor--;
-	return true;
-    }
-
-    protected boolean eq_s(int s_size, String s)
-    {
-	if (limit - cursor < s_size) return false;
+	if (limit - cursor < s.length()) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
+	for (i = 0; i != s.length(); i++) {
 	    if (current.charAt(cursor + i) != s.charAt(i)) return false;
 	}
-	cursor += s_size;
+	cursor += s.length();
 	return true;
     }
 
-    protected boolean eq_s_b(int s_size, String s)
+    protected boolean eq_s_b(CharSequence s)
     {
-	if (cursor - limit_backward < s_size) return false;
+	if (cursor - limit_backward < s.length()) return false;
 	int i;
-	for (i = 0; i != s_size; i++) {
-	    if (current.charAt(cursor - s_size + i) != s.charAt(i)) return false;
+	for (i = 0; i != s.length(); i++) {
+	    if (current.charAt(cursor - s.length() + i) != s.charAt(i)) return false;
 	}
-	cursor -= s_size;
+	cursor -= s.length();
 	return true;
     }
 
-    protected boolean eq_v(StringBuffer s)
-    {
-	return eq_s(s.length(), s.toString());
-    }
-
-    protected boolean eq_v_b(StringBuffer s)
-    {   return eq_s_b(s.length(), s.toString());
-    }
-
-    protected int find_among(Among v[], int v_size)
+    protected int find_among(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int l = limit;
@@ -197,12 +166,12 @@ public class SnowballProgram {
 	    int common = common_i < common_j ? common_i : common_j; // smaller
 	    Among w = v[k];
 	    int i2;
-	    for (i2 = common; i2 < w.s_size; i2++) {
+	    for (i2 = common; i2 < w.s.length; i2++) {
 		if (c + common == l) {
 		    diff = -1;
 		    break;
 		}
-		diff = current.charAt(c + common) - w.s.charAt(i2);
+		diff = current.charAt(c + common) - w.s[i2];
 		if (diff != 0) break;
 		common++;
 	    }
@@ -227,13 +196,12 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
-	    if (common_i >= w.s_size) {
-		cursor = c + w.s_size;
+	    if (common_i >= w.s.length) {
+		cursor = c + w.s.length;
 		if (w.method == null) return w.result;
 		boolean res;
 		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
+		    Object resobj = w.method.invoke(this);
 		    res = resobj.toString().equals("true");
 		} catch (InvocationTargetException e) {
 		    res = false;
@@ -242,7 +210,7 @@ public class SnowballProgram {
 		    res = false;
 		    // FIXME - debug message
 		}
-		cursor = c + w.s_size;
+		cursor = c + w.s.length;
 		if (res) return w.result;
 	    }
 	    i = w.substring_i;
@@ -251,10 +219,10 @@ public class SnowballProgram {
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    protected int find_among_b(Among v[], int v_size)
+    protected int find_among_b(Among v[])
     {
 	int i = 0;
-	int j = v_size;
+	int j = v.length;
 
 	int c = cursor;
 	int lb = limit_backward;
@@ -270,12 +238,12 @@ public class SnowballProgram {
 	    int common = common_i < common_j ? common_i : common_j;
 	    Among w = v[k];
 	    int i2;
-	    for (i2 = w.s_size - 1 - common; i2 >= 0; i2--) {
+	    for (i2 = w.s.length - 1 - common; i2 >= 0; i2--) {
 		if (c - common == lb) {
 		    diff = -1;
 		    break;
 		}
-		diff = current.charAt(c - 1 - common) - w.s.charAt(i2);
+		diff = current.charAt(c - 1 - common) - w.s[i2];
 		if (diff != 0) break;
 		common++;
 	    }
@@ -295,14 +263,13 @@ public class SnowballProgram {
 	}
 	while(true) {
 	    Among w = v[i];
-	    if (common_i >= w.s_size) {
-		cursor = c - w.s_size;
+	    if (common_i >= w.s.length) {
+		cursor = c - w.s.length;
 		if (w.method == null) return w.result;
 
 		boolean res;
 		try {
-		    Object resobj = w.method.invoke(w.methodobject,
-						    new Object[0]);
+		    Object resobj = w.method.invoke(this);
 		    res = resobj.toString().equals("true");
 		} catch (InvocationTargetException e) {
 		    res = false;
@@ -311,7 +278,7 @@ public class SnowballProgram {
 		    res = false;
 		    // FIXME - debug message
 		}
-		cursor = c - w.s_size;
+		cursor = c - w.s.length;
 		if (res) return w.result;
 	    }
 	    i = w.substring_i;
@@ -325,7 +292,7 @@ public class SnowballProgram {
     protected int replace_s(int c_bra, int c_ket, String s)
     {
 	int adjustment = s.length() - (c_ket - c_bra);
-	current.replace(bra, ket, s);
+	current.replace(c_bra, c_ket, s);
 	limit += adjustment;
 	if (cursor >= c_ket) cursor += adjustment;
 	else if (cursor > c_bra) cursor = c_bra;
@@ -355,7 +322,7 @@ public class SnowballProgram {
 	replace_s(bra, ket, s);
     }
 
-    protected void slice_from(StringBuffer s)
+    protected void slice_from(CharSequence s)
     {
         slice_from(s.toString());
     }
@@ -372,24 +339,21 @@ public class SnowballProgram {
 	if (c_bra <= ket) ket += adjustment;
     }
 
-    protected void insert(int c_bra, int c_ket, StringBuffer s)
+    protected void insert(int c_bra, int c_ket, CharSequence s)
     {
 	insert(c_bra, c_ket, s.toString());
     }
 
-    /* Copy the slice into the supplied StringBuffer */
-    protected StringBuffer slice_to(StringBuffer s)
+    /* Copy the slice into the supplied StringBuilder */
+    protected void slice_to(StringBuilder s)
     {
 	slice_check();
-	int len = ket - bra;
 	s.replace(0, s.length(), current.substring(bra, ket));
-	return s;
     }
 
-    protected StringBuffer assign_to(StringBuffer s)
+    protected void assign_to(StringBuilder s)
     {
 	s.replace(0, s.length(), current.substring(0, limit));
-	return s;
     }
 
 /*
@@ -415,4 +379,3 @@ extern void debug(struct SN_env * z, int number, int line_count)
 */
 
 };
-

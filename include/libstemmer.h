@@ -5,7 +5,7 @@ extern "C" {
 #endif
 
 struct sb_stemmer;
-typedef char sb_symbol;
+typedef unsigned char sb_symbol;
 
 /* FIXME - should be able to get a version number for each stemming
  * algorithm (which will be incremented each time the output changes). */
@@ -19,13 +19,31 @@ typedef char sb_symbol;
  */
 const char ** sb_stemmer_list(void);
 
-/** Create a new stemmer object, using the specified algorithm.
+/** Create a new stemmer object, using the specified algorithm, for the
+ *  specified character encoding.
  *
- *  @return If the specified algorithm is not recognised, 0 will be 
- *  returned; otherwise a pointer to a newly created stemmer for that
- *  algorithm will be returned.
+ *  All algorithms will usually be available in UTF-8, but may also be
+ *  available in other character encodings.
+ *
+ *  @param algorithm The algorithm name.  This is either the english
+ *  name of the algorithm, or the 2 or 3 letter ISO 639 codes for the
+ *  language.  Note that case is significant in this parameter - the
+ *  value should be supplied in lower case.
+ *
+ *  @param charenc The character encoding.  NULL may be passed as
+ *  this value, in which case UTF-8 encoding will be assumed. Otherwise,
+ *  the argument may be one of "UTF_8", "ISO_8859_1" (ie, Latin 1),
+ *  "CP850" (ie, MS-DOS Latin 1) or "KOI8_R" (Russian).  Note that
+ *  case is significant in this parameter.
+ *
+ *  @return NULL if the specified algorithm is not recognised, or the
+ *  algorithm is not available for the requested encoding.  Otherwise,
+ *  returns a pointer to a newly created stemmer for the requested algorithm.
+ *  The returned pointer must be deleted by calling sb_stemmer_delete().
+ *
+ *  @note NULL will also be returned if an out of memory error occurs.
  */
-struct sb_stemmer * sb_stemmer_new(const char * algorithm);
+struct sb_stemmer * sb_stemmer_new(const char * algorithm, const char * charenc);
 
 /** Delete a stemmer object.
  *
@@ -43,7 +61,9 @@ void                sb_stemmer_delete(struct sb_stemmer * stemmer);
  *  modified, and it will become invalid when the stemmer is called again,
  *  or if the stemmer is freed.
  *
- *  The length of the return value can be obtained using sb_stemmer_length()
+ *  The length of the return value can be obtained using sb_stemmer_length().
+ *
+ *  If an out-of-memory error occurs, this will return NULL.
  */
 const sb_symbol *   sb_stemmer_stem(struct sb_stemmer * stemmer,
 				    const sb_symbol * word, int size);

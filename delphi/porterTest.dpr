@@ -1,5 +1,7 @@
 program porterTest;
 
+{$APPTYPE CONSOLE}
+
 uses
   SysUtils,
   SnowballProgram in 'SnowballProgram.pas',
