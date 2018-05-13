@@ -677,13 +677,13 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 := assign_to(~V0);~N", p);
+    writef(g, "~M~V0 := AssignTo();~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 := SliceTo(~V0);~N", p);
+    writef(g, "~M~V0 := SliceTo();~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {

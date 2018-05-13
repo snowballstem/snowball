@@ -49,8 +49,8 @@ Type
         Function  ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;        
         Procedure Insert(bra, ket : Integer; s : AnsiString);
 
-        Function SliceTo(s : AnsiString) : AnsiString;
-        Function AssignTo(s : AnsiString) : AnsiString;
+        Function SliceTo : AnsiString;
+        Function AssignTo : AnsiString;
 
     Public
         { Set & Retrieve current string }
@@ -410,11 +410,10 @@ Begin
 	If (bra <= FKet) Then FKet := FKet + adjustment;
 End;
 
-Function TSnowballProgram.SliceTo(s : AnsiString) : AnsiString;
+Function TSnowballProgram.SliceTo() : AnsiString;
 Begin
     SliceCheck();
-	s := Copy(FCurrent, FBra + 1, FKet - FBra);
-	Result := s;
+    Result := Copy(FCurrent, FBra + 1, FKet - FBra);
 End;
 
 Procedure TSnowballProgram.SliceFrom(s : AnsiString);
@@ -423,10 +422,9 @@ Begin
 	ReplaceS(FBra, FKet, s);
 End;
 
-Function TSnowballProgram.AssignTo(s : AnsiString) : AnsiString;
+Function TSnowballProgram.AssignTo() : AnsiString;
 Begin
-    s := Copy(FCurrent, 1, FLimit);
-	Result := s;
+    Result := Copy(FCurrent, 1, FLimit);
 End;
 
 End.
