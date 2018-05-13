@@ -1080,7 +1080,11 @@ static void generate_class_end(struct generator * g) {
 static void generate_method_decl(struct generator * g, struct node * p, int type) {
     if (p->type == c_define && p->name->type == type) {            
         g->V[0] = p->name;
-        w(g, "~MFunction ~W0 : Boolean;~N");
+        w(g, "~MFunction ~W0 : Boolean;");
+        if (type == t_external) {
+            w(g, " Override;");
+        }
+        w(g, "~N");
     }        
 }
 

@@ -302,11 +302,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             char * new_name = malloc(len + 1);
             switch (o->make_lang) {
                 case LANG_CSHARP:
+                case LANG_DELPHI:
                     /* Upper case initial letter. */
                     memcpy(new_name, leaf, len);
                     new_name[0] = toupper(new_name[0]);
                     break;
-                case LANG_DELPHI:
                 case LANG_JAVASCRIPT:
                 case LANG_PYTHON: {
                     /* Upper case initial letter and change each

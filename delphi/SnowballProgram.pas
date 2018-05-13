@@ -55,6 +55,8 @@ Type
     Public
         { Set & Retrieve current string }
         Property Current: AnsiString Read FCurrent Write SetCurrent;
+	{ Method subclasses need to implement }
+	Function stem : Boolean; Virtual; Abstract;
     End;
 
 Implementation
@@ -411,7 +413,7 @@ End;
 Function TSnowballProgram.SliceTo(s : AnsiString) : AnsiString;
 Begin
     SliceCheck();
-	s := Copy(FCurrent, FBra + 1, FKet);
+	s := Copy(FCurrent, FBra + 1, FKet - FBra);
 	Result := s;
 End;
 
