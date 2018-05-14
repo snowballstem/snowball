@@ -94,6 +94,16 @@ stringdef h  '{U+0939}'
 
 integers ( p )
 
+groupings ( consonant )
+
+define consonant '{k}{K}{g}{G}{f}' +
+                 '{c}{C}{j}{J}{F}' +
+                 '{t}{T}{d}{D}{N}' +
+                 '{w}{W}{x}{X}{n}' +
+                 '{p}{P}{b}{B}{m}' +
+                 '{y}{r}{l}{v}' +
+                 '{S}{R}{s}{h}'
+
 define stem as (
     test ( next setmark p )
     backwards (
@@ -113,13 +123,17 @@ define stem as (
             //
             // * within the suffixes, "a" after a consonant is dropped since
             //   consonants have an implicit "a".
+            //
             // * within the suffixes, a vowel other than "a" after a consonant
             //   is a dependent vowel (vowel sign); a vowel (including "a")
             //   after a non-consonant is an independent vowel.
+            //
             // * to allow the vowel at the start of each suffix being dependent
             //   or independent, we include each suffix twice.  For the
-            //   dependent version, a leading "a" is dropped (since it's
-            //   implicitly there on the consonant which should precede it).
+            //   dependent version, a leading "a" is dropped and we check that
+            //   the suffix is preceded by a consonant (which will have an
+            //   implicit "a").
+            //
             // * we add '{a}', which is needed for the example given right at
             //   the end of section 5 to work (conflating BarawIya and
             //   BarawIyawA), and which 3.1 a.iv strongly suggests should be in
@@ -132,6 +146,7 @@ define stem as (
             //
             //   Adding '{a}' only affect 2 words out of the 65,140 in the
             //   sample vocabulary.
+            //
             // * The transliterations of our stems would end with "a" when our
             //   stems end in a consonant, so we also include {virama} in the
             //   list of suffixes to remove (this affects 222 words from the
@@ -233,22 +248,11 @@ define stem as (
             '{_A}{Mh}'
             '{_i}{y}{_A}{Mh}'
             '{_A}{i}{y}{_A}{Mh}'
-            /* '{a}' */ '{w}{_A}{e}{M}'
-            /* '{a}' */ '{w}{_A}{o}{M}'
-            /* '{a}' */ '{n}{_A}{e}{M}'
-            /* '{a}' */ '{n}{_A}{o}{M}'
-            /* '{a}' */ '{w}{_A}'
-            /* '{a}' */ '{w}{_I}'
             '{_I}{M}'
-            /* '{a}' */ '{w}{_I}{M}'
-            /* '{a}' */ '{w}{_e}'
             '{_A}{w}{_A}'
             '{_A}{w}{_I}'
             '{_A}{w}{_I}{M}'
             '{_A}{w}{_e}'
-            /* '{a}' */ '{n}{_A}'
-            /* '{a}' */ '{n}{_I}'
-            /* '{a}' */ '{n}{_e}'
             '{_A}{n}{_A}'
             '{_A}{n}{_e}'
             '{_U}{M}{g}{_A}'
@@ -274,8 +278,22 @@ define stem as (
             '{_i}{e}'
             '{_A}{o}'
             '{_A}{i}{e}'
-            /* '{a}' */ '{k}{r}'
             '{_A}{k}{r}'
                 (delete)
+
+            /* Suffixes with a leading implicit a: */
+            '{w}{_A}{e}{M}'
+            '{w}{_A}{o}{M}'
+            '{n}{_A}{e}{M}'
+            '{n}{_A}{o}{M}'
+            '{w}{_A}'
+            '{w}{_I}'
+            '{w}{_I}{M}'
+            '{w}{_e}'
+            '{n}{_A}'
+            '{n}{_I}'
+            '{n}{_e}'
+            '{k}{r}'
+                (consonant delete)
     ))
 )
