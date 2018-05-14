@@ -7,7 +7,6 @@ Type
 
 Type
     TAmong = record
-        Size   : Integer;       // search string length
         Str    : AnsiString;    // search string
         Index  : Integer;       // index to longest matching substring
         Result : Integer;       // result of the lookup
@@ -214,7 +213,7 @@ Begin
 	    common := Min(common_i, common_j); // smaller
 	    w := v[k];
 
-	    For i2 := common To w.Size - 1 Do
+	    For i2 := common To Length(w.Str) - 1 Do
         Begin
 		    if (c + common) = l Then
             Begin
@@ -256,9 +255,9 @@ Begin
 	While True Do
     Begin
 	    w := v[i];
-	    If (common_i >= w.Size) Then
+	    If (common_i >= Length(w.Str)) Then
         Begin
-    		FCursor := c + w.Size;
+    		FCursor := c + Length(w.Str);
 	    	If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
@@ -267,7 +266,7 @@ Begin
 
 		    res := w.Method;
 
-	    	FCursor := c + w.Size;
+	    	FCursor := c + Length(w.Str);
     		if (res) Then Begin
                 Result := w.Result;
                 Exit;
@@ -306,7 +305,7 @@ Begin
 	    common := Min(common_i, common_j);
 	    w := v[k];
 
-	    For i2 := w.Size - 1 - common DownTo 0 Do
+	    For i2 := Length(w.Str) - 1 - common DownTo 0 Do
 		Begin
             If (c - common) = lb Then
             Begin
@@ -342,9 +341,9 @@ Begin
 	While True Do
     Begin
 	    w := v[i];
-	    if common_i >= w.Size Then
+	    if common_i >= Length(w.Str) Then
         Begin
-		    FCursor := c - w.Size;
+		    FCursor := c - Length(w.Str);
     		If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
@@ -353,7 +352,7 @@ Begin
 
 		    res := w.Method;
 
-		    FCursor := c - w.Size;
+		    FCursor := c - Length(w.Str);
 		    If Res Then
             Begin
                 Result := w.Result;

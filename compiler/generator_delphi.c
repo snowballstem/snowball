@@ -1160,7 +1160,6 @@ static void generate_among_table(struct generator * g, struct among * x) {
         /* Write among's string. */
         g->L[0] = v->b;
         w(g, "~Ma_~I0[~I1].Str  := ~L0;~N");
-        w(g, "~Ma_~I0[~I1].Size := Length(a_~I0[~I1].Str);~N");
 
         /* Write among's index & result. */
         g->I[2] = v->i;
