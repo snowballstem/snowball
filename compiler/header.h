@@ -175,9 +175,10 @@ struct amongvec {
 
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
-    struct node * p; /* the corresponding node for this string */
+    struct node * action; /* the corresponding action */
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
+    int line_number; /* for diagnostics and stable sorting */
     struct name * function;
 
 };
