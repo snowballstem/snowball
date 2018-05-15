@@ -88,7 +88,7 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
     if (b1 >= 0xC0 || c == lb) {   /* 1100 0000 */
         * slot = (b1 & 0x1F) << 6 | (b0 & 0x3F); return 2;
     }
-    * slot = (p[c] & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
+    * slot = (p[--c] & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
 }
 
 extern int in_grouping_U(struct SN_env * z, const unsigned char * s, int min, int max, int repeat) {
