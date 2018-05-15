@@ -25,7 +25,7 @@ extern void lose_s(symbol * p) {
 /*
    new_p = skip_utf8(p, c, lb, l, n); skips n characters forwards from p + c
    if n +ve, or n characters backwards from p + c - 1 if n -ve. new_p is the new
-   position, or 0 on failure.
+   position, or -1 on failure.
 
    -- used to implement hop and next in the utf8 case.
 */
