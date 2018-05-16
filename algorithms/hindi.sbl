@@ -96,6 +96,8 @@ integers ( p )
 
 groupings ( consonant )
 
+routines ( CONSONANT )
+
 define consonant '{k}{K}{g}{G}{f}' +
                  '{c}{C}{j}{J}{F}' +
                  '{t}{T}{d}{D}{N}' +
@@ -103,6 +105,8 @@ define consonant '{k}{K}{g}{G}{f}' +
                  '{p}{P}{b}{B}{m}' +
                  '{y}{r}{l}{v}' +
                  '{S}{R}{s}{h}'
+
+backwardmode ( define CONSONANT as ( consonant ) )
 
 define stem as (
     test ( next setmark p )
@@ -279,21 +283,21 @@ define stem as (
             '{_A}{o}'
             '{_A}{i}{e}'
             '{_A}{k}{r}'
-                (delete)
 
             /* Suffixes with a leading implicit a: */
-            '{w}{_A}{e}{M}'
-            '{w}{_A}{o}{M}'
-            '{n}{_A}{e}{M}'
-            '{n}{_A}{o}{M}'
-            '{w}{_A}'
-            '{w}{_I}'
-            '{w}{_I}{M}'
-            '{w}{_e}'
-            '{n}{_A}'
-            '{n}{_I}'
-            '{n}{_e}'
-            '{k}{r}'
-                (consonant delete)
-    ))
+            '{w}{_A}{e}{M}' CONSONANT
+            '{w}{_A}{o}{M}' CONSONANT
+            '{n}{_A}{e}{M}' CONSONANT
+            '{n}{_A}{o}{M}' CONSONANT
+            '{w}{_A}' CONSONANT
+            '{w}{_I}' CONSONANT
+            '{w}{_I}{M}' CONSONANT
+            '{w}{_e}' CONSONANT
+            '{n}{_A}' CONSONANT
+            '{n}{_I}' CONSONANT
+            '{n}{_e}' CONSONANT
+            '{k}{r}' CONSONANT
+        )
+        delete
+    )
 )
