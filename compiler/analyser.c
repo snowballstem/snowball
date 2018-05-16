@@ -612,6 +612,8 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->number = a->among_count++;
     x->function_count = 0;
     x->starter = 0;
+    x->nocommand_count = 0;
+    x->amongvar_needed = 0;
 
     if (q->type == c_bra) { x->starter = q; q = q->right; }
 
@@ -679,6 +681,8 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
                 }
                 if (!commands[w0->result - 1])
                     commands[w0->result - 1] = w0->action;
+            } else {
+                ++x->nocommand_count;
             }
             if (backward) reverse_b(w0->b);
         }
@@ -719,7 +723,14 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
 
     x->substring = substring;
     if (substring != 0) substring->among = x;
-    if (x->command_count != 0 || x->starter != 0) a->amongvar_needed = true;
+    if (x->command_count > 1 ||
+        (x->command_count == 1 && x->nocommand_count > 0) ||
+        x->starter != 0) {
+        /* We need to set among_var rather than just checking if find_among*()
+         * returns zero or not.
+         */
+        x->amongvar_needed = a->amongvar_needed = true;
+    }
 }
 
 static struct node * read_among(struct analyser * a) {
