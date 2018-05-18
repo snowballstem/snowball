@@ -24,8 +24,7 @@ stringdef z*   '{U+017E}'  // ž z + caron (haček)
 // [C](VC)^m[V|C]
 // definitions of variables for
 // p1 - position of m = 0
-// p2 - position of m = 1
-integers ( p1 p2 s)
+integers ( p1 s )
 
 // groupings
 // v - lithuanian vowels
@@ -354,15 +353,13 @@ backwardmode(
 define stem as (
 
   $p1 = limit
-  $p2 = limit
-  $s = size
+  $s = len
 
   do (
     // priešdėlis 'a' ilgeniuose nei 6 raidės žodžiuose, pvz. 'a-liejus'.
     try (test 'a' $s > 6 hop 1)
 
     gopast v  gopast non-v  setmark p1
-    gopast v  gopast non-v  setmark p2
   )
 
   backwards (
