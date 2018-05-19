@@ -43,8 +43,8 @@ backwardmode(
   define R1 as $p1 <= cursor
   define step1 as (
 	 setlimit tomark p1 for ([substring]) R1  among(
-      // Daiktavardžiai
-      // I linksniuotė
+      // Daiktavardžiai (Nouns)
+      // I linksniuotė (declension I)
       'as' 'ias' 'is' 'ys'        // vyras, kelias, brolis, gaidys
       'o'    'io'                 // vyro, kelio
       'ui'   'iui'                // vyrui, keliui
@@ -74,7 +74,7 @@ backwardmode(
       'uo'                        // mėnuo
 
 
-      // II linksniuote
+      // II linksniuote (declension II)
       'a'  'ia'                   // galva, vysnios
       'os' 'ios'                  // galvos, vysnios
       'oj' 'oje' 'ioje'           // galvoje, vysnioje
@@ -85,7 +85,7 @@ backwardmode(
       'on' 'ion'                  // galvon, vyšnion
 
 
-      // III linksniuote
+      // III linksniuote (declension III)
       '{e.}'                      // gervė
       '{e.}s'                     // gervės
       'ei'                        // gervei
@@ -99,7 +99,7 @@ backwardmode(
       '{e.}n'                     // žydaitėn
 
 
-      // IV linksniuote
+      // IV linksniuote (declension IV)
       'aus' 'iaus'                // sūnaus, skaičiaus
       'umi' 'iumi'                // sūnumi, skaičiumi
       'uje' 'iuje'                // sūnuje, skaičiuje
@@ -111,7 +111,7 @@ backwardmode(
       'un' 'iun'                  // sūnun, administratoriun
 
 
-      // V linksniuote
+      // V linksniuote (declension V)
       'ies' 'ens' 'enio' 'ers'    // avies, vandens, sesers
       'eniui' 'eriai'             // vandeniui, eriai
       'en{i'}' 'er{i'}'           // vandenį, seserį
@@ -129,16 +129,16 @@ backwardmode(
       'yse' 'enyse' 'eryse'       // avyse, vandenyse, seseryse
 
 
-      // Būdvardžiai
+      // Būdvardžiai (Adjectives)
       // (i)a linksniuotė
       'iem' 'iems'                // geriem, geriems
       'ame' 'iame'                // naujame, mediniame
 
 
-      // Veiksmažodžiai
-      // Tiesioginė nuosaka
-      // esamasis laikas
-      // (i)a asmenuotė
+      // Veiksmažodžiai (Verbs)
+      // Tiesioginė nuosaka (indicative mood)
+      // esamasis laikas (present tense)
+      // (i)a asmenuotė (declension (i)a)
       'uosi' 'iuosi'              // dirbuosi, traukiuosi
       'iesi'                      // dirbiesi
       'asi' 'iasi'                // dirbasi, traukiasi
@@ -146,7 +146,7 @@ backwardmode(
       'at' 'ate' 'iat' 'iate'     // dirbat, dirbate, ariat, traukiate
       'at{e.}s' 'iat{e.}s'        // dirbatės, traukiatės
 
-      // i asmenuotė
+      // i asmenuotė (declension i)
       'isi'                       // tikisi
       'im'                        // mylim
       //'ime' konfliktassu daiktavardžiu vietininku, pvz. 'gėrime'
@@ -154,16 +154,16 @@ backwardmode(
       'it' 'ite'                  // mylit, mylite, tikitės
       // 'it{e.}s' konfliktas su priesaga ir dgs. vardininko galūne -ait-ės pvz. žydaitės
 
-      // o asmenuotė
+      // o asmenuotė (declension o)
       'ome'                       // mokome
       'ot' 'ote'                  // mokot, mokote
 
       // būtasis laikas
-      // o asmenuotė
+      // o asmenuotė (declension o)
       '{e.}jo' '{e.}josi'         // tikėjo, tikėjosi
       'ot{e.}s'                   // tikėjotės/bijotės
 
-      // ė asmenuotė
+      // ė asmenuotė (declension ė)
       'eisi'                      // mokeisi
       '{e.}si'                    // mokėsi
       '{e.}m' '{e.}me'            // mokėm, mokėme
@@ -171,19 +171,19 @@ backwardmode(
       '{e.}t' '{e.}te'            // mokėt, mokėte
       '{e.}t{e.}s'                // mokėtės
 
-      // būtasis dažninis laikas
+      // būtasis dažninis laikas (frequentative past tense)
       'ausi'                      // mokydavausi
       'om{e.}s'                   // mokydavomės/bijomės
 
 
-      // būsimasis laikas
+      // būsimasis laikas (future tense)
       'siu' 'siuosi'              // dirbsiu, mokysiuosi
       'si' 'siesi'                // dirbsi, dirbsiesi
       's' 'ysis'                  // dirbs, mokysis
       'sim' 'sime'                // dirbsim, dirbsime
       'sit' 'site'                // gersit, gersite
 
-      // tariamoji nuosaka
+      // tariamoji nuosaka (subjunctive mood)
       '{c*}iau' '{c*}iausi'       // dirbčiau
       'tum' 'tumei'               // dirbtum, dirbtumei
       'tumeis' 'tumeisi'          // mokytumeis, mokytumeisi
@@ -197,13 +197,13 @@ backwardmode(
       'tum{e.}te'                 // dirbtumėte
       'tum{e.}t{e.}s'             // mokytumėtės
 
-      // liepiamoji nuosaka
+      // liepiamoji nuosaka (imperative mood)
       'k' 'ki'                    // dirbk, dirbki, mokykis
       // 'kis' konfliktas viln-išk-is
       // 'kime' konfliktas, nes pirkime
       'kim{e.}s'                  // mokykimės
 
-      // bendratis
+      // bendratis (infinitive)
       'uoti' 'iuoti'              // meluoti, dygsniuoti
       'auti' 'iauti'              // draugauti, girtuokliauti
       'oti' 'ioti'                // dovanoti, meškerioti
@@ -218,7 +218,7 @@ backwardmode(
       'ti'                        // skalbti
       // 'tis' konfliktas, nes rytme-tis -> rytme
 
-      // dalyviai
+      // dalyviai (participles)
       '{a'}s' 'i{a'}s' '{i'}s'    // dirbąs, žaidžiąs, gulįs
       't{u'}s'                    // suktųs -> suk
       'sim{e.}s'                  // suksimės
@@ -231,9 +231,9 @@ backwardmode(
 
   define step2 as repeat (
     setlimit tomark p1 for ([substring]) among(
-      // daiktavardziu priesagos
+      // daiktavardziu priesagos (Noun suffixes)
 
-      // budvardziu priesagos
+      // budvardziu priesagos (Adjective suffixes)
       // 'in' // konfliktas su 'augintinis' ir 'akiniais' // lauk-in-is
       'ing'                       // tvark-ing-as
       'i{s*}k'                    // lenk-išk-as
@@ -261,8 +261,8 @@ backwardmode(
       'esn'                       // did-esn-is
       'aus' 'iaus'                // nauj-aus-ias, ger-iaus-ias
 
-      // ivardziuotiniai budvardziai
-      // vyriska gimine
+      // ivardziuotiniai budvardziai (Pronominal adjectives)
+      // vyriska gimine (Male gender)
       'ias'                       // žaliasis
       'oj' 'ioj'                  // gerojo, žaliojo
       'aj' 'iaj'                  // gerajam, žaliajam
@@ -274,14 +274,14 @@ backwardmode(
       'uos' 'iuos'                // geruosius, žaliuosius
       'ais' 'iais'                // geraisiais, žaliaisiais
 
-      // moteriska gimine
+      // moteriska gimine (Female gender)
       'os' 'ios'                  // gerosios, žaliosios
       '{a'}s' 'i{a'}s'            // gerąsios, žaliąsias
 
-      // būtasis dažninis laikas
+      // būtasis dažninis laikas (frequentative past tense)
       'dav'                       // ei-dav-o
 
-      // dalyvių priesagos
+      // dalyvių priesagos (particple suffix)
       'ant' 'iant'
       'int'                       // tur-int-is
       '{e.}j'                     // tur-ėj-o
@@ -291,7 +291,7 @@ backwardmode(
 
       'siant'                     // dirb-siant
 
-      // pusdalyviai
+      // pusdalyviai (participle)
       'dam'                       // bėg-dam-as
 
       'auj'                       // ūkinink-auj-a
