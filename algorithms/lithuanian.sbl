@@ -35,14 +35,14 @@ define v 'aeiyou{a'}{e'}{i'}{u'}{e.}{u-}'
 
 // all lithuanian stemmer routines: 4 steps
 routines (
-   step2 R1 step1 fix_chdz fix_gd fix_conflicts
+  step2 R1 step1 fix_chdz fix_gd fix_conflicts
 )
 
-backwardmode(
+backwardmode (
 
   define R1 as $p1 <= cursor
   define step1 as (
-	 setlimit tomark p1 for ([substring]) R1  among(
+    setlimit tomark p1 for ([substring]) R1 among (
       // Daiktavardžiai (Nouns)
       // I linksniuotė (declension I)
       'as' 'ias' 'is' 'ys'        // vyras, kelias, brolis, gaidys
@@ -51,12 +51,12 @@ backwardmode(
       '{a'}' 'i{a'}' '{i'}'       // vyrą, kelią, brolį
       'u'    'iu'                 // vyru, keliu
       'e'    'yje'                // vyre, kelyje
-      'y'     'au'   'i'          // kely, brolau, broli,
+      'y'    'au'    'i'          // kely, brolau, broli,
       'an'                        // nusižengiman
 
       'ai'   'iai'                // vyrai, keliai
       '{u'}' 'i{u'}'              // vyrų, kelių
-      'ams' 'am'                  // vyrams, vyram
+      'ams'  'am'                 // vyrams, vyram
       'iams' 'iam'                // broliams, broliam
       'us'   'ius'                // vyrus, brolius
       'ais'  'iais'               // vyrais, keliais
@@ -149,7 +149,7 @@ backwardmode(
       // i asmenuotė (declension i)
       'isi'                       // tikisi
       'im'                        // mylim
-      //'ime' konfliktassu daiktavardžiu vietininku, pvz. 'gėrime'
+      // 'ime' konfliktassu daiktavardžiu vietininku, pvz. 'gėrime'
       'im{e.}s'                   // tikimės
       'it' 'ite'                  // mylit, mylite, tikitės
       // 'it{e.}s' konfliktas su priesaga ir dgs. vardininko galūne -ait-ės pvz. žydaitės
@@ -230,7 +230,7 @@ backwardmode(
   )
 
   define step2 as repeat (
-    setlimit tomark p1 for ([substring]) among(
+    setlimit tomark p1 for ([substring]) among (
       // daiktavardziu priesagos (Noun suffixes)
 
       // budvardziu priesagos (Adjective suffixes)
@@ -341,10 +341,10 @@ backwardmode(
     )
   )
 
- define fix_gd as (
+  define fix_gd as (
     [substring] among (
       'gd' (<-'g')
-      //'{e.}k' (<-'{e.}g')
+      // '{e.}k' (<-'{e.}g')
     )
   )
 
