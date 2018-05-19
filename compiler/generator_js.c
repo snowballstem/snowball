@@ -281,7 +281,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             g->V[0] = p->name;
             w(g, "~V0.length");
             break;
-        case c_len: /* Same as size() for Java. */
+        case c_len: /* Same as size() for Javascript. */
         case c_size:
             w(g, "base.current.length");
             break;
