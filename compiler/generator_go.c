@@ -48,7 +48,7 @@ static void write_varname(struct generator * g, struct name * p) {
             break;
         }
     }
-    str_append_b(g->outbuf, p->b);
+    write_b(g, p->b);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
@@ -101,8 +101,8 @@ static void write_comment(struct generator * g, struct node * p) {
     write_string(g, "// ");
     write_string(g, name_of_token(p->type));
     if (p->name != 0) {
-        write_string(g, " ");
-        str_append_b(g->outbuf, p->name->b);
+        write_char(g, ' ');
+        write_b(g, p->name->b);
     }
     write_string(g, ", line ");
     write_int(g, p->line_number);
