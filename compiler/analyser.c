@@ -846,7 +846,7 @@ static struct node * read_C(struct analyser * a) {
         case c_true:
         case c_false:
         case c_debug:
-            return C_style(a, "", token);
+            return new_node(a, token);
         case c_assignto:
         case c_sliceto: {
             struct node *n;
