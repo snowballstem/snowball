@@ -921,7 +921,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    if (x->command_count == 0 && x->starter == 0) {
+    if (!x->amongvar_needed) {
         write_failure_if(g, "FindAmong~S0(a_~I0, ~I1) = 0", p);
     } else {
         writef(g, "~MAmongVar := FindAmong~S0(a_~I0, ~I1);~N", p);
@@ -934,19 +934,16 @@ static void generate_among(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     if (x->substring == 0) generate_substring(g, p);
-    if (x->command_count == 0 && x->starter == 0) return;
 
     if (x->starter != 0) generate(g, x->starter);
 
-    write_comment(g, p);
-    w(g, "~MCase AmongVar Of~N~+");
-    w(g, "~M0:~N~{");
-    write_failure(g);
-    g->unreachable = false;
-    w(g, "~}");
-
-    {
+    if (x->command_count == 1 && x->nocommand_count == 0) {
+        /* Only one outcome ("no match" already handled). */
+        generate(g, x->commands[0]);
+    } else if (x->command_count > 0) {
         int i;
+        write_comment(g, p);
+        w(g, "~MCase AmongVar Of~N~+");
         for (i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~M~I0:~N~{");
@@ -954,9 +951,8 @@ static void generate_among(struct generator * g, struct node * p) {
             w(g, "~}");
             g->unreachable = false;
         }
+        write_block_end(g);
     }
-
-    write_block_end(g);
 }
 
 static void generate_booltest(struct generator * g, struct node * p) {
