@@ -175,18 +175,6 @@ static void error2(struct analyser * a, error_code n, int x) {
 
 static void error(struct analyser * a, error_code n) { error2(a, n, 0); }
 
-static void error3(struct analyser * a, struct node * p, symbol * b) {
-    count_error(a);
-    fprintf(stderr, "%s:%d: among(...) has repeated string '", a->tokeniser->file, p->line_number);
-    report_b(stderr, b);
-    fprintf(stderr, "'\n");
-}
-
-static void error3a(struct analyser * a, struct node * p) {
-    count_error(a);
-    fprintf(stderr, "%s:%d: previously seen here\n", a->tokeniser->file, p->line_number);
-}
-
 static void error4(struct analyser * a, struct name * q) {
     count_error(a);
     fprintf(stderr, "%s:%d: ", a->tokeniser->file, q->used->line_number);
@@ -536,8 +524,8 @@ static int compare_amongvec(const void *pv, const void *qv) {
     for (i = 0; i < smaller_size; i++)
         if (b_p[i] != b_q[i]) return b_p[i] - b_q[i];
     if (p_size - q_size)
-	return p_size - q_size;
-    return p->p->line_number - q->p->line_number;
+        return p_size - q_size;
+    return p->line_number - q->line_number;
 }
 
 #define PTR_NULL_CHECK(P, Q) do {\
@@ -624,6 +612,8 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->number = a->among_count++;
     x->function_count = 0;
     x->starter = 0;
+    x->nocommand_count = 0;
+    x->amongvar_needed = 0;
 
     if (q->type == c_bra) { x->starter = q; q = q->right; }
 
@@ -631,7 +621,8 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
         if (q->type == c_literalstring) {
             symbol * b = q->literalstring;
             w1->b = b;           /* pointer to case string */
-            w1->p = q;           /* pointer to corresponding node */
+            w1->action = NULL;   /* action gets filled in below */
+            w1->line_number = q->line_number;
             w1->size = SIZE(b);  /* number of characters in string */
             w1->i = -1;          /* index of longest substring */
             w1->result = -1;     /* number of corresponding case expression */
@@ -655,7 +646,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
             int among_result = -1;
             struct amongvec * w;
             for (w = v; w < w0; ++w) {
-                if (compare_node(w->p->left, q->left) == 0) {
+                if (w->action && compare_node(w->action->left, q->left) == 0) {
                     if (w->result <= 0) {
                         printf("Among code %d isn't positive\n", w->result);
                         exit(1);
@@ -669,7 +660,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
             }
 
             while (w0 != w1) {
-                w0->p = q;
+                w0->action = q;
                 w0->result = among_result;
                 w0++;
             }
@@ -689,7 +680,9 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
                     exit(1);
                 }
                 if (!commands[w0->result - 1])
-                    commands[w0->result - 1] = w0->p;
+                    commands[w0->result - 1] = w0->action;
+            } else {
+                ++x->nocommand_count;
             }
             if (backward) reverse_b(w0->b);
         }
@@ -715,16 +708,29 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     for (w0 = v; w0 < w1 - 1; w0++)
         if (w0->size == (w0 + 1)->size &&
             memcmp(w0->b, (w0 + 1)->b, w0->size * sizeof(symbol)) == 0) {
-	    error3(a, (w0 + 1)->p, (w0 + 1)->b);
-	    error3a(a, w0->p);
-	}
+            count_error(a);
+            fprintf(stderr, "%s:%d: among(...) has repeated string '",
+                    a->tokeniser->file, (w0 + 1)->line_number);
+            report_b(stderr, (w0 + 1)->b);
+            fprintf(stderr, "'\n");
+            count_error(a);
+            fprintf(stderr, "%s:%d: previously seen here\n",
+                    a->tokeniser->file, w0->line_number);
+        }
 
     x->literalstring_count = p->number;
     p->among = x;
 
     x->substring = substring;
     if (substring != 0) substring->among = x;
-    if (x->command_count != 0 || x->starter != 0) a->amongvar_needed = true;
+    if (x->command_count > 1 ||
+        (x->command_count == 1 && x->nocommand_count > 0) ||
+        x->starter != 0) {
+        /* We need to set among_var rather than just checking if find_among*()
+         * returns zero or not.
+         */
+        x->amongvar_needed = a->amongvar_needed = true;
+    }
 }
 
 static struct node * read_among(struct analyser * a) {
@@ -840,7 +846,7 @@ static struct node * read_C(struct analyser * a) {
         case c_true:
         case c_false:
         case c_debug:
-            return C_style(a, "", token);
+            return new_node(a, token);
         case c_assignto:
         case c_sliceto: {
             struct node *n;

@@ -942,7 +942,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
 
-    if (x->command_count == 0 && x->starter == 0) {
+    if (!x->amongvar_needed) {
         write_failure_if(g, "self.find_among~S0(~n.a_~I0) == 0", p);
     } else {
         writef(g, "~Mamong_var = self.find_among~S0(~n.a_~I0)~N", p);
@@ -955,20 +955,18 @@ static void generate_among(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     if (x->substring == 0) generate_substring(g, p);
-    if (x->command_count == 0 && x->starter == 0) return;
 
     if (x->starter != 0) generate(g, x->starter);
 
-    w(g, "~Mif among_var == 0:~N~+");
-    write_failure(g);
-    g->unreachable = false;
-    w(g, "~-");
-
-    {
+    if (x->command_count == 1 && x->nocommand_count == 0) {
+        /* Only one outcome ("no match" already handled). */
+        generate(g, x->commands[0]);
+    } else if (x->command_count > 0) {
         int i;
         for (i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
-            w(g, "~Melif among_var == ~I0:~N~+");
+            w(g, (i > 1 ? "~Melif" : "~Mif"));
+            w(g, " among_var == ~I0:~N~+");
             generate(g, x->commands[i - 1]);
             w(g, "~-");
             g->unreachable = false;

@@ -1242,7 +1242,7 @@ static void generate_substring(struct generator * g, struct node * p) {
 #endif
     }
 
-    if (x->command_count == 0 && x->starter == 0) {
+    if (!x->amongvar_needed) {
         writef(g, "~Mif (!(find_among~S0(z, a_~I0, ~I1))) ~f", p);
         writef(g, shown_comment ? "~N" : "~C", p);
     } else {
@@ -1257,24 +1257,23 @@ static void generate_among(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     if (x->substring == 0) generate_substring(g, p);
-    if (x->command_count == 0 && x->starter == 0) return;
 
     if (x->starter != 0) generate(g, x->starter);
 
-    writef(g, "~Mswitch (among_var) {~C~+"
-              "~Mcase 0: ~f~N", p);
-
-    {
+    if (x->command_count == 1 && x->nocommand_count == 0) {
+        /* Only one outcome ("no match" already handled). */
+        generate(g, x->commands[0]);
+    } else if (x->command_count > 0) {
         int i;
+        writef(g, "~Mswitch (among_var) {~C~+", p);
         for (i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~Mcase ~I0:~N~+");
             generate(g, x->commands[i - 1]);
             w(g, "~Mbreak;~N~-");
         }
+        w(g, "~}");
     }
-
-    w(g, "~}");
 }
 
 static void generate_booltest(struct generator * g, struct node * p) {

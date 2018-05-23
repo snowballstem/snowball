@@ -175,9 +175,10 @@ struct amongvec {
 
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
-    struct node * p; /* the corresponding node for this string */
+    struct node * action; /* the corresponding action */
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
+    int line_number; /* for diagnostics and stable sorting */
     struct name * function;
 
 };
@@ -189,7 +190,9 @@ struct among {
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among */
+    int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* in this among */
+    int amongvar_needed;      /* do we need to set among_var? */
     struct node * starter;    /* i.e. among( (starter) 'string' ... ) */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
