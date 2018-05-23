@@ -1,6 +1,6 @@
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
-#include <stdio.h>  /* for fprintf etc */
+#include <stdio.h> /* for fprintf etc */
 #include "header.h"
 
 #define BASE_UNIT   "SnowballProgram"
@@ -23,10 +23,10 @@ static int new_label(struct generator * g) {
     return g->next_label++;
 }
 
-static struct str * vars_newname(struct generator * g)
-{
+static struct str * vars_newname(struct generator * g) {
+
     struct str * output;
-    g->var_number ++;
+    g->var_number++;
     output = str_new();
     str_append_string(output, "v_");
     str_append_int(output, g->var_number);
@@ -74,7 +74,7 @@ static void write_declare(struct generator * g,
                           char * declaration,
                           struct node * p) {
     struct str * temp = g->outbuf;
-    g->outbuf = g->declarations;    
+    g->outbuf = g->declarations;
     write_string(g, "    ");
     writef(g, declaration, p);
     write_string(g, ";");
@@ -145,7 +145,7 @@ static void wsetlab_begin(struct generator * g) {
 static void wsetlab_end(struct generator * g, int n) {
     w(g, "~-~MUntil True;~N");
     w(g, "lab");
-    write_int(g, n);    
+    write_int(g, n);
     w(g, ":~N");
 }
 
@@ -178,8 +178,8 @@ static void write_failure(struct generator * g) {
     g->unreachable = true;
 }
 
-static void write_failure_if(struct generator * g, char * s, struct node * p)
-{
+static void write_failure_if(struct generator * g, char * s, struct node * p) {
+
     writef(g, "~MIf (", p);
     writef(g, s, p);
     writef(g, ") Then~N", p);
@@ -224,7 +224,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'S': write_string(g, g->S[input[i++] - '0']); continue;
             case 'B': write_b(g, g->B[input[i++] - '0']); continue;
             case 'I': write_int(g, g->I[input[i++] - '0']); continue;
-            case 'W': 
+            case 'W':
             case 'V': write_varname(g, g->V[input[i++] - '0']); continue;
             case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
             case '+': g->margin++; continue;
@@ -475,7 +475,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     struct str * a1 = str_copy(g->failure_str);
 
     int golab = new_label(g);
-    
+
     write_comment(g, p);
     w(g, "~MWhile True Do~N");
     w(g, "~{");
@@ -506,7 +506,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     write_check_limit(g, p);
     write_inc_cursor(g, p);
-    
+
     g->I[0] = golab;
     w(g, "~}lab~I0:~N");
     str_delete(savevar);
@@ -537,7 +537,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
     int replab = new_label(g);
 
     write_comment(g, p);
-    
+
     g->I[0] = replab;
     writef(g, "lab~I0:~N~MWhile True Do~N~{", p);
 
@@ -569,11 +569,11 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
 static void generate_atleast(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
-    
+
     write_comment(g, p);
     w(g, "~{");
     g->B[0] = str_data(loopvar);
-    
+
     write_declare(g, "~B0 : Integer", p);
     w(g, "~M~B0 := ");
     generate_AE(g, p->AE);
@@ -798,13 +798,13 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
     g->V[0] = p->name;
     w(g, "~M~W0 := ");
-    
+
     if (s != 0) {
         g->S[0] = s;
         w(g, "~W0 ~S0 ");
     }
-       
-    generate_AE(g, p->AE);   
+
+    generate_AE(g, p->AE);
     w(g, ";~N");
 }
 
@@ -868,14 +868,14 @@ static void generate_define(struct generator * g, struct node * p) {
 
     g->outbuf = str_new();
     g->declarations = str_new();
-    
+
     g->next_label = 0;
     g->var_number = 0;
 
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
-    
+
     /* Generate function body. */
     w(g, "~{");
     generate(g, p->left);
@@ -892,10 +892,10 @@ static void generate_define(struct generator * g, struct node * p) {
     if (g->var_number) {
         str_append(saved_output, g->declarations);
     }
-    
+
     if (g->next_label) {
         int i, num = g->next_label;
-        
+
         str_append_string(saved_output, "Label\n");
 
         for (i = 0; i < num; ++i) {
@@ -1078,19 +1078,19 @@ static void generate_class_end(struct generator * g) {
 }
 
 static void generate_method_decl(struct generator * g, struct node * p, int type) {
-    if (p->type == c_define && p->name->type == type) {            
+    if (p->type == c_define && p->name->type == type) {
         g->V[0] = p->name;
         w(g, "~MFunction ~W0 : Boolean;");
         if (type == t_external) {
             w(g, " Override;");
         }
         w(g, "~N");
-    }        
+    }
 }
 
 static void generate_method_decls(struct generator * g) {
     struct node * p = g->analyser->program;
- 
+
     w(g, "~Mpublic~N~+");
     w(g, "~MConstructor Create;~N");
 
@@ -1105,13 +1105,13 @@ static void generate_method_decls(struct generator * g) {
     while (p != 0) {
         generate_method_decl(g, p, t_routine);
         p = p->right;
-    }    
+    }
     w(g, "~-");
 }
 
 static void generate_member_decls(struct generator * g) {
     struct name * q;
-    w(g, "~Mprivate~N~+");    
+    w(g, "~Mprivate~N~+");
     for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
@@ -1133,14 +1133,14 @@ static void generate_member_decls(struct generator * g) {
 static void generate_among_decls(struct generator * g) {
     struct among *a = g->analyser->amongs;
 
-    w(g, "~Mprivate~N~+");    
+    w(g, "~Mprivate~N~+");
 
     while (a != 0) {
         g->I[0] = a->number;
-        w(g, "~Ma_~I0 : Array Of TAmong;~N");            
+        w(g, "~Ma_~I0 : Array Of TAmong;~N");
         a = a->next;
     }
-    
+
     w(g, "~-");
 }
 
@@ -1219,8 +1219,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     g->V[0] = q->name;
     g->I[0] = size - 1;
     w(g, "~N~MConst~+~N~M~W0 : Array [0..~I0] Of Char = (~N~+");
-    for (i = 0; i < size; i++)
-    {   
+    for (i = 0; i < size; i++) {
         if (i != 0) w(g, ",~N");
         g->I[0] = map[i];
         w(g, "~MChr(~I0)");
@@ -1248,7 +1247,7 @@ extern void generate_program_delphi(struct generator * g) {
     generate_member_decls(g);
     generate_among_decls(g);
     generate_method_decls(g);
-    generate_class_end(g);    
+    generate_class_end(g);
 
     /* generate implementation. */
     generate_groupings(g);
