@@ -37,9 +37,47 @@ static struct str * vars_newname(struct generator * g) {
 
 static void write_varname(struct generator * g, struct name * p) {
 
-    int ch = "SBIrxg"[p->type];
     if (p->type != t_external) {
-        write_char(g, ch);
+        /* Pascal identifiers are case-insensitive but Snowball identifiers
+         * should be case-sensitive.  To address this, we encode the case of
+         * the identifier.  For readability of the generated code, the
+         * encoding tries to be minimally intrusive for common cases.
+         *
+         * After the letter which indicates the type and before the "_" we
+         * encode the case pattern in the Snowball identifier using "U" for
+         * an upper-case letter, "l" for a lower-case letter and nothing for
+         * other characters.  Any trailing string of "l" is omitted (since
+         * it's redundant and decreases readability).
+         *
+         * Identifiers without any upper-case encode most simply, e.g. I_foo2
+         *
+         * A capitalised identifier is also concise, e.g. IU_Foo2
+         *
+         * All-caps gives a string of Us, e.g. IUUUUUUUU_SHOUTING
+         *
+         * But any example can be handled, e.g. IUllU_Foo79_Bar
+         *
+         * We don't try to solve this problem for external identifiers - it
+         * seems more helpful to leave those alone and encourage snowball
+         * program authors to avoid naming externals which only differ by
+         * case.
+         */
+        int i, len = SIZE(p->b);
+        int lower_pending = 0;
+        write_char(g, "SBIrxg"[p->type]);
+        for (i = 0; i != len; ++i) {
+            int ch = p->b[i];
+            if (ch >= 'a' && ch <= 'z') {
+                ++lower_pending;
+            } else if (ch >= 'A' && ch <= 'Z') {
+                while (lower_pending) {
+                    write_char(g, 'l');
+                    --lower_pending;
+                }
+                write_char(g, 'U');
+            }
+        }
+
         write_char(g, '_');
     }
     str_append_b(g->outbuf, p->b);
