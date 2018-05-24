@@ -38,8 +38,9 @@ static void write_varname(struct generator * g, struct name * p) {
     switch (p->type) {
         case t_external:
             write_char(g, toupper(p->b[0]));
-            const char *rest = b_to_s(p->b);
+            char *rest = b_to_s(p->b);
             str_append_string(g->outbuf, rest+1);
+            free(rest);
             return;
         default: {
             int ch = "SbirxG"[p->type];
