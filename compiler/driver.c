@@ -4,10 +4,11 @@
 #include <string.h>  /* for strcmp */
 #include "header.h"
 
-#define DEFAULT_PACKAGE "org.tartarus.snowball.ext"
-#define DEFAULT_BASE_CLASS "org.tartarus.snowball.SnowballProgram"
-#define DEFAULT_AMONG_CLASS "org.tartarus.snowball.Among"
-#define DEFAULT_STRING_CLASS "java.lang.StringBuilder"
+#define DEFAULT_JAVA_PACKAGE "org.tartarus.snowball.ext"
+#define DEFAULT_JAVA_BASE_CLASS "org.tartarus.snowball.SnowballProgram"
+#define DEFAULT_JAVA_AMONG_CLASS "org.tartarus.snowball.Among"
+#define DEFAULT_JAVA_STRING_CLASS "java.lang.StringBuilder"
+
 #define DEFAULT_GO_PACKAGE "snowball"
 #define DEFAULT_GO_SNOWBALL_RUNTIME "github.com/snowballstem/snowball/go"
 
@@ -89,6 +90,10 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     char * s;
     int i = 1;
     int new_argc = 1;
+    /* Note down the last option used to specify an explicit encoding so
+     * we can warn we ignored it for languages with a fixed encoding.
+     */
+    const char * encoding_opt = NULL;
 
     /* set defaults: */
 
@@ -97,11 +102,10 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     o->externals_prefix = NULL;
     o->variables_prefix = 0;
     o->runtime_path = 0;
-    o->parent_class_name = DEFAULT_BASE_CLASS;
-    o->string_class = DEFAULT_STRING_CLASS;
-    o->among_class = DEFAULT_AMONG_CLASS;
-    o->package = DEFAULT_PACKAGE;
-    o->go_package = DEFAULT_GO_PACKAGE;
+    o->parent_class_name = NULL;
+    o->string_class = NULL;
+    o->among_class = NULL;
+    o->package = NULL;
     o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
     o->name = NULL;
     o->make_lang = LANG_C;
@@ -133,39 +137,30 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
 #ifndef DISABLE_RUST
             if (eq(s, "-rust")) {
                 o->make_lang = LANG_RUST;
-                o->encoding = ENC_UTF8;
                 continue;
             }
 #endif
 #ifndef DISABLE_GO
             if (eq(s, "-go")) {
                 o->make_lang = LANG_GO;
-                o->encoding = ENC_UTF8;
                 continue;
             }
 #endif
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
-                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
 #ifndef DISABLE_CSHARP
             if (eq(s, "-cs") || eq(s, "-csharp")) {
                 o->make_lang = LANG_CSHARP;
-		o->encoding = ENC_WIDECHARS;
-                o->parent_class_name = DEFAULT_CS_BASE_CLASS;
-                o->string_class = DEFAULT_CS_STRING_CLASS;
-                o->among_class = DEFAULT_CS_AMONG_CLASS;
-                o->package = DEFAULT_CS_NAMESPACE;
                 continue;
             }
 #endif
@@ -182,11 +177,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_PYTHON
             if (eq(s, "-py") || eq(s, "-python")) {
                 o->make_lang = LANG_PYTHON;
-                o->encoding = ENC_WIDECHARS;
                 continue;
             }
 #endif
             if (eq(s, "-w") || eq(s, "-widechars")) {
+                encoding_opt = s;
                 o->encoding = ENC_WIDECHARS;
                 continue;
             }
@@ -225,6 +220,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
             if (eq(s, "-u") || eq(s, "-utf8")) {
+                encoding_opt = s;
                 o->encoding = ENC_UTF8;
                 continue;
             }
@@ -253,7 +249,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_GO
             if (eq(s, "-gop") || eq(s, "-gopackage")) {
                 check_lim(i, argc);
-                o->go_package = argv[i++];
+                o->package = argv[i++];
                 continue;
             }
             if (eq(s, "-gor") || eq(s, "-goruntime")) {
@@ -271,6 +267,57 @@ static int read_options(struct options * o, int argc, char * argv[]) {
         print_arglist();
     }
     argv[new_argc] = NULL;
+
+    /* Set language-dependent defaults. */
+    switch (o->make_lang) {
+        case LANG_C:
+        case LANG_CPLUSPLUS:
+            encoding_opt = NULL;
+            break;
+        case LANG_CSHARP:
+            o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_CS_BASE_CLASS;
+            if (!o->string_class)
+                o->string_class = DEFAULT_CS_STRING_CLASS;
+            if (!o->among_class)
+                o->among_class = DEFAULT_CS_AMONG_CLASS;
+            if (!o->package)
+                o->package = DEFAULT_CS_NAMESPACE;
+            break;
+        case LANG_GO:
+            o->encoding = ENC_UTF8;
+            if (!o->package)
+                o->package = DEFAULT_GO_PACKAGE;
+            break;
+        case LANG_JAVA:
+            o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_JAVA_BASE_CLASS;
+            if (!o->string_class)
+                o->string_class = DEFAULT_JAVA_STRING_CLASS;
+            if (!o->among_class)
+                o->among_class = DEFAULT_JAVA_AMONG_CLASS;
+            if (!o->package)
+                o->package = DEFAULT_JAVA_PACKAGE;
+            break;
+        case LANG_JAVASCRIPT:
+            o->encoding = ENC_WIDECHARS;
+            break;
+        case LANG_PYTHON:
+            o->encoding = ENC_WIDECHARS;
+            break;
+        case LANG_RUST:
+            o->encoding = ENC_UTF8;
+            break;
+        default:
+            break;
+    }
+
+    if (encoding_opt) {
+        fprintf(stderr, "warning: %s only meaningful for C and C++\n",
+                encoding_opt);
+    }
 
     if (o->make_lang != LANG_C && o->make_lang != LANG_CPLUSPLUS) {
 	if (o->runtime_path) {

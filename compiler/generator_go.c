@@ -1109,7 +1109,7 @@ static void generate_start_comment(struct generator * g) {
 
 static void generate_class_begin(struct generator * g) {
     w(g, "package ");
-    w(g, g->options->go_package);
+    w(g, g->options->package);
     w(g, "~N~N");
 
     w(g, "import(~N");

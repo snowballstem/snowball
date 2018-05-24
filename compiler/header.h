@@ -338,7 +338,6 @@ struct options {
     const char * runtime_path;
     const char * parent_class_name;
     const char * package;
-    const char * go_package;
     const char * go_snowball_runtime;
     const char * string_class;
     const char * among_class;
