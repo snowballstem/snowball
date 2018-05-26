@@ -306,12 +306,12 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, p->mode == m_forward ? "FLimit" : "FBkLimit"); break;
         case c_len:
         case c_size:
-            w(g, "(current.length())");
+            w(g, "Length(current)");
             break;
         case c_lenof:
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "(~V0.length())");
+            w(g, "Length(~V0)");
             break;
     }
 }
