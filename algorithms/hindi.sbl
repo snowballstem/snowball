@@ -43,6 +43,7 @@ stringdef _O '{U+094C}'
 stringdef M  '{U+0902}'
 stringdef H  '{U+0903}'
 stringdef Mh '{U+0901}'
+stringdef Z  '{U+093C}' // Nukta
 stringdef virama '{U+094D}'
 
 // Velar consonants:
@@ -92,6 +93,21 @@ stringdef R  '{U+0937}'
 stringdef s  '{U+0938}'
 stringdef h  '{U+0939}'
 
+stringdef lY '{U+0933}'
+
+// Precomposed characters - letters + nukta:
+stringdef nZ '{U+0929}' // ≡ {n}{Z}
+stringdef rZ '{U+0931}' // ≡ {r}{Z}
+stringdef lYZ '{U+0934}' // ≡ {lY}{Z}
+stringdef kZ '{U+0958}' // ≡ {k}{Z}
+stringdef KZ '{U+0959}' // ≡ {K}{Z}
+stringdef gZ '{U+095A}' // ≡ {g}{Z}
+stringdef jZ '{U+095B}' // ≡ {j}{Z}
+stringdef dZ '{U+095C}' // ≡ {d}{Z}
+stringdef DZ '{U+095D}' // ≡ {D}{Z}
+stringdef PZ '{U+095E}' // ≡ {P}{Z}
+stringdef yZ '{U+095F}' // ≡ {y}{Z}
+
 integers ( p )
 
 groupings ( consonant )
@@ -104,7 +120,11 @@ define consonant '{k}{K}{g}{G}{f}' +
                  '{w}{W}{x}{X}{n}' +
                  '{p}{P}{b}{B}{m}' +
                  '{y}{r}{l}{v}' +
-                 '{S}{R}{s}{h}'
+                 '{S}{R}{s}{h}' +
+                 '{lY}' +
+                 '{Z}' + // Nukta
+                 // Precomposed characters - letter and nukta:
+                 '{nZ}{rZ}{lYZ}{kZ}{KZ}{gZ}{jZ}{dZ}{DZ}{PZ}{yZ}'
 
 backwardmode ( define CONSONANT as ( consonant ) )
 
