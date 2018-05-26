@@ -556,10 +556,9 @@ static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
     write_declare(g, "~B0 : Integer", p);
-    w(g, "~Mfor (~B0 := ");
+    w(g, "~MFor ~B0 := ");
     generate_AE(g, p->AE);
-    g->B[0] = str_data(loopvar);
-    writef(g, "; ~B0 > 0; ~B0--)~N", p);
+    writef(g, " DownTo 1 Do~N", p);
     writef(g, "~{", p);
 
     generate(g, p->left);
