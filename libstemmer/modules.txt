@@ -20,6 +20,7 @@ hungarian       UTF_8,ISO_8859_2        hungarian,hu,hun
 indonesian      UTF_8,ISO_8859_1        indonesian,id,ind
 irish           UTF_8,ISO_8859_1        irish,ga,gle
 italian         UTF_8,ISO_8859_1        italian,it,ita
+lithuanian      UTF_8                   lithuanian,lt,lit
 nepali          UTF_8                   nepali,ne,nep
 norwegian       UTF_8,ISO_8859_1        norwegian,no,nor
 portuguese      UTF_8,ISO_8859_1        portuguese,pt,por
