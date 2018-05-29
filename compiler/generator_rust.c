@@ -280,15 +280,15 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "env.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
-        case c_lenof: 
+        case c_lenof:
             g->V[0] = p->name;
             w(g, "~V0.chars().count() as i32");
-            break;            
+            break;
         case c_sizeof:
             g->V[0] = p->name;
             w(g, "~V0.len() as i32");
             break;
-        case c_len: 
+        case c_len:
             w(g, "env.current.chars().count() as i32");
             break;
         case c_size:
@@ -432,7 +432,7 @@ static void generate_try(struct generator * g, struct node * p) {
     g->failure_label = new_label(g);
     int label = g->failure_label;
 
-    if (keep_c) restore_string(p, g->failure_str, savevar);         
+    if (keep_c) restore_string(p, g->failure_str, savevar);
     wsetlab_begin(g, label);
     generate(g, p->left);
     wsetlab_end(g, label);
@@ -816,7 +816,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append(g->failure_str, varname);
             str_append_string(g->failure_str, ";");
         }
-                
+
         generate(g, p->aux);
 
         if (!g->unreachable) {
@@ -1123,7 +1123,7 @@ static void generate_allow_warnings(struct generator * g) {
 static void generate_class_begin(struct generator * g) {
 
     w(g, "use snowball::SnowballEnv;~N");
-    w(g, "use snowball::Among;~N~N");  
+    w(g, "use snowball::Among;~N~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1199,7 +1199,7 @@ static void generate_groupings(struct generator * g) {
 
 
 static void generate_members(struct generator * g) {
-  
+
     struct name * q;
     w(g, "#[derive(Clone)]~N");
     w(g, "struct Context {~+~N");
