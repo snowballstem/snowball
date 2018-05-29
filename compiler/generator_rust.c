@@ -260,9 +260,9 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "usize::MAX"); break;
+            write_string(g, "i32::MAX"); break;
         case c_minint:
-            write_string(g, "usize::MIN"); break;
+            write_string(g, "i32::MIN"); break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
@@ -282,17 +282,17 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
         case c_lenof: 
             g->V[0] = p->name;
-            w(g, "~V0.chars().count()");
+            w(g, "~V0.chars().count() as i32");
             break;            
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "~V0.len()");
+            w(g, "~V0.len() as i32");
             break;
         case c_len: 
-            w(g, "env.current.chars().count()");
+            w(g, "env.current.chars().count() as i32");
             break;
         case c_size:
-            w(g, "env.current.len()");
+            w(g, "env.current.len() as i32");
             break;
     }
 }
@@ -666,8 +666,8 @@ static void generate_hop(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "0" : "env.limit_backward";
 
-    write_failure_if(g, "~S0 as i32 > c || c > env.limit as i32", p);
-    writef(g, "~Menv.cursor = c as usize;~N", p);
+    write_failure_if(g, "~S0 as i32 > c || c > env.limit", p);
+    writef(g, "~Menv.cursor = c;~N", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -840,7 +840,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Menv.set_current_s(~V0.clone());~N"
               "~Menv.cursor = 0;~N"
-              "~Menv.limit = env.current.len();~N", p);
+              "~Menv.limit = env.current.len() as i32;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
@@ -1210,7 +1210,7 @@ static void generate_members(struct generator * g) {
                 w(g, "~M~W0: String,~N");
                 break;
             case t_integer:
-                w(g, "~M~W0: usize,~N");
+                w(g, "~M~W0: i32,~N");
                 break;
             case t_boolean:
                 w(g, "~M~W0: bool,~N");
@@ -1238,8 +1238,8 @@ extern void generate_program_rust(struct generator * g) {
     generate_start_comment(g);
     generate_allow_warnings(g);
     if (g->analyser->int_limits_used) {
-        /* std::usize is used in the code generated for usize::MAX and usize::MIN */
-        w(g, "use std::usize;~N~N");
+        /* std::i32 is used in the code generated for i32::MAX and i32::MIN */
+        w(g, "use std::i32;~N~N");
     }
     generate_class_begin(g);
 
