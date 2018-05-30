@@ -246,7 +246,7 @@ $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	echo "./snowball $< -py -o $${o} -p BaseStemmer"; \
 	./snowball $< -py -o $${o} -p BaseStemmer
 
-$(python_output_dir)/__init__.py:
+$(python_output_dir)/__init__.py: libstemmer/modules.txt
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
 
