@@ -81,12 +81,9 @@ CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 
 CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 
-JS_RUNTIME_SOURCES = js/among.js \
-		     js/base-stemmer.js \
-		     js/stemmer.js
+JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
-JS_SAMPLE_SOURCES = js/testapp.js \
-		    js/stemwords.js
+JS_SAMPLE_SOURCES = javascript/stemwords.js
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -103,8 +100,6 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/module
 LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
-
-JS_STEMWORDS_SOURCE = js/stemwords.js
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
