@@ -89,12 +89,9 @@ DELPHI_RUNTIME_SOURCES = delphi/SnowballProgram.pas
 
 DELPHI_STEMWORDS_SOURCES = delphi/stemwords.dpr
 
-JS_RUNTIME_SOURCES = js/among.js \
-		     js/base-stemmer.js \
-		     js/stemmer.js
+JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
-JS_SAMPLE_SOURCES = js/testapp.js \
-		    js/stemwords.js
+JS_SAMPLE_SOURCES = javascript/stemwords.js
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -111,8 +108,6 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/module
 LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
-
-JS_STEMWORDS_SOURCE = js/stemwords.js
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
@@ -270,7 +265,7 @@ $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	echo "./snowball $< -py -o $${o} -p BaseStemmer"; \
 	./snowball $< -py -o $${o} -p BaseStemmer
 
-$(python_output_dir)/__init__.py:
+$(python_output_dir)/__init__.py: libstemmer/modules.txt
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
 

@@ -38,8 +38,9 @@ static void write_varname(struct generator * g, struct name * p) {
     switch (p->type) {
         case t_external:
             write_char(g, toupper(p->b[0]));
-            const char *rest = b_to_s(p->b);
+            char *rest = b_to_s(p->b);
             str_append_string(g->outbuf, rest+1);
+            free(rest);
             return;
         default: {
             int ch = "SbirxG"[p->type];
@@ -48,7 +49,7 @@ static void write_varname(struct generator * g, struct name * p) {
             break;
         }
     }
-    str_append_b(g->outbuf, p->b);
+    write_b(g, p->b);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
@@ -101,8 +102,8 @@ static void write_comment(struct generator * g, struct node * p) {
     write_string(g, "// ");
     write_string(g, name_of_token(p->type));
     if (p->name != 0) {
-        write_string(g, " ");
-        str_append_b(g->outbuf, p->name->b);
+        write_char(g, ' ');
+        write_b(g, p->name->b);
     }
     write_string(g, ", line ");
     write_int(g, p->line_number);

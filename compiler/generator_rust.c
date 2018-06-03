@@ -45,7 +45,7 @@ static void write_varname(struct generator * g, struct name * p) {
             break;
         }
     }
-    str_append_b(g->outbuf, p->b);
+    write_b(g, p->b);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
@@ -98,8 +98,8 @@ static void write_comment(struct generator * g, struct node * p) {
     write_string(g, "// ");
     write_string(g, name_of_token(p->type));
     if (p->name != 0) {
-        write_string(g, " ");
-        str_append_b(g->outbuf, p->name->b);
+        write_char(g, ' ');
+        write_b(g, p->name->b);
     }
     write_string(g, ", line ");
     write_int(g, p->line_number);
@@ -260,9 +260,9 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "usize::MAX"); break;
+            write_string(g, "i32::MAX"); break;
         case c_minint:
-            write_string(g, "usize::MIN"); break;
+            write_string(g, "i32::MIN"); break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
@@ -280,19 +280,19 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "env.cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
-        case c_lenof: 
+        case c_lenof:
             g->V[0] = p->name;
-            w(g, "~V0.chars().count()");
-            break;            
+            w(g, "~V0.chars().count() as i32");
+            break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "~V0.len()");
+            w(g, "~V0.len() as i32");
             break;
-        case c_len: 
-            w(g, "env.current.chars().count()");
+        case c_len:
+            w(g, "env.current.chars().count() as i32");
             break;
         case c_size:
-            w(g, "env.current.len()");
+            w(g, "env.current.len() as i32");
             break;
     }
 }
@@ -432,7 +432,7 @@ static void generate_try(struct generator * g, struct node * p) {
     g->failure_label = new_label(g);
     int label = g->failure_label;
 
-    if (keep_c) restore_string(p, g->failure_str, savevar);         
+    if (keep_c) restore_string(p, g->failure_str, savevar);
     wsetlab_begin(g, label);
     generate(g, p->left);
     wsetlab_end(g, label);
@@ -666,8 +666,8 @@ static void generate_hop(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "0" : "env.limit_backward";
 
-    write_failure_if(g, "~S0 as i32 > c || c > env.limit as i32", p);
-    writef(g, "~Menv.cursor = c as usize;~N", p);
+    write_failure_if(g, "~S0 as i32 > c || c > env.limit", p);
+    writef(g, "~Menv.cursor = c;~N", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -816,7 +816,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append(g->failure_str, varname);
             str_append_string(g->failure_str, ";");
         }
-                
+
         generate(g, p->aux);
 
         if (!g->unreachable) {
@@ -840,7 +840,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Menv.set_current_s(~V0.clone());~N"
               "~Menv.cursor = 0;~N"
-              "~Menv.limit = env.current.len();~N", p);
+              "~Menv.limit = env.current.len() as i32;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
@@ -1123,7 +1123,7 @@ static void generate_allow_warnings(struct generator * g) {
 static void generate_class_begin(struct generator * g) {
 
     w(g, "use snowball::SnowballEnv;~N");
-    w(g, "use snowball::Among;~N~N");  
+    w(g, "use snowball::Among;~N~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1199,7 +1199,7 @@ static void generate_groupings(struct generator * g) {
 
 
 static void generate_members(struct generator * g) {
-  
+
     struct name * q;
     w(g, "#[derive(Clone)]~N");
     w(g, "struct Context {~+~N");
@@ -1210,7 +1210,7 @@ static void generate_members(struct generator * g) {
                 w(g, "~M~W0: String,~N");
                 break;
             case t_integer:
-                w(g, "~M~W0: usize,~N");
+                w(g, "~M~W0: i32,~N");
                 break;
             case t_boolean:
                 w(g, "~M~W0: bool,~N");
@@ -1238,8 +1238,8 @@ extern void generate_program_rust(struct generator * g) {
     generate_start_comment(g);
     generate_allow_warnings(g);
     if (g->analyser->int_limits_used) {
-        /* std::usize is used in the code generated for usize::MAX and usize::MIN */
-        w(g, "use std::usize;~N~N");
+        /* std::i32 is used in the code generated for i32::MAX and i32::MIN */
+        w(g, "use std::i32;~N~N");
     }
     generate_class_begin(g);
 

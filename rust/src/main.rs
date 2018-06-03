@@ -53,7 +53,7 @@ fn main() {
             return;
         }
         let stemmer = Stemmer::create(language.unwrap());
-        
+
 
         let mut output = if let Some(output_file) = output_arg {
             Box::new(File::create(Path::new(&output_file)).unwrap()) as Box<Write>
@@ -70,14 +70,14 @@ fn main() {
             for line in stdin.lock().lines() {
                 writeln!(&mut output, "{}", stemmer.stem(&line.unwrap())).unwrap();
             }
-        }        
+        }
     }
 }
 
 
 /// Wraps a usable interface around the actual stemmer implementation
 pub struct Stemmer {
-    stemmer: Box<Fn(&mut SnowballEnv) -> bool>,
+    stemmer: fn(&mut SnowballEnv) -> bool,
 }
 
 impl Stemmer {

@@ -58,7 +58,7 @@ static void write_varname(struct generator * g, struct name * p) {
         default:
             write_char(g, ch); write_char(g, '_');
     }
-    str_append_b(g->outbuf, p->b);
+    write_b(g, p->b);
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
@@ -138,7 +138,7 @@ static void write_comment(struct generator * g, struct node * p) {
         case c_le:
             if (p->name) {
                 write_char(g, '$');
-                str_append_b(g->outbuf, p->name->b);
+                write_b(g, p->name->b);
                 write_char(g, ' ');
             }
             write_string(g, name_of_token(p->type));
@@ -148,7 +148,7 @@ static void write_comment(struct generator * g, struct node * p) {
             write_string(g, name_of_token(p->type));
             if (p->name) {
                 write_char(g, ' ');
-                str_append_b(g->outbuf, p->name->b);
+                write_b(g, p->name->b);
             }
     }
     write_string(g, ", line "); write_int(g, p->line_number); write_string(g, " */");
@@ -1548,7 +1548,7 @@ static void generate_header_file(struct generator * g) {
                 if (vp) {
                     g->I[0] = q->count;
                     w(g, "#define ~S0");
-                    str_append_b(g->outbuf, q->b);
+                    write_b(g, q->b);
                     w(g, " (~S1[~I0])~N");
                 }
                 break;
