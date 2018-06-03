@@ -2,9 +2,6 @@
 
 c_src_dir = src_c
 
-FPC ?= fpc
-delphi_src_dir = delphi
-
 JAVAC ?= javac
 JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
@@ -15,6 +12,9 @@ MCS ?= mcs
 csharp_src_main_dir = csharp/Snowball
 csharp_src_dir = $(csharp_src_main_dir)/Algorithms
 csharp_sample_dir = csharp/Stemwords
+
+FPC ?= fpc
+pascal_src_dir = pascal
 
 python ?= python3
 python_output_dir = python_out
@@ -57,9 +57,9 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator.c \
 		   compiler/driver.c \
 		   compiler/generator_csharp.c \
-		   compiler/generator_delphi.c \
 		   compiler/generator_java.c \
 		   compiler/generator_js.c \
+		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
 		   compiler/generator_go.c
@@ -85,13 +85,13 @@ CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 
 CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 
-DELPHI_RUNTIME_SOURCES = delphi/SnowballProgram.pas
-
-DELPHI_STEMWORDS_SOURCES = delphi/stemwords.dpr
-
 JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
 JS_SAMPLE_SOURCES = javascript/stemwords.js
+
+PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
+
+PASCAL_STEMWORDS_SOURCES = pascal/stemwords.dpr
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -124,7 +124,7 @@ C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
 CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
-DELPHI_SOURCES = $(ISO_8859_1_algorithms:%=$(delphi_src_dir)/%Stemmer.pas)
+PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
@@ -158,7 +158,7 @@ clean:
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(CSHARP_SOURCES) \
-	      $(DELPHI_SOURCES) delphi/stemwords.dpr delphi/stemwords delphi/*.o delphi/*.ppu \
+	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
@@ -198,11 +198,11 @@ stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
-delphi/stemwords.dpr: delphi/stemwords-template.dpr libstemmer/modules.txt
-	delphi/generate.pl $(ISO_8859_1_algorithms) < delphi/stemwords-template.dpr > $@
+pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
+	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
 
-delphi/stemwords: $(DELPHI_STEMWORDS_SOURCES) $(DELPHI_RUNTIME_SOURCES) $(DELPHI_SOURCES)
-	$(FPC) -o$@ -Mdelphi $(DELPHI_STEMWORDS_SOURCES)
+pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
+	$(FPC) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball
 	@mkdir -p $(c_src_dir)
@@ -250,13 +250,13 @@ $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
 	echo "./snowball $< -cs -o $${o} -p Stemmer"; \
 	./snowball $< -cs -o $${o} -p Stemmer
 
-$(delphi_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball
-	@mkdir -p $(delphi_src_dir)
+$(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball
+	@mkdir -p $(pascal_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
-	o="$(delphi_src_dir)/$${l}Stemmer"; \
-	echo "./snowball $< -delphi -o $${o}"; \
-	./snowball $< -delphi -o $${o}
+	o="$(pascal_src_dir)/$${l}Stemmer"; \
+	echo "./snowball $< -pascal -o $${o}"; \
+	./snowball $< -pascal -o $${o}
 
 $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	@mkdir -p $(python_output_dir)
@@ -547,15 +547,15 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_delphi: delphi/stemwords
-	$(MAKE) do_check_delphi
+check_pascal: pascal/stemwords
+	$(MAKE) do_check_pascal
 
-do_check_delphi: $(ISO_8859_1_algorithms:%=check_delphi_%)
+do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
 
-check_delphi_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1 for Delphi"
+check_pascal_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1 for Pascal"
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
-	    ./delphi/stemwords -l `echo $<|sed 's!.*/!!'` > tmp.txt
+	    ./pascal/stemwords -l `echo $<|sed 's!.*/!!'` > tmp.txt
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
 	    diff -u - tmp.txt
 	@rm tmp.txt

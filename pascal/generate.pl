@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-# Generate Delphi stemwords source.
+# Generate Pascal stemwords source.
 
 my @sources = @ARGV;
 

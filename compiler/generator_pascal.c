@@ -1094,7 +1094,7 @@ static void generate(struct generator * g, struct node * p) {
 
 /* Class declaration generation. */
 static void generate_unit_start(struct generator * g) {
-    w(g, "{ This file was generated automatically by the Snowball to Delphi compiler. }~N~N");
+    w(g, "{ This file was generated automatically by the Snowball to Pascal compiler. }~N~N");
     w(g, "Unit ~n;~N~N{$HINTS OFF}~N~NInterface~N~NUses " BASE_UNIT ";~N");
 }
 
@@ -1269,7 +1269,7 @@ static void generate_groupings(struct generator * g) {
     }
 }
 
-extern void generate_program_delphi(struct generator * g) {
+extern void generate_program_pascal(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
