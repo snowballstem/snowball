@@ -880,9 +880,7 @@ static struct node * read_C(struct analyser * a) {
                 struct name * q = find_name(a);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
-                switch (q ? q->type : t_string)
-                    /* above line was: switch (q->type) - bug #1 fix 7/2/2003 */
-                {
+                switch (q ? q->type : t_string) {
                     default:
                         error(a, e_not_of_type_string_or_integer);
                         /* Handle $foo for unknown 'foo' as string since
