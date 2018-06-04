@@ -1135,34 +1135,33 @@ static void generate_class_end(struct generator * g) {
     w(g, "~}~NImplementation~N");
 }
 
-static void generate_method_decl(struct generator * g, struct node * p, int type) {
-    if (p->type == c_define && p->name->type == type) {
-        g->V[0] = p->name;
-        w(g, "~MFunction ~W0 : Boolean;");
-        if (type == t_external) {
-            w(g, " Override;");
-        }
-        w(g, "~N");
+static void generate_method_decl(struct generator * g, struct name * q) {
+    g->V[0] = q;
+    w(g, "~MFunction ~W0 : Boolean;");
+    if (q->type == t_external) {
+        w(g, " Override;");
     }
+    w(g, "~N");
 }
 
 static void generate_method_decls(struct generator * g) {
-    struct node * p = g->analyser->program;
+    struct name * q;
 
     w(g, "~Mpublic~N~+");
     w(g, "~MConstructor Create;~N");
 
-    while (p != 0) {
-        generate_method_decl(g, p, t_external);
-        p = p->right;
+    for (q = g->analyser->names; q; q = q->next) {
+        if (q->type == t_external) {
+            generate_method_decl(g, q);
+        }
     }
     w(g, "~-");
 
-    p = g->analyser->program;
     w(g, "~Mprivate~N~+");
-    while (p != 0) {
-        generate_method_decl(g, p, t_routine);
-        p = p->right;
+    for (q = g->analyser->names; q; q = q->next) {
+        if (q->type == t_routine) {
+            generate_method_decl(g, q);
+        }
     }
     w(g, "~-");
 }
