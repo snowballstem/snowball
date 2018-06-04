@@ -810,17 +810,42 @@ static void generate_setlimit(struct generator * g, struct node * p) {
  * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
+    g->B[0] = str_data(savevar);
     write_comment(g, p);
     g->V[0] = p->name;
 
-    str_assign(g->failure_str, "copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
-    g->B[0] = str_data(savevar);
-    writef(g, "~{~M~n ~B0 = this;~N"
-             "~Mcurrent = ~V0;~N"
-             "~Mcursor = 0;~N"
-             "~MFLimit := (current.length());~N", p);
+    {
+        struct str * saved_output = g->outbuf;
+        str_clear(g->failure_str);
+        g->outbuf = g->failure_str;
+        writef(g, "~V0 := FCurrent; "
+                  "FCurrent := ~B0_Current; "
+                  "FCursor := ~B0_Cursor; "
+                  "FLimit := ~B0_Limit; "
+                  "FBkLimit := ~B0_BkLimit; "
+                  "FBra := ~B0_Bra; "
+                  "FKet := ~B0_Ket;", p);
+        g->failure_str = g->outbuf;
+        g->outbuf = saved_output;
+    }
+
+    write_declare(g, "~B0_Current : AnsiString", p);
+    write_declare(g, "~B0_Cursor : Integer", p);
+    write_declare(g, "~B0_Limit : Integer", p);
+    write_declare(g, "~B0_BkLimit : Integer", p);
+    write_declare(g, "~B0_Bra : Integer", p);
+    write_declare(g, "~B0_Ket : Integer", p);
+    writef(g, "~{"
+              "~M~B0_Current := FCurrent;~N"
+              "{ ~M~B0_Current := Copy(FCurrent, 1, FLimit); }~N"
+              "~M~B0_Cursor := FCursor;~N"
+              "~M~B0_Limit := FLimit;~N"
+              "~M~B0_BkLimit := FBkLimit;~N"
+              "~M~B0_Bra := FBra;~N"
+              "~M~B0_Ket := FKet;~N"
+              "~MFCurrent := ~V0;~N"
+              "~MFCursor := 0;~N"
+              "~MFLimit := Length(current);~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
