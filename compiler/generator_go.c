@@ -96,17 +96,10 @@ static void write_margin(struct generator * g) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
-
     /* FIXME could use Go //line syntax if we had original filename */
     write_margin(g);
     write_string(g, "// ");
-    write_string(g, name_of_token(p->type));
-    if (p->name != 0) {
-        write_char(g, ' ');
-        write_b(g, p->name->b);
-    }
-    write_string(g, ", line ");
-    write_int(g, p->line_number);
+    write_comment_content(g, p);
     write_newline(g);
 }
 

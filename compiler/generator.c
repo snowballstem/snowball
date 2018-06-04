@@ -121,9 +121,7 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
-static void write_comment(struct generator * g, struct node * p) {
-
-    ws_opt_space(g, "/* ");
+void write_comment_content(struct generator * g, struct node * p) {
     switch (p->type) {
         case c_mathassign:
         case c_plusassign:
@@ -151,7 +149,14 @@ static void write_comment(struct generator * g, struct node * p) {
                 write_b(g, p->name->b);
             }
     }
-    write_string(g, ", line "); write_int(g, p->line_number); write_string(g, " */");
+    write_string(g, ", line ");
+    write_int(g, p->line_number);
+}
+
+static void write_comment(struct generator * g, struct node * p) {
+    ws_opt_space(g, "/* ");
+    write_comment_content(g, p);
+    write_string(g, " */");
     write_newline(g);
 }
 

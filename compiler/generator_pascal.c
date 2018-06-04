@@ -121,16 +121,9 @@ static void write_declare(struct generator * g,
 }
 
 static void write_comment(struct generator * g, struct node * p) {
-
     write_margin(g);
     write_string(g, "{ ");
-    write_string(g, name_of_token(p->type));
-    if (p->name != 0) {
-        write_string(g, " ");
-        str_append_b(g->outbuf, p->name->b);
-    }
-    write_string(g, ", line ");
-    write_int(g, p->line_number);
+    write_comment_content(g, p);
     write_string(g, " }");
     write_newline(g);
 }

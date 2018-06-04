@@ -357,6 +357,8 @@ extern void write_int(struct generator * g, int i);
 extern void write_b(struct generator * g, symbol * b);
 extern void write_str(struct generator * g, struct str * str);
 
+extern void write_comment_content(struct generator * g, struct node * p);
+
 extern int K_needed(struct generator * g, struct node * p);
 extern int repeat_restore(struct generator * g, struct node * p);
 
