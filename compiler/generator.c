@@ -927,7 +927,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     int keep_c = p->mode == m_forward; /* like 'attach' */
     writef(g, "~{int ret;~N", p);
     if (keep_c) writef(g, "~{int saved_c = z->c;~N", p);
-    w(g, "~Mret =");
+    w(g, "~Mret = ");
     writef(g, keep_c ? "insert_~$(z, z->c, z->l, ~a);~C" : "insert_~$(z, z->lb, z->c, ~a);~C", p);
     if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
     writef(g, "~Mif (ret < 0) return ret;~N"
