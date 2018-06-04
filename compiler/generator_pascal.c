@@ -80,7 +80,7 @@ static void write_varname(struct generator * g, struct name * p) {
 
         write_char(g, '_');
     }
-    str_append_b(g->outbuf, p->b);
+    write_b(g, p->b);
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
@@ -262,8 +262,8 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'S': write_string(g, g->S[input[i++] - '0']); continue;
             case 'B': write_b(g, g->B[input[i++] - '0']); continue;
             case 'I': write_int(g, g->I[input[i++] - '0']); continue;
-            case 'W':
-            case 'V': write_varname(g, g->V[input[i++] - '0']); continue;
+            case 'V':
+            case 'W': write_varname(g, g->V[input[i++] - '0']); continue;
             case 'L': write_literal_string(g, g->L[input[i++] - '0']); continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
@@ -663,7 +663,6 @@ static void generate_atmark(struct generator * g, struct node * p) {
     write_block_end(g);
     g->unreachable = false;
 }
-
 
 static void generate_hop(struct generator * g, struct node * p) {
     write_comment(g, p);
