@@ -389,7 +389,7 @@ static void generate_backwards(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g,"~MFBkLimit := FCursor; FCursor := FLimit;~N", p);
     generate(g, p->left);
-    w(g, "~MFCursor := FBkLimit;");
+    w(g, "~MFCursor := FBkLimit;~N");
 }
 
 
