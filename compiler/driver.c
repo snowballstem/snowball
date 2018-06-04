@@ -32,6 +32,9 @@ static void print_arglist(void) {
                     "             [-cs[harp]]\n"
 #endif
                     "             [-c++]\n"
+#ifndef DISABLE_PASCAL
+                    "             [-pascal]\n"
+#endif
 #ifndef DISABLE_PYTHON
                     "             [-py[thon]]\n"
 #endif
@@ -165,6 +168,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 o->make_lang = LANG_CPLUSPLUS;
                 continue;
             }
+#ifndef DISABLE_PASCAL
+            if (eq(s, "-pascal")) {
+                o->make_lang = LANG_PASCAL;
+                continue;
+            }
+#endif
 #ifndef DISABLE_PYTHON
             if (eq(s, "-py") || eq(s, "-python")) {
                 o->make_lang = LANG_PYTHON;
@@ -340,6 +349,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             char * new_name = malloc(len + 1);
             switch (o->make_lang) {
                 case LANG_CSHARP:
+                case LANG_PASCAL:
                     /* Upper case initial letter. */
                     memcpy(new_name, leaf, len);
                     new_name[0] = toupper(new_name[0]);
@@ -458,6 +468,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_java(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_PASCAL
+                if (o->make_lang == LANG_PASCAL) {
+                    symbol *b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".pas");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_pascal(g);
                     fclose(o->output_src);
                 }
 #endif

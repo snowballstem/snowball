@@ -332,7 +332,7 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -371,6 +371,10 @@ extern void generate_program_java(struct generator * g);
 #ifndef DISABLE_CSHARP
 /* Generator for C# code. */
 extern void generate_program_csharp(struct generator * g);
+#endif
+
+#ifndef DISABLE_PASCAL
+extern void generate_program_pascal(struct generator * g);
 #endif
 
 #ifndef DISABLE_PYTHON
