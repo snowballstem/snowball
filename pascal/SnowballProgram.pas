@@ -389,8 +389,8 @@ Var adjustment : Integer;
 Begin
     adjustment := Length(s) - (ket - bra);
 
-    Delete(FCurrent, FBra + 1, FKet - FBra);
-    System.Insert(s, FCurrent, FBra + 1);
+    Delete(FCurrent, bra + 1, ket - bra);
+    System.Insert(s, FCurrent, bra + 1);
 
     FLimit := FLimit + adjustment;
 
