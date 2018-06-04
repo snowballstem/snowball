@@ -1196,7 +1196,6 @@ extern void read_program(struct analyser * a) {
             } else if (q->type == t_external) {
                 /* Unused is OK. */
             } else if (!q->initialised) {
-                count_error(a);
                 fprintf(stderr, "%s:%d: warning: %s '",
                         a->tokeniser->file,
                         q->declaration_line_number,
@@ -1204,7 +1203,6 @@ extern void read_program(struct analyser * a) {
                 report_b(stderr, q->b);
                 fprintf(stderr, "' is never initialised\n");
             } else if (!q->value_used) {
-                count_error(a);
                 fprintf(stderr, "%s:%d: warning: %s '",
                         a->tokeniser->file,
                         q->declaration_line_number,
