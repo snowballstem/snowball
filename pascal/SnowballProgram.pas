@@ -54,8 +54,9 @@ Type
     Public
         { Set & Retrieve current string }
         Property Current: AnsiString Read FCurrent Write SetCurrent;
-	{ Method subclasses need to implement }
-	Function stem : Boolean; Virtual; Abstract;
+
+        { Method subclasses need to implement }
+        Function stem : Boolean; Virtual; Abstract;
     End;
 
 Implementation
@@ -65,66 +66,66 @@ Uses Math;
 Procedure TSnowballProgram.SetCurrent(Current: AnsiString);
 Begin
     FCurrent := Current;
-	FCursor  := 0;
-	FLimit   := Length(Current);
-	FBkLimit := 0;
-	FBra     := FCursor;
-	FKet     := FLimit;
+    FCursor  := 0;
+    FLimit   := Length(Current);
+    FBkLimit := 0;
+    FBra     := FCursor;
+    FKet     := FLimit;
 End;
 
 Function TSnowballProgram.InGrouping(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
     Result := False;
-	If (FCursor >= FLimit) Then Exit;
+    If (FCursor >= FLimit) Then Exit;
 
     ch := Ord(FCurrent[FCursor + 1]);
-	If (ch > max) Or (ch < min) Then Exit;
+    If (ch > max) Or (ch < min) Then Exit;
 
-	ch := ch - min;
-	If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+    ch := ch - min;
+    If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
 
-	Inc(FCursor);
-	Result := True;
+    Inc(FCursor);
+    Result := True;
 End;
 
 Function TSnowballProgram.InGroupingBk(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
     Result := False;
-	If (FCursor <= FBkLimit) Then Exit;
+    If (FCursor <= FBkLimit) Then Exit;
 
     ch := Ord(FCurrent[FCursor]);
-	If (ch > max) Or (ch < min) Then Exit;
+    If (ch > max) Or (ch < min) Then Exit;
 
-	ch := ch - min;
-	If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+    ch := ch - min;
+    If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
 
-	Dec(FCursor);
-	Result := True;
+    Dec(FCursor);
+    Result := True;
 End;
 
 Function TSnowballProgram.OutGrouping(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
     Result := False;
-	If (FCursor >= FLimit) Then Exit;
+    If (FCursor >= FLimit) Then Exit;
 
-	ch := Ord(FCurrent[FCursor + 1]);
+    ch := Ord(FCurrent[FCursor + 1]);
 
-	If (ch > max) Or (ch < min) Then
+    If (ch > max) Or (ch < min) Then
     Begin
-	    Inc(FCursor);
-	    Result := True;
+        Inc(FCursor);
+        Result := True;
         Exit;
-	End;
+    End;
 
-	ch := ch - min;
+    ch := ch - min;
     If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then
     Begin
-	    Inc(FCursor);
-	    Result := True;
-	End;
+        Inc(FCursor);
+        Result := True;
+    End;
 End;
 
 Function TSnowballProgram.OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
@@ -132,22 +133,22 @@ Var ch : Integer;
 Begin
     Result := False;
 
-	If (FCursor <= FBkLimit) Then Exit;
+    If (FCursor <= FBkLimit) Then Exit;
 
-	ch := Ord(FCurrent[FCursor]);
-	If (ch > max) Or (ch < min) Then
+    ch := Ord(FCurrent[FCursor]);
+    If (ch > max) Or (ch < min) Then
     Begin
         Dec(FCursor);
-	    Result := True;
+        Result := True;
         Exit;
-	End;
+    End;
 
-	ch := ch - min;
+    ch := ch - min;
     If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then
     Begin
-	    Dec(FCursor);
-	    Result := True;
-	End;
+        Dec(FCursor);
+        Result := True;
+    End;
 End;
 
 Function TSnowballProgram.EqS(s_size : Integer; s : AnsiString) : Boolean;
@@ -155,12 +156,12 @@ Var I : Integer;
 Begin
     Result := False;
 
-	If (FLimit - FCursor) < s_size Then Exit;
+    If (FLimit - FCursor) < s_size Then Exit;
 
-	For I := 1 To s_size Do
-	    If FCurrent[FCursor + I] <> s[I] Then Exit;
+    For I := 1 To s_size Do
+        If FCurrent[FCursor + I] <> s[I] Then Exit;
 
-	FCursor := FCursor + s_size;
+    FCursor := FCursor + s_size;
 
     Result := True;
 End;
@@ -170,12 +171,12 @@ Var I : Integer;
 Begin
     Result := False;
 
-	if (FCursor - FBkLimit) < s_size Then Exit;
+    if (FCursor - FBkLimit) < s_size Then Exit;
 
-	For I := 1 To s_size Do
-	    If FCurrent[FCursor - s_size + I] <> s[i] Then Exit;
+    For I := 1 To s_size Do
+        If FCurrent[FCursor - s_size + I] <> s[i] Then Exit;
 
-	FCursor := FCursor - s_size;
+    FCursor := FCursor - s_size;
 
     Result := True;
 End;
@@ -196,90 +197,90 @@ Var i, i2, j, c, l, common_i, common_j, k, diff, common : Integer;
     w : TAmong;
 Begin
     i := 0;
-	j := v_size;
+    j := v_size;
 
-	c := FCursor;
-	l := FLimit;
+    c := FCursor;
+    l := FLimit;
 
-	common_i := 0;
-	common_j := 0;
+    common_i := 0;
+    common_j := 0;
 
-	first_key_inspected := false;
+    first_key_inspected := false;
 
-	While True Do
+    While True Do
     Begin
-	    k := i + ((j - i) Shr 1);
-	    diff := 0;
-	    common := Min(common_i, common_j); // smaller
-	    w := v[k];
+        k := i + ((j - i) Shr 1);
+        diff := 0;
+        common := Min(common_i, common_j); // smaller
+        w := v[k];
 
-	    For i2 := common To Length(w.Str) - 1 Do
+        For i2 := common To Length(w.Str) - 1 Do
         Begin
-		    if (c + common) = l Then
+            if (c + common) = l Then
             Begin
-		        diff := -1;
-		        Break;
-		    End;
+                diff := -1;
+                Break;
+            End;
 
-	    	diff := Ord(FCurrent[c + common + 1]) - Ord(w.Str[i2 + 1]);
-    		if diff <> 0 Then Break;
+            diff := Ord(FCurrent[c + common + 1]) - Ord(w.Str[i2 + 1]);
+            if diff <> 0 Then Break;
 
-		    Inc(common);
-	    End;
+            Inc(common);
+        End;
 
-	    if diff < 0 Then
+        if diff < 0 Then
         Begin
-		    j := k;
-		    common_j := common;
-	    End
+            j := k;
+            common_j := common;
+        End
         Else
         Begin
-		    i := k;
-		    common_i := common;
-	    End;
+            i := k;
+            common_i := common;
+        End;
 
-	    If (j - i) <= 1 Then
+        If (j - i) <= 1 Then
         Begin
-		    If (i > 0) Then Break; // v->s has been inspected
-		    if (j = i) Then Break; // only one item in v
+            If (i > 0) Then Break; // v->s has been inspected
+            if (j = i) Then Break; // only one item in v
 
-    		// - but now we need to go round once more to get
-	    	// v->s inspected. This looks messy, but is actually
-		    // the optimal approach.
+            // - but now we need to go round once more to get
+            // v->s inspected. This looks messy, but is actually
+            // the optimal approach.
 
-    		if (first_key_inspected) Then Break;
-	    	first_key_inspected := True;
-	    End;
-	End;
+            if (first_key_inspected) Then Break;
+            first_key_inspected := True;
+        End;
+    End;
 
-	While True Do
+    While True Do
     Begin
-	    w := v[i];
-	    If (common_i >= Length(w.Str)) Then
+        w := v[i];
+        If (common_i >= Length(w.Str)) Then
         Begin
-    		FCursor := c + Length(w.Str);
-	    	If Not Assigned(w.Method) Then
+            FCursor := c + Length(w.Str);
+            If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
                 Exit;   
             End;
 
-		    res := w.Method;
+            res := w.Method;
 
-	    	FCursor := c + Length(w.Str);
-    		if (res) Then Begin
+            FCursor := c + Length(w.Str);
+            if (res) Then Begin
                 Result := w.Result;
                 Exit;
             End;
-	    End;
+        End;
 
-	    i := w.Index;
-	    if i < 0 Then
+        i := w.Index;
+        if i < 0 Then
         Begin
             Result := 0;
             Exit;
         End;
-	End;
+    End;
 End;
 
 Function TSnowballProgram.FindAmongBk(v : array of TAmong; v_size : Integer) : Integer;
@@ -288,92 +289,92 @@ Var i, j, c, lb, common_i, common_j, k, diff, common, i2 : Integer;
     w : TAmong;
 Begin
     i := 0;
-	j := v_size;
+    j := v_size;
 
-	c := FCursor;
-	lb := FBkLimit;
+    c := FCursor;
+    lb := FBkLimit;
 
-	common_i := 0;
-	common_j := 0;
+    common_i := 0;
+    common_j := 0;
 
-	first_key_inspected := false;
+    first_key_inspected := false;
 
-	While True Do
+    While True Do
     Begin
-	    k := i + ((j - i) Shr 1);
-	    diff := 0;
-	    common := Min(common_i, common_j);
-	    w := v[k];
+        k := i + ((j - i) Shr 1);
+        diff := 0;
+        common := Min(common_i, common_j);
+        w := v[k];
 
-	    For i2 := Length(w.Str) - 1 - common DownTo 0 Do
-		Begin
+        For i2 := Length(w.Str) - 1 - common DownTo 0 Do
+        Begin
             If (c - common) = lb Then
             Begin
-		        diff := -1;
-    		    Break;
-		    End;
+                diff := -1;
+                Break;
+            End;
 
-	    	diff := Ord(FCurrent[c - common]) - Ord(w.Str[i2 + 1]);
-    		if diff <> 0 Then Break;
-		    Inc(common);
-	    End;
+            diff := Ord(FCurrent[c - common]) - Ord(w.Str[i2 + 1]);
+            if diff <> 0 Then Break;
+            Inc(common);
+        End;
 
-	    If diff < 0 Then
-		Begin
+        If diff < 0 Then
+        Begin
             j := k;
-    		common_j := common;
-	    End
+            common_j := common;
+        End
         Else
         Begin
-    		i := k;
-	    	common_i := common;
-	    End;
+            i := k;
+            common_i := common;
+        End;
 
-	    If (j - i) <= 1 Then
-		Begin
-            if i > 0 Then Break;
-    		if j = i Then Break;
-	    	if first_key_inspected Then Break;
-		    first_key_inspected := True;
-	    End;
-	End;
-
-	While True Do
-    Begin
-	    w := v[i];
-	    if common_i >= Length(w.Str) Then
+        If (j - i) <= 1 Then
         Begin
-		    FCursor := c - Length(w.Str);
-    		If Not Assigned(w.Method) Then
+            if i > 0 Then Break;
+            if j = i Then Break;
+            if first_key_inspected Then Break;
+            first_key_inspected := True;
+        End;
+    End;
+
+    While True Do
+    Begin
+        w := v[i];
+        if common_i >= Length(w.Str) Then
+        Begin
+            FCursor := c - Length(w.Str);
+            If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
                 Exit;
             End;
 
-		    res := w.Method;
+            res := w.Method;
 
-		    FCursor := c - Length(w.Str);
-		    If Res Then
+            FCursor := c - Length(w.Str);
+            If Res Then
             Begin
                 Result := w.Result;
                 Exit;
             End;
-	    End;
+        End;
 
-	    i := w.Index;
-	    If i < 0 Then
+        i := w.Index;
+        If i < 0 Then
         Begin
                 Result := 0;
                 Exit;
         End;
-	End;
+    End;
 End;
 
 Procedure TSnowballProgram.SliceCheck;
 Begin
     if (FBra < 0) Or (FBra > FKet) Or (FKet > FLimit) Or (FLimit > Length(FCurrent)) Then
-	Begin
-	    WriteLn('Faulty slice operation.');
+    Begin
+        WriteLn('Faulty slice operation.');
         Halt;
     End;
 End;
@@ -386,27 +387,27 @@ End;
 Function TSnowballProgram.ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;
 Var adjustment : Integer;
 Begin
-	adjustment := Length(s) - (ket - bra);
+    adjustment := Length(s) - (ket - bra);
 
     Delete(FCurrent, FBra + 1, FKet - FBra);
     System.Insert(s, FCurrent, FBra + 1);
 
-	FLimit := FLimit + adjustment;
+    FLimit := FLimit + adjustment;
 
-	if (FCursor >= ket) Then
+    if (FCursor >= ket) Then
         FCursor := FCursor + adjustment
-	Else If (FCursor > bra) Then
+    Else If (FCursor > bra) Then
         FCursor := bra;
 
-	Result := adjustment;
+    Result := adjustment;
 End;
 
 Procedure TSnowballProgram.Insert(bra, ket : Integer; s : AnsiString);
 Var adjustment : Integer;
 Begin
     adjustment := ReplaceS(bra, ket, s);
-	If (bra <= FBra) Then FBra := FBra + adjustment;
-	If (bra <= FKet) Then FKet := FKet + adjustment;
+    If (bra <= FBra) Then FBra := FBra + adjustment;
+    If (bra <= FKet) Then FKet := FKet + adjustment;
 End;
 
 Function TSnowballProgram.SliceTo() : AnsiString;
@@ -417,8 +418,8 @@ End;
 
 Procedure TSnowballProgram.SliceFrom(s : AnsiString);
 Begin
-	SliceCheck();
-	ReplaceS(FBra, FKet, s);
+    SliceCheck();
+    ReplaceS(FBra, FKet, s);
 End;
 
 Function TSnowballProgram.AssignTo() : AnsiString;
