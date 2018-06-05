@@ -780,19 +780,32 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
     write_comment(g, p);
-    write_savecursor(g, p, savevar);
-    generate(g, p->left);
+    if (p->left && p->left->type == c_tomark && !p->left->right) {
+        /* Special case for:
+         *
+         *   setlimit tomark AE for C
+         *
+         * All uses of setlimit in the current stemmers we ship follow this
+         * pattern, and by special-casing we can avoid having to save and
+         * restore c.
+         */
+        struct node * q = p->left;
+        g->S[0] = q->mode == m_forward ? ">" : "<";
+        w(g, "~Mif self.cursor ~S0 "); generate_AE(g, q->AE); w(g, ":");
+        write_block_start(g);
+        write_failure(g);
+        write_block_end(g);
+        g->unreachable = false;
 
-    if (!g->unreachable) {
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
             w(g, "~M~B0 = self.limit - self.cursor~N");
-            w(g, "~Mself.limit = self.cursor~N");
+            w(g, "~Mself.limit = ");
         } else {
             w(g, "~M~B0 = self.limit_backward~N");
-            w(g, "~Mself.limit_backward = self.cursor~N");
+            w(g, "~Mself.limit_backward = ");
         }
-        write_restorecursor(g, p, savevar);
+        generate_AE(g, q->AE); writef(g, "~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "self.limit += ");
@@ -801,6 +814,32 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_assign(g->failure_str, "self.limit_backward = ");
             str_append(g->failure_str, varname);
         }
+    } else {
+        write_savecursor(g, p, savevar);
+        generate(g, p->left);
+
+        if (!g->unreachable) {
+            g->B[0] = str_data(varname);
+            if (p->mode == m_forward) {
+                w(g, "~M~B0 = self.limit - self.cursor~N");
+                w(g, "~Mself.limit = self.cursor~N");
+            } else {
+                w(g, "~M~B0 = self.limit_backward~N");
+                w(g, "~Mself.limit_backward = self.cursor~N");
+            }
+            write_restorecursor(g, p, savevar);
+
+            if (p->mode == m_forward) {
+                str_assign(g->failure_str, "self.limit += ");
+                str_append(g->failure_str, varname);
+            } else {
+                str_assign(g->failure_str, "self.limit_backward = ");
+                str_append(g->failure_str, varname);
+            }
+        }
+    }
+
+    if (!g->unreachable) {
         generate(g, p->aux);
 
         if (!g->unreachable) {
@@ -809,6 +848,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             write_newline(g);
         }
     }
+
     str_delete(varname);
     str_delete(savevar);
 }
