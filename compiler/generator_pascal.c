@@ -870,9 +870,13 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
 
-    g->V[0] = p->name;
-    g->S[0] = s;
-    w(g, "~MIf Not (~V0 ~S0 "); generate_AE(g, p->AE); w(g, ") Then~N");
+    w(g, "~MIf Not (");
+    generate_AE(g, p->left);
+    write_char(g, ' ');
+    write_string(g, s);
+    write_char(g, ' ');
+    generate_AE(g, p->AE);
+    w(g, ") Then~N");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);

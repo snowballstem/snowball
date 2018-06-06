@@ -128,12 +128,6 @@ void write_comment_content(struct generator * g, struct node * p) {
         case c_minusassign:
         case c_multiplyassign:
         case c_divideassign:
-        case c_eq:
-        case c_ne:
-        case c_gr:
-        case c_ge:
-        case c_ls:
-        case c_le:
             if (p->name) {
                 write_char(g, '$');
                 write_b(g, p->name->b);
@@ -141,6 +135,16 @@ void write_comment_content(struct generator * g, struct node * p) {
             }
             write_string(g, name_of_token(p->type));
             write_string(g, " <integer expression>");
+            break;
+        case c_eq:
+        case c_ne:
+        case c_gr:
+        case c_ge:
+        case c_ls:
+        case c_le:
+            write_string(g, "$(<integer expression> ");
+            write_string(g, name_of_token(p->type));
+            write_string(g, " <integer expression>)");
             break;
         default:
             write_string(g, name_of_token(p->type));
@@ -1042,9 +1046,13 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
 
-    g->V[0] = p->name;
-    g->S[0] = s;
-    w(g, "~Mif (!(~V0 ~S0 "); generate_AE(g, p->AE); writef(g, ")) ~f~C", p);
+    w(g, "~Mif (!(");
+    generate_AE(g, p->left);
+    write_char(g, ' ');
+    write_string(g, s);
+    write_char(g, ' ');
+    generate_AE(g, p->AE);
+    writef(g, ")) ~f~C", p);
 }
 
 static void generate_call(struct generator * g, struct node * p) {

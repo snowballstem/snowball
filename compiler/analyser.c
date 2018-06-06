@@ -873,61 +873,104 @@ static struct node * read_C(struct analyser * a) {
             if (n->name) n->name->initialised = true;
             return n;
         }
-        case c_dollar:
-            get_token(a, c_name);
-            {
+        case c_dollar: {
+            struct tokeniser * t = a->tokeniser;
+            read_token(t);
+            if (t->token == c_bra) {
+                /* Handle newer $(AE REL_OP AE) syntax. */
+                struct node * n = read_AE(a, 0);
+                read_token(t);
+                switch (t->token) {
+                    case c_eq:
+                    case c_ne:
+                    case c_gr:
+                    case c_ge:
+                    case c_ls:
+                    case c_le: {
+                        struct node * lhs = n;
+                        n = new_node(a, t->token);
+                        n->left = lhs;
+                        n->AE = read_AE(a, 0);
+                        get_token(a, c_ket);
+                        break;
+                    }
+                    default:
+                        error(a, e_unexpected_token);
+                        t->token_held = true;
+                        break;
+                }
+                return n;
+            }
+
+            if (t->token == c_name) {
                 struct node * p;
                 struct name * q = find_name(a);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
-                switch (q ? q->type : t_string) {
-                    default:
+                if (q && q->type == t_string) {
+                    /* Assume for now that $ on string both initialises and
+                     * uses the string variable.  FIXME: Can we do better?
+                     */
+                    q->initialised = true;
+                    q->value_used = true;
+                    a->mode = m_forward;
+                    a->modifyable = true;
+                    p = new_node(a, c_dollar);
+                    p->left = read_C(a);
+                    p->name = q;
+                } else {
+                    if (q && q->type != t_integer) {
+                        /* If $ is used on an unknown name or a name which
+                         * isn't a string or an integer then we assume the
+                         * unknown name is an integer as $ is used more often
+                         * on integers than strings, so hopefully this it less
+                         * likely to cause an error avalanche.
+                         *
+                         * For an unknown name, we'll already have reported an
+                         * error.
+                         */
                         error(a, e_not_of_type_string_or_integer);
-                        /* Handle $foo for unknown 'foo' as string since
-                         * that's more common and so less likely to cause
-                         * an error avalanche. */
-                        /* fall through */
-                    case t_string:
-			/* Assume for now that $ on string both initialises and
-			 * uses the string variable.  FIXME: Can we do better?
-			 */
-			q->initialised = true;
-			q->value_used = true;
-                        a->mode = m_forward;
-                        a->modifyable = true;
-                        p = new_node(a, c_dollar);
-                        p->left = read_C(a); break;
-                    case t_integer:
-                    /*  a->mode = m_integer;  */
-                        p = new_node(a, read_AE_test(a));
-                        p->AE = read_AE(a, 0);
-                        if (q) {
-                            /* +=, etc don't "initialise" as they only amend an
-                             * existing value.  Similarly, they don't count as
-                             * using the value.
-                             */
-                            switch (p->type) {
-                                case c_mathassign:
-                                    q->initialised = true;
-                                    break;
-                                case c_eq:
-                                case c_ne:
-                                case c_gr:
-                                case c_ge:
-                                case c_ls:
-                                case c_le:
-                                    q->value_used = true;
-                                    break;
-                            }
+                        q = NULL;
+                    }
+                    p = new_node(a, read_AE_test(a));
+                    p->AE = read_AE(a, 0);
+
+                    if (q) {
+                        switch (p->type) {
+                            case c_mathassign:
+                                q->initialised = true;
+                                p->name = q;
+                                break;
+                            default:
+                                /* +=, etc don't "initialise" as they only
+                                 * amend an existing value.  Similarly, they
+                                 * don't count as using the value.
+                                 */
+                                p->name = q;
+                                break;
+                            case c_eq:
+                            case c_ne:
+                            case c_gr:
+                            case c_ge:
+                            case c_ls:
+                            case c_le:
+                                p->left = new_node(a, c_name);
+                                p->left->name = q;
+                                q->value_used = true;
+                                break;
                         }
-                        break;
+                    }
                 }
                 if (q) mark_used_in(a, q, p);
-                p->name = q;
                 a->mode = mode;
                 a->modifyable = modifyable;
                 return p;
             }
+
+            error(a, e_unexpected_token);
+            t->token_held = true;
+            return new_node(a, c_dollar);
+        }
         case c_name:
             {
                 struct name * q = find_name(a);
