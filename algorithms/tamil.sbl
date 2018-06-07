@@ -96,13 +96,8 @@ booleans (
  found_vetrumai_urupu
 )
 
-integers (
- length
-)
-
 define has_min_length as (
- $length = len
- $length > 4
+ $(len > 4)
 )
 
 define fix_va_start as (
@@ -123,8 +118,7 @@ define remove_question_prefixes as (
 
 // Gives signal t if an ending was fixed, signal f otherwise.
 define fix_ending as (
- $length = len
- $length > 3
+ $(len > 3)
  backwards (
   ( [among('{na}{pulli}' '{na}{pulli}{ta}' '{na}{pulli}{ta}{pulli}') ] delete )
   or
@@ -278,7 +272,7 @@ define remove_vetrumai_urupukal as (
             '{vs_i}{nnna}{pulli}{rra}{vs_u}' or
             '{vs_i}{ra}{vs_u}{na}{pulli}{ta}{vs_u}' or
             '{va}{vs_i}{tta}' or
-            ($length >= 7 '{vs_i}{tta}{ma}{pulli}') or
+            ($(len >= 7) '{vs_i}{tta}{ma}{pulli}') or
             '{vs_aa}{la}{pulli}' or
             '{vs_u}{tta}{vs_ai}' or
             '{vs_aa}{ma}{la}{pulli}' or
