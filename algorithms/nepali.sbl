@@ -86,7 +86,7 @@ define stem as (
 	backwards (
 		do remove_category_1
 			do (
-				repeat (check_category_2 and remove_category_2 and remove_category_3 or remove_category_3)
+				repeat (do (check_category_2 and remove_category_2) remove_category_3)
 			)
 	)
 )
