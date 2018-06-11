@@ -1091,6 +1091,7 @@ static void generate_class_begin(struct generator * g) {
          "  * It implements the stemming algorithm defined by a snowball script.~N"
          "  */~N"
          "~N"
+         "@SuppressWarnings(\"unused\")~N"
          "public class ~n extends ");
 
     w(g, g->options->parent_class_name);
@@ -1109,16 +1110,18 @@ static void generate_class_end(struct generator * g) {
 static void generate_equals(struct generator * g) {
 
     w(g, "~N"
+         "@Override~N"
          "~Mpublic boolean equals( Object o ) {~N"
          "~+~Mreturn o instanceof ");
     w(g, g->options->name);
-	 w(g, ";~N~-~M}~N"
-	      "~N"
-	      "~Mpublic int hashCode() {~N"
-	      "~+~Mreturn ");
+    w(g, ";~N~-~M}~N"
+         "~N"
+         "@Override~N"
+         "~Mpublic int hashCode() {~N"
+         "~+~Mreturn ");
     w(g, g->options->name);
-	 w(g, ".class.getName().hashCode();~N"
-	      "~-~M}~N");
+    w(g, ".class.getName().hashCode();~N"
+         "~-~M}~N");
     w(g, "~N~N");
 }
 
