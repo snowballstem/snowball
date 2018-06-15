@@ -17,6 +17,10 @@
 #define DEFAULT_CS_AMONG_CLASS "Among"
 #define DEFAULT_CS_STRING_CLASS "StringBuilder"
 
+#define DEFAULT_JS_BASE_CLASS "Stemmer"
+
+#define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
+
 static int eq(const char * s1, const char * s2) {
     return strcmp(s1, s2) == 0;
 }
@@ -303,9 +307,13 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             break;
         case LANG_JAVASCRIPT:
             o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_JS_BASE_CLASS;
             break;
         case LANG_PYTHON:
             o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_PYTHON_BASE_CLASS;
             break;
         case LANG_RUST:
             o->encoding = ENC_UTF8;
