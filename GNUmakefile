@@ -286,7 +286,7 @@ $(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball
 	mkdir -p $(go_src_dir)/$${l}
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
-	echo "./snowball $< -go -o $${o}"; \
+	echo "./snowball $< -go -o $${o} -gop $${l}"; \
 	./snowball $< -go -o $${o} -gop $${l}
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
