@@ -247,8 +247,8 @@ $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
 	o="$(csharp_src_dir)/$${l}Stemmer.generated"; \
-	echo "./snowball $< -cs -o $${o} -p Stemmer"; \
-	./snowball $< -cs -o $${o} -p Stemmer
+	echo "./snowball $< -cs -o $${o}"; \
+	./snowball $< -cs -o $${o}
 
 $(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball
 	@mkdir -p $(pascal_src_dir)
@@ -262,8 +262,8 @@ $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball
 	@mkdir -p $(python_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
-	echo "./snowball $< -py -o $${o} -p BaseStemmer"; \
-	./snowball $< -py -o $${o} -p BaseStemmer
+	echo "./snowball $< -py -o $${o}"; \
+	./snowball $< -py -o $${o}
 
 $(python_output_dir)/__init__.py: libstemmer/modules.txt
 	@mkdir -p $(python_output_dir)
@@ -297,8 +297,8 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	@mkdir -p $(js_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(js_output_dir)/$${l}-stemmer"; \
-	echo "./snowball $< -js -o $${o} -p BaseStemmer"; \
-	./snowball $< -js -o $${o} -p BaseStemmer
+	echo "./snowball $< -js -o $${o}"; \
+	./snowball $< -js -o $${o}
 
 splint: snowball.splint
 snowball.splint: $(COMPILER_SOURCES)
