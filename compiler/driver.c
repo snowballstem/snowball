@@ -17,7 +17,7 @@
 #define DEFAULT_CS_AMONG_CLASS "Among"
 #define DEFAULT_CS_STRING_CLASS "StringBuilder"
 
-#define DEFAULT_JS_BASE_CLASS "Stemmer"
+#define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
