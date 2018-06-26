@@ -65,6 +65,7 @@ struct input {
     symbol * p;
     int c;
     char * file;
+    int file_needs_freeing;
     int line_number;
 
 };
@@ -105,6 +106,7 @@ struct tokeniser {
     symbol * p;
     int c;
     char * file;
+    int file_needs_freeing;
     int line_number;
     symbol * b;
     symbol * b2;
@@ -132,7 +134,7 @@ struct tokeniser {
     char token_disabled[NUM_TOKEN_CODES];
 };
 
-extern symbol * get_input(symbol * p, char ** p_file);
+extern symbol * get_input(const char * filename);
 extern struct tokeniser * create_tokeniser(symbol * b, char * file);
 extern int read_token(struct tokeniser * t);
 extern const char * name_of_token(int code);

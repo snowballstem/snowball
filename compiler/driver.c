@@ -406,12 +406,10 @@ extern int main(int argc, char * argv[]) {
     NEW(options, o);
     argc = read_options(o, argc, argv);
     {
-        symbol * filename = add_s_to_b(0, argv[1]);
-        char * file;
-        symbol * u = get_input(filename, &file);
-        lose_b(filename);
+        char * file = argv[1];
+        symbol * u = get_input(file);
         if (u == 0) {
-            fprintf(stderr, "Can't open input %s\n", argv[1]);
+            fprintf(stderr, "Can't open input %s\n", file);
             exit(1);
         }
         {
@@ -425,16 +423,16 @@ extern int main(int argc, char * argv[]) {
              * 'get' uses. */
             for (i = 2; i != argc; ++i) {
                 NEW(input, q);
-                filename = add_s_to_b(0, argv[i]);
-                u = get_input(filename, &file);
-                lose_b(filename);
+                file = argv[i];
+                u = get_input(file);
                 if (u == 0) {
-                    fprintf(stderr, "Can't open input %s\n", argv[i]);
+                    fprintf(stderr, "Can't open input %s\n", file);
                     exit(1);
                 }
                 q->p = u;
                 q->c = 0;
                 q->file = file;
+                q->file_needs_freeing = false;
                 q->line_number = 1;
                 *next_input_ptr = q;
                 next_input_ptr = &(q->next);
