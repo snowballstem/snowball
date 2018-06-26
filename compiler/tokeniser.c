@@ -16,6 +16,8 @@ struct system_word {
 
 #include "syswords.h"
 
+#define INITIAL_INPUT_BUFFER_SIZE 8192
+
 static int hex_to_num(int ch);
 
 static int smaller(int a, int b) { return a < b ? a : b; }
@@ -24,12 +26,12 @@ extern symbol * get_input(const char * filename) {
     FILE * input = fopen(filename, "r");
     if (input == 0) { return 0; }
     {
-        symbol * u = create_b(STARTSIZE);
+        symbol * u = create_b(INITIAL_INPUT_BUFFER_SIZE);
         int size = 0;
         while (true) {
             int ch = getc(input);
             if (ch == EOF) break;
-            if (size >= CAPACITY(u)) u = increase_capacity(u, size/2);
+            if (size >= CAPACITY(u)) u = increase_capacity(u, size);
             u[size++] = ch;
         }
         fclose(input);
