@@ -364,12 +364,13 @@ dist_libstemmer_c: \
 	 ls include/*.h >> MANIFEST) && \
         cp -a libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak $${dest}/ && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
-	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
+	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
+	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
 	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
 	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
 	echo 'stemwords: examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
-	echo '	$$(CC) -o $$@ $$^' >> $${dest}/Makefile && \
+	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
 	echo '	rm -f stemwords *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
