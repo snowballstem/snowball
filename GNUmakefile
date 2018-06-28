@@ -171,7 +171,7 @@ clean:
 	rmdir $(js_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 
@@ -193,7 +193,7 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
 
 csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
