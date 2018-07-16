@@ -265,7 +265,7 @@ backwardmode (
         ([substring] atlimit among (
           '{m}' '{p}' '{a}{p}' '{a}{r}' '{i}{d}' '{k}{t}' '{s}{k}' '{s}{ch}' '{u}{ps}' '{f}{a}' '{ch}{r}' '{ch}{t}' '{a}{k}{t}'
           '{a}{o}{r}' '{a}{s}{ch}' '{a}{t}{a}' '{a}{ch}{n}' '{a}{ch}{t}' '{g}{e}{m}' '{g}{u}{r}' '{e}{m}{p}' '{e}{u}{p}' '{e}{ch}{th}' '{i}{f}{a}'
-          'Ή{f}{a}' '{k}{a}{th}' '{k}{a}{k}' '{k}{u}{l}' '{l}{u}{g}' '{m}{a}{k}' '{m}{e}{g}' '{t}{a}{ch}' '{f}{y}{l}' '{ch}{oo}{r}'
+          '{k}{a}{th}' '{k}{a}{k}' '{k}{u}{l}' '{l}{u}{g}' '{m}{a}{k}' '{m}{e}{g}' '{t}{a}{ch}' '{f}{y}{l}' '{ch}{oo}{r}'
           (-> s <- '{y}{s}{t}' insert s)
         ))
       )
@@ -308,7 +308,7 @@ backwardmode (
         do unset test1
         [substring] atlimit among (
          '{s}' '{ch}'
-         (-> s <- 'A{r}{a}{k}' insert s)
+         (-> s <- '{a}{r}{a}{k}' insert s)
         )
       )
     )
@@ -345,7 +345,7 @@ backwardmode (
           '{a}{y}{f}{n}' '{y}{r}' '{o}{l}{o}' '{ps}{a}{l}' (-> s <- '{y}{d}' insert s)
         )) or
         ([substring] among (
-          '{e}' '{p}{a}{y}{ch}{n}' (-> s <- 'I{z}' insert s)
+          '{e}' '{p}{a}{y}{ch}{n}' (-> s <- '{y}{d}' insert s)
         ))
       )
     )
