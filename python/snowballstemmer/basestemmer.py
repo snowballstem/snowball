@@ -111,7 +111,7 @@ class BaseStemmer(object):
         while True:
             k = i + ((j - i) >> 1)
             diff = 0
-            common = min(common_i, common_j) # smalle
+            common = min(common_i, common_j) # smaller
             w = v[k]
             for i2 in range(common, len(w.s)):
                 if c + common == l:
@@ -133,7 +133,7 @@ class BaseStemmer(object):
                 if j == i:
                     break # only one item in v
                 # - but now we need to go round once more to get
-                # v->s inspected. self looks messy, but is actually
+                # v->s inspected. This looks messy, but is actually
                 # the optimal approach.
                 if first_key_inspected:
                     break
@@ -260,20 +260,18 @@ class BaseStemmer(object):
         if c_bra <= self.ket:
             self.ket += adjustment
 
-    def slice_to(self, s):
+    def slice_to(self):
         '''
-        Copy the slice into the supplied StringBuffer
-
-        @type s: string
+        Return the slice as a string.
         '''
         result = ''
         if self.slice_check():
             result = self.current[self.bra:self.ket]
         return result
 
-    def assign_to(self, s):
+    def assign_to(self):
         '''
-        @type s: string
+        Return the current string up to the limit.
         '''
         return self.current[0:self.limit]
 

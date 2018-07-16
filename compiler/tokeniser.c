@@ -16,27 +16,25 @@ struct system_word {
 
 #include "syswords.h"
 
+static int hex_to_num(int ch);
+
 static int smaller(int a, int b) { return a < b ? a : b; }
 
-extern symbol * get_input(symbol * p, char ** p_file) {
-
-    char * s = b_to_s(p);
+extern symbol * get_input(const char * filename) {
+    FILE * input = fopen(filename, "r");
+    if (input == 0) { return 0; }
     {
-        FILE * input = fopen(s, "r");
-        if (input == 0) { free(s); return 0; }
-        *p_file = s;
-        {
-            symbol * u = create_b(STARTSIZE);
-            int size = 0;
-            while (true) {
-                int ch = getc(input);
-                if (ch == EOF) break;
-                if (size >= CAPACITY(u)) u = increase_capacity(u, size/2);
-                u[size++] = ch;
-            }
-            fclose(input);
-            SIZE(u) = size; return u;
+        symbol * u = create_b(STARTSIZE);
+        int size = 0;
+        while (true) {
+            int ch = getc(input);
+            if (ch == EOF) break;
+            if (size >= CAPACITY(u)) u = increase_capacity(u, size/2);
+            u[size++] = ch;
         }
+        fclose(input);
+        SIZE(u) = size;
+        return u;
     }
 }
 
@@ -102,10 +100,13 @@ static int eq_s(struct tokeniser * t, const char * s) {
 
 static int white_space(struct tokeniser * t, int ch) {
     switch (ch) {
-        case '\n': t->line_number++;
+        case '\n':
+            t->line_number++;
+            /* fall through */
         case '\r':
         case '\t':
-        case ' ': return true;
+        case ' ':
+            return true;
     }
     return false;
 }
@@ -129,6 +130,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
         if (ch == '\n') { error1(t, "string not terminated"); return c; }
         c++;
         if (ch == t->m_start) {
+            /* Inside insert characters. */
             int c0 = c;
             int newlines = false; /* no newlines as yet */
             int black_found = false; /* no printing chars as yet */
@@ -150,7 +152,65 @@ static int read_literal_string(struct tokeniser * t, int c) {
                 if (q == 0) {
                     if (n == 1 && (firstch == '\'' || firstch == t->m_start))
                         t->b = add_to_b(t->b, 1, p + c0);
-                    else
+                    else if (n >= 3 && firstch == 'U' && p[c0 + 1] == '+') {
+                        int codepoint = 0;
+                        int x;
+                        if (t->uplusmode == UPLUS_DEFINED) {
+                            /* See if found with xxxx upper-cased. */
+                            symbol * uc = create_b(n);
+                            int i;
+                            for (i = 0; i != n; ++i) {
+                                uc[i] = toupper(p[c0 + i]);
+                            }
+                            q = find_in_m(t, n, uc);
+                            lose_b(uc);
+                            if (q != 0) {
+                                t->b = add_to_b(t->b, SIZE(q), q);
+                                continue;
+                            }
+                            error1(t, "Some U+xxxx stringdefs seen but not this one");
+                        } else {
+                            t->uplusmode = UPLUS_UNICODE;
+                        }
+                        for (x = c0 + 2; x != c - 1; ++x) {
+                            int hex = hex_to_num(p[x]);
+                            if (hex < 0) {
+                                error1(t, "Bad hex digit following U+");
+                                break;
+                            }
+                            codepoint = (codepoint << 4) | hex;
+                        }
+                        if (t->encoding == ENC_UTF8) {
+                            if (codepoint < 0 || codepoint > 0x01ffff) {
+                                error1(t, "character values exceed 0x01ffff");
+                            }
+                            /* Ensure there's enough space for a max length
+                             * UTF-8 sequence. */
+                            if (CAPACITY(t->b) < SIZE(t->b) + 3) {
+                                t->b = increase_capacity(t->b, 3);
+                            }
+                            SIZE(t->b) += put_utf8(codepoint, t->b + SIZE(t->b));
+                        } else {
+                            if (t->encoding == ENC_SINGLEBYTE) {
+                                /* Only ISO-8859-1 is handled this way - for
+                                 * other single-byte character sets you need
+                                 * stringdef all the U+xxxx codes you use
+                                 * like - e.g.:
+                                 *
+                                 * stringdef U+0171   hex 'FB'
+                                 */
+                                if (codepoint < 0 || codepoint > 0xff) {
+                                    error1(t, "character values exceed 256");
+                                }
+                            } else {
+                                if (codepoint < 0 || codepoint > 0xffff) {
+                                    error1(t, "character values exceed 64K");
+                                }
+                            }
+                            symbol sym = codepoint;
+                            t->b = add_to_b(t->b, 1, &sym);
+                        }
+                    } else
                         error(t, "string macro '", n, p + c0, "' undeclared");
                 } else
                     t->b = add_to_b(t->b, SIZE(q), q);
@@ -241,6 +301,7 @@ static int decimal_to_num(int ch) {
 static int hex_to_num(int ch) {
     if ('0' <= ch && ch <= '9') return ch - '0';
     if ('a' <= ch && ch <= 'f') return ch - 'a' + 10;
+    if ('A' <= ch && ch <= 'F') return ch - 'A' + 10;
     return -1;
 }
 
@@ -261,7 +322,7 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                         return;
                     }
                 } else {
-                    ch = hex_to_num(tolower(ch));
+                    ch = hex_to_num(ch);
                     if (ch < 0) {
                         error1(t, "hex string contains non-hex characters");
                         return;
@@ -270,18 +331,18 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
                 number = base * number + ch;
                 c++;
             }
-            if (t->widechars || t->utf8) {
-                if (number < 0 || number > 0xffff) {
-                    error1(t, "character values exceed 64K");
-                    return;
-                }
-            } else {
+            if (t->encoding == ENC_SINGLEBYTE) {
                 if (number < 0 || number > 0xff) {
                     error1(t, "character values exceed 256");
                     return;
                 }
+            } else {
+                if (number < 0 || number > 0xffff) {
+                    error1(t, "character values exceed 64K");
+                    return;
+                }
             }
-            if (t->utf8)
+            if (t->encoding == ENC_UTF8)
                 d += put_utf8(number, p + d);
             else
                 p[d++] = number;
@@ -340,6 +401,14 @@ extern int read_token(struct tokeniser * t) {
                        q->name = copy_b(t->b2);
                        q->value = copy_b(t->b);
                        t->m_pairs = q;
+                       if (t->uplusmode != UPLUS_DEFINED &&
+                           (SIZE(t->b2) >= 3 && t->b2[0] == 'U' && t->b2[1] == '+')) {
+                           if (t->uplusmode == UPLUS_UNICODE) {
+                               error1(t, "U+xxxx already used with implicit meaning");
+                           } else {
+                               t->uplusmode = UPLUS_DEFINED;
+                           }
+                       }
                    }
                }
                continue;
@@ -354,15 +423,17 @@ extern int read_token(struct tokeniser * t) {
                    exit(1);
                }
                {
-                   char * file;
                    NEW(input, q);
-                   symbol * u = get_input(t->b, &file);
+                   char * file = b_to_s(t->b);
+                   symbol * u = get_input(file);
                    if (u == 0) {
                        struct include * r;
                        for (r = t->includes; r; r = r->next) {
                            symbol * b = copy_b(r->b);
                            b = add_to_b(b, SIZE(t->b), t->b);
-                           u = get_input(b, &file);
+                           free(file);
+                           file = b_to_s(b);
+                           u = get_input(file);
                            lose_b(b);
                            if (u != 0) break;
                        }
@@ -376,6 +447,7 @@ extern int read_token(struct tokeniser * t) {
                    t->p = u;
                    t->c = 0;
                    t->file = file;
+                   t->file_needs_freeing = true;
                    t->line_number = 1;
                }
                p = t->p;
@@ -391,7 +463,7 @@ extern int read_token(struct tokeniser * t) {
                    t->get_depth--;
                    continue;
                }
-               /* drop through */
+               /* fall through */
             default:
                 t->previous_token = t->token;
                 t->token = code;
@@ -429,6 +501,7 @@ extern struct tokeniser * create_tokeniser(symbol * p, char * file) {
     t->p = p;
     t->c = 0;
     t->file = file;
+    t->file_needs_freeing = false;
     t->line_number = 1;
     t->b = create_b(0);
     t->b2 = create_b(0);
@@ -439,6 +512,7 @@ extern struct tokeniser * create_tokeniser(symbol * p, char * file) {
     t->token_held = false;
     t->token = -2;
     t->previous_token = -2;
+    t->uplusmode = UPLUS_NONE;
     memset(t->token_disabled, 0, sizeof(t->token_disabled));
     return t;
 }
@@ -464,6 +538,6 @@ extern void close_tokeniser(struct tokeniser * t) {
             q = q_next;
         }
     }
-    free(t->file);
+    if (t->file_needs_freeing) free(t->file);
     FREE(t);
 }

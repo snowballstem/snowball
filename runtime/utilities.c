@@ -25,7 +25,7 @@ extern void lose_s(symbol * p) {
 /*
    new_p = skip_utf8(p, c, lb, l, n); skips n characters forwards from p + c
    if n +ve, or n characters backwards from p + c - 1 if n -ve. new_p is the new
-   position, or 0 on failure.
+   position, or -1 on failure.
 
    -- used to implement hop and next in the utf8 case.
 */
@@ -88,7 +88,7 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
     if (b1 >= 0xC0 || c == lb) {   /* 1100 0000 */
         * slot = (b1 & 0x1F) << 6 | (b0 & 0x3F); return 2;
     }
-    * slot = (p[c] & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
+    * slot = (p[--c] & 0xF) << 12 | (b1 & 0x3F) << 6 | (b0 & 0x3F); return 3;
 }
 
 extern int in_grouping_U(struct SN_env * z, const unsigned char * s, int min, int max, int repeat) {
@@ -415,12 +415,7 @@ extern int insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbo
 }
 
 extern int insert_v(struct SN_env * z, int bra, int ket, const symbol * p) {
-    int adjustment;
-    if (replace_s(z, bra, ket, SIZE(p), p, &adjustment))
-        return -1;
-    if (bra <= z->bra) z->bra += adjustment;
-    if (bra <= z->ket) z->ket += adjustment;
-    return 0;
+    return insert_s(z, bra, ket, SIZE(p), p);
 }
 
 extern symbol * slice_to(struct SN_env * z, symbol * p) {
