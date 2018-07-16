@@ -10,81 +10,81 @@
 
 stringescapes {}
 
-stringdef a    hex '03B1' // alpha
-stringdef v    hex '03B2' // beta
-stringdef g    hex '03B3' // gamma
-stringdef d    hex '03B4' // delta
-stringdef e    hex '03B5' // epsilon
-stringdef z    hex '03B6' // zeta
-stringdef i    hex '03B7' // eta
-stringdef th   hex '03B8' // theta
-stringdef y    hex '03B9' // iota
-stringdef k    hex '03BA' // kappa
-stringdef l    hex '03BB' // lamda
-stringdef m    hex '03BC' // mu
-stringdef n    hex '03BD' // nu
-stringdef x    hex '03BE' // xi
-stringdef o    hex '03BF' // omicron
-stringdef p    hex '03C0' // pi
-stringdef r    hex '03C1' // rho
-stringdef ss   hex '03C2' // sigma final
-stringdef s    hex '03C3' // sigma
-stringdef t    hex '03C4' // tau
-stringdef u    hex '03C5' // upsilon
-stringdef f    hex '03C6' // phi
-stringdef ch   hex '03C7' // chi
-stringdef ps   hex '03C8' // psi
-stringdef oo   hex '03C9' // omega
+stringdef a    '{U+03B1}' // alpha
+stringdef v    '{U+03B2}' // beta
+stringdef g    '{U+03B3}' // gamma
+stringdef d    '{U+03B4}' // delta
+stringdef e    '{U+03B5}' // epsilon
+stringdef z    '{U+03B6}' // zeta
+stringdef i    '{U+03B7}' // eta
+stringdef th   '{U+03B8}' // theta
+stringdef y    '{U+03B9}' // iota
+stringdef k    '{U+03BA}' // kappa
+stringdef l    '{U+03BB}' // lamda
+stringdef m    '{U+03BC}' // mu
+stringdef n    '{U+03BD}' // nu
+stringdef x    '{U+03BE}' // xi
+stringdef o    '{U+03BF}' // omicron
+stringdef p    '{U+03C0}' // pi
+stringdef r    '{U+03C1}' // rho
+stringdef ss   '{U+03C2}' // sigma final
+stringdef s    '{U+03C3}' // sigma
+stringdef t    '{U+03C4}' // tau
+stringdef u    '{U+03C5}' // upsilon
+stringdef f    '{U+03C6}' // phi
+stringdef ch   '{U+03C7}' // chi
+stringdef ps   '{U+03C8}' // psi
+stringdef oo   '{U+03C9}' // omega
 
-stringdef A    hex '0391' // Alpha
-stringdef V    hex '0392' // Beta
-stringdef G    hex '0393' // Gamma
-stringdef D    hex '0394' // Delta
-stringdef E    hex '0395' // Epsilon
-stringdef Z    hex '0396' // Zeta
-stringdef I    hex '0397' // Eta
-stringdef Th   hex '0398' // Theta
-stringdef Y    hex '0399' // Iota
-stringdef K    hex '039A' // Kappa
-stringdef L    hex '039B' // Lamda
-stringdef M    hex '039C' // Mu
-stringdef N    hex '039D' // Nu
-stringdef X    hex '039E' // Xi
-stringdef O    hex '039F' // Omicron
-stringdef P    hex '03A0' // Pi
-stringdef R    hex '03A1' // Rho
-stringdef S    hex '03A3' // Sigma
-stringdef T    hex '03A4' // Tau
-stringdef U    hex '03A5' // Upsilon
-stringdef F    hex '03A6' // Phi
-stringdef Ch   hex '03A7' // Chi
-stringdef Ps   hex '03A8' // Psi
-stringdef Oo   hex '03A9' // Omega
+stringdef A    '{U+0391}' // Alpha
+stringdef V    '{U+0392}' // Beta
+stringdef G    '{U+0393}' // Gamma
+stringdef D    '{U+0394}' // Delta
+stringdef E    '{U+0395}' // Epsilon
+stringdef Z    '{U+0396}' // Zeta
+stringdef I    '{U+0397}' // Eta
+stringdef Th   '{U+0398}' // Theta
+stringdef Y    '{U+0399}' // Iota
+stringdef K    '{U+039A}' // Kappa
+stringdef L    '{U+039B}' // Lamda
+stringdef M    '{U+039C}' // Mu
+stringdef N    '{U+039D}' // Nu
+stringdef X    '{U+039E}' // Xi
+stringdef O    '{U+039F}' // Omicron
+stringdef P    '{U+03A0}' // Pi
+stringdef R    '{U+03A1}' // Rho
+stringdef S    '{U+03A3}' // Sigma
+stringdef T    '{U+03A4}' // Tau
+stringdef U    '{U+03A5}' // Upsilon
+stringdef F    '{U+03A6}' // Phi
+stringdef Ch   '{U+03A7}' // Chi
+stringdef Ps   '{U+03A8}' // Psi
+stringdef Oo   '{U+03A9}' // Omega
 
-stringdef Y:   hex '03AA' // Iota with dialytika
-stringdef U:   hex '03AB' // Upsilon with dialytika
+stringdef Y:   '{U+03AA}' // Iota with dialytika
+stringdef U:   '{U+03AB}' // Upsilon with dialytika
 
-stringdef a'   hex '03AC' // alpha with tonos
-stringdef e'   hex '03AD' // epsilon with tonos
-stringdef i'   hex '03AE' // eta with tonos
-stringdef y'   hex '03AF' // iota with tonos
-stringdef o'   hex '03CC' // omicron with tonos
-stringdef u'   hex '03CD' // upsilon with tonos
-stringdef oo'  hex '03CE' // omega with tonos
+stringdef a'   '{U+03AC}' // alpha with tonos
+stringdef e'   '{U+03AD}' // epsilon with tonos
+stringdef i'   '{U+03AE}' // eta with tonos
+stringdef y'   '{U+03AF}' // iota with tonos
+stringdef o'   '{U+03CC}' // omicron with tonos
+stringdef u'   '{U+03CD}' // upsilon with tonos
+stringdef oo'  '{U+03CE}' // omega with tonos
 
-stringdef i:'  hex '0390' // iota with dialytika and tonos
-stringdef u:'  hex '03B0' // upsilon with dialytika and tonos
+stringdef i:'  '{U+0390}' // iota with dialytika and tonos
+stringdef u:'  '{U+03B0}' // upsilon with dialytika and tonos
 
-stringdef i:   hex '03CA' // iota with dialytika
-stringdef u:   hex '03CB' // upsilon with dialytika
+stringdef i:   '{U+03CA}' // iota with dialytika
+stringdef u:   '{U+03CB}' // upsilon with dialytika
 
-stringdef A'   hex '0386' // Alpha with tonos
-stringdef E'   hex '0388' // Epsilon with tonos
-stringdef I'   hex '0389' // Eta with tonos
-stringdef Y'   hex '038A' // Iota with tonos
-stringdef O'   hex '038C' // Omicron with tonos
-stringdef U'   hex '038E' // Upsilon with tonos
-stringdef OO'  hex '038F' // Omega with tonos
+stringdef A'   '{U+0386}' // Alpha with tonos
+stringdef E'   '{U+0388}' // Epsilon with tonos
+stringdef I'   '{U+0389}' // Eta with tonos
+stringdef Y'   '{U+038A}' // Iota with tonos
+stringdef O'   '{U+038C}' // Omicron with tonos
+stringdef U'   '{U+038E}' // Upsilon with tonos
+stringdef OO'  '{U+038F}' // Omega with tonos
 
 externals ( stem )
 
