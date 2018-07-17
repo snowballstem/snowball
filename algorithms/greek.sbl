@@ -110,8 +110,7 @@ integers ( length )
 
 backwardmode (
   define has_min_length as (
-    $length = len
-    $length >= 3
+    $(len >= 3)
   )
 
   define tolower as (
@@ -331,7 +330,7 @@ backwardmode (
           '{p}{a}{t}{e}{r}' '{p}' '{s}{k}' '{t}{o}{s}' '{t}{r}{y}{p}{o}{l}'
           (-> s <- '{y}{t}{s}' insert s)
         )) or
-        (['{k}{o}{r}'] -> s <- '{y}{z}' insert s)
+        (['{k}{o}{r}'] -> s <- '{y}{t}{s}' insert s)
       )
     )
   )
