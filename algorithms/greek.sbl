@@ -106,8 +106,6 @@ define v2 '{a}{e}{i}{y}{o}{oo}'
 
 strings ( s )
 
-integers ( length )
-
 backwardmode (
   define has_min_length as (
     $(len >= 3)
