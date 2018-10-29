@@ -275,17 +275,17 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
         case c_lenof:
             g->V[0] = p->name;
-            w(g, "~V0.chars().count() as i32");
+            w(g, "(~V0.chars().count() as i32)");
             break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "~V0.len() as i32");
+            w(g, "(~V0.len() as i32)");
             break;
         case c_len:
-            w(g, "env.current.chars().count() as i32");
+            w(g, "(env.current.chars().count() as i32)");
             break;
         case c_size:
-            w(g, "env.current.len() as i32");
+            w(g, "(env.current.len() as i32)");
             break;
     }
 }
