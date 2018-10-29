@@ -1120,7 +1120,9 @@ static void generate_allow_warnings(struct generator * g) {
 static void generate_class_begin(struct generator * g) {
 
     w(g, "use snowball::SnowballEnv;~N");
-    w(g, "use snowball::Among;~N~N");
+    if (g->analyser->among_count > 0) {
+        w(g, "use snowball::Among;~N~N");
+    }
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
