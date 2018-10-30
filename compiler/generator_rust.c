@@ -275,17 +275,17 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, p->mode == m_forward ? "env.limit" : "env.limit_backward"); break;
         case c_lenof:
             g->V[0] = p->name;
-            w(g, "~V0.chars().count() as i32");
+            w(g, "(~V0.chars().count() as i32)");
             break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "~V0.len() as i32");
+            w(g, "(~V0.len() as i32)");
             break;
         case c_len:
-            w(g, "env.current.chars().count() as i32");
+            w(g, "(env.current.chars().count() as i32)");
             break;
         case c_size:
-            w(g, "env.current.len() as i32");
+            w(g, "(env.current.len() as i32)");
             break;
     }
 }
@@ -1120,7 +1120,9 @@ static void generate_allow_warnings(struct generator * g) {
 static void generate_class_begin(struct generator * g) {
 
     w(g, "use snowball::SnowballEnv;~N");
-    w(g, "use snowball::Among;~N~N");
+    if (g->analyser->among_count > 0) {
+        w(g, "use snowball::Among;~N~N");
+    }
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
