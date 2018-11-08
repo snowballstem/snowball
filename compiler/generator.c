@@ -104,7 +104,9 @@ static void wlitarray(struct generator * g, symbol * p) {  /* write literal arra
 
 static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal array */
 
-    if (SIZE(p) == 0) write_char(g, '0'); else {
+    if (SIZE(p) == 0) {
+        write_char(g, '0');
+    } else {
         struct str * s = g->outbuf;
         g->outbuf = g->declarations;
         write_string(g, "static const symbol s_"); write_int(g, g->literalstring_count); write_string(g, "[] = ");
@@ -252,8 +254,7 @@ static void write_failure(struct generator * g, struct node * p) {          /* f
         }
         write_char(g, ' ');
     }
-    switch (g->failure_label)
-    {
+    switch (g->failure_label) {
         case x_return:
             write_string(g, "return 0;");
             break;
@@ -1314,8 +1315,7 @@ static void generate(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     int a1 = g->failure_keep_count;
 
-    switch (p->type)
-    {
+    switch (p->type) {
         case c_define:        generate_define(g, p); break;
         case c_bra:           generate_bra(g, p); break;
         case c_and:           generate_and(g, p); break;
@@ -1433,8 +1433,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     {
         int i;
-        for (i = 0; i < x->literalstring_count; i++)
-        {
+        for (i = 0; i < x->literalstring_count; i++) {
             g->I[1] = i;
             g->I[2] = v->size;
             g->L[0] = v->b;
@@ -1458,8 +1457,11 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
             w(g, "/*~J1 */ { ~I2, ");
-            if (v->size == 0) w(g, "0,");
-                         else w(g, "s_~I0_~I1,");
+            if (v->size == 0) {
+                w(g, "0,");
+            } else {
+                w(g, "s_~I0_~I1,");
+            }
             w(g, " ~I3, ~I4, ");
             if (v->function == 0) {
                 write_char(g, '0');

@@ -163,8 +163,7 @@ static void write_failure(struct generator * g) {
         write_newline(g);
     }
     write_margin(g);
-    switch (g->failure_label)
-    {
+    switch (g->failure_label) {
         case x_return:
             write_string(g, "return false;");
             break;
@@ -1030,8 +1029,7 @@ static void generate(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    switch (p->type)
-    {
+    switch (p->type) {
         case c_define:        generate_define(g, p); break;
         case c_bra:           generate_bra(g, p); break;
         case c_and:           generate_and(g, p); break;

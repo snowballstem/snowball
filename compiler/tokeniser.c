@@ -362,110 +362,114 @@ extern int read_token(struct tokeniser * t) {
         int code = next_token(t);
         switch (code) {
             case c_comment1: /*  slash-slash comment */
-               while (t->c < SIZE(p) && p[t->c] != '\n') t->c++;
-               continue;
+                while (t->c < SIZE(p) && p[t->c] != '\n') t->c++;
+                continue;
             case c_comment2: /* slash-star comment */
-               while (true) {
-                   if (t->c >= SIZE(p)) {
-                       error1(t, "/* comment not terminated");
-                       t->token = -1;
-                       return -1;
-                   }
-                   if (p[t->c] == '\n') t->line_number++;
-                   if (eq_s(t, "*/")) break;
-                   t->c++;
-               }
-               continue;
-            case c_stringescapes:
-               {
-                   int ch1 = next_real_char(t);
-                   int ch2 = next_real_char(t);
-                   if (ch2 < 0)
-                       { error2(t, "stringescapes"); continue; }
-                   if (ch1 == '\'')
-                       { error1(t, "first stringescape cannot be '"); continue; }
-                   t->m_start = ch1;
-                   t->m_end = ch2;
-               }
-               continue;
-            case c_stringdef:
-               {
-                   int base = 0;
-                   read_chars(t);
-                   code = read_token(t);
-                   if (code == c_hex) { base = 16; code = read_token(t); } else
-                   if (code == c_decimal) { base = 10; code = read_token(t); }
-                   if (code != c_literalstring)
-                       { error1(t, "string omitted after stringdef"); continue; }
-                   if (base > 0) convert_numeric_string(t, t->b, base);
-                   {   NEW(m_pair, q);
-                       q->next = t->m_pairs;
-                       q->name = copy_b(t->b2);
-                       q->value = copy_b(t->b);
-                       t->m_pairs = q;
-                       if (t->uplusmode != UPLUS_DEFINED &&
-                           (SIZE(t->b2) >= 3 && t->b2[0] == 'U' && t->b2[1] == '+')) {
-                           if (t->uplusmode == UPLUS_UNICODE) {
-                               error1(t, "U+xxxx already used with implicit meaning");
-                           } else {
-                               t->uplusmode = UPLUS_DEFINED;
-                           }
-                       }
-                   }
-               }
-               continue;
+                while (true) {
+                    if (t->c >= SIZE(p)) {
+                        error1(t, "/* comment not terminated");
+                        t->token = -1;
+                        return -1;
+                    }
+                    if (p[t->c] == '\n') t->line_number++;
+                    if (eq_s(t, "*/")) break;
+                    t->c++;
+                }
+                continue;
+            case c_stringescapes: {
+                int ch1 = next_real_char(t);
+                int ch2 = next_real_char(t);
+                if (ch2 < 0) {
+                    error2(t, "stringescapes");
+                    continue;
+                }
+                if (ch1 == '\'') {
+                    error1(t, "first stringescape cannot be '");
+                    continue;
+                }
+                t->m_start = ch1;
+                t->m_end = ch2;
+                continue;
+            }
+            case c_stringdef: {
+                int base = 0;
+                read_chars(t);
+                code = read_token(t);
+                if (code == c_hex) { base = 16; code = read_token(t); } else
+                if (code == c_decimal) { base = 10; code = read_token(t); }
+                if (code != c_literalstring) {
+                    error1(t, "string omitted after stringdef");
+                    continue;
+                }
+                if (base > 0) convert_numeric_string(t, t->b, base);
+                {   NEW(m_pair, q);
+                    q->next = t->m_pairs;
+                    q->name = copy_b(t->b2);
+                    q->value = copy_b(t->b);
+                    t->m_pairs = q;
+                    if (t->uplusmode != UPLUS_DEFINED &&
+                        (SIZE(t->b2) >= 3 && t->b2[0] == 'U' && t->b2[1] == '+')) {
+                        if (t->uplusmode == UPLUS_UNICODE) {
+                            error1(t, "U+xxxx already used with implicit meaning");
+                        } else {
+                            t->uplusmode = UPLUS_DEFINED;
+                        }
+                    }
+                }
+                continue;
+            }
             case c_get:
-               code = read_token(t);
-               if (code != c_literalstring) {
-                   error1(t, "string omitted after get"); continue;
-               }
-               t->get_depth++;
-               if (t->get_depth > 10) {
-                   fprintf(stderr, "get directives go 10 deep. Looping?\n");
-                   exit(1);
-               }
-               {
-                   NEW(input, q);
-                   char * file = b_to_s(t->b);
-                   symbol * u = get_input(file);
-                   if (u == 0) {
-                       struct include * r;
-                       for (r = t->includes; r; r = r->next) {
-                           symbol * b = copy_b(r->b);
-                           b = add_to_b(b, SIZE(t->b), t->b);
-                           free(file);
-                           file = b_to_s(b);
-                           u = get_input(file);
-                           lose_b(b);
-                           if (u != 0) break;
-                       }
-                   }
-                   if (u == 0) {
-                       error(t, "Can't get '", SIZE(t->b), t->b, "'");
-                       exit(1);
-                   }
-                   memmove(q, t, sizeof(struct input));
-                   t->next = q;
-                   t->p = u;
-                   t->c = 0;
-                   t->file = file;
-                   t->file_needs_freeing = true;
-                   t->line_number = 1;
-               }
-               p = t->p;
-               continue;
+                code = read_token(t);
+                if (code != c_literalstring) {
+                    error1(t, "string omitted after get"); continue;
+                }
+                t->get_depth++;
+                if (t->get_depth > 10) {
+                    fprintf(stderr, "get directives go 10 deep. Looping?\n");
+                    exit(1);
+                }
+                {
+                    NEW(input, q);
+                    char * file = b_to_s(t->b);
+                    symbol * u = get_input(file);
+                    if (u == 0) {
+                        struct include * r;
+                        for (r = t->includes; r; r = r->next) {
+                            symbol * b = copy_b(r->b);
+                            b = add_to_b(b, SIZE(t->b), t->b);
+                            free(file);
+                            file = b_to_s(b);
+                            u = get_input(file);
+                            lose_b(b);
+                            if (u != 0) break;
+                        }
+                    }
+                    if (u == 0) {
+                        error(t, "Can't get '", SIZE(t->b), t->b, "'");
+                        exit(1);
+                    }
+                    memmove(q, t, sizeof(struct input));
+                    t->next = q;
+                    t->p = u;
+                    t->c = 0;
+                    t->file = file;
+                    t->file_needs_freeing = true;
+                    t->line_number = 1;
+                }
+                p = t->p;
+                continue;
             case -1:
-               if (t->next) {
-                   lose_b(p);
-                   {
-                       struct input * q = t->next;
-                       memmove(t, q, sizeof(struct input)); p = t->p;
-                       FREE(q);
-                   }
-                   t->get_depth--;
-                   continue;
-               }
-               /* fall through */
+                if (t->next) {
+                    lose_b(p);
+                    {
+                        struct input * q = t->next;
+                        memmove(t, q, sizeof(struct input)); p = t->p;
+                        FREE(q);
+                    }
+                    t->get_depth--;
+                    continue;
+                }
+                /* fall through */
             default:
                 t->previous_token = t->token;
                 t->token = code;

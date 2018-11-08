@@ -169,8 +169,7 @@ static void write_failure(struct generator * g) {
         write_str(g, g->failure_str);
         write_newline(g);
     }
-    switch (g->failure_label)
-    {
+    switch (g->failure_label) {
         case x_return:
             w(g, "~Mreturn False~N");
             g->unreachable = true;
@@ -1042,8 +1041,7 @@ static void generate(struct generator * g, struct node * p) {
     a0 = g->failure_label;
     a1 = str_copy(g->failure_str);
 
-    switch (p->type)
-    {
+    switch (p->type) {
         case c_define:        generate_define(g, p); break;
         case c_bra:           generate_bra(g, p); break;
         case c_and:           generate_and(g, p); break;
@@ -1144,16 +1142,14 @@ static void generate_among_table(struct generator * g, struct among * x) {
     w(g, "~Ma_~I0 = [~N~+");
     {
         int i;
-        for (i = 0; i < x->literalstring_count; i++)
-        {
+        for (i = 0; i < x->literalstring_count; i++) {
             g->I[0] = v->i;
             g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
             w(g, "~MAmong(~L0, ~I0, ~I1");
-            if (v->function != 0)
-            {
+            if (v->function != 0) {
                 w(g, ", \"");
                 if (v->function->type == t_routine) {
                     /* Need to use mangled version of private name here. */
@@ -1242,8 +1238,7 @@ static void generate_methods(struct generator * g) {
 static void generate_label_classes(struct generator * g)
 {
     int i;
-    for (i = 0; i <= g->max_label; i++)
-    {
+    for (i = 0; i <= g->max_label; i++) {
         g->I[0] = i;
         w(g, "~N~Nclass lab~I0(BaseException): pass~N");
     }

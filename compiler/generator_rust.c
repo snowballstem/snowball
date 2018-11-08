@@ -171,8 +171,7 @@ static void write_failure(struct generator * g) {
         write_str(g, g->failure_str);
         write_newline(g);
     }
-    switch (g->failure_label)
-    {
+    switch (g->failure_label) {
         case x_return:
             w(g, "~Mreturn false;~N");
             g->unreachable = true;
@@ -1030,8 +1029,7 @@ static void generate(struct generator * g, struct node * p) {
     a0 = g->failure_label;
     a1 = str_copy(g->failure_str);
 
-    switch (p->type)
-    {
+    switch (p->type) {
         case c_define:        generate_define(g, p); break;
         case c_bra:           generate_bra(g, p); break;
         case c_and:           generate_and(g, p); break;
@@ -1135,16 +1133,14 @@ static void generate_among_table(struct generator * g, struct among * x) {
     w(g, "~Mstatic A_~I0: &'static [Among<Context>; ~I1] = &[~N~+");
     {
         int i;
-        for (i = 0; i < x->literalstring_count; i++)
-        {
+        for (i = 0; i < x->literalstring_count; i++) {
             g->I[0] = v->i;
             g->I[1] = v->result;
             g->L[0] = v->b;
             g->S[0] = ",";
 
             w(g, "~MAmong(~L0, ~I0, ~I1, ");
-            if (v->function != 0)
-            {
+            if (v->function != 0) {
                 w(g, "Some(&");
                 write_varname(g, v->function);
                 w(g, ")");

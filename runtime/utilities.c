@@ -253,8 +253,13 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
                 common++;
             }
         }
-        if (diff < 0) { j = k; common_j = common; }
-                 else { i = k; common_i = common; }
+        if (diff < 0) {
+            j = k;
+            common_j = common;
+        } else {
+            i = k;
+            common_i = common;
+        }
         if (j - i <= 1) {
             if (i > 0) break; /* v->s has been inspected */
             if (j == i) break; /* only one item in v */
@@ -383,9 +388,8 @@ extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const 
         z->l += adjustment;
         if (z->c >= c_ket)
             z->c += adjustment;
-        else
-            if (z->c > c_bra)
-                z->c = c_bra;
+        else if (z->c > c_bra)
+            z->c = c_bra;
     }
     if (s_size) memmove(z->p + c_bra, s, s_size * sizeof(symbol));
     if (adjptr != NULL)
