@@ -149,8 +149,7 @@ BaseStemmer = function() {
 		first_key_inspected = true;
 	    }
 	}
-	while (true)
-        {
+	do {
 	    var w = v[i];
 	    if (common_i >= w[0].length)
             {
@@ -161,8 +160,8 @@ BaseStemmer = function() {
 		if (res) return w[2];
 	    }
 	    i = w[1];
-	    if (i < 0) return 0;
-	}
+	} while (i >= 0);
+	return 0;
     };
 
     // find_among_b is for backwards processing. Same comments apply
@@ -215,8 +214,7 @@ BaseStemmer = function() {
 		first_key_inspected = true;
 	    }
 	}
-	while (true)
-        {
+	do {
 	    var w = v[i];
 	    if (common_i >= w[0].length)
             {
@@ -227,8 +225,8 @@ BaseStemmer = function() {
 		if (res) return w[2];
 	    }
 	    i = w[1];
-	    if (i < 0) return 0;
-	}
+	} while (i >= 0);
+	return 0;
     };
 
     /* to replace chars between c_bra and c_ket in this.current by the
