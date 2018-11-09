@@ -822,7 +822,6 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         write_failure(g);
         write_block_end(g);
 
-
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
             w(g, "~Mint ~B0 = limit - cursor;~N");
