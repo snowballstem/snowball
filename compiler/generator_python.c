@@ -10,13 +10,7 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-
-enum special_labels {
-    x_return = -1
-};
-
 static int new_label(struct generator * g) {
-
     int next_label = g->next_label++;
     g->max_label = (next_label > g->max_label) ? next_label : g->max_label;
     return next_label;

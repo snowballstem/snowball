@@ -323,6 +323,11 @@ struct generator {
                             about shadowed variables */
 };
 
+/* Special values for failure_label in struct generator. */
+enum special_labels {
+    x_return = -1
+};
+
 struct options {
 
     /* for the command line: */

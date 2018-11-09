@@ -12,13 +12,6 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-
-/* New labels' and variables' names generation */
-
-enum special_labels {
-    x_return = -1
-};
-
 static int new_label(struct generator * g) {
     return g->next_label++;
 }

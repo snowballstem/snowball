@@ -12,12 +12,6 @@
 
 static void generate(struct generator * g, struct node * p);
 
-enum special_labels {
-
-    x_return = -1
-
-};
-
 static int new_label(struct generator * g) {
     return g->next_label++;
 }
