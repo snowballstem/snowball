@@ -806,28 +806,65 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
     write_comment(g, p);
-    write_savecursor(g, p, savevar);
-    generate(g, p->left);
+    if (p->left && p->left->type == c_tomark && !p->left->right) {
+        /* Special case for:
+         *
+         *   setlimit tomark AE for C
+         *
+         * All uses of setlimit in the current stemmers we ship follow this
+         * pattern, and by special-casing we can avoid having to save and
+         * restore c.
+         */
+        struct node * q = p->left;
+        g->S[0] = q->mode == m_forward ? ">" : "<";
+        w(g, "~Mif (cursor ~S0 "); generate_AE(g, q->AE); w(g, ")~N");
+        write_block_start(g);
+        write_failure(g);
+        write_block_end(g);
 
 
-    g->B[0] = str_data(varname);
-    if (p->mode == m_forward) {
-        w(g, "~Mint ~B0 = limit - cursor;~N");
-        w(g, "~Mlimit = cursor;~N");
+        g->B[0] = str_data(varname);
+        if (p->mode == m_forward) {
+            w(g, "~Mint ~B0 = limit - cursor;~N");
+            w(g, "~Mlimit = ");
+        } else {
+            w(g, "~Mint ~B0 = limit_backward;~N");
+            w(g, "~Mlimit_backward = ");
+        }
+        generate_AE(g, q->AE); writef(g, ";~N", q);
+
+        if (p->mode == m_forward) {
+            str_assign(g->failure_str, "limit += ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        } else {
+            str_assign(g->failure_str, "limit_backward = ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        }
     } else {
-        w(g, "~Mint ~B0 = limit_backward;~N");
-        w(g, "~Mlimit_backward = cursor;~N");
-    }
-    write_restorecursor(g, p, savevar);
+        write_savecursor(g, p, savevar);
+        generate(g, p->left);
 
-    if (p->mode == m_forward) {
-        str_assign(g->failure_str, "limit += ");
-        str_append(g->failure_str, varname);
-        str_append_ch(g->failure_str, ';');
-    } else {
-        str_assign(g->failure_str, "limit_backward = ");
-        str_append(g->failure_str, varname);
-        str_append_ch(g->failure_str, ';');
+        g->B[0] = str_data(varname);
+        if (p->mode == m_forward) {
+            w(g, "~Mint ~B0 = limit - cursor;~N");
+            w(g, "~Mlimit = cursor;~N");
+        } else {
+            w(g, "~Mint ~B0 = limit_backward;~N");
+            w(g, "~Mlimit_backward = cursor;~N");
+        }
+        write_restorecursor(g, p, savevar);
+
+        if (p->mode == m_forward) {
+            str_assign(g->failure_str, "limit += ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        } else {
+            str_assign(g->failure_str, "limit_backward = ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        }
     }
 
     generate(g, p->aux);
