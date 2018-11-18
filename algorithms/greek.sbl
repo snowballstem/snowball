@@ -2,11 +2,11 @@
 //
 // Ntais, Georgios. Development of a Stemmer for the Greek
 // Language. Diss. Royal Institute of Technology, 2006.
-// http://sais.se/mthprize/2007/ntais2007.pdf
+// https://sais.se/mthprize/2007/ntais2007.pdf
 //
 // Saroukos, Spyridon. Enhancing a Greek language stemmer.
 // University of Tampere, 2008.
-// http://tampub.uta.fi/bitstream/handle/10024/80480/gradu03463.pdf
+// https://tampub.uta.fi/bitstream/handle/10024/80480/gradu03463.pdf
 
 stringescapes {}
 
