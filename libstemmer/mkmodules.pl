@@ -174,7 +174,6 @@ static const char * algorithm_names[] = {
 EOS
 
     for $lang (@algorithms) {
-        my $l = $aliases{$lang};
         print OUT "  \"$lang\", \n";
     }
 
