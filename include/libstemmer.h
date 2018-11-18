@@ -32,8 +32,9 @@ const char ** sb_stemmer_list(void);
  *
  *  @param charenc The character encoding.  NULL may be passed as
  *  this value, in which case UTF-8 encoding will be assumed. Otherwise,
- *  the argument may be one of "UTF_8", "ISO_8859_1" (ie, Latin 1) or
- *  "KOI8_R" (Russian).  Note that case is significant in this parameter.
+ *  the argument may be one of "UTF_8", "ISO_8859_1" (i.e. Latin 1),
+ *  "ISO_8859_2" (i.e. Latin 2) or "KOI8_R" (Russian).  Note that case is
+ *  significant in this parameter.
  *
  *  @return NULL if the specified algorithm is not recognised, or the
  *  algorithm is not available for the requested encoding.  Otherwise,
