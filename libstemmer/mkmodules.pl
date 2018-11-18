@@ -135,7 +135,7 @@ struct stemmer_encoding {
   const char * name;
   stemmer_encoding_t enc;
 };
-static struct stemmer_encoding encodings[] = {
+static const struct stemmer_encoding encodings[] = {
 EOS
     for $enc (sort keys %encs) {
         print OUT "  {\"${enc}\", ENC_${enc}},\n";
@@ -151,7 +151,7 @@ struct stemmer_modules {
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
 };
-static struct stemmer_modules modules[] = {
+static const struct stemmer_modules modules[] = {
 EOS
 
     for $lang (sort keys %aliases) {
