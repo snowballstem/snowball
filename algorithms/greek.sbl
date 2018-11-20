@@ -178,7 +178,7 @@ backwardmode (
       '{k}{a}{th}{e}{s}{t}{oo}{s}' '{k}{a}{th}{e}{s}{t}{oo}{t}{o}{s}' '{k}{a}{th}{e}{s}{t}{oo}{t}{a}' '{k}{a}{th}{e}{s}{t}{oo}{t}{oo}{n}' (<- '{k}{a}{th}{e}{s}{t}')
       '{g}{e}{g}{o}{n}{o}{s}' '{g}{e}{g}{o}{n}{o}{t}{o}{s}' '{g}{e}{g}{o}{n}{o}{t}{a}' '{g}{e}{g}{o}{n}{o}{t}{oo}{n}' (<- '{g}{e}{g}{o}{n}')
     )
-    do unset test1
+    unset test1
   )
 
   define steps1 as (
@@ -186,7 +186,7 @@ backwardmode (
       '{y}{z}{a}' '{y}{z}{e}{s}' '{y}{z}{e}' '{y}{z}{a}{m}{e}' '{y}{z}{a}{t}{e}' '{y}{z}{a}{n}' '{y}{z}{a}{n}{e}' '{y}{z}{oo}' '{y}{z}{e}{y}{s}' '{y}{z}{e}{y}'
       '{y}{z}{o}{u}{m}{e}' '{y}{z}{e}{t}{e}' '{y}{z}{o}{u}{n}' '{y}{z}{o}{u}{n}{e}' (
         delete
-        do unset test1
+        unset test1
         ([substring] atlimit among (
           '{a}{n}{a}{m}{p}{a}' '{e}{m}{p}{a}' '{e}{p}{a}' '{x}{a}{n}{a}{p}{a}' '{p}{a}' '{p}{e}{r}{y}{p}{a}' '{a}{th}{r}{o}' '{s}{u}{n}{a}{th}{r}{o}' '{d}{a}{n}{e}'
           (-> s <- '{y}' insert s)
@@ -205,7 +205,7 @@ backwardmode (
     [substring] among (
       '{oo}{th}{i}{k}{a}' '{oo}{th}{i}{k}{e}{s}' '{oo}{th}{i}{k}{e}' '{oo}{th}{i}{k}{a}{m}{e}' '{oo}{th}{i}{k}{a}{t}{e}' '{oo}{th}{i}{k}{a}{n}' '{oo}{th}{i}{k}{a}{n}{e}' (
         delete
-        do unset test1
+        unset test1
         [substring] atlimit among (
           '{a}{l}' '{v}{y}' '{e}{n}' '{u}{ps}' '{l}{y}' '{z}{oo}' '{s}' '{ch}' (-> s <- '{oo}{n}' insert s)
         )
@@ -217,7 +217,7 @@ backwardmode (
     [substring] among (
       '{y}{s}{a}' '{y}{s}{e}{s}' '{y}{s}{e}' '{y}{s}{a}{m}{e}' '{y}{s}{a}{t}{e}' '{y}{s}{a}{n}' '{y}{s}{a}{n}{e}' (
         delete
-        do unset test1
+        unset test1
         ('{y}{s}{a}' atlimit <- '{y}{s}') or
         ([substring] atlimit among (
           '{a}{n}{a}{m}{p}{a}' '{a}{th}{r}{o}' '{e}{m}{p}{a}' '{e}{s}{e}' '{e}{s}{oo}{k}{l}{e}' '{e}{p}{a}' '{x}{a}{n}{a}{p}{a}' '{e}{p}{e}' '{p}{e}{r}{y}{p}{a}'
@@ -238,7 +238,7 @@ backwardmode (
     [substring] among (
       '{y}{s}{oo}' '{y}{s}{e}{y}{s}' '{y}{s}{e}{y}' '{y}{s}{o}{u}{m}{e}' '{y}{s}{e}{t}{e}' '{y}{s}{o}{u}{n}' '{y}{s}{o}{u}{n}{e}' (
         delete
-        do unset test1
+        unset test1
         [substring] atlimit among (
           '{a}{n}{a}{m}{p}{a}' '{e}{m}{p}{a}' '{e}{s}{e}' '{e}{s}{oo}{k}{l}{e}' '{e}{p}{a}' '{x}{a}{n}{a}{p}{a}' '{e}{p}{e}' '{p}{e}{r}{y}{p}{a}' '{a}{th}{r}{o}'
           '{s}{u}{n}{a}{th}{r}{o}' '{d}{a}{n}{e}' '{k}{l}{e}' '{ch}{a}{r}{t}{o}{p}{a}' '{e}{x}{a}{r}{ch}{a}' '{m}{e}{t}{e}{p}{e}' '{a}{p}{o}{k}{l}{e}' '{a}{p}{e}{k}{l}{e}'
@@ -254,7 +254,7 @@ backwardmode (
       '{y}{s}{t}{o}{s}' '{y}{s}{t}{o}{u}' '{y}{s}{t}{o}' '{y}{s}{t}{e}' '{y}{s}{t}{o}{y}' '{y}{s}{t}{oo}{n}' '{y}{s}{t}{o}{u}{s}' '{y}{s}{t}{i}' '{y}{s}{t}{i}{s}'
       '{y}{s}{t}{a}' '{y}{s}{t}{e}{s}' (
         delete
-        do unset test1
+        unset test1
         ([substring] atlimit among (
           '{d}{a}{n}{e}' '{s}{u}{n}{a}{th}{r}{o}' '{k}{l}{e}' '{s}{e}' '{e}{s}{oo}{k}{l}{e}' '{a}{s}{e}' '{p}{l}{e}'
           (-> s <- '{y}' insert s)
@@ -273,7 +273,7 @@ backwardmode (
     [substring] among (
       '{y}{s}{m}{o}' '{y}{s}{m}{o}{y}' '{y}{s}{m}{o}{s}' '{y}{s}{m}{o}{u}' '{y}{s}{m}{o}{u}{s}' '{y}{s}{m}{oo}{n}' (
         delete
-        do unset test1
+        unset test1
         ([substring] atlimit among (
           '{s}{e}' '{m}{e}{t}{a}{s}{e}' '{m}{y}{k}{r}{o}{s}{e}' '{e}{g}{k}{l}{e}' '{a}{p}{o}{k}{l}{e}'
           (-> s <- '{y}{s}{m}' insert s)
@@ -302,7 +302,7 @@ backwardmode (
     [substring] among (
       '{a}{r}{a}{k}{y}' '{a}{r}{a}{k}{y}{a}' '{o}{u}{d}{a}{k}{y}' '{o}{u}{d}{a}{k}{y}{a}' (
         delete
-        do unset test1
+        unset test1
         [substring] atlimit among (
          '{s}' '{ch}'
          (-> s <- '{a}{r}{a}{k}' insert s)
@@ -315,7 +315,7 @@ backwardmode (
     [substring] among (
       '{a}{k}{y}' '{a}{k}{y}{a}' '{y}{t}{s}{a}' '{y}{t}{s}{a}{s}' '{y}{t}{s}{e}{s}' '{y}{t}{s}{oo}{n}' '{a}{r}{a}{k}{y}' '{a}{r}{a}{k}{y}{a}' (
         delete
-        do unset test1
+        unset test1
         ([substring] atlimit among (
           '{v}{a}{m}{v}' '{v}{r}' '{k}{a}{y}{m}' '{k}{o}{n}' '{k}{o}{r}' '{l}{a}{v}{r}' '{l}{o}{u}{l}' '{m}{e}{r}' '{m}{o}{u}{s}{t}'
           '{n}{a}{g}{k}{a}{s}' '{p}{l}' '{r}' '{r}{u}' '{s}' '{s}{k}' '{s}{o}{k}' '{s}{p}{a}{n}' '{t}{z}' '{f}{a}{r}{m}' '{ch}' '{k}{a}{p}{a}{k}'
@@ -337,7 +337,7 @@ backwardmode (
     [substring] among (
       '{y}{d}{y}{o}' '{y}{d}{y}{a}' '{y}{d}{y}{oo}{n}' (
         delete
-        do unset test1
+        unset test1
         ([substring] atlimit among (
           '{a}{y}{f}{n}' '{y}{r}' '{o}{l}{o}' '{ps}{a}{l}' (-> s <- '{y}{d}' insert s)
         )) or
@@ -352,7 +352,7 @@ backwardmode (
     [substring] among (
       '{y}{s}{k}{o}{s}' '{y}{s}{k}{o}{u}' '{y}{s}{k}{o}' '{y}{s}{k}{e}' (
         delete
-        do unset test1
+        unset test1
         [substring] atlimit among (
          '{d}' '{y}{v}' '{m}{i}{n}' '{r}' '{f}{r}{a}{g}{k}' '{l}{u}{k}' '{o}{v}{e}{l}'
          (-> s <- '{y}{s}{k}' insert s)
@@ -392,7 +392,7 @@ backwardmode (
 
   define step2d as (
     [substring] among (
-      '{e}{oo}{s}' '{e}{oo}{n}' (delete do unset test1)
+      '{e}{oo}{s}' '{e}{oo}{n}' (delete unset test1)
     )
     [substring] atlimit among (
       '{th}' '{d}' '{e}{l}' '{g}{a}{l}' '{n}' '{p}' '{y}{d}' '{p}{a}{r}' (-> s <- '{e}' insert s)
@@ -401,14 +401,14 @@ backwardmode (
 
   define step3 as (
     [substring] among (
-      '{y}{a}' '{y}{o}{u}' '{y}{oo}{n}' (delete do unset test1)
+      '{y}{a}' '{y}{o}{u}' '{y}{oo}{n}' (delete unset test1)
     )
     ([v] -> s <- '{y}' insert s)
   )
 
   define step4 as (
     [substring] among (
-       '{y}{k}{a}' '{y}{k}{o}' '{y}{k}{o}{u}' '{y}{k}{oo}{n}' (delete do unset test1)
+       '{y}{k}{a}' '{y}{k}{o}' '{y}{k}{o}{u}' '{y}{k}{oo}{n}' (delete unset test1)
     )
     ([v] -> s <- '{y}{k}' insert s) or
     [substring] atlimit among (
@@ -424,12 +424,12 @@ backwardmode (
     do ('{a}{g}{a}{m}{e}' atlimit <- '{a}{g}{a}{m}')
     do (
       [substring] among (
-        '{a}{g}{a}{m}{e}' '{i}{s}{a}{m}{e}' '{o}{u}{s}{a}{m}{e}' '{i}{k}{a}{m}{e}' '{i}{th}{i}{k}{a}{m}{e}' (delete do unset test1)
+        '{a}{g}{a}{m}{e}' '{i}{s}{a}{m}{e}' '{o}{u}{s}{a}{m}{e}' '{i}{k}{a}{m}{e}' '{i}{th}{i}{k}{a}{m}{e}' (delete unset test1)
       )
     )
     ['{a}{m}{e}']
     delete
-    do unset test1
+    unset test1
     [substring] atlimit among (
       '{a}{n}{a}{p}' '{a}{p}{o}{th}' '{a}{p}{o}{k}' '{a}{p}{o}{s}{t}' '{v}{o}{u}{v}' '{x}{e}{th}' '{o}{u}{l}' '{p}{e}{th}' '{p}{y}{k}{r}' '{p}{o}{t}' '{s}{y}{ch}' '{ch}'
       (-> s <- '{a}{m}' insert s)
@@ -442,7 +442,7 @@ backwardmode (
         '{a}{g}{a}{n}{e}' '{i}{s}{a}{n}{e}' '{o}{u}{s}{a}{n}{e}' '{y}{o}{n}{t}{a}{n}{e}' '{y}{o}{t}{a}{n}{e}' '{y}{o}{u}{n}{t}{a}{n}{e}' '{o}{n}{t}{a}{n}{e}' '{o}{t}{a}{n}{e}'
         '{o}{u}{n}{t}{a}{n}{e}' '{i}{k}{a}{n}{e}' '{i}{th}{i}{k}{a}{n}{e}' (
           delete
-          do unset test1
+          unset test1
           [substring] atlimit among (
             '{t}{r}' '{t}{s}' (-> s <- '{a}{g}{a}{n}' insert s)
           )
@@ -451,7 +451,7 @@ backwardmode (
     )
     ['{a}{n}{e}']
     delete
-    do unset test1
+    unset test1
     ([v2] -> s <- '{a}{n}' insert s) or
     [substring] atlimit among (
       '{v}{e}{t}{e}{r}' '{v}{o}{u}{l}{k}' '{v}{r}{a}{ch}{m}' '{g}' '{d}{r}{a}{d}{o}{u}{m}'
@@ -477,12 +477,12 @@ backwardmode (
   define step5c as (
     do (
       [substring] among (
-        '{i}{s}{e}{t}{e}' (delete do unset test1)
+        '{i}{s}{e}{t}{e}' (delete unset test1)
       )
     )
     ['{e}{t}{e}']
     delete
-    do unset test1
+    unset test1
     ([v2] -> s <- '{e}{t}' insert s) or
     ([substring] among (
       '{o}{d}' '{a}{y}{r}' '{f}{o}{r}' '{t}{a}{th}' '{d}{y}{a}{th}' '{s}{ch}' '{e}{n}{d}' '{e}{u}{r}' '{t}{y}{th}' '{u}{p}{e}{r}{th}'
@@ -502,7 +502,7 @@ backwardmode (
     [substring] among (
       '{o}{n}{t}{a}{s}' '{oo}{n}{t}{a}{s}' (
         delete
-        do unset test1
+        unset test1
         (['{a}{r}{ch}'] atlimit -> s <- '{o}{n}{t}' insert s) or
         (['{k}{r}{e}'] -> s <- '{oo}{n}{t}' insert s)
       )
@@ -513,7 +513,7 @@ backwardmode (
     [substring] among (
       '{o}{m}{a}{s}{t}{e}' '{y}{o}{m}{a}{s}{t}{e}' (
         delete
-        do unset test1
+        unset test1
         (['{o}{n}'] atlimit -> s <- '{o}{m}{a}{s}{t}' insert s)
       )
     )
@@ -523,14 +523,14 @@ backwardmode (
     do (
       ['{y}{e}{s}{t}{e}']
       delete
-      do unset test1
+      unset test1
       [substring] atlimit among (
         '{p}' '{a}{p}' '{s}{u}{m}{p}' '{a}{s}{u}{m}{p}' '{a}{k}{a}{t}{a}{p}' '{a}{m}{e}{t}{a}{m}{f}' (-> s <- '{y}{e}{s}{t}' insert s)
       )
     )
     ['{e}{s}{t}{e}']
     delete
-    do unset test1
+    unset test1
     [substring] atlimit among (
       '{a}{l}' '{a}{r}' '{e}{k}{t}{e}{l}' '{z}' '{m}' '{x}' '{p}{a}{r}{a}{k}{a}{l}' '{p}{r}{o}' '{n}{y}{s}'
       (-> s <- '{y}{e}{s}{t}' insert s)
@@ -540,13 +540,13 @@ backwardmode (
   define step5g as (
     do (
       [substring] among (
-        '{i}{th}{i}{k}{a}' '{i}{th}{i}{k}{e}{s}' '{i}{th}{i}{k}{e}' (delete do unset test1)
+        '{i}{th}{i}{k}{a}' '{i}{th}{i}{k}{e}{s}' '{i}{th}{i}{k}{e}' (delete unset test1)
       )
     )
     [substring] among (
       '{i}{k}{a}' '{i}{k}{e}{s}' '{i}{k}{e}' (
         delete
-        do unset test1
+        unset test1
         ([substring] among (
            '{s}{k}{oo}{l}' '{s}{k}{o}{u}{l}' '{n}{a}{r}{th}' '{s}{f}' '{o}{th}' '{p}{y}{th}' (-> s <- '{i}{k}' insert s)
         )) or
@@ -561,7 +561,7 @@ backwardmode (
     [substring] among (
       '{o}{u}{s}{a}' '{o}{u}{s}{e}{s}' '{o}{u}{s}{e}' (
         delete
-        do unset test1
+        unset test1
         ([substring] among (
           '{p}{o}{d}{a}{r}' '{v}{l}{e}{p}' '{p}{a}{n}{t}{a}{ch}' '{f}{r}{u}{d}' '{m}{a}{n}{t}{y}{l}' '{m}{a}{l}{l}' '{k}{u}{m}{a}{t}' '{l}{a}{ch}' '{l}{i}{g}'
           '{f}{a}{g}' '{o}{m}' '{p}{r}{oo}{t}' (-> s <- '{o}{u}{s}' insert s)
@@ -581,7 +581,7 @@ backwardmode (
     [substring] among (
       '{a}{g}{a}' '{a}{g}{e}{s}' '{a}{g}{e}' (
         delete
-        do unset test1
+        unset test1
         (['{k}{o}{l}{l}'] -> s <- '{a}{g}' insert s) or (
           not ([substring] among ('{ps}{o}{f}' '{n}{a}{u}{l}{o}{ch}'))
           ([substring] among (
@@ -603,7 +603,7 @@ backwardmode (
 
   define step5j as (
     [substring] among (
-      '{i}{s}{e}' '{i}{s}{o}{u}' '{i}{s}{a}' (delete do unset test1)
+      '{i}{s}{e}' '{i}{s}{o}{u}' '{i}{s}{a}' (delete unset test1)
     )
     [substring] atlimit among (
       '{n}' '{ch}{e}{r}{s}{o}{n}' '{d}{oo}{d}{e}{k}{a}{n}' '{e}{r}{i}{m}{o}{n}' '{m}{e}{g}{a}{l}{o}{n}' '{e}{p}{t}{a}{n}' (-> s <- '{i}{s}' insert s)
@@ -612,7 +612,7 @@ backwardmode (
 
   define step5k as (
     [substring] among (
-      '{i}{s}{t}{e}' (delete do unset test1)
+      '{i}{s}{t}{e}' (delete unset test1)
     )
     [substring] atlimit among (
       '{a}{s}{v}' '{s}{v}' '{a}{ch}{r}' '{ch}{r}' '{a}{p}{l}' '{a}{e}{y}{m}{n}' '{d}{u}{s}{ch}{r}' '{e}{u}{ch}{r}' '{k}{o}{y}{n}{o}{ch}{r}' '{p}{a}{l}{y}{m}{ps}'
@@ -622,7 +622,7 @@ backwardmode (
 
   define step5l as (
     [substring] among (
-      '{o}{u}{n}{e}' '{i}{s}{o}{u}{n}{e}' '{i}{th}{o}{u}{n}{e}' (delete do unset test1)
+      '{o}{u}{n}{e}' '{i}{s}{o}{u}{n}{e}' '{i}{th}{o}{u}{n}{e}' (delete unset test1)
     )
     [substring] atlimit among (
       '{n}' '{r}' '{s}{p}{y}' '{s}{t}{r}{a}{v}{o}{m}{o}{u}{t}{s}' '{k}{a}{k}{o}{m}{o}{u}{t}{s}' '{e}{x}{oo}{n}' (-> s <- '{o}{u}{n}' insert s)
@@ -631,7 +631,7 @@ backwardmode (
 
   define step5m as (
     [substring] among (
-      '{o}{u}{m}{e}' '{i}{s}{o}{u}{m}{e}' '{i}{th}{o}{u}{m}{e}' (delete do unset test1)
+      '{o}{u}{m}{e}' '{i}{s}{o}{u}{m}{e}' '{i}{th}{o}{u}{m}{e}' (delete unset test1)
     )
     [substring] atlimit among (
       '{p}{a}{r}{a}{s}{o}{u}{s}' '{f}' '{ch}' '{oo}{r}{y}{o}{p}{l}' '{a}{z}' '{a}{l}{l}{o}{s}{o}{u}{s}' '{a}{s}{o}{u}{s}'
