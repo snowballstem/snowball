@@ -49,8 +49,8 @@ static void print_node_(struct node * p, int n, const char * s) {
     printf("\n");
     if (p->AE) print_node_(p->AE, n+1, "# ");
     if (p->left) print_node_(p->left, n+1, "  ");
-    if (p->right) print_node_(p->right, n, "  ");
     if (p->aux) print_node_(p->aux, n+1, "@ ");
+    if (p->right) print_node_(p->right, n, "  ");
 }
 
 extern void print_program(struct analyser * a) {
