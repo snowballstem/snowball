@@ -32,7 +32,7 @@ if **PyStemmer** is installed, ``snowballstemmer.stemmer`` returns ``PyStemmer``
 
 **PyStemmer** has faster speed because it uses C-lang module, and **snowballstemmer** has higher usability because it is pure Python module.
 
-* `PyStemmer <http://pypi.python.org/pypi/PyStemmer/>`_
+* `PyStemmer <https://pypi.org/project/PyStemmer/>`_
 
 Benchmark
 ~~~~~~~~~

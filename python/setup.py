@@ -44,7 +44,9 @@ classifiers = [
 for lang in langs:
     lang_titlecase = lang.title()
     long_desc += '* ' + lang_titlecase
-    classifiers.append('Natural Language :: ' + lang_titlecase)
+    # Only classifiers listed in https://pypi.org/classifiers/ are allowed
+    if lang_titlecase not in ('Irish', 'Lithuanian', 'Nepali'):
+        classifiers.append('Natural Language :: ' + lang_titlecase)
     if lang in variants:
         long_desc += ' (Standard'
         for variant in variants[lang]:
@@ -53,7 +55,7 @@ for lang in langs:
     long_desc += '\n'
 
 long_desc += '''
-This is a pure Python stemming library. If `PyStemmer <http://pypi.python.org/pypi/PyStemmer>`_ is available, this module uses
+This is a pure Python stemming library. If `PyStemmer <https://pypi.org/project/PyStemmer/>`_ is available, this module uses
 it to accelerate.
 '''
 
@@ -69,11 +71,11 @@ classifiers.extend([
 ])
 
 setup(name='snowballstemmer',
-      version='1.2.0',
+      version='1.9.0',
       description=desc,
       long_description=long_desc,
       author='Snowball Developers',
-      author_email='snowball-discuss at lists.tartarus.org',
+      author_email='snowball-discuss@lists.tartarus.org',
       url='https://github.com/snowballstem/snowball',
       keywords="stemmer",
       license="BSD",

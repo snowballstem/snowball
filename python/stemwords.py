@@ -81,7 +81,7 @@ def stemming(lang, input, output, encoding, pretty):
     for original in codecs.open(input, "r", encoding).readlines():
         original = original.strip()
         # Convert only ASCII-letters to lowercase, to match C behavior
-        original = ''.join((lower_(c) if 'A' <= c <= 'Z' else c for c in original))
+        original = ''.join((c.lower() if 'A' <= c <= 'Z' else c for c in original))
         stemmed = stemmer.stemWord(original)
         if pretty == 0:
             if stemmed != "":
