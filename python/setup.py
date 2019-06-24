@@ -53,7 +53,7 @@ for lang in langs:
     long_desc += '\n'
 
 long_desc += '''
-This is a pure Python stemming library. If `PyStemmer <http://pypi.python.org/pypi/PyStemmer>`_ is available, this module uses
+This is a pure Python stemming library. If `PyStemmer <https://pypi.org/project/PyStemmer/>`_ is available, this module uses
 it to accelerate.
 '''
 
