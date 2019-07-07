@@ -20,6 +20,10 @@ matrix:
     # hits the travis time limit.  With pypy, it's enough faster than we
     # can run the full tests.
     - language: python
+      python: "3.7"
+      env: CC=gcc PYTHON=python THIN_FACTOR=10
+      dist: xenial
+    - language: python
       python: "3.6"
       env: CC=gcc PYTHON=python THIN_FACTOR=10
     - language: python
