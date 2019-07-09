@@ -7,25 +7,26 @@ n_stemmers = 0
 
 langs = []
 variants = {}
-for line in open('modules.txt').readlines():
-    if len(line) <= 1 or line[0] == '#':
-        continue
-    if line[-1:] == '\n':
-        line = line[:-1]
-    tokens = re.split(r'\s+', line)
-    if len(tokens) < 3:
-        print("Bad modules.txt line: " + line)
-        continue
-    (name, encs, codes) = tokens[:3]
-    if len(tokens) > 3:
-        variant_of = tokens[3]
-        if variant_of in variants:
-            variants[variant_of].append(name)
+with open('modules.txt') as fp:
+    for line in fp.readlines():
+        if len(line) <= 1 or line[0] == '#':
+            continue
+        if line[-1:] == '\n':
+            line = line[:-1]
+        tokens = re.split(r'\s+', line)
+        if len(tokens) < 3:
+            print("Bad modules.txt line: " + line)
+            continue
+        (name, encs, codes) = tokens[:3]
+        if len(tokens) > 3:
+            variant_of = tokens[3]
+            if variant_of in variants:
+                variants[variant_of].append(name)
+            else:
+                variants[variant_of] = [name]
         else:
-            variants[variant_of] = [name]
-    else:
-        langs.append(name)
-    n_stemmers += 1
+            langs.append(name)
+        n_stemmers += 1
 
 desc = 'This package provides ' + str(n_stemmers) + ' stemmers for ' + \
     str(len(langs)) + ' languages generated from Snowball algorithms.'
