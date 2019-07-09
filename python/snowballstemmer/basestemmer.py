@@ -162,7 +162,7 @@ class BaseStemmer(object):
         j = len(v)
 
         c = self.cursor
-        lb = self.limit_backward;
+        lb = self.limit_backward
 
         common_i = 0
         common_j = 0
