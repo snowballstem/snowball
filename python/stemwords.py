@@ -1,5 +1,4 @@
 import sys
-import re
 import codecs
 import snowballstemmer
 
