@@ -50,6 +50,5 @@ def stemmer(lang):
         raise KeyError("Stemming algorithm '%%s' not found" %% lang)
 ''' % {'imports': '\n'.join(imports), 'languages': '\n'.join(languages)}
 
-out = open(os.path.join(python_out_folder, '__init__.py'), 'w')
-out.write(src)
-out.close()
+with open(os.path.join(python_out_folder, '__init__.py'), 'w') as out:
+    out.write(src)
