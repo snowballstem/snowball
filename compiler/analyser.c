@@ -1305,7 +1305,9 @@ extern void close_analyser(struct analyser * a) {
         struct among * q = a->amongs;
         while (q) {
             struct among * q_next = q->next;
-            FREE(q->b); FREE(q);
+            FREE(q->b);
+            FREE(q->commands);
+            FREE(q);
             q = q_next;
         }
     }
