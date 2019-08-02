@@ -3,3 +3,4 @@ include modules.txt
 include setup.*
 recursive-include src *.py
 include MANIFEST.in
+include COPYING
