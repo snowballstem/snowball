@@ -99,7 +99,8 @@ PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 PYTHON_SAMPLE_SOURCES = python/testapp.py \
 		        python/stemwords.py
 
-PYTHON_PACKAGE_FILES = python/MANIFEST.in \
+PYTHON_PACKAGE_FILES = COPYING \
+		       python/MANIFEST.in \
 		       python/setup.py
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
