@@ -303,5 +303,5 @@ class BaseStemmer(object):
     def stemWords(self, words):
         result = [self._stem_word(word) for word in words]
         if len(self._cache) > self.maxCacheSize:
-            self.clear_cache()
+            self._clear_cache()
         return result
