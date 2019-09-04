@@ -480,14 +480,22 @@ static void generate_do(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
     write_comment(g, p);
     if (keep_c) write_savecursor(g, p, savevar);
-    g->failure_label = new_label(g);
-    int label = g->failure_label;
-    str_clear(g->failure_str);
 
-    wsetlab_begin(g, label);
-    generate(g, p->left);
-    wsetlab_end(g, label);
-    g->unreachable = false;
+    if (p->left->type == c_call) {
+        /* Optimise do <call> */
+        write_comment(g, p->left);
+        g->V[0] = p->left->name;
+        w(g, "~M~V0()~N");
+    } else {
+        g->failure_label = new_label(g);
+        int label = g->failure_label;
+        str_clear(g->failure_str);
+
+        wsetlab_begin(g, label);
+        generate(g, p->left);
+        wsetlab_end(g, label);
+        g->unreachable = false;
+    }
 
     if (keep_c) write_restorecursor(g, p, savevar);
     str_delete(savevar);

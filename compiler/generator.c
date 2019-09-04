@@ -681,13 +681,20 @@ static void generate_do(struct generator * g, struct node * p) {
         writef(g, "~M~C", p);
     }
 
-    g->failure_label = new_label(g);
-    g->label_used = 0;
-    g->failure_keep_count = 0;
-    generate(g, p->left);
+    if (p->left->type == c_call) {
+        /* Optimise do <call> */
+        g->V[0] = p->left->name;
+        writef(g, "~{int ret = ~V0(z);~C", p->left);
+        w(g, "~Mif (ret < 0) return ret;~N~}");
+    } else {
+        g->failure_label = new_label(g);
+        g->label_used = 0;
+        g->failure_keep_count = 0;
+        generate(g, p->left);
 
-    if (g->label_used)
-        wsetl(g, g->failure_label);
+        if (g->label_used)
+            wsetl(g, g->failure_label);
+    }
     if (keep_c) {
         w(g, "~M"); wrestore(g, p, keep_c);
         w(g, "~N~}");
