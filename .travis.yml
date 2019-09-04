@@ -3,46 +3,9 @@ sudo: false
 dist: trusty
 matrix:
   include:
-    - compiler: gcc
-      env: c_tests=y cc_append=' -std=c90'
-    - compiler: clang
-      env: c_tests=y cc_append=' -std=c90'
-    - env: JAVA=java JAVAC=javac
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
       dist: bionic
-    - language: node_js
-      node_js: "node"
-      env: CC=gcc NODE=node
-    - env: RUST=rust
-    - env: MCS=mcs
-    - env: FPC=fpc
-    # The pure Python versions run slowly so we need to thin the testdata
-    # for languages such as Arabic where there's a lot, or else the build
-    # hits the travis time limit.  With pypy, it's enough faster than we
-    # can run the full tests.
-    - language: python
-      python: "3.7"
-      env: CC=gcc PYTHON=python THIN_FACTOR=10
-      dist: xenial
-    - language: python
-      python: "3.6"
-      env: CC=gcc PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "3.4"
-      env: CC=gcc PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "2.7"
-      env: CC=gcc PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "2.6"
-      env: CC=gcc PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "pypy"
-      env: CC=gcc PYTHON=python
-    - language: python
-      python: "pypy3.5"
-      env: CC=gcc PYTHON=python
 before_install:
   # Try to check out a branch of the same name from the snowball-data repo
   # sibling of this snowball repo, so that PRs requiring changes to both can be
