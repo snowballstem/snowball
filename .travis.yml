@@ -3,9 +3,12 @@ sudo: false
 dist: trusty
 matrix:
   include:
-    - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
-    - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
+    - language: go
+      go: "1.8"
+      env: GO=go
+    - language: go
       dist: bionic
+      go: "1.11"
 before_install:
   # Try to check out a branch of the same name from the snowball-data repo
   # sibling of this snowball repo, so that PRs requiring changes to both can be
@@ -25,11 +28,6 @@ before_install:
   - test -z "$RUST" || ./rustup.sh -y
   - test -z "$RUST" || source "$HOME/.cargo/env"
   - test -z "$RUST" || rm rustup.sh
-  # install go into $HOME/goroot
-  - test -z "$GO" || curl -sLO https://storage.googleapis.com/golang/go1.8.1.linux-amd64.tar.gz
-  - test -z "$GO" || tar -C $HOME -xzf go1.8.1.linux-amd64.tar.gz
-  - test -z "$GO" || rm go1.8.1.linux-amd64.tar.gz
-  - test -z "$GO" || mv $HOME/go $HOME/goroot
   # now create gopath that points to this repo
   - test -z "$GO" || mkdir -p $HOME/gopath/src/github.com/
   - test -z "$GO" || ln -s $HOME/build/snowballstem $HOME/gopath/src/github.com/snowballstem
