@@ -10,7 +10,8 @@ snowball repo
 
 Add `.sbl` source to algorithms subdirectory.
 
-Add entry to `libstemmer/modules.txt` - columns are:
+Add entry to `libstemmer/modules.txt`, maintaining the current sorted order by
+the first column.  The columns are:
 
 * Algorithm name (needs to match the `.sbl` source without extension)
 * Encodings to support
