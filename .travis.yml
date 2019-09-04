@@ -9,6 +9,8 @@ matrix:
       env: c_tests=y cc_append=' -std=c90'
     - env: JAVA=java JAVAC=javac
     - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
+    - env: GO=go GOROOT=$HOME/goroot PATH=$PATH:$GOROOT/bin
+      dist: bionic
     - language: node_js
       node_js: "node"
       env: CC=gcc NODE=node
