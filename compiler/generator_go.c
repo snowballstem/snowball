@@ -485,7 +485,7 @@ static void generate_do(struct generator * g, struct node * p) {
         /* Optimise do <call> */
         write_comment(g, p->left);
         g->V[0] = p->left->name;
-        w(g, "~M~V0()~N");
+        w(g, "~M~W0(env, context)~N");
     } else {
         g->failure_label = new_label(g);
         int label = g->failure_label;
