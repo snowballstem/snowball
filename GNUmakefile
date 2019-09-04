@@ -100,6 +100,7 @@ PYTHON_SAMPLE_SOURCES = python/testapp.py \
 		        python/stemwords.py
 
 PYTHON_PACKAGE_FILES = COPYING \
+		       python/CHANGES.rst \
 		       python/MANIFEST.in \
 		       python/setup.py
 

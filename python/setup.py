@@ -46,7 +46,7 @@ for lang in langs:
     lang_titlecase = lang.title()
     long_desc += '* ' + lang_titlecase
     # Only classifiers listed in https://pypi.org/classifiers/ are allowed
-    if lang_titlecase not in ('Irish', 'Lithuanian', 'Nepali'):
+    if lang_titlecase not in ('Basque', 'Irish', 'Lithuanian', 'Nepali'):
         classifiers.append('Natural Language :: ' + lang_titlecase)
     if lang in variants:
         long_desc += ' (Standard'
@@ -80,7 +80,7 @@ classifiers.extend([
 ])
 
 setup(name='snowballstemmer',
-      version='1.9.0',
+      version='1.9.1',
       description=desc,
       long_description=long_desc,
       author='Snowball Developers',
