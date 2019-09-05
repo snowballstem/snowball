@@ -219,6 +219,23 @@ static int read_literal_string(struct tokeniser * t, int c) {
             }
         } else {
             if (ch == '\'') return c;
+            if (ch < 0 || ch >= 0x80) {
+                if (t->encoding != ENC_WIDECHARS) {
+                    /* We don't really want people using non-ASCII literal
+                     * strings, but historically it's worked for single-byte
+                     * and UTF-8 if the source encoding matches what the
+                     * generated stemmer works in and it seems unfair to just
+                     * suddenly make this a hard error.`
+                     */
+                    fprintf(stderr,
+                            "%s:%d: warning: Non-ASCII literal strings aren't "
+                            "portable - use stringdef instead\n",
+                            t->file, t->line_number);
+                } else {
+                    error1(t, "Non-ASCII literal strings aren't "
+                              "portable - use stringdef instead");
+                }
+            }
             t->b = add_to_b(t->b, 1, p + c - 1);
         }
     }
