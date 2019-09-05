@@ -1,5 +1,5 @@
 Adding a new stemming algorithm
-=============================
+===============================
 
 This needs PRs against three repositories.  Name the branch the same for
 at least `snowball` and `snowball-data`, push to the latter repo first, and the
@@ -10,9 +10,9 @@ Some points to note about algorithm implementations:
 * Avoid literal non-ASCII characters in snowball string literals - they will
   work OK for languages that use UTF-8, but not wide-character Unicode or other
   encodings.  Instead use ``stringdef`` like the existing stemmers do, and
-  please use the newer `U+` notation rather than the older `hex` or `decimal`
-  as this allows us to support different encodings without having to modify the
-  source files - for example::
+  please use the newer `U+` notation rather than the older ``hex`` or
+  ``decimal`` as this allows us to support different encodings without having
+  to modify the source files - for example::
 
     stringdef o" {U+00F6}
     define foo 'o{o"}'
@@ -26,6 +26,12 @@ Some points to note about algorithm implementations:
 
     define foo 'oö'
 
+  It's helpful to consistently use the same ``stringdef`` codes across the
+  different stemmers - the website has `guidance on what to use
+  <https://snowballstem.org/codesets/guide.html>`_ and a `list of stringdef
+  lines for common characters to cut and paste from
+  <https://snowballstem.org/codesets/latin-stringdef-list.txt>`_.
+
 snowball repo
 -------------
 
@@ -35,8 +41,17 @@ Add entry to `libstemmer/modules.txt`, maintaining the current sorted order by
 the first column.  The columns are:
 
 * Algorithm name (needs to match the `.sbl` source without extension)
-* Encodings to support
-* Names and ISO codes for the language
+* Encodings to support.  Wide-character Unicode is always supported
+  and doesn't need to be listed here.  You should always include `UTF_8`, and
+  also `ISO_8859_1` if the stemmer only uses characters from that and the
+  language can be usefully written using it.  We currently also have support
+  for `ISO_8859_2` and `KOI8_R`, but other single-byte character sets can be
+  supported quite easily if they are useful.
+* Names and ISO-639 codes for the language.  Wikipedia has a handy list of `all
+  the ISO-639 codes <https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes>`_ -
+  find the row for your new language and include the codes from the "639-1",
+  "639-2/T" and (if different) "639-2/B" columns.  For example, for the `Afar`
+  language you'd put `afar,aa,aar` here.
 
 snowball-data repo
 ------------------
