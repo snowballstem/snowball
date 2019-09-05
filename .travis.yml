@@ -8,7 +8,7 @@ matrix:
       env: GO=go
     - language: go
       dist: bionic
-      go: "1.11"
+      go: "1.12"
       env: GO=go
 before_install:
   # Try to check out a branch of the same name from the snowball-data repo
@@ -29,9 +29,6 @@ before_install:
   - test -z "$RUST" || ./rustup.sh -y
   - test -z "$RUST" || source "$HOME/.cargo/env"
   - test -z "$RUST" || rm rustup.sh
-  # now create gopath that points to this repo
-  - test -z "$GO" || mkdir -p $HOME/gopath/src/github.com/
-  - test -z "$GO" || ln -s $HOME/build/snowballstem $HOME/gopath/src/github.com/snowballstem
   - test -z "$FPC" || sudo apt-get update -qq
   - test -z "$FPC" || sudo apt-get install -qq fpc
 script:
