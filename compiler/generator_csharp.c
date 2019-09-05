@@ -1140,7 +1140,7 @@ static void generate(struct generator * g, struct node * p) {
 static void generate_start_comment(struct generator * g) {
 
     w(g, "// This file was generated automatically by the Snowball to C# compiler~N");
-    w(g, "// http://snowballstem.org/~N~N");
+    w(g, "// https://snowballstem.org/~N~N");
 }
 
 static void generate_class_begin(struct generator * g) {
