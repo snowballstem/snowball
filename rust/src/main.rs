@@ -56,9 +56,9 @@ fn main() {
 
 
         let mut output = if let Some(output_file) = output_arg {
-            Box::new(File::create(Path::new(&output_file)).unwrap()) as Box<Write>
+            Box::new(File::create(Path::new(&output_file)).unwrap()) as Box<dyn Write>
         } else {
-            Box::new(std::io::stdout()) as Box<Write>
+            Box::new(std::io::stdout()) as Box<dyn Write>
         };
 
         if let Some(input_file) = input_arg {
