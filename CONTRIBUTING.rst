@@ -2,8 +2,29 @@ Adding a new stemming algorithm
 =============================
 
 This needs PRs against three repositories.  Name the branch the same for
-at least `snowball` and `snowball-data` and the CI should use your new
-vocabularies lists when running the testsuite.
+at least `snowball` and `snowball-data`, push to the latter repo first, and the
+CI should use your new vocabulary list when running the testsuite.
+
+Some points to note about algorithm implementations:
+
+* Avoid literal non-ASCII characters in snowball string literals - they will
+  work OK for languages that use UTF-8, but not wide-character Unicode or other
+  encodings.  Instead use ``stringdef`` like the existing stemmers do, and
+  please use the newer `U+` notation rather than the older `hex` or `decimal`
+  as this allows us to support different encodings without having to modify the
+  source files - for example::
+
+    stringdef o" {U+00F6}
+    define foo 'o{o"}'
+
+  not::
+
+    stringdef o" hex F6
+    define foo 'o{o"}'
+
+  and definitely not::
+
+    define foo 'oö'
 
 snowball repo
 -------------
