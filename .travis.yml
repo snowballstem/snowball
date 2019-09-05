@@ -9,6 +9,7 @@ matrix:
     - language: go
       dist: bionic
       go: "1.11"
+      env: GO=go
 before_install:
   # Try to check out a branch of the same name from the snowball-data repo
   # sibling of this snowball repo, so that PRs requiring changes to both can be
@@ -34,8 +35,8 @@ before_install:
   - test -z "$FPC" || sudo apt-get update -qq
   - test -z "$FPC" || sudo apt-get install -qq fpc
 script:
-  - make CC="$CC$cc_append"
-  - test -z "$c_tests" || make check CC="$CC$cc_append" STEMMING_DATA=snowball-data
+  - make CC="${CC:-gcc}$cc_append"
+  - test -z "$c_tests" || make check CC="${CC:-gcc}$cc_append" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
