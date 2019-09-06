@@ -1,0 +1,30 @@
+Applying this patch restores compatibility with Rust < 1.27 (but causes newer
+versions to report "warning: trait objects without an explicit `dyn` are
+deprecated").
+
+diff --git a/rust/src/main.rs b/rust/src/main.rs
+index 064325a9..bf752795 100644
+--- a/rust/src/main.rs
++++ b/rust/src/main.rs
+@@ -56,9 +56,9 @@ fn main() {
+ 
+ 
+         let mut output = if let Some(output_file) = output_arg {
+-            Box::new(File::create(Path::new(&output_file)).unwrap()) as Box<dyn Write>
++            Box::new(File::create(Path::new(&output_file)).unwrap()) as Box<Write>
+         } else {
+-            Box::new(std::io::stdout()) as Box<dyn Write>
++            Box::new(std::io::stdout()) as Box<Write>
+         };
+ 
+         if let Some(input_file) = input_arg {
+diff --git a/rust/src/snowball/among.rs b/rust/src/snowball/among.rs
+index 57fc8bae..70631933 100644
+--- a/rust/src/snowball/among.rs
++++ b/rust/src/snowball/among.rs
+@@ -3,4 +3,4 @@ use snowball::SnowballEnv;
+ pub struct Among<T: 'static>(pub &'static str,
+                              pub i32,
+                              pub i32,
+-                             pub Option<&'static (dyn Fn(&mut SnowballEnv, &mut T) -> bool + Sync)>);
++                             pub Option<&'static (Fn(&mut SnowballEnv, &mut T) -> bool + Sync)>);
