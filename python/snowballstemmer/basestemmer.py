@@ -42,6 +42,17 @@ class BaseStemmer(object):
         self.cursor += 1
         return True
 
+    def go_in_grouping(self, s, min, max):
+        while self.cursor < self.limit:
+            ch = ord(self.current[self.cursor])
+            if ch > max or ch < min:
+                return True
+            ch -= min
+            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+                return True
+            self.cursor += 1
+        return False
+
     def in_grouping_b(self, s, min, max):
         if self.cursor <= self.limit_backward:
             return False
@@ -53,6 +64,17 @@ class BaseStemmer(object):
             return False
         self.cursor -= 1
         return True
+
+    def go_in_grouping_b(self, s, min, max):
+        while self.cursor > self.limit_backward:
+            ch = ord(self.current[self.cursor - 1])
+            if ch > max or ch < min:
+                return True
+            ch -= min
+            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+                return True
+            self.cursor -= 1
+        return False
 
     def out_grouping(self, s, min, max):
         if self.cursor >= self.limit:
@@ -67,6 +89,16 @@ class BaseStemmer(object):
             return True
         return False
 
+    def go_out_grouping(self, s, min, max):
+        while self.cursor < self.limit:
+            ch = ord(self.current[self.cursor])
+            if ch <= max and ch >= min:
+                ch -= min
+                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
+                    return True
+            self.cursor += 1
+        return False
+
     def out_grouping_b(self, s, min, max):
         if self.cursor <= self.limit_backward:
             return False
@@ -78,6 +110,16 @@ class BaseStemmer(object):
         if (s[ch >> 3] & (0X1 << (ch & 0x7))) == 0:
             self.cursor -= 1
             return True
+        return False
+
+    def go_out_grouping_b(self, s, min, max):
+        while self.cursor > self.limit_backward:
+            ch = ord(self.current[self.cursor - 1])
+            if ch <= max and ch >= min:
+                ch -= min
+                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
+                    return True
+            self.cursor -= 1
         return False
 
     def eq_s(self, s):

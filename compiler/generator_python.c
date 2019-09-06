@@ -494,7 +494,39 @@ static void generate_do(struct generator * g, struct node * p) {
     str_delete(savevar);
 }
 
+static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
+
+    struct grouping * q = p->name->grouping;
+    w(g, (is_goto ? "~M# goto " : "~M# gopast "));
+    write_comment_content(g, p);
+    write_newline(g);
+    g->S[0] = p->mode == m_forward ? "" : "_b";
+    g->S[1] = complement ? "in" : "out";
+    g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
+    g->V[0] = p->name;
+    g->I[0] = q->smallest_ch;
+    g->I[1] = q->largest_ch;
+    write_failure_if(g, "not self.go_~S1_grouping~S0~S2(~n.~W0, ~I0, ~I1)", p);
+    if (!is_goto) {
+        if (p->mode == m_forward)
+            w(g, "~Mself.cursor += 1~N");
+        else
+            w(g, "~Mself.cursor -= 1~N");
+    }
+}
+
 static void generate_GO(struct generator * g, struct node * p, int style) {
+
+    if (p->left->type == c_grouping || p->left->type == c_non) {
+	/* Special case for "goto" or "gopast" when used on a grouping or an
+	 * inverted grouping - the movement of c by the matching action is
+	 * exactly what we want! */
+#ifdef OPTIMISATION_WARNINGS
+	printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
+#endif
+	generate_GO_grouping(g, p->left, style, p->left->type == c_non);
+	return;
+    }
 
     int end_unreachable = false;
     struct str * savevar = vars_newname(g);
