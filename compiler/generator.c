@@ -799,9 +799,9 @@ static void generate_loop(struct generator * g, struct node * p) {
          "~}");
 }
 
-static void generate_repeat(struct generator * g, struct node * p, int atleast_case) {
+static void generate_repeat_or_atleast(struct generator * g, struct node * p, int atleast_case) {
     int keep_c = 0;
-    writef(g, "~Mwhile(1) {~C~+", p);
+    writef(g, "~Mwhile(1) {~+", p);
 
     if (repeat_restore(g, p->left)) {
         writef(g, "~M~k~N", p);
@@ -827,6 +827,12 @@ static void generate_repeat(struct generator * g, struct node * p, int atleast_c
       "~}");
 }
 
+static void generate_repeat(struct generator * g, struct node * p) {
+    write_comment(g, p);
+    write_newline(g);
+    generate_repeat_or_atleast(g, p, false);
+}
+
 static void generate_atleast(struct generator * g, struct node * p) {
     w(g, "~{int i = "); generate_AE(g, p->AE); w(g, ";~N");
     {
@@ -834,7 +840,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
         int a0 = g->failure_label;
         int a1 = g->failure_keep_count;
 
-        generate_repeat(g, p, true);
+        generate_repeat_or_atleast(g, p, true);
 
         g->label_used = used;
         g->failure_label = a0;
@@ -1332,7 +1338,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_do:            generate_do(g, p); break;
         case c_goto:          generate_GO(g, p, 1); break;
         case c_gopast:        generate_GO(g, p, 0); break;
-        case c_repeat:        generate_repeat(g, p, false); break;
+        case c_repeat:        generate_repeat(g, p); break;
         case c_loop:          generate_loop(g, p); break;
         case c_atleast:       generate_atleast(g, p); break;
         case c_setmark:       generate_setmark(g, p); break;

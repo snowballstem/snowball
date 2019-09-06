@@ -568,13 +568,10 @@ static void generate_loop(struct generator * g, struct node * p) {
     g->unreachable = false;
 }
 
-static void generate_repeat(struct generator * g, struct node * p, struct str * loopvar) {
+static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
     struct str * savevar = vars_newname(g);
     int keep_c = repeat_restore(g, p->left);
     int replab = new_label(g);
-
-    write_comment(g, p);
-
     g->I[0] = replab;
     writef(g, "lab~I0:~N~MWhile True Do~N~{", p);
 
@@ -604,6 +601,11 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
     str_delete(savevar);
 }
 
+static void generate_repeat(struct generator * g, struct node * p) {
+    write_comment(g, p);
+    generate_repeat_or_atleast(g, p, NULL);
+}
+
 static void generate_atleast(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
 
@@ -619,7 +621,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
         int a0 = g->failure_label;
         struct str * a1 = str_copy(g->failure_str);
 
-        generate_repeat(g, p, loopvar);
+        generate_repeat_or_atleast(g, p, loopvar);
 
         g->failure_label = a0;
         str_delete(g->failure_str);
@@ -1110,7 +1112,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_do:            generate_do(g, p); break;
         case c_goto:          generate_GO(g, p, 1); break;
         case c_gopast:        generate_GO(g, p, 0); break;
-        case c_repeat:        generate_repeat(g, p, 0); break;
+        case c_repeat:        generate_repeat(g, p); break;
         case c_loop:          generate_loop(g, p); break;
         case c_atleast:       generate_atleast(g, p); break;
         case c_setmark:       generate_setmark(g, p); break;
