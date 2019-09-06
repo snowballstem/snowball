@@ -563,12 +563,8 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
     struct str * savevar = vars_newname(g);
     int keep_c = repeat_restore(g, p->left);
-    int rep_break_lab = new_label(g);
-    int rep_continue_lab = new_label(g);
     write_comment(g, p);
-    writef(g, "~Mtry:~N~+"
-                  "~Mwhile True:~N~+"
-                      "~Mtry:~N~+", p);
+    writef(g, "~Mwhile True:~N~+", p);
     if (keep_c) write_savecursor(g, p, savevar);
 
     g->failure_label = new_label(g);
@@ -583,8 +579,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
             w(g, "~M~B0 -= 1~N");
         }
 
-        g->I[0] = rep_continue_lab;
-        w(g, "~Mraise lab~I0()~N");
+        w(g, "~Mcontinue~N");
     }
 
     wsetlab_end(g, label);
@@ -592,12 +587,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
     if (keep_c) write_restorecursor(g, p, savevar);
 
-    g->I[0] = rep_continue_lab;
-    g->I[1] = rep_break_lab;
-    w(g, "~Mraise lab~I1()~N~}"
-         "~Mexcept lab~I0: pass~N"
-         "~}~}"
-         "~Mexcept lab~I1: pass~N");
+    w(g, "~Mbreak~N~}");
     str_delete(savevar);
 }
 

@@ -136,12 +136,12 @@ static void wsetlab_begin(struct generator * g, int n) {
 
     w(g, "~Mlab");
     write_int(g, n);
-    w(g, ": do {~+~N");
+    w(g, ": {~+~N");
 }
 
 static void wsetlab_end(struct generator * g) {
 
-    w(g, "~-~M} while (false);~N");
+    w(g, "~-~M}~N");
 }
 
 static void wgotol(struct generator * g, int n) {
@@ -559,10 +559,8 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
     struct str * savevar = vars_newname(g);
     int keep_c = repeat_restore(g, p->left);
-    int replab = new_label(g);
-    g->I[0] = replab;
     write_comment(g, p);
-    writef(g, "~Mreplab~I0: while(true)~N~{", p);
+    writef(g, "~Mwhile(true)~N~{", p);
 
     if (keep_c) write_savecursor(g, p, savevar);
 
@@ -577,8 +575,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
             w(g, "~M~B0--;~N");
         }
 
-        g->I[0] = replab;
-        w(g, "~Mcontinue replab~I0;~N");
+        w(g, "~Mcontinue;~N");
     }
 
     wsetlab_end(g);
@@ -586,8 +583,7 @@ static void generate_repeat(struct generator * g, struct node * p, struct str * 
 
     if (keep_c) write_restorecursor(g, p, savevar);
 
-    g->I[0] = replab;
-    w(g, "~Mbreak replab~I0;~N~}");
+    w(g, "~Mbreak;~N~}");
     str_delete(savevar);
 }
 
