@@ -1,9 +1,6 @@
 class BaseStemmer(object):
     def __init__(self):
         self.set_current("")
-        self.maxCacheSize = 10000
-        self._cache = {}
-        self._counter = 0
 
     def set_current(self, value):
         '''
@@ -317,33 +314,10 @@ class BaseStemmer(object):
         '''
         return self.current[0:self.limit]
 
-    def _stem_word(self, word):
-        cache = self._cache.get(word)
-        if cache is None:
-            self.set_current(word)
-            self._stem()
-            result = self.get_current()
-            self._cache[word] = [result, self._counter]
-        else:
-            cache[1] = self._counter
-            result = cache[0]
-        self._counter += 1
-        return result
-
-    def _clear_cache(self):
-        removecount = int(len(self._cache) - self.maxCacheSize * 8 / 10)
-        oldcaches = sorted(self._cache.items(), key=lambda cache: cache[1][1])[0:removecount]
-        for key, value in oldcaches:
-            del self._cache[key]
-
     def stemWord(self, word):
-        result = self._stem_word(word)
-        if len(self._cache) > self.maxCacheSize:
-            self._clear_cache()
-        return result
+        self.set_current(word)
+        self._stem()
+        return self.get_current()
 
     def stemWords(self, words):
-        result = [self._stem_word(word) for word in words]
-        if len(self._cache) > self.maxCacheSize:
-            self._clear_cache()
-        return result
+        return [self.stemWord(word) for word in words]
