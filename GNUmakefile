@@ -102,7 +102,8 @@ PYTHON_SAMPLE_SOURCES = python/testapp.py \
 PYTHON_PACKAGE_FILES = COPYING \
 		       python/CHANGES.rst \
 		       python/MANIFEST.in \
-		       python/setup.py
+		       python/setup.py \
+		       python/setup.cfg
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
@@ -432,7 +433,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
 	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_PACKAGE_FILES) $${dest} && \
-	(cd $${dest} && $(python) setup.py sdist && cp dist/*.tar.gz ..) && \
+	(cd $${dest} && $(python) setup.py sdist bdist_wheel && cp dist/*.tar.gz dist/*.whl ..) && \
 	rm -rf $${dest}
 
 dist_libstemmer_js: $(JS_SOURCES)
