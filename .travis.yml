@@ -63,7 +63,7 @@ before_install:
   # sibling of this snowball repo, so that PRs requiring changes to both can be
   # CI tested easily.
   #
-  # If that fails, just the standard snowball-data repo's default branch.
+  # If that fails, just use the standard snowball-data repo's default branch.
   - GH_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
   - GH_REPO_SLUG=${TRAVIS_PULL_REQUEST_SLUG:-$TRAVIS_REPO_SLUG}
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
