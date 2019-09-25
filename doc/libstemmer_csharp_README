@@ -10,12 +10,13 @@ https://snowballstem.org/dist/libstemmer_csharp.tgz
 Compiling the library
 =====================
 
-Simply run xbuild on the Snowball.sln solution file in the csharp/Snowball
-directory.  For example, this can be done under unix by changing directory into
-the csharp directory, and running:
+To build a library::
 
- xbuild /p:Configuration=Release Snowball.sln
+mcs -target:library -out:snowballstemmer.dll csharp/Snowball/*.cs csharp/Snowball/Algorithms/*cs
 
+And to build the example program using that library::
+
+mcs -target:exe -out:stemwords.exe -r:snowballstemmer.dll csharp/Stemwords/Program.cs
 
 Using the library
 =================
