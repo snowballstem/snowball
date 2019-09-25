@@ -1,5 +1,9 @@
 # -*- makefile -*-
 
+# After changing this, run `make update_version` to update various sources
+# which hard-code it.
+SNOWBALL_VERSION = 2.0.0
+
 c_src_dir = src_c
 
 JAVAC ?= javac
@@ -652,5 +656,11 @@ check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
+
+update_version:
+	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/' \
+		compiler/header.h \
+		csharp/Snowball/AssemblyInfo.cs \
+		python/setup.py
 
 .SUFFIXES: .class .java

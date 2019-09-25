@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#define SNOWBALL_VERSION "2.0.0"
+
 typedef unsigned char byte;
 typedef unsigned short symbol;
 

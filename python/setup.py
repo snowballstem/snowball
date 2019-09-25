@@ -3,6 +3,8 @@
 from setuptools import setup
 import re
 
+SNOWBALL_VERSION = '2.0.0'
+
 n_stemmers = 0
 
 langs = []
@@ -80,7 +82,7 @@ classifiers.extend([
 ])
 
 setup(name='snowballstemmer',
-      version='1.9.1',
+      version=SNOWBALL_VERSION
       description=desc,
       long_description=long_desc,
       author='Snowball Developers',

@@ -1164,7 +1164,7 @@ static void generate_class_begin(struct generator * g) {
     w(g, "~M///  It implements the stemming algorithm defined by a snowball script.~N");
     w(g, "~M///</summary>~N");
     w(g, "~M/// ~N");
-    w(g, "~M[System.CodeDom.Compiler.GeneratedCode(\"Snowball\", \"1.0.0\")]~N");
+    w(g, "~M[System.CodeDom.Compiler.GeneratedCode(\"Snowball\", \"" SNOWBALL_VERSION "\")]~N");
     w(g, "~Mpublic partial class ~n : ");
     w(g, g->options->parent_class_name);
     w(g, "~N~{");
