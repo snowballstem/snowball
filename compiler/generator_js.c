@@ -1151,12 +1151,6 @@ static void generate(struct generator * g, struct node * p) {
     g->failure_str = a1;
 }
 
-static void generate_start_comment(struct generator * g) {
-
-    w(g, "// This file was generated automatically by the Snowball to Javascript compiler~N");
-    w(g, "// https://snowballstem.org/~N~N");
-}
-
 static void generate_class_begin(struct generator * g) {
 
     w(g, "/**@constructor*/~N");
@@ -1278,7 +1272,8 @@ extern void generate_program_js(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
-    generate_start_comment(g);
+    write_start_comment(g, "// ", NULL);
+
     generate_class_begin(g);
 
     generate_amongs(g);

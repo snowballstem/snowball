@@ -1143,12 +1143,6 @@ static void generate(struct generator * g, struct node * p) {
     g->failure_str = a1;
 }
 
-static void generate_start_comment(struct generator * g) {
-
-    w(g, "//! This file was generated automatically by the Snowball to Rust compiler~N");
-    w(g, "//! https://snowballstem.org/~N~N");
-}
-
 /* rustc emits warnings if variables don't match the style guide */
 /* (i.e. upper-case for globals, snake case for fields etc.) */
 /* To allow warning free compilation of generated code and */
@@ -1276,7 +1270,7 @@ extern void generate_program_rust(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
-    generate_start_comment(g);
+    write_start_comment(g, "//! ", NULL);
     generate_allow_warnings(g);
     if (g->analyser->int_limits_used) {
         /* std::i32 is used in the code generated for i32::MAX and i32::MIN */

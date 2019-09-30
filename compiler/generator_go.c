@@ -1143,12 +1143,6 @@ static void generate(struct generator * g, struct node * p) {
     g->failure_str = a1;
 }
 
-static void generate_start_comment(struct generator * g) {
-
-    w(g, "//! This file was generated automatically by the Snowball to Go compiler~N");
-    w(g, "//! https://snowballstem.org/~N~N");
-}
-
 static void generate_class_begin(struct generator * g) {
     w(g, "package ");
     w(g, g->options->package);
@@ -1265,7 +1259,7 @@ extern void generate_program_go(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
-    generate_start_comment(g);
+    write_start_comment(g, "//! ", NULL);
     if (g->analyser->int_limits_used) {
         /* std::usize is used in the code generated for usize::MAX and usize::MIN */
         w(g, "use std::usize;~N~N");

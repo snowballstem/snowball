@@ -1166,7 +1166,7 @@ static void generate(struct generator * g, struct node * p) {
 
 /* Class declaration generation. */
 static void generate_unit_start(struct generator * g) {
-    w(g, "{ This file was generated automatically by the Snowball to Pascal compiler. }~N~N");
+    write_start_comment(g, "{ ", " }");
     w(g, "Unit ~n;~N~N{$HINTS OFF}~N~NInterface~N~NUses " BASE_UNIT ";~N");
 }
 
