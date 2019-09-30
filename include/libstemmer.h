@@ -66,7 +66,7 @@ void                sb_stemmer_delete(struct sb_stemmer * stemmer);
  *  If an out-of-memory error occurs, this will return NULL.
  */
 const sb_symbol *   sb_stemmer_stem(struct sb_stemmer * stemmer,
-				    const sb_symbol * word, int size);
+                                    const sb_symbol * word, int size);
 
 /** Get the length of the result of the last stemmed word.
  *  This should not be called before sb_stemmer_stem() has been called.
@@ -76,4 +76,3 @@ int                 sb_stemmer_length(struct sb_stemmer * stemmer);
 #ifdef __cplusplus
 }
 #endif
-

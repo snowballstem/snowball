@@ -63,4 +63,3 @@ extern int SN_set_current(struct SN_env * z, int size, const symbol * s)
     z->c = 0;
     return err;
 }
-

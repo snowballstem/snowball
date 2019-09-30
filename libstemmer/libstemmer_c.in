@@ -25,7 +25,7 @@ sb_getenc(const char * charenc)
     const struct stemmer_encoding * encoding;
     if (charenc == NULL) return ENC_UTF_8;
     for (encoding = encodings; encoding->name != 0; encoding++) {
-	if (strcmp(encoding->name, charenc) == 0) break;
+        if (strcmp(encoding->name, charenc) == 0) break;
     }
     if (encoding->name == NULL) return ENC_UNKNOWN;
     return encoding->enc;
@@ -42,7 +42,7 @@ sb_stemmer_new(const char * algorithm, const char * charenc)
     if (enc == ENC_UNKNOWN) return NULL;
 
     for (module = modules; module->name != 0; module++) {
-	if (strcmp(module->name, algorithm) == 0 && module->enc == enc) break;
+        if (strcmp(module->name, algorithm) == 0 && module->enc == enc) break;
     }
     if (module->name == NULL) return NULL;
     

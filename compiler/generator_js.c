@@ -348,7 +348,7 @@ static void generate_or(struct generator * g, struct node * p) {
     generate(g, p);
     wsetlab_end(g);
     if (!end_unreachable) {
-	g->unreachable = false;
+        g->unreachable = false;
     }
     str_delete(savevar);
 }

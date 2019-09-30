@@ -78,7 +78,7 @@ static void wlitch(struct generator * g, int ch) {
         }
         write_char(g, ch);
         write_char(g, '\'');
-    }  else {
+    } else {
         write_string(g, "0x"); write_hex(g, ch);
     }
 }
@@ -184,7 +184,7 @@ static void wk(struct generator * g, struct node * p, int keep_limit) {
         write_string(g, "int c");
         write_int(g, g->keep_count);
         write_string(g, " = z->c");
-	if (keep_limit) {
+        if (keep_limit) {
             write_string(g, ", mlimit");
             write_int(g, g->keep_count);
         }
@@ -193,7 +193,7 @@ static void wk(struct generator * g, struct node * p, int keep_limit) {
         write_string(g, "int m");
         write_int(g, g->keep_count);
         write_string(g, " = z->l - z->c");
-	if (keep_limit) {
+        if (keep_limit) {
             write_string(g, ", mlimit");
             write_int(g, g->keep_count);
         }
@@ -729,13 +729,13 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
         writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1) < 0) ~f /* goto */~C", p);
     } else {
         writef(g, "~{ /* gopast */~C"
-	      "~Mint ret = ~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1);~N"
-	      "~Mif (ret < 0) ~f~N", p);
-	if (p->mode == m_forward)
-	    w(g, "~Mz->c += ret;~N");
-	else
-	    w(g, "~Mz->c -= ret;~N");
-	w(g, "~}");
+              "~Mint ret = ~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1);~N"
+              "~Mif (ret < 0) ~f~N", p);
+        if (p->mode == m_forward)
+            w(g, "~Mz->c += ret;~N");
+        else
+            w(g, "~Mz->c -= ret;~N");
+        w(g, "~}");
     }
 }
 
@@ -747,14 +747,14 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int a1 = g->failure_keep_count;
 
     if (p->left->type == c_grouping || p->left->type == c_non) {
-	/* Special case for "goto" or "gopast" when used on a grouping or an
-	 * inverted grouping - the movement of c by the matching action is
-	 * exactly what we want! */
+        /* Special case for "goto" or "gopast" when used on a grouping or an
+         * inverted grouping - the movement of c by the matching action is
+         * exactly what we want! */
 #ifdef OPTIMISATION_WARNINGS
-	printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
+        printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
-	generate_GO_grouping(g, p->left, style, p->left->type == c_non);
-	return;
+        generate_GO_grouping(g, p->left, style, p->left->type == c_non);
+        return;
     }
 
     w(g, "~Mwhile(1) {"); writef(g, "~C~+", p);

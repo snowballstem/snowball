@@ -38,7 +38,7 @@ sub readinput()
 {
     open DESCFILE, $descfile;
     my $line;
-    while($line = <DESCFILE>)
+    while ($line = <DESCFILE>)
     {
         next if $line =~ m/^\s*#/;
         next if $line =~ m/^\s*$/;

@@ -352,7 +352,7 @@ static void generate_or(struct generator * g, struct node * p) {
     generate(g, p);
     wsetlab_end(g, out_lab);
     if (!end_unreachable) {
-	g->unreachable = false;
+        g->unreachable = false;
     }
     str_delete(savevar);
 }
@@ -518,14 +518,14 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
 static void generate_GO(struct generator * g, struct node * p, int style) {
 
     if (p->left->type == c_grouping || p->left->type == c_non) {
-	/* Special case for "goto" or "gopast" when used on a grouping or an
-	 * inverted grouping - the movement of c by the matching action is
-	 * exactly what we want! */
+        /* Special case for "goto" or "gopast" when used on a grouping or an
+         * inverted grouping - the movement of c by the matching action is
+         * exactly what we want! */
 #ifdef OPTIMISATION_WARNINGS
-	printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
+        printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
-	generate_GO_grouping(g, p->left, style, p->left->type == c_non);
-	return;
+        generate_GO_grouping(g, p->left, style, p->left->type == c_non);
+        return;
     }
 
     int end_unreachable = false;

@@ -1321,4 +1321,3 @@ extern void close_analyser(struct analyser * a) {
     }
     FREE(a);
 }
-

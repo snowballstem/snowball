@@ -160,7 +160,7 @@ public class SnowballProgram implements Serializable {
 
 	boolean first_key_inspected = false;
 
-	while(true) {
+	while (true) {
 	    int k = i + ((j - i) >> 1);
 	    int diff = 0;
 	    int common = common_i < common_j ? common_i : common_j; // smaller
@@ -194,7 +194,7 @@ public class SnowballProgram implements Serializable {
 		first_key_inspected = true;
 	    }
 	}
-	while(true) {
+	while (true) {
 	    Among w = v[i];
 	    if (common_i >= w.s.length) {
 		cursor = c + w.s.length;
@@ -232,7 +232,7 @@ public class SnowballProgram implements Serializable {
 
 	boolean first_key_inspected = false;
 
-	while(true) {
+	while (true) {
 	    int k = i + ((j - i) >> 1);
 	    int diff = 0;
 	    int common = common_i < common_j ? common_i : common_j;
@@ -261,7 +261,7 @@ public class SnowballProgram implements Serializable {
 		first_key_inspected = true;
 	    }
 	}
-	while(true) {
+	while (true) {
 	    Among w = v[i];
 	    if (common_i >= w.s.length) {
 		cursor = c - w.s.length;

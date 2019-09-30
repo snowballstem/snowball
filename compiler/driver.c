@@ -341,12 +341,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     }
 
     if (o->make_lang != LANG_C && o->make_lang != LANG_CPLUSPLUS) {
-	if (o->runtime_path) {
-	    fprintf(stderr, "warning: -r/-runtime only meaningful for C and C++\n");
-	}
-	if (o->externals_prefix) {
-	    fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
-	}
+        if (o->runtime_path) {
+            fprintf(stderr, "warning: -r/-runtime only meaningful for C and C++\n");
+        }
+        if (o->externals_prefix) {
+            fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
+        }
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
@@ -384,7 +384,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                     size_t i, j = 0;
                     int uc_next = true;
                     for (i = 0; i != len; ++i) {
-			unsigned char ch = leaf[i];
+                        unsigned char ch = leaf[i];
                         if (ch == '_' || ch == '-') {
                             uc_next = true;
                         } else {
