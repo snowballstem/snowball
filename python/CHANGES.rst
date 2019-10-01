@@ -1,3 +1,12 @@
+snowballstemmer 2.0.0, 2019-10-02
+=================================
+
+* Simplified generated code for ``repeat`` and ``atleast`` commands.
+* Implemented “go grouping” optimisation.
+* Removed caching layer (#114).
+* Enabled building wheels (#115).
+* Updated package README.
+
 snowballstemmer 1.9.1, 2019-09-05
 =================================
 
