@@ -82,7 +82,7 @@ classifiers.extend([
 ])
 
 setup(name='snowballstemmer',
-      version=SNOWBALL_VERSION
+      version=SNOWBALL_VERSION,
       description=desc,
       long_description=long_desc,
       author='Snowball Developers',
