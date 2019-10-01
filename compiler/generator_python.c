@@ -1245,7 +1245,6 @@ static void generate_members(struct generator * g) {
                 break;
         }
     }
-    w(g, "~N");
 }
 
 static void generate_methods(struct generator * g) {
