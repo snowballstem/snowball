@@ -12,6 +12,7 @@
 /dist
 /java/org/tartarus/snowball/ext/
 /js_out
+/python_check
 /python_out
 *.generated.cs
 /rust/Cargo.lock
