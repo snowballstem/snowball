@@ -79,7 +79,6 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "\"");
 }
 
-
 static void write_margin(struct generator * g) {
 
     int i;
@@ -335,7 +334,7 @@ static void generate_or(struct generator * g, struct node * p) {
         /* p should never be 0 after an or: there should be at least two
          * sub nodes. */
         fprintf(stderr, "Error: \"or\" node without children nodes.");
-        exit (1);
+        exit(1);
     }
     while (p->right != 0) {
         g->failure_label = new_label(g);
