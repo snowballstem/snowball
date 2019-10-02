@@ -162,7 +162,6 @@ clean:
 	      libstemmer.o stemwords \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
-              snowball.splint \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
@@ -308,10 +307,6 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	o="$(js_output_dir)/$${l}-stemmer"; \
 	echo "./snowball $< -js -o $${o}"; \
 	./snowball $< -js -o $${o}
-
-splint: snowball.splint
-snowball.splint: $(COMPILER_SOURCES)
-	splint $^ >$@ -weak
 
 # Make a full source distribution
 dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
