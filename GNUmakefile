@@ -103,8 +103,7 @@ PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 PYTHON_SAMPLE_SOURCES = python/testapp.py \
 		        python/stemwords.py
 
-PYTHON_PACKAGE_FILES = COPYING \
-		       python/CHANGES.rst \
+PYTHON_PACKAGE_FILES = python/CHANGES.rst \
 		       python/MANIFEST.in \
 		       python/setup.py \
 		       python/setup.cfg
@@ -117,6 +116,9 @@ LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 STEMWORDS_SOURCES = examples/stemwords.c
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
+
+COMMON_FILES = COPYING \
+	       NEWS
 
 ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
@@ -322,6 +324,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
             $(LIBSTEMMER_HEADERS) \
 	    $(LIBSTEMMER_EXTRA) \
 	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
+	    $(COMMON_FILES) \
 	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
 	destname=snowball_code; \
 	dest=dist/$${destname}; \
@@ -370,6 +373,7 @@ dist_libstemmer_c: \
 	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
 	 ls include/*.h >> MANIFEST) && \
         cp -a libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak $${dest}/ && \
+	cp -a $(COMMON_FILES) $${dest} && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
 	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
@@ -397,6 +401,7 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
 	mkdir -p $${dest}/$(java_src_main_dir) && \
 	cp -a $(JAVARUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
+	cp -a $(COMMON_FILES) $${dest} && \
 	(cd $${dest} && \
 	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
@@ -420,6 +425,7 @@ dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	cp -a $(CSHARP_RUNTIME_SOURCES) $${dest}/$(csharp_src_main_dir) && \
 	mkdir -p $${dest}/$(csharp_sample_dir) && \
 	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
+	cp -a $(COMMON_FILES) $${dest} && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
@@ -436,7 +442,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
 	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
-	cp -a $(PYTHON_PACKAGE_FILES) $${dest} && \
+	cp -a $(COMMON_FILES) $(PYTHON_PACKAGE_FILES) $${dest} && \
 	(cd $${dest} && $(python) setup.py sdist bdist_wheel && cp dist/*.tar.gz dist/*.whl ..) && \
 	rm -rf $${dest}
 
@@ -449,13 +455,12 @@ dist_libstemmer_js: $(JS_SOURCES)
 	mkdir -p $${dest}/$(js_runtime_dir) && \
 	mkdir -p $${dest}/$(js_sample_dir) && \
 	cp -a doc/libstemmer_js_README $${dest}/README && \
+	cp -a $(COMMON_FILES) $${dest} && \
 	cp -a $(JS_RUNTIME_SOURCES) $${dest}/$(js_runtime_dir) && \
 	cp -a $(JS_SAMPLE_SOURCES) $${dest}/$(js_sample_dir) && \
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
-	 echo "README" >> MANIFEST && \
-	 ls $(js_runtime_dir)/*.js >> MANIFEST && \
-	 ls $(js_sample_dir)/*.js >> MANIFEST) && \
+	 ls README $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
