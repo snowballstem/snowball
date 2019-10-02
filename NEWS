@@ -1,14 +1,14 @@
-Snowball 2.0.0 (2019-10-??)
+Snowball 2.0.0 (2019-10-02)
 ===========================
 
 C/C++
 -----
 
-* Fully handle 4-byte UTF-8 sequences.  Previously 'hop' and 'next' handled
+* Fully handle 4-byte UTF-8 sequences.  Previously `hop` and `next` handled
   sequences of any length, but commands which look at the character value only
   handled sequences up to length 3.  Fixes #89.
 
-* Fix handling of a 3-byte UTF-8 sequence in a grouping in backwardmode.
+* Fix handling of a 3-byte UTF-8 sequence in a grouping in `backwardmode`.
 
 Java
 ----
@@ -30,7 +30,7 @@ Code Quality Improvements
 
 * Fix various warnings from newer compilers.
 
-* Improve use of const.
+* Improve use of `const`.
 
 * Share common functions between compiler backends rather than having multiple
   copies of the same code.
@@ -54,7 +54,7 @@ New Code Generators
 
 * Add Go generator from Marty Schoch (#57).
 
-* Add C# generator.  Based on patch from Cesar Souza (#17).
+* Add C# generator.  Based on patch from Cesar Souza (#16, #17).
 
 * Add Pascal generator.  Based on Delphi backend from stemming.zip file on old
   website (#75).
