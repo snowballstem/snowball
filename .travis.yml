@@ -1,10 +1,12 @@
-language: c
+language: minimal
 dist: trusty
 matrix:
   include:
-    - compiler: gcc
+    - language: c
+      compiler: gcc
       env: c_tests=y cc_append=' -std=c90 -Werror'
-    - compiler: clang
+    - language: c
+      compiler: clang
       env: c_tests=y cc_append=' -std=c90 -Werror'
     - language: java
       env: JAVA=java JAVAC=javac
@@ -26,7 +28,8 @@ matrix:
       env: RUST=rust
     - language: csharp
       env: MCS=mcs
-    - env: FPC=fpc
+    - name: Pascal
+      env: FPC=fpc
       dist: bionic
       addons:
         apt:
