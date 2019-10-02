@@ -174,9 +174,9 @@ clean:
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
 	rm -rf dist
-	rmdir $(c_src_dir) || true
-	rmdir $(python_output_dir) || true
-	rmdir $(js_output_dir) || true
+	-rmdir $(c_src_dir)
+	-rmdir $(python_output_dir)
+	-rmdir $(js_output_dir)
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^
