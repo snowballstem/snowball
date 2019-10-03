@@ -160,7 +160,7 @@ define stem as (
             //
             // * we add '{a}', which is needed for the example given right at
             //   the end of section 5 to work (conflating BarawIya and
-            //   BarawIyawA), and which 3.1 a.iv strongly suggests should be in
+            //   BarawIyawA), and which 3.1 a.v strongly suggests should be in
             //   the list:
             //
             //     Thus, the following suffix deletions (longest possible
