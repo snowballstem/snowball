@@ -4,3 +4,4 @@ include setup.*
 recursive-include src *.py
 include MANIFEST.in
 include COPYING
+include NEWS
