@@ -33,11 +33,6 @@ with open('modules.txt') as fp:
 desc = 'This package provides ' + str(n_stemmers) + ' stemmers for ' + \
     str(len(langs)) + ' languages generated from Snowball algorithms.'
 
-long_desc = '''
-It includes following language algorithms:
-
-'''
-
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
@@ -46,21 +41,10 @@ classifiers = [
 
 for lang in langs:
     lang_titlecase = lang.title()
-    long_desc += '* ' + lang_titlecase
     # Only classifiers listed in https://pypi.org/classifiers/ are allowed
     if lang_titlecase not in ('Basque', 'Irish', 'Lithuanian', 'Nepali'):
         classifiers.append('Natural Language :: ' + lang_titlecase)
-    if lang in variants:
-        long_desc += ' (Standard'
-        for variant in variants[lang]:
-            long_desc += ', ' + variant.title()
-        long_desc += ')'
-    long_desc += '\n'
 
-long_desc += '''
-This is a pure Python stemming library. If `PyStemmer <https://pypi.org/project/PyStemmer/>`_ is available, this module uses
-it to accelerate.
-'''
 
 classifiers.extend([
     'Operating System :: OS Independent',
@@ -84,7 +68,6 @@ classifiers.extend([
 setup(name='snowballstemmer',
       version=SNOWBALL_VERSION,
       description=desc,
-      long_description=long_desc,
       author='Snowball Developers',
       author_email='snowball-discuss@lists.tartarus.org',
       url='https://github.com/snowballstem/snowball',
