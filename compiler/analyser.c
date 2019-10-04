@@ -613,7 +613,7 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->function_count = 0;
     x->starter = 0;
     x->nocommand_count = 0;
-    x->amongvar_needed = 0;
+    x->amongvar_needed = false;
 
     if (q->type == c_bra) { x->starter = q; q = q->right; }
 
