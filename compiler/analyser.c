@@ -1210,6 +1210,26 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
     }
 }
 
+static struct node * read_routine_definition(struct analyser * a) {
+    struct node * def = read_C(a);
+    struct node * p;
+    if (def->type == c_bra) {
+        p = def->left;
+        while (p->right) p = p->right;
+    } else {
+        /* Create a c_bra list for single-node routines. */
+        p = def;
+        def = new_node(a, c_bra);
+        def->left = p;
+    }
+    /* We synthesise a "functionend" node at the end of each routine definition
+     * so optimisations such as dead code elimination and tail call
+     * optimisation can easily see where the routine's code ends.
+     */
+    p->right = new_node(a, c_functionend);
+    return def;
+}
+
 static void read_define_routine(struct analyser * a, struct name * q) {
     struct node * p = new_node(a, c_define);
     a->amongvar_needed = false;
@@ -1223,7 +1243,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     if (a->program == 0) a->program = p; else a->program_end->right = p;
     a->program_end = p;
     get_token(a, c_as);
-    p->left = read_C(a);
+    p->left = read_routine_definition(a);
     if (q) q->definition = p->left;
 
     if (a->substring != 0) {

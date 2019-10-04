@@ -1005,12 +1005,16 @@ static void generate_define(struct generator * g, struct node * p) {
     g->label_used = 0;
     g->keep_count = 0;
     generate(g, p->left);
-    w(g, "~Mreturn true;~N");
     w(g, "~}");
 
     str_append(saved_output, g->outbuf);
     str_delete(g->outbuf);
     g->outbuf = saved_output;
+}
+
+static void generate_functionend(struct generator * g, struct node * p) {
+    (void)p;
+    w(g, "~Mreturn true;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
@@ -1140,6 +1144,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;
+        case c_functionend:   generate_functionend(g, p); break;
         default: fprintf(stderr, "%d encountered\n", p->type);
                  exit(1);
     }

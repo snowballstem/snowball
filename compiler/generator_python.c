@@ -716,6 +716,11 @@ static void generate_hop(struct generator * g, struct node * p) {
 static void generate_delete(struct generator * g, struct node * p) {
 
     write_comment(g, p);
+    if (p->right && p->right->type == c_functionend) {
+        writef(g, "~Mreturn self.slice_del()~N", p);
+        g->unreachable = true;
+        return;
+    }
     writef(g, "~Mif not self.slice_del():~N"
               "~+~Mreturn False~N~-"
               "~N", p);
@@ -769,8 +774,13 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = self.slice_to()~N"
-              "~Mif ~V0 == '':~N"
+    writef(g, "~M~V0 = self.slice_to()~N", p);
+    if (p->right && p->right->type == c_functionend) {
+        writef(g, "~Mreturn ~V0 != ''~N", p);
+        g->unreachable = true;
+        return;
+    }
+    writef(g, "~Mif ~V0 == '':~N"
               "~+~Mreturn False~N~-", p);
 }
 
@@ -816,6 +826,13 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
+    if (p->right && p->right->type == c_functionend) {
+        writef(g, "~Mreturn self.slice_from(", p);
+        generate_address(g, p);
+        writef(g, ")~N", p);
+        g->unreachable = true;
+        return;
+    }
     w(g, "~Mif not self.slice_from(");
     generate_address(g, p);
     writef(g, "):~N"
@@ -959,6 +976,12 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
+    if (p->right && p->right->type == c_functionend &&
+        g->failure_label == x_return) {
+        writef(g, "~Mreturn ~V0()~N", p);
+        g->unreachable = true;
+        return;
+    }
     write_failure_if(g, "not ~V0()", p);
 }
 
@@ -1006,12 +1029,16 @@ static void generate_define(struct generator * g, struct node * p) {
     g->failure_label = x_return;
     g->unreachable = false;
     generate(g, p->left);
-    if (!g->unreachable) w(g, "~Mreturn True~N");
     w(g, "~-");
 
     str_append(saved_output, g->outbuf);
     str_delete(g->outbuf);
     g->outbuf = saved_output;
+}
+
+static void generate_functionend(struct generator * g, struct node * p) {
+    (void)p;
+    w(g, "~Mreturn True~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
@@ -1149,6 +1176,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;
+        case c_functionend:   generate_functionend(g, p); break;
         default: fprintf(stderr, "%d encountered\n", p->type);
                  exit(1);
     }

@@ -424,6 +424,7 @@ static int K_needed_(struct generator * g, struct node * p, int call_depth) {
             case c_true:
             case c_false:
             case c_debug:
+            case c_functionend:
                 break;
 
             case c_call:
@@ -473,6 +474,7 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
             case c_le:
             case c_sliceto:   /* case c_not: must not be included here! */
             case c_debug:
+            case c_functionend:
                 break;
 
             case c_call:
@@ -1189,7 +1191,12 @@ static void generate_define(struct generator * g, struct node * p) {
     g->label_used = 0;
     g->keep_count = 0;
     generate(g, p->left);
-    w(g, "~Mreturn 1;~N~}");
+    w(g, "~}");
+}
+
+static void generate_functionend(struct generator * g, struct node * p) {
+    (void)p;
+    w(g, "~Mreturn 1;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
@@ -1429,6 +1436,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;
+        case c_functionend:   generate_functionend(g, p); break;
         default: fprintf(stderr, "%d encountered\n", p->type);
                  exit(1);
     }

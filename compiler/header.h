@@ -92,6 +92,7 @@ enum token_codes {
     c_call,
     c_grouping,
     c_booltest,
+    c_functionend,
 
     NUM_TOKEN_CODES
 };
@@ -198,7 +199,7 @@ struct among {
     int command_count;        /* in this among (includes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* in this among */
-    int amongvar_needed;      /* do we need to set among_var? */
+    byte amongvar_needed;     /* do we need to set among_var? */
     struct node * starter;    /* i.e. among( (starter) 'string' ... ) */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
@@ -228,7 +229,7 @@ struct node {
     symbol * literalstring;
     int number;
     int line_number;
-    int amongvar_needed;   /* used in routine definitions */
+    byte amongvar_needed;   /* used in routine definitions */
 };
 
 enum name_types {
@@ -266,7 +267,7 @@ struct analyser {
     struct among * amongs;
     struct among * amongs_end;
     int among_count;
-    int amongvar_needed;      /* used in reading routine definitions */
+    byte amongvar_needed;     /* used in reading routine definitions */
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
