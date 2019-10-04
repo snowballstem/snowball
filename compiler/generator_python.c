@@ -958,6 +958,18 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 }
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
+    if (p->right && p->right->type == c_functionend &&
+        g->failure_label == x_return) {
+        w(g, "~Mreturn ");
+        generate_AE(g, p->left);
+        write_char(g, ' ');
+        write_string(g, s);
+        write_char(g, ' ');
+        generate_AE(g, p->AE);
+        write_newline(g);
+        g->unreachable = true;
+        return;
+    }
 
     w(g, "~Mif not ");
     generate_AE(g, p->left);
