@@ -80,6 +80,7 @@ static void write_margin(struct generator * g) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
+    if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "// ");
     write_comment_content(g, p);
@@ -517,9 +518,9 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
     if (is_goto) {
-        w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, true) < 0)~N~f /* goto */");
+        w(g, "~Mif (~S1_grouping~S0(~V0, ~I0, ~I1, true) < 0)~N~f~N");
     } else {
-        w(g, "~{~M/* gopast */ ~N"
+        w(g, "~{~N"
             "~Mint ret = ~S1_grouping~S0(~V0, ~I0, ~I1, true);~N"
             "~Mif (ret < 0)~N~f~N");
         if (p->mode == m_forward)
@@ -546,6 +547,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 #ifdef OPTIMISATION_WARNINGS
         printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
+        write_comment(g, p);
         generate_GO_grouping(g, p->left, style, p->left->type == c_non);
 
         g->failure_label = a0;

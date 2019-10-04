@@ -78,6 +78,7 @@ static void write_margin(struct generator * g) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
+    if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "// ");
     write_comment_content(g, p);

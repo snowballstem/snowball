@@ -31,6 +31,7 @@ static void print_arglist(int exit_code) {
                "Supported options:\n"
                "  -o[utput] file\n"
                "  -s[yntax]\n"
+               "  -comments\n"
 #ifndef DISABLE_JAVA
                "  -j[ava]\n"
 #endif
@@ -107,6 +108,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
     o->output_file = 0;
     o->syntax_tree = false;
+    o->comments = false;
     o->externals_prefix = NULL;
     o->variables_prefix = 0;
     o->runtime_path = 0;
@@ -195,6 +197,10 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             }
             if (eq(s, "-s") || eq(s, "-syntax")) {
                 o->syntax_tree = true;
+                continue;
+            }
+            if (eq(s, "-comments")) {
+                o->comments = true;
                 continue;
             }
             if (eq(s, "-ep") || eq(s, "-eprefix")) {

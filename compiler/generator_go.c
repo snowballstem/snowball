@@ -89,6 +89,7 @@ static void write_margin(struct generator * g) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
+    if (!g->options->comments) return;
     /* FIXME could use Go //line syntax if we had original filename */
     write_margin(g);
     write_string(g, "// ");

@@ -90,6 +90,7 @@ static void write_margin(struct generator * g) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
+    if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "# ");
     write_comment_content(g, p);
@@ -497,9 +498,7 @@ static void generate_do(struct generator * g, struct node * p) {
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
 
     struct grouping * q = p->name->grouping;
-    w(g, (is_goto ? "~M# goto " : "~M# gopast "));
-    write_comment_content(g, p);
-    write_newline(g);
+    write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
@@ -524,6 +523,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 #ifdef OPTIMISATION_WARNINGS
         printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
+        write_comment(g, p);
         generate_GO_grouping(g, p->left, style, p->left->type == c_non);
         return;
     }

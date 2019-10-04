@@ -154,9 +154,11 @@ void write_comment_content(struct generator * g, struct node * p) {
 }
 
 static void write_comment(struct generator * g, struct node * p) {
-    ws_opt_space(g, "/* ");
-    write_comment_content(g, p);
-    write_string(g, " */");
+    if (g->options->comments) {
+        ws_opt_space(g, "/* ");
+        write_comment_content(g, p);
+        write_string(g, " */");
+    }
     write_newline(g);
 }
 
@@ -726,9 +728,9 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
     if (is_goto) {
-        writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1) < 0) ~f /* goto */~C", p);
+        writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1) < 0) ~f~C", p);
     } else {
-        writef(g, "~{ /* gopast */~C"
+        writef(g, "~{~C"
               "~Mint ret = ~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1);~N"
               "~Mif (ret < 0) ~f~N", p);
         if (p->mode == m_forward)
@@ -753,6 +755,9 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 #ifdef OPTIMISATION_WARNINGS
         printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
+        if (g->options->comments) {
+            writef(g, "~M~C", p);
+        }
         generate_GO_grouping(g, p->left, style, p->left->type == c_non);
         return;
     }
@@ -801,7 +806,11 @@ static void generate_loop(struct generator * g, struct node * p) {
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, int atleast_case) {
     int keep_c = 0;
-    writef(g, "~Mwhile(1) {~+", p);
+    if (atleast_case) {
+        writef(g, "~Mwhile(1) {~+~N", p);
+    } else {
+        writef(g, "~Mwhile(1) {~+~C", p);
+    }
 
     if (repeat_restore(g, p->left)) {
         writef(g, "~M~k~N", p);
@@ -828,13 +837,11 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, in
 }
 
 static void generate_repeat(struct generator * g, struct node * p) {
-    write_comment(g, p);
-    write_newline(g);
     generate_repeat_or_atleast(g, p, false);
 }
 
 static void generate_atleast(struct generator * g, struct node * p) {
-    w(g, "~{int i = "); generate_AE(g, p->AE); w(g, ";~N");
+    w(g, "~{int i = "); generate_AE(g, p->AE); w(g, ";~C");
     {
         int used = g->label_used;
         int a0 = g->failure_label;
@@ -1025,12 +1032,14 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->I[0] = keep_token;
     writef(g, "~{struct SN_env env~I0 = * z;~C", p);
     g->V[0] = p->name;
-    writef(g, "~Mint failure = 1; /* assume failure */~N"
+    /* Assume failure. */
+    writef(g, "~Mint failure = 1;~N"
           "~Mz->p = ~V0;~N"
           "~Mz->lb = z->c = 0;~N"
           "~Mz->l = SIZE(z->p);~N", p);
     generate(g, p->left);
-    w(g, "~Mfailure = 0; /* mark success */~N");
+    /* Mark success. */
+    w(g, "~Mfailure = 0;~N");
     if (g->label_used)
         wsetl(g, g->failure_label);
     g->V[0] = p->name; /* necessary */
@@ -1133,7 +1142,9 @@ static void generate_define(struct generator * g, struct node * p) {
     g->V[0] = q;
 
     w(g, "~N~S0 int ~V0(struct SN_env * z) {");
-    write_string(g, p->mode == m_forward ? " /* forwardmode */" : " /* backwardmode */");
+    if (g->options->comments) {
+        write_string(g, p->mode == m_forward ? " /* forwardmode */" : " /* backwardmode */");
+    }
     w(g, "~N~+");
     if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     g->failure_keep_count = 0;
@@ -1472,7 +1483,10 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->I[4] = v->result;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "/*~J1 */ { ~I2, ");
+            if (g->options->comments) {
+                w(g, "/*~J1 */ ");
+            }
+            w(g, "{ ~I2, ");
             if (v->size == 0) {
                 w(g, "0,");
             } else {
