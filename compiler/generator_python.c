@@ -716,7 +716,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 static void generate_delete(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    if (p->right && p->right->type == c_functionend) {
+    if (at_function_end(g, p)) {
         writef(g, "~Mreturn self.slice_del()~N", p);
         g->unreachable = true;
         return;
@@ -775,7 +775,7 @@ static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = self.slice_to()~N", p);
-    if (p->right && p->right->type == c_functionend) {
+    if (at_function_end(g, p)) {
         writef(g, "~Mreturn ~V0 != ''~N", p);
         g->unreachable = true;
         return;
@@ -826,7 +826,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 static void generate_slicefrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
-    if (p->right && p->right->type == c_functionend) {
+    if (at_function_end(g, p)) {
         writef(g, "~Mreturn self.slice_from(", p);
         generate_address(g, p);
         writef(g, ")~N", p);
@@ -957,9 +957,15 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
     w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); w(g, "~N");
 }
 
+static int at_function_end(struct generator * g, struct node * p) {
+    if (p->right && p->right->type == c_functionend) {
+        return true;
+    }
+    return false;
+}
+
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
-    if (p->right && p->right->type == c_functionend &&
-        g->failure_label == x_return) {
+    if (g->failure_label == x_return && at_function_end(g, p)) {
         w(g, "~Mreturn ");
         generate_AE(g, p->left);
         write_char(g, ' ');
@@ -988,8 +994,7 @@ static void generate_call(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    if (p->right && p->right->type == c_functionend &&
-        g->failure_label == x_return) {
+    if (g->failure_label == x_return && at_function_end(g, p)) {
         writef(g, "~Mreturn ~V0()~N", p);
         g->unreachable = true;
         return;
