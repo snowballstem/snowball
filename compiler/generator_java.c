@@ -770,7 +770,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
     write_comment(g, p);
-    if (p->left && p->left->type == c_tomark && !p->left->right) {
+    if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
          *   setlimit tomark AE for C

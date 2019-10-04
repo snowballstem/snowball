@@ -958,7 +958,7 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 
 static void generate_setlimit(struct generator * g, struct node * p) {
     int keep_c;
-    if (p->left && p->left->type == c_tomark && !p->left->right) {
+    if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
          *   setlimit tomark AE for C
