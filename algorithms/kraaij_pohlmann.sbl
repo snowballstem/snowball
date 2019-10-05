@@ -198,11 +198,8 @@ define Lose_infix as (
 )
 
 define measure as (
-    do (
-        tolimit
-        setmark p1
-        setmark p2
-    )
+    $p1 = limit
+    $p2 = limit
     do(
         repeat non-v  atleast 1 ('ij' or v)  non-v  setmark p1
         repeat non-v  atleast 1 ('ij' or v)  non-v  setmark p2
