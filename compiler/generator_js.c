@@ -1234,7 +1234,8 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 static void generate_groupings(struct generator * g) {
     struct grouping * q;
     for (q = g->analyser->groupings; q; q = q->next) {
-        generate_grouping_table(g, q);
+        if (q->name->used)
+            generate_grouping_table(g, q);
     }
 }
 
