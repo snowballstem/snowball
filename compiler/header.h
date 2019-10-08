@@ -204,7 +204,6 @@ struct among {
 struct grouping {
 
     struct grouping * next;
-    int number;               /* groupings are numbered 0, 1, 2 ... */
     symbol * b;               /* the characters of this group */
     int largest_ch;           /* character with max code */
     int smallest_ch;          /* character with min code */
