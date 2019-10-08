@@ -293,6 +293,7 @@ handle_as_name:
                     p->used = 0;
                     p->value_used = false;
                     p->initialised = false;
+                    p->used_in_definition = false;
                     p->local_to = 0;
                     p->grouping = 0;
                     p->definition = 0;
@@ -1073,6 +1074,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                         if (r) {
                             check_name_type(a, r, 'g');
                             p->b = alter_grouping(p->b, r->grouping->b, style, false);
+                            r->used_in_definition = true;
                         }
                     }
                     break;
@@ -1221,7 +1223,10 @@ extern void read_program(struct analyser * a) {
                     fprintf(stderr, "' defined but not used\n");
                 }
             } else if (q->type == t_routine || q->type == t_grouping) {
-                if (!q->used) {
+                /* It's OK to define a grouping but only use it to define other
+                 * groupings.
+                 */
+                if (!q->used && !q->used_in_definition) {
                     int line_num;
                     if (q->type == t_routine) {
                         line_num = q->definition->line_number;

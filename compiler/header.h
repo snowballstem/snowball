@@ -161,6 +161,7 @@ struct name {
     byte used_in_among;         /* Function used in among? */
     byte value_used;            /* (For variables) is its value ever used? */
     byte initialised;           /* (For variables) is it ever initialised? */
+    byte used_in_definition;    /* (grouping) used in grouping definition? */
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
     int declaration_line_number;/* Line number of declaration */
