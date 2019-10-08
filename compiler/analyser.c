@@ -1063,7 +1063,6 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         if (q) q->grouping = p;
         p->next = 0;
         p->name = q;
-        p->number = q ? q->count : 0;
         p->line_number = a->tokeniser->line_number;
         p->b = create_b(0);
         while (true) {
