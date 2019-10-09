@@ -93,8 +93,57 @@ Add a news entry to `index.tt`.
 
 .. FIXME: Also needs adding for the online demo.
 
-Adding a new programming language backend
-=========================================
+Adding a new programming language generator
+===========================================
+
+This is a short guide to adding support for generating code for another
+programming language.
+
+Is a new generator the right solution?
+--------------------------------------
+
+Adding a new code generator is probably not your only option if you want
+to use Snowball from another language - most languages have support for
+writing bindings to a C library, so this is probably another option.
+
+Generating code can have advantages.  For example, it can be simpler to
+deploy without C bindings which need to be built for a specific platform.
+
+However, it's likely to be significantly more work to implement a new generator
+than to write bindings to the generated C code, especially as the libstemmer
+C API is a very small and simple one.  Generated code can also be slower -
+currently the Snowball compiler often generates code that assumes an optimising
+compiler will clean up redundant constructs, which is not a problem for C, and
+probably not for most compiled languages, but for a language like Python C
+bindings are much faster than the generated Python code (using pypy helps a
+lot, but is still slower).  See doc/libstemmer_python_README for some timings.
+
+That said, the unoptimised generated code has improved over time, and is likely
+to improve further in the future.
+
+Key problems to solve
+---------------------
+
+A key problem to solve is how to map the required flow of control in response
+to Snowball signals.
+
+In the generated C code this is mostly done using `goto`.  If your language
+doesn't provide an equivalent to `goto` then you'll need an alternative
+solution.
+
+In Java and JavaScript we use labelled `break` from blocks and loops
+instead.  If your language has an equivalent to this feature, that will
+probably work.
+
+For Python, we currently generate a `try:` ... `raise lab123` ...
+`except lab123: pass` construct.  This works, but doesn't seem ideal.
+
+If one of the mechanisms above sounds suitable then take a look at the
+generator for the respective generated output and generator code.  If
+not, come and talk to us on the snowball-discuss mailing list.
+
+Mechanics of adding a new generator
+-----------------------------------
 
 Copy an existing `compiler/generator_*.c` for your new language and modify
 away (`generator.c` has the generator for C, but also some common functions
