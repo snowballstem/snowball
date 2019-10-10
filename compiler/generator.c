@@ -43,12 +43,20 @@ static void write_varname(struct generator * g, struct name * p) {
             write_string(g, g->options->externals_prefix); break;
         case t_string:
         case t_boolean:
-        case t_integer:
+        case t_integer: {
+            int count = p->count;
+            if (count < 0) {
+                fprintf(stderr, "Reference to optimised out variable ");
+                report_b(stderr, p->b);
+                fprintf(stderr, " attempted\n");
+                exit(1);
+            }
             write_char(g, ch);
             write_char(g, '[');
-            write_int(g, p->count);
+            write_int(g, count);
             write_char(g, ']');
             return;
+        }
         default:
             write_char(g, ch); write_char(g, '_');
     }
@@ -1591,7 +1599,15 @@ static void generate_header_file(struct generator * g) {
             case t_boolean: g->S[1] = "B";
             label0:
                 if (vp) {
-                    g->I[0] = q->count;
+                    int count = q->count;
+                    if (count < 0) {
+                        /* Unused variables should get removed from `names`. */
+                        fprintf(stderr, "Optimised out variable ");
+                        report_b(stderr, q->b);
+                        fprintf(stderr, " still in names list\n");
+                        exit(1);
+                    }
+                    g->I[0] = count;
                     w(g, "#define ~S0");
                     write_b(g, q->b);
                     w(g, " (~S1[~I0])~N");
