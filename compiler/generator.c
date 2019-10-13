@@ -37,7 +37,7 @@ static void wi3(struct generator * g, int i) {
 
 static void write_varname(struct generator * g, struct name * p) {
 
-    int ch = "SBIrxg"[p->type];
+    int ch = "SIIrxg"[p->type];
     switch (p->type) {
         case t_external:
             write_string(g, g->options->externals_prefix); break;
@@ -50,6 +50,12 @@ static void write_varname(struct generator * g, struct name * p) {
                 report_b(stderr, p->b);
                 fprintf(stderr, " attempted\n");
                 exit(1);
+            }
+            if (p->type == t_boolean) {
+                /* We use a single array for booleans and integers, with the
+                 * integers first.
+                 */
+                count += g->analyser->name_count[t_integer];
             }
             write_char(g, ch);
             write_char(g, '[');
@@ -1556,10 +1562,9 @@ static void generate_create(struct generator * g) {
 
     int * p = g->analyser->name_count;
     g->I[0] = p[t_string];
-    g->I[1] = p[t_integer];
-    g->I[2] = p[t_boolean];
+    g->I[1] = p[t_integer] + p[t_boolean];
     w(g, "~N"
-         "extern struct SN_env * ~pcreate_env(void) { return SN_create_env(~I0, ~I1, ~I2); }"
+         "extern struct SN_env * ~pcreate_env(void) { return SN_create_env(~I0, ~I1); }"
          "~N");
 }
 
@@ -1594,10 +1599,9 @@ static void generate_header_file(struct generator * g) {
             case t_external:
                 w(g, "extern int ~W0(struct SN_env * z);~N");
                 break;
-            case t_string:  g->S[1] = "S"; goto label0;
-            case t_integer: g->S[1] = "I"; goto label0;
-            case t_boolean: g->S[1] = "B";
-            label0:
+            case t_string:
+            case t_integer:
+            case t_boolean:
                 if (vp) {
                     int count = q->count;
                     if (count < 0) {
@@ -1607,10 +1611,17 @@ static void generate_header_file(struct generator * g) {
                         fprintf(stderr, " still in names list\n");
                         exit(1);
                     }
+                    if (q->type == t_boolean) {
+                        /* We use a single array for booleans and integers,
+                         * with the integers first.
+                         */
+                        count += g->analyser->name_count[t_integer];
+                    }
                     g->I[0] = count;
+                    g->I[1] = "SIIrxg"[q->type];
                     w(g, "#define ~S0");
                     write_b(g, q->b);
-                    w(g, " (~S1[~I0])~N");
+                    w(g, " (~c1[~I0])~N");
                 }
                 break;
         }
