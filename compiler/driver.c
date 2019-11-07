@@ -61,8 +61,8 @@ static void print_arglist(int exit_code) {
                "  -vp[refix] string\n"
                "  -i[nclude] directory\n"
                "  -r[untime] path to runtime headers\n"
-#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
                "  -p[arentclassname] fully qualified parent class name\n"
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
                "  -P[ackage] package name for stemmers\n"
                "  -S[tringclass] StringBuffer-compatible class\n"
                "  -a[mongclass] fully qualified name of the Among class\n"
@@ -238,12 +238,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 o->encoding = ENC_UTF8;
                 continue;
             }
-#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
             if (eq(s, "-p") || eq(s, "-parentclassname")) {
                 check_lim(i, argc);
                 o->parent_class_name = argv[i++];
                 continue;
             }
+#if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
             if (eq(s, "-P") || eq(s, "-Package")) {
                 check_lim(i, argc);
                 o->package = argv[i++];
