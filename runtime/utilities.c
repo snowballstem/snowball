@@ -231,7 +231,7 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
     int j = v_size;
 
     int c = z->c; int l = z->l;
-    symbol * q = z->p + c;
+    const symbol * q = z->p + c;
 
     const struct among * w;
 
@@ -296,7 +296,7 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
     int j = v_size;
 
     int c = z->c; int lb = z->lb;
-    symbol * q = z->p + c - 1;
+    const symbol * q = z->p + c - 1;
 
     const struct among * w;
 
