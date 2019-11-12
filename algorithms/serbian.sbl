@@ -140,6 +140,7 @@ define mark_regions as (
     
     $p1 = limit
     $p2 = 0
+    $sbst = 0
     
     do (
         gopast 'r' setmark p2
