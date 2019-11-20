@@ -132,11 +132,11 @@ function stemming (lang, input, output, encoding, pretty) {
 function create (name) {
     var lc_name = name.toLowerCase();
     if (!lc_name.match('\\W') && lc_name != 'base') {
-	try {
-        const Stemmer = require('./' + lc_name + '-stemmer.js');
-        return new Stemmer();
-	} catch (error) {
-	}
+        try {
+            const Stemmer = require('./' + lc_name + '-stemmer.js');
+            return new Stemmer();
+        } catch (error) {
+        }
     }
     console.log('Unknown stemming language: ' + name + '\n');
     usage();
