@@ -11,6 +11,8 @@
 /stemwords
 /dist
 /java/org/tartarus/snowball/ext/
+/javascript/*-stemmer.js
+!/javascript/base-stemmer.js
 /js_out
 /python_check
 /python_out

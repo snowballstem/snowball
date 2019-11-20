@@ -292,3 +292,7 @@ BaseStemmer = function() {
         return this.current.slice(0, this.limit);
     };
 };
+
+if (typeof module === 'object' && module.exports) {
+	module.exports = BaseStemmer;
+}
