@@ -6,14 +6,15 @@ routines (
 
 externals ( stem )
 
-integers ( p1 x )
+integers ( p1 )
 
 booleans ( ccend )
 
+/* See vowels
 groupings ( v )
+*/
 
 stringescapes {}
-
 
 /* Special characters. "'" indicates acute */
 
@@ -26,18 +27,18 @@ stringdef o/    '{U+00F8}' // strikethrough "o"
 stringdef u'    '{U+00FA}'
 stringdef y'    '{U+00FD}'
 
-/* Vowels */
-
+/* Faroese vowels (not used)
 define v 'a{a'}ei{i'}o{o'}u{u'}y{y'}{ae}{o/}'
+*/
 
 define mark_regions as (
     $p1 = limit
     unset ccend
-    test ( hop 3 setmark x )
-    try ( goto v gopast non-v setmark p1 )
-    try ( $p1 < x  $p1 = x )
+    hop 3 setmark p1
     backwards substring among
-      ('kt' 'gt' 'vt' 'mt' 'nt') (set ccend) ($p1 = x)
+      (
+        'kt' 'gt' 'vt' 'mt' 'nt' ( set ccend )
+      )
 )
 
 backwardmode (
@@ -45,16 +46,16 @@ backwardmode (
     define strip_suffix as (
         setlimit tomark p1 for ([substring])
         among(
-            'a' 'ana' 'ina' 'una' 'anna' 'a{d/}a' 'liga'
+            'a' 'ana' 'ina' 'una' 'anna' 'a{d/}a' 'liga' 'heitina'
             'i' 'ini' 'uni' 'a{d/}ni' 'a{d/}i' 'ari' 'a{d/}ari' 'andi' 'asti'
             'a{d/}' 'i{d/}' 'ni{d/}'
-            'um' 'anum' 'inum' 'unum' 'a{d/}um'
-            'an' 'a{d/}an' 'in' 'urin' 'inn' 'arinn' 'urinn' 'irn'
+            'um' 'anum' 'inum' 'unum' 'a{d/}um' 'heitum'
+            'an' 'a{d/}an' 'in' 'urin' 'inn' 'arinn' 'urinn' 'irn' 'heitin'
             'ar' 'a{d/}ar' 'anar' 'arnar' 'irnar' 'unnar' 'urnar' 'arinnar' 'anarinnar'
-            'ir' 'inir' 'arnir' 'irnir' 'urnir' 'ur' 'a{d/}ur'
+            'ir' 'inir' 'arnir' 'irnir' 'urnir' 'ur' 'a{d/}ur' 'heitir' 'heitirnar'
             'u' 'a{d/}u'
             'is' 'ans' 'ins' 'isins' 'arins'
-            'ast' 'a{d/}ust' 'a{d/}ist' ( delete )
+            'ast' 'a{d/}ust' 'a{d/}ist' 'heit' ( delete )
 
             /* Conditionals based on characters preceding slice */
             'na' 'nu' 'nar' 'ni' 'nari' 'nan' 'nir' 'num' 'nis' 'nisins' ( ( not 'n' delete ) or ( <-'n' ) )
@@ -65,7 +66,7 @@ backwardmode (
 
 
     define strip_t as (
-      ccend [next] delete
+     ccend [next] delete
     )
 
 )
