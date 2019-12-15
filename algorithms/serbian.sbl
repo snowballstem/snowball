@@ -69,14 +69,14 @@ stringdef zx    '{U+017E}' // small z with caron
 stringdef sx    '{U+0161}' // small s with caron
 stringdef dx    '{U+0111}' // small d with stroke
 
-define v 'aeiou' 
+define v 'aeiou'
 define sa '{cx}{cy}{zx}{sx}{dx}'
 define ca 'bvgdzjklmnprstfhc' + sa
 define rg 'r'
 
 
 define cyr_to_lat as (
-    
+
     do repeat goto (
         [substring] among (
             '{cyrA}'    (<- 'a')
@@ -111,36 +111,36 @@ define cyr_to_lat as (
             '{cyrSx}'   (<- '{sx}')
         )
     )
-        
+
 )
 
 define prelude as (
 
     do repeat goto (
-        ca ['ije'] ca <- 'e' 
+        ca ['ije'] ca <- 'e'
     )
 
     do repeat goto (
-        ca ['je'] ca <- 'e' 
+        ca ['je'] ca <- 'e'
     )
-        
+
     do repeat goto (
-        ['dj'] <- '{dx}' 
+        ['dj'] <- '{dx}'
     )
-        
+
 )
 
 define mark_regions as (
 
     $p3 = 0
-    
+
     do (
         gopast sa setmark p3
     )
-    
+
     $p1 = limit
     $p2 = 0
-    
+
     do (
         gopast v setmark p1
     )
@@ -152,7 +152,7 @@ define mark_regions as (
         ($p1 == p2 gopast 'r' gopast non-rg) or ($p1 != p2 gopast v gopast non-v)
         setmark p1
     )
-    
+
 )
 
 backwardmode (
@@ -294,7 +294,7 @@ backwardmode (
             'asan'          (R2 <-'asni')
         )
     )
-	
+
     define Step_2 as (
         [substring] R1 among (
             'skijima'
@@ -2334,7 +2334,7 @@ backwardmode (
             'nes'           (R2 <-'n')
         )
     )
-    
+
     define Step_3 as (
         [substring] R1 among (
             'enom'
