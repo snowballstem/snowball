@@ -153,6 +153,14 @@ JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
 CPPFLAGS=-Iinclude
 
+# pass -dead_strip and -bind_at_load on macOS to shave some binary size
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+CPPFLAGS=-Iinclude
+LDFLAGS=-Wl,-dead_strip,-bind_at_load
+endif
+
 all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 clean:
