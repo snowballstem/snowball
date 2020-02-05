@@ -198,6 +198,13 @@ extern void str_append_b(struct str * str, const symbol * q) {
     str->data = add_to_b(str->data, SIZE(q), q);
 }
 
+/* Append the tail of a low level block to a str. */
+extern void str_append_b_tail(struct str * str, const symbol * q, int skip) {
+    if (skip < 0 || skip >= SIZE(q)) return;
+
+    str->data = add_to_b(str->data, SIZE(q) - skip, q + skip);
+}
+
 /* Append a (char *, null terminated) string to a str. */
 extern void str_append_string(struct str * str, const char * s) {
 

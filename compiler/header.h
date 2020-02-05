@@ -37,6 +37,7 @@ extern void str_delete(struct str * str);
 extern void str_append(struct str * str, const struct str * add);
 extern void str_append_ch(struct str * str, char add);
 extern void str_append_b(struct str * str, const symbol * q);
+extern void str_append_b_tail(struct str * str, const symbol * q, int skip);
 extern void str_append_string(struct str * str, const char * s);
 extern void str_append_int(struct str * str, int i);
 extern void str_clear(struct str * str);
