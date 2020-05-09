@@ -49,6 +49,7 @@ extern int str_back(const struct str *str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 extern void output_str(FILE * outfile, struct str * str);
+extern void output_str_utf8(FILE * outfile, struct str * str);
 
 typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
 
@@ -342,7 +343,7 @@ struct options {
     byte syntax_tree;
     byte comments;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -408,4 +409,8 @@ extern void generate_program_rust(struct generator * g);
 
 #ifndef DISABLE_GO
 extern void generate_program_go(struct generator * g);
+#endif
+
+#ifndef DISABLE_ADA
+extern void generate_program_ada(struct generator * g);
 #endif

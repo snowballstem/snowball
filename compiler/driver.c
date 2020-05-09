@@ -54,6 +54,9 @@ static void print_arglist(int exit_code) {
 #ifndef DISABLE_GO
                "  -go\n"
 #endif
+#ifndef DISABLE_ADA
+               "  -ada\n"
+#endif
                "  -w[idechars]\n"
                "  -u[tf8]\n"
                "  -n[ame] class name\n"
@@ -187,6 +190,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_PYTHON
             if (eq(s, "-py") || eq(s, "-python")) {
                 o->make_lang = LANG_PYTHON;
+                continue;
+            }
+#endif
+#ifndef DISABLE_ADA
+            if (eq(s, "-ada")) {
+                o->make_lang = LANG_ADA;
                 continue;
             }
 #endif

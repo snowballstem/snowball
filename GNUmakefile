@@ -66,7 +66,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
-		   compiler/generator_go.c
+		   compiler/generator_go.c \
+		   compiler/generator_ada.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \

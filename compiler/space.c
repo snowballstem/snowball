@@ -68,8 +68,19 @@ extern void report_b(FILE * out, const symbol * p) {
     }
 }
 
+extern void report_b_utf8(FILE * out, const symbol * p) {
+    int i;
+    for (i = 0; i < SIZE(p); i++) {
+        putc(p[i] & 0x0ff, out);
+    }
+}
+
 extern void output_str(FILE * outfile, struct str * str) {
     report_b(outfile, str_data(str));
+}
+
+extern void output_str_utf8(FILE * outfile, struct str * str) {
+    report_b_utf8(outfile, str_data(str));
 }
 
 extern void lose_b(symbol * p) {
