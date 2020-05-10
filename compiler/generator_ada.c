@@ -323,7 +323,7 @@ static void generate_or(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
 
     int a0 = g->failure_label;
-    int a1 = g->failure_keep_count;
+    struct str * a1 = str_copy(g->failure_str);
 
     int out_lab = new_label(g);
     int end_unreachable = true;
@@ -333,6 +333,7 @@ static void generate_or(struct generator * g, struct node * p) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     p = p->left;
+    str_clear(g->failure_str);
 
     if (p == 0) {
         /* p should never be 0 after an or: there should be at least two
@@ -340,14 +341,18 @@ static void generate_or(struct generator * g, struct node * p) {
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
     }
-    g->failure_keep_count = 0;
     while (p->right) {
         g->failure_label = new_label(g);
         g->label_used = 0;
         generate(g, p);
-        wgotol(g, out_lab);
+        if (!g->unreachable) {
+            wgotol(g, out_lab);
+            end_unreachable = false;
+        }
+        
         if (g->label_used)
             wsetl(g, g->failure_label);
+        g->unreachable = false;
         if (keep_c) {
             write_restorecursor(g, p, savevar);
         }
@@ -355,7 +360,8 @@ static void generate_or(struct generator * g, struct node * p) {
     }
     g->label_used = used;
     g->failure_label = a0;
-    g->failure_keep_count = a1;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
 
     generate(g, p);
     wsetl(g, out_lab);
@@ -416,9 +422,8 @@ static void generate_try(struct generator * g, struct node * p) {
         savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
         restore_string(p, g->failure_str, savevar);
-    }
-    
-    g->failure_keep_count = keep_c;
+    }    
+
     g->failure_label = new_label(g);
 
     g->label_used = 0;
@@ -485,6 +490,7 @@ static void generate_do(struct generator * g, struct node * p) {
         w(g, "~M~V0 (Z, Result);~N");
     } else {
         g->failure_label = new_label(g);
+        str_clear(g->failure_str);
 
         generate(g, p->left);
         if (g->label_used)
@@ -612,7 +618,6 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
 
     g->failure_label = new_label(g);
     g->label_used = 0;
-    g->failure_keep_count = 0;
     generate(g, p->left);
 
     if (!g->unreachable) {
@@ -798,7 +803,6 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
-    int keep_c;
 
     g->B[0] = str_data(varname);
     write_declare(g, "   ~B0 : Integer", p);
@@ -814,7 +818,6 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         struct node * q = p->left;
 
         ++g->keep_count;
-        keep_c = g->keep_count;
 
         g->S[0] = q->mode == m_forward ? ">" : "<";
 
@@ -845,7 +848,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
     } else {
         write_savecursor(g, p, savevar);
-        keep_c = g->keep_count;
+
         generate(g, p->left);
 
         if (!g->unreachable) {
@@ -871,7 +874,6 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         }
     }
 
-    g->failure_keep_count = -keep_c;
     if (!g->unreachable) {
         generate(g, p->aux);
 
