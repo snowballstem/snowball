@@ -523,7 +523,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
 static void generate_GO(struct generator * g, struct node * p, int style) {
     int end_unreachable = false;
     int used = g->label_used;
-    struct str * savevar = vars_newname(g);
+    struct str * savevar;
     int keep_c = style == 1 || repeat_restore(g, p->left);
     int a0 = g->failure_label;
 
@@ -546,7 +546,10 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     write_comment(g, p);
     w(g, "~Mloop~N~+");
 
-    if (keep_c) write_savecursor(g, p, savevar);
+    if (keep_c) {
+        savevar = vars_newname(g);
+        write_savecursor(g, p, savevar);
+    }
 
     g->failure_label = new_label(g);
     g->label_used = 0;
@@ -565,8 +568,10 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->unreachable = false;
     if (g->label_used)
         wsetl(g, g->failure_label);
-    if (keep_c) write_restorecursor(g, p, savevar);
-
+    if (keep_c) {
+        write_restorecursor(g, p, savevar);
+        str_delete(savevar);
+    }
     g->label_used = used;
     g->failure_label = a0;
 
@@ -575,7 +580,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     g->I[0] = golab;
     w(g, "~-~Mend loop;~N");
-    str_delete(savevar);
     g->unreachable = end_unreachable;
 }
 
@@ -1569,5 +1573,6 @@ extern void generate_program_ada(struct generator * g) {
     w(g, g->options->package);
     w(g, ";~N");
     output_str_utf8(g->options->output_h, g->outbuf);
+    str_delete(g->failure_str);
     str_delete(g->outbuf);
 }
