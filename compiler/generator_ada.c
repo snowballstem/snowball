@@ -2,6 +2,7 @@
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
 #include <ctype.h>
+#include <limits.h>
 #include "header.h"
 
 /* prototypes */
@@ -28,54 +29,13 @@ static struct str * vars_newname(struct generator * g) {
 
 static void write_varname(struct generator * g, struct name * p) {
 
+    int ch = p->b[0];
     if (p->type != t_external) {
-        /* Pascal identifiers are case-insensitive but Snowball identifiers
-         * should be case-sensitive.  To address this, we encode the case of
-         * the identifier.  For readability of the generated code, the
-         * encoding tries to be minimally intrusive for common cases.
-         *
-         * After the letter which indicates the type and before the "_" we
-         * encode the case pattern in the Snowball identifier using "U" for
-         * an upper-case letter, "l" for a lower-case letter and nothing for
-         * other characters.  Any trailing string of "l" is omitted (since
-         * it's redundant and decreases readability).
-         *
-         * Identifiers without any upper-case encode most simply, e.g. I_foo2
-         *
-         * A capitalised identifier is also concise, e.g. IU_Foo2
-         *
-         * All-caps gives a string of Us, e.g. IUUUUUUUU_SHOUTING
-         *
-         * But any example can be handled, e.g. IUllU_Foo79_Bar
-         *
-         * We don't try to solve this problem for external identifiers - it
-         * seems more helpful to leave those alone and encourage snowball
-         * program authors to avoid naming externals which only differ by
-         * case.
-         */
-        int i, len = SIZE(p->b);
-        int lower_pending = 0;
-        write_char(g, "SBIrxg"[p->type]);
-        for (i = 0; i != len; ++i) {
-            int ch = p->b[i];
-            if (ch >= 'a' && ch <= 'z') {
-                ++lower_pending;
-            } else if (ch >= 'A' && ch <= 'Z') {
-                while (lower_pending) {
-                    write_char(g, 'l');
-                    --lower_pending;
-                }
-                write_char(g, 'U');
-            }
-        }
-
+        write_char(g, "SBIRXG"[p->type]);
         write_char(g, '_');
-        write_b(g, p->b);
-    } else {
-        int ch = p->b[0];
-        write_char(g, toupper(ch));
-        str_append_b_tail(g->outbuf, p->b, 1);
     }   
+    write_char(g, toupper(ch));
+    str_append_b_tail(g->outbuf, p->b, 1);
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
@@ -136,12 +96,13 @@ static void write_block_end(struct generator * g) {   /* block end */
     w(g, "~-~Mend;~N");
 }
 
-static void wrestorelimit(struct generator * g, struct node * p, int keep_token) {     /* restore limit */
-    if (p->mode == m_forward) {
-        w(g, "Z.L := Z.L + ~B0;~N");
-    } else {
-        w(g, "Z.Lb := ~B0;~N");
-    }
+static void restore_string(struct node * p, struct str * out, struct str * savevar) {
+
+    str_clear(out);
+    str_append_string(out, "Z.C := ");
+    if (p->mode != m_forward) str_append_string(out, "Z.L - ");
+    str_append(out, savevar);
+    str_append_string(out, ";");
 }
 
 static void write_savecursor(struct generator * g, struct node * p,
@@ -153,22 +114,16 @@ static void write_savecursor(struct generator * g, struct node * p,
     writef(g, "~M~B0 := ~S1Z.C;~N" , p);
 }
 
-static void restore_string(struct node * p, struct str * out, struct str * savevar) {
-    str_clear(out);
-    str_append_string(out, "Z.C := ");
-    if (p->mode != m_forward) str_append_string(out, "Z.L - ");
-    str_append(out, savevar);
-    str_append_string(out, ";");
-}
-
-static void write_restorecursor(struct generator * g, struct node * p,
-                                struct str * savevar) {
-    struct str * temp = str_new();
+static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
     write_margin(g);
-    restore_string(p, temp, savevar);
-    write_str(g, temp);
+    if (p->mode == m_forward) {
+        write_string(g, "Z.C := ");
+    } else {
+        write_string(g, "Z.C := Z.L - ");
+    }
+    write_str(g, savevar);
+    write_string(g, ";");
     write_newline(g);
-    str_delete(temp);
 }
 
 static void write_inc_cursor(struct generator * g, struct node * p) {
@@ -197,6 +152,12 @@ static void wgotol(struct generator * g, int n) {
 }
 
 static void write_failure(struct generator * g) {
+
+    if (str_len(g->failure_str) != 0) {
+        write_margin(g);
+        write_str(g, g->failure_str);
+        write_newline(g);
+    }
     write_margin(g);
     switch (g->failure_label) {
         case x_return:
@@ -248,10 +209,9 @@ static void writef(struct generator * g, const char * input, struct node * p) {
         switch (input[i++]) {
             default: write_char(g, input[i - 1]); continue;
             case 'C': write_comment(g, p); continue;
-            case 'f': write_block_start(g);
+            case 'f': 
                       write_failure(g);
                       g->unreachable = false;
-                      write_block_end(g);
                       continue;
             case 'M': write_margin(g); continue;
             case 'N': write_newline(g); continue;
@@ -417,20 +377,23 @@ static void generate_not(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
 
     int a0 = g->failure_label, l;
+    struct str * a1 = str_copy(g->failure_str);
 
     write_comment(g, p);
     if (keep_c) {
-        write_block_start(g);
         write_savecursor(g, p, savevar);
     }
 
     g->failure_label = new_label(g);
+    str_clear(g->failure_str);
 
     l = g->failure_label;
 
     generate(g, p->left);
 
     g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
 
     if (!g->unreachable) write_failure(g);
 
@@ -440,7 +403,6 @@ static void generate_not(struct generator * g, struct node * p) {
     g->unreachable = false;
 
     if (keep_c) write_restorecursor(g, p, savevar);
-    if (keep_c) write_block_end(g);
     str_delete(savevar);
 }
 
@@ -453,14 +415,17 @@ static void generate_try(struct generator * g, struct node * p) {
     if (keep_c) {
         savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
+        restore_string(p, g->failure_str, savevar);
     }
     
     g->failure_keep_count = keep_c;
     g->failure_label = new_label(g);
+
     g->label_used = 0;
     generate(g, p->left);
     if (g->label_used)
         wsetl(g, g->failure_label);
+    g->unreachable = false;
 
     if (keep_c) {
         str_delete(savevar);
@@ -854,6 +819,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         w(g, "~Mreturn;~-~N");
         w(g, "~Mend if;~N");
         w(g, "~M~B0");
+        g->unreachable = false;
 
         if (p->mode == m_forward) {
             w(g, " := Z.L - Z.C; Z.L := ");
@@ -862,27 +828,55 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         }
         generate_AE(g, q->AE);
         w(g, ";~N");
+
+        if (p->mode == m_forward) {
+            str_assign(g->failure_str, "Z.L := Z.L + ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        } else {
+            str_assign(g->failure_str, "Z.Lb := ");
+            str_append(g->failure_str, varname);
+            str_append_ch(g->failure_str, ';');
+        }
+
     } else {
         write_savecursor(g, p, savevar);
         keep_c = g->keep_count;
         generate(g, p->left);
 
-        w(g, "~M~B0");
-        write_int(g, keep_c);
-        if (p->mode == m_forward)
-            w(g, " := Z.L - Z.C; Z.L = Z.C;~N");
-        else
-            w(g, " := Z.Lb; Z.Lb = Z.C;~N");
-        w(g, "~M");
-        write_restorecursor(g, p, savevar);
-        w(g, "~N");
+        if (!g->unreachable) {
+            g->B[0] = str_data(varname);
+            if (p->mode == m_forward) {
+                w(g, "~M~B0 := Z.L - Z.C;~N");
+                w(g, "~MZ.L := Z.C;~N");
+            } else {
+                w(g, "~M~B0 := Z.Lb;~N");
+                w(g, "~MZ.Lb := Z.C;~N");
+            }
+            write_restorecursor(g, p, savevar);
+
+            if (p->mode == m_forward) {
+                str_assign(g->failure_str, "Z.L := Z.L + ");
+                str_append(g->failure_str, varname);
+                str_append_ch(g->failure_str, ';');
+            } else {
+                str_assign(g->failure_str, "Z.Lb := ");
+                str_append(g->failure_str, varname);
+                str_append_ch(g->failure_str, ';');
+            }
+        }
     }
 
     g->failure_keep_count = -keep_c;
-    generate(g, p->aux);
-    w(g, "~M");
-    g->B[0] = str_data(varname);
-    wrestorelimit(g, p, -g->failure_keep_count);
+    if (!g->unreachable) {
+        generate(g, p->aux);
+
+        if (!g->unreachable) {
+            write_margin(g);
+            write_str(g, g->failure_str);
+            write_newline(g);
+        }
+    }
     str_delete(varname);
     str_delete(savevar);
 }
@@ -1075,14 +1069,140 @@ static void generate_define(struct generator * g, struct node * p) {
 
 static void generate_substring(struct generator * g, struct node * p) {
     struct among * x = p->among;
+    int block = -1;
+    unsigned int bitmap = 0;
+    struct amongvec * among_cases = x->b;
+    int c;
+    int empty_case = -1;
+    int n_cases = 0;
+    symbol cases[2];
+    int shortest_size = INT_MAX;
+    int call_done = 0;
 
     write_comment(g, p);
 
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->I[0] = x->number;
 
-    writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, A);~N", p);
-    write_failure_if(g, "A = 0", p);
+    /* In forward mode with non-ASCII UTF-8 characters, the first character
+     * of the string will often be the same, so instead look at the last
+     * common character position.
+     *
+     * In backward mode, we can't match if there are fewer characters before
+     * the current position than the minimum length.
+     */
+    for (c = 0; c < x->literalstring_count; ++c) {
+        int size = among_cases[c].size;
+        if (size != 0 && size < shortest_size) {
+            shortest_size = size;
+        }
+    }
+
+    for (c = 0; c < x->literalstring_count; ++c) {
+        symbol ch;
+        if (among_cases[c].size == 0) {
+            empty_case = c;
+            continue;
+        }
+        if (p->mode == m_forward) {
+            ch = among_cases[c].b[shortest_size - 1];
+        } else {
+            ch = among_cases[c].b[among_cases[c].size - 1];
+        }
+        if (n_cases == 0) {
+            block = ch >> 5;
+        } else if (ch >> 5 != block) {
+            block = -1;
+            if (n_cases > 2) break;
+        }
+        if (block == -1) {
+            if (n_cases > 0 && ch == cases[0]) continue;
+            if (n_cases < 2) {
+                cases[n_cases++] = ch;
+            } else if (ch != cases[1]) {
+                ++n_cases;
+                break;
+            }
+        } else {
+            if ((bitmap & (1u << (ch & 0x1f))) == 0) {
+                bitmap |= 1u << (ch & 0x1f);
+                if (n_cases < 2)
+                    cases[n_cases] = ch;
+                ++n_cases;
+            }
+        }
+    }
+
+    if (block != -1 || n_cases <= 2) {
+        char buf[64];
+        char buf2[64];
+        char buf3[64];
+        g->I[2] = block;
+        g->I[3] = bitmap;
+        g->I[4] = shortest_size - 1;
+        g->S[3] = buf3;
+        snprintf(buf3, sizeof(buf3), "16#%x#", bitmap);
+        if (p->mode == m_forward) {
+            if (shortest_size == 1)
+                sprintf(buf, "Z.C");
+            else
+                sprintf(buf, "Z.C + %d", shortest_size - 1);
+            snprintf(buf2, sizeof(buf2), "Character'Pos (Z.P (%s))", buf);
+            g->S[1] = buf;
+            g->S[2] = buf2;
+            if (shortest_size == 1) {
+                writef(g, "~Mif Z.C >= Z.L", p);
+            } else {
+                writef(g, "~Mif Z.C + ~I4 >= Z.L", p);
+            }
+        } else {
+            g->S[1] = "Z.C - 1";
+            g->S[2] = "Character'Pos (Z.P (Z.C - 1))";
+            if (shortest_size == 1) {
+                writef(g, "~Mif Z.C <= Z.Lb", p);
+            } else {
+                writef(g, "~Mif Z.C - ~I4 <= Z.Lb", p);
+            }
+        }
+        if (n_cases == 0) {
+            /* We get this for the degenerate case: among { '' }
+             * This doesn't seem to be a useful construct, but it is
+             * syntactically valid.
+             */
+        } else if (n_cases == 1) {
+            g->I[4] = cases[0];
+            writef(g, " or else ~S2 /= ~I4", p);
+        } else if (n_cases == 2) {
+            g->I[4] = cases[0];
+            g->I[5] = cases[1];
+            writef(g, " or else (~S2 /= ~I4 and then ~S2 /= ~I5)", p);
+        } else {
+            writef(g, " or else Check_Among (Z, ~S1, ~I2, ~S3)", p);
+        }
+        writef(g, " then~+~N", p);
+        if (empty_case != -1) {
+            /* If the among includes the empty string, it can never fail
+             * so not matching the bitmap means we match the empty string.
+             */
+            g->I[4] = among_cases[empty_case].result;
+            writef(g, "~MA := ~I4;~-~N~Melse~+~C", p);
+            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, A);~N", p);
+            write_failure_if(g, "A = 0", p);
+            call_done = 1;
+        } else {
+            writef(g, "~f~C", p);
+        }
+        writef(g, "~-~Mend if;~N", p);
+    } else {
+#ifdef OPTIMISATION_WARNINGS
+        printf("Couldn't shortcut among %d\n", x->number);
+#endif
+    }
+
+    if (!call_done) {
+        writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, A);~N", p);
+        write_failure_if(g, "A = 0", p);
+    }
 }
 
 static void generate_among(struct generator * g, struct node * p) {
@@ -1138,10 +1258,12 @@ static void generate_debug(struct generator * g, struct node * p) {
 static void generate(struct generator * g, struct node * p) {
 
     int a0;
+    struct str * a1;
 
     if (g->unreachable) return;
 
     a0 = g->failure_label;
+    a1 = str_copy(g->failure_str);
 
     switch (p->type) {
         case c_define:        generate_define(g, p); break;
@@ -1207,6 +1329,8 @@ static void generate(struct generator * g, struct node * p) {
     }
 
     g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
 }
 
 /* Class declaration generation. */
@@ -1406,7 +1530,9 @@ static void generate_groupings(struct generator * g) {
 }
 
 extern void generate_program_ada(struct generator * g) {
+
     g->outbuf = str_new();
+    g->failure_str = str_new();
 
     generate_unit_start(g);
 
