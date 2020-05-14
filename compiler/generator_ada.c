@@ -8,6 +8,7 @@
 /* prototypes */
 
 static void generate(struct generator * g, struct node * p);
+static void generate_next(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
@@ -277,6 +278,8 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "Z.L" : "Z.Lb"); break;
         case c_len:
+            w(g, "Length_Utf8 (Z)");
+            break;
         case c_size:
             w(g, "Length (Z)");
             break;
@@ -582,7 +585,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->failure_label = a0;
 
     write_check_limit(g, p);
-    write_inc_cursor(g, p);
+    //    write_inc_cursor(g, p);
+    generate_next(g, p);
 
     g->I[0] = golab;
     w(g, "~-~Mend loop;~N");
@@ -1153,7 +1157,7 @@ static void generate_substring(struct generator * g, struct node * p) {
                 sprintf(buf, "Z.C");
             else
                 sprintf(buf, "Z.C + %d", shortest_size - 1);
-            snprintf(buf2, sizeof(buf2), "Character'Pos (Z.P (%s))", buf);
+            snprintf(buf2, sizeof(buf2), "Character'Pos (Z.P (%s + 1))", buf);
             g->S[1] = buf;
             g->S[2] = buf2;
             if (shortest_size == 1) {
@@ -1163,7 +1167,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             }
         } else {
             g->S[1] = "Z.C - 1";
-            g->S[2] = "Character'Pos (Z.P (Z.C - 1))";
+            g->S[2] = "Character'Pos (Z.P (Z.C))";
             if (shortest_size == 1) {
                 writef(g, "~Mif Z.C <= Z.Lb", p);
             } else {
@@ -1545,7 +1549,14 @@ extern void generate_program_ada(struct generator * g) {
     /* generate implementation. */
     w(g, "package body Stemmer.");
     w(g, g->options->package);
-    w(g, " is~N~+");
+    w(g, " is~N~+~N");
+    w(g, "~Mpragma Style_Checks (\"-mr\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*variable*is never read and never assigned*\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*mode could be*instead of*\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*formal parameter.*is not modified*\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*this line is too long*\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*label.*is not referenced*\");~N");
+    w(g, "~N");
 
     generate_method_decls(g, t_routine);
     generate_groupings(g);
