@@ -127,12 +127,6 @@ static void write_restorecursor(struct generator * g, struct node * p, struct st
     write_newline(g);
 }
 
-static void write_inc_cursor(struct generator * g, struct node * p) {
-    write_margin(g);
-    write_string(g, p->mode == m_forward ? "Z.C := Z.C + 1;" : "Z.C := Z.C - 1;");
-    write_newline(g);
-}
-
 static void wsetl(struct generator * g, int n) {
 
     write_newline(g);
@@ -585,7 +579,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->failure_label = a0;
 
     write_check_limit(g, p);
-    //    write_inc_cursor(g, p);
     generate_next(g, p);
 
     g->I[0] = golab;
@@ -758,7 +751,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 := Slice_To (Z);~N", p);
+    writef(g, "~M~V0 := Ada.Strings.Unbounded.To_Unbounded_String (Slice_To (Z));~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -1007,7 +1000,8 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->V[0] = p->name;
-    write_failure_if(g, "not EqV~S0 (Z, ~V0)", p);
+    writef(g, "~MC := Eq_S~S0 (Z, Ada.Strings.Unbounded.To_String (~V0));", p);
+    write_failure_if(g, "C = 0", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1364,13 +1358,25 @@ static void generate_method_decls(struct generator * g, enum name_types type) {
     }
 }
 
+static int has_string_variable(struct generator * g) {
+    struct name * q;
+    for (q = g->analyser->names; q; q = q->next) {
+        g->V[0] = q;
+        if (q->type == t_string) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 static void generate_member_decls(struct generator * g) {
     struct name * q;
     for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "~M~W0 : String;~N");
+                w(g, "~M~W0 : Ada.Strings.Unbounded.Unbounded_String;~N");
                 break;
             case t_integer:
                 w(g, "~M~W0 : Integer;~N");
@@ -1573,6 +1579,9 @@ extern void generate_program_ada(struct generator * g) {
 
     g->margin = 0;
     write_start_comment(g, "--  ", NULL);
+    if (has_string_variable(g)) {
+        w(g, "private with Ada.Strings.Unbounded;");
+    }
     w(g, "package Stemmer.");
     w(g, g->options->package);
     w(g, " is~N~+");
