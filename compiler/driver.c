@@ -141,18 +141,8 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             }
             if (eq(s, "-n") || eq(s, "-name")) {
                 /* Copy here so we do not free an argv item. */
-                const char * name = NULL;
-                char * new_name = NULL;
-                size_t len = 0;
-
                 check_lim(i, argc);
-                name = argv[i++];
-
-                len = strlen(name);
-                new_name = malloc(len);
-                memcpy(new_name, name, len);
-
-                o->name = new_name;
+                o->name = strdup(argv[i++]);
                 continue;
             }
 #ifndef DISABLE_JS
