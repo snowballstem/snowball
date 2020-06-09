@@ -149,8 +149,9 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 name = argv[i++];
 
                 len = strlen(name);
-                new_name = malloc(len);
+                new_name = malloc(len+1);
                 memcpy(new_name, name, len);
+                new_name[len] = '\0';
 
                 o->name = new_name;
                 continue;
