@@ -18,7 +18,7 @@ externals ( stem )
 
 integers ( p1 x )
 
-groupings ( vowel niked alefBeys consonant hebrewCons )
+groupings ( vowel niked alefBeys consonant )
 
 stringescapes {}
 
@@ -76,8 +76,6 @@ define niked       '{Shvo}{Khirik}{Tseyre}{Segl}{ReducedSegl}{Pasekh}{ReducedPas
 define alefBeys    '{Alef}{Beys}{Giml}{Dalet}{Hey}{Vov}{Zayen}{Khes}{Tes}{Yud}{LangerKhof}{Khof}{Lamed}{ShlosMem}{Mem}{LangerNun}{Nun}{Samekh}{Ayen}{LangerFey}{Fey}{LangerTsadek}{Tsadek}{Kuf}{Reysh}{Shin}{Sof}{TsveyVovn}{VovYud}{TsveyYudn}'
 define vowel           '{Alef}{Vov}{Yud}{Ayen}{VovYud}{TsveyYudn}'
 define consonant   alefBeys - vowel
-// We use hebrew consonants to detect three-letter hebraic roots. We exclude Shin to exclude Yiddish three-letter sequences like {Shin}{Fey}{Reysh}
-define hebrewCons  consonant - '{Shin}'
 
 define prelude as (
   do (
@@ -139,11 +137,18 @@ define mark_regions as (
 
     test(hop 3 setmark x)
 
-    // Either 3 hebrew consonants or the first non-vowel after a vowel
+    // We want to allow three-consonant Hebrew roots.
+    // To this end, we skip three-consonant combinations that exist in non-Hebraic Yiddish.
+    try (
+      among(
+        '{Shin}{Fey}{Reysh}' '{Shin}{Tes}{Reysh}' '{Shin}{Tes}{Shin}' '{Dalet}{Zayen}{Shin}'
+          ( true )
+      )
+    )
+
+    // Either 3 consonants or the first non-vowel after a vowel
     (
-      // Three exceptions with Shin in the Hebrew root
-      not (('{Mem}{Shin}{Fey}{Tes}' or '{Khof}{Shin}{Reysh}' or '{Shin}{Mem}{Dalet}') setmark p1)
-      not (hebrewCons hebrewCons hebrewCons setmark p1)
+      not (consonant consonant consonant setmark p1)
       goto vowel repeat vowel setmark p1
     )
     try($p1 < x  $p1 = x)  // at least 3 past the prefix
@@ -414,9 +419,8 @@ backwardmode (
     do (
       [substring] among(
         // Adjective endings: -ig, -ik, -ish, -nik
-        '{Yud}{Giml}' '{Yud}{Kuf}' '{Yud}{Shin}' '{Nun}{Yud}{Kuf}'
-          ( R1 delete
-          )
+        '{Yud}{Giml}' '{Yud}{Kuf}' '{Yud}{Shin}' '{Nun}{Yud}{Kuf}' '{Dalet}{Yud}{Kuf}'
+          ( R1 delete )
 
         // Exceptions to above: -blik, -glik
         '{Beys}{Lamed}{Yud}{Kuf}' '{Giml}{Lamed}{Yud}{Kuf}'
