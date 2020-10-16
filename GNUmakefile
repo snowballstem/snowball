@@ -319,7 +319,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(LIBSTEMMER_EXTRA) \
 	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
 	    $(COMMON_FILES) \
-	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
+	    GNUmakefile README.rst doc/TODO libstemmer/mkmodules.pl
 	destname=snowball_code; \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
@@ -361,7 +361,7 @@ dist_libstemmer_c: \
 	mkdir -p $${dest}/include && \
 	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
 	(cd $${dest} && \
-	 echo "README" >> MANIFEST && \
+	 echo "README.rst" >> MANIFEST && \
 	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
 	 ls runtime/*.c runtime/*.h >> MANIFEST && \
 	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
@@ -454,7 +454,7 @@ dist_libstemmer_js: $(JS_SOURCES)
 	cp -a $(JS_SAMPLE_SOURCES) $${dest}/$(js_sample_dir) && \
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
-	 ls README $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
+	 ls README.rst $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
