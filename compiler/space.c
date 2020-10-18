@@ -68,19 +68,8 @@ extern void report_b(FILE * out, const symbol * p) {
     }
 }
 
-extern void report_b_utf8(FILE * out, const symbol * p) {
-    int i;
-    for (i = 0; i < SIZE(p); i++) {
-        putc(p[i] & 0x0ff, out);
-    }
-}
-
 extern void output_str(FILE * outfile, struct str * str) {
     report_b(outfile, str_data(str));
-}
-
-extern void output_str_utf8(FILE * outfile, struct str * str) {
-    report_b_utf8(outfile, str_data(str));
 }
 
 extern void lose_b(symbol * p) {
@@ -201,6 +190,11 @@ extern void str_append_ch(struct str * str, char add) {
     symbol q[1];
     q[0] = add;
     str->data = add_to_b(str->data, 1, q);
+}
+
+extern void str_append_symbol(struct str * str, symbol add) {
+
+    str->data = add_to_b(str->data, 1, &add);
 }
 
 /* Append a low level block to a str. */

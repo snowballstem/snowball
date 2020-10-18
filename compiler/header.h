@@ -36,6 +36,7 @@ extern struct str * str_new(void);
 extern void str_delete(struct str * str);
 extern void str_append(struct str * str, const struct str * add);
 extern void str_append_ch(struct str * str, char add);
+extern void str_append_symbol(struct str * str, symbol add);
 extern void str_append_b(struct str * str, const symbol * q);
 extern void str_append_b_tail(struct str * str, const symbol * q, int skip);
 extern void str_append_string(struct str * str, const char * s);
@@ -49,7 +50,6 @@ extern int str_back(const struct str *str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 extern void output_str(FILE * outfile, struct str * str);
-extern void output_str_utf8(FILE * outfile, struct str * str);
 
 typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
 
@@ -365,6 +365,7 @@ extern void write_char(struct generator * g, int ch);
 extern void write_newline(struct generator * g);
 extern void write_string(struct generator * g, const char * s);
 extern void write_int(struct generator * g, int i);
+extern void write_symbol(struct generator * g, symbol s);
 extern void write_b(struct generator * g, symbol * b);
 extern void write_str(struct generator * g, struct str * str);
 

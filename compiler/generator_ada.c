@@ -55,8 +55,11 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_string(g, "\"\"");
         } else if (32 <= ch && ch < 127) {
             write_char(g, ch);
+        } else if (ch <= 255) {
+            write_symbol(g, ch);
         } else {
-            write_char(g, ch & 0x0ff);
+            printf("In write_literal_string, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
+            exit(1);
         }
     }
     write_char(g, '"');
@@ -1139,7 +1142,7 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     if (block != -1 || n_cases <= 2) {
         char buf[64];
-        char buf2[64];
+        char buf2[128];
         char buf3[64];
         g->I[2] = block;
         g->I[3] = bitmap;
@@ -1573,7 +1576,7 @@ extern void generate_program_ada(struct generator * g) {
     w(g, g->options->package);
     w(g, ";~N");
 
-    output_str_utf8(g->options->output_src, g->outbuf);
+    output_str(g->options->output_src, g->outbuf);
 
     str_clear(g->outbuf);
 
@@ -1594,7 +1597,7 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "end Stemmer.");
     w(g, g->options->package);
     w(g, ";~N");
-    output_str_utf8(g->options->output_h, g->outbuf);
+    output_str(g->options->output_h, g->outbuf);
     str_delete(g->failure_str);
     str_delete(g->outbuf);
 }
