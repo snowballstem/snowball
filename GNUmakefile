@@ -41,6 +41,10 @@ gofmt ?= gofmt
 go_src_main_dir = go
 go_src_dir = $(go_src_main_dir)/algorithms
 
+gprbuild ?= gprbuild
+ada_src_main_dir = ada
+ada_src_dir = $(ada_src_main_dir)/algorithms
+
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -140,6 +144,7 @@ JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
+ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.ads) $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.adb)
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -170,6 +175,7 @@ clean:
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
+	      $(ADA_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
@@ -307,6 +313,13 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	o="$(js_output_dir)/$${l}-stemmer"; \
 	echo "./snowball $< -js -o $${o}"; \
 	./snowball $< -js -o $${o}
+
+$(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
+	@mkdir -p $(ada_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(ada_src_dir)/stemmer-$${l}"; \
+	echo "./snowball $< -ada -o $${o}"; \
+	./snowball $< -ada -P $${l} -o $${o}
 
 # Make a full source distribution
 dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
@@ -662,5 +675,29 @@ update_version:
 		compiler/header.h \
 		csharp/Snowball/AssemblyInfo.cs \
 		python/setup.py
+
+check_ada: ada/bin/stemwords
+	$(MAKE) do_check_ada
+
+do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
+
+check_ada_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Ada"
+	@cd ada && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  ./bin/stemwords `echo $<|sed 's!.*/!!'` tmp.in $(PWD)/tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  ./bin/stemwords `echo $<|sed 's!.*/!!'` $</voc.txt $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt | head -300; \
+	fi
+	@rm tmp.txt
+
+ada/bin/stemwords: $(ADA_SOURCES)
+	cd ada && $(gprbuild) -Pstemwords -p
 
 .SUFFIXES: .class .java
