@@ -37,6 +37,11 @@ static void write_varname(struct generator * g, struct name * p) {
     }   
     write_char(g, toupper(ch));
     str_append_b_tail(g->outbuf, p->b, 1);
+
+    ch = p->b[SIZE(p->b) - 1];
+    if (ch == '_') {
+        write_char(g, 'E');
+    }
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
@@ -243,6 +248,19 @@ static int need_among_var(struct node *p) {
         }
         p = p->left;
     }
+    return 0;
+}
+
+static int need_among_handler(struct among *a) {
+    int i;
+    struct amongvec * v = a->b;
+
+    for (i = 0; i < a->literalstring_count; i++, v++) {
+        if (v->function != 0) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -959,9 +977,9 @@ static void generate_integer_test(struct generator * g, struct node * p, char * 
     write_string(g, s);
     write_char(g, ' ');
     generate_AE(g, p->AE);
-    w(g, ") then~N");
+    w(g, ") then~+~N");
     write_failure(g);
-    w(g, "~Mend if;~N");
+    w(g, "~-~Mend if;~N");
     g->unreachable = false;
 }
 
@@ -1046,7 +1064,7 @@ static void generate_define(struct generator * g, struct node * p) {
     w(g, "~{");
     switch (p->left->type) {
         case c_eq:            generate_integer_function(g, p->left, "="); break;
-        case c_ne:            generate_integer_function(g, p->left, "<>"); break;
+        case c_ne:            generate_integer_function(g, p->left, "/="); break;
         case c_gr:            generate_integer_function(g, p->left, ">"); break;
         case c_ge:            generate_integer_function(g, p->left, ">="); break;
         case c_ls:            generate_integer_function(g, p->left, "<"); break;
@@ -1085,6 +1103,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     symbol cases[2];
     int shortest_size = INT_MAX;
     int call_done = 0;
+    int need_handler = need_among_handler(x);
 
     write_comment(g, p);
 
@@ -1193,7 +1212,11 @@ static void generate_substring(struct generator * g, struct node * p) {
              */
             g->I[4] = among_cases[empty_case].result;
             writef(g, "~MA := ~I4;~-~N~Melse~+~C", p);
-            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, A);~N", p);
+            if (need_handler) {
+                writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
+            } else {
+                writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
+            }
             write_failure_if(g, "A = 0", p);
             call_done = 1;
         } else {
@@ -1207,7 +1230,11 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (!call_done) {
-        writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, A);~N", p);
+        if (need_handler) {
+            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
+        } else {
+            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
+        }
         write_failure_if(g, "A = 0", p);
     }
 }
@@ -1315,7 +1342,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_multiplyassign:generate_integer_assign(g, p, "*"); break;
         case c_divideassign:  generate_integer_assign(g, p, "/"); break;
         case c_eq:            generate_integer_test(g, p, "="); break;
-        case c_ne:            generate_integer_test(g, p, "<>"); break;
+        case c_ne:            generate_integer_test(g, p, "/="); break;
         case c_gr:            generate_integer_test(g, p, ">"); break;
         case c_ge:            generate_integer_test(g, p, ">="); break;
         case c_ls:            generate_integer_test(g, p, "<"); break;
@@ -1353,11 +1380,21 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 
 static void generate_method_decls(struct generator * g, enum name_types type) {
     struct name * q;
+    struct among * a = g->analyser->amongs;
+    int need_handler = 0;
 
     for (q = g->analyser->names; q; q = q->next) {
         if ((enum name_types)q->type == type) {
             generate_method_decl(g, q);
         }
+    }
+
+    while (a != 0 && need_handler == 0) {
+        need_handler = need_among_handler(a);
+        a = a->next;
+    }
+    if (need_handler) {
+        w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
     }
 }
 
@@ -1375,22 +1412,37 @@ static int has_string_variable(struct generator * g) {
 
 static void generate_member_decls(struct generator * g) {
     struct name * q;
+    int count = 0;
+
+    
     for (q = g->analyser->names; q; q = q->next) {
-        g->V[0] = q;
-        switch (q->type) {
-            case t_string:
-                w(g, "~M~W0 : Ada.Strings.Unbounded.Unbounded_String;~N");
-                break;
-            case t_integer:
-                w(g, "~M~W0 : Integer;~N");
-                break;
-            case t_boolean:
-                w(g, "~M~W0 : Boolean;~N");
-                break;
-        }
+        if (q->type == t_string || q->type == t_integer || q->type == t_boolean)
+            count++;
     }
 
-    w(g, "~-");
+    w(g, "   type Context_Type is new Stemmer.Context_Type with");
+    if (count > 0) {
+        w(g, " record~N~+");
+        for (q = g->analyser->names; q; q = q->next) {
+            g->V[0] = q;
+            switch (q->type) {
+                case t_string:
+                    w(g, "~M~W0 : Ada.Strings.Unbounded.Unbounded_String;~N");
+                    break;
+                case t_integer:
+                    w(g, "~M~W0 : Integer;~N");
+                    break;
+                case t_boolean:
+                    w(g, "~M~W0 : Boolean;~N");
+                    break;
+            }
+        }
+
+        w(g, "~-");
+        w(g, "~-   end record;~N");
+    } else {
+        w(g, " null record;~N");
+    }
 }
 
 static int generate_among_string(struct generator * g, struct among * x, int count) {
@@ -1417,7 +1469,7 @@ static int generate_among_string(struct generator * g, struct among * x, int cou
     return count;
 }
 
-static int generate_among_table(struct generator * g, struct among * x, int start_pos) {
+static int generate_among_table(struct generator * g, struct among * x, int start_pos, int *operation) {
     int i;
     struct amongvec * v = x->b;
 
@@ -1444,15 +1496,16 @@ static int generate_among_table(struct generator * g, struct among * x, int star
         g->I[2] = v->i;
         w(g, "~I2, ");
         g->I[2] = v->result;
-        w(g, "~I2)");
+        w(g, "~I2, ");
 
         /* Write among's handler. */
-        /* if (v->function == 0) {
-            w(g, "null)");
+        if (v->function == 0) {
+            w(g, "0)");
         } else {
-            g->V[0] = v->function;
-            w(g, "~W0)");
-            }*/
+            *operation = *operation + 1;
+            g->I[1] = *operation;
+            w(g, "~I1)");
+        }
         if (i + 1 < x->literalstring_count) {
             w(g, ",~N");
         }
@@ -1461,7 +1514,7 @@ static int generate_among_table(struct generator * g, struct among * x, int star
     return start_pos;
 }
 
-static void generate_amongs(struct generator * g) {
+static int generate_amongs(struct generator * g) {
     struct among * a = g->analyser->amongs;
     int count;
     int start_pos;
@@ -1474,16 +1527,18 @@ static void generate_amongs(struct generator * g) {
     }
     w(g, ";~N~-~N");
 
+    int operation = 0;
     start_pos = 1;
     a = g->analyser->amongs;
     while (a != 0) {
-        start_pos = generate_among_table(g, a, start_pos);
+        start_pos = generate_among_table(g, a, start_pos, &operation);
         a = a->next;
     }
+    return operation;
 }
 
-static void generate_constructor(struct generator * g) {
-    generate_amongs(g);
+static int generate_constructor(struct generator * g) {
+    return generate_amongs(g);
 }
 
 static void generate_methods(struct generator * g) {
@@ -1492,6 +1547,34 @@ static void generate_methods(struct generator * g) {
         generate(g, p);
         p = p->right;
     }
+}
+
+static int generate_operations_dispatcher(struct generator * g) {
+    struct among * a = g->analyser->amongs;
+    int i;
+    int operation = 0;
+
+    w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean) is~N");
+    w(g, "~Mbegin~+~N~M");
+    w(g, "case Operation is~+~N~M");
+    a = g->analyser->amongs;
+    while (a != 0) {
+        struct amongvec * v = a->b;
+        for (i = 0; i < a->literalstring_count; i++, v++) {
+            if (v->function != 0) {
+                operation++;
+                g->I[2] = operation;
+                w(g, "when ~I2 =>~N~M");
+                g->V[0] = v->function;
+                w(g, "   ~W0 (Context_Type (Context), Result);~N~M");
+            }
+        }
+        a = a->next;
+    }
+    w(g, "when others =>~N~M");
+    w(g, "   Result := False;~-~N~Mend case;~-~N~M");
+    w(g, "end Among_Handler;~N~-");
+    return operation;
 }
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
@@ -1564,13 +1647,17 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "~Mpragma Warnings (Off, \"*mode could be*instead of*\");~N");
     w(g, "~Mpragma Warnings (Off, \"*formal parameter.*is not modified*\");~N");
     w(g, "~Mpragma Warnings (Off, \"*this line is too long*\");~N");
-    w(g, "~Mpragma Warnings (Off, \"*label.*is not referenced*\");~N");
+    w(g, "~Mpragma Warnings (Off, \"*is not referenced*\");~N");
     w(g, "~N");
 
     generate_method_decls(g, t_routine);
     generate_groupings(g);
-    generate_constructor(g);
+
+    int operations = generate_constructor(g);
     generate_methods(g);
+    if (operations > 0) {
+        generate_operations_dispatcher(g);
+    }
 
     w(g, "end Stemmer.");
     w(g, g->options->package);
@@ -1583,7 +1670,7 @@ extern void generate_program_ada(struct generator * g) {
     g->margin = 0;
     write_start_comment(g, "--  ", NULL);
     if (has_string_variable(g)) {
-        w(g, "private with Ada.Strings.Unbounded;");
+        w(g, "private with Ada.Strings.Unbounded;~N");
     }
     w(g, "package Stemmer.");
     w(g, g->options->package);
@@ -1591,9 +1678,7 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "   type Context_Type is new Stemmer.Context_Type with private;~N");
     w(g, "   procedure Stem (Z : in out Context_Type; Result : out Boolean);~N");
     w(g, "private~N");
-    w(g, "   type Context_Type is new Stemmer.Context_Type with record~N~+");
     generate_member_decls(g);
-    w(g, "~-   end record;~N");
     w(g, "end Stemmer.");
     w(g, g->options->package);
     w(g, ";~N");
