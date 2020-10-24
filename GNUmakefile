@@ -113,6 +113,7 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/module
 LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
+STEMTEST_SOURCES = tests/stemtest.c
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
@@ -145,6 +146,7 @@ RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 LIBSTEMMER_UTF8_OBJECTS=$(LIBSTEMMER_UTF8_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
+STEMTEST_OBJECTS=$(STEMTEST_SOURCES:.c=.o)
 C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
@@ -200,6 +202,9 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+stemtest: $(STEMTEST_OBJECTS) libstemmer.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
@@ -317,7 +322,7 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(LIBSTEMMER_UTF8_SOURCES) \
             $(LIBSTEMMER_HEADERS) \
 	    $(LIBSTEMMER_EXTRA) \
-	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
+	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) $(STEMTEST_SOURCES) \
 	    $(COMMON_FILES) \
 	    GNUmakefile README.rst doc/TODO libstemmer/mkmodules.pl
 	destname=snowball_code; \
@@ -458,7 +463,10 @@ dist_libstemmer_js: $(JS_SOURCES)
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
 	rm -rf $${dest}
 
-check: check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
+check_stemtest: stemtest
+	./stemtest
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
 
