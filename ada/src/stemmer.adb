@@ -38,7 +38,7 @@ package body Stemmer with SPARK_Mode is
    end Get_Result;
 
    function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Natural is
+                  S       : in String) return Char_Index is
    begin
       if Context.L - Context.C < S'Length then
          return 0;
@@ -50,7 +50,7 @@ package body Stemmer with SPARK_Mode is
    end Eq_S;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Natural is
+                           S       : in String) return Char_Index is
    begin
       if Context.C - Context.Lb < S'Length then
          return 0;
@@ -82,7 +82,7 @@ package body Stemmer with SPARK_Mode is
    end Length_Utf8;
 
    function Check_Among (Context : in Context_Type'Class;
-                         Pos     : in Natural;
+                         Pos     : in Char_Index;
                          Shift   : in Natural;
                          Mask    : in Mask_Type) return Boolean is
       use Interfaces;
@@ -107,8 +107,8 @@ package body Stemmer with SPARK_Mode is
       Common_I : Natural := 0;
       Common_J : Natural := 0;
       First_Key_Inspected : Boolean := False;
-      C   : constant Natural := Context.C;
-      L   : constant Integer := Context.L;
+      C   : constant Char_Index := Context.C;
+      L   : constant Char_Index := Context.L;
    begin
       loop
          declare
@@ -118,11 +118,11 @@ package body Stemmer with SPARK_Mode is
             Diff   : Integer := 0;
          begin
             for I2 in W.First + Common .. W.Last loop
-               if C + Common = L then
+               if C + Common >= L then
                   Diff := -1;
                   exit;
                end if;
-               Diff := Character'Pos (Context.P (Context.C + Common + 1))
+               Diff := Character'Pos (Context.P (C + Common + 1))
                  - Character'Pos (Pattern (I2));
                exit when Diff /= 0;
                Common := Common + 1;
@@ -180,8 +180,8 @@ package body Stemmer with SPARK_Mode is
       Common_I : Natural := 0;
       Common_J : Natural := 0;
       First_Key_Inspected : Boolean := False;
-      C   : constant Integer := Context.C;
-      Lb  : constant Integer := Context.Lb;
+      C   : constant Char_Index := Context.C;
+      Lb  : constant Char_Index := Context.Lb;
    begin
       loop
          declare
@@ -240,9 +240,28 @@ package body Stemmer with SPARK_Mode is
       Result := 0;
    end Find_Among_Backward;
 
+   function Skip_Utf8 (Context : in Context_Type'Class) return Result_Index is
+      Pos : Char_Index := Context.C;
+      Val : Byte;
+   begin
+      if Pos >= Context.L then
+         return -1;
+      end if;
+      Pos := Pos + 1;
+      Val := Character'Pos (Context.P (Pos));
+      if Val >= 16#C0# then
+         while Pos < Context.L loop
+            Val := Character'Pos (Context.P (Pos + 1));
+            exit when Val >= 16#C0# or Val < 16#80#;
+            Pos := Pos + 1;
+         end loop;
+      end if;
+      return Pos;
+   end Skip_Utf8;
+
    function Skip_Utf8 (Context : in Context_Type'Class;
-                       N       : in Positive) return Integer is
-      Pos : Integer := Context.C;
+                       N       : in Positive) return Result_Index is
+      Pos : Char_Index := Context.C;
       Val : Byte;
    begin
       for I in 1 .. N loop
@@ -262,9 +281,28 @@ package body Stemmer with SPARK_Mode is
       return Pos;
    end Skip_Utf8;
 
+   function Skip_Utf8_Backward (Context : in Context_Type'Class) return Result_Index is
+      Pos : Char_Index := Context.C;
+      Val : Byte;
+   begin
+      if Pos <= Context.Lb then
+         return -1;
+      end if;
+      Val := Character'Pos (Context.P (Pos));
+      Pos := Pos - 1;
+      if Val >= 16#80# then
+         while Pos > Context.Lb loop
+            Val := Character'Pos (Context.P (Pos + 1));
+            exit when Val >= 16#C0#;
+            Pos := Pos - 1;
+         end loop;
+      end if;
+      return Pos;
+   end Skip_Utf8_Backward;
+
    function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Positive) return Integer is
-      Pos : Integer := Context.C;
+                                N       : in Positive) return Result_Index is
+      Pos : Char_Index := Context.C;
       Val : Byte;
    begin
       for I in 1 .. N loop
@@ -371,7 +409,7 @@ package body Stemmer with SPARK_Mode is
                            Min     : in Utf8_Type;
                            Max     : in Utf8_Type;
                            Repeat  : in Boolean;
-                           Result  : out Integer) is
+                           Result  : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
@@ -404,7 +442,7 @@ package body Stemmer with SPARK_Mode is
                                     Min     : in Utf8_Type;
                                     Max     : in Utf8_Type;
                                     Repeat  : in Boolean;
-                                    Result  : out Integer) is
+                                    Result  : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
@@ -437,7 +475,7 @@ package body Stemmer with SPARK_Mode is
                           Min     : in Utf8_Type;
                           Max     : in Utf8_Type;
                           Repeat  : in Boolean;
-                          Result  : out Integer) is
+                          Result  : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
@@ -472,7 +510,7 @@ package body Stemmer with SPARK_Mode is
                                    Min     : in Utf8_Type;
                                    Max     : in Utf8_Type;
                                    Repeat  : in Boolean;
-                                   Result  : out Integer) is
+                                   Result  : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
@@ -503,8 +541,8 @@ package body Stemmer with SPARK_Mode is
    end In_Grouping_Backward;
 
    procedure Replace (Context    : in out Context_Type'Class;
-                      C_Bra      : in Integer;
-                      C_Ket      : in Integer;
+                      C_Bra      : in Char_Index;
+                      C_Ket      : in Char_Index;
                       S          : in String;
                       Adjustment : out Integer) is
    begin
@@ -547,8 +585,8 @@ package body Stemmer with SPARK_Mode is
    end Slice_To;
 
    procedure Insert (Context : in out Context_Type'Class;
-                     C_Bra   : in Natural;
-                     C_Ket   : in Natural;
+                     C_Bra   : in Char_Index;
+                     C_Ket   : in Char_Index;
                      S       : in String) is
       Result : Integer;
    begin

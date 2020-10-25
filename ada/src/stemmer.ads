@@ -17,6 +17,8 @@
 -----------------------------------------------------------------------
 package Stemmer with SPARK_Mode is
 
+   pragma Preelaborate;
+
    WORD_MAX_LENGTH : constant := 1024;
 
    type Context_Type is abstract tagged private;
@@ -51,29 +53,32 @@ private
    subtype Grouping_Index is Utf8_Type range 0 .. 16384;
 
    type Grouping_Array is array (Grouping_Index range <>) of Boolean with Pack;
-
-   subtype Among_Index is Natural range 0 .. 65535;
+   
+   subtype Among_Type_Index is Integer range -32768 .. 32767;
+   subtype Among_Index is Among_Type_Index range 0 .. Among_Type_Index'Last;
    subtype Among_Start_Index is Among_Index range 1 .. Among_Index'Last;
    subtype Operation_Index is Natural range 0 .. 65535;
+   subtype Result_Index is Integer range -1 .. WORD_MAX_LENGTH - 1;
+   subtype Char_Index is Result_Index range 0 .. Result_Index'Last;
 
    type Among_Type is record
       First       : Among_Start_Index;
       Last        : Among_Index;
-      Substring_I : Integer;
-      Result      : Integer;
+      Substring_I : Among_Type_Index;
+      Result      : Result_Index;
       Operation   : Operation_Index;
    end record;
 
    type Among_Array_Type is array (Natural range <>) of Among_Type;
 
    function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Natural with
+                  S       : in String) return Char_Index with
      Global => null,
      Pre => S'Length > 0,
      Post => Eq_S'Result = 0 or Eq_S'Result = S'Length;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Natural with
+                           S       : in String) return Char_Index with
      Global => null,
      Pre => S'Length > 0,
      Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = S'Length;
@@ -100,12 +105,18 @@ private
      Global => null,
      Pre => Pattern'Length > 0 and Amongs'Length > 0;
 
+   function Skip_Utf8 (Context : in Context_Type'Class) return Result_Index with
+     Global => null;
+
    function Skip_Utf8 (Context : in Context_Type'Class;
-                       N       : in Positive) return Integer with
+                       N       : in Positive) return Result_Index with
+     Global => null;
+
+   function Skip_Utf8_Backward (Context : in Context_Type'Class) return Result_Index with
      Global => null;
 
    function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Positive) return Integer with
+                                N       : in Positive) return Result_Index with
      Global => null;
 
    procedure Get_Utf8 (Context : in Context_Type'Class;
@@ -121,7 +132,7 @@ private
    function Length_Utf8 (Context : in Context_Type'Class) return Natural;
 
    function Check_Among (Context : in Context_Type'Class;
-                         Pos     : in Natural;
+                         Pos     : in Char_Index;
                          Shift   : in Natural;
                          Mask    : in Mask_Type) return Boolean;
 
@@ -130,32 +141,32 @@ private
                            Min     : in Utf8_Type;
                            Max     : in Utf8_Type;
                            Repeat  : in Boolean;
-                           Result  : out Integer);
+                           Result  : out Result_Index);
 
    procedure Out_Grouping_Backward (Context : in out Context_Type'Class;
                                     S       : in Grouping_Array;
                                     Min     : in Utf8_Type;
                                     Max     : in Utf8_Type;
                                     Repeat  : in Boolean;
-                                    Result  : out Integer);
+                                    Result  : out Result_Index);
 
    procedure In_Grouping (Context : in out Context_Type'Class;
                           S       : in Grouping_Array;
                           Min     : in Utf8_Type;
                           Max     : in Utf8_Type;
                           Repeat  : in Boolean;
-                          Result  : out Integer);
+                          Result  : out Result_Index);
 
    procedure In_Grouping_Backward (Context : in out Context_Type'Class;
                                    S       : in Grouping_Array;
                                    Min     : in Utf8_Type;
                                    Max     : in Utf8_Type;
                                    Repeat  : in Boolean;
-                                   Result  : out Integer);
+                                   Result  : out Result_Index);
 
    procedure Replace (Context    : in out Context_Type'Class;
-                      C_Bra      : in Integer;
-                      C_Ket      : in Integer;
+                      C_Bra      : in Char_Index;
+                      C_Ket      : in Char_Index;
                       S          : in String;
                       Adjustment : out Integer) with
      Global => null,
@@ -176,8 +187,8 @@ private
    function Slice_To (Context : in Context_Type'Class) return String;
 
    procedure Insert (Context : in out Context_Type'Class;
-                     C_Bra   : in Natural;
-                     C_Ket   : in Natural;
+                     C_Bra   : in Char_Index;
+                     C_Ket   : in Char_Index;
                      S       : in String) with
      Global => null,
      Pre => C_Bra >= Context.Lb and C_Ket >= C_Bra and C_Ket <= Context.L;
@@ -186,11 +197,11 @@ private
    --  This is necessary because several algorithms rely on this when they compare the
    --  cursor position ('C') or setup some markers from the cursor.
    type Context_Type is abstract tagged record
-      C   : Natural := 0;
-      L   : Integer := 0;
-      Lb  : Integer := 0;
-      Bra : Integer := 0;
-      Ket : Integer := 0;
+      C   : Char_Index := 0;
+      L   : Char_Index := 0;
+      Lb  : Char_Index := 0;
+      Bra : Char_Index := 0;
+      Ket : Char_Index := 0;
       P   : String (1 .. WORD_MAX_LENGTH);
    end record;
 

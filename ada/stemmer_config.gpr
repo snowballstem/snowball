@@ -15,7 +15,7 @@ abstract project Stemmer_Config is
           when "debug" => 
              for Default_Switches ("Ada") use ("-g", "-j" & Processors);
           when others =>
-             for Default_Switches ("Ada") use ("-g", "-O2", "-j" & Processors);
+             for Default_Switches ("Ada") use ("-g", "-O3", "-j" & Processors);
        end case;
    end Builder;
 

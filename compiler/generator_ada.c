@@ -119,7 +119,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "Z.L - ";
-    write_declare(g, "   ~B0 : Integer", p);
+    write_declare(g, "   ~B0 : Char_Index", p);
     writef(g, "~M~B0 := ~S1Z.C;~N" , p);
 }
 
@@ -734,9 +734,9 @@ static void generate_delete(struct generator * g, struct node * p) {
 static void generate_next(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (p->mode == m_forward)
-        w(g, "~MC := Skip_Utf8 (Z, 1);~N");
+        w(g, "~MC := Skip_Utf8 (Z);~N");
     else
-        w(g, "~MC := Skip_Utf8_Backward (Z, 1);");
+        w(g, "~MC := Skip_Utf8_Backward (Z);~N");
     write_failure_if(g, "C < 0", p);
     w(g, "~MZ.C := C;~N");
 }
@@ -1072,7 +1072,7 @@ static void generate_define(struct generator * g, struct node * p) {
         default:
             generate(g, p->left);
             if (!g->unreachable) w(g, "~N~MResult := True;~N");
-            str_append_string(saved_output, "      C : Integer;\n");
+            str_append_string(saved_output, "      C : Result_Index;\n");
             if (need_among_var(p->left) || 1) {
                 str_append_string(saved_output, "      A : Integer;\n");
             }
@@ -1674,7 +1674,7 @@ extern void generate_program_ada(struct generator * g) {
     }
     w(g, "package Stemmer.");
     w(g, g->options->package);
-    w(g, " is~N~+");
+    w(g, " with SPARK_Mode is~N~+");
     w(g, "   type Context_Type is new Stemmer.Context_Type with private;~N");
     w(g, "   procedure Stem (Z : in out Context_Type; Result : out Boolean);~N");
     w(g, "private~N");
