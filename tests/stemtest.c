@@ -9,6 +9,7 @@
 #include "libstemmer.h"
 
 #define EMOJI_FACE_THROWING_A_KISS "\xf0\x9f\x98\x98"
+#define U_40079 "\xf1\x80\x81\xb9"
 static const struct testcase {
     const char * language;
     const char * charenc;
@@ -16,7 +17,9 @@ static const struct testcase {
     const char * expect;
 } testcases[] = {
     { "en", 0,
-      "a"EMOJI_FACE_THROWING_A_KISS"ing", "a"EMOJI_FACE_THROWING_A_KISS"e" },
+      "a" EMOJI_FACE_THROWING_A_KISS "ing",
+      "a" EMOJI_FACE_THROWING_A_KISS "e" },
+    { "en", 0, U_40079 "wing", 0 },
     { 0, 0, 0, 0 }
 };
 
