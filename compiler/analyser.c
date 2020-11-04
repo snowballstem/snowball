@@ -735,6 +735,14 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     }
 }
 
+static int
+is_just_true(struct node * q)
+{
+    if (!q) return 1;
+    if (q->type != c_bra && q->type != c_true) return 0;
+    return is_just_true(q->left) && is_just_true(q->right);
+}
+
 static struct node * read_among(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     struct node * p = new_node(a, c_among);
@@ -760,7 +768,14 @@ static struct node * read_among(struct analyser * a) {
                 p->number++; break;
             case c_bra:
                 if (previous_token == c_bra) error(a, e_adjacent_bracketed_in_among);
-                q = read_C_list(a); break;
+                q = read_C_list(a);
+                if (is_just_true(q->left)) {
+                    /* Convert anything equivalent to () to () so we handle it
+                     * the same way.
+                     */
+                    q->left = 0;
+                }
+                break;
             default:
                 error(a, e_unexpected_token_in_among);
                 previous_token = token;
