@@ -67,7 +67,7 @@ If you don't have access to a suitably licensed word list of a suitable size,
 you may be able to use the `wikipedia-most-common-words` script to generate
 one by extracting the most frequent words from a Wikipedia dump in the
 language the stemmer is for.  If the language uses a script/alphabet which
-isn't already supported you may need to add a regular new regular expression.
+isn't already supported you may need to add a new regular expression.
 
 snowball-website repo
 ---------------------
