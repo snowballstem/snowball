@@ -92,6 +92,7 @@ Link to your new `stemmer.tt` from `algorithms/index.tt`.
 Add a news entry to `index.tt`.
 
 .. FIXME: Also needs adding for the online demo.
+.. Demo needs an extra tweak for RTL languages.
 
 Adding a new programming language generator
 ===========================================
