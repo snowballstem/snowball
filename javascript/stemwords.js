@@ -1,3 +1,5 @@
+const stemmer = require('base-stemmer.js');
+
 const fs = require('fs');
 
 function usage() {
@@ -132,11 +134,11 @@ function stemming (lang, input, output, encoding, pretty) {
 function create (name) {
     var lc_name = name.toLowerCase();
     if (!lc_name.match('\\W') && lc_name != 'base') {
+        var algo = lc_name.substr(0, 1).toUpperCase() + lc_name.substr(1);
         try {
-            const Stemmer = require(lc_name + '-stemmer.js');
-            return new Stemmer();
+            const stemmer = require(lc_name + '-stemmer.js');
+            return Function('return new ' + algo + 'Stemmer()')();
         } catch (error) {
-            console.log(error);
         }
     }
     console.log('Unknown stemming language: ' + name + '\n');
