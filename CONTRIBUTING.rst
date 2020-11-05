@@ -142,6 +142,24 @@ If one of the mechanisms above sounds suitable then take a look at the
 generator for the respective generated output and generator code.  If
 not, come and talk to us on the snowball-discuss mailing list.
 
+Don't hardcode algorithm names
+------------------------------
+
+We want to avoid hard-coded lists of algorithms in the language-specific code
+that have to be manually updated each time a new algorithm is added, because
+that adds some extra tedious work for adding a new algorithm, and mechanical
+updates done by hand tend to miss places that need updating, or code gets
+copied and pasted from an existing case but not fully updated.
+
+All the existing language backends generate any such code at build time, and
+adding a new algorithm just requires updating `libstemmer/modules.txt`.
+
+You can probably copy the approach used for Pascal (script `pascal/generate.pl`
+works from template `stemwords-template.dpr` which has marked blocks of code
+that get expanded for each stemming algorithm with a placeholder replaced by
+the algorithm name.  For an alternative approach, see Rust where this is done
+by `rust/build.rs`.
+
 Mechanics of adding a new generator
 -----------------------------------
 
