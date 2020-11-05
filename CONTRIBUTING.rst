@@ -148,7 +148,7 @@ Mechanics of adding a new generator
 Copy an existing `compiler/generator_*.c` for your new language and modify
 away (`generator.c` has the generator for C, but also some common functions
 so if you start from this one you'll need to remove those common functions).
-Please resist reformatting existing code - there's currently a lot of code
+Please resist reformatting existing C code - there's currently a lot of code
 repeated in each generator which ought to be pulled out as common code, and
 if you reformat that just makes that job harder.
 
