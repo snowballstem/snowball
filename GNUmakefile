@@ -144,7 +144,9 @@ JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
-ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.ads) $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.adb)
+ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.ads) \
+        $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.adb) \
+        $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
@@ -696,6 +698,12 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 	  diff -u $</output.txt tmp.txt | head -300; \
 	fi
 	@rm tmp.txt
+
+$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
+	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
+
+ada/bin/generate:
+	cd ada && $(gprbuild) -Pgenerate -p
 
 ada/bin/stemwords: $(ADA_SOURCES)
 	cd ada && $(gprbuild) -Pstemwords -p
