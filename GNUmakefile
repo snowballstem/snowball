@@ -453,7 +453,7 @@ dist_libstemmer_js: $(JS_SOURCES)
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/$(js_runtime_dir) && \
 	mkdir -p $${dest}/$(js_sample_dir) && \
-	cp -a doc/libstemmer_js_README $${dest}/README && \
+	cp -a doc/libstemmer_js_README $${dest}/README.rst && \
 	cp -a $(COMMON_FILES) $${dest} && \
 	cp -a $(JS_RUNTIME_SOURCES) $${dest}/$(js_runtime_dir) && \
 	cp -a $(JS_SAMPLE_SOURCES) $${dest}/$(js_sample_dir) && \
