@@ -2,12 +2,24 @@ language: minimal
 dist: trusty
 matrix:
   include:
+    - name: "C distribution build"
+      language: c
+      compiler: gcc
+      python: "3.7"
+      pip install setuptools
+      env: CFLAGS_DIST_BUILD='-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+    - name: "C distribution build (clang)"
+      language: c
+      compiler: clang
+      python: "3.7"
+      pip install setuptools
+      env: CFLAGS_DIST_BUILD='-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
     - language: c
       compiler: gcc
-      env: c_tests=y cc_append=' -std=c90 -Wdeclaration-after-statement -Werror'
+      env: c_tests=y CFLAGS='-O2 -Wall -W -std=c99 -Werror'
     - language: c
       compiler: clang
-      env: c_tests=y cc_append=' -std=c90 -Wdeclaration-after-statement -Werror'
+      env: c_tests=y CFLAGS='-O2 -Wall -W -std=c99 -Werror'
     - language: java
       env: JAVA=java JAVAC=javac
     - language: go
@@ -73,8 +85,9 @@ before_install:
   - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 script:
-  - make CC="${CC:-gcc}$cc_append"
-  - test -z "$c_tests" || make check CC="${CC:-gcc}$cc_append" STEMMING_DATA=snowball-data
+  - make CC="${CC:-gcc}"
+  - test -z "$CFLAGS_DIST_BUILD" || { make dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c.tgz && cd libstemmer_c && make CFLAGS="$CFLAGS_DIST_BUILD" ; }
+  - test -z "$c_tests" || make check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
