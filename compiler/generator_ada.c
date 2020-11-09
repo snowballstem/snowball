@@ -547,7 +547,8 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
 static void generate_GO(struct generator * g, struct node * p, int style) {
     int end_unreachable = false;
     int used = g->label_used;
-    struct str * savevar;
+    /* Initialise to NULL to suppress bogus "may be used uninitialised" warning. */
+    struct str * savevar = NULL;
     int keep_c = style == 1 || repeat_restore(g, p->left);
     int a0 = g->failure_label;
 
