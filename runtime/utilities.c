@@ -23,38 +23,48 @@ extern void lose_s(symbol * p) {
 }
 
 /*
-   new_p = skip_utf8(p, c, lb, l, n); skips n characters forwards from p + c
-   if n +ve, or n characters backwards from p + c - 1 if n -ve. new_p is the new
-   position, or -1 on failure.
+   new_p = skip_utf8(p, c, l, n); skips n characters forwards from p + c.
+   new_p is the new position, or -1 on failure.
 
    -- used to implement hop and next in the utf8 case.
 */
 
-extern int skip_utf8(const symbol * p, int c, int lb, int l, int n) {
+extern int skip_utf8(const symbol * p, int c, int limit, int n) {
     int b;
-    if (n >= 0) {
-        for (; n > 0; n--) {
-            if (c >= l) return -1;
-            b = p[c++];
-            if (b >= 0xC0) {   /* 1100 0000 */
-                while (c < l) {
-                    b = p[c];
-                    if (b >= 0xC0 || b < 0x80) break;
-                    /* break unless b is 10------ */
-                    c++;
-                }
+    if (n < 0) return -1;
+    for (; n > 0; n--) {
+        if (c >= limit) return -1;
+        b = p[c++];
+        if (b >= 0xC0) {   /* 1100 0000 */
+            while (c < limit) {
+                b = p[c];
+                if (b >= 0xC0 || b < 0x80) break;
+                /* break unless b is 10------ */
+                c++;
             }
         }
-    } else {
-        for (; n < 0; n++) {
-            if (c <= lb) return -1;
-            b = p[--c];
-            if (b >= 0x80) {   /* 1000 0000 */
-                while (c > lb) {
-                    b = p[c];
-                    if (b >= 0xC0) break; /* 1100 0000 */
-                    c--;
-                }
+    }
+    return c;
+}
+
+/*
+   new_p = skip_b_utf8(p, c, lb, n); skips n characters backwards from p + c - 1
+   new_p is the new position, or -1 on failure.
+
+   -- used to implement hop and next in the utf8 case.
+*/
+
+extern int skip_b_utf8(const symbol * p, int c, int limit, int n) {
+    int b;
+    if (n < 0) return -1;
+    for (; n > 0; n--) {
+        if (c <= limit) return -1;
+        b = p[--c];
+        if (b >= 0x80) {   /* 1000 0000 */
+            while (c > limit) {
+                b = p[c];
+                if (b >= 0xC0) break; /* 1100 0000 */
+                c--;
             }
         }
     }
