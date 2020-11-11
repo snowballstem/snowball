@@ -435,6 +435,10 @@ static void generate_try(struct generator * g, struct node * p) {
     struct str * savevar;
     int keep_c = K_needed(g, p->left);
 
+    g->failure_label = new_label(g);
+    g->label_used = 0;
+    str_clear(g->failure_str);
+
     write_comment(g, p);
     if (keep_c) {
         savevar = vars_newname(g);
@@ -442,9 +446,6 @@ static void generate_try(struct generator * g, struct node * p) {
         restore_string(p, g->failure_str, savevar);
     }    
 
-    g->failure_label = new_label(g);
-
-    g->label_used = 0;
     generate(g, p->left);
     if (g->label_used)
         wsetl(g, g->failure_label);
@@ -578,6 +579,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     g->failure_label = new_label(g);
     g->label_used = 0;
+    str_clear(g->failure_str);
     generate(g, p->left);
 
     if (g->unreachable) {
