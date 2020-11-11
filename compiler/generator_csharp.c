@@ -418,6 +418,7 @@ static void generate_try(struct generator * g, struct node * p) {
 
     g->failure_label = new_label(g);
     g->label_used = 0;
+    str_clear(g->failure_str);
     if (keep_c) restore_string(p, g->failure_str, savevar);
 
     generate(g, p->left);
@@ -564,6 +565,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     g->failure_label = new_label(g);
     g->label_used = 0;
+    str_clear(g->failure_str);
     generate(g, p->left);
 
     if (style == 1) {

@@ -431,6 +431,7 @@ static void generate_try(struct generator * g, struct node * p) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     g->failure_label = new_label(g);
+    str_clear(g->failure_str);
     if (keep_c) restore_string(p, g->failure_str, savevar);
 
     wsetlab_begin(g);
@@ -522,6 +523,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     if (keep_c) write_savecursor(g, p, savevar);
 
     g->failure_label = new_label(g);
+    str_clear(g->failure_str);
     wsetlab_begin(g);
     generate(g, p->left);
 

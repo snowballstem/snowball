@@ -785,6 +785,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     g->failure_label = new_label(g);
     g->label_used = 0;
+    g->failure_keep_count = 0;
     generate(g, p->left);
 
     if (style == 1) {
