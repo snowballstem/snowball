@@ -32,60 +32,60 @@ else
     var show_help = false;
     while (process.argv.length > 0)
     {
-	var arg = process.argv.shift();
-	switch (arg)
-	{
-	case "-h":
-	    show_help = true;
-	    process.argv.length = 0;
-	    break;
-	case "-p":
-	    pretty = 1;
-	    break;
-	case "-p2":
-	    pretty = 2;
-	    break;
-	case "-l":
-	    if (process.argv.length == 0)
-	    {
-		show_help = true;
-		break;
-	    }
-	    language = process.argv.shift();
-	    break;
-	case "-i":
-	    if (process.argv.length == 0)
-	    {
-		show_help = true;
-		break;
-	    }
-	    input = process.argv.shift();
-	    break;
-	case "-o":
-	    if (process.argv.length == 0)
-	    {
-		show_help = true;
-		break;
-	    }
-	    output = process.argv.shift();
-	    break;
-	case "-c":
-	    if (process.argv.length == 0)
-	    {
-		show_help = true;
-		break;
-	    }
-	    encoding = process.argv.shift();
-	    break;
-	}
+        var arg = process.argv.shift();
+        switch (arg)
+        {
+        case "-h":
+            show_help = true;
+            process.argv.length = 0;
+            break;
+        case "-p":
+            pretty = 1;
+            break;
+        case "-p2":
+            pretty = 2;
+            break;
+        case "-l":
+            if (process.argv.length == 0)
+            {
+                show_help = true;
+                break;
+            }
+            language = process.argv.shift();
+            break;
+        case "-i":
+            if (process.argv.length == 0)
+            {
+                show_help = true;
+                break;
+            }
+            input = process.argv.shift();
+            break;
+        case "-o":
+            if (process.argv.length == 0)
+            {
+                show_help = true;
+                break;
+            }
+            output = process.argv.shift();
+            break;
+        case "-c":
+            if (process.argv.length == 0)
+            {
+                show_help = true;
+                break;
+            }
+            encoding = process.argv.shift();
+            break;
+        }
     }
     if (show_help || input == '' || output == '')
     {
-	usage();
+        usage();
     }
     else
     {
-	stemming(language, input, output, encoding, pretty);
+        stemming(language, input, output, encoding, pretty);
     }
 }
 
@@ -134,12 +134,12 @@ function stemming (lang, input, output, encoding, pretty) {
 function create (name) {
     var lc_name = name.toLowerCase();
     if (!lc_name.match('\\W') && lc_name != 'base') {
-	var algo = lc_name.substr(0, 1).toUpperCase() + lc_name.substr(1);
-	try {
-	    const stemmer = require(lc_name + '-stemmer.js');
-	    return Function('return new ' + algo + 'Stemmer()')();
-	} catch (error) {
-	}
+        var algo = lc_name.substr(0, 1).toUpperCase() + lc_name.substr(1);
+        try {
+            const stemmer = require(lc_name + '-stemmer.js');
+            return Function('return new ' + algo + 'Stemmer()')();
+        } catch (error) {
+        }
     }
     console.log('Unknown stemming language: ' + name + '\n');
     usage();

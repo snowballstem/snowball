@@ -408,6 +408,7 @@ static void generate_try(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
     int label = new_label(g);
     g->failure_label = label;
+    str_clear(g->failure_str);
 
     write_comment(g, p);
     if (keep_c) {
@@ -551,6 +552,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     label = new_label(g);
     g->failure_label = label;
+    str_clear(g->failure_str);
     wsetlab_begin(g);
     generate(g, p->left);
 

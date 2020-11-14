@@ -13,8 +13,11 @@ language - currently ISO C, C#, Go, Java, Javascript, Object Pascal, Python and
 Rust are supported.
 
 This repository contains the source code for the snowball compiler and the
-stemming algorithms.  See https://snowballstem.org/ for more information about
-Snowball.
+stemming algorithms.  The snowball compiler is written in ISO C - you'll need
+a C compiler which support C99 to build it (but the C code it generates should
+work with any ISO C compiler.)
+
+See https://snowballstem.org/ for more information about Snowball.
 
 What is Stemming?
 =================

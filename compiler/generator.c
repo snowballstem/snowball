@@ -785,6 +785,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     g->failure_label = new_label(g);
     g->label_used = 0;
+    g->failure_keep_count = 0;
     generate(g, p->left);
 
     if (style == 1) {
@@ -802,8 +803,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->failure_label = a0;
     g->failure_keep_count = a1;
 
-/*  writef(g, "~M~l~N"
-          "~M~i~N", p);  */
     generate_next(g, p);
     w(g, "~}");
 }
@@ -967,11 +966,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
           "~}", p);
 }
 
-/* bugs marked <======= fixed 22/7/02. Similar fixes required for Java */
-
 static void generate_slicefrom(struct generator * g, struct node * p) {
-
-/*  w(g, "~Mslice_from_s(z, ");   <============= bug! should be: */
     writef(g, "~{int ret = slice_from_~$(z, ~a);~C", p);
     writef(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);

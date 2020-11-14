@@ -67,7 +67,7 @@ If you don't have access to a suitably licensed word list of a suitable size,
 you may be able to use the `wikipedia-most-common-words` script to generate
 one by extracting the most frequent words from a Wikipedia dump in the
 language the stemmer is for.  If the language uses a script/alphabet which
-isn't already supported you may need to add a regular new regular expression.
+isn't already supported you may need to add a new regular expression.
 
 snowball-website repo
 ---------------------
@@ -92,6 +92,7 @@ Link to your new `stemmer.tt` from `algorithms/index.tt`.
 Add a news entry to `index.tt`.
 
 .. FIXME: Also needs adding for the online demo.
+.. Demo needs an extra tweak for RTL languages.
 
 Adding a new programming language generator
 ===========================================
@@ -142,13 +143,31 @@ If one of the mechanisms above sounds suitable then take a look at the
 generator for the respective generated output and generator code.  If
 not, come and talk to us on the snowball-discuss mailing list.
 
+Don't hardcode algorithm names
+------------------------------
+
+We want to avoid hard-coded lists of algorithms in the language-specific code
+that have to be manually updated each time a new algorithm is added, because
+that adds some extra tedious work for adding a new algorithm, and mechanical
+updates done by hand tend to miss places that need updating, or code gets
+copied and pasted from an existing case but not fully updated.
+
+All the existing language backends generate any such code at build time, and
+adding a new algorithm just requires updating `libstemmer/modules.txt`.
+
+You can probably copy the approach used for Pascal (script `pascal/generate.pl`
+works from template `stemwords-template.dpr` which has marked blocks of code
+that get expanded for each stemming algorithm with a placeholder replaced by
+the algorithm name.  For an alternative approach, see Rust where this is done
+by `rust/build.rs`.
+
 Mechanics of adding a new generator
 -----------------------------------
 
 Copy an existing `compiler/generator_*.c` for your new language and modify
 away (`generator.c` has the generator for C, but also some common functions
 so if you start from this one you'll need to remove those common functions).
-Please resist reformatting existing code - there's currently a lot of code
+Please resist reformatting existing C code - there's currently a lot of code
 repeated in each generator which ought to be pulled out as common code, and
 if you reformat that just makes that job harder.
 
