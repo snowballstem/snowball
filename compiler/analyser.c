@@ -45,6 +45,8 @@ static void print_node_(struct node * p, int n, const char * s) {
         printf("'");
         report_b(stdout, p->literalstring);
         printf("'");
+    } else if (p->type == c_number) {
+        printf("%d", p->number);
     }
     printf("\n");
     if (p->AE) print_node_(p->AE, n+1, "# ");
