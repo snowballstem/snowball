@@ -372,13 +372,13 @@ static void name_to_node(struct analyser * a, struct node * p, int type) {
     p->name = q;
 }
 
-static struct node * read_AE(struct analyser * a, int B) {
+static struct node * read_AE(struct analyser * a, struct name * assigned_to, int B) {
     struct tokeniser * t = a->tokeniser;
     struct node * p;
     struct node * q;
     switch (read_token(t)) {
         case c_minus: /* monadic */
-            q = read_AE(a, 100);
+            q = read_AE(a, assigned_to, 100);
             if (q->type == c_neg) {
                 /* Optimise away double negation, which avoids generators
                  * having to worry about generating "--" (decrement operator
@@ -398,13 +398,16 @@ static struct node * read_AE(struct analyser * a, int B) {
             p->right = q;
             break;
         case c_bra:
-            p = read_AE(a, 0);
+            p = read_AE(a, assigned_to, 0);
             get_token(a, c_ket);
             break;
         case c_name:
             p = new_node(a, c_name);
             name_to_node(a, p, 'i');
-            if (p->name) p->name->value_used = true;
+            if (p->name) {
+                // $x = x + 1 shouldn't count as a use of x.
+                p->name->value_used = (p->name != assigned_to);
+            }
             break;
         case c_maxint:
         case c_minint:
@@ -443,7 +446,8 @@ static struct node * read_AE(struct analyser * a, int B) {
             } else {
                 result = SIZE(p->literalstring);
             }
-            p = new_node(a, c_number);
+            p->type = c_number;
+            p->literalstring = NULL;
             p->number = result;
             break;
         }
@@ -461,7 +465,7 @@ static struct node * read_AE(struct analyser * a, int B) {
         }
         q = new_node(a, token);
         q->left = p;
-        q->right = read_AE(a, b);
+        q->right = read_AE(a, assigned_to, b);
         p = q;
     }
 }
@@ -513,7 +517,7 @@ static struct node * C_style(struct analyser * a, const char * s, int token) {
         case 'D':
             p->aux = read_C(a); continue;
         case 'A':
-            p->AE = read_AE(a, 0); continue;
+            p->AE = read_AE(a, 0, 0); continue;
         case 'f':
             get_token(a, c_for); continue;
         case 'S':
@@ -834,6 +838,24 @@ static void check_modifyable(struct analyser * a) {
     if (!a->modifyable) error(a, e_not_allowed_inside_reverse);
 }
 
+static int ae_uses_name(struct node * p, struct name * q) {
+    switch (p->type) {
+        case c_name:
+        case c_lenof:
+        case c_sizeof:
+            if (p->name == q) return 1;
+            break;
+        case c_neg:
+            return ae_uses_name(p->right, q);
+        case c_multiply:
+        case c_plus:
+        case c_minus:
+        case c_divide:
+            return ae_uses_name(p->left, q) || ae_uses_name(p->right, q);
+    }
+    return 0;
+}
+
 static struct node * read_C(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     int token = read_token(t);
@@ -926,7 +948,7 @@ static struct node * read_C(struct analyser * a) {
             read_token(t);
             if (t->token == c_bra) {
                 /* Handle newer $(AE REL_OP AE) syntax. */
-                struct node * n = read_AE(a, 0);
+                struct node * n = read_AE(a, 0, 0);
                 read_token(t);
                 switch (t->token) {
                     case c_eq:
@@ -938,7 +960,7 @@ static struct node * read_C(struct analyser * a) {
                         struct node * lhs = n;
                         n = new_node(a, t->token);
                         n->left = lhs;
-                        n->AE = read_AE(a, 0);
+                        n->AE = read_AE(a, 0, 0);
                         get_token(a, c_ket);
                         break;
                     }
@@ -981,32 +1003,32 @@ static struct node * read_C(struct analyser * a) {
                         q = NULL;
                     }
                     p = new_node(a, read_AE_test(a));
-                    p->AE = read_AE(a, 0);
-
-                    if (q) {
-                        switch (p->type) {
-                            case c_mathassign:
-                                q->initialised = true;
-                                p->name = q;
-                                break;
-                            default:
-                                /* +=, etc don't "initialise" as they only
-                                 * amend an existing value.  Similarly, they
-                                 * don't count as using the value.
-                                 */
-                                p->name = q;
-                                break;
-                            case c_eq:
-                            case c_ne:
-                            case c_gr:
-                            case c_ge:
-                            case c_ls:
-                            case c_le:
-                                p->left = new_node(a, c_name);
-                                p->left->name = q;
+                    switch (p->type) {
+                        case c_eq:
+                        case c_ne:
+                        case c_gr:
+                        case c_ge:
+                        case c_ls:
+                        case c_le:
+                            p->left = new_node(a, c_name);
+                            p->left->name = q;
+                            if (q) {
                                 q->value_used = true;
-                                break;
-                        }
+                            }
+                            p->AE = read_AE(a, NULL, 0);
+                            break;
+                        default:
+                            /* +=, etc don't "initialise" as they only
+                             * amend an existing value.  Similarly, they
+                             * don't count as using the value.
+                             */
+                            p->name = q;
+                            p->AE = read_AE(a, q, 0);
+                            if (p->type == c_mathassign && q) {
+                                /* $x = x + 1 doesn't initialise x. */
+                                q->initialised = !ae_uses_name(p->AE, q);
+                            }
+                            break;
                     }
                 }
                 if (q) mark_used_in(a, q, p);
@@ -1252,6 +1274,7 @@ static void remove_dead_assignments(struct node * p, struct name * q) {
             case c_dollar:
                 /* c_true is a no-op. */
                 p->type = c_true;
+                p->AE = NULL;
                 break;
             default:
                 /* There are no read accesses to this variable, so any
