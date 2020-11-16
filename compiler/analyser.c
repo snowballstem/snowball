@@ -421,9 +421,32 @@ static struct node * read_AE(struct analyser * a, int B) {
             p->number = t->number;
             break;
         case c_lenof:
-        case c_sizeof:
-            p = C_style(a, "s", t->token);
+        case c_sizeof: {
+            int token = t->token;
+            p = C_style(a, "S", token);
+            if (!p->literalstring) break;
+
+            /* Replace lenof or sizeof on a literal string with a numeric
+             * constant.
+             */
+            int result;
+            if (token == c_lenof && t->encoding == ENC_UTF8) {
+                // UTF-8.
+                int i = 0;
+                symbol * b = p->literalstring;
+                result = 0;
+                while (i < SIZE(b)) {
+                    int dummy;
+                    i += get_utf8(b + i, &dummy);
+                    ++result;
+                }
+            } else {
+                result = SIZE(p->literalstring);
+            }
+            p = new_node(a, c_number);
+            p->number = result;
             break;
+        }
         default:
             error(a, e_unexpected_token);
             t->token_held = true;
