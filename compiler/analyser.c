@@ -388,6 +388,12 @@ static struct node * read_AE(struct analyser * a, int B) {
                 /* Don't free q, it's in the linked list a->nodes. */
                 break;
             }
+            if (q->type == c_number) {
+                /* Negated constant. */
+                q->number = -q->number;
+                p = q;
+                break;
+            }
             p = new_node(a, c_neg);
             p->right = q;
             break;
