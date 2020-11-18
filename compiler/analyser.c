@@ -903,8 +903,31 @@ static struct node * read_C(struct analyser * a) {
         }
         case c_tomark:
         case c_atmark:
-        case c_hop:
             return C_style(a, "A", token);
+        case c_hop: {
+            struct node * n = C_style(a, "A", token);
+            if (n->AE->type == c_number) {
+                if (n->AE->number < 0) {
+                    fprintf(stderr,
+                            "%s:%d: warning: hop %d now signals f (as was "
+                            "always documented) rather than moving the cursor "
+                            "in the opposite direction\n",
+                            a->tokeniser->file,
+                            n->AE->line_number,
+                            n->AE->number);
+                    n->AE = NULL;
+                    n->type = c_false;
+                } else if (n->AE->number == 0) {
+                    fprintf(stderr,
+                            "%s:%d: warning: hop 0 is a no-op\n",
+                            a->tokeniser->file,
+                            n->AE->line_number);
+                    n->AE = NULL;
+                    n->type = c_true;
+                }
+            }
+            return n;
+        }
         case c_delete:
             check_modifyable(a);
             /* fall through */
