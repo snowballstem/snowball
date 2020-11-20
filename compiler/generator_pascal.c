@@ -675,6 +675,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
     write_failure_if(g, "(~S0 > C) Or (C > FLimit)", p);
     writef(g, "~MFCursor := c;~N", p);
+    g->temporary_used = true;
     writef(g, "~}", p);
 }
 
@@ -741,7 +742,10 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
-    if (keep_c) w(g, "~{~MC := FCursor;~N");
+    if (keep_c) {
+        w(g, "~{~MC := FCursor;~N");
+        g->temporary_used = true;
+    }
     writef(g, "~Minsert(FCursor, FCursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
@@ -752,7 +756,10 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
-    if (keep_c) writef(g, "~{~MC := FCursor;~N", p);
+    if (keep_c) {
+        writef(g, "~{~MC := FCursor;~N", p);
+        g->temporary_used = true;
+    }
     if (p->mode == m_forward) {
         writef(g, "~Minsert(FCursor, FLimit, ", p);
     } else {
@@ -991,18 +998,21 @@ static void generate_define(struct generator * g, struct node * p) {
 
     /* Generate function body. */
     w(g, "~{");
+    g->temporary_used = false;
     generate(g, p->left);
     if (!g->unreachable) w(g, "~MResult := True;~N");
     w(g, "~}");
 
-    str_append_string(saved_output, "Var\n");
-    str_append_string(saved_output, "    C : Integer;\n");
-
-    if (p->amongvar_needed) {
-        str_append_string(saved_output, "    AmongVar : Integer;\n");
+    if (g->temporary_used) {
+        str_append_string(g->declarations, "    C : Integer;\n");
     }
 
-    if (g->var_number) {
+    if (p->amongvar_needed) {
+        str_append_string(g->declarations, "    AmongVar : Integer;\n");
+    }
+
+    if (str_len(g->declarations) > 0) {
+        str_append_string(saved_output, "Var\n");
         str_append(saved_output, g->declarations);
     }
 

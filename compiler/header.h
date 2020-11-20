@@ -324,6 +324,7 @@ struct generator {
     int literalstring_count;
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
+    int temporary_used;  /* track if temporary variable used (for Pascal) */
 };
 
 /* Special values for failure_label in struct generator. */
