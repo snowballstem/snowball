@@ -671,10 +671,18 @@ static void generate_hop(struct generator * g, struct node * p) {
     generate_AE(g, p->AE);
     w(g, ";~N");
 
-    g->S[0] = p->mode == m_forward ? "0" : "FBkLimit";
-
-    write_failure_if(g, "(~S0 > C) Or (C > FLimit)", p);
-    writef(g, "~MFCursor := c;~N", p);
+    g->S[1] = p->mode == m_forward ? "> FLimit" : "< FBkLimit";
+    g->S[2] = p->mode == m_forward ? "<" : ">";
+    if (p->AE->type == c_number) {
+        // Constant distance hop.
+        //
+        // No need to check for negative hop as that's converted to false by
+        // the analyser.
+        write_failure_if(g, "C ~S1", p);
+    } else {
+        write_failure_if(g, "(C ~S1) Or (C ~S2 FCursor)", p);
+    }
+    writef(g, "~MFCursor := C;~N", p);
     g->temporary_used = true;
     writef(g, "~}", p);
 }
