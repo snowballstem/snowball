@@ -656,10 +656,16 @@ static void generate_hop(struct generator * g, struct node * p) {
     w(g, ";~N");
 
     g->I[0] = c_count;
-    if (p->mode == m_forward) {
-        write_failure_if(g, "0 > c~I0 || c~I0 > base.limit", p);
+    g->S[1] = p->mode == m_forward ? "> base.limit" : "< base.limit_backward";
+    g->S[2] = p->mode == m_forward ? "<" : ">";
+    if (p->AE->type == c_number) {
+        // Constant distance hop.
+        //
+        // No need to check for negative hop as that's converted to false by
+        // the analyser.
+        write_failure_if(g, "c~I0 ~S1", p);
     } else {
-        write_failure_if(g, "base.limit_backward > c~I0 || c~I0 > base.limit", p);
+        write_failure_if(g, "c~I0 ~S1 || c~I0 ~S2 base.cursor", p);
     }
     writef(g, "~Mbase.cursor = c~I0;~N", p);
     writef(g, "~}", p);
