@@ -288,7 +288,7 @@ $(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball
 	echo "./snowball $< -rust -o $${o}"; \
 	./snowball $< -rust -o $${o}
 
-$(go_src_main_dir)/stemwords/algorithms.go:
+$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/modules.txt
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
