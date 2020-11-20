@@ -113,30 +113,44 @@ func (env *Env) PrevChar() {
 	}
 }
 
-func (env *Env) ByteIndexForHop(delta int32) int32 {
-	if delta > 0 {
-		res := env.Cursor
-		for delta > 0 {
+func (env *Env) Hop(delta int32) bool {
+	res := env.Cursor
+	for delta > 0 {
+		delta--
+		if res >= env.Limit {
+			return false
+		}
+		res++
+		for res < env.Limit && !onCharBoundary(env.current, res) {
 			res++
-			delta--
-			for res <= len(env.current) && !onCharBoundary(env.current, res) {
-				res++
-			}
 		}
-		return int32(res)
-	} else if delta < 0 {
-		res := env.Cursor
-		for delta < 0 {
-			res--
-			delta++
-			for res >= 0 && !onCharBoundary(env.current, res) {
-				res--
-			}
-		}
-		return int32(res)
-	} else {
-		return int32(env.Cursor)
 	}
+	env.Cursor = res
+	return true
+}
+
+func (env *Env) HopChecked(delta int32) bool {
+	return delta >= 0 && env.Hop(delta)
+}
+
+func (env *Env) HopBack(delta int32) bool {
+	res := env.Cursor
+	for delta > 0 {
+		delta--
+		if res <= env.LimitBackward {
+			return false
+		}
+		res--
+		for res > env.LimitBackward && !onCharBoundary(env.current, res) {
+			res--
+		}
+	}
+	env.Cursor = res
+	return true
+}
+
+func (env *Env) HopBackChecked(delta int32) bool {
+	return delta >= 0 && env.HopBack(delta)
 }
 
 func (env *Env) InGrouping(chars []byte, min, max int32) bool {
