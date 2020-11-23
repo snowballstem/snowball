@@ -434,8 +434,8 @@ backwardmode (
         // Otherwise, delete just the -ndik part.
         '{Ayen}{Nun}{Dalet}{Yud}{Kuf}'
            ( R1 
-             not (test('{Nun}{Giml}' or '{Nun}{Kuf}' or '{Nun}' or '{Mem}' or ('Lamed' consonant) or vowel) delete)
-             hop -5 '{Nun}{Dalet}{Yud}{Kuf}' delete
+             not (test('{Nun}{Giml}' or '{Nun}{Kuf}' or '{Nun}' or '{Mem}' or ('{Lamed}' consonant) or vowel) delete)
+             <- '{Ayen}'
            )
       )
     )
