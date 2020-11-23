@@ -1037,9 +1037,13 @@ static void generate_among(struct generator * g, struct node * p) {
     } else if (x->command_count > 0) {
         int i;
         for (i = 1; i <= x->command_count; i++) {
-            g->I[0] = i;
-            w(g, (i > 1 ? "~Melif" : "~Mif"));
-            w(g, " among_var == ~I0:~N~+");
+            if (i == x->command_count && x->nocommand_count == 0) {
+                w(g, "~Melse:~N~+");
+            } else {
+                g->I[0] = i;
+                w(g, (i > 1 ? "~Melif" : "~Mif"));
+                w(g, " among_var == ~I0:~N~+");
+            }
             generate(g, x->commands[i - 1]);
             w(g, "~-");
             g->unreachable = false;
