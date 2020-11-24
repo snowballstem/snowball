@@ -11,6 +11,8 @@ routines (
        prelude
        mark_regions
        R1
+       R1plus1
+       R1plus3
        standard_suffix
 )
 
@@ -125,8 +127,7 @@ define mark_regions as (
 
         // If verbal prefix followed by Tsu- or Ge-, replace it
         (
-
-          (('{Tsadek}{Vov}{Giml}{Nun}' or '{Tsadek}{Vov}{Kuf}{Tes}' or '{Tsadek}{Vov}{Kuf}{Nun}') not (hop 1) hop -4)
+          test (('{Tsadek}{Vov}{Giml}{Nun}' or '{Tsadek}{Vov}{Kuf}{Tes}' or '{Tsadek}{Vov}{Kuf}{Nun}') atlimit)
           or
           ( ['{Giml}{Ayen}'] <- 'GE')
           or
@@ -158,6 +159,10 @@ define mark_regions as (
 
 backwardmode (
   define R1 as $p1 <= cursor
+  // Like R1, but also allows the cursor to be outside R1 by the width of Tes.
+  define R1plus1 as $p1 <= cursor + sizeof '{Tes}'
+  // Like R1plus1, but by the width of Giml Yud Samekh
+  define R1plus3 as $p1 <= cursor + sizeof '{Giml}{Yud}{Samekh}'
 
   define standard_suffix as (
     do (
@@ -240,12 +245,10 @@ backwardmode (
         // If the Tes was before R1, we try to perform the same action while leaving the Tes in place
         '{Tes}{Nun}' '{Tes}{Ayen}' '{Tes}{Ayen}{Reysh}' '{Tes}{Samekh}'
         '{Tes}{Nun}{Samekh}' '{Tes}{Ayen}{Nun}{Ayen}' '{Tes}{Ayen}{Nun}{Ayen}{Mem}' '{Tes}{Ayen}{Nun}{Ayen}{Reysh}'
-          ( not (R1 delete
-              // -gebrakht => -breng
-              not (['{Giml}{Ayen}{Beys}{Reysh}{Alef}{Khof}' or '{Beys}{Reysh}{Alef}{Khof}'] <- '{Beys}{Reysh}{Ayen}{Nun}{Giml}')
-              )
-              repeat (hop -1)
-              ['{Ayen}{Nun}{Ayen}{Reysh}' or '{Ayen}{Nun}{Ayen}{Mem}' or '{Ayen}{Nun}{Ayen}' or'{Nun}' or '{Ayen}{Reysh}' or '{Nun}{Samekh}' or '{Ayen}' or '{Samekh}'] R1 delete) 
+          ( ((R1 delete) or (R1plus1 <- '{Tes}'))
+            // -(ge)brakht => -breng
+            ['{Beys}{Reysh}{Alef}{Khof}' try '{Giml}{Ayen}'] <- '{Beys}{Reysh}{Ayen}{Nun}{Giml}'
+          )
 
         // -geyn shorted to -gey
         '{Giml}{TsveyYudn}{Nun}'
@@ -382,13 +385,18 @@ backwardmode (
         '{Ayen}{Lamed}{Ayen}{Khof}' '{Ayen}{Lamed}{Ayen}' '{Lamed}{Ayen}{Khof}' '{Ayen}{Lamed}{Ayen}{Samekh}' '{Ayen}{Lamed}{Ayen}{Nun}'
            ( R1 delete )
         
-        // Noun ending: -ist, -istn
-        '{Yud}{Samekh}{Tes}' '{Yud}{Samekh}{Tes}{Nun}'
-          ( R1 delete )
+        // Noun ending: -ist
+        '{Yud}{Samekh}{Tes}'
+          (
+            // Exceptions: -gist, -shist
+            ( ('{Giml}' or '{Shin}') try (R1plus3 <- '{Yud}{Samekh}') )
+            or
+            ( R1 delete )
+          )
 
-        // Exceptions to above: -gist, -shist
-        '{Giml}{Yud}{Samekh}{Tes}' '{Shin}{Yud}{Samekh}{Tes}'
-          ( hop -4 ['{Tes}'] R1 delete )
+        // Noun ending: -istn
+        '{Yud}{Samekh}{Tes}{Nun}'
+          ( R1 delete )
         
         // Verb ending: -stu
         '{Samekh}{Tes}{Vov}'
