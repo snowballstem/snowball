@@ -9,6 +9,7 @@
 # List all the main algorithms for each language, in UTF-8, and also with
 # the most commonly used encoding.
 
+amharic         UTF_8                   amharic,am,amh
 arabic          UTF_8                   arabic,ar,ara
 basque          UTF_8,ISO_8859_1        basque,eu,eus,baq
 catalan         UTF_8,ISO_8859_1        catalan,ca,cat
