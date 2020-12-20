@@ -7,352 +7,352 @@
 stringescapes { }
 
 /* the Amharic letters in Unicode */
-stringdef ha	{U+1200}	// ha
-stringdef hu	{U+1201}	// hu
-stringdef hi	{U+1202}	// hi
-stringdef haa	{U+1203}	// haa
-stringdef hee	{U+1204}	// hee
-stringdef he	{U+1205}	// he
-stringdef ho	{U+1206}	// ho
-stringdef hoa	{U+1207}	// hoa
-stringdef la	{U+1208}	// la
-stringdef lu	{U+1209}	// lu
-stringdef li	{U+120A}	// li
-stringdef laa	{U+120B}	// laa
-stringdef lee	{U+120C}	// lee
-stringdef le	{U+120D}	// le
-stringdef lo	{U+120E}	// lo
-stringdef lwa	{U+120F}	// lwa
-stringdef hha	{U+1210}	// hha
-stringdef hhu	{U+1211}	// hhu
-stringdef hhi	{U+1212}	// hhi
-stringdef hhaa	{U+1213}	// hhaa
-stringdef hhee	{U+1214}	// hhee
-stringdef hhe	{U+1215}	// hhe
-stringdef hho	{U+1216}	// hho
-stringdef hhwa	{U+1217}	// hhwa
-stringdef ma	{U+1218}	// ma
-stringdef mu	{U+1219}	// mu
-stringdef mi	{U+121A}	// mi
-stringdef maa	{U+121B}	// maa
-stringdef mee	{U+121C}	// mee
-stringdef me	{U+121D}	// me
-stringdef mo	{U+121E}	// mo
-stringdef mwa	{U+121F}	// mwa
-stringdef sza	{U+1220}	// sza
-stringdef szu	{U+1221}	// szu
-stringdef szi	{U+1222}	// szi
-stringdef szaa	{U+1223}	// szaa
-stringdef szee	{U+1224}	// szee
-stringdef sze	{U+1225}	// sze
-stringdef szo	{U+1226}	// szo
-stringdef szwa	{U+1227}	// szwa
-stringdef ra	{U+1228}	// ra
-stringdef ru	{U+1229}	// ru
-stringdef ri	{U+122A}	// ri
-stringdef raa	{U+122B}	// raa
-stringdef ree	{U+122C}	// ree
-stringdef re	{U+122D}	// re
-stringdef ro	{U+122E}	// ro
-stringdef rwa	{U+122F}	// rwa
-stringdef sa	{U+1230}	// sa
-stringdef su	{U+1231}	// su
-stringdef si	{U+1232}	// si
-stringdef saa	{U+1233}	// saa
-stringdef see	{U+1234}	// see
-stringdef se	{U+1235}	// se
-stringdef so	{U+1236}	// so
-stringdef swa	{U+1237}	// swa
-stringdef sha	{U+1238}	// sha
-stringdef shu	{U+1239}	// shu
-stringdef shi	{U+123A}	// shi
-stringdef shaa	{U+123B}	// shaa
-stringdef shee	{U+123C}	// shee
-stringdef she	{U+123D}	// she
-stringdef sho	{U+123E}	// sho
-stringdef shwa	{U+123F}	// shwa
-stringdef qa	{U+1240}	// qa
-stringdef qu	{U+1241}	// qu
-stringdef qi	{U+1242}	// qi
-stringdef qaa	{U+1243}	// qaa
-stringdef qee	{U+1244}	// qee
-stringdef qe	{U+1245}	// qe
-stringdef qo	{U+1246}	// qo
-stringdef qoa	{U+1247}	// qoa
-stringdef qwa	{U+1248}	// qwa
-stringdef qwi	{U+124A}	// qwi
-stringdef qwaa	{U+124B}	// qwaa
-stringdef qwee	{U+124C}	// qwee
-stringdef qwe	{U+124D}	// qwe
-stringdef qha	{U+1250}	// qha
-stringdef qhu	{U+1251}	// qhu
-stringdef qhi	{U+1252}	// qhi
-stringdef qhaa	{U+1253}	// qhaa
-stringdef qhee	{U+1254}	// qhee
-stringdef qhe	{U+1255}	// qhe
-stringdef qho	{U+1256}	// qho
-stringdef qhwa	{U+1258}	// qhwa
-stringdef qhwi	{U+125A}	// qhwi
-stringdef qhwaa	{U+125B}	// qhwaa
-stringdef qhwee	{U+125C}	// qhwee
-stringdef qhwe	{U+125D}	// qhwe
-stringdef ba	{U+1260}	// ba
-stringdef bu	{U+1261}	// bu
-stringdef bi	{U+1262}	// bi
-stringdef baa	{U+1263}	// baa
-stringdef bee	{U+1264}	// bee
-stringdef be	{U+1265}	// be
-stringdef bo	{U+1266}	// bo
-stringdef bwa	{U+1267}	// bwa
-stringdef va	{U+1268}	// va
-stringdef vu	{U+1269}	// vu
-stringdef vi	{U+126A}	// vi
-stringdef vaa	{U+126B}	// vaa
-stringdef vee	{U+126C}	// vee
-stringdef ve	{U+126D}	// ve
-stringdef vo	{U+126E}	// vo
-stringdef vwa	{U+126F}	// vwa
-stringdef ta	{U+1270}	// ta
-stringdef tu	{U+1271}	// tu
-stringdef ti	{U+1272}	// ti
-stringdef taa	{U+1273}	// taa
-stringdef tee	{U+1274}	// tee
-stringdef te	{U+1275}	// te
-stringdef to	{U+1276}	// to
-stringdef twa	{U+1277}	// twa
-stringdef ca	{U+1278}	// ca
-stringdef cu	{U+1279}	// cu
-stringdef ci	{U+127A}	// ci
-stringdef caa	{U+127B}	// caa
-stringdef cee	{U+127C}	// cee
-stringdef ce	{U+127D}	// ce
-stringdef co	{U+127E}	// co
-stringdef cwa	{U+127F}	// cwa
-stringdef xa	{U+1280}	// xa
-stringdef xu	{U+1281}	// xu
-stringdef xi	{U+1282}	// xi
-stringdef xaa	{U+1283}	// xaa
-stringdef xee	{U+1284}	// xee
-stringdef xe	{U+1285}	// xe
-stringdef xo	{U+1286}	// xo
-stringdef xoa	{U+1287}	// xoa
-stringdef xwa	{U+1288}	// xwa
-stringdef xwi	{U+128A}	// xwi
-stringdef xwaa	{U+128B}	// xwaa
-stringdef xwee	{U+128C}	// xwee
-stringdef xwe	{U+128D}	// xwe
-stringdef na	{U+1290}	// na
-stringdef nu	{U+1291}	// nu
-stringdef ni	{U+1292}	// ni
-stringdef naa	{U+1293}	// naa
-stringdef nee	{U+1294}	// nee
-stringdef ne	{U+1295}	// ne
-stringdef no	{U+1296}	// no
-stringdef nwa	{U+1297}	// nwa
-stringdef nya	{U+1298}	// nya
-stringdef nyu	{U+1299}	// nyu
-stringdef nyi	{U+129A}	// nyi
-stringdef nyaa	{U+129B}	// nyaa
-stringdef nyee	{U+129C}	// nyee
-stringdef nye	{U+129D}	// nye
-stringdef nyo	{U+129E}	// nyo
-stringdef nywa	{U+129F}	// nywa
-stringdef g_a	{U+12A0}	// glottal a
-stringdef g_u	{U+12A1}	// glottal u
-stringdef g_i	{U+12A2}	// glottal i
-stringdef g_aa	{U+12A3}	// glottal aa
-stringdef g_ee	{U+12A4}	// glottal ee
-stringdef g_e	{U+12A5}	// glottal e
-stringdef g_o	{U+12A6}	// glottal o
-stringdef g_wa	{U+12A7}	// glottal wa
-stringdef ka	{U+12A8}	// ka
-stringdef ku	{U+12A9}	// ku
-stringdef ki	{U+12AA}	// ki
-stringdef kaa	{U+12AB}	// kaa
-stringdef kee	{U+12AC}	// kee
-stringdef ke	{U+12AD}	// ke
-stringdef ko	{U+12AE}	// ko
-stringdef koa	{U+12AF}	// koa
-stringdef kwa	{U+12B0}	// kwa
-stringdef kwi	{U+12B2}	// kwi
-stringdef kwaa	{U+12B3}	// kwaa
-stringdef kwee	{U+12B4}	// kwee
-stringdef kwe	{U+12B5}	// kwe
-stringdef kxa	{U+12B8}	// kxa
-stringdef kxu	{U+12B9}	// kxu
-stringdef kxi	{U+12BA}	// kxi
-stringdef kxaa	{U+12BB}	// kxaa
-stringdef kxee	{U+12BC}	// kxee
-stringdef kxe	{U+12BD}	// kxe
-stringdef kxo	{U+12BE}	// kxo
-stringdef kxwa	{U+12C0}	// kxwa
-stringdef kxwi	{U+12C2}	// kxwi
-stringdef kxwaa	{U+12C3}	// kxwaa
-stringdef kxwee	{U+12C4}	// kxwee
-stringdef kxwe	{U+12C5}	// kxwe
-stringdef wa	{U+12C8}	// wa
-stringdef wu	{U+12C9}	// wu
-stringdef wi	{U+12CA}	// wi
-stringdef waa	{U+12CB}	// waa
-stringdef wee	{U+12CC}	// wee
-stringdef we	{U+12CD}	// we
-stringdef wo	{U+12CE}	// wo
-stringdef woa	{U+12CF}	// woa
-stringdef p_a	{U+12D0}	// pharyngeal a
-stringdef p_u	{U+12D1}	// pharyngeal u
-stringdef p_i	{U+12D2}	// pharyngeal i
-stringdef p_aa	{U+12D3}	// pharyngeal aa
-stringdef p_ee	{U+12D4}	// pharyngeal ee
-stringdef p_e	{U+12D5}	// pharyngeal e
-stringdef p_o	{U+12D6}	// pharyngeal o
-stringdef za	{U+12D8}	// za
-stringdef zu	{U+12D9}	// zu
-stringdef zi	{U+12DA}	// zi
-stringdef zaa	{U+12DB}	// zaa
-stringdef zee	{U+12DC}	// zee
-stringdef ze	{U+12DD}	// ze
-stringdef zo	{U+12DE}	// zo
-stringdef zwa	{U+12DF}	// zwa
-stringdef zha	{U+12E0}	// zha
-stringdef zhu	{U+12E1}	// zhu
-stringdef zhi	{U+12E2}	// zhi
-stringdef zhaa	{U+12E3}	// zhaa
-stringdef zhee	{U+12E4}	// zhee
-stringdef zhe	{U+12E5}	// zhe
-stringdef zho	{U+12E6}	// zho
-stringdef zhwa	{U+12E7}	// zhwa
-stringdef ya	{U+12E8}	// ya
-stringdef yu	{U+12E9}	// yu
-stringdef yi	{U+12EA}	// yi
-stringdef yaa	{U+12EB}	// yaa
-stringdef yee	{U+12EC}	// yee
-stringdef ye	{U+12ED}	// ye
-stringdef yo	{U+12EE}	// yo
-stringdef yoa	{U+12EF}	// yoa
-stringdef da	{U+12F0}	// da
-stringdef du	{U+12F1}	// du
-stringdef di	{U+12F2}	// di
-stringdef daa	{U+12F3}	// daa
-stringdef dee	{U+12F4}	// dee
-stringdef de	{U+12F5}	// de
-stringdef do	{U+12F6}	// do
-stringdef dwa	{U+12F7}	// dwa
-stringdef dda	{U+12F8}	// dda
-stringdef ddu	{U+12F9}	// ddu
-stringdef ddi	{U+12FA}	// ddi
-stringdef ddaa	{U+12FB}	// ddaa
-stringdef ddee	{U+12FC}	// ddee
-stringdef dde	{U+12FD}	// dde
-stringdef ddo	{U+12FE}	// ddo
-stringdef ddwa	{U+12FF}	// ddwa
-stringdef ja	{U+1300}	// ja
-stringdef ju	{U+1301}	// ju
-stringdef ji	{U+1302}	// ji
-stringdef jaa	{U+1303}	// jaa
-stringdef jee	{U+1304}	// jee
-stringdef je	{U+1305}	// je
-stringdef jo	{U+1306}	// jo
-stringdef jwa	{U+1307}	// jwa
-stringdef ga	{U+1308}	// ga
-stringdef gu	{U+1309}	// gu
-stringdef gi	{U+130A}	// gi
-stringdef gaa	{U+130B}	// gaa
-stringdef gee	{U+130C}	// gee
-stringdef ge	{U+130D}	// ge
-stringdef go	{U+130E}	// go
-stringdef goa	{U+130F}	// goa
-stringdef gwa	{U+1310}	// gwa
-stringdef gwi	{U+1312}	// gwi
-stringdef gwaa	{U+1313}	// gwaa
-stringdef gwee	{U+1314}	// gwee
-stringdef gwe	{U+1315}	// gwe
-stringdef gga	{U+1318}	// gga
-stringdef ggu	{U+1319}	// ggu
-stringdef ggi	{U+131A}	// ggi
-stringdef ggaa	{U+131B}	// ggaa
-stringdef ggee	{U+131C}	// ggee
-stringdef gge	{U+131D}	// gge
-stringdef ggo	{U+131E}	// ggo
-stringdef ggwaa	{U+131F}	// ggwaa
-stringdef tha	{U+1320}	// tha
-stringdef thu	{U+1321}	// thu
-stringdef thi	{U+1322}	// thi
-stringdef thaa	{U+1323}	// thaa
-stringdef thee	{U+1324}	// thee
-stringdef the	{U+1325}	// the
-stringdef tho	{U+1326}	// tho
-stringdef thwa	{U+1327}	// thwa
-stringdef cha	{U+1328}	// cha
-stringdef chu	{U+1329}	// chu
-stringdef chi	{U+132A}	// chi
-stringdef chaa	{U+132B}	// chaa
-stringdef chee	{U+132C}	// chee
-stringdef che	{U+132D}	// che
-stringdef cho	{U+132E}	// cho
-stringdef chwa	{U+132F}	// chwa
-stringdef pha	{U+1330}	// pha
-stringdef phu	{U+1331}	// phu
-stringdef phi	{U+1332}	// phi
-stringdef phaa	{U+1333}	// phaa
-stringdef phee	{U+1334}	// phee
-stringdef phe	{U+1335}	// phe
-stringdef pho	{U+1336}	// pho
-stringdef phwa	{U+1337}	// phwa
-stringdef tsa	{U+1338}	// tsa
-stringdef tsu	{U+1339}	// tsu
-stringdef tsi	{U+133A}	// tsi
-stringdef tsaa	{U+133B}	// tsaa
-stringdef tsee	{U+133C}	// tsee
-stringdef tse	{U+133D}	// tse
-stringdef tso	{U+133E}	// tso
-stringdef tswa	{U+133F}	// tswa
-stringdef tza	{U+1340}	// tza
-stringdef tzu	{U+1341}	// tzu
-stringdef tzi	{U+1342}	// tzi
-stringdef tzaa	{U+1343}	// tzaa
-stringdef tzee	{U+1344}	// tzee
-stringdef tze	{U+1345}	// tze
-stringdef tzo	{U+1346}	// tzo
-stringdef tzoa	{U+1347}	// tzoa
-stringdef fa	{U+1348}	// fa
-stringdef fu	{U+1349}	// fu
-stringdef fi	{U+134A}	// fi
-stringdef faa	{U+134B}	// faa
-stringdef fee	{U+134C}	// fee
-stringdef fe	{U+134D}	// fe
-stringdef fo	{U+134E}	// fo
-stringdef fwa	{U+134F}	// fwa
-stringdef pa	{U+1350}	// pa
-stringdef pu	{U+1351}	// pu
-stringdef pi	{U+1352}	// pi
-stringdef paa	{U+1353}	// paa
-stringdef pee	{U+1354}	// pee
-stringdef pe	{U+1355}	// pe
-stringdef po	{U+1356}	// po
-stringdef pwa	{U+1357}	// pwa
-stringdef rya	{U+1358}	// rya
-stringdef mya	{U+1359}	// mya
-stringdef fya	{U+135A}	// fya
-stringdef one	{U+1369}	
-stringdef two	{U+136A}	
-stringdef three	{U+136B}	
-stringdef four	{U+136C}	
-stringdef five	{U+136D}	
-stringdef six	{U+136E}	
-stringdef seven	{U+136F}	
-stringdef eight	{U+1370}	
-stringdef nine	{U+1371}	
-stringdef ten	{U+1372}	
-stringdef 20	{U+1373}	
-stringdef 30	{U+1374}	
-stringdef 40	{U+1375}	
-stringdef 50	{U+1376}	
-stringdef 60	{U+1377}	
-stringdef 70	{U+1378}	
-stringdef 80	{U+1379}	
-stringdef 90	{U+137A}	
-stringdef 100	{U+137B}	
-stringdef 10000	{U+137C}		
+stringdef ha	'{U+1200}'	// ha
+stringdef hu	'{U+1201}'	// hu
+stringdef hi	'{U+1202}'	// hi
+stringdef haa	'{U+1203}'	// haa
+stringdef hee	'{U+1204}'	// hee
+stringdef he	'{U+1205}'	// he
+stringdef ho	'{U+1206}'	// ho
+stringdef hoa	'{U+1207}'	// hoa
+stringdef la	'{U+1208}'	// la
+stringdef lu	'{U+1209}'	// lu
+stringdef li	'{U+120A}'	// li
+stringdef laa	'{U+120B}'	// laa
+stringdef lee	'{U+120C}'	// lee
+stringdef le	'{U+120D}'	// le
+stringdef lo	'{U+120E}'	// lo
+stringdef lwa	'{U+120F}'	// lwa
+stringdef hha	'{U+1210}'	// hha
+stringdef hhu	'{U+1211}'	// hhu
+stringdef hhi	'{U+1212}'	// hhi
+stringdef hhaa	'{U+1213}'	// hhaa
+stringdef hhee	'{U+1214}'	// hhee
+stringdef hhe	'{U+1215}'	// hhe
+stringdef hho	'{U+1216}'	// hho
+stringdef hhwa	'{U+1217}'	// hhwa
+stringdef ma	'{U+1218}'	// ma
+stringdef mu	'{U+1219}'	// mu
+stringdef mi	'{U+121A}'	// mi
+stringdef maa	'{U+121B}'	// maa
+stringdef mee	'{U+121C}'	// mee
+stringdef me	'{U+121D}'	// me
+stringdef mo	'{U+121E}'	// mo
+stringdef mwa	'{U+121F}'	// mwa
+stringdef sza	'{U+1220}'	// sza
+stringdef szu	'{U+1221}'	// szu
+stringdef szi	'{U+1222}'	// szi
+stringdef szaa	'{U+1223}'	// szaa
+stringdef szee	'{U+1224}'	// szee
+stringdef sze	'{U+1225}'	// sze
+stringdef szo	'{U+1226}'	// szo
+stringdef szwa	'{U+1227}'	// szwa
+stringdef ra	'{U+1228}'	// ra
+stringdef ru	'{U+1229}'	// ru
+stringdef ri	'{U+122A}'	// ri
+stringdef raa	'{U+122B}'	// raa
+stringdef ree	'{U+122C}'	// ree
+stringdef re	'{U+122D}'	// re
+stringdef ro	'{U+122E}'	// ro
+stringdef rwa	'{U+122F}'	// rwa
+stringdef sa	'{U+1230}'	// sa
+stringdef su	'{U+1231}'	// su
+stringdef si	'{U+1232}'	// si
+stringdef saa	'{U+1233}'	// saa
+stringdef see	'{U+1234}'	// see
+stringdef se	'{U+1235}'	// se
+stringdef so	'{U+1236}'	// so
+stringdef swa	'{U+1237}'	// swa
+stringdef sha	'{U+1238}'	// sha
+stringdef shu	'{U+1239}'	// shu
+stringdef shi	'{U+123A}'	// shi
+stringdef shaa	'{U+123B}'	// shaa
+stringdef shee	'{U+123C}'	// shee
+stringdef she	'{U+123D}'	// she
+stringdef sho	'{U+123E}'	// sho
+stringdef shwa	'{U+123F}'	// shwa
+stringdef qa	'{U+1240}'	// qa
+stringdef qu	'{U+1241}'	// qu
+stringdef qi	'{U+1242}'	// qi
+stringdef qaa	'{U+1243}'	// qaa
+stringdef qee	'{U+1244}'	// qee
+stringdef qe	'{U+1245}'	// qe
+stringdef qo	'{U+1246}'	// qo
+stringdef qoa	'{U+1247}'	// qoa
+stringdef qwa	'{U+1248}'	// qwa
+stringdef qwi	'{U+124A}'	// qwi
+stringdef qwaa	'{U+124B}'	// qwaa
+stringdef qwee	'{U+124C}'	// qwee
+stringdef qwe	'{U+124D}'	// qwe
+stringdef qha	'{U+1250}'	// qha
+stringdef qhu	'{U+1251}'	// qhu
+stringdef qhi	'{U+1252}'	// qhi
+stringdef qhaa	'{U+1253}'	// qhaa
+stringdef qhee	'{U+1254}'	// qhee
+stringdef qhe	'{U+1255}'	// qhe
+stringdef qho	'{U+1256}'	// qho
+stringdef qhwa	'{U+1258}'	// qhwa
+stringdef qhwi	'{U+125A}'	// qhwi
+stringdef qhwaa	'{U+125B}'	// qhwaa
+stringdef qhwee	'{U+125C}'	// qhwee
+stringdef qhwe	'{U+125D}'	// qhwe
+stringdef ba	'{U+1260}'	// ba
+stringdef bu	'{U+1261}'	// bu
+stringdef bi	'{U+1262}'	// bi
+stringdef baa	'{U+1263}'	// baa
+stringdef bee	'{U+1264}'	// bee
+stringdef be	'{U+1265}'	// be
+stringdef bo	'{U+1266}'	// bo
+stringdef bwa	'{U+1267}'	// bwa
+stringdef va	'{U+1268}'	// va
+stringdef vu	'{U+1269}'	// vu
+stringdef vi	'{U+126A}'	// vi
+stringdef vaa	'{U+126B}'	// vaa
+stringdef vee	'{U+126C}'	// vee
+stringdef ve	'{U+126D}'	// ve
+stringdef vo	'{U+126E}'	// vo
+stringdef vwa	'{U+126F}'	// vwa
+stringdef ta	'{U+1270}'	// ta
+stringdef tu	'{U+1271}'	// tu
+stringdef ti	'{U+1272}'	// ti
+stringdef taa	'{U+1273}'	// taa
+stringdef tee	'{U+1274}'	// tee
+stringdef te	'{U+1275}'	// te
+stringdef to	'{U+1276}'	// to
+stringdef twa	'{U+1277}'	// twa
+stringdef ca	'{U+1278}'	// ca
+stringdef cu	'{U+1279}'	// cu
+stringdef ci	'{U+127A}'	// ci
+stringdef caa	'{U+127B}'	// caa
+stringdef cee	'{U+127C}'	// cee
+stringdef ce	'{U+127D}'	// ce
+stringdef co	'{U+127E}'	// co
+stringdef cwa	'{U+127F}'	// cwa
+stringdef xa	'{U+1280}'	// xa
+stringdef xu	'{U+1281}'	// xu
+stringdef xi	'{U+1282}'	// xi
+stringdef xaa	'{U+1283}'	// xaa
+stringdef xee	'{U+1284}'	// xee
+stringdef xe	'{U+1285}'	// xe
+stringdef xo	'{U+1286}'	// xo
+stringdef xoa	'{U+1287}'	// xoa
+stringdef xwa	'{U+1288}'	// xwa
+stringdef xwi	'{U+128A}'	// xwi
+stringdef xwaa	'{U+128B}'	// xwaa
+stringdef xwee	'{U+128C}'	// xwee
+stringdef xwe	'{U+128D}'	// xwe
+stringdef na	'{U+1290}'	// na
+stringdef nu	'{U+1291}'	// nu
+stringdef ni	'{U+1292}'	// ni
+stringdef naa	'{U+1293}'	// naa
+stringdef nee	'{U+1294}'	// nee
+stringdef ne	'{U+1295}'	// ne
+stringdef no	'{U+1296}'	// no
+stringdef nwa	'{U+1297}'	// nwa
+stringdef nya	'{U+1298}'	// nya
+stringdef nyu	'{U+1299}'	// nyu
+stringdef nyi	'{U+129A}'	// nyi
+stringdef nyaa	'{U+129B}'	// nyaa
+stringdef nyee	'{U+129C}'	// nyee
+stringdef nye	'{U+129D}'	// nye
+stringdef nyo	'{U+129E}'	// nyo
+stringdef nywa	'{U+129F}'	// nywa
+stringdef glottal a	'{U+12A0}'	// glottal a
+stringdef glottal u	'{U+12A1}'	// glottal u
+stringdef glottal i	'{U+12A2}'	// glottal i
+stringdef glottal aa	'{U+12A3}'	// glottal aa
+stringdef glottal ee	'{U+12A4}'	// glottal ee
+stringdef glottal e	'{U+12A5}'	// glottal e
+stringdef glottal o	'{U+12A6}'	// glottal o
+stringdef glottal wa	'{U+12A7}'	// glottal wa
+stringdef ka	'{U+12A8}'	// ka
+stringdef ku	'{U+12A9}'	// ku
+stringdef ki	'{U+12AA}'	// ki
+stringdef kaa	'{U+12AB}'	// kaa
+stringdef kee	'{U+12AC}'	// kee
+stringdef ke	'{U+12AD}'	// ke
+stringdef ko	'{U+12AE}'	// ko
+stringdef koa	'{U+12AF}'	// koa
+stringdef kwa	'{U+12B0}'	// kwa
+stringdef kwi	'{U+12B2}'	// kwi
+stringdef kwaa	'{U+12B3}'	// kwaa
+stringdef kwee	'{U+12B4}'	// kwee
+stringdef kwe	'{U+12B5}'	// kwe
+stringdef kxa	'{U+12B8}'	// kxa
+stringdef kxu	'{U+12B9}'	// kxu
+stringdef kxi	'{U+12BA}'	// kxi
+stringdef kxaa	'{U+12BB}'	// kxaa
+stringdef kxee	'{U+12BC}'	// kxee
+stringdef kxe	'{U+12BD}'	// kxe
+stringdef kxo	'{U+12BE}'	// kxo
+stringdef kxwa	'{U+12C0}'	// kxwa
+stringdef kxwi	'{U+12C2}'	// kxwi
+stringdef kxwaa	'{U+12C3}'	// kxwaa
+stringdef kxwee	'{U+12C4}'	// kxwee
+stringdef kxwe	'{U+12C5}'	// kxwe
+stringdef wa	'{U+12C8}'	// wa
+stringdef wu	'{U+12C9}'	// wu
+stringdef wi	'{U+12CA}'	// wi
+stringdef waa	'{U+12CB}'	// waa
+stringdef wee	'{U+12CC}'	// wee
+stringdef we	'{U+12CD}'	// we
+stringdef wo	'{U+12CE}'	// wo
+stringdef woa	'{U+12CF}'	// woa
+stringdef pharyngeal a	'{U+12D0}'	// pharyngeal a
+stringdef pharyngeal u	'{U+12D1}'	// pharyngeal u
+stringdef pharyngeal i	'{U+12D2}'	// pharyngeal i
+stringdef pharyngeal aa	'{U+12D3}'	// pharyngeal aa
+stringdef pharyngeal ee	'{U+12D4}'	// pharyngeal ee
+stringdef pharyngeal e	'{U+12D5}'	// pharyngeal e
+stringdef pharyngeal o	'{U+12D6}'	// pharyngeal o
+stringdef za	'{U+12D8}'	// za
+stringdef zu	'{U+12D9}'	// zu
+stringdef zi	'{U+12DA}'	// zi
+stringdef zaa	'{U+12DB}'	// zaa
+stringdef zee	'{U+12DC}'	// zee
+stringdef ze	'{U+12DD}'	// ze
+stringdef zo	'{U+12DE}'	// zo
+stringdef zwa	'{U+12DF}'	// zwa
+stringdef zha	'{U+12E0}'	// zha
+stringdef zhu	'{U+12E1}'	// zhu
+stringdef zhi	'{U+12E2}'	// zhi
+stringdef zhaa	'{U+12E3}'	// zhaa
+stringdef zhee	'{U+12E4}'	// zhee
+stringdef zhe	'{U+12E5}'	// zhe
+stringdef zho	'{U+12E6}'	// zho
+stringdef zhwa	'{U+12E7}'	// zhwa
+stringdef ya	'{U+12E8}'	// ya
+stringdef yu	'{U+12E9}'	// yu
+stringdef yi	'{U+12EA}'	// yi
+stringdef yaa	'{U+12EB}'	// yaa
+stringdef yee	'{U+12EC}'	// yee
+stringdef ye	'{U+12ED}'	// ye
+stringdef yo	'{U+12EE}'	// yo
+stringdef yoa	'{U+12EF}'	// yoa
+stringdef da	'{U+12F0}'	// da
+stringdef du	'{U+12F1}'	// du
+stringdef di	'{U+12F2}'	// di
+stringdef daa	'{U+12F3}'	// daa
+stringdef dee	'{U+12F4}'	// dee
+stringdef de	'{U+12F5}'	// de
+stringdef do	'{U+12F6}'	// do
+stringdef dwa	'{U+12F7}'	// dwa
+stringdef dda	'{U+12F8}'	// dda
+stringdef ddu	'{U+12F9}'	// ddu
+stringdef ddi	'{U+12FA}'	// ddi
+stringdef ddaa	'{U+12FB}'	// ddaa
+stringdef ddee	'{U+12FC}'	// ddee
+stringdef dde	'{U+12FD}'	// dde
+stringdef ddo	'{U+12FE}'	// ddo
+stringdef ddwa	'{U+12FF}'	// ddwa
+stringdef ja	'{U+1300}'	// ja
+stringdef ju	'{U+1301}'	// ju
+stringdef ji	'{U+1302}'	// ji
+stringdef jaa	'{U+1303}'	// jaa
+stringdef jee	'{U+1304}'	// jee
+stringdef je	'{U+1305}'	// je
+stringdef jo	'{U+1306}'	// jo
+stringdef jwa	'{U+1307}'	// jwa
+stringdef ga	'{U+1308}'	// ga
+stringdef gu	'{U+1309}'	// gu
+stringdef gi	'{U+130A}'	// gi
+stringdef gaa	'{U+130B}'	// gaa
+stringdef gee	'{U+130C}'	// gee
+stringdef ge	'{U+130D}'	// ge
+stringdef go	'{U+130E}'	// go
+stringdef goa	'{U+130F}'	// goa
+stringdef gwa	'{U+1310}'	// gwa
+stringdef gwi	'{U+1312}'	// gwi
+stringdef gwaa	'{U+1313}'	// gwaa
+stringdef gwee	'{U+1314}'	// gwee
+stringdef gwe	'{U+1315}'	// gwe
+stringdef gga	'{U+1318}'	// gga
+stringdef ggu	'{U+1319}'	// ggu
+stringdef ggi	'{U+131A}'	// ggi
+stringdef ggaa	'{U+131B}'	// ggaa
+stringdef ggee	'{U+131C}'	// ggee
+stringdef gge	'{U+131D}'	// gge
+stringdef ggo	'{U+131E}'	// ggo
+stringdef ggwaa	'{U+131F}'	// ggwaa
+stringdef tha	'{U+1320}'	// tha
+stringdef thu	'{U+1321}'	// thu
+stringdef thi	'{U+1322}'	// thi
+stringdef thaa	'{U+1323}'	// thaa
+stringdef thee	'{U+1324}'	// thee
+stringdef the	'{U+1325}'	// the
+stringdef tho	'{U+1326}'	// tho
+stringdef thwa	'{U+1327}'	// thwa
+stringdef cha	'{U+1328}'	// cha
+stringdef chu	'{U+1329}'	// chu
+stringdef chi	'{U+132A}'	// chi
+stringdef chaa	'{U+132B}'	// chaa
+stringdef chee	'{U+132C}'	// chee
+stringdef che	'{U+132D}'	// che
+stringdef cho	'{U+132E}'	// cho
+stringdef chwa	'{U+132F}'	// chwa
+stringdef pha	'{U+1330}'	// pha
+stringdef phu	'{U+1331}'	// phu
+stringdef phi	'{U+1332}'	// phi
+stringdef phaa	'{U+1333}'	// phaa
+stringdef phee	'{U+1334}'	// phee
+stringdef phe	'{U+1335}'	// phe
+stringdef pho	'{U+1336}'	// pho
+stringdef phwa	'{U+1337}'	// phwa
+stringdef tsa	'{U+1338}'	// tsa
+stringdef tsu	'{U+1339}'	// tsu
+stringdef tsi	'{U+133A}'	// tsi
+stringdef tsaa	'{U+133B}'	// tsaa
+stringdef tsee	'{U+133C}'	// tsee
+stringdef tse	'{U+133D}'	// tse
+stringdef tso	'{U+133E}'	// tso
+stringdef tswa	'{U+133F}'	// tswa
+stringdef tza	'{U+1340}'	// tza
+stringdef tzu	'{U+1341}'	// tzu
+stringdef tzi	'{U+1342}'	// tzi
+stringdef tzaa	'{U+1343}'	// tzaa
+stringdef tzee	'{U+1344}'	// tzee
+stringdef tze	'{U+1345}'	// tze
+stringdef tzo	'{U+1346}'	// tzo
+stringdef tzoa	'{U+1347}'	// tzoa
+stringdef fa	'{U+1348}'	// fa
+stringdef fu	'{U+1349}'	// fu
+stringdef fi	'{U+134A}'	// fi
+stringdef faa	'{U+134B}'	// faa
+stringdef fee	'{U+134C}'	// fee
+stringdef fe	'{U+134D}'	// fe
+stringdef fo	'{U+134E}'	// fo
+stringdef fwa	'{U+134F}'	// fwa
+stringdef pa	'{U+1350}'	// pa
+stringdef pu	'{U+1351}'	// pu
+stringdef pi	'{U+1352}'	// pi
+stringdef paa	'{U+1353}'	// paa
+stringdef pee	'{U+1354}'	// pee
+stringdef pe	'{U+1355}'	// pe
+stringdef po	'{U+1356}'	// po
+stringdef pwa	'{U+1357}'	// pwa
+stringdef rya	'{U+1358}'	// rya
+stringdef mya	'{U+1359}'	// mya
+stringdef fya	'{U+135A}'	// fya
+stringdef 01	'{U+1369}'	
+stringdef 02	'{U+136A}'	
+stringdef 03	'{U+136B}'	
+stringdef 04	'{U+136C}'	
+stringdef 05	'{U+136D}'	
+stringdef 06	'{U+136E}'	
+stringdef 07	'{U+136F}'	
+stringdef 08	'{U+1370}'	
+stringdef 09	'{U+1371}'	
+stringdef 10	'{U+1372}'	
+stringdef 20	'{U+1373}'	
+stringdef 30	'{U+1374}'	
+stringdef 40	'{U+1375}'	
+stringdef 50	'{U+1376}'	
+stringdef 60	'{U+1377}'	
+stringdef 70	'{U+1378}'	
+stringdef 80	'{U+1379}'	
+stringdef 90	'{U+137A}'	
+stringdef 100	'{U+137B}'	
+stringdef 10000	'{U+137C}'	
 
 booleans (
             is_noun
