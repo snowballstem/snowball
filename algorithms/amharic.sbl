@@ -157,14 +157,14 @@ stringdef nyee	'{U+129C}'	// nyee
 stringdef nye	'{U+129D}'	// nye
 stringdef nyo	'{U+129E}'	// nyo
 stringdef nywa	'{U+129F}'	// nywa
-stringdef glottal a	'{U+12A0}'	// glottal a
-stringdef glottal u	'{U+12A1}'	// glottal u
-stringdef glottal i	'{U+12A2}'	// glottal i
-stringdef glottal aa	'{U+12A3}'	// glottal aa
-stringdef glottal ee	'{U+12A4}'	// glottal ee
-stringdef glottal e	'{U+12A5}'	// glottal e
-stringdef glottal o	'{U+12A6}'	// glottal o
-stringdef glottal wa	'{U+12A7}'	// glottal wa
+stringdef g_a	'{U+12A0}'	// glottal a
+stringdef g_u	'{U+12A1}'	// glottal u
+stringdef g_i	'{U+12A2}'	// glottal i
+stringdef g_aa	'{U+12A3}'	// glottal aa
+stringdef g_ee	'{U+12A4}'	// glottal ee
+stringdef g_e	'{U+12A5}'	// glottal e
+stringdef g_o	'{U+12A6}'	// glottal o
+stringdef g_wa	'{U+12A7}'	// glottal wa
 stringdef ka	'{U+12A8}'	// ka
 stringdef ku	'{U+12A9}'	// ku
 stringdef ki	'{U+12AA}'	// ki
@@ -198,13 +198,13 @@ stringdef wee	'{U+12CC}'	// wee
 stringdef we	'{U+12CD}'	// we
 stringdef wo	'{U+12CE}'	// wo
 stringdef woa	'{U+12CF}'	// woa
-stringdef pharyngeal a	'{U+12D0}'	// pharyngeal a
-stringdef pharyngeal u	'{U+12D1}'	// pharyngeal u
-stringdef pharyngeal i	'{U+12D2}'	// pharyngeal i
-stringdef pharyngeal aa	'{U+12D3}'	// pharyngeal aa
-stringdef pharyngeal ee	'{U+12D4}'	// pharyngeal ee
-stringdef pharyngeal e	'{U+12D5}'	// pharyngeal e
-stringdef pharyngeal o	'{U+12D6}'	// pharyngeal o
+stringdef p_a	'{U+12D0}'	// pharyngeal a
+stringdef p_u	'{U+12D1}'	// pharyngeal u
+stringdef p_i	'{U+12D2}'	// pharyngeal i
+stringdef p_aa	'{U+12D3}'	// pharyngeal aa
+stringdef p_ee	'{U+12D4}'	// pharyngeal ee
+stringdef p_e	'{U+12D5}'	// pharyngeal e
+stringdef p_o	'{U+12D6}'	// pharyngeal o
 stringdef za	'{U+12D8}'	// za
 stringdef zu	'{U+12D9}'	// zu
 stringdef zi	'{U+12DA}'	// zi
