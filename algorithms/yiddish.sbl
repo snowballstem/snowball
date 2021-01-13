@@ -11,7 +11,6 @@ routines (
        prelude
        mark_regions
        R1
-       R1plus1
        R1plus3
        standard_suffix
 )
@@ -109,8 +108,10 @@ define mark_regions as (
   (
     try (
       // Replace past participle ge- at start of word
-      ['{Giml}{Ayen}']
-         ( <- 'GE' )
+      // Unless word starts with gelt- or gebn-
+      test ('{Giml}{Ayen}{Lamed}{Tes}' or '{Giml}{Ayen}{Beys}{Nun}')
+        or
+      (['{Giml}{Ayen}'] <- 'GE' )
     )
 
     try (
@@ -128,6 +129,8 @@ define mark_regions as (
         // If verbal prefix followed by Tsu- or Ge-, replace it
         (
           test (('{Tsadek}{Vov}{Giml}{Nun}' or '{Tsadek}{Vov}{Kuf}{Tes}' or '{Tsadek}{Vov}{Kuf}{Nun}') atlimit)
+          or
+          test ('{Giml}{Ayen}{Beys}{Nun}')
           or
           ( ['{Giml}{Ayen}'] <- 'GE')
           or
@@ -159,9 +162,7 @@ define mark_regions as (
 
 backwardmode (
   define R1 as $p1 <= cursor
-  // Like R1, but also allows the cursor to be outside R1 by the width of Tes.
-  define R1plus1 as $p1 <= cursor + sizeof '{Tes}'
-  // Like R1plus1, but by the width of Giml Yud Samekh
+  // Like R1, but by the width of Giml Yud Samekh
   define R1plus3 as $p1 <= cursor + sizeof '{Giml}{Yud}{Samekh}'
 
   define standard_suffix as (
@@ -245,10 +246,14 @@ backwardmode (
         // If the Tes was before R1, we try to perform the same action while leaving the Tes in place
         '{Tes}{Nun}' '{Tes}{Ayen}' '{Tes}{Ayen}{Reysh}' '{Tes}{Samekh}'
         '{Tes}{Nun}{Samekh}' '{Tes}{Ayen}{Nun}{Ayen}' '{Tes}{Ayen}{Nun}{Ayen}{Mem}' '{Tes}{Ayen}{Nun}{Ayen}{Reysh}'
-          ( ((R1 delete) or (R1plus1 <- '{Tes}'))
+          ( ((R1 delete) or ( <- '{Tes}'))
             // -(ge)brakht => -breng
             ['{Beys}{Reysh}{Alef}{Khof}' try '{Giml}{Ayen}'] <- '{Beys}{Reysh}{Ayen}{Nun}{Giml}'
           )
+
+        // Past participles: -et, -etn, -ets, -ete, -eter
+        '{Ayen}{Tes}' '{Ayen}{Tes}{Nun}' '{Ayen}{Tes}{Samekh}' '{Ayen}{Tes}{Ayen}' '{Ayen}{Tes}{Ayen}{Reysh}'
+          ( R1 delete )
 
         // -geyn shorted to -gey
         '{Giml}{TsveyYudn}{Nun}'
@@ -426,7 +431,7 @@ backwardmode (
 
     do (
       [substring] among(
-        // Adjective endings: -ig, -ik, -ish, -nik
+        // Adjective endings: -ig, -ik, -ish, -nik, -dik
         '{Yud}{Giml}' '{Yud}{Kuf}' '{Yud}{Shin}' '{Nun}{Yud}{Kuf}' '{Dalet}{Yud}{Kuf}'
           ( R1 delete )
 
@@ -441,10 +446,7 @@ backwardmode (
         // Present participle ending -endik: delete if after a -ng, -nk, -n, -m, consonant+l, or vowel.
         // Otherwise, delete just the -ndik part.
         '{Ayen}{Nun}{Dalet}{Yud}{Kuf}'
-           ( R1 
-             not (test('{Nun}{Giml}' or '{Nun}{Kuf}' or '{Nun}' or '{Mem}' or ('{Lamed}' consonant) or vowel) delete)
-             <- '{Ayen}'
-           )
+           ( R1 delete )
       )
     )
 
