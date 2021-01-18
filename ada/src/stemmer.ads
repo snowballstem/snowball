@@ -120,14 +120,14 @@ private
      Global => null;
 
    function Skip_Utf8 (Context : in Context_Type'Class;
-                       N       : in Positive) return Result_Index with
+                       N       : in Integer) return Result_Index with
      Global => null;
 
    function Skip_Utf8_Backward (Context : in Context_Type'Class) return Result_Index with
      Global => null;
 
    function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Positive) return Result_Index with
+                                N       : in Integer) return Result_Index with
      Global => null;
 
    procedure Get_Utf8 (Context : in Context_Type'Class;

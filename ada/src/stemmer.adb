@@ -272,10 +272,13 @@ package body Stemmer with SPARK_Mode is
    end Skip_Utf8;
 
    function Skip_Utf8 (Context : in Context_Type'Class;
-                       N       : in Positive) return Result_Index is
+                       N       : in Integer) return Result_Index is
       Pos : Char_Index := Context.C;
       Val : Byte;
    begin
+      if N < 0 then
+          return -1;
+      end if;
       for I in 1 .. N loop
          if Pos >= Context.L then
             return -1;
@@ -313,10 +316,13 @@ package body Stemmer with SPARK_Mode is
    end Skip_Utf8_Backward;
 
    function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Positive) return Result_Index is
+                                N       : in Integer) return Result_Index is
       Pos : Char_Index := Context.C;
       Val : Byte;
    begin
+      if N < 0 then
+          return -1;
+      end if;
       for I in 1 .. N loop
          if Pos <= Context.Lb then
             return -1;

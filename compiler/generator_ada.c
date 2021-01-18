@@ -725,7 +725,11 @@ static void generate_hop(struct generator * g, struct node * p) {
         w(g, "~MC := Z.C ~S0 ");
         generate_AE(g, p->AE);
         writef(g, ";~C~N", p);
-        write_failure_if(g, "~S1 > C or C > Z.L", p);
+        if (p->mode == m_forward) {
+            write_failure_if(g, "C > Z.L or C < Z.C", p);
+        } else {
+            write_failure_if(g, "C < Z.Lb or C > Z.C", p);
+        }
     }
     writef(g, "~MZ.C := C;~N", p);
 }
