@@ -162,7 +162,7 @@ define mark_regions as (
 
 backwardmode (
   define R1 as $p1 <= cursor
-  // Like R1, but by the width of Giml Yud Samekh
+  // Like R1, but also allows the cursor to be outside R1 by the width of Giml Yud Samekh
   define R1plus3 as $p1 <= cursor + sizeof '{Giml}{Yud}{Samekh}'
 
   define standard_suffix as (
