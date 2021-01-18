@@ -1709,6 +1709,10 @@ extern void write_int(struct generator * g, int i) {
     str_append_int(g->outbuf, i);
 }
 
+extern void write_symbol(struct generator * g, symbol s) {
+    str_append_symbol(g->outbuf, s);
+}
+
 extern void write_b(struct generator * g, symbol * b) {
 
     str_append_b(g->outbuf, b);

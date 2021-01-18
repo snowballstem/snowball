@@ -36,6 +36,7 @@ extern struct str * str_new(void);
 extern void str_delete(struct str * str);
 extern void str_append(struct str * str, const struct str * add);
 extern void str_append_ch(struct str * str, char add);
+extern void str_append_symbol(struct str * str, symbol add);
 extern void str_append_b(struct str * str, const symbol * q);
 extern void str_append_b_tail(struct str * str, const symbol * q, int skip);
 extern void str_append_string(struct str * str, const char * s);
@@ -343,7 +344,7 @@ struct options {
     byte syntax_tree;
     byte comments;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -365,6 +366,7 @@ extern void write_char(struct generator * g, int ch);
 extern void write_newline(struct generator * g);
 extern void write_string(struct generator * g, const char * s);
 extern void write_int(struct generator * g, int i);
+extern void write_symbol(struct generator * g, symbol s);
 extern void write_b(struct generator * g, symbol * b);
 extern void write_str(struct generator * g, struct str * str);
 
@@ -409,4 +411,8 @@ extern void generate_program_rust(struct generator * g);
 
 #ifndef DISABLE_GO
 extern void generate_program_go(struct generator * g);
+#endif
+
+#ifndef DISABLE_ADA
+extern void generate_program_ada(struct generator * g);
 #endif
