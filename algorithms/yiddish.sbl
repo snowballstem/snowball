@@ -128,8 +128,10 @@ define mark_regions as (
 
         // If verbal prefix followed by Tsu- or Ge-, replace it
         (
+          // Don't mark the TSU- prefix inside verbs like "oys-tsugn"
           test (('{Tsadek}{Vov}{Giml}{Nun}' or '{Tsadek}{Vov}{Kuf}{Tes}' or '{Tsadek}{Vov}{Kuf}{Nun}') atlimit)
           or
+          // Don't mark the GE- prefix inside verbs like "avek-gebn"
           test ('{Giml}{Ayen}{Beys}{Nun}')
           or
           ( ['{Giml}{Ayen}'] <- 'GE')
