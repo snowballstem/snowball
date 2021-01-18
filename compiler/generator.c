@@ -720,9 +720,9 @@ static void generate_do(struct generator * g, struct node * p) {
 static void generate_next(struct generator * g, struct node * p) {
     if (g->options->encoding == ENC_UTF8) {
         if (p->mode == m_forward)
-            w(g, "~{int ret = skip_utf8(z->p, z->c, 0, z->l, 1");
+            w(g, "~{int ret = skip_utf8(z->p, z->c, z->l, 1");
         else
-            w(g, "~{int ret = skip_utf8(z->p, z->c, z->lb, 0, -1");
+            w(g, "~{int ret = skip_b_utf8(z->p, z->c, z->lb, 1");
         writef(g, ");~N"
               "~Mif (ret < 0) ~f~N"
               "~Mz->c = ret;~C"
@@ -888,19 +888,47 @@ static void generate_atmark(struct generator * g, struct node * p) {
 }
 
 static void generate_hop(struct generator * g, struct node * p) {
-    g->S[0] = p->mode == m_forward ? "+" : "-";
-    g->S[1] = p->mode == m_forward ? "0" : "z->lb";
     if (g->options->encoding == ENC_UTF8) {
-        w(g, "~{int ret = skip_utf8(z->p, z->c, ~S1, z->l, ~S0 ");
-        generate_AE(g, p->AE); writef(g, ");~C", p);
+        g->S[0] = p->mode == m_forward ? "" : "_b";
+        g->S[1] = p->mode == m_forward ? "z->l" : "z->lb";
+        w(g, "~{int ret = skip~S0_utf8(z->p, z->c, ~S1, ");
+        generate_AE(g, p->AE);
+        writef(g, ");~C", p);
         writef(g, "~Mif (ret < 0) ~f~N", p);
+        writef(g, "~Mz->c = ret;~N"
+               "~}", p);
     } else {
-        w(g, "~{int ret = z->c ~S0 ");
-        generate_AE(g, p->AE); writef(g, ";~C", p);
-        writef(g, "~Mif (~S1 > ret || ret > z->l) ~f~N", p);
+        // Fixed-width characters.
+        g->S[0] = p->mode == m_forward ? "+" : "-";
+        if (p->AE->type == c_number) {
+            // Constant distance hop.
+            //
+            // No need to check for negative hop as that's converted to false by
+            // the analyser.
+            //
+            // Note that if we signal f then z->c will be reset when this is
+            // handled - we rely on this here and unconditionally update z->c.
+            w(g, "z->c = z->c ~S0 ");
+            generate_AE(g, p->AE);
+            w(g, ";~C");
+            if (p->mode == m_forward) {
+                writef(g, "~Mif (z->c > z->l) ~f~N", p);
+            } else {
+                writef(g, "~Mif (z->c < z->lb) ~f~N", p);
+            }
+        } else {
+            w(g, "~{int ret = z->c ~S0 ");
+            generate_AE(g, p->AE);
+            writef(g, ";~C", p);
+            if (p->mode == m_forward) {
+                writef(g, "~Mif (ret > z->l || ret < z->c) ~f~N", p);
+            } else {
+                writef(g, "~Mif (ret < z->lb || ret > z->c) ~f~N", p);
+            }
+            writef(g, "~Mz->c = ret;~N"
+                      "~}", p);
+        }
     }
-    writef(g, "~Mz->c = ret;~N"
-          "~}", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {

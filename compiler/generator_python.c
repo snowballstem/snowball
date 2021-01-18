@@ -699,9 +699,17 @@ static void generate_hop(struct generator * g, struct node * p) {
     generate_AE(g, p->AE);
     w(g, "~N");
 
-    g->S[0] = p->mode == m_forward ? "0" : "self.limit_backward";
-
-    write_failure_if(g, "~S0 > c or c > self.limit", p);
+    g->S[1] = p->mode == m_forward ? "> self.limit" : "< self.limit_backward";
+    g->S[2] = p->mode == m_forward ? "<" : ">";
+    if (p->AE->type == c_number) {
+        // Constant distance hop.
+        //
+        // No need to check for negative hop as that's converted to false by
+        // the analyser.
+        write_failure_if(g, "c ~S1", p);
+    } else {
+        write_failure_if(g, "c ~S1 or c ~S2 self.cursor", p);
+    }
     writef(g, "~Mself.cursor = c~N", p);
 }
 

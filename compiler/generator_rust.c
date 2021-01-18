@@ -658,18 +658,19 @@ static void generate_atmark(struct generator * g, struct node * p) {
 }
 
 static void generate_hop(struct generator * g, struct node * p) {
-
     write_comment(g, p);
-    g->S[0] = p->mode == m_forward ? "" : "-";
-
-    w(g, "~Mlet c = env.byte_index_for_hop(~S0");
+    // Generate the AE to a temporary block so we can substitute it in
+    // write_failure_if().
+    struct str * ae = str_new();
+    struct str * s = g->outbuf;
+    g->outbuf = ae;
     generate_AE(g, p->AE);
-    w(g, ");~N");
-
-    g->S[0] = p->mode == m_forward ? "0" : "env.limit_backward";
-
-    write_failure_if(g, "~S0 as i32 > c || c > env.limit", p);
-    writef(g, "~Menv.cursor = c;~N", p);
+    g->outbuf = s;
+    g->B[0] = str_data(ae);
+    g->S[0] = p->mode == m_forward ? "" : "_back";
+    g->S[1] = p->AE->type == c_number ? "" : "_checked";
+    write_failure_if(g, "!env.hop~S0~S1(~B0)", p);
+    str_delete(ae);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
