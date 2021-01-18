@@ -191,11 +191,6 @@ extern void str_append_ch(struct str * str, char add) {
     str->data = add_to_b(str->data, 1, &sym);
 }
 
-extern void str_append_symbol(struct str * str, symbol add) {
-
-    str->data = add_to_b(str->data, 1, &add);
-}
-
 /* Append a low level block to a str. */
 extern void str_append_b(struct str * str, const symbol * q) {
 
