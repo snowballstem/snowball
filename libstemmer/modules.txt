@@ -10,6 +10,7 @@
 # the most commonly used encoding.
 
 arabic          UTF_8                   arabic,ar,ara
+armenian        UTF_8                   armenian,hy,hye,arm
 basque          UTF_8,ISO_8859_1        basque,eu,eus,baq
 catalan         UTF_8,ISO_8859_1        catalan,ca,cat
 danish          UTF_8,ISO_8859_1        danish,da,dan
