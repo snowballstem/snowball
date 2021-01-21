@@ -66,8 +66,24 @@ Add subdirectory named after new stemmer containing:
 If you don't have access to a suitably licensed word list of a suitable size,
 you may be able to use the `wikipedia-most-common-words` script to generate
 one by extracting the most frequent words from a Wikipedia dump in the
-language the stemmer is for.  If the language uses a script/alphabet which
-isn't already supported you may need to add a new regular expression.
+language the stemmer is for.  You need to specify the Unicode "script" (that's
+"script" in the sense of alphabet) to use - you can find the appropriate one
+by looking in the Unicode `Scripts.txt`::
+
+https://www.unicode.org/Public/13.0.0/ucd/Scripts.txt
+
+The script name is the second column, between `;` and `#`.  The first entries
+are all "Common" which isn't what you want - scroll down to get to the entries
+that are useful here.
+
+You also need to specify the minimum frequency to select.  Picking this value
+will probably need some experimentation as the appropriate threshold depends on
+how much data there is in the wikipedia dump for a particular language, as well
+as the size of the vocabulary for the language, and how inflected the language
+is.  Try counting the number of unique words extracted (`wc -l voc.txt` on
+Unix) and also looking through the list - some proper nouns, words from other
+languages, typos, etc are OK (since the stemmer will encounter all these in
+practice too), but at some point "more" stops being "better".
 
 snowball-website repo
 ---------------------
@@ -90,6 +106,16 @@ If you have a stopword list, add that as `stop.txt` and link to it from
 Link to your new `stemmer.tt` from `algorithms/index.tt`.
 
 Add a news entry to `index.tt`.
+
+Add the new stemmer to the online demo.  Assuming you have checkouts of the
+`snowball` and `snowball-website` repos in sibling directories:
+
+* run `make check_js` in the `snowball` repo
+* run `./update-js`
+* add the new stemmer to git with: `git add js/*-stemmer.js`
+* if the new language is written right-to-left (RTL) then add it to the check
+  in `demo.tt` (search for `rtl` to find the place to change.
+* `git commit`.
 
 .. FIXME: Also needs adding for the online demo.
 .. Demo needs an extra tweak for RTL languages.
