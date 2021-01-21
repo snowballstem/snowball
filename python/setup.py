@@ -39,7 +39,11 @@ classifiers = [
     'License :: OSI Approved :: BSD License'
 ]
 
-classifiers.extend('Natural Language :: ' + lang.title() for lang in langs)
+for lang in langs:
+    lang_titlecase = lang.title()
+    # Only classifiers listed in https://pypi.org/classifiers/ are allowed
+    if lang_titlecase not in ('Armenian', 'Yiddish'):
+        classifiers.append('Natural Language :: ' + lang_titlecase)
 
 classifiers.extend([
     'Operating System :: OS Independent',
