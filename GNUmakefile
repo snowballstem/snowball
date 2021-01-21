@@ -2,7 +2,7 @@
 
 # After changing this, run `make update_version` to update various sources
 # which hard-code it.
-SNOWBALL_VERSION = 2.0.0
+SNOWBALL_VERSION = 2.1.0
 
 c_src_dir = src_c
 
