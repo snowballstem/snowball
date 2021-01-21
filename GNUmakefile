@@ -48,6 +48,8 @@ ada_src_dir = $(ada_src_main_dir)/algorithms
 ICONV = iconv
 #ICONV = python ./iconv.py
 
+tarball_ext = .tar.gz
+
 # algorithms.mk is generated from libstemmer/modules.txt and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
@@ -341,16 +343,16 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) $(STEMTEST_SOURCES) \
 	    $(COMMON_FILES) \
 	    GNUmakefile README.rst doc/TODO libstemmer/mkmodules.pl
-	destname=snowball_code; \
+	destname=snowball-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	for file in $^; do \
 	  dir=`dirname $$file` && \
 	  mkdir -p $${dest}/$${dir} && \
 	  cp -a $${file} $${dest}/$${dir} || exit 1 ; \
 	done && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C library.
@@ -365,10 +367,10 @@ dist_libstemmer_c: \
             $(C_LIB_HEADERS) \
             libstemmer/mkinc.mak \
             libstemmer/mkinc_utf8.mak
-	destname=libstemmer_c; \
+	destname=libstemmer_c-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_c_README $${dest}/README && \
 	mkdir -p $${dest}/examples && \
@@ -399,17 +401,17 @@ dist_libstemmer_c: \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
 	echo '	rm -f stemwords *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the Java library.
 dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
 	    $(JAVA_SOURCES)
-	destname=libstemmer_java; \
+	destname=libstemmer_java-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_java_README $${dest}/README && \
 	mkdir -p $${dest}/$(java_src_dir) && \
@@ -421,17 +423,17 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C# library.
 dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
 	    $(CSHARP_SOURCES)
-	destname=libstemmer_csharp; \
+	destname=libstemmer_csharp-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_csharp_README $${dest}/README && \
 	mkdir -p $${dest}/$(csharp_src_dir) && \
@@ -441,14 +443,14 @@ dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/$(csharp_sample_dir) && \
 	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
 	cp -a $(COMMON_FILES) $${dest} && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 dist_libstemmer_python: $(PYTHON_SOURCES)
-	destname=snowballstemmer; \
+	destname=snowballstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
@@ -462,10 +464,10 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	rm -rf $${dest}
 
 dist_libstemmer_js: $(JS_SOURCES)
-	destname=jsstemmer; \
+	destname=jsstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/$(js_runtime_dir) && \
 	mkdir -p $${dest}/$(js_sample_dir) && \
@@ -476,7 +478,7 @@ dist_libstemmer_js: $(JS_SOURCES)
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
 	 ls README.rst $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
