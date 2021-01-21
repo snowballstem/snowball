@@ -4,8 +4,8 @@ Snowball 2.1.0 (2021-01-21)
 C/C++
 -----
 
-* Fix decoding of 4-byte UTF-8 sequences in `grouping` checks.  This bug 
-  affected Unicode codepoints U+40000 to U+7FFFF and U+C0000 to U+FFFFF and 
+* Fix decoding of 4-byte UTF-8 sequences in `grouping` checks.  This bug
+  affected Unicode codepoints U+40000 to U+7FFFF and U+C0000 to U+FFFFF and
   doesn't affect any of the stemming algorithms we currently ship (#138,
   reported by Stephane Carrez).
 
