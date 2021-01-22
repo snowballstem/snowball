@@ -114,11 +114,8 @@ Add the new stemmer to the online demo.  Assuming you have checkouts of the
 * run `./update-js`
 * add the new stemmer to git with: `git add js/*-stemmer.js`
 * if the new language is written right-to-left (RTL) then add it to the check
-  in `demo.tt` (search for `rtl` to find the place to change.
+  in `demo.tt` (search for `rtl` to find the place to change.)
 * `git commit`.
-
-.. FIXME: Also needs adding for the online demo.
-.. Demo needs an extra tweak for RTL languages.
 
 Adding a new programming language generator
 ===========================================
