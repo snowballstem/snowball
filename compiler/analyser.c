@@ -1227,6 +1227,17 @@ static struct node * read_routine_definition(struct analyser * a) {
      * optimisation can easily see where the routine's code ends.
      */
     p->right = new_node(a, c_functionend);
+    /* FIXME: Make this a "hard" c_functionend and propagate back nodes that
+     * lead directly to it and add "soft" c_functionend nodes after those.
+     * Then any c_functionend node can be use for tail call and similar
+     * optimisations, while only a "hard" one (probably) results in a return
+     * being emitted.
+     *
+     * How to propagate though?  Should we have pointers to "next node if t"
+     * (and maybe "next node if f", if that's known and in the same routine,
+     * and some special value otherwise?  NULL should probably mean "can't
+     * fail"...)
+     */
     return def;
 }
 

@@ -713,6 +713,14 @@ static void generate_hop(struct generator * g, struct node * p) {
     writef(g, "~Mself.cursor = c~N", p);
 }
 
+static int at_function_end(struct generator * g, struct node * p) {
+    (void)g;
+    if (p->right && p->right->type == c_functionend) {
+        return true;
+    }
+    return false;
+}
+
 static void generate_delete(struct generator * g, struct node * p) {
 
     write_comment(g, p);
@@ -955,13 +963,6 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
     g->V[0] = p->name;
     g->S[0] = s;
     w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); w(g, "~N");
-}
-
-static int at_function_end(struct generator * g, struct node * p) {
-    if (p->right && p->right->type == c_functionend) {
-        return true;
-    }
-    return false;
 }
 
 static void generate_integer_test(struct generator * g, struct node * p, char * s) {
