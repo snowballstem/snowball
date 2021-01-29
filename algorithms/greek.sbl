@@ -363,7 +363,7 @@ backwardmode (
     [substring] among (
       '{a}{d}{e}{s}' '{a}{d}{oo}{n}' (delete)
     )
-    not ([substring] among (
+    not (substring among (
       '{o}{k}' '{m}{a}{m}' '{m}{a}{n}' '{m}{p}{a}{m}{p}' '{p}{a}{t}{e}{r}' '{g}{y}{a}{g}{y}' '{n}{t}{a}{n}{t}' '{k}{u}{r}' '{th}{e}{y}' '{p}{e}{th}{e}{r}'
     ))
     insert '{a}{d}'
@@ -581,8 +581,8 @@ backwardmode (
         delete
         unset test1
         ([] '{k}{o}{l}{l}' <- '{a}{g}') or (
-          not ([substring] among ('{ps}{o}{f}' '{n}{a}{u}{l}{o}{ch}'))
           ([] substring among (
+            '{ps}{o}{f}' '{n}{a}{u}{l}{o}{ch}' ()
             '{o}{f}' '{p}{e}{l}' '{ch}{o}{r}{t}' '{l}{l}' '{s}{f}' '{r}{p}' '{f}{r}' '{p}{r}' '{l}{o}{ch}' '{s}{m}{i}{n}'
             (<- '{a}{g}')
           )) or
