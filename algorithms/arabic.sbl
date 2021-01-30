@@ -363,10 +363,7 @@ define Prefix_Step1 as (
 
 define Prefix_Step2 as (
         [substring] among (
-            '{f}{a}'
-            '{w}{a}'
-            '{f}' ($(len > 3) delete)
-            '{w}' ($(len > 3) delete)
+            '{f}' '{w}' ($(len > 3) not '{a}' delete)
         )
 )
 
