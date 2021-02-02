@@ -860,8 +860,20 @@ static struct node * read_C(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     int token = read_token(t);
     switch (token) {
-        case c_bra:
-            return read_C_list(a);
+        case c_bra: {
+            struct node * p = read_C_list(a);
+            if (p->type != c_bra) {
+                fprintf(stderr, "read_C_list returned unexpected type %s\n",
+                        name_of_token(p->type));
+                exit(1);
+            }
+            if (p->left && !p->left->right) {
+                // Replace a single entry command list with the command it
+                // contains in order to make subsequent optimisations easier.
+                p = p->left;
+            }
+            return p;
+        }
         case c_backwards:
             {
                 int mode = a->mode;
