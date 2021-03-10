@@ -705,7 +705,7 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt | head -300; \
+	  diff -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
