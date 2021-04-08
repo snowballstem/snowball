@@ -1252,7 +1252,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~Mprivate static string ~V0 = ");
+    w(g, "~Mprivate const string ~V0 = ");
     write_literal_string(g, b);
     w(g, ";~N");
 }
