@@ -1186,12 +1186,14 @@ static void generate_class_end(struct generator * g) {
     w(g, "~N");
 }
 
-static void generate_among_declaration(struct generator * g, struct among * x) {
+static void generate_among_table(struct generator * g, struct among * x, const char * type) {
 
     struct amongvec * v = x->b;
-    g->I[0] = x->number;
 
-    w(g, "~Mprivate static readonly Among[] a_~I0 = new[] ~N~M{~N~+");
+    g->I[0] = x->number;
+    g->S[0] = type;
+    w(g, "~M~S0a_~I0 = new[] ~N~M{~N~+");
+
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1213,13 +1215,39 @@ static void generate_among_declaration(struct generator * g, struct among * x) {
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x;
+    int amongs_with_functions = 0;
+    struct among * x = g->analyser->amongs;
 
-    x = g->analyser->amongs;
     while (x != 0) {
-        generate_among_declaration(g, x);
+        if (x->function_count) {
+            g->I[0] = x->number;
+            g->I[1] = x->literalstring_count;
+
+            w(g, "~Mprivate readonly Among[] a_~I0;~N");
+            ++amongs_with_functions;
+        } else {
+            generate_among_table(g, x, "private static readonly Among[] ");
+        }
         x = x->next;
     }
+    w(g, "~N");
+
+    if (!amongs_with_functions) return;
+
+    w(g, "~M/// <summary>~N");
+    w(g, "~M///   Initializes a new instance of the <see cref=\"~n\"/> class.~N");
+    w(g, "~M/// </summary>~N");
+    w(g, "~M/// ~N");
+    w(g, "~Mpublic ~n()~N~{");
+    x = g->analyser->amongs;
+    while (x != 0) {
+        if (x->function_count) {
+            generate_among_table(g, x, "");
+        }
+        x = x->next;
+    }
+
+    w(g, "~}~N~N");
 }
 
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
