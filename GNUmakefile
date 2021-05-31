@@ -163,7 +163,9 @@ JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
-CPPFLAGS=-Iinclude
+CPPFLAGS=
+
+INCLUDES=-Iinclude
 
 all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
@@ -212,8 +214,14 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
+examples/%.o: examples/%.c
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+tests/%.o: tests/%.c
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
 stemtest: $(STEMTEST_OBJECTS) libstemmer.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
@@ -256,7 +264,7 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.
 	./snowball charsets/ISO-8859-2.sbl $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
 $(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball
 	@mkdir -p $(java_src_dir)
