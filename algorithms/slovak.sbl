@@ -1,0 +1,87 @@
+routines (
+  RV
+  mark_regions
+  do_possessive
+  do_case
+)
+
+externals ( stem )
+
+integers ( pV p1 )
+
+groupings ( v )
+
+stringescapes {}
+
+stringdef a' '{U+00E1}'
+stringdef a" '{U+00E4}'
+stringdef c^ '{U+010D}'
+stringdef d^ '{U+010F}'
+stringdef e' '{U+00E9}'
+stringdef i' '{U+00ED}'
+stringdef l' '{U+013A}'
+stringdef l^ '{U+013E}'
+stringdef n^ '{U+0148}'
+stringdef o' '{U+00F3}'
+stringdef o^ '{U+00F4}'
+stringdef r' '{U+0155}'
+stringdef s^ '{U+0161}'
+stringdef t^ '{U+0165}'
+stringdef u' '{U+00FA}'
+stringdef y' '{U+00FD}'
+stringdef z^ '{U+017E}'
+
+define v 'aeiouy{a'}{a"}{e'}{i'}{o'}{o^}{u'}{y'}'
+
+define mark_regions as (
+
+    $pV = limit
+    $p1 = limit
+
+    do (
+        gopast non-v setmark pV
+        gopast non-v gopast v setmark p1
+    )
+)
+
+backwardmode (
+
+  define RV as $pV <= cursor
+
+  define do_possessive as (
+    [substring] RV among (
+      'ov'
+      (delete)
+      'in'
+      (delete)
+    )
+  )
+
+  define do_case as (
+    [substring] among (
+      'ej{s^}ieho' 'ejsieho' 'ej{s^}iemu' 'ejsiemu'
+      'ej{s^}ich' 'ejsich' 'encoch' 'ej{s^}imi' 'ejsimi' 'encami'
+      'ej{s^}ia' 'ejsia' 'atami' 'at{a'}ch' 'eniec' 'encom' 'ej{s^}om' 'ejsom'
+      'ej{s^}im' 'ejsim' 'ej{s^}ej' 'ejsej' 'ej{s^}ou' 'ejsou' 'ej{s^}iu' 'ejsiu' 'ej{s^}ie' 'ejsie'
+      'e{t^}om' 'etom' 'iami' 'at{a'}m' 'atam' 'a{t^}om' 'atom' 'ovia' 'iach'
+      'ence' 'ieho' 'iemu' 'ieme' 'iete' 'ej{s^}i' 'ejsi'
+      'eho' '{i'}ch' 'ich' '{e'}ho' 'emi' '{i'}mi' 'imi' '{a'}ch' 'ach' '{y'}ch' 'ych'
+      'ami' 'ov{e'}' 'ove' 'ov{y'}' 'ovy' 'ov{i'}' 'ovi' 'ie{t^}' 'iet' 'ie{s^}' 'ies'
+      'ej{u'}' 'eju' 'aj{u'}' 'aju' 'uj{u'}' 'uju' 'eme' '{i'}te' 'ite' '{i'}me' 'ime'
+       '{y'}mi' 'ymi' 'iam' 'at{a'}' 'ata' 'iac' 'ili' 'ila' 'ilo' 'och'
+       '{i'}m' 'im' '{a'}m' 'am' 'us' '{y'}m' 'ym' 'mi' 'ou' 'ia' 'ie' 'iu' 'ho' 'mu' 'me'
+       'te' 'a{t^}' 'at' 'a{s^}' 'as' '{u'}{t^}' 'ut' 'i{t^}' 'it' '{i'}{s^}' 'i{s^}' 'is'
+       '{i'}l' 'il' '{u'}c' 'uc' 'e{s^}' 'es'
+       'a' '{a'}' 'e' '{e'}' 'i' '{i'}' 'o' '{o'}' 'u' '{u'}' '{y'}' 'y'
+      (delete)
+    )
+  )
+)
+
+define stem as (
+  do mark_regions
+  backwards (
+    do_case
+    do_possessive
+  )
+)
