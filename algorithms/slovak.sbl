@@ -142,11 +142,23 @@ define exception as (
         'jedz' 'jedzte' 'jedzme'
         (<-'jest')
 
+		'babiek' 'babicka'
+		(<- 'babk')
+
 		'dlan'
 		(<- 'dlan')
 
-		'miest'
+		'matka' 'maticka' 'mamka' 'mamicka'
+		(<- 'mam')
+
+		'majetok'
+		(<- 'majetk')
+
+		'meste' 'miest'
 		(<- 'mest')
+
+		'sral' 'srali'
+		(<- 'ser')
 
 		'zien'
 		(<- 'zen')
@@ -194,18 +206,23 @@ backwardmode (
 				'ejsom' 'ejsim' 'ejsia' 'ejsie' 'ejsej' 'eniec'
 				'ejsiu' 'ejsou' 'inych' 'inymi' 'ovych' 'ovymi'
 				'inami' 'inovi' 'inoch' 'atami' 'atach' 'encom'
+				'avame' 'avate' 'avaju' 'ovala' 'ovalo' 'ovali'
+				'ujeme' 'ujete'
 				'ejsi' 'iemu' 'ieho' 'inmu' 'inho' 'inej' 'ence'
 				'inou' 'inov' 'inom' 'inym' 'ovia' 'iach' 'atom'
 				'ovho' 'ovej' 'ovou' 'ovym' 'ovmu' 'ovom' 'atam'
-				'ieme' 'iete'
-				'ovi' 'ovy' 'och' 'ami' 'ach' 'iam'	'eho'
-				'ych' 'ich' 'ymi' 'imi' 'ini' 'ata' 'atu'
-				'ina' 'inu' 'ino' 'ine' 'sie' 'emu' 'ati'
+				'ieme' 'iete' 'avam' 'avas' 'oval' 'ujem' 'ujes'
+				'ujme' 'ujte' 'ujuc'
+				'ovi' 'ovy' 'och' 'ami' 'ach' 'iam'	'eho' 'ete'
+				'ych' 'ich' 'ymi' 'imi' 'ini' 'ata' 'atu' 'uju'
+				'ina' 'inu' 'ino' 'ine' 'sie' 'emu' 'ati' 'uje'
 				'ime' 'ite' 'ila' 'ilo' 'ili' 'iem' 'ies'
-				'ali' 'ala' 'alo' 'ame' 'ate' 'aju'
+				'ali' 'ala' 'alo' 'ame' 'ate' 'aju' 'eme'
+				'ove' 'ovu' 'ovo' 'jte' 'jme' 'ska'
 				'ym' 'im' 'ia' 'ie' 'ej' 'iu' 'om' 'ou'
 				'ho' 'mu' 'ov' 'mi' 'am' 'in' 'at' 'is' 'il'
-				'va' 'vu' 've' 'vo' 'al' 'es' 'it' 'as'
+				'va' 'vu' 've' 'vo' 'al' 'es' 'it' 'as' 'te'
+				'me'
 				'v' 'n' 'a' 'm' 'i'	'u' 'e'  'y'
                 (delete)
             )
