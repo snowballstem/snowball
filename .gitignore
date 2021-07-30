@@ -6,6 +6,7 @@
 /libstemmer/mkinc_utf8.mak
 /libstemmer/modules.h
 /libstemmer/modules_utf8.h
+/libstemmer.a
 /snowball
 /src_c
 /stemwords

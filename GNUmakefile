@@ -167,12 +167,12 @@ CPPFLAGS=
 
 INCLUDES=-Iinclude
 
-all: snowball libstemmer.o stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+all: snowball libstemmer.a stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball \
-	      libstemmer.o stemwords \
+	      libstemmer.a stemwords \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
@@ -211,19 +211,19 @@ libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl lib
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
-libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 examples/%.o: examples/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
+stemwords: $(STEMWORDS_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 tests/%.o: tests/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-stemtest: $(STEMTEST_OBJECTS) libstemmer.o
+stemtest: $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
@@ -402,10 +402,10 @@ dist_libstemmer_c: \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
 	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
-	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
-	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
+	echo 'all: libstemmer.a stemwords' >> $${dest}/Makefile && \
+	echo 'libstemmer.a: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
-	echo 'stemwords: examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
+	echo 'stemwords: examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
 	echo '	rm -f stemwords *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
