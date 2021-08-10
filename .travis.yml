@@ -1,4 +1,7 @@
 language: minimal
+arch:
+  - arm64
+  - s390x
 dist: trusty
 matrix:
   include:
