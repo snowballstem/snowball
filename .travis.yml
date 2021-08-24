@@ -1,8 +1,9 @@
 language: minimal
 arch:
   - arm64
+  - ppc64le
   - s390x
-dist: trusty
+dist: xenial
 matrix:
   include:
     - name: "C distribution build"
