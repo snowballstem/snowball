@@ -19,9 +19,6 @@ Python
   PyPI's list, but Armenian and Yiddish aren't on it.  Patch from Dmitry
   Shachnev.
 
-Java
-----
-
 Code Quality Improvements
 -------------------------
 
@@ -120,9 +117,6 @@ New stemming algorithms
 * Add Armenian stemmer from Astghik Mkrtchyan.  It's been on the website for
   over a decade, and included in Xapian for over 9 years without any negative
   feedback.
-
-Behavioural changes to existing algorithms
-------------------------------------------
 
 Optimisations to existing algorithms
 ------------------------------------
@@ -407,7 +401,7 @@ New stemming algorithms
 
 * Add Arabic stemmer from Assem Chelli (#32, #50).
 
-* Add Irish stemmer Jim O'Regan (#48).
+* Add Irish stemmer from Jim O'Regan (#48).
 
 * Add Nepali stemmer from Arthur Zakirov (#70).
 
