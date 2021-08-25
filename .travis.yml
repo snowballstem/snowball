@@ -39,6 +39,7 @@ matrix:
       env: RUST=rust
     - language: csharp
       env: MCS=mcs
+      dist: focal
     - name: Pascal
       env: FPC=fpc
       dist: bionic
@@ -60,7 +61,7 @@ matrix:
       python: "3.6"
       env: PYTHON=python THIN_FACTOR=10
     - language: python
-      python: "pypy3.7"
+      python: "pypy3.7-7.3.5"
       env: PYTHON=python
       dist: bionic
     - name: "Ada"
