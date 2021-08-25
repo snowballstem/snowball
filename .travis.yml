@@ -1,8 +1,5 @@
 language: minimal
-arch:
-  - arm64
-  - ppc64le
-  - s390x
+arch: arm64
 dist: xenial
 matrix:
   include:
@@ -54,27 +51,18 @@ matrix:
     # hits the travis time limit.  With pypy, it's enough faster than we
     # can run the full tests.
     - language: python
+      python: "3.9"
+      env: PYTHON=python THIN_FACTOR=10
+    - language: python
       python: "3.7"
       env: PYTHON=python THIN_FACTOR=10
-      dist: xenial
     - language: python
       python: "3.6"
       env: PYTHON=python THIN_FACTOR=10
     - language: python
-      python: "3.4"
-      env: PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "2.7"
-      env: PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "2.6"
-      env: PYTHON=python THIN_FACTOR=10
-    - language: python
-      python: "pypy"
+      python: "pypy3.7"
       env: PYTHON=python
-    - language: python
-      python: "pypy3.5"
-      env: PYTHON=python
+      dist: bionic
     - name: "Ada"
       env: gprbuild=gprbuild
       dist: bionic
