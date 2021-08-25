@@ -39,7 +39,7 @@ matrix:
       env: RUST=rust
     - language: csharp
       env: MCS=mcs
-      dist: focal
+      dist: bionic
     - name: Pascal
       env: FPC=fpc
       dist: bionic
