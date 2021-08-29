@@ -35,7 +35,7 @@ stringdef shch '{U+0449}'
 stringdef soft '{U+044C}'
 stringdef iu   '{U+044E}'
 stringdef ia   '{U+044F}'
-stringdef apostrophe '{U+027F}'
+stringdef apostrophe '{U+0027}'
 
 routines ( exception1
            adjective
