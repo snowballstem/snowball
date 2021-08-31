@@ -109,7 +109,8 @@ Link to your new `stemmer.tt` from `algorithms/index.tt`.
 Add a news entry to `index.tt`.
 
 Add the new stemmer to the online demo.  Assuming you have checkouts of the
-`snowball` and `snowball-website` repos in sibling directories:
+`snowball`, `snowball-data` and `snowball-website` repos in sibling
+directories:
 
 * run `make check_js` in the `snowball` repo
 * run `./update-js`
