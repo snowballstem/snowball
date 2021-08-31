@@ -100,8 +100,9 @@ between your implementation and that described in the paper (for example,
 sometimes papers have ambiguities that need resolving to re-implement the
 algorithm described).
 
-If you have a stopword list, add that as `stop.txt` and link to it from
-`stemmer.tt`.
+If you have a stopword list, add that as `stop.txt` in your new subdirectory.
+The `generate` script checks if such a file exists and if it does a link to
+it is automatically added.
 
 Link to your new `stemmer.tt` from `algorithms/index.tt`.
 
