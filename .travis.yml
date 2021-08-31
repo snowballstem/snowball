@@ -38,6 +38,7 @@ matrix:
       dist: bionic
       env: RUST=rust
     - language: csharp
+      arch: amd64 # csharp doesn't seem to work on arm64
       env: MCS=mcs
       dist: bionic
     - name: Pascal
