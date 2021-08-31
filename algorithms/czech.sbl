@@ -80,7 +80,7 @@ backwardmode (
   )
 
   define do_case as (
-    [substring] among (
+    [substring] R1 among (
       'atech'
       '{e^}tem' 'at{u*}m'
       '{a'}ch' '{y'}ch' 'ov{e'}' '{y'}mi'
