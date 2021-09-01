@@ -4,12 +4,6 @@ routines (
   mark_regions
   do_possessive
   do_case
-  do_comparative
-  do_diminutive
-  do_augmentative
-  do_derivational
-  do_deriv_single
-  do_aggressive
 )
 
 externals ( stem )
@@ -104,130 +98,6 @@ backwardmode (
       )
     )
   )
-
-  define do_derivational as (
-    [substring] R1 among (
-      'obinec'
-      'ovisk' 'ovstv' 'ovi{s^}t' 'ovn{i'}k'
-      '{a'}sek' 'loun' 'nost' 'teln' 'ovec' 'ov{i'}k' 'ovtv' 'ovin' '{s^}tin'
-      '{a'}rn' 'och' 'ost' 'ovn' 'oun' 'out' 'ou{s^}' 'u{s^}k'
-      'kyn' '{c^}an' 'k{a'}{r^}' 'n{e'}{r^}' 'n{i'}k' 'ctv' 'stv'
-      '{a'}{c^}' 'a{c^}' '{a'}n' 'an' '{a'}{r^}' 'as'
-      'ob' 'ot' 'ov' 'o{n^}' 'ul' 'yn'
-      '{c^}k' '{c^}n' 'dl' 'nk' 'tv' 'tk' 'vk'
-      (delete)
-      'ion{a'}{r^}'
-      'inec' 'itel'
-      'i{a'}n' 'ist' 'isk' 'i{s^}k' 'itb'
-      'ic' 'in' 'it' 'iv'
-      (
-        <- 'i'
-        palatalise
-      )
-      'enic' 'ec' 'en'
-      (
-        <- 'e'
-        palatalise
-      )
-      '{e'}{r^}'
-      (
-        <- '{e'}'
-        palatalise
-      )
-      '{e^}n'
-      (
-        <- '{e^}'
-        palatalise
-      )
-      '{i'}rn'
-      '{i'}{r^}' '{i'}n'
-      (
-        <- '{i'}'
-        palatalise
-      )
-    )
-  )
-  define do_deriv_single as (
-    [substring] among (
-      'c' '{c^}' 'k' 'l' 'n' 't'
-      (delete)
-    )
-  )
-
-
-  define do_augmentative as (
-    [substring] among (
-      'ajzn' '{a'}k'
-      (delete)
-      'izn' 'isk'
-      (
-        <- 'i'
-        palatalise
-      )
-    )
-  )
-
-  define do_diminutive as (
-    [substring] among (
-      'ou{s^}ek' '{a'}{c^}ek' 'a{c^}ek' 'o{c^}ek' 'u{c^}ek'
-      'anek' 'onek' 'unek' '{a'}nek'
-      'e{c^}k' '{e'}{c^}k' 'i{c^}k' '{i'}{c^}k' 'enk' '{e'}nk' 'ink' '{i'}nk'
-      '{a'}{c^}k' 'a{c^}k' 'o{c^}k' 'u{c^}k' 'ank' 'onk' 'unk'
-      '{a'}tk' '{a'}nk' 'u{s^}k'
-      'k'
-      (delete)
-      'e{c^}ek' 'enek' 'ek'
-      (
-        <- 'e'
-        palatalise
-      )
-      '{e'}{c^}ek' '{e'}k'
-      (
-        <- '{e'}'
-        palatalise
-      )
-      'i{c^}ek' 'inek' 'ik'
-      (
-        <- 'i'
-        palatalise
-      )
-      '{i'}{c^}ek' '{i'}k'
-      (
-        <- '{i'}'
-        palatalise
-      )
-      '{a'}k'
-       (<- '{a'}')
-      'ak'
-       (<- 'a')
-      'ok'
-       (<- 'o')
-      'uk'
-       (<- 'u')
-    )
-  )
-
-  define do_comparative as (
-    [substring] among (
-      '{e^}j{s^}'
-      (
-        <- '{e^}'
-        palatalise
-      )
-      'ej{s^}'
-      (
-        <- 'e'
-        palatalise
-      )
-    )
-  )
-
-  define do_aggressive as (
-    do do_comparative
-    do do_diminutive
-    do do_augmentative
-    do_derivational or do_deriv_single
-  )
 )
 
 define stem as (
@@ -235,9 +105,6 @@ define stem as (
   backwards (
     do_case
     do_possessive
-    // light and aggressive are the same to this point
-    // comment next line for light stemmer
-    // do_aggressive
   )
 )
 
@@ -246,4 +113,3 @@ define stem as (
 // Inf. Process. Manage. 45, 6 (November 2009), 714-720.
 // based on Java code by Ljiljana Dolamic:
 // http://members.unine.ch/jacques.savoy/clef/CzechStemmerLight.txt
-// http://members.unine.ch/jacques.savoy/clef/CzechStemmerAgressive.txt
