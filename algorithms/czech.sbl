@@ -244,5 +244,6 @@ define stem as (
 // Ljiljana Dolamic and Jacques Savoy. 2009.
 // Indexing and stemming approaches for the Czech language.
 // Inf. Process. Manage. 45, 6 (November 2009), 714-720.
+// based on Java code by Ljiljana Dolamic:
 // http://members.unine.ch/jacques.savoy/clef/CzechStemmerLight.txt
 // http://members.unine.ch/jacques.savoy/clef/CzechStemmerAgressive.txt
