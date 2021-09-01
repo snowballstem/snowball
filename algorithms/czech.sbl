@@ -237,7 +237,7 @@ define stem as (
     do_possessive
     // light and aggressive are the same to this point
     // comment next line for light stemmer
-    do_aggressive
+    // do_aggressive
   )
 )
 
