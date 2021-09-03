@@ -66,8 +66,24 @@ Add subdirectory named after new stemmer containing:
 If you don't have access to a suitably licensed word list of a suitable size,
 you may be able to use the `wikipedia-most-common-words` script to generate
 one by extracting the most frequent words from a Wikipedia dump in the
-language the stemmer is for.  If the language uses a script/alphabet which
-isn't already supported you may need to add a regular new regular expression.
+language the stemmer is for.  You need to specify the Unicode "script" (that's
+"script" in the sense of alphabet) to use - you can find the appropriate one
+by looking in the Unicode `Scripts.txt`::
+
+https://www.unicode.org/Public/13.0.0/ucd/Scripts.txt
+
+The script name is the second column, between `;` and `#`.  The first entries
+are all "Common" which isn't what you want - scroll down to get to the entries
+that are useful here.
+
+You also need to specify the minimum frequency to select.  Picking this value
+will probably need some experimentation as the appropriate threshold depends on
+how much data there is in the wikipedia dump for a particular language, as well
+as the size of the vocabulary for the language, and how inflected the language
+is.  Try counting the number of unique words extracted (`wc -l voc.txt` on
+Unix) and also looking through the list - some proper nouns, words from other
+languages, typos, etc are OK (since the stemmer will encounter all these in
+practice too), but at some point "more" stops being "better".
 
 snowball-website repo
 ---------------------
@@ -84,14 +100,24 @@ between your implementation and that described in the paper (for example,
 sometimes papers have ambiguities that need resolving to re-implement the
 algorithm described).
 
-If you have a stopword list, add that as `stop.txt` and link to it from
-`stemmer.tt`.
+If you have a stopword list, add that as `stop.txt` in your new subdirectory.
+The `generate` script checks if such a file exists and if it does a link to
+it is automatically added.
 
 Link to your new `stemmer.tt` from `algorithms/index.tt`.
 
 Add a news entry to `index.tt`.
 
-.. FIXME: Also needs adding for the online demo.
+Add the new stemmer to the online demo.  Assuming you have checkouts of the
+`snowball`, `snowball-data` and `snowball-website` repos in sibling
+directories:
+
+* run `make check_js` in the `snowball` repo
+* run `./update-js`
+* add the new stemmer to git with: `git add js/*-stemmer.js`
+* if the new language is written right-to-left (RTL) then add it to the check
+  in `demo.tt` (search for `rtl` to find the place to change.)
+* `git commit`.
 
 Adding a new programming language generator
 ===========================================
@@ -142,13 +168,31 @@ If one of the mechanisms above sounds suitable then take a look at the
 generator for the respective generated output and generator code.  If
 not, come and talk to us on the snowball-discuss mailing list.
 
+Don't hardcode algorithm names
+------------------------------
+
+We want to avoid hard-coded lists of algorithms in the language-specific code
+that have to be manually updated each time a new algorithm is added, because
+that adds some extra tedious work for adding a new algorithm, and mechanical
+updates done by hand tend to miss places that need updating, or code gets
+copied and pasted from an existing case but not fully updated.
+
+All the existing language backends generate any such code at build time, and
+adding a new algorithm just requires updating `libstemmer/modules.txt`.
+
+You can probably copy the approach used for Pascal (script `pascal/generate.pl`
+works from template `stemwords-template.dpr` which has marked blocks of code
+that get expanded for each stemming algorithm with a placeholder replaced by
+the algorithm name.  For an alternative approach, see Rust where this is done
+by `rust/build.rs`.
+
 Mechanics of adding a new generator
 -----------------------------------
 
 Copy an existing `compiler/generator_*.c` for your new language and modify
 away (`generator.c` has the generator for C, but also some common functions
 so if you start from this one you'll need to remove those common functions).
-Please resist reformatting existing code - there's currently a lot of code
+Please resist reformatting existing C code - there's currently a lot of code
 repeated in each generator which ought to be pulled out as common code, and
 if you reformat that just makes that job harder.
 

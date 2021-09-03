@@ -115,30 +115,44 @@ impl<'a> SnowballEnv<'a> {
         }
     }
 
-    pub fn byte_index_for_hop(&self, mut delta: i32) -> i32 {
-        if delta > 0 {
-            let mut res = self.cursor;
-            while delta > 0 {
+    pub fn hop(&mut self, mut delta: i32) -> bool {
+        let mut res = self.cursor;
+        while delta > 0 {
+            delta -= 1;
+            if res >= self.limit {
+                return false;
+            }
+            res += 1;
+            while res < self.limit && !self.current.is_char_boundary(res as usize) {
                 res += 1;
-                delta -= 1;
-                while res <= self.current.len() as i32 && !self.current.is_char_boundary(res as usize) {
-                    res += 1;
-                }
             }
-            return res;
-        } else if delta < 0 {
-            let mut res: i32 = self.cursor;
-            while delta < 0 {
-                res -= 1;
-                delta += 1;
-                while res >= 0 && !self.current.is_char_boundary(res as usize) {
-                    res -= 1;
-                }
-            }
-            return res as i32;
-        } else {
-            return self.cursor as i32;
         }
+        self.cursor = res;
+        return true;
+    }
+
+    pub fn hop_checked(&mut self, delta: i32) -> bool {
+        return delta >= 0 && self.hop(delta);
+    }
+
+    pub fn hop_back(&mut self, mut delta: i32) -> bool {
+        let mut res = self.cursor;
+        while delta > 0 {
+            delta -= 1;
+            if res <= self.limit_backward {
+                return false;
+            }
+            res -= 1;
+            while res > self.limit_backward && !self.current.is_char_boundary(res as usize) {
+                res -= 1;
+            }
+        }
+        self.cursor = res;
+        return true;
+    }
+
+    pub fn hop_back_checked(&mut self, delta: i32) -> bool {
+        return delta >= 0 && self.hop_back(delta);
     }
 
     // A grouping is represented by a minimum code point, a maximum code point,
