@@ -408,7 +408,7 @@ dist_libstemmer_c: \
 	echo 'stemwords: examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f stemwords *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	echo '	rm -f stemwords libstemmer.a *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
