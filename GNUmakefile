@@ -417,8 +417,8 @@ dist_libstemmer_c: \
 	echo 'stemwords$$(EXEEXT): examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f stemwords$$(EXEEXT) *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	echo '	rm -f stemwords$$(EXEEXT) libstemmer.a *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the Java library.
