@@ -1,5 +1,6 @@
 routines (
            mark_regions
+           R1
            main_suffix
            consonant_pair
            other_suffix
@@ -32,6 +33,8 @@ define mark_regions as (
 )
 
 backwardmode (
+
+    define R1 as $p1 <= cursor
 
     define main_suffix as (
         setlimit tomark p1 for ([substring])
@@ -66,6 +69,7 @@ define stem as (
     do mark_regions
     backwards (
         do main_suffix
+        do ( ['et' or 'en'  R1 ] 'et' delete )
         do consonant_pair
         do other_suffix
     )
