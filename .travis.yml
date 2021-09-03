@@ -81,11 +81,15 @@ before_install:
   # CI tested easily.
   #
   # If that fails, just use the standard snowball-data repo's default branch.
+  #
+  # We currently skip this step on Microsoft Windows as checking out the
+  # data repo seems to stall indefinitely, so for now we just do the build
+  # there and don't run any tests.
   - GH_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
   - GH_REPO_SLUG=${TRAVIS_PULL_REQUEST_SLUG:-$TRAVIS_REPO_SLUG}
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
-  - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
-  - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+  - test "$TRAVIS_OS_NAME" = windows || echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
+  - test "$TRAVIS_OS_NAME" = windows || git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
   - |-
       case $TRAVIS_OS_NAME in
         windows)
