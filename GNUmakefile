@@ -411,7 +411,8 @@ dist_libstemmer_c: \
 	echo 'EXEEXT=.exe' >> $${dest}/Makefile && \
 	echo 'endif' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
-	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \	echo 'all: libstemmer.a stemwords$$(EXEEXT)' >> $${dest}/Makefile && \
+	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
+	echo 'all: libstemmer.a stemwords$$(EXEEXT)' >> $${dest}/Makefile && \
 	echo 'libstemmer.a: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
 	echo 'stemwords$$(EXEEXT): examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
