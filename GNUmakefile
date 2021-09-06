@@ -28,6 +28,11 @@ python_sample_dir = sample
 js_output_dir = js_out
 js_runtime_dir = javascript
 js_sample_dir = sample
+
+ts_output_dir = ts_out
+ts_runtime_dir = typescript
+ts_sample_dir = sample
+
 NODE ?= nodejs
 
 cargo ?= cargo
@@ -69,6 +74,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
 		   compiler/generator_js.c \
+           compiler/generator_ts.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
@@ -99,6 +105,10 @@ CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
 JS_SAMPLE_SOURCES = javascript/stemwords.js
+
+TS_RUNTIME_SOURCES = typescript/BaseStemmer.ts
+
+TS_SAMPLE_SOURCES = typescript/stemWords.ts
 
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
@@ -144,6 +154,7 @@ PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
+TS_SOURCES = $(libstemmer_algorithms:%=$(ts_output_dir)/%-stemmer.ts)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -331,6 +342,13 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball
 	echo "./snowball $< -js -o $${o}"; \
 	./snowball $< -js -o $${o}
 
+$(ts_output_dir)/%-stemmer.ts: algorithms/%.sbl snowball
+	@mkdir -p $(ts_output_dir)
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(ts_output_dir)/$${l}-stemmer"; \
+	echo "./snowball $< -ts -o $${o}"; \
+	./snowball $< -ts -o $${o}
+
 $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
@@ -339,7 +357,7 @@ $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	./snowball $< -ada -P $${l} -o $${o}
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_ts dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -489,6 +507,24 @@ dist_libstemmer_js: $(JS_SOURCES)
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
+dist_libstemmer_ts: $(TS_SOURCES)
+	destname=tsstemmer-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(ts_runtime_dir) && \
+	mkdir -p $${dest}/$(ts_sample_dir) && \
+	cp -a doc/libstemmer_ts_README $${dest}/README.rst && \
+	cp -a $(COMMON_FILES) $${dest} && \
+	cp -a $(TS_RUNTIME_SOURCES) $${dest}/$(ts_runtime_dir) && \
+	cp -a $(TS_SAMPLE_SOURCES) $${dest}/$(ts_sample_dir) && \
+	cp -a $(TS_SOURCES) $${dest}/$(ts_runtime_dir) && \
+	(cd $${dest} && \
+	 ls README.rst $(COMMON_FILES) $(ts_runtime_dir)/*.ts $(ts_sample_dir)/*.ts > MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+	rm -rf $${dest}
+
 check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_stemtest: stemtest
@@ -603,6 +639,8 @@ check_pascal_%: $(STEMMING_DATA_ABS)/%
 
 check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
 
+check_ts: $(TS_SOURCES) $(libstemmer_algorithms:%=check_ts_%)
+
 # Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
 THIN_FACTOR ?= 3
 
@@ -647,7 +685,7 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
+export NODE_PATH = $(js_runtime_dir):$(js_output_dir):$(ts_runtime_dir):$(ts_output_dir)
 
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
@@ -657,6 +695,22 @@ check_js_%: $(STEMMING_DATA)/%
 	  rm tmp.in; \
 	else \
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+check_ts_%: $(STEMMING_DATA)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for TS"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  $(NODE) typescript/stemWords.ts -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(NODE) typescript/stemWords.ts -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \

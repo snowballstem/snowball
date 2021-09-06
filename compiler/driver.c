@@ -22,6 +22,8 @@
 
 #define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
+#define DEFAULT_TS_BASE_CLASS "BaseStemmer"
+
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
 static int eq(const char * s1, const char * s2) {
@@ -50,6 +52,9 @@ static void print_arglist(int exit_code) {
 #endif
 #ifndef DISABLE_JS
                "  -js\n"
+#endif
+#ifndef DISABLE_TS
+               "  -ts\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust\n"
@@ -153,6 +158,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
+                continue;
+            }
+#endif
+#ifndef DISABLE_TS
+            if (eq(s, "-ts")) {
+                o->make_lang = LANG_TYPESCRIPT;
                 continue;
             }
 #endif
@@ -346,6 +357,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             if (!o->parent_class_name)
                 o->parent_class_name = DEFAULT_JS_BASE_CLASS;
             break;
+        case LANG_TYPESCRIPT:
+            o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_TS_BASE_CLASS;
+            break;
         case LANG_PYTHON:
             o->encoding = ENC_WIDECHARS;
             if (!o->parent_class_name)
@@ -399,6 +415,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                     new_name[0] = toupper(new_name[0]);
                     break;
                 case LANG_JAVASCRIPT:
+                case LANG_TYPESCRIPT:
                 case LANG_PYTHON: {
                     /* Upper case initial letter and change each
                      * underscore+letter or hyphen+letter to an upper case
@@ -539,6 +556,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_js(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_TS
+                if (o->make_lang == LANG_TYPESCRIPT) {
+                    symbol * b = add_s_to_b(0, s);
+                    b = add_s_to_b(b, ".ts");
+                    o->output_src = get_output(b);
+                    lose_b(b);
+                    generate_program_ts(g);
                     fclose(o->output_src);
                 }
 #endif
