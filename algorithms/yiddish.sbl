@@ -81,21 +81,16 @@ define consonant   alefBeys - vowel
 define prelude as (
   do (
     repeat goto (
-      ( ['{Vov}{Vov}'] not '{Melupm}' <- '{TsveyVovn}' )
-      or
-      ( ['{Vov}{Yud}'] not '{Khirik}' <- '{VovYud}' )
-      or
-      ( ['{Yud}{Yud}'] not '{Khirik}' <- '{TsveyYudn}' )
-      or
-      ( ['{LangerKhof}'] <- '{Khof}')
-      or
-      ( ['{ShlosMem}'] <- '{Mem}' )
-      or
-      ( ['{LangerNun}'] <- '{Nun}' )
-      or
-      ( ['{LangerFey}'] <- '{Fey}' )
-      or
-      ( ['{LangerTsadek}'] <- '{Tsadek}' )
+      [substring] among (
+        '{Vov}{Vov}' ( not '{Melupm}' <- '{TsveyVovn}' )
+        '{Vov}{Yud}' ( not '{Khirik}' <- '{VovYud}' )
+        '{Yud}{Yud}' ( not '{Khirik}' <- '{TsveyYudn}' )
+        '{LangerKhof}' ( <- '{Khof}')
+        '{ShlosMem}' ( <- '{Mem}' )
+        '{LangerNun}' ( <- '{Nun}' )
+        '{LangerFey}' ( <- '{Fey}' )
+        '{LangerTsadek}' ( <- '{Tsadek}' )
+      )
     )
   )
 
@@ -109,9 +104,8 @@ define mark_regions as (
     try (
       // Replace past participle ge- at start of word
       // Unless word starts with gelt- or gebn-
-      test ('{Giml}{Ayen}{Lamed}{Tes}' or '{Giml}{Ayen}{Beys}{Nun}')
-        or
-      (['{Giml}{Ayen}'] <- 'GE' )
+      ['{Giml}{Ayen}']
+      not ('{Lamed}{Tes}' or '{Beys}{Nun}') <- 'GE'
     )
 
     try (
@@ -185,58 +179,60 @@ backwardmode (
         // Plural/adjective endings: -enem, -ener, -ene, -ens
         '{Ayen}{Nun}{Ayen}' '{Ayen}{Nun}{Ayen}{Mem}' '{Ayen}{Nun}{Ayen}{Reysh}' '{Ayen}{Nun}{Samekh}'
           (R1 delete 
-            // -gegangen => -gey
-            not (['{Giml}{Alef}{Nun}{Giml}' ] <- '{Giml}{TsveyYudn}')
-            // -genumen => -nem
-            not (['{Nun}{Vov}{Mem}'] <- '{Nun}{Ayen}{Mem}')
-            // -gemiten => -mayd
-            not (['{Mem}{Yud}{Tes}'] <- '{Mem}{TsveyYudn}{Dalet}')
-            // -gebiten => -bayt
-            not (['{Beys}{Yud}{Tes}'] <- '{Beys}{TsveyYudn}{Tes}')
-            // -gebisen => -bays
-            not (['{Beys}{Yud}{Samekh}'] <- '{Beys}{TsveyYudn}{Samekh}')
-            // -gevizen => -vayz
-            not (['{TsveyVovn}{Yud}{Zayen}'] <- '{TsveyVovn}{TsveyYudn}{Zayen}')
-            // -getriben => -trayb
-            not (['{Tes}{Reysh}{Yud}{Beys}'] <- '{Tes}{Reysh}{TsveyYudn}{Beys}')
-            // -geliten => -layt
-            not (['{Lamed}{Yud}{Tes}'] <- '{Lamed}{TsveyYudn}{Tes}')
-            // -gekliben => -klayb
-            not (['{Kuf}{Lamed}{Yud}{Beys}'] <- '{Kuf}{Lamed}{TsveyYudn}{Beys}')
-            // -geriben => -rayb
-            not (['{Reysh}{Yud}{Beys}'] <- '{Reysh}{TsveyYudn}{Beys}')
-            // -gerisen => -rays
-            not (['{Reysh}{Yud}{Samekh}'] <- '{Reysh}{TsveyYudn}{Samekh}')
-            // -geshvigen => -shvayg
-            not (['{Shin}{TsveyVovn}{Yud}{Giml}'] <- '{Shin}{TsveyVovn}{TsveyYudn}{Giml}')
-            // -geshmisen => -shmays
-            not (['{Shin}{Mem}{Yud}{Samekh}'] <- '{Shin}{Mem}{TsveyYudn}{Samekh}')
-            // -geshniten => -shnayd
-            not (['{Shin}{Nun}{Yud}{Tes}'] <- '{Shin}{Nun}{TsveyYudn}{Dalet}')
-            // -geshriben => -shrayb
-            not (['{Shin}{Reysh}{Yud}{Beys}'] <- '{Shin}{Reysh}{TsveyYudn}{Beys}')
-            // -gebunden => -bind
-            not (['{Beys}{Vov}{Nun}{Dalet}'] <- '{Beys}{Yud}{Nun}{Dalet}')
-            // -gevuntshn => -vintsh
-            not (['{TsveyVovn}{Vov}{Tes}{Shin}'] <- '{TsveyVovn}{Yud}{Tes}{Shin}')
-            // -gezungen => -zing
-            not (['{Zayen}{Vov}{Nun}{Giml}'] <- '{Zayen}{Yud}{Nun}{Giml}')
-            // -getrunken => -trink
-            not (['{Tes}{Reysh}{Vov}{Nun}{Kuf}'] <- '{Tes}{Reysh}{Yud}{Nun}{Kuf}')
-            // -getsvungen => -tsving
-            not (['{Tsadek}{TsveyVovn}{Vov}{Nun}{Giml}'] <- '{Tsadek}{TsveyVovn}{Yud}{Nun}{Giml}')
-            // -geshlungen => -shling
-            not (['{Shin}{Lamed}{Vov}{Nun}{Giml}'] <- '{Shin}{Lamed}{Yud}{Nun}{Giml}')
-            // -geboygen => -beyg
-            not (['{Beys}{VovYud}{Giml}'] <- '{Beys}{TsveyYudn}{Giml}')
-            // -gehoyben => -heyb
-            not (['{Hey}{VovYud}{Beys}'] <- '{Hey}{TsveyYudn}{Beys}')
-            // -farloyren => -farlir
-            not (['{Fey}{Alef}{Reysh}{Lamed}{VovYud}{Reysh}'] <- '{Fey}{Alef}{Reysh}{Lamed}{Yud}{Reysh}')
-            // -shtanen => -shtey
-            not (['{Shin}{Tes}{Alef}{Nun}'] <- '{Shin}{Tes}{TsveyYudn}')
-             // -geshvoyrn => -shver
-            not (['{Shin}{TsveyVovn}{VovYud}{Reysh}'] <- '{Shin}{TsveyVovn}{Ayen}{Reysh}')
+            [substring] among (
+              // -gegangen => -gey
+              '{Giml}{Alef}{Nun}{Giml}' (<- '{Giml}{TsveyYudn}')
+              // -genumen => -nem
+              '{Nun}{Vov}{Mem}' (<- '{Nun}{Ayen}{Mem}')
+              // -gemiten => -mayd
+              '{Mem}{Yud}{Tes}' (<- '{Mem}{TsveyYudn}{Dalet}')
+              // -gebiten => -bayt
+              '{Beys}{Yud}{Tes}' (<- '{Beys}{TsveyYudn}{Tes}')
+              // -gebisen => -bays
+              '{Beys}{Yud}{Samekh}' (<- '{Beys}{TsveyYudn}{Samekh}')
+              // -gevizen => -vayz
+              '{TsveyVovn}{Yud}{Zayen}' (<- '{TsveyVovn}{TsveyYudn}{Zayen}')
+              // -getriben => -trayb
+              '{Tes}{Reysh}{Yud}{Beys}' (<- '{Tes}{Reysh}{TsveyYudn}{Beys}')
+              // -geliten => -layt
+              '{Lamed}{Yud}{Tes}' (<- '{Lamed}{TsveyYudn}{Tes}')
+              // -gekliben => -klayb
+              '{Kuf}{Lamed}{Yud}{Beys}' (<- '{Kuf}{Lamed}{TsveyYudn}{Beys}')
+              // -geriben => -rayb
+              '{Reysh}{Yud}{Beys}' (<- '{Reysh}{TsveyYudn}{Beys}')
+              // -gerisen => -rays
+              '{Reysh}{Yud}{Samekh}' (<- '{Reysh}{TsveyYudn}{Samekh}')
+              // -geshvigen => -shvayg
+              '{Shin}{TsveyVovn}{Yud}{Giml}' (<- '{Shin}{TsveyVovn}{TsveyYudn}{Giml}')
+              // -geshmisen => -shmays
+              '{Shin}{Mem}{Yud}{Samekh}' (<- '{Shin}{Mem}{TsveyYudn}{Samekh}')
+              // -geshniten => -shnayd
+              '{Shin}{Nun}{Yud}{Tes}' (<- '{Shin}{Nun}{TsveyYudn}{Dalet}')
+              // -geshriben => -shrayb
+              '{Shin}{Reysh}{Yud}{Beys}' (<- '{Shin}{Reysh}{TsveyYudn}{Beys}')
+              // -gebunden => -bind
+              '{Beys}{Vov}{Nun}{Dalet}' (<- '{Beys}{Yud}{Nun}{Dalet}')
+              // -gevuntshn => -vintsh
+              '{TsveyVovn}{Vov}{Tes}{Shin}' (<- '{TsveyVovn}{Yud}{Tes}{Shin}')
+              // -gezungen => -zing
+              '{Zayen}{Vov}{Nun}{Giml}' (<- '{Zayen}{Yud}{Nun}{Giml}')
+              // -getrunken => -trink
+              '{Tes}{Reysh}{Vov}{Nun}{Kuf}' (<- '{Tes}{Reysh}{Yud}{Nun}{Kuf}')
+              // -getsvungen => -tsving
+              '{Tsadek}{TsveyVovn}{Vov}{Nun}{Giml}' (<- '{Tsadek}{TsveyVovn}{Yud}{Nun}{Giml}')
+              // -geshlungen => -shling
+              '{Shin}{Lamed}{Vov}{Nun}{Giml}' (<- '{Shin}{Lamed}{Yud}{Nun}{Giml}')
+              // -geboygen => -beyg
+              '{Beys}{VovYud}{Giml}' (<- '{Beys}{TsveyYudn}{Giml}')
+              // -gehoyben => -heyb
+              '{Hey}{VovYud}{Beys}' (<- '{Hey}{TsveyYudn}{Beys}')
+              // -farloyren => -farlir
+              '{Fey}{Alef}{Reysh}{Lamed}{VovYud}{Reysh}' (<- '{Fey}{Alef}{Reysh}{Lamed}{Yud}{Reysh}')
+              // -shtanen => -shtey
+              '{Shin}{Tes}{Alef}{Nun}' (<- '{Shin}{Tes}{TsveyYudn}')
+              // -geshvoyrn => -shver
+              '{Shin}{TsveyVovn}{VovYud}{Reysh}' (<- '{Shin}{TsveyVovn}{Ayen}{Reysh}')
+            )
          )
 
         // Verb/past participle ending: -t
