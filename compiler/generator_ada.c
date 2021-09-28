@@ -1199,7 +1199,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             }
         }
         if (n_cases == 0) {
-            /* We get this for the degenerate case: among { '' }
+            /* We get this for the degenerate case: among ( '' )
              * This doesn't seem to be a useful construct, but it is
              * syntactically valid.
              */
