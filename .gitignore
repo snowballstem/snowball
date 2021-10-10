@@ -11,6 +11,7 @@
 /src_c
 /stemwords
 /dist
+/dart_out
 /java/org/tartarus/snowball/ext/
 /js_out
 /python_check

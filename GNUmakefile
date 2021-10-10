@@ -11,6 +11,10 @@ JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
+dart_output_dir = dart_out
+dart_src_main_dir = dart/snowball
+dart_src_dir = $(dart_src_main_dir)/ext
+
 MONO ?= mono
 MCS ?= mcs
 csharp_src_main_dir = csharp/Snowball
@@ -68,6 +72,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/driver.c \
 		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
+           compiler/generator_dart.c \
 		   compiler/generator_js.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
@@ -89,6 +94,9 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
+
+DARTRUNTIME_SOURCES = dart/snowball/among.dart \
+		      dart/snowball/base_stemmer.dart
 
 CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 			 csharp/Snowball/Stemmer.cs \
@@ -139,6 +147,7 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+DART_SOURCES = $(libstemmer_algorithms:%=$(dart_output_dir)/%_stemmer.dart)
 CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
@@ -178,6 +187,7 @@ clean:
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+		  $(DART_SOURCES) \
 	      $(CSHARP_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
@@ -191,6 +201,7 @@ clean:
 	-rmdir $(c_src_dir)
 	-rmdir $(python_output_dir)
 	-rmdir $(js_output_dir)
+	-rmdir $(dart_output_dir)
 
 snowball: $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
@@ -272,6 +283,13 @@ $(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball
 	o="$(java_src_dir)/$${l}Stemmer"; \
 	echo "./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer"; \
 	./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer
+
+$(dart_output_dir)/%_stemmer.dart: algorithms/%.sbl snowball
+	@mkdir -p $(dart_output_dir)
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(dart_output_dir)/$${l}_stemmer"; \
+	echo "./snowball $< -dart -o $${o}"; \
+	./snowball $< -dart -o $${o}
 
 $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball
 	@mkdir -p $(csharp_src_dir)
@@ -433,6 +451,23 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
+
+# Make a distribution of all the sources required to compile the Dart library.
+dist_libstemmer_dart: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+            $(LIBSTEMMER_EXTRA) \
+	    $(DART_SOURCES)
+		destname=libstemmer_dart-$(SNOWBALL_VERSION); \
+	    dest=dist/$${destname}; \
+	    rm -rf $${dest} && \
+	    rm -f $${dest}$(tarball_ext) && \
+	    mkdir -p $${dest} && \
+		mkdir -p $${dest}/$(dart_src_dir) && \
+		cp -a $(DART_SOURCES) $${dest}/$(dart_src_dir) && \
+		mkdir -p $${dest}/$(dart_src_main_dir) && \
+		cp -a $(DARTRUNTIME_SOURCES) $${dest}/$(dart_src_main_dir) && \
+		cp -a $(COMMON_FILES) $${dest} && \
+		(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+		rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C# library.
 dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \

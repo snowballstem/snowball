@@ -296,7 +296,7 @@ struct generator {
     struct str * outbuf;       /* temporary str to store output */
     struct str * declarations; /* str storing variable declarations */
     int next_label;
-#ifndef DISABLE_PYTHON
+#if !defined(DISABLE_PYTHON) && !defined(DISABLE_DART)
     int max_label;
 #endif
     int margin;
@@ -344,7 +344,7 @@ struct options {
     byte syntax_tree;
     byte comments;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
+    enum { LANG_JAVA, LANG_DART, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -385,6 +385,11 @@ extern void generate_program_c(struct generator * g);
 #ifndef DISABLE_JAVA
 /* Generator for Java code. */
 extern void generate_program_java(struct generator * g);
+#endif
+
+#ifndef DISABLE_JAVA
+/* Generator for Dart code. */
+extern void generate_program_dart(struct generator * g);
 #endif
 
 #ifndef DISABLE_CSHARP
