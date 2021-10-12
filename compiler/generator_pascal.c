@@ -282,7 +282,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_minus:
             s = " - "; goto label0;
         case c_divide:
-            s = " / ";
+            s = " div ";
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
@@ -1158,7 +1158,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_plusassign:    generate_integer_assign(g, p, "+"); break;
         case c_minusassign:   generate_integer_assign(g, p, "-"); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*"); break;
-        case c_divideassign:  generate_integer_assign(g, p, "/"); break;
+        case c_divideassign:  generate_integer_assign(g, p, "div"); break;
         case c_eq:            generate_integer_test(g, p, "="); break;
         case c_ne:            generate_integer_test(g, p, "<>"); break;
         case c_gr:            generate_integer_test(g, p, ">"); break;
