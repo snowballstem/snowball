@@ -1,7 +1,9 @@
 Snowball stemming library collection for Python
 ===============================================
 
-Both Python 2 and Python 3 (>= 3.3) are supported.
+Python 3 (>= 3.3) is supported.  We no longer actively support Python 2 as
+the Python developers stopped supporting it at the start of 2020.  Snowball
+2.1.0 was the last release to officially support Python 2.
 
 What is Stemming?
 -----------------
