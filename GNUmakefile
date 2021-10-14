@@ -55,7 +55,7 @@ tarball_ext = .tar.gz
 # * ISO_8859_1_algorithms
 # * ISO_8859_2_algorithms
 # * KOI8_R_algorithms
-include algorithms.mk $(shell libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt >/dev/null)
+include algorithms.mk
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -168,6 +168,9 @@ CPPFLAGS=
 INCLUDES=-Iinclude
 
 all: snowball libstemmer.a stemwords $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+
+algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
+	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
