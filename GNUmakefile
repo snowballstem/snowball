@@ -636,14 +636,14 @@ check_go: $(GO_SOURCES) $(libstemmer_algorithms:%=check_go_%)
 check_go_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Go"
 	@cd go && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
