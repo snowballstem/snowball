@@ -31,7 +31,7 @@ js_sample_dir = sample
 NODE ?= nodejs
 
 cargo ?= cargo
-cargoflags ?=
+cargoflags ?= --release
 rust_src_main_dir = rust/src
 rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
 
@@ -619,14 +619,14 @@ check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
 check_rust_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Rust"
 	@cd rust && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi

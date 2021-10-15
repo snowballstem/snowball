@@ -93,7 +93,7 @@ script:
   - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
   - test -z "$NODE" || make check_js STEMMING_DATA=snowball-data
   - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
-  - test -z "$RUST" || make check_rust cargoflags=--release STEMMING_DATA=snowball-data
+  - test -z "$RUST" || make check_rust STEMMING_DATA=snowball-data
   - test -z "$GO" || make check_go STEMMING_DATA=snowball-data
   - test -z "$FPC" || make check_pascal STEMMING_DATA=snowball-data
   - test -z "$gprbuild" || make check_ada STEMMING_DATA=snowball-data
