@@ -609,8 +609,7 @@ check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
 # Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
 THIN_FACTOR ?= 3
 
-# Command to thin out the testdata - the full arabic test data causes
-# stemwords.js to run out of memory.  Also use for Python tests, which
+# Command to thin out the testdata.  Used for Python tests, which otherwise
 # take a long time (unless you use pypy).
 THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
 
@@ -655,14 +654,14 @@ export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
