@@ -46,17 +46,17 @@ The ``snowballstemmer.stemmer`` function takes an algorithm name and returns a
 Automatic Acceleration
 ----------------------
 
-If `PyStemmer <https://pypi.org/project/PyStemmer/>`_ is installed,
-``snowballstemmer.stemmer`` returns a ``PyStemmer`` ``Stemmer`` object
-which provides the same ``Stemmer.stemWord()`` and ``Stemmer.stemWords()``
-methods.
-
-**PyStemmer** is a wrapper module for Snowball's ``libstemmer_c`` and should
-provide results 100% compatible to **snowballstemmer**.
+`PyStemmer <https://pypi.org/project/PyStemmer/>`_ is a wrapper module for
+Snowball's ``libstemmer_c`` and should provide results 100% compatible to
+**snowballstemmer**.
 
 **PyStemmer** is faster because it wraps generated C versions of the stemmers;
 **snowballstemmer** uses generate Python code and is slower but offers a pure
 Python solution.
+
+If PyStemmer is installed, ``snowballstemmer.stemmer`` returns a ``PyStemmer``
+``Stemmer`` object which provides the same ``Stemmer.stemWord()`` and
+``Stemmer.stemWords()`` methods.
 
 Benchmark
 ~~~~~~~~~
