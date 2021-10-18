@@ -1,3 +1,149 @@
+up to: 66a8d802e9a006c779d58f00b2a858ff8f37a3a9
+
+Snowball 2.2.0 (2021-10-??)
+===========================
+
+C/C++
+-----
+
+C#
+--
+
+Java
+----
+
+Pascal
+------
+
+* Fix code generated for division.  Previously real division was used and the
+  generated code would fail to compile with a "Incompatible types" error.
+
+  Noted by David Corbett in #156.
+
+Python
+------
+
+* Python 2 is no longer actively supported, as proposed on the mailing list:
+  https://lists.tartarus.org/pipermail/snowball-discuss/2021-August/001721.html
+
+Code Quality Improvements
+-------------------------
+
+* C#: An `among` without functions is now generated as `static` and groupings
+  are now generated as constant.  Patches from James Turner in #146 and #147.
+
+New Code Generators
+-------------------
+
+New Snowball Language Features
+------------------------------
+
+Code generation improvements
+----------------------------
+
+* General:
+
+* C/C++:
+
+* Java:
+
+* Pascal:
+
+* Python:
+
+New stemming algorithms
+-----------------------
+
+Behavioural changes to existing algorithms
+------------------------------------------
+
+* german2: Fix handling of `qu` to match algorithm description.  Previously
+  the implementation erroneously did `skip 2` after `qu`.  We suspect this was
+  intended to skip the `qu` but that's already been done by the substring/among
+  matching, so it actually skips an extra two characters.
+
+  The implementation has always differed in this way, but there's no good
+  reason to skip two extra characters here so overall it seems best to change
+  the code to match the description.  This change only affects the stemming of
+  a single word in the sample vocabulary - `quae` which seems to actually be
+  Latin rather than German.
+
+Optimisations to existing algorithms
+------------------------------------
+
+* arabic: Handle exception cases in the among they're exceptions to.
+
+* greek: Remove unused slice setting, handle exception cases in the among
+  they're exceptions to, and turn `substring ... among ...  or substring ...
+  among ...` into a single `substring ... among ...` in cases where it is
+  trivial to do so.
+
+* hindi: Eliminate the need for variable `p`.
+
+* irish: Minor optimisation in setting `pV` and `p1`.
+
+* yiddish: Make use of `among` more.
+
+Code clarity improvements to existing algorithms
+------------------------------------------------
+
+Compiler
+--------
+
+* Replace single entry command list with its contents in internal syntax tree.
+  This puts things in a more canonical form, which makes subsequent
+  optimisations easier.
+
+Build system
+------------
+
+* Split out INCLUDES from CPPFLAGS so that CPPFLAGS can now be overridden by
+  the user if required.  Fixes #148, reported by Dominique Leuenberger.
+
+* Regenerate algorithms.mk only when needed rather than on every `make` run.
+
+libstemmer
+----------
+
+* The libstemmer static library now has a `.a` extension, rather than `.o`.
+  Patch from Michal Vasilek in #150.
+
+Testsuite
+---------
+
+* stemtest: Test that numbers and numeric codes aren't damaged by any of the
+  algorithms.  Regression test for #66.  Fixes #81.
+
+* ada: Fix ada tests to fail if output differs.  There was an extra `| head
+  -300` compared to other languages, which meant that the exit code of `diff`
+  was ignored.  It seems more helpful (and is more consistent) not to limit how
+  many differences are shown so just drop this addition.
+
+* go: Stop thinning testdata.  It looks like we only are because the test
+  harness code was based on that for rust, which was based on that for
+  javascript, which was only thinning because it was reading everything into
+  memory and the larger vocabulary lists were resulting in out of memory
+  issues.
+
+* javascript: Speed up stemwords.js.  Process input line-by-line rather than
+  reading the whole file into memory, splitting, iterating, and creating an
+  array with all the output, joining and writing out a single huge string.
+  This also means we can stop thinning the test data for javascript, which we
+  were only doing because the huge arabic test data file was causing out of
+  memory errors.  Also drop the -p option, which isn't useful here and
+  complicates the code.
+
+* rust: Turn on optimisation in makefile rather than travis-ci config.  This
+  makes the tests run in about 1/5 of the time and there's really no reason to
+  be thinning the testdata for rust.
+
+Documentation
+-------------
+
+* CONTRIBUTING.rst: Improve documentation for adding a new stemming algorithm.
+
+* Improve wording of Python docs.
+
 Snowball 2.1.0 (2021-01-21)
 ===========================
 
