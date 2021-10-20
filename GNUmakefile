@@ -537,25 +537,25 @@ check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
-	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-1 '$</output.txt' |\
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
-	@$(ICONV) -fUTF8 -tISO8859-2 '$</voc.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-2 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@$(ICONV) -fUTF8 -tISO8859-2 '$</output.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-2 '$</output.txt' |\
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with KOI8R"
-	@$(ICONV) -fUTF8 -tKOI8-R '$</voc.txt' |\
+	$(ICONV) -f UTF-8 -t KOI8-R '$</voc.txt' |\
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
-	@$(ICONV) -fUTF8 -tKOI8-R '$</output.txt' |\
+	$(ICONV) -f UTF-8 -t KOI8-R '$</output.txt' |\
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
@@ -609,9 +609,9 @@ do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
 
 check_pascal_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1 for Pascal"
-	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
 	    ./pascal/stemwords -l `echo $<|sed 's!.*/!!'` > tmp.txt
-	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
+	$(ICONV) -f UTF-8 -t ISO-8859-1 '$</output.txt' |\
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
