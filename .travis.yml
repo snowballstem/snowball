@@ -78,6 +78,9 @@ matrix:
     - os: windows
       language: c
       env: c_tests=y MAKE=mingw32-make
+    - os: windows
+      language: go
+      env: GO=go MAKE=mingw32-make
 
 before_install:
   # Try to check out a branch of the same name from the snowball-data repo
