@@ -205,3 +205,5 @@ Add support to `compiler/driver.c`.
 Add targets to `GNUmakefile` to run tests for the new language.
 
 Hook up automated testing via CI in `.travis.yml`.
+
+Add to the list of languages in `README.rst`.
