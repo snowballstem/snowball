@@ -52,6 +52,10 @@ gprbuild ?= gprbuild
 ada_src_main_dir = ada
 ada_src_dir = $(ada_src_main_dir)/algorithms
 
+DIFF = diff
+ifeq ($(OS),Windows_NT)
+DIFF = diff --strip-trailing-cr
+endif
 ICONV = iconv
 #ICONV = python ./iconv.py
 
@@ -528,9 +532,9 @@ check_utf8_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	  ./$(STEMWORDS_PROG) -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -539,7 +543,7 @@ check_iso_8859_1_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
-	    diff -u - tmp.txt
+	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 check_iso_8859_2_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
@@ -547,7 +551,7 @@ check_iso_8859_2_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	@$(ICONV) -fUTF8 -tISO8859-2 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
 	@$(ICONV) -fUTF8 -tISO8859-2 '$</output.txt' |\
-	    diff -u - tmp.txt
+	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 check_koi8r_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
@@ -555,7 +559,7 @@ check_koi8r_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	@$(ICONV) -fUTF8 -tKOI8-R '$</voc.txt' |\
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
 	@$(ICONV) -fUTF8 -tKOI8-R '$</output.txt' |\
-	    diff -u - tmp.txt
+	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 .java.class:
@@ -575,9 +579,9 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	  $(JAVA) org/tartarus/snowball/TestApp `echo $<|sed 's!.*/!!'` $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -595,9 +599,9 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	  $(MONO) $(CSHARP_STEMWORDS_PROG) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -611,7 +615,7 @@ check_pascal_%: $(STEMMING_DATA_ABS)/%
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
 	    ./pascal/stemwords -l `echo $<|sed 's!.*/!!'` > tmp.txt
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</output.txt' |\
-	    diff -u - tmp.txt
+	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
 check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
@@ -635,9 +639,9 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -653,9 +657,9 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -671,9 +675,9 @@ check_js_%: $(STEMMING_DATA)/%
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -689,9 +693,9 @@ check_python_%: $(STEMMING_DATA_ABS)/%
 	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 
@@ -723,9 +727,9 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 	  ./bin/stemwords `echo $<|sed 's!.*/!!'` $</voc.txt $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  diff -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt tmp.txt; \
 	fi
 	@rm tmp.txt
 

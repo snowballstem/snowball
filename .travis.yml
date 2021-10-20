@@ -5,7 +5,7 @@ matrix:
   include:
     - os: windows
       language: c
-      env: MAKE=mingw32-make
+      env: c_tests=y MAKE=mingw32-make
     - name: "C distribution build"
       language: c
       dist: focal
@@ -91,7 +91,7 @@ before_install:
 script:
   - ${MAKE:-make} CC="${CC:-gcc}"
   - test -z "$CFLAGS_DIST_BUILD" || { pip install setuptools && make dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && make CFLAGS="$CFLAGS_DIST_BUILD" ; }
-  - test -z "$c_tests" || make check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
+  - test -z "$c_tests" || ${MAKE:-make} check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
