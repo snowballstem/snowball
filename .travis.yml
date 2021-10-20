@@ -3,6 +3,9 @@ arch: arm64
 dist: xenial
 matrix:
   include:
+    - os: windows
+      language: c
+      env: c_tests=y MAKE=mingw32-make
     - name: "C distribution build"
       language: c
       dist: focal
@@ -84,10 +87,11 @@ before_install:
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
   - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
+
 script:
-  - make CC="${CC:-gcc}"
+  - ${MAKE:-make} CC="${CC:-gcc}"
   - test -z "$CFLAGS_DIST_BUILD" || { pip install setuptools && make dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && make CFLAGS="$CFLAGS_DIST_BUILD" ; }
-  - test -z "$c_tests" || make check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
+  - test -z "$c_tests" || ${MAKE:-make} check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || make check_java STEMMING_DATA=snowball-data
   - test -z "$MCS" || make check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
