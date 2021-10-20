@@ -95,9 +95,10 @@ before_install:
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
 
 script:
-  - $MAKE CC="${CC:-gcc}"
+  - : ${CC=gcc}
+  - $MAKE CC="$CC"
   - test -z "$CFLAGS_DIST_BUILD" || { pip install setuptools && $MAKE dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && $MAKE CFLAGS="$CFLAGS_DIST_BUILD" ; }
-  - test -z "$c_tests" || $MAKE check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
+  - test -z "$c_tests" || $MAKE check CC="$CC" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || $MAKE check_python python="$PYTHON" STEMMING_DATA=snowball-data
   - test -z "$JAVA" -o -z "$JAVAC" || $MAKE check_java STEMMING_DATA=snowball-data
   - test -z "$MCS" || $MAKE check_csharp MCS="$MCS" STEMMING_DATA=snowball-data
