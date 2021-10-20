@@ -5,6 +5,7 @@ matrix:
   include:
     - os: windows
       language: c
+      env: MAKE=mingw32-make
     - name: "C distribution build"
       language: c
       dist: focal
@@ -86,27 +87,9 @@ before_install:
   - GH_REPO_URL=https://github.com/${GH_REPO_SLUG%%/*}/snowball-data.git
   - echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
   - git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || git clone --depth=1 https://github.com/snowballstem/snowball-data.git
-  - |-
-      case $TRAVIS_OS_NAME in
-        windows)
-          [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
-          choco uninstall -y mingw
-          choco upgrade --no-progress -y msys2
-          export msys2='cmd //C RefreshEnv.cmd '
-          export msys2+='& set MSYS=winsymlinks:nativestrict '
-          export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-          export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
-          export msys2+=" -msys2 -c "\"\$@"\" --"
-          $msys2 pacman --sync --noconfirm --needed mingw-w64-x86_64-toolchain
-          ## Install more MSYS2 packages from https://packages.msys2.org/base here
-          taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
-          export PATH=/C/tools/msys64/mingw64/bin:/C/tools/msys64/usr/bin:$PATH
-          export MAKE=make  # so that Autotools can find it
-          ;;
-      esac
 
 script:
-  - make CC="${CC:-gcc}"
+  - ${MAKE:-make} CC="${CC:-gcc}"
   - test -z "$CFLAGS_DIST_BUILD" || { pip install setuptools && make dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && make CFLAGS="$CFLAGS_DIST_BUILD" ; }
   - test -z "$c_tests" || make check CC="${CC:-gcc}" STEMMING_DATA=snowball-data
   - test -z "$PYTHON" || make check_python python="$PYTHON" STEMMING_DATA=snowball-data
