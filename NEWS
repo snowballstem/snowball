@@ -1,4 +1,4 @@
-up to: 66a8d802e9a006c779d58f00b2a858ff8f37a3a9
+up to: e05481dcf0f28d63c8d86a0cbc80d8ab47e3bd1a
 
 Snowball 2.2.0 (2021-10-??)
 ===========================
@@ -96,6 +96,9 @@ Compiler
 
 Build system
 ------------
+
+* Support building on Microsoft Windows (using mingw+msys or a similar
+  Unix-like environment).  Patch from Jannick in #129.
 
 * Split out INCLUDES from CPPFLAGS so that CPPFLAGS can now be overridden by
   the user if required.  Fixes #148, reported by Dominique Leuenberger.
