@@ -1133,7 +1133,16 @@ static void generate(struct generator * g, struct node * p) {
         case c_plusassign:    generate_integer_assign(g, p, "+="); break;
         case c_minusassign:   generate_integer_assign(g, p, "-="); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
-        case c_divideassign:  generate_integer_assign(g, p, "/="); break;
+        case c_divideassign:
+            /* Snowball specifies integer division with semantics matching C,
+             * so we need to use `Math.floor(x/y)` here.  (`(x/y)|0` would be
+             * suitable in cases where we knew that the arguments had the same
+             * sign.)
+            g->V[0] = p->name;
+            w(g, "~M~V0 = Math.floor(~V0 / ");
+            generate_AE(g, p->AE);
+            w(g, ");~N");
+            break;
         case c_eq:            generate_integer_test(g, p, "=="); break;
         case c_ne:            generate_integer_test(g, p, "!="); break;
         case c_gr:            generate_integer_test(g, p, ">"); break;

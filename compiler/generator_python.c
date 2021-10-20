@@ -255,12 +255,23 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_plus:
             s = " + "; goto label0;
         case c_minus:
-            s = " - "; goto label0;
-        case c_divide:
-            s = " / ";
+            s = " - ";
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
+        case c_divide:
+            /* Snowball specifies integer division with semantics matching C,
+             * so Python's `/` or `//` isn't suitable (`//` would be in cases
+             * where we knew that the arguments had the same sign).
+             *
+             * The `float(`...`)` is needed for Python2.
+             */
+            write_string(g, "int(float(");
+            generate_AE(g, p->left);
+            write_string(g, ") / ");
+            generate_AE(g, p->right);
+            write_char(g, ')');
+            break;
         case c_cursor:
             w(g, "self.cursor"); break;
         case c_limit:
@@ -1131,7 +1142,18 @@ static void generate(struct generator * g, struct node * p) {
         case c_plusassign:    generate_integer_assign(g, p, "+="); break;
         case c_minusassign:   generate_integer_assign(g, p, "-="); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
-        case c_divideassign:  generate_integer_assign(g, p, "/="); break;
+        case c_divideassign:
+            /* Snowball specifies integer division with semantics matching C,
+             * so Python's `/=` or `//=` isn't suitable (`//=` would be in
+             * cases where we knew that the arguments had the same sign).
+             *
+             * The `float(`...`)` is needed for Python2.
+             */
+            g->V[0] = p->name;
+            w(g, "~M~V0 = int(float(~V0) / ");
+            generate_AE(g, p->AE);
+            w(g, ")~N");
+            break;
         case c_eq:            generate_integer_test(g, p, "=="); break;
         case c_ne:            generate_integer_test(g, p, "!="); break;
         case c_gr:            generate_integer_test(g, p, ">"); break;
