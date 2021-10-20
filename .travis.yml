@@ -28,7 +28,7 @@ matrix:
       env: GO=go
     - language: go
       dist: bionic
-      go: "1.15"
+      go: "1.17"
       env: GO=go
     - language: node_js
       node_js: "node"
