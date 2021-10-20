@@ -2,8 +2,8 @@ Snowball is a small string processing language for creating stemming algorithms
 for use in Information Retrieval, plus a collection of stemming algorithms
 implemented using it.
 
-Snowball was originally designed and built by Martin Porter. Martin retired from
-development in 2014 and Snowball is now maintained as a community project.
+Snowball was originally designed and built by Martin Porter.  Martin retired
+from development in 2014 and Snowball is now maintained as a community project.
 Martin originally chose the name Snowball as a tribute to SNOBOL, the excellent
 string handling language from the 1960s.  It now also serves as a metaphor for
 how the project grows by gathering contributions over time.
@@ -15,7 +15,7 @@ Python and Rust are supported.
 This repository contains the source code for the snowball compiler and the
 stemming algorithms.  The snowball compiler is written in ISO C - you'll need
 a C compiler which support C99 to build it (but the C code it generates should
-work with any ISO C compiler.)
+work with any ISO C compiler).
 
 See https://snowballstem.org/ for more information about Snowball.
 
