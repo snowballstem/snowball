@@ -96,7 +96,7 @@ before_install:
 
 script:
   # Ensure CC is set for building the compiler in non-C builds.
-  - test -z "$CC" && export CC=gcc
+  - test -n "$CC" || export CC=gcc
   - $MAKE CC="$CC"
   - test -z "$CFLAGS_DIST_BUILD" || { pip install setuptools && $MAKE dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && $MAKE CFLAGS="$CFLAGS_DIST_BUILD" ; }
   - test -z "$c_tests" || $MAKE check CC="$CC" STEMMING_DATA=snowball-data
