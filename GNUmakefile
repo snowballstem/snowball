@@ -234,7 +234,7 @@ stemwords$(EXE_EXT): $(STEMWORDS_OBJECTS) libstemmer.a
 tests/%.o: tests/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-stemtest: $(STEMTEST_OBJECTS) libstemmer.a
+stemtest$(EXE_EXT): $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 csharp_stemwords$(EXE_EXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
@@ -505,7 +505,7 @@ dist_libstemmer_js: $(JS_SOURCES)
 
 check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check_stemtest: stemtest
+check_stemtest: stemtest$(EXEEXT)
 	./stemtest
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
