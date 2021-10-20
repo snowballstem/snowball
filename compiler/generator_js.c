@@ -252,12 +252,20 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_plus:
             s = " + "; goto label0;
         case c_minus:
-            s = " - "; goto label0;
-        case c_divide:
-            s = " / ";
+            s = " - ";
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
+        case c_divide:
+            /* Snowball specifies integer division with semantics matching C,
+             * so we need to use `Math.trunc(x/y)` here.
+             */
+            write_string(g, "Math.trunc(");
+            generate_AE(g, p->left);
+            write_string(g, " / ");
+            generate_AE(g, p->right);
+            write_char(g, ')');
+            break;
         case c_cursor:
             w(g, "base.cursor"); break;
         case c_limit:
@@ -1135,11 +1143,10 @@ static void generate(struct generator * g, struct node * p) {
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
         case c_divideassign:
             /* Snowball specifies integer division with semantics matching C,
-             * so we need to use `Math.floor(x/y)` here.  (`(x/y)|0` would be
-             * suitable in cases where we knew that the arguments had the same
-             * sign.)
+             * so we need to use `Math.trunc(x/y)` here.
+             */
             g->V[0] = p->name;
-            w(g, "~M~V0 = Math.floor(~V0 / ");
+            w(g, "~M~V0 = Math.trunc(~V0 / ");
             generate_AE(g, p->AE);
             w(g, ");~N");
             break;
