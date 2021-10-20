@@ -408,6 +408,7 @@ static void generate_try(struct generator * g, struct node * p) {
     int keep_c = K_needed(g, p->left);
     int label = new_label(g);
     g->failure_label = label;
+    str_clear(g->failure_str);
 
     write_comment(g, p);
     if (keep_c) {
@@ -551,6 +552,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     label = new_label(g);
     g->failure_label = label;
+    str_clear(g->failure_str);
     wsetlab_begin(g);
     generate(g, p->left);
 
@@ -697,9 +699,17 @@ static void generate_hop(struct generator * g, struct node * p) {
     generate_AE(g, p->AE);
     w(g, "~N");
 
-    g->S[0] = p->mode == m_forward ? "0" : "self.limit_backward";
-
-    write_failure_if(g, "~S0 > c or c > self.limit", p);
+    g->S[1] = p->mode == m_forward ? "> self.limit" : "< self.limit_backward";
+    g->S[2] = p->mode == m_forward ? "<" : ">";
+    if (p->AE->type == c_number) {
+        // Constant distance hop.
+        //
+        // No need to check for negative hop as that's converted to false by
+        // the analyser.
+        write_failure_if(g, "c ~S1", p);
+    } else {
+        write_failure_if(g, "c ~S1 or c ~S2 self.cursor", p);
+    }
     writef(g, "~Mself.cursor = c~N", p);
 }
 
@@ -1035,9 +1045,13 @@ static void generate_among(struct generator * g, struct node * p) {
     } else if (x->command_count > 0) {
         int i;
         for (i = 1; i <= x->command_count; i++) {
-            g->I[0] = i;
-            w(g, (i > 1 ? "~Melif" : "~Mif"));
-            w(g, " among_var == ~I0:~N~+");
+            if (i == x->command_count && x->nocommand_count == 0) {
+                w(g, "~Melse:~N~+");
+            } else {
+                g->I[0] = i;
+                w(g, (i > 1 ? "~Melif" : "~Mif"));
+                w(g, " among_var == ~I0:~N~+");
+            }
             generate(g, x->commands[i - 1]);
             w(g, "~-");
             g->unreachable = false;

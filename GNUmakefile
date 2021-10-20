@@ -2,7 +2,7 @@
 
 # After changing this, run `make update_version` to update various sources
 # which hard-code it.
-SNOWBALL_VERSION = 2.0.0
+SNOWBALL_VERSION = 2.1.0
 
 ifeq ($(OS),Windows_NT)
   EXEEXT = .exe
@@ -38,7 +38,7 @@ js_sample_dir = sample
 NODE ?= nodejs
 
 cargo ?= cargo
-cargoflags ?=
+cargoflags ?= --release
 rust_src_main_dir = rust/src
 rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
 
@@ -48,15 +48,21 @@ gofmt ?= gofmt
 go_src_main_dir = go
 go_src_dir = $(go_src_main_dir)/algorithms
 
+gprbuild ?= gprbuild
+ada_src_main_dir = ada
+ada_src_dir = $(ada_src_main_dir)/algorithms
+
 ICONV = iconv
 #ICONV = python ./iconv.py
+
+tarball_ext = .tar.gz
 
 # algorithms.mk is generated from libstemmer/modules.txt and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
 # * ISO_8859_2_algorithms
 # * KOI8_R_algorithms
-include algorithms.mk $(shell libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt >/dev/null)
+include algorithms.mk
 
 other_algorithms = german2 kraaij_pohlmann lovins
 
@@ -73,7 +79,8 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
-		   compiler/generator_go.c
+		   compiler/generator_go.c \
+		   compiler/generator_ada.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h \
@@ -120,6 +127,7 @@ LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/module
 LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
+STEMTEST_SOURCES = tests/stemtest.c
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
@@ -146,26 +154,35 @@ JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
+ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.ads) \
+        $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.adb) \
+        $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
 RUNTIME_OBJECTS=$(RUNTIME_SOURCES:.c=.o)
 LIBSTEMMER_OBJECTS=$(LIBSTEMMER_SOURCES:.c=.o)
 LIBSTEMMER_UTF8_OBJECTS=$(LIBSTEMMER_UTF8_SOURCES:.c=.o)
 STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
+STEMTEST_OBJECTS=$(STEMTEST_SOURCES:.c=.o)
 C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
-CPPFLAGS=-Iinclude
+CPPFLAGS=
 
-all: $(SNOWBALLPROG) libstemmer.o $(STEMWORDS_PROG) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+INCLUDES=-Iinclude
+
+all: $(SNOWBALLPROG) libstemmer.a $(STEMWORDS_PROG) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+
+algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
+	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) $(SNOWBALLPROG) \
-	      libstemmer.o $(STEMWORDS_PROG) \
+	      libstemmer.a $(STEMWORDS_PROG) \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
@@ -176,6 +193,7 @@ clean:
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
+	      $(ADA_SOURCES) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
@@ -203,10 +221,19 @@ libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl lib
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
-libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
-$(STEMWORDS_PROG): $(STEMWORDS_OBJECTS) libstemmer.o
+examples/%.o: examples/%.c
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+
+$(STEMWORDS_PROG): $(STEMWORDS_OBJECTS) libstemmer.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+tests/%.o: tests/%.c
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+
+stemtest: $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(CSHARP_STEMWORDS_PROG): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
@@ -247,7 +274,7 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.
 	./snowball charsets/ISO-8859-2.sbl $< -o $${o} -eprefix $${l}_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
 $(java_src_dir)/%Stemmer.java: algorithms/%.sbl $(SNOWBALLPROG)
 	@mkdir -p $(java_src_dir)
@@ -290,7 +317,7 @@ $(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl $(SNOWBALLPROG)
 	echo "./snowball $< -rust -o $${o}"; \
 	./snowball $< -rust -o $${o}
 
-$(go_src_main_dir)/stemwords/algorithms.go:
+$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/modules.txt
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
@@ -314,6 +341,13 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl $(SNOWBALLPROG)
 	echo "./snowball $< -js -o $${o}"; \
 	./snowball $< -js -o $${o}
 
+$(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
+	@mkdir -p $(ada_src_dir)
+	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
+	o="$(ada_src_dir)/stemmer-$${l}"; \
+	echo "./snowball $< -ada -o $${o}"; \
+	./snowball $< -ada -P $${l} -o $${o}
+
 # Make a full source distribution
 dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
 
@@ -324,19 +358,19 @@ dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
 	    $(LIBSTEMMER_UTF8_SOURCES) \
             $(LIBSTEMMER_HEADERS) \
 	    $(LIBSTEMMER_EXTRA) \
-	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) \
+	    $(ALL_ALGORITHM_FILES) $(STEMWORDS_SOURCES) $(STEMTEST_SOURCES) \
 	    $(COMMON_FILES) \
-	    GNUmakefile README doc/TODO libstemmer/mkmodules.pl
-	destname=snowball_code; \
+	    GNUmakefile README.rst doc/TODO libstemmer/mkmodules.pl
+	destname=snowball-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	for file in $^; do \
 	  dir=`dirname $$file` && \
 	  mkdir -p $${dest}/$${dir} && \
 	  cp -a $${file} $${dest}/$${dir} || exit 1 ; \
 	done && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C library.
@@ -351,10 +385,10 @@ dist_libstemmer_c: \
             $(C_LIB_HEADERS) \
             libstemmer/mkinc.mak \
             libstemmer/mkinc_utf8.mak
-	destname=libstemmer_c; \
+	destname=libstemmer_c-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_c_README $${dest}/README && \
 	mkdir -p $${dest}/examples && \
@@ -368,7 +402,7 @@ dist_libstemmer_c: \
 	mkdir -p $${dest}/include && \
 	mv $${dest}/libstemmer/libstemmer.h $${dest}/include && \
 	(cd $${dest} && \
-	 echo "README" >> MANIFEST && \
+	 echo "README.rst" >> MANIFEST && \
 	 ls $(c_src_dir)/*.c $(c_src_dir)/*.h >> MANIFEST && \
 	 ls runtime/*.c runtime/*.h >> MANIFEST && \
 	 ls libstemmer/*.c libstemmer/*.h >> MANIFEST && \
@@ -381,24 +415,24 @@ dist_libstemmer_c: \
 	echo 'endif' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
 	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
-	echo 'all: libstemmer.o stemwords$$(EXEEXT)' >> $${dest}/Makefile && \
-	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
+	echo 'all: libstemmer.a stemwords$$(EXEEXT)' >> $${dest}/Makefile && \
+	echo 'libstemmer.a: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
-	echo 'stemwords$$(EXEEXT): examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
+	echo 'stemwords$$(EXEEXT): examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
-	echo '	rm -f stemwords$$(EXEEXT) *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	echo '	rm -f stemwords$$(EXEEXT) libstemmer.a *.o $(c_src_dir)/*.o examples/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the Java library.
 dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
 	    $(JAVA_SOURCES)
-	destname=libstemmer_java; \
+	destname=libstemmer_java-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_java_README $${dest}/README && \
 	mkdir -p $${dest}/$(java_src_dir) && \
@@ -410,17 +444,17 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 # Make a distribution of all the sources required to compile the C# library.
 dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
             $(LIBSTEMMER_EXTRA) \
 	    $(CSHARP_SOURCES)
-	destname=libstemmer_csharp; \
+	destname=libstemmer_csharp-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	cp -a doc/libstemmer_csharp_README $${dest}/README && \
 	mkdir -p $${dest}/$(csharp_src_dir) && \
@@ -430,14 +464,14 @@ dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/$(csharp_sample_dir) && \
 	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
 	cp -a $(COMMON_FILES) $${dest} && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
 dist_libstemmer_python: $(PYTHON_SOURCES)
-	destname=snowballstemmer; \
+	destname=snowballstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
@@ -451,24 +485,27 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	rm -rf $${dest}
 
 dist_libstemmer_js: $(JS_SOURCES)
-	destname=jsstemmer; \
+	destname=jsstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
-	rm -f $${dest}.tgz && \
+	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/$(js_runtime_dir) && \
 	mkdir -p $${dest}/$(js_sample_dir) && \
-	cp -a doc/libstemmer_js_README $${dest}/README && \
+	cp -a doc/libstemmer_js_README $${dest}/README.rst && \
 	cp -a $(COMMON_FILES) $${dest} && \
 	cp -a $(JS_RUNTIME_SOURCES) $${dest}/$(js_runtime_dir) && \
 	cp -a $(JS_SAMPLE_SOURCES) $${dest}/$(js_sample_dir) && \
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
-	 ls README $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
-	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
+	 ls README.rst $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
-check: check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
+check_stemtest: stemtest
+	./stemtest
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
 
@@ -582,8 +619,7 @@ check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
 # Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
 THIN_FACTOR ?= 3
 
-# Command to thin out the testdata - the full arabic test data causes
-# stemwords.js to run out of memory.  Also use for Python tests, which
+# Command to thin out the testdata.  Used for Python tests, which otherwise
 # take a long time (unless you use pypy).
 THIN_TEST_DATA := awk '(FNR % $(THIN_FACTOR) == 0){print}'
 
@@ -592,14 +628,14 @@ check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
 check_rust_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Rust"
 	@cd rust && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(cargo) run $(cargoflags) -- -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
@@ -610,14 +646,14 @@ check_go: $(GO_SOURCES) $(libstemmer_algorithms:%=check_go_%)
 check_go_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Go"
 	@cd go && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(go) run $(goflags) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o $(PWD)/tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
@@ -628,14 +664,14 @@ export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|$(THIN_TEST_DATA) > tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
 	  $(NODE) javascript/stemwords.js -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(THIN_TEST_DATA)|diff -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
 	else \
 	  diff -u $</output.txt tmp.txt; \
 	fi
@@ -671,5 +707,35 @@ update_version:
 		compiler/header.h \
 		csharp/Snowball/AssemblyInfo.cs \
 		python/setup.py
+
+check_ada: ada/bin/stemwords
+	$(MAKE) do_check_ada
+
+do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
+
+check_ada_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Ada"
+	@cd ada && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  ./bin/stemwords `echo $<|sed 's!.*/!!'` tmp.in $(PWD)/tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  ./bin/stemwords `echo $<|sed 's!.*/!!'` $</voc.txt $(PWD)/tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|diff -u - tmp.txt; \
+	else \
+	  diff -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
+	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
+
+ada/bin/generate:
+	cd ada && $(gprbuild) -Pgenerate -p
+
+ada/bin/stemwords: $(ADA_SOURCES)
+	cd ada && $(gprbuild) -Pstemwords -p
 
 .SUFFIXES: .class .java
