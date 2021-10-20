@@ -5,11 +5,8 @@
 SNOWBALL_VERSION = 2.1.0
 
 ifeq ($(OS),Windows_NT)
-  EXEEXT = .exe
+EXEEXT = .exe
 endif
-SNOWBALLPROG = snowball$(EXEEXT)
-STEMWORDS_PROG = stemwords$(EXEEXT)
-CSHARP_STEMWORDS_PROG = csharp_stemwords$(EXEEXT)
 
 c_src_dir = src_c
 
@@ -178,15 +175,15 @@ CPPFLAGS=
 
 INCLUDES=-Iinclude
 
-all: $(SNOWBALLPROG) libstemmer.a $(STEMWORDS_PROG) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+all: snowball$(EXE_EXT) libstemmer.a stemwords$(EXE_EXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
 	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
-	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) $(SNOWBALLPROG) \
-	      libstemmer.a $(STEMWORDS_PROG) \
+	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball$(EXE_EXT) \
+	      libstemmer.a stemwords$(EXE_EXT) \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
@@ -206,7 +203,7 @@ clean:
 	-rmdir $(python_output_dir)
 	-rmdir $(js_output_dir)
 
-$(SNOWBALLPROG): $(COMPILER_OBJECTS)
+snowball$(EXE_EXT): $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
@@ -231,7 +228,7 @@ libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 examples/%.o: examples/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-$(STEMWORDS_PROG): $(STEMWORDS_OBJECTS) libstemmer.a
+stemwords$(EXE_EXT): $(STEMWORDS_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 tests/%.o: tests/%.c
@@ -240,7 +237,7 @@ tests/%.o: tests/%.c
 stemtest: $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-$(CSHARP_STEMWORDS_PROG): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+csharp_stemwords$(EXE_EXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
 pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
@@ -249,28 +246,28 @@ pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
 pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
 	$(FPC) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
 
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl $(SNOWBALLPROG)
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_UTF_8_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u"; \
 	./snowball $< -o $${o} -eprefix $${l}_UTF_8_ -r ../runtime -u
 
-$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%.sbl $(SNOWBALLPROG)
+$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_KOI8_R_$${l}"; \
 	echo "./snowball charsets/KOI8-R.sbl $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime"; \
 	./snowball charsets/KOI8-R.sbl $< -o $${o} -eprefix $${l}_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%.sbl $(SNOWBALLPROG)
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_ISO_8859_1_$${l}"; \
 	echo "./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime"; \
 	./snowball $< -o $${o} -eprefix $${l}_ISO_8859_1_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.sbl $(SNOWBALLPROG)
+$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(c_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(c_src_dir)/stem_ISO_8859_2_$${l}"; \
@@ -280,14 +277,14 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-$(java_src_dir)/%Stemmer.java: algorithms/%.sbl $(SNOWBALLPROG)
+$(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(java_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(java_src_dir)/$${l}Stemmer"; \
 	echo "./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer"; \
 	./snowball $< -j -o $${o} -p org.tartarus.snowball.SnowballStemmer
 
-$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl $(SNOWBALLPROG)
+$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(csharp_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
@@ -295,7 +292,7 @@ $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl $(SNOWBALLPROG)
 	echo "./snowball $< -cs -o $${o}"; \
 	./snowball $< -cs -o $${o}
 
-$(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl $(SNOWBALLPROG)
+$(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(pascal_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	t=`echo "$${l}" | sed 's/.*/\L&/; s/[a-z]*/\u&/g'`; \
@@ -303,7 +300,7 @@ $(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl $(SNOWBALLPROG)
 	echo "./snowball $< -pascal -o $${o}"; \
 	./snowball $< -pascal -o $${o}
 
-$(python_output_dir)/%_stemmer.py: algorithms/%.sbl $(SNOWBALLPROG)
+$(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(python_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(python_output_dir)/$${l}_stemmer"; \
@@ -314,7 +311,7 @@ $(python_output_dir)/__init__.py: libstemmer/modules.txt
 	@mkdir -p $(python_output_dir)
 	$(python) python/create_init.py $(python_output_dir)
 
-$(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl $(SNOWBALLPROG)
+$(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(rust_src_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(rust_src_dir)/$${l}_stemmer"; \
@@ -325,7 +322,7 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
-$(go_src_dir)/%_stemmer.go: algorithms/%.sbl $(SNOWBALLPROG)
+$(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball$(EXE_EXT)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(go_src_dir)/$${l}/$${l}_stemmer"; \
 	mkdir -p $(go_src_dir)/$${l}
@@ -338,7 +335,7 @@ $(go_src_dir)/%_stemmer.go: algorithms/%.sbl $(SNOWBALLPROG)
 	echo "$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go"; \
 	$(gofmt) -s -w $(go_src_dir)/$${l}/$${l}_stemmer.go
 
-$(js_output_dir)/%-stemmer.js: algorithms/%.sbl $(SNOWBALLPROG)
+$(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXE_EXT)
 	@mkdir -p $(js_output_dir)
 	@l=`echo "$<" | sed 's!\(.*\)\.sbl$$!\1!;s!^.*/!!'`; \
 	o="$(js_output_dir)/$${l}-stemmer"; \
@@ -524,12 +521,12 @@ check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 STEMMING_DATA ?= ../snowball-data
 STEMMING_DATA_ABS := $(abspath $(STEMMING_DATA))
 
-check_utf8_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
+check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with UTF-8"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|./$(STEMWORDS_PROG) -c UTF_8 -l `echo $<|sed 's!.*/!!'` -o tmp.txt; \
+	  gzip -dc '$</voc.txt.gz'|./stemwords$(EXE_EXT) -c UTF_8 -l `echo $<|sed 's!.*/!!'` -o tmp.txt; \
 	else \
-	  ./$(STEMWORDS_PROG) -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  ./stemwords$(EXE_EXT) -c UTF_8 -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
@@ -538,7 +535,7 @@ check_utf8_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	fi
 	@rm tmp.txt
 
-check_iso_8859_1_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
+check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_1"
 	@$(ICONV) -fUTF8 -tISO8859-1 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_1 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
@@ -546,7 +543,7 @@ check_iso_8859_1_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
-check_iso_8859_2_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
+check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with ISO_8859_2"
 	@$(ICONV) -fUTF8 -tISO8859-2 '$</voc.txt' |\
 	    ./stemwords -c ISO_8859_2 -l `echo $<|sed 's!.*/!!'` -o tmp.txt
@@ -554,7 +551,7 @@ check_iso_8859_2_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
-check_koi8r_%: $(STEMMING_DATA)/% $(STEMWORDS_PROG)
+check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXE_EXT)
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer with KOI8R"
 	@$(ICONV) -fUTF8 -tKOI8-R '$</voc.txt' |\
 	    ./stemwords -c KOI8_R -l `echo $<|sed 's!.*/!!'` -o tmp.txt
@@ -585,7 +582,7 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_csharp: $(CSHARP_STEMWORDS_PROG)
+check_csharp: csharp_stemwords$(EXE_EXT)
 	$(MAKE) do_check_csharp
 
 do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
@@ -594,9 +591,9 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for C#"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(MONO) $(CSHARP_STEMWORDS_PROG) -l `echo $<|sed 's!.*/!!'` -i /dev/stdin -o tmp.txt; \
+	    $(MONO) csharp_stemwords$(EXE_EXT) -l `echo $<|sed 's!.*/!!'` -i /dev/stdin -o tmp.txt; \
 	else \
-	  $(MONO) $(CSHARP_STEMWORDS_PROG) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
+	  $(MONO) csharp_stemwords$(EXE_EXT) -l `echo $<|sed 's!.*/!!'` -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
