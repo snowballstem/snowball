@@ -1,7 +1,16 @@
-up to: 85e2640034b0a1100584e48c7c3261a08a70758a
+up to: f89c3b9d639b9543222f69b0e24742be1dcfe392
 
 Snowball 2.2.0 (2021-10-??)
 ===========================
+
+Ada
+---
+
+* Avoid generating invalid Ada code for some uses of negative constants and
+  unary minus, which resulted in "parentheses required for unary minus" errors
+  from gnat.
+
+* Generate valid code for Snowball's `minint` and `maxint` constants.
 
 C/C++
 -----
@@ -27,6 +36,8 @@ Pascal
   generated code would fail to compile with a "Incompatible types" error.
 
   Noted by David Corbett.
+
+* Fix code generated for Snowball's `minint` and `maxint` constant.
 
 Python
 ------
