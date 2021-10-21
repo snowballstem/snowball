@@ -271,13 +271,19 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_name:
             write_varref(g, p->name); break;
         case c_number:
-            write_int(g, p->number); break;
+            // Avoid `parentheses required for unary minus` error from gnat.
+            if (p->number < 0)
+                write_char(g, '(');
+            write_int(g, p->number);
+            if (p->number < 0)
+                write_char(g, ')');
+            break;
         case c_maxint:
             write_string(g, "MAXINT"); break;
         case c_minint:
             write_string(g, "MININT"); break;
         case c_neg:
-            write_char(g, '-'); generate_AE(g, p->right); break;
+            write_string(g, "(-"); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_multiply:
             s = " * "; goto label0;
         case c_plus:
