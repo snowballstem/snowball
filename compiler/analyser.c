@@ -463,9 +463,33 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             t->token_held = true;
             return p;
         }
-        q = new_node(a, token);
-        q->left = p;
-        q->right = read_AE(a, assigned_to, b);
+        struct node * r = read_AE(a, assigned_to, b);
+        if (p->type == c_number && r->type == c_number) {
+            // Evaluate constant sub-expression.
+            q = new_node(a, c_number);
+            switch (token) {
+                case c_plus:
+                    q->number = p->number + r->number;
+                    break;
+                case c_minus:
+                    q->number = p->number - r->number;
+                    break;
+                case c_multiply:
+                    q->number = p->number * r->number;
+                    break;
+                case c_divide:
+                    q->number = p->number / r->number;
+                    break;
+                default:
+                    fprintf(stderr, "Unexpected AE operator %s\n",
+                            name_of_token(token));
+                    exit(1);
+            }
+        } else {
+            q = new_node(a, token);
+            q->left = p;
+            q->right = r;
+        }
         p = q;
     }
 }
@@ -985,7 +1009,8 @@ static struct node * read_C(struct analyser * a) {
                 /* Handle newer $(AE REL_OP AE) syntax. */
                 struct node * n = read_AE(a, 0, 0);
                 read_token(t);
-                switch (t->token) {
+                int token = t->token;
+                switch (token) {
                     case c_eq:
                     case c_ne:
                     case c_gr:
@@ -993,9 +1018,40 @@ static struct node * read_C(struct analyser * a) {
                     case c_ls:
                     case c_le: {
                         struct node * lhs = n;
-                        n = new_node(a, t->token);
-                        n->left = lhs;
-                        n->AE = read_AE(a, 0, 0);
+                        struct node * rhs = read_AE(a, 0, 0);
+                        if (lhs->type == c_number && rhs->type == c_number) {
+                            // Evaluate constant numeric test expression.
+                            int result;
+                            switch (token) {
+                                case c_eq:
+                                    result = (lhs->number == rhs->number);
+                                    break;
+                                case c_ne:
+                                    result = (lhs->number != rhs->number);
+                                    break;
+                                case c_gr:
+                                    result = (lhs->number > rhs->number);
+                                    break;
+                                case c_ge:
+                                    result = (lhs->number >= rhs->number);
+                                    break;
+                                case c_ls:
+                                    result = (lhs->number < rhs->number);
+                                    break;
+                                case c_le:
+                                    result = (lhs->number <= rhs->number);
+                                    break;
+                                default:
+                                    fprintf(stderr, "Unexpected numeric test operator %s\n",
+                                            name_of_token(t->token));
+                                    exit(1);
+                            }
+                            n = new_node(a, result ? c_true : c_false);
+                        } else {
+                            n = new_node(a, token);
+                            n->left = lhs;
+                            n->AE = rhs;
+                        }
                         get_token(a, c_ket);
                         break;
                     }
