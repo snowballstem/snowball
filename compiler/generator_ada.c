@@ -279,9 +279,9 @@ static void generate_AE(struct generator * g, struct node * p) {
                 write_char(g, ')');
             break;
         case c_maxint:
-            write_string(g, "MAXINT"); break;
+            write_string(g, "Integer'Last"); break;
         case c_minint:
-            write_string(g, "MININT"); break;
+            write_string(g, "Integer'First"); break;
         case c_neg:
             write_string(g, "(-"); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_multiply:
