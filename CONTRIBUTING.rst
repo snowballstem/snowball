@@ -150,23 +150,30 @@ to improve further in the future.
 Key problems to solve
 ---------------------
 
-A key problem to solve is how to map the required flow of control in response
-to Snowball signals.
+* A key problem to solve is how to map the required flow of control in response
+  to Snowball signals.
 
-In the generated C code this is mostly done using `goto`.  If your language
-doesn't provide an equivalent to `goto` then you'll need an alternative
-solution.
+  In the generated C code this is mostly done using `goto`.  If your language
+  doesn't provide an equivalent to `goto` then you'll need an alternative
+  solution.
 
-In Java and JavaScript we use labelled `break` from blocks and loops
-instead.  If your language has an equivalent to this feature, that will
-probably work.
+  In Java and JavaScript we use labelled `break` from blocks and loops
+  instead.  If your language has an equivalent to this feature, that will
+  probably work.
 
-For Python, we currently generate a `try:` ... `raise lab123` ...
-`except lab123: pass` construct.  This works, but doesn't seem ideal.
+  For Python, we currently generate a `try:` ... `raise lab123` ...
+  `except lab123: pass` construct.  This works, but doesn't seem ideal.
 
-If one of the mechanisms above sounds suitable then take a look at the
-generator for the respective generated output and generator code.  If
-not, come and talk to us on the snowball-discuss mailing list.
+  If one of the mechanisms above sounds suitable then take a look at the
+  generator for the respective generated output and generator code.  If
+  not, come and talk to us on the snowball-discuss mailing list.
+
+* Snowball's division is specified as integer division with semantics
+  matching C - i.e. the result should be truncated (rounded towards zero).
+  Some languages lack a built-in integer division operation, or have one
+  which instead implements rounding towards negative infinity.  Existing
+  backends with special handling handling here which may be useful to look at
+  include Javascript, Pascal and Python.
 
 Don't hardcode algorithm names
 ------------------------------
