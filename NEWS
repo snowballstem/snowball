@@ -1,4 +1,4 @@
-up to: e05481dcf0f28d63c8d86a0cbc80d8ab47e3bd1a
+up to: 85e2640034b0a1100584e48c7c3261a08a70758a
 
 Snowball 2.2.0 (2021-10-??)
 ===========================
@@ -12,19 +12,34 @@ C#
 Java
 ----
 
+Javascript
+----------
+
+* Fix generated code to use integer division rather than floating point
+  division.
+
+  Noted by David Corbett.
+
 Pascal
 ------
 
 * Fix code generated for division.  Previously real division was used and the
   generated code would fail to compile with a "Incompatible types" error.
 
-  Noted by David Corbett in #156.
+  Noted by David Corbett.
 
 Python
 ------
 
 * Python 2 is no longer actively supported, as proposed on the mailing list:
   https://lists.tartarus.org/pipermail/snowball-discuss/2021-August/001721.html
+
+* Fix code generated for division.  Previously the Python code we generated
+  used integer division but rounded negative fractions towards negative
+  infinity rather than zero under Python 2, and under Python 3 used floating
+  point division.
+
+  Noted by David Corbett.
 
 Code Quality Improvements
 -------------------------
