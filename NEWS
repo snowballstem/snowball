@@ -1,25 +1,10 @@
-up to: f89c3b9d639b9543222f69b0e24742be1dcfe392
-
-Snowball 2.2.0 (2021-10-??)
+Snowball 2.2.0 (2021-11-10)
 ===========================
 
-Ada
----
+New Code Generators
+-------------------
 
-* Avoid generating invalid Ada code for some uses of negative constants and
-  unary minus, which resulted in "parentheses required for unary minus" errors
-  from gnat.
-
-* Generate valid code for Snowball's `minint` and `maxint` constants.
-
-C/C++
------
-
-C#
---
-
-Java
-----
+* Add Ada generator from Stephane Carrez (#135).
 
 Javascript
 ----------
@@ -58,27 +43,13 @@ Code Quality Improvements
 * C#: An `among` without functions is now generated as `static` and groupings
   are now generated as constant.  Patches from James Turner in #146 and #147.
 
-New Code Generators
--------------------
-
-New Snowball Language Features
-------------------------------
-
 Code generation improvements
 ----------------------------
 
 * General:
 
-* C/C++:
-
-* Java:
-
-* Pascal:
-
-* Python:
-
-New stemming algorithms
------------------------
+  + Constant numeric subexpressions and constant numeric tests are now
+    evaluated at Snowball compile time.
 
 Behavioural changes to existing algorithms
 ------------------------------------------
@@ -110,15 +81,21 @@ Optimisations to existing algorithms
 
 * yiddish: Make use of `among` more.
 
-Code clarity improvements to existing algorithms
-------------------------------------------------
-
 Compiler
 --------
 
-* Replace single entry command list with its contents in internal syntax tree.
-  This puts things in a more canonical form, which makes subsequent
-  optimisations easier.
+* Fix handling of `len` and `lenof` being declared as names.
+
+  For compatibility with programs written for older Snowball versions
+  len and lenof stop being tokens if declared as names.  However this
+  code didn't work correctly if the tokeniser's name buffer needed to
+  be enlarged to hold the token name (i.e. 3 or 5 elements respectively).
+
+* Report a clearer error if `=` is used instead of `==` in an integer test.
+
+* Replace a single entry command list with its contents in the internal syntax
+  tree.  This puts things in a more canonical form, which helps subsequent
+  optimisations.
 
 Build system
 ------------
@@ -162,7 +139,7 @@ Testsuite
   memory errors.  Also drop the -p option, which isn't useful here and
   complicates the code.
 
-* rust: Turn on optimisation in makefile rather than travis-ci config.  This
+* rust: Turn on optimisation in the makefile rather than the CI config.  This
   makes the tests run in about 1/5 of the time and there's really no reason to
   be thinning the testdata for rust.
 
@@ -203,11 +180,6 @@ Code Quality Improvements
 
 * Only use spaces for indentation in javascript code.  Change proposed by Emily
   Marigold Klassen in #123, and seems to be the modern Javascript norm.
-
-New Code Generators
--------------------
-
-* Add Ada generator from Stephane Carrez (#135).
 
 New Snowball Language Features
 ------------------------------
@@ -352,7 +324,7 @@ Documentation
 -------------
 
 * Document a C99 compiler as a requirement for building the snowball compiler
-  (but the C code it generates should still work with any ISO C compiler.)
+  (but the C code it generates should still work with any ISO C compiler).
 
   A few declarations mixed with code crept in some time ago (which nobody's
   complained about), so this is really just formally documenting a requirement
