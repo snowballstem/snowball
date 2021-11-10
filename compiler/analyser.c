@@ -268,7 +268,7 @@ static void read_names(struct analyser * a, int type) {
                 static const symbol c_len_lit[] = {
                     'l', 'e', 'n'
                 };
-                MOVE_TO_B(t->b, c_len_lit);
+                t->b = MOVE_TO_B(t->b, c_len_lit);
                 goto handle_as_name;
             }
             case c_lenof: {
@@ -279,7 +279,7 @@ static void read_names(struct analyser * a, int type) {
                 static const symbol c_lenof_lit[] = {
                     'l', 'e', 'n', 'o', 'f'
                 };
-                MOVE_TO_B(t->b, c_lenof_lit);
+                t->b = MOVE_TO_B(t->b, c_lenof_lit);
                 goto handle_as_name;
             }
             case c_name:
