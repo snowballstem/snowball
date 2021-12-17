@@ -43,10 +43,10 @@ the first column.  The columns are:
 * Algorithm name (needs to match the `.sbl` source without extension)
 * Encodings to support.  Wide-character Unicode is always supported
   and doesn't need to be listed here.  You should always include `UTF_8`, and
-  also `ISO_8859_1` if the stemmer only uses characters from that and the
-  language can be usefully written using it.  We currently also have support
-  for `ISO_8859_2` and `KOI8_R`, but other single-byte character sets can be
-  supported quite easily if they are useful.
+  also any of `ISO_8859_1`, `ISO_8859_2` and `KOI8_R` which the language can
+  usefully be written using only characters from (in particular they need to
+  contain all the characters the stemmer explicitly uses).  Support for other
+  single-byte character sets is easy to add if they're useful.
 * Names and ISO-639 codes for the language.  Wikipedia has a handy list of `all
   the ISO-639 codes <https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes>`_ -
   find the row for your new language and include the codes from the "639-1",
