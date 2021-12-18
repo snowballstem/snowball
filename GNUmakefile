@@ -2,7 +2,10 @@
 
 # After changing this, run `make update_version` to update various sources
 # which hard-code it.
-SNOWBALL_VERSION = 2.2.0
+MAJOR_VERSION := 2
+MINOR_VERSION := 2
+PATCH_VERSION := 0
+SNOWBALL_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 ifeq ($(OS),Windows_NT)
 EXEEXT = .exe
@@ -170,12 +173,12 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
-CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+CFLAGS=-fPIC -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
 CPPFLAGS=
 
 INCLUDES=-Iinclude
 
-all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+all: snowball$(EXEEXT) libstemmer.a libstemmer.so stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
 algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
 	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
@@ -183,7 +186,7 @@ algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
 	      $(LIBSTEMMER_OBJECTS) $(LIBSTEMMER_UTF8_OBJECTS) $(STEMWORDS_OBJECTS) snowball$(EXEEXT) \
-	      libstemmer.a stemwords$(EXEEXT) \
+	      libstemmer.a libstemmer.so libstemmer.so.$(SNOWBALL_VERSION) libstemmer.so.$(MAJOR_VERSION) stemwords$(EXEEXT) \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
@@ -224,6 +227,11 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
 libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
+
+libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+	$(CC) $(CFLAGS) -shared $(LDFLAGS) -Wl,-soname,$@.$(MAJOR_VERSION),-version-script,libstemmer/symbol.map -o $@.$(SNOWBALL_VERSION) $^
+	ln -s $@.$(SNOWBALL_VERSION) $@.$(MAJOR_VERSION)
+	ln -s $@.$(SNOWBALL_VERSION) $@
 
 examples/%.o: examples/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
