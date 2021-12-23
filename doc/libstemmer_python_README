@@ -25,6 +25,16 @@ stemming algorithms likely aren't the right answer.
 How to use library
 ------------------
 
+Creating a stemmer is a relatively expensive operation - the expected usage
+pattern is that a new stemmer is created when needed, used to stem many words,
+and deleted after some time.
+
+Stemmers are re-entrant, but not threadsafe.  In other words, if you wish to
+access the same stemmer object from multiple threads, you must ensure that all
+access is protected by appropriate thread locks. Or alternatively one should
+instantiate a new stemmer within each thread for multithreaded usage, this will
+avoid bottlenecks from GIL.
+
 The ``snowballstemmer`` module has two functions.
 
 The ``snowballstemmer.algorithms`` function returns a list of available
