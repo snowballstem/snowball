@@ -1,0 +1,163 @@
+stringescapes {}
+
+/* the 33 Ukrainian letters and apostrophe represented by single quote*/
+
+stringdef a    '{U+0430}'
+stringdef b    '{U+0431}'
+stringdef v    '{U+0432}'
+stringdef gh   '{U+0433}'
+stringdef g    '{U+0491}'
+stringdef d    '{U+0434}'
+stringdef e    '{U+0435}'
+stringdef ye   '{U+0454}'
+stringdef zh   '{U+0436}'
+stringdef z    '{U+0437}'
+stringdef y    '{U+0438}'
+stringdef i    '{U+0456}'
+stringdef yi   '{U+0457}'
+stringdef i`   '{U+0439}'
+stringdef k    '{U+043A}'
+stringdef l    '{U+043B}'
+stringdef m    '{U+043C}'
+stringdef n    '{U+043D}'
+stringdef o    '{U+043E}'
+stringdef p    '{U+043F}'
+stringdef r    '{U+0440}'
+stringdef s    '{U+0441}'
+stringdef t    '{U+0442}'
+stringdef u    '{U+0443}'
+stringdef f    '{U+0444}'
+stringdef kh   '{U+0445}'
+stringdef ts   '{U+0446}'
+stringdef ch   '{U+0447}'
+stringdef sh   '{U+0448}'
+stringdef shch '{U+0449}'
+stringdef soft '{U+044C}'
+stringdef iu   '{U+044E}'
+stringdef ia   '{U+044F}'
+stringdef apostrophe '{U+0027}'
+
+routines ( exception1
+           adjective
+           postfix
+           verb
+           noun
+           tidy_up
+)
+
+externals ( stem )
+
+define exception1 as (
+
+    [substring] atlimit among(
+		
+		'{z}{d}{o}{r}{o}{v}{apostrophe}{ia}'      (<-'{z}{d}{o}{r}')
+        /* invariant forms: */
+		'{k}{r}{i}{m}'
+		'{a}{d}{zh}{e}'
+		'{a}{t}{o}{m}'
+		'{k}{r}{o}{k}'
+		'{d}{e}{s}{soft}'
+		'{v}{i}{s}{soft}'
+        // ... extensions possible here ...
+    )
+)
+
+
+backwardmode (
+
+
+    define adjective as (
+	
+        [substring] among (
+			
+			'{o}{v}{e}' '{o}{v}{a}' '{o}{v}{o}' '{o}{v}{y}{i`}'
+			'{o}{v}{y}{m}' '{o}{v}{y}{kh}' '{o}{v}{o}{gh}{o}'
+			'{o}{v}{o}{m}{u}' '{o}{v}{o}{iu}' '{o}{v}{o}{yi}'
+			'{o}{v}{i}{i`}' '{y}{m}{y}'
+            '{e}{i`}' '{i}{i`}' '{y}{i`}' '{o}{yi}' '{e}{m}' '{i}{m}'
+            '{y}{m}' '{o}{m}' '{o}{gh}{o}' '{e}{m}{u}'
+            '{o}{m}{u}' '{i}{kh}' '{y}{kh}' '{u}{iu}' '{iu}{iu}' '{a}{ia}'
+            '{o}{iu}' '{e}{iu}'
+                (delete)
+        )
+    )
+
+
+    define postfix as (
+        [substring] among (
+            '{s}{ia}'
+            '{s}{soft}'
+                (delete)
+        )
+    )
+
+    define verb as (
+        [substring] among (
+			'{sh}{o}{v}' '{sh}{l}{a}' '{sh}{l}{y}' '{sh}{l}{o}' (<-'{t}') 
+			'{u}{iu}{t}{soft}' '{a}{iu}{t}{soft}' '{i}{iu}{t}{soft}' '{y}{v}{sh}{y}'
+			'{a}{n}{y}{m}{y}' '{a}{n}{y}{kh}' '{a}{n}{i}' '{y}{v}'
+            '{i}{l}{a}' '{y}{l}{a}' '{y}{l}{y}' '{y}{t}{a}' '{e}{n}{a}'
+            '{u}{i`}{t}{e}' '{u}{v}{a}{l}{y}' '{u}{v}{a}{l}{o}'
+			'{u}{v}{a}{l}{a}' '{u}{v}{a}{v}' '{u}{v}{a}{t}{y}' '{u}{v}{a}{n}{n}{ia}'
+			'{a}{l}{y}' '{a}{l}{o}' '{a}{l}{a}' '{a}{v}' '{y}{l}{i}'
+            '{u}{i`}' '{a}{ye}' '{u}{ye}' '{i}{ye}' '{y}{ye}' '{ia}{ye}'
+            '{i}{l}{o}' '{y}{l}{o}' '{e}{n}{o}' '{iu}{ye}'
+            '{i}{t}{soft}' '{y}{t}{soft}'
+			
+                (delete)
+        )
+    )
+
+    define noun as (
+        [substring] among (
+			'{ia}{t}{a}' '{ia}{t}{a}{m}' '{ia}{t}{a}{m}{y}' 
+			('{n}' delete)
+			'{o}{k}'      (<-'{k}')
+			'{o}{yi}{v}' '{o}{ia}{kh}' '{o}{ye}{m}' '{o}{ia}' 
+			'{i}{ia}{kh}' 
+            '{a}' '{yi}{v}' '{o}{v}{i}' '{o}{v}' '{i}{v}' '{e}'
+			'{ia}{t}' '{i}{l}' '{y}{l}' '{e}{n}' '{u}{iu}'
+            '{i}{ia}{m}{y}' '{ia}{m}{y}' '{a}{m}{y}'
+			'{i}{yi}' '{i}{ye}{iu}'
+            '{i}' '{e}{i`}' '{e}{yi}' '{o}{i`}' '{i}{i`}' '{i`}'
+            '{i}{ia}{m}' '{ia}{m}' '{e}{m}' '{a}{m}' '{o}{m}'
+            '{o}' '{u}' '{a}{kh}' '{ia}{kh}' '{y}' '{soft}'
+            '{i}{iu}' '{iu}' '{i}{ia}' '{ia}'
+                (delete)
+        )
+    )
+
+
+    define tidy_up as (
+        [substring] among (
+            '{n}'
+               ('{n}' delete)
+			'{t}'
+               ('{t}' delete)			   //double suffixes
+            '{soft}'
+			'{i}{ch}{n}'
+			'{i}{i`}{s}{soft}{k}'
+			'{s}{soft}{k}'
+			'{soft}{n}'
+			'{e}{n}' '{a}{n}' '{y}{t}' '{iu}{iu}{t}'
+			'{u}{ye}{t}' '{a}{ye}{t}' '{iu}{ye}{t}' '{ia}{ye}{t}' 
+			'{apostrophe}'
+               (delete)  
+			    '{o}{s}{t}'      (<-'{i}{s}{t}')
+        )
+    )
+)
+
+define stem as (
+	not hop 4 or (
+	exception1 or
+    backwards(
+        do (
+              try postfix
+               adjective or verb or noun
+        )
+        do tidy_up
+		)
+	)
+)
