@@ -176,6 +176,8 @@ define exception1 as (
         'dying'     (<-'die')
         'lying'     (<-'lie')
         'tying'     (<-'tie')
+        'busses'    (<-'bus')
+        'buses'     (<-'bus')
 
         /* special -LY cases */
 
