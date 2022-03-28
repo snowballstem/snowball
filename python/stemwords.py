@@ -16,7 +16,7 @@ and output files.  If it is omitted, the UTF-8 encoding is used.
 If -p is given the output file consists of each word of the input
 file followed by \"->\" followed by its stemmed equivalent.
 If -p2 is given the output file is a two column layout containing
-the input words in the first column and the stemmed eqivalents in
+the input words in the first column and the stemmed equivalents in
 the second column.
 
 Otherwise, the output file consists of the stemmed words, one per
