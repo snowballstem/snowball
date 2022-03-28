@@ -238,7 +238,7 @@ enum name_types {
     t_string = 0, t_boolean = 1, t_integer = 2, t_routine = 3, t_external = 4,
     t_grouping = 5
 
-/*  If this list is extended, adjust wvn in generator.c  */
+/*  If this list is extended, adjust write_varname in generator.c  */
 };
 
 /*  In name_count[i] below, remember that
