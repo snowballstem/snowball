@@ -68,7 +68,7 @@ stringdef vs_au    '{U+0BCC}'
 /* Pulli */
 stringdef pulli    '{U+0BCD}'
 
-/* AU length markk */
+/* AU length mark */
 stringdef au_lmark '{U+0BD7}'
 
 
