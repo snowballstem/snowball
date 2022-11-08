@@ -33,6 +33,7 @@ matrix:
     - language: node_js
       node_js: "node"
       env: NODE=node
+      dist: focal # seems to be needed for working node
     - language: rust
       rust:
         - stable
