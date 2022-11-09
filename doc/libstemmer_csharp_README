@@ -43,3 +43,11 @@ There is currently no formal documentation on the use of the C# version
 of the library. Additionally, its interface is not guaranteed to be
 stable.
 
+The stemmer code is re-entrant, but not thread-safe if the same stemmer object
+is used concurrently in different threads.
+
+If you want to perform stemming concurrently in different threads, we suggest
+creating a new stemmer object for each thread.  The alternative is to share
+stemmer objects between threads and protect access using a mutex or similar
+but that's liable to slow your program down as threads can end up waiting for
+the lock.

@@ -56,14 +56,18 @@ used to stem a word, "sb_stemmer_length" returns the stemmed
 length of the last word processed, and "sb_stemmer_delete" is
 used to delete a stemmer.
 
-Creating a stemmer is a relatively expensive operation - the expected
-usage pattern is that a new stemmer is created when needed, used
-to stem many words, and deleted after some time.
+Generally you should create a stemmer object and reuse it rather than creating
+a fresh object for each word stemmed (since there's some cost to creating and
+destroying the object).
 
-Stemmers are re-entrant, but not threadsafe.  In other words, if
-you wish to access the same stemmer object from multiple threads,
-you must ensure that all access is protected by a mutex or similar
-device.
+The stemmer code is re-entrant, but not thread-safe if the same stemmer object
+is used concurrently in different threads.
+
+If you want to perform stemming concurrently in different threads, we suggest
+creating a new stemmer object for each thread.  The alternative is to share
+stemmer objects between threads and protect access using a mutex or similar
+but that's liable to slow your program down as threads can end up waiting for
+the lock.
 
 libstemmer does not currently incorporate any mechanism for caching the results
 of stemming operations.  Such caching can greatly increase the performance of a
