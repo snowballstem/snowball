@@ -25,16 +25,6 @@ stemming algorithms likely aren't the right answer.
 How to use library
 ------------------
 
-Creating a stemmer is a relatively expensive operation - the expected usage
-pattern is that a new stemmer is created when needed, used to stem many words,
-and deleted after some time.
-
-Stemmers are re-entrant, but not threadsafe.  In other words, if you wish to
-access the same stemmer object from multiple threads, you must ensure that all
-access is protected by appropriate thread locks. Or alternatively one should
-instantiate a new stemmer within each thread for multithreaded usage, this will
-avoid bottlenecks from GIL.
-
 The ``snowballstemmer`` module has two functions.
 
 The ``snowballstemmer.algorithms`` function returns a list of available
@@ -52,6 +42,19 @@ The ``snowballstemmer.stemmer`` function takes an algorithm name and returns a
 
    stemmer = snowballstemmer.stemmer('english');
    print(stemmer.stemWords("We are the world".split()));
+
+Generally you should create a stemmer object and reuse it rather than creating
+a fresh object for each word stemmed (since there's some cost to creating and
+destroying the object).
+
+The stemmer code is re-entrant, but not thread-safe if the same stemmer object
+is used concurrently in different threads.
+
+If you want to perform stemming concurrently in different threads, we suggest
+creating a new stemmer object for each thread.  The alternative is to share
+stemmer objects between threads and protect access using a mutex or similar
+(e.g. `threading.Lock` in Python) but that's liable to slow your program down
+as threads can end up waiting for the lock.
 
 Automatic Acceleration
 ----------------------
