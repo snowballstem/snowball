@@ -1152,10 +1152,11 @@ static void generate(struct generator * g, struct node * p) {
 /* consistency with snowball variable namings we allow some kind of warnings here */
 static void generate_allow_warnings(struct generator * g) {
 
-    w(g, "#![allow(non_upper_case_globals)]~N");
     w(g, "#![allow(non_snake_case)]~N");
-    w(g, "#![allow(unused_variables)]~N");
+    w(g, "#![allow(non_upper_case_globals)]~N");
     w(g, "#![allow(unused_mut)]~N");
+    w(g, "#![allow(unused_parens)]~N");
+    w(g, "#![allow(unused_variables)]~N");
 }
 
 static void generate_class_begin(struct generator * g) {
