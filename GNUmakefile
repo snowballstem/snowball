@@ -194,11 +194,11 @@ clean:
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
-	      $(ADA_SOURCES) \
+	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
-	rm -rf dist
+	rm -rf ada/obj dist
 	-rmdir $(c_src_dir)
 	-rmdir $(python_output_dir)
 	-rmdir $(js_output_dir)
