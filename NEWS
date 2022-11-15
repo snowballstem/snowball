@@ -18,7 +18,7 @@ Pascal
 ------
 
 * Fix code generated for division.  Previously real division was used and the
-  generated code would fail to compile with a "Incompatible types" error.
+  generated code would fail to compile with an "Incompatible types" error.
 
   Noted by David Corbett.
 
