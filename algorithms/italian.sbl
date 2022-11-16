@@ -1,5 +1,6 @@
 
 routines (
+           exceptions
            prelude postlude mark_regions
            RV R1 R2
            attached_pronoun
@@ -178,15 +179,21 @@ backwardmode (
     )
 )
 
+define exceptions as (
+    ['divano' atlimit ] <- 'divan' // Otherwise "divano" stems to "div" and collides with "diva"
+)
+
 define stem as (
-    do prelude
-    do mark_regions
-    backwards (
-        do attached_pronoun
-        do (standard_suffix or verb_suffix)
-        do vowel_suffix
+    exceptions or (
+        do prelude
+        do mark_regions
+        backwards (
+            do attached_pronoun
+            do (standard_suffix or verb_suffix)
+            do vowel_suffix
+        )
+        do postlude
     )
-    do postlude
 )
 
 /*
