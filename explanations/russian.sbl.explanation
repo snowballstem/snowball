@@ -1,0 +1,261 @@
+stringescapes {}
+
+/* the 33 Cyrillic letters represented in ASCII characters following the
+ * conventions of the standard Library of Congress transliteration: */
+
+stringdef a    '{U+0430}'
+stringdef b    '{U+0431}'
+stringdef v    '{U+0432}'
+stringdef g    '{U+0433}'
+stringdef d    '{U+0434}'
+stringdef e    '{U+0435}'
+stringdef e"   '{U+0451}'
+stringdef zh   '{U+0436}'
+stringdef z    '{U+0437}'
+stringdef i    '{U+0438}'
+stringdef i`   '{U+0439}'
+stringdef k    '{U+043A}'
+stringdef l    '{U+043B}'
+stringdef m    '{U+043C}'
+stringdef n    '{U+043D}'
+stringdef o    '{U+043E}'
+stringdef p    '{U+043F}'
+stringdef r    '{U+0440}'
+stringdef s    '{U+0441}'
+stringdef t    '{U+0442}'
+stringdef u    '{U+0443}'
+stringdef f    '{U+0444}'
+stringdef kh   '{U+0445}'
+stringdef ts   '{U+0446}'
+stringdef ch   '{U+0447}'
+stringdef sh   '{U+0448}'
+stringdef shch '{U+0449}'
+stringdef "    '{U+044A}'
+stringdef y    '{U+044B}'
+stringdef '    '{U+044C}'
+stringdef e`   '{U+044D}'
+stringdef iu   '{U+044E}'
+stringdef ia   '{U+044F}'
+
+routines ( mark_regions R2
+           perfective_gerund
+           adjective
+           adjectival
+           reflexive
+           verb
+           noun
+           derivational
+           tidy_up
+)
+
+externals ( stem )
+
+integers ( pV p2 )
+
+groupings ( v )
+
+define v 'аеиоуыэюя'
+
+define mark_regions as (
+
+    $pV = limit
+    $p2 = limit
+    do (
+        gopast v  setmark pV  gopast non-v
+        gopast v  gopast non-v  setmark p2
+       )
+)
+
+backwardmode (
+
+    define R2 as $p2 <= cursor
+
+    define perfective_gerund as (
+        [substring] among (
+            'в'                     // написа|в     проковыля|в
+            'вши'                   // написа|вши   заслоня|вши
+            'вшись'                 // написа|вшись обня|вшись
+                ('а' or 'я' delete) // REGEXP /(.*[ая])вшись|вши|в/
+            'ив'                    // насыт|ив
+            'ивши'                  // насыт|ивши
+            'ившись'                // насыт|ившись
+            'ыв'                    // приб|ыв
+            'ывши'                  // приб|ывши
+            'ывшись'                // приб|ывшись
+                (delete)            // REGEXP /(.*)ывшись|ывши|ыв|ившись|ивши|ив/
+        )
+    )
+
+    define adjective as (
+        [substring] among (
+            'ее' 'ие' 'ые' 'ое' 'ими' 'ыми'         // зелен|ее  висевш|ие ароматн|ые  испорчен|ое иссохш|ими атласн|ыми
+            'ей' 'ий' 'ый' 'ой' 'ем' 'им'           // зелен|ей  баран|ий  аккуратн|ый активн|ой   высохш|ем  глубок|им
+            'ым' 'ом' 'его' 'ого' 'ему'             // главн|ым  главн|ом  бегущ|его   главн|ого   бывш|ему
+            'ому' 'их' 'ых' 'ую' 'юю' 'ая'          // богат|ому больш|их  бурн|ых     бронзов|ую  верхн|юю   весел|ая
+            'яя'                                    // внешн|яя
+                  // and -
+            'ою'  // - which is somewhat archaic    // верн|ою
+            'ею'  // - soft form of ою              // верхн|ею
+                (delete)
+        )
+    )
+
+    define adjectival as (
+        adjective                                   // cut firstly adjective ending
+
+        /* of the participle forms, em, vsh, ivsh, yvsh are readily removable.
+           nn, юshch, shch, uюshch can be removed, with a small proportion of
+           errors. Removing im, uem, enn creates too many errors.
+        */
+
+        try (
+            [substring] among (
+                'ем'                    // present passive participle                 // задава|емые     изменя|ем
+                'нн'                    // adjective from past passive participle     // беспреста|нно   деревя|нными
+                'вш'                    // past active participle                     // отказа|вшись    отделя|вший
+                'ющ' 'щ'                // present active participle                  // сталкива|ющихся умоля|ющими  спеша|щих блестя|щему
+                    ('а' or 'я' delete)
+
+                // but not   'им' 'уем' // present passive participle
+                // or        'енн'      // adjective from past passive participle
+
+                'ивш' 'ывш'             // past active participle                     // брод|ивших      несб|ывшееся
+                'ующ'                   // present active participle                  // несуществ|ующий
+                    (delete)
+            )
+        )
+
+    )
+
+    define reflexive as (
+        [substring] among (
+            'ся'            // осек|ся
+            'сь'            // ввы|сь
+                (delete)
+        )
+    )
+
+    define verb as (
+        [substring] among (
+            'ла' 'на' 'ете' 'йте' 'ли' 'й'    // сдела|ла  приня|ла    воспита|на потеря|на  сдела|ете причиня|ете
+                                              // сдела|йте причиня|йте сдела|ли   причиня|ли сдела|й   причиня|й
+            'л' 'ем' 'н' 'ло' 'но' 'ет' 'ют'  // сдела|л   приня|л     воспита|ем потеря|ем  сдела|н   растеря|н
+                                              // сдела|ло  причиня|ло  сдела|но   настоя|но  сдела|ет  объясня|ет
+                                              // сдела|ют  объясня|ют
+            'ны' 'ть' 'ешь'                   // сдела|ны  потеря|ны   сдела|ть   потеря|ть  сдела|ешь потеря|ешь
+
+            'нно'                             // пута|нно постоя|нно
+                ('а' or 'я' delete)
+
+            'ила' 'ыла' 'ена' 'ейте'          // беспоко|ила прикр|ыла  выруч|ена   пожал|ейте
+            'уйте' 'ите' 'или' 'ыли' 'ей'     // пожал|уйте  позвол|ите полюб|или   приб|ыли   приникш|ей
+            'уй' 'ил' 'ыл' 'им' 'ым' 'ен'     // протест|уй  проход|ил  раскр|ыл    редк|им    решительн|ым свобод|ен
+            'ило' 'ыло' 'ено' 'ят' 'ует'      // став|ило    неун|ыло   обознач|ено обрат|ят   повеств|ует
+            'уют' 'ит' 'ыт' 'ены' 'ить'       // преслед|уют прибеж|ит  закр|ыт     зауч|ены   затуш|ить
+            'ыть' 'ишь' 'ую' 'ю'              // откр|ыть    отправ|ишь отперт|ую   отрица|ю
+                (delete)
+            /* note the short passive participle tests:
+               'на' 'н' 'но' 'ны'
+               'ена' 'ен' 'ено' 'ены'
+            */
+        )
+    )
+
+    define noun as (
+        [substring] among (
+            'а' 'ев' 'ов' 'ие' 'ье' 'е'     // вод|а       нап|ев     вопрос|ов  здрав|ие здоров|ье вопрос|е
+            'иями' 'ями' 'ами' 'еи' 'ии'    // волнен|иями вопл|ями   вопрос|ами галер|еи гармон|ии
+            'и' 'ией' 'ей' 'ой' 'ий' 'й'    // потер|и     гармон|ией галере|ей  гер|ой   ген|ий    сара|й
+            'иям' 'ям' 'ием' 'ем' 'ам' 'ом' // губерн|иям  двер|ям    биен|ием   братц|ем бумаг|ам  букет|ом
+            'о' 'у' 'ах' 'иях' 'ях' 'ы' 'ь' // брюх|о      брюх|у     бумаг|ах   здан|иях камн|ях   казн|ы камен|ь
+            'ию' 'ью' 'ю' 'ия' 'ья' 'я'     // комед|ию    кров|ью    кровл|ю    лечен|ия лист|ья   локт|я
+                (delete)
+            /* the small class of neuter forms 'ени' 'енем'
+               'ена' 'ен' 'енам' 'енами' 'ена{x}'
+               omitted - they only occur on 12 words.
+            */
+        )
+    )
+
+    define derivational as (
+        [substring] R2 among (
+            'ост'        // любезностей
+            'ость'       // любезностью
+                (delete)
+        )
+    )
+
+    define tidy_up as (
+        [substring] among (
+
+            'ейш'                                               // наиполезн|ейший    смирен|нейший
+            'ейше'  // superlative forms                        // многочислен|нейшее сильн|ейшее
+               (delete
+                ['н'] 'н' delete                                // REGEXP /(.*н)н(ейше|ейш|).*/
+               )
+            'н'                                                 // смирен|но смирн|о
+               ('н' delete) // e.g. -nno endings                // REGEXP /(.*н)н.*/
+            'ь'                                                 // совест|ь
+               (delete)  // with some slight false conflations
+        )
+    )
+)
+
+define stem as (
+
+    // Normalise ё to е.  The documentation has long suggested the user
+    // should do this before calling the stemmer - we now do it for them.
+    do repeat ( goto (['ё']) <- 'е' )                                      // угнетённый => угнетен
+
+    do mark_regions
+    backwards setlimit tomark pV for (
+        do (
+             perfective_gerund or
+             ( try reflexive
+               adjectival or verb or noun
+             )
+        )
+        try([ 'и' ] delete)                                                // академию => академ
+        // because noun ending -ию is being treated as verb ending -ю
+
+        do derivational
+        do tidy_up
+    )
+)
+
+
+
+
+
+
+/*
+Russian stemming algorithm:
+--------------------------
+
+[Step 1]
+remove(perfective_gerund)                   # всплыла ? -> No
+OR
+  remove!(reflexive)                        # всплыла ? -> No
+  remove([adjective, adjectival])           # всплыла ? -> No
+  OR
+  remove(verb)                              # вспл|ыла ? -> Yes -> вспл !!But Snowball skips it!! Why?!
+  OR
+  remove(noun)
+
+[Step 2]
+remove('и')
+
+[Step 3]
+remove(derivational)
+
+[Step 4]
+remove(tidy_up)
+
+--------------------------
+
+echo "всплыла" | ./stemwords -l ru
+=>
+всплыл
+
+Why?!
+*/
