@@ -1,0 +1,223 @@
+stringescapes {}
+
+/* the 33 Ukrainian letters and apostrophe represented by single quote */
+
+stringdef a    '{U+0430}'
+stringdef b    '{U+0431}'
+stringdef v    '{U+0432}'
+stringdef gh   '{U+0433}'
+stringdef g    '{U+0491}'
+stringdef d    '{U+0434}'
+stringdef e    '{U+0435}'
+stringdef ye   '{U+0454}'
+stringdef zh   '{U+0436}'
+stringdef z    '{U+0437}'
+stringdef y    '{U+0438}'
+stringdef i    '{U+0456}'
+stringdef yi   '{U+0457}'
+stringdef i`   '{U+0439}'
+stringdef k    '{U+043A}'
+stringdef l    '{U+043B}'
+stringdef m    '{U+043C}'
+stringdef n    '{U+043D}'
+stringdef o    '{U+043E}'
+stringdef p    '{U+043F}'
+stringdef r    '{U+0440}'
+stringdef s    '{U+0441}'
+stringdef t    '{U+0442}'
+stringdef u    '{U+0443}'
+stringdef f    '{U+0444}'
+stringdef kh   '{U+0445}'
+stringdef ts   '{U+0446}'
+stringdef ch   '{U+0447}'
+stringdef sh   '{U+0448}'
+stringdef shch '{U+0449}'
+stringdef soft '{U+044C}'
+stringdef iu   '{U+044E}'
+stringdef ia   '{U+044F}'
+stringdef apostrophe '{U+0027}'
+
+routines ( mark_regions R2
+           // perfective_gerund
+           adjective
+           adjectival
+           // reflexive
+           // verb
+           // noun
+           // derivational
+           // tidy_up
+)
+
+externals ( stem )
+
+integers ( pV p2 )
+
+groupings ( v )
+
+define v 'аеєиіїоуюя'
+
+define mark_regions as (
+
+    $pV = limit
+    $p2 = limit
+    do (
+        gopast v  setmark pV  gopast non-v
+        gopast v  gopast non-v  setmark p2
+       )
+)
+
+backwardmode (
+
+    define R2 as $p2 <= cursor
+
+    // define perfective_gerund as (
+    //     [substring] among (
+    //         // 'в'
+    //         // 'вші'
+    //         // 'вшіс{'}'
+    //         //     ('а' or 'я' delete)
+    //         // 'ів'
+    //         // 'івші'
+    //         // 'івшіс{'}'
+    //         // 'ив'
+    //         // 'ивші'
+    //         // 'ившіс{'}'
+    //         //     (delete)
+    //     )
+    // )
+
+    define adjective as (
+        [substring] among (
+            'ього'
+              (delete)
+            // 'ее' 'іе' 'ие' 'ое' 'імі' 'имі'
+            // 'ей' 'ій' 'ий' 'ой' 'ем' 'ім'
+            // 'им' 'ом' 'еґо' 'оґо' 'ему'
+            // 'ому' 'іх' 'их' 'ую' 'юю' 'ая'
+            // 'яя'
+            //             // and -
+            // 'ою'   // - which is somewhat archaic
+            // 'ею'   // - soft form of ою
+            //     (delete)
+        )
+    )
+
+    define adjectival as (
+        adjective
+
+        /* of the participle forms, em, vsh, ivsh, yvsh are readily removable.
+           nn, юshch, shch, uюshch can be removed, with a small proportion of
+           errors. Removing im, uem, enn creates too many errors.
+        */
+
+     //    try (
+     //        [substring] among (
+     //            // 'ем'                  // present passive participle
+     //            // 'нн'                  // adjective from past passive participle
+     //            // 'вш'                 // past active participle
+     //            // 'ющ' 'щ'     // present active participle
+     //            //     ('а' or 'я' delete)
+
+     // // //but not  'ім' 'уем'      // present passive participle
+     // // //or       'енн'               // adjective from past passive participle
+
+     // //            'івш' 'ивш'// past active participle
+     // //            'ующ'          // present active participle
+     // //                (delete)
+     //        )
+     //    )
+
+    )
+
+    // define reflexive as (
+    //     [substring] among (
+    //         // 'ся'
+    //         // 'с{'}'
+    //         //     (delete)
+    //     )
+    // )
+
+    // define verb as (
+    //     [substring] among (
+    //         // 'ла' 'на' 'ете' 'йте' 'лі' 'й'
+    //         // 'л' 'ем' 'н' 'ло' 'но' 'ет' 'ют'
+    //         // 'ни' 'т{'}' 'еш{'}'
+
+    //         // 'нно'
+    //         //     ('а' or 'я' delete)
+
+    //         // 'іла' 'ила' 'ена' 'ейте'
+    //         // 'уйте' 'іте' 'ілі' 'илі' 'ей'
+    //         // 'уй' 'іл' 'ил' 'ім' 'им' 'ен'
+    //         // 'іло' 'ило' 'ено' 'ят' 'ует'
+    //         // 'уют' 'іт' 'ит' 'ени' 'іт{'}'
+    //         // 'ит{'}' 'іш{'}' 'ую' 'ю'
+    //         //     (delete)
+    //         /* note the short passive participle tests:
+    //            'на' 'н' 'но' 'ни'
+    //            'ена' 'ен' 'ено' 'ени'
+    //         */
+    //     )
+    // )
+
+    // define noun as (
+    //     [substring] among (
+    //         // 'а' 'ев' 'ов' 'іе' '{'}е' 'е'
+    //         // 'іямі' 'ямі' 'амі' 'еі' 'іі'
+    //         // 'і' 'іей' 'ей' 'ой' 'ій' 'й'
+    //         // 'іям' 'ям' 'іем' 'ем' 'ам' 'ом'
+    //         // 'о' 'у' 'ах' 'іях' 'ях' 'и' '{'}'
+    //         // 'ію' '{'}ю' 'ю' 'ія' '{'}я' 'я'
+    //         //     (delete)
+    //         /* the small class of neuter forms 'ені' 'енем'
+    //            'ена' 'ен' 'енам' 'енамі' 'ена{x}'
+    //            omitted - they only occur on 12 words.
+    //         */
+    //     )
+    // )
+
+    // define derivational as (
+    //     [substring] R2 among (
+    //         // 'ост'
+    //         // 'ост{'}'
+    //         //     (delete)
+    //     )
+    // )
+
+    // define tidy_up as (
+    //     [substring] among (
+    //         // 'ейш'
+    //         // 'ейше'  // superlative forms
+    //         //    (delete
+    //         //     ['н'] 'н' delete
+    //         //    )
+    //         // 'н'
+    //         //    ('н' delete) // e.g. -nno endings
+    //         // '{'}'
+    //         //    (delete)  // with some slight false conflations
+    //     )
+    // )
+)
+
+define stem as (
+
+    // Normalise {e"} to е.  The documentation has long suggested the user
+    // should do this before calling the stemmer - we now do it for them.
+    // do repeat ( goto (['{e"}']) <- 'е' )
+
+    do mark_regions
+    backwards setlimit tomark pV for (
+        do (
+             adjectival
+             // perfective_gerund or
+             // ( try reflexive
+             //   adjectival or verb or noun
+             // )
+        )
+        // try([ 'і' ] delete)
+        // because noun ending -iю is being treated as verb ending -ю
+
+        // do derivational
+        // do tidy_up
+    )
+)

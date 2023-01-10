@@ -21,11 +21,17 @@
 
 def build_chars_map(sbl_file)
   chars_hash = {}
+  exceptions = ["'"] # apostrophe
+
   File.readlines(sbl_file).each do |line|
     char = line.match(/stringdef\s+(\S+)\s+'\{U\+(\S+)\}'/) # E.g.: stringdef zh    '{U+0436}'
     next if char.nil?
 
-    chars_hash[char[1]] = '' << char[2].to_i(16) # extracts { 'zh': '0436' } => { 'zh': 'ж' }
+    latin = char[1]
+    utf = '' << char[2].to_i(16)
+    next unless exceptions.index(utf).nil?
+
+    chars_hash[latin] = utf # extracts { 'zh': '0436' } => { 'zh': 'ж' }
   end
 
   chars_hash
