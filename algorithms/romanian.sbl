@@ -1,5 +1,6 @@
 
 routines (
+           norm
            prelude postlude mark_regions
            RV R1 R2
            step_0
@@ -23,10 +24,22 @@ stringescapes {}
 stringdef a^   '{U+00E2}'  // a circumflex
 stringdef i^   '{U+00EE}'  // i circumflex
 stringdef a+   '{U+0103}'  // a breve
-stringdef s,   '{U+015F}'  // s cedilla
-stringdef t,   '{U+0163}'  // t cedilla
+stringdef s~   '{U+015F}'  // s cedilla
+stringdef t~   '{U+0163}'  // t cedilla
+stringdef s,   '{U+0219}'  // s comma
+stringdef t,   '{U+021B}'  // t comma
 
 define v 'aeiou{a^}{i^}{a+}'
+
+// normalize s~ to s, and t~ to t,
+define norm as (
+    do repeat goto (
+        [substring] among (
+            '{s~}'    (<- '{s,}')
+            '{t~}'    (<- '{t,}')
+        )
+    )
+)
 
 define prelude as (
     repeat goto (
@@ -223,6 +236,7 @@ backwardmode (
 )
 
 define stem as (
+    do norm
     do prelude
     do mark_regions
     backwards (
