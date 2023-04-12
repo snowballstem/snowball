@@ -195,6 +195,7 @@ clean:
 	      $(JS_SOURCES) \
 	      $(RUST_SOURCES) \
 	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
+	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
