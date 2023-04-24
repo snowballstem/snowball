@@ -153,7 +153,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 /* Take a copy of the argument here, because
                  * later we will free o->name */
                 len = strlen(argv[i]);
-                new_name = malloc(len + 1);
+                new_name = MALLOC(len + 1);
                 memcpy(new_name, argv[i++], len);
                 new_name[len] = '\0';
                 o->name = new_name;
@@ -399,7 +399,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
         }
 
         {
-            char * new_name = malloc(len + 1);
+            char * new_name = MALLOC(len + 1);
             switch (o->make_lang) {
                 case LANG_CSHARP:
                 case LANG_PASCAL:
