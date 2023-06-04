@@ -38,12 +38,12 @@ stringdef ia   '{U+044F}'
 stringdef apostrophe '{U+0027}'
 
 routines ( mark_regions R2
-           // perfective_gerund
+           perfective_gerund
            adjective
            adjectival
-           // reflexive
-           // verb
-           // noun
+           reflexive
+           verb
+           noun
            // derivational
            // tidy_up
 )
@@ -70,35 +70,62 @@ backwardmode (
 
     define R2 as $p2 <= cursor
 
-    // define perfective_gerund as (
-    //     [substring] among (
-    //         // '{v}'
-    //         // '{v}{sh}{i}'
-    //         // '{v}{sh}{i}{s}{'}'
-    //         //     ('{a}' or '{ia}' delete)
-    //         // '{i}{v}'
-    //         // '{i}{v}{sh}{i}'
-    //         // '{i}{v}{sh}{i}{s}{'}'
-    //         // '{y}{v}'
-    //         // '{y}{v}{sh}{i}'
-    //         // '{y}{v}{sh}{i}{s}{'}'
-    //         //     (delete)
-    //     )
-    // )
+    define perfective_gerund as (
+       [substring] among (
+           // '{v}'
+           // '{v}{sh}{i}'
+           // '{v}{sh}{i}{s}{'}'
+           //     ('{a}' or '{ia}' delete)
+           // '{i}{v}'
+           // '{i}{v}{sh}{i}'
+           // '{i}{v}{sh}{i}{s}{'}'
+           // '{y}{v}'
+           // '{y}{v}{sh}{i}'
+           // '{y}{v}{sh}{i}{s}{'}'
+           //     (delete)
+
+          '{v}'      // {d}{o}{n}{a}{p}{y}{s}{a}|{v}    {d}{o}{r}{o}{b}{y}|{v} {d}{o}{r}{o}{b}{y}|{v}
+          '{v}{sh}{y}'    // {n}{a}{p}{y}{s}{a}|{v}{sh}{y}    {z}{r}{o}{b}{y}|{v}{sh}{y}
+          '{v}{sh}{y}{s}{soft}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{soft} {s}{p}{a}{k}{u}{v}{a}|{v}{sh}{y}{s}{soft}
+          '{v}{sh}{y}{s}{ia}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{ia} {s}{p}{o}{d}{i}{v}{a}|{v}{sh}{y}{s}{ia}
+            // ('{a}' or '{ia}' delete)
+          '{u}{ch}{y}'    // {p}{y}{sh}|{u}{ch}{y}       {r}{e}{v}|{u}{ch}{y}
+          '{iu}{ch}{y}'    // {s}{ia}|{iu}{ch}{y}        {p}{i}{d}{p}{y}{s}{u}|{iu}{ch}{y}
+          '{iu}{ch}{y}{s}{soft}'  // {z}{m}{a}{gh}{a}|{iu}{ch}{y}{s}{soft}
+          '{iu}{ch}{y}{s}{ia}'  // {n}{a}{v}{ch}{a}|{iu}{ch}{y}{s}{ia}
+          '{a}{ch}{y}'    // {b}{a}{ch}|{a}{ch}{y}
+          '{a}{ch}{y}{s}{soft}'  // {b}{a}{ch}|{a}{ch}{y}{s}{soft}
+          '{a}{ch}{y}{s}{ia}'  // {b}{a}{ch}|{a}{ch}{y}{s}{ia}
+          '{l}{ia}{ch}{y}'   // {r}{o}{b}|{l}{ia}{ch}{y}      {l}{iu}{b}|{l}{ia}{ch}{y}
+          '{l}{ia}{ch}{y}{s}{soft}' // {b}{a}{v}|{l}{ia}{ch}{y}{s}{soft}
+          '{l}{ia}{ch}{y}{s}{ia}' // {b}{a}{v}|{l}{ia}{ch}{y}{s}{ia}
+          '{ia}{ch}{y}'    // {s}{y}{d}|{ia}{ch}{y}       {v}{o}{v}{t}{u}{z}|{ia}{ch}{y}
+          '{ia}{ch}{y}{s}{soft}'  //
+          '{ia}{ch}{y}{s}{ia}'  //
+            (delete)
+       )
+    )
 
     define adjective as (
         [substring] among (
-            '{soft}{o}{gh}{o}'
-              (delete)
             // '{e}{e}' '{i}{e}' '{y}{e}' '{o}{e}' '{i}{m}{i}' '{y}{m}{i}'
-            // '{e}{i`}' '{i}{i`}' '{y}{i`}' '{o}{i`}' '{e}{m}' '{i}{m}'
-            // '{y}{m}' '{o}{m}' '{e}{g}{o}' '{o}{g}{o}' '{e}{m}{u}'
-            // '{o}{m}{u}' '{i}{kh}' '{y}{kh}' '{u}{iu}' '{iu}{iu}' '{a}{ia}'
-            // '{ia}{ia}'
-            //             // and -
-            // '{o}{iu}'   // - which is somewhat archaic
+            // '{e}{i`}' '{o}{i`}' '{e}{m}'
+            // '{o}{m}' '{e}{g}{o}' '{o}{g}{o}' '{e}{m}{u}'
+            // '{u}{iu}' '{iu}{iu}' '{a}{ia}'
             // '{e}{iu}'   // - soft form of {o}{iu}
             //     (delete)
+
+            '{y}{i`}' '{o}{gh}{o}' '{o}{m}{u}' '{y}{m}' '{i}{m}'            // {z}{e}{l}{e}{n}|{y}{i`}    {z}{e}{l}{e}{n}|{o}{gh}{o}   {z}{e}{l}{e}{n}|{o}{m}{u}   {z}{e}{l}{e}{n}|{y}{m}    {z}{e}{l}{e}{n}|{i}{m}
+            '{i}{sh}{y}{i`}' '{i}{sh}{o}{gh}{o}' '{i}{sh}{o}{m}{u}' '{i}{sh}{y}{m}' '{i}{sh}{i}{m}'  // {z}{e}{l}{e}{n}|{i}{sh}{y}{i`}  {z}{e}{l}{e}{n}|{i}{sh}{o}{gh}{o} {z}{e}{l}{e}{n}|{i}{sh}{o}{m}{u} {z}{e}{l}{e}{n}|{i}{sh}{y}{m}  {z}{e}{l}{e}{n}|{i}{sh}{i}{m}
+            '{e}' '{i}{sh}{e}'                             // {z}{e}{l}{e}{n}|{e}     {z}{e}{l}{e}{n}|{i}{sh}{e}
+            '{a}' '{o}{yi}' '{i}{i`}' '{u}' '{o}{iu}'                // {z}{e}{l}{e}{n}|{a}     {z}{e}{l}{e}{n}|{o}{yi}    {z}{e}{l}{e}{n}|{i}{i`}    {z}{e}{l}{e}{n}|{u}     {z}{e}{l}{e}{n}|{o}{iu}
+            '{i}{sh}{a}' '{i}{sh}{o}{yi}' '{i}{sh}{i}{i`}' '{i}{sh}{u}' '{i}{sh}{o}{iu}'      // {z}{e}{l}{e}{n}|{i}{sh}{a}   {z}{e}{l}{e}{n}|{i}{sh}{o}{yi}  {z}{e}{l}{e}{n}|{i}{sh}{i}{i`}  {z}{e}{l}{e}{n}|{i}{sh}{u}   {z}{e}{l}{e}{n}|{i}{sh}{o}{iu}
+            '{i}' '{y}{kh}' '{y}{m}{y}'                        // {z}{e}{l}{e}{n}|{i}     {z}{e}{l}{e}{n}|{y}{kh}    {z}{e}{l}{e}{n}|{y}{m}{y}
+            '{i}{sh}{i}' '{i}{sh}{y}{kh}' '{i}{sh}{y}{m}{y}'                  // {z}{e}{l}{e}{n}|{i}{sh}{i}   {z}{e}{l}{e}{n}|{i}{sh}{y}{kh}  {z}{e}{l}{e}{n}|{i}{sh}{y}{m}{y}
+            '{soft}{o}{gh}{o}' '{soft}{o}{m}{u}'                         // {v}{e}{r}{kh}{n}|{soft}{o}{gh}{o}  {v}{e}{r}{kh}{n}|{soft}{o}{m}{u}
+            '{ia}' '{soft}{o}{yi}' '{iu}' '{soft}{o}{iu}'                   // {v}{e}{r}{kh}{n}|{ia}     {v}{e}{r}{kh}{n}|{soft}{o}{yi}   {v}{e}{r}{kh}{n}|{iu}     {v}{e}{r}{kh}{n}|{soft}{o}{iu}
+            '{i}{kh}' '{i}{m}{y}'                            // {v}{e}{r}{kh}{n}|{i}{kh}    {v}{e}{r}{kh}{n}|{i}{m}{y}
+              (delete)
         )
     )
 
@@ -110,71 +137,134 @@ backwardmode (
            errors. Removing im, uem, enn creates too many errors.
         */
 
-     //    try (
-     //        [substring] among (
-     //            // '{e}{m}'                  // present passive participle
-     //            // '{n}{n}'                  // adjective from past passive participle
-     //            // '{v}{sh}'                 // past active participle
-     //            // '{iu}{shch}' '{shch}'     // present active participle
-     //            //     ('{a}' or '{ia}' delete)
+        try (
+            [substring] among (
+                // '{e}{m}'                  // present passive participle
+                // '{n}{n}'                  // adjective from past passive participle
+                // '{v}{sh}'                 // past active participle
+                // '{iu}{shch}' '{shch}'     // present active participle
+                //     ('{a}' or '{ia}' delete)
 
-     // // //but not  '{i}{m}' '{u}{e}{m}'      // present passive participle
-     // // //or       '{e}{n}{n}'               // adjective from past passive participle
+                // //but not  '{i}{m}' '{u}{e}{m}'      // present passive participle
+                // //or       '{e}{n}{n}'               // adjective from past passive participle
 
-     // //            '{i}{v}{sh}' '{y}{v}{sh}'// past active participle
-     // //            '{u}{iu}{shch}'          // present active participle
-     // //                (delete)
-     //        )
-     //    )
+                //            '{i}{v}{sh}' '{y}{v}{sh}'// past active participle
+                //            '{u}{iu}{shch}'          // present active participle
+                //                (delete)
+
+                '{ia}{ch}{y}{i`}' '{ia}{ch}{o}{gh}{o}' '{ia}{ch}{o}{m}{u}' '{ia}{ch}{y}{m}' '{ia}{ch}{i}{m}'    // {s}{y}{d}|{ia}{ch}{y}{i`}    {s}{y}{d}|{ia}{ch}{o}{gh}{o}     {s}{y}{d}|{ia}{ch}{o}{m}{u}     {s}{y}{d}|{ia}{ch}{y}{m}      {s}{y}{d}|{ia}{ch}{i}{m}
+                '{ia}{ch}{a}' '{ia}{ch}{e}' '{ia}{ch}{o}{yi}' '{ia}{ch}{i}{i`}' '{ia}{ch}{u}' '{ia}{ch}{o}{iu}'  // {s}{y}{d}|{ia}{ch}{a}     {s}{y}{d}|{ia}{ch}{e}       {s}{y}{d}|{ia}{ch}{o}{yi}      {s}{y}{d}|{ia}{ch}{i}{i`}      {s}{y}{d}|{ia}{ch}{u}     {s}{y}{d}|{ia}{ch}{o}{iu}
+                '{ia}{ch}{i}' '{ia}{ch}{y}{kh}' '{ia}{ch}{y}{m}{y}'                    // {s}{y}{d}|{ia}{ch}{i}     {s}{y}{d}|{ia}{ch}{y}{kh}      {s}{y}{d}|{ia}{ch}{y}{m}{y}
+                '{a}{ch}{y}{i`}' '{a}{ch}{o}{gh}{o}' '{a}{ch}{o}{m}{u}' '{a}{ch}{y}{m}' '{a}{ch}{i}{m}'    // {d}{r}{y}{zh}|{a}{ch}{y}{i`}   {d}{r}{y}{zh}|{a}{ch}{o}{gh}{o}    {d}{r}{y}{zh}|{a}{ch}{o}{m}{u}    {d}{r}{y}{zh}|{a}{ch}{y}{m}     {d}{r}{y}{zh}|{a}{ch}{i}{m}
+                '{a}{ch}{a}' '{a}{ch}{e}' '{a}{ch}{o}{yi}' '{a}{ch}{i}{i`}' '{a}{ch}{u}' '{a}{ch}{o}{iu}'  // {d}{r}{y}{zh}|{a}{ch}{a}    {d}{r}{y}{zh}|{a}{ch}{e}      {d}{r}{y}{zh}|{a}{ch}{o}{yi}     {d}{r}{y}{zh}|{a}{ch}{i}{i`}     {d}{r}{y}{zh}|{a}{ch}{u}    {d}{r}{y}{zh}|{a}{ch}{o}{iu}
+                '{a}{ch}{i}' '{a}{ch}{y}{kh}'  '{a}{ch}{y}{m}{y}'                   // {d}{r}{y}{zh}|{a}{ch}{i}    {d}{r}{y}{zh}|{a}{ch}{y}{kh}     {d}{r}{y}{zh} |{a}{ch}{y}{m}{y}
+                '{iu}{ch}{y}{i`}' '{iu}{ch}{o}{gh}{o}' '{iu}{ch}{o}{m}{u}' '{iu}{ch}{y}{m}' '{iu}{ch}{i}{m}'    // {d}{a}{l}{e}{n}{i}|{iu}{ch}{y}{i`} {d}{a}{l}{e}{n}{i}|{iu}{ch}{o}{gh}{o}  {d}{a}{l}{e}{n}{i}{iu}|{iu}{ch}{o}{m}{u} {d}{a}{l}{e}{n}{i}|{iu}{ch}{y}{m}   {d}{a}{l}{e}{n}{i}|{iu}{ch}{i}{m}
+                '{iu}{ch}{a}' '{iu}{ch}{e}' '{iu}{ch}{o}{yi}' '{iu}{ch}{i}{i`}' '{iu}{ch}{u}' '{iu}{ch}{o}{iu}'  // {d}{a}{l}{e}{n}{i}|{iu}{ch}{a}  {d}{a}{l}{e}{n}{i}|{iu}{ch}{e}    {d}{a}{l}{e}{n}{i}|{iu}{ch}{o}{yi}   {d}{a}{l}{e}{n}{i}{iu}|{iu}{ch}{i}{i`}  {d}{a}{l}{e}{n}{i}|{iu}{ch}{u}  {d}{a}{l}{e}{n}{i}|{iu}{ch}{o}{iu}
+                '{iu}{ch}{i}' '{iu}{ch}{y}{kh}' '{iu}{ch}{y}{m}{y}'                    // {d}{a}{l}{e}{n}{i}|{iu}{ch}{i}  {d}{a}{l}{e}{n}{i}|{iu}{ch}{y}{kh}   {d}{a}{l}{e}{n}{i}|{iu}{ch}{y}{m}{y}
+                '{u}{ch}{y}{i`}' '{u}{ch}{o}{gh}{o}' '{u}{ch}{o}{m}{u}' '{u}{ch}{y}{m}' '{u}{ch}{i}{m}'    // {p}{y}{sh}|{u}{ch}{y}{i`}    {d}{a}{l}{e}{n}{i}|{u}{ch}{o}{gh}{o}  {p}{y}{sh}|{u}{ch}{o}{m}{u}     {p}{y}{sh}|{u}{ch}{y}{m}      {p}{y}{sh}|{u}{ch}{i}{m}
+                '{u}{ch}{a}' '{u}{ch}{e}' '{u}{ch}{o}{yi}' '{u}{ch}{i}{i`}' '{u}{ch}{u}' '{u}{ch}{o}{iu}'  // {p}{y}{sh}|{u}{ch}{a}     {p}{y}{sh}|{u}{ch}{e}       {p}{y}{sh}|{u}{ch}{o}{yi}      {p}{y}{sh}|{u}{ch}{i}{i`}      {p}{y}{sh}|{u}{ch}{u}     {p}{y}{sh}|{u}{ch}{o}{iu}
+                '{u}{ch}{i}' '{u}{ch}{y}{kh}' '{u}{ch}{y}{m}{y}'                    // {p}{y}{sh}|{u}{ch}{i}     {p}{y}{sh}|{u}{ch}{y}{kh}      {p}{y}{sh}|{u}{ch}{y}{m}{y}
+                '{e}{n}{y}{i`}' '{e}{n}{o}{gh}{o}' '{e}{n}{o}{m}{u}' '{e}{n}{y}{m}' '{e}{n}{i}{m}'    // {v}{t}{r}{a}{ch}|{e}{n}{y}{i`}  {v}{t}{r}{a}{ch}|{e}{n}{o}{gh}{o}   {v}{t}{r}{a}{ch}|{e}{n}{o}{m}{u}   {v}{t}{r}{a}{ch}|{e}{n}{y}{m}    {v}{t}{r}{a}{ch}|{e}{n}{i}{m}
+                '{e}{n}{a}' '{e}{n}{e}' '{e}{n}{o}{yi}' '{e}{n}{i}{i`}' '{e}{n}{u}' '{e}{n}{o}{iu}'  // {v}{t}{r}{a}{ch}|{e}{n}{a}   {v}{t}{r}{a}{ch}|{e}{n}{e}     {v}{t}{r}{a}{ch}|{e}{n}{o}{yi}    {v}{t}{r}{a}{ch}|{e}{n}{i}{i`}    {v}{t}{r}{a}{ch}|{e}{n}{u}   {v}{t}{r}{a}{ch}|{e}{n}{o}{iu}
+                '{e}{n}{i}' '{e}{n}{y}{kh}' '{e}{n}{y}{m}{y}'                    // {v}{t}{r}{a}{ch}|{e}{n}{i}   {v}{t}{r}{a}{ch}|{e}{n}{y}{kh}    {v}{t}{r}{a}{ch}|{e}{n}{y}{m}{y}
+                  (delete)
+            )
+        )
 
     )
 
-    // define reflexive as (
-    //     [substring] among (
-    //         // '{s}{ia}'
-    //         // '{s}{'}'
-    //         //     (delete)
-    //     )
-    // )
+    define reflexive as (
+        [substring] among (
+            // '{s}{ia}'
+            // '{s}{'}'
+            //     (delete)
 
-    // define verb as (
-    //     [substring] among (
-    //         // '{l}{a}' '{n}{a}' '{e}{t}{e}' '{i`}{t}{e}' '{l}{i}' '{i`}'
-    //         // '{l}' '{e}{m}' '{n}' '{l}{o}' '{n}{o}' '{e}{t}' '{iu}{t}'
-    //         // '{n}{y}' '{t}{'}' '{e}{sh}{'}'
+            '{s}{ia}'     // {o}{s}{i}{k}|{s}{ia}
+            '{s}{soft}'     // {n}{e}{d}{o}{n}{a}{v}{ch}{y}|{s}{soft}
+            '{t}{y}{s}{ia}'   // {b}{y}|{t}{y}{s}{ia}
+            '{t}{y}{s}{soft}'   // {b}{o}{r}{o}|{t}{y}{s}{soft}
+            // '{t}{soft}{s}{ia}'   // {r}{o}{b}{y}|{t}{soft}{s}{ia} ???
+            '{i}{t}{soft}{s}{ia}'  // {p}{o}{d}{r}{u}{zh}|{i}{t}{soft}{s}{ia}
+            '{t}{e}{s}{ia}'   // {b}{a}{v}|{t}{e}{s}{ia}
+            '{i`}{s}{ia}'    // {v}{d}{u}{m}{a}|{i`}{s}{ia}
+            '{i`}{t}{e}{s}{ia}'  // {v}{d}{u}{m}{a}|{i`}{t}{e}{s}{ia}
+            '{v}{s}{ia}' '{l}{a}{s}{ia}' '{l}{o}{s}{ia}' '{l}{y}{s}{ia}'                    // {v}{ch}{y}|{v}{s}{ia}   {v}{ch}{y}|{l}{a}{s}{ia}  {v}{ch}{y}|{l}{o}{s}{ia}    {v}{ch}{y}|{l}{y}{s}{ia}
+            '{v}{s}{soft}' '{l}{a}{s}{soft}' '{l}{o}{s}{soft}' '{l}{y}{s}{soft}'                    // {v}{ch}{y}|{v}{s}{soft}   {v}{ch}{y}|{l}{a}{s}{soft}  {v}{ch}{y}|{l}{o}{s}{soft}    {v}{ch}{y}|{l}{y}{s}{soft}
+            '{iu}{s}{ia}' '{ye}{sh}{s}{ia}' '{ye}{t}{soft}{s}{ia}' '{ye}{m}{o}{s}{ia}' '{ye}{t}{e}{s}{ia}' '{iu}{t}{soft}{s}{ia}'  // {s}{m}{i}|{iu}{s}{ia}   {s}{m}{i}|{ye}{sh}{s}{ia}  {s}{m}{i}|{ye}{t}{soft}{s}{ia}   {s}{m}{i}|{ye}{m}{o}{s}{ia}   {s}{m}{i}|{ye}{t}{e}{s}{ia}   {s}{m}{i}|{iu}{t}{soft}{s}{ia}
+            '{u}{s}{ia}' '{e}{sh}{s}{ia}' '{e}{t}{soft}{s}{ia}' '{e}{m}{o}{s}{ia}' '{e}{t}{e}{s}{ia}' '{u}{t}{soft}{s}{ia}'  // {s}{p}{y}{sh}|{u}{s}{ia}  {s}{p}{y}{sh}|{e}{sh}{s}{ia} {s}{p}{y}{sh}|{e}{t}{soft}{s}{ia}  {s}{p}{y}{sh}|{e}{m}{o}{s}{ia}  {s}{p}{y}{sh}|{e}{t}{e}{s}{ia}  {s}{p}{y}{sh}|{u}{t}{soft}{s}{ia}
+            '{l}{iu}{s}{ia}' '{y}{sh}{s}{ia}' '{y}{t}{soft}{s}{ia}' '{y}{m}{o}{s}{ia}' '{y}{t}{e}{s}{ia}' '{l}{ia}{t}{soft}{s}{ia}'// {d}{y}{v}|{l}{iu}{s}{ia}  {d}{y}{v}|{y}{sh}{s}{ia}  {d}{y}{v}|{y}{t}{soft}{s}{ia}   {d}{y}{v}|{y}{m}{o}{s}{ia}   {d}{y}{v}|{y}{t}{e}{s}{ia}   {d}{y}{v}|{l}{ia}{t}{soft}{s}{ia}
+            '{yi}{sh}{s}{ia}' '{yi}{t}{soft}{s}{ia}' '{yi}{m}{o}{s}{ia}' '{yi}{t}{e}{s}{ia}' '{ia}{t}{soft}{s}{ia}'        // {b}{o}|{yi}{sh}{s}{ia}   {b}{o}|{yi}{t}{soft}{s}{ia}  {b}{o}|{yi}{m}{o}{s}{ia}    {b}{o}|{yi}{t}{e}{s}{ia}    {b}{o}|{ia}{t}{soft}{s}{ia}
+            '{a}{t}{soft}{s}{ia}'                                       // {b}{a}{ch}|{a}{t}{soft}{s}{ia}
+              (delete)
+        )
+    )
 
-    //         // '{n}{n}{o}'
-    //         //     ('{a}' or '{ia}' delete)
+    define verb as (
+        [substring] among (
+            // '{n}{a}' '{l}{i}'
+            // '{l}' '{e}{m}' '{n}'  '{n}{o}' '{e}{t}' '{iu}{t}'
+            // '{n}{y}' '{t}{'}' '{e}{sh}{'}'
 
-    //         // '{i}{l}{a}' '{y}{l}{a}' '{e}{n}{a}' '{e}{i`}{t}{e}'
-    //         // '{u}{i`}{t}{e}' '{i}{t}{e}' '{i}{l}{i}' '{y}{l}{i}' '{e}{i`}'
-    //         // '{u}{i`}' '{i}{l}' '{y}{l}' '{i}{m}' '{y}{m}' '{e}{n}'
-    //         // '{i}{l}{o}' '{y}{l}{o}' '{e}{n}{o}' '{ia}{t}' '{u}{e}{t}'
-    //         // '{u}{iu}{t}' '{i}{t}' '{y}{t}' '{e}{n}{y}' '{i}{t}{'}'
-    //         // '{y}{t}{'}' '{i}{sh}{'}' '{u}{iu}' '{iu}'
-    //         //     (delete)
-    //         /* note the short passive participle tests:
-    //            '{n}{a}' '{n}' '{n}{o}' '{n}{y}'
-    //            '{e}{n}{a}' '{e}{n}' '{e}{n}{o}' '{e}{n}{y}'
-    //         */
-    //     )
-    // )
+            // '{n}{n}{o}'
+            //     ('{a}' or '{ia}' delete)
 
-    // define noun as (
-    //     [substring] among (
-    //         // '{a}' '{e}{v}' '{o}{v}' '{i}{e}' '{'}{e}' '{e}'
-    //         // '{i}{ia}{m}{i}' '{ia}{m}{i}' '{a}{m}{i}' '{e}{i}' '{i}{i}'
-    //         // '{i}' '{i}{e}{i`}' '{e}{i`}' '{o}{i`}' '{i}{i`}' '{i`}'
-    //         // '{i}{ia}{m}' '{ia}{m}' '{i}{e}{m}' '{e}{m}' '{a}{m}' '{o}{m}'
-    //         // '{o}' '{u}' '{a}{kh}' '{i}{ia}{kh}' '{ia}{kh}' '{y}' '{'}'
-    //         // '{i}{iu}' '{'}{iu}' '{iu}' '{i}{ia}' '{'}{ia}' '{ia}'
-    //         //     (delete)
-    //         /* the small class of neuter forms '{e}{n}{i}' '{e}{n}{e}{m}'
-    //            '{e}{n}{a}' '{e}{n}' '{e}{n}{a}{m}' '{e}{n}{a}{m}{i}' '{e}{n}{a}{x}'
-    //            omitted - they only occur on 12 words.
-    //         */
-    //     )
-    // )
+            // '{i}{l}{a}' '{y}{l}{a}' '{e}{n}{a}' '{e}{i`}{t}{e}'
+            // '{u}{i`}{t}{e}' '{i}{t}{e}' '{i}{l}{i}' '{y}{l}{i}' '{e}{i`}'
+            // '{u}{i`}' '{i}{l}' '{y}{l}' '{i}{m}' '{y}{m}' '{e}{n}'
+            // '{i}{l}{o}' '{y}{l}{o}' '{e}{n}{o}' '{ia}{t}' '{u}{e}{t}'
+            // '{u}{iu}{t}' '{i}{t}' '{y}{t}' '{e}{n}{y}' '{i}{t}{'}'
+            // '{y}{t}{'}' '{i}{sh}{'}' '{u}{iu}'
+            //     (delete)
+            /* note the short passive participle tests:
+               '{n}{a}' '{n}' '{n}{o}' '{n}{y}'
+               '{e}{n}{a}' '{e}{n}' '{e}{n}{o}' '{e}{n}{y}'
+            */
+
+            '{t}{y}'  // {p}{r}{a}{ts}{iu}{v}{a}|{t}{y}
+            // '{t}{soft}'  // {r}{o}{b}{y}|{t}{soft} ???
+            '{i}{t}{soft}' // {r}{o}{b}|{i}{t}{soft}
+            '{t}{e}'  // {v}{i}{d}{p}{r}{a}{v}|{t}{e}
+            '{i`}'   // {ch}{y}{t}{a}|{i`}
+            '{i`}{t}{e}' // {d}{u}{m}{a}|{i`}{t}{e}
+            '{v}' '{l}{a}' '{l}{o}' '{l}{y}'                  // {ch}{y}{t}{a}|{v}  {ch}{y}{t}{a}|{l}{a} {ch}{y}{t}{a}|{l}{o}   {ch}{y}{t}{a}|{l}{y}
+            '{iu}' '{ye}{sh}' '{ye}' '{ye}{m}{o}' '{ye}{t}{e}' '{iu}{t}{soft}'      // {ch}{y}{t}{a}|{iu}  {ch}{y}{t}{a}|{ye}{sh} {ch}{y}{t}{a}|{ye}    {ch}{y}{t}{a}|{ye}{m}{o}  {ch}{y}{t}{a}|{ye}{t}{e}  {ch}{y}{t}{a}|{iu}{t}{soft}
+            '{u}' '{e}{sh}' '{e}' '{e}{m}{o}' '{e}{t}{e}' '{u}{t}{soft}'      // {p}{y}{sh}|{u}   {p}{y}{sh}|{e}{sh}  {p}{y}{sh}|{e}     {p}{y}{sh}|{e}{m}{o}   {p}{y}{sh}|{e}{t}{e}   {p}{y}{sh}|{u}{t}{soft}
+            '{l}{iu}' '{y}{sh}' '{y}{t}{soft}' '{y}{m}{o}' '{y}{t}{e}' '{l}{ia}{t}{soft}'  // {r}{o}{b}|{l}{iu}  {r}{o}{b}|{y}{sh}  {r}{o}{b}|{y}{t}{soft}   {r}{o}{b}|{y}{m}{o}   {r}{o}{b}|{y}{t}{e}   {r}{o}{b}|{l}{ia}{t}{soft}
+            '{yi}{sh}' '{yi}{t}{soft}' '{yi}{m}{o}' '{yi}{t}{e}' '{ia}{t}{soft}'        // {s}{t}{o}|{yi}{sh}  {s}{t}{o}|{yi}{t}{soft} {s}{t}{o}|{yi}{m}{o}   {s}{t}{o}|{yi}{t}{e}   {s}{t}{o}|{ia}{t}{soft}
+            '{a}{t}{soft}'                               // {b}{a}{ch}|{a}{t}{soft}
+              (delete)
+        )
+    )
+
+    define noun as (
+        [substring] among (
+            // '{a}' '{e}{v}' '{o}{v}' '{i}{e}' '{'}{e}' '{e}'
+            // '{i}{ia}{m}{i}' '{ia}{m}{i}' '{a}{m}{i}' '{e}{i}' '{i}{i}'
+            // '{i}' '{i}{e}{i`}' '{e}{i`}' '{o}{i`}' '{i}{i`}' '{i`}'
+            // '{i}{ia}{m}' '{ia}{m}' '{i}{e}{m}' '{e}{m}' '{a}{m}' '{o}{m}'
+            // '{o}' '{u}' '{a}{kh}' '{i}{ia}{kh}' '{ia}{kh}' '{y}' '{'}'
+            // '{i}{iu}' '{'}{iu}' '{iu}' '{i}{ia}' '{'}{ia}' '{ia}'
+            //     (delete)
+            /* the small class of neuter forms '{e}{n}{i}' '{e}{n}{e}{m}'
+               '{e}{n}{a}' '{e}{n}' '{e}{n}{a}{m}' '{e}{n}{a}{m}{i}' '{e}{n}{a}{x}'
+               omitted - they only occur on 12 words.
+            */
+
+            '{a}' '{y}' '{i}' '{u}' '{o}{iu}' '{o}' // {v}{o}{d}|{a}       {v}{o}{d}|{y}     {v}{o}{d}|{i}   {v}{o}{d}|{u}   {v}{o}{d}|{o}{iu}  {v}{o}{d}|{o}
+            '{a}{m}' '{a}{m}{y}' '{a}{kh}'          // {v}{o}{d}|{a}{m}      {v}{o}{d}|{a}{m}{y}   {v}{o}{d}|{a}{kh}
+            '{ia}' '{iu}' '{e}{iu}' '{e}'         // {p}{i}{s}{n}|{ia}      {p}{i}{s}{n}|{iu}    {p}{i}{s}{n}|{e}{iu} {p}{i}{s}{n}|{e}
+            '{ia}{m}' '{ia}{m}{y}' '{ia}{kh}'          // {p}{i}{s}{n}|{ia}{m}     {p}{i}{s}{n}|{ia}{m}{y}  {p}{i}{s}{n}|{ia}{kh}
+            '{o}{v}{i}' '{o}{m}'               // {b}{a}{t}{soft}{k}|{o}{v}{i}   {b}{a}{t}{soft}{k}|{o}{m}
+            '{e}{ts}{soft}' '{e}{m}'               // {o}{l}{i}{v}|{e}{ts}{soft}    {o}{l}{i}{v}{ts}|{e}{m}
+            '{e}{n}{soft}'                    // {z}{e}{l}|{e}{n}{soft}
+            '{i}{i`}'                     // {gh}{e}{n}|{i}{i`}
+            '{i`}'                      // {s}{a}{r}{a}|{i`}
+            '{o}{i`}'                     // {gh}{e}{r}|{o}{i`}
+            '{soft}'                      // {s}{o}{v}{i}{s}{t}|{soft}
+            '{i}{iu}' '{i}{yi}'                // {k}{o}{m}{e}{d}|{i}{iu}    {k}{o}{m}{e}{d}|{i}{yi}
+              (delete)
+        )
+    )
 
     // define derivational as (
     //     [substring] R2 among (
@@ -208,16 +298,47 @@ define stem as (
     do mark_regions
     backwards setlimit tomark pV for (
         do (
-             adjectival
-             // perfective_gerund or
-             // ( try reflexive
-             //   adjectival or verb or noun
-             // )
+             // TEST:
+             // reflexive
+             // verb
+             // noun
+
+             perfective_gerund or
+             ( try reflexive
+                adjectival or verb or noun
+             )
         )
-        // try([ '{i}' ] delete)
+        try([ '{i}' ] delete)
         // because noun ending -i{iu} is being treated as verb ending -{iu}
 
         // do derivational
         // do tidy_up
     )
 )
+
+
+// ToDo:
+// 1. Ґ => Г
+//     do repeat ( goto (['{g}]) <- '{gh}' )                                      // {u}{gh}{n}{e}{t}ё{n}{n}ы{i`} => {u}{gh}{n}{e}{t}{e}{n}
+// 2. В{y}{d}{a}{l}{y}{t}{y} {v}{s}{i} {t}{y}{p}{y} А{p}{o}{s}{t}{r}{o}{f}{i}{v} 'ʼ`
+
+// 3. Д{o}{d}{a}{t}{k}{o}{v}{o} {p}{e}{r}{e}{v}{i}{r}{y}{t}{y} {s}{l}{o}{v}{a}:
+// {b}{r}{a}{t}{y}
+// {b}{e}{r}{u}{t}{soft}
+
+// {d}{o}{p}{y}{s}{a}{t}{y}
+// {d}{o}{p}{y}{sh}{u}{t}{soft}
+
+// {p}{o}{s}{y}{d}{e}{n}{soft}{k}{y}
+
+// {l}{i}{k}{a}{r}
+// {l}{i}{k}{a}{r}{i}{v}
+
+// ----- {p}{r}{y}{s}{l}{i}{v}{n}{y}{k}{y}? - {k}{u}{d}{y} {p}{o}{p}{a}{d}{e}?
+// {d}{o}{b}{r}{e} - {d}{o}{b}{r}{o}
+// {ch}{a}{s}{t}{o} - {ch}{a}{s}{t}{i}{sh}{y}{i`}
+// {d}{o}{v}{gh}{o} - {d}{o}{v}{gh}{y}{i`}
+// {ch}{y}{s}{t}{o} - {ch}{y}{s}{t}{i}{sh}{y}{i`}
+
+// {r}{o}{b}{y}{t}{y}{m}{u}{t}{soft} - ?
+// {r}{o}{b}{y}{t}{y}{m}

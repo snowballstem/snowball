@@ -119,7 +119,7 @@ backwardmode (
                 // but not   'им' 'уем' // present passive participle
                 // or        'енн'      // adjective from past passive participle
 
-                'ивш' 'ывш'             // past active participle                     // брод|ивших      несб|ывшееся
+                'ивш' 'ывш'             // past active participle                     // брод|ивших      несб|ывш(ее(ся))
                 'ующ'                   // present active participle                  // несуществ|ующий
                     (delete)
             )
@@ -129,7 +129,7 @@ backwardmode (
 
     define reflexive as (
         [substring] among (
-            'ся'            // осек|ся
+            'ся'            // осек|ся несбывшее|ся
             'сь'            // ввы|сь
                 (delete)
         )
