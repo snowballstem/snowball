@@ -2,5 +2,7 @@
 
 For checking the correctness of the stemmer you can run some language test cases, for example:
 ```sh
-ruby ./tests/algorithms/russian_test.rb
+bin/utf_to_sbl ./explanations/ukrainian.sbl.utf > algorithms/ukrainian.sbl && make
+
+ruby ./tests/algorithms/ukrainian_test.rb
 ```
