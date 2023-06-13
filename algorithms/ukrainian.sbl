@@ -51,7 +51,7 @@ stringdef a_prime           '{U+2032}' // {a_prime}
 
 routines (
   prelude
-  mark_regions R1 R2
+  mark_regions R2
   perfective_gerund
   adjective
   adjectival
@@ -65,7 +65,7 @@ routines (
 
 externals ( stem )
 
-integers ( pV p1 p2 )
+integers ( pV p2 )
 
 groupings ( v )
 
@@ -89,16 +89,14 @@ define prelude as (
 
 define mark_regions as (
   $pV = limit
-  $p1 = limit
   $p2 = limit
   do (
-    gopast v  setmark pV  gopast non-v setmark p1
+    gopast v  setmark pV  gopast non-v
     gopast v  gopast non-v  setmark p2
   )
 )
 
 backwardmode (
-  define R1 as $p1 <= cursor
   define R2 as $p2 <= cursor
 
   define perfective_gerund as (
@@ -108,17 +106,17 @@ backwardmode (
       '{v}{sh}{y}{s}{soft}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{soft} {s}{p}{a}{k}{u}{v}{a}|{v}{sh}{y}{s}{soft}
       '{v}{sh}{y}{s}{ia}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{ia} {s}{p}{o}{d}{i}{v}{a}|{v}{sh}{y}{s}{ia}
                // ('{a}' or '{ia}' delete) ???
-      '{u}{ch}{y}'    // {p}{y}{sh}|{u}{ch}{y}       {r}{e}{v}|{u}{ch}{y}
-      '{iu}{ch}{y}'    // {s}{ia}|{iu}{ch}{y}        {p}{i}{d}{p}{y}{s}{u}|{iu}{ch}{y}
-      '{iu}{ch}{y}{s}{soft}'  // {z}{m}{a}{gh}{a}|{iu}{ch}{y}{s}{soft}
-      '{iu}{ch}{y}{s}{ia}'  // {n}{a}{v}{ch}{a}|{iu}{ch}{y}{s}{ia}
-      '{a}{ch}{y}'    // {b}{a}{ch}|{a}{ch}{y}
-      '{a}{ch}{y}{s}{soft}'  // {b}{a}{ch}|{a}{ch}{y}{s}{soft}
-      '{a}{ch}{y}{s}{ia}'  // {b}{a}{ch}|{a}{ch}{y}{s}{ia}
-      '{l}{ia}{ch}{y}'   // {r}{o}{b}|{l}{ia}{ch}{y}      {l}{iu}{b}|{l}{ia}{ch}{y}
-      '{l}{ia}{ch}{y}{s}{soft}' // {b}{a}{v}|{l}{ia}{ch}{y}{s}{soft}
-      '{l}{ia}{ch}{y}{s}{ia}' // {b}{a}{v}|{l}{ia}{ch}{y}{s}{ia}
-      '{ia}{ch}{y}'    // {s}{y}{d}|{ia}{ch}{y}       {v}{o}{v}{t}{u}{z}|{ia}{ch}{y}
+      '{u}{ch}{y}'
+      '{iu}{ch}{y}'
+      '{iu}{ch}{y}{s}{soft}'
+      '{iu}{ch}{y}{s}{ia}'
+      '{a}{ch}{y}'
+      '{a}{ch}{y}{s}{soft}'
+      '{a}{ch}{y}{s}{ia}'
+      '{l}{ia}{ch}{y}'
+      '{l}{ia}{ch}{y}{s}{soft}'
+      '{l}{ia}{ch}{y}{s}{ia}'
+      '{ia}{ch}{y}'
       '{ia}{ch}{y}{s}{soft}'  // ???
       '{ia}{ch}{y}{s}{ia}'  // ???
         (delete)
@@ -166,10 +164,10 @@ backwardmode (
 
   define reflexive as (
     [substring] among (
-      '{s}{ia}'    // {o}{s}{i}{k}|{s}{ia}
-      '{s}{soft}'    // {n}{e}{d}{o}{n}{a}{v}{ch}{y}|{s}{soft}
-      '{ye}{t}{soft}{s}{ia}' // {s}{m}{i}|{ye}{t}{soft}{s}{ia}
-      '{e}{t}{soft}{s}{ia}' // {s}{p}{y}{sh}|{e}{t}{soft}{s}{ia}
+      '{s}{ia}'
+      '{s}{soft}'
+      '{ye}{t}{soft}{s}{ia}'
+      '{e}{t}{soft}{s}{ia}'
         (delete)
     )
   )
@@ -208,17 +206,6 @@ backwardmode (
 
   define common_avn as (
     [substring] among (
-      // adj
-      // {z}{e}{l}{e}{n}|{a}  {z}{e}{l}{e}{n}|{e}   {z}{e}{l}{e}{n}|{i}   {z}{e}{l}{e}{n}|{u}  {v}{e}{r}{kh}{n}|{iu}  {v}{e}{r}{kh}{n}|{ia}
-
-      // verb
-      // {p}{y}{s}{a}|{v}   {p}{y}{sh}|{e}     {ch}{y}{t}{a}|{ye}    {ch}{y}{t}{a}|{i`}   {p}{y}{sh}|{u}    {ch}{y}{t}{a}|{iu}
-
-      // noun
-      // {v}{o}{d}|{a}    {p}{i}{s}{n}|{e}    {v}{o}{d}|{y}     {v}{o}{d}|{i}    {s}{a}{r}{a}|{i`}
-      // {v}{o}{d}|{o}    {v}{o}{d}|{u}     {s}{o}{v}{i}{s}{t}|{soft}  {p}{i}{s}{n}|{iu}   {p}{i}{s}{n}|{ia}
-      // {gh}{e}{n}|{i}{i`}   {v}{o}{d}|{o}{iu}
-
       '{a}' '{v}' '{e}' '{ye}' '{y}' '{i}'
       '{i`}' '{o}' '{u}' '{soft}' '{iu}' '{ia}'
       '{i}{i`}' '{o}{iu}'
@@ -228,8 +215,8 @@ backwardmode (
 
   define derivational as (
     [substring] R2 among (
-      '{i}{s}{t}'  // {b}{e}{z}{t}{u}{r}{b}{o}{t}{n}|{i}{s}{t}.{iu}
-      '{o}{s}{t}'  // {b}{e}{z}{t}{u}{r}{b}{o}{t}{n}|{o}{s}{t}.{i}
+      '{i}{s}{t}'
+      '{o}{s}{t}'
         (delete)
     )
   )
@@ -250,10 +237,6 @@ backwardmode (
 )
 
 define stem as (
-  // Normalise {e"} to {e}.  The documentation has long suggested the user
-  // should do this before calling the stemmer - we now do it for them.
-  // do repeat ( goto (['{e"}']) <- '{e}' )
-
   do prelude
   do mark_regions
 
@@ -271,5 +254,3 @@ define stem as (
     // do tidy_up
   )
 )
-
-

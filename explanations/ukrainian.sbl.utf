@@ -51,7 +51,7 @@ stringdef a_prime           '{U+2032}' // ′
 
 routines (
   prelude
-  mark_regions R1 R2
+  mark_regions R2
   perfective_gerund
   adjective
   adjectival
@@ -65,7 +65,7 @@ routines (
 
 externals ( stem )
 
-integers ( pV p1 p2 )
+integers ( pV p2 )
 
 groupings ( v )
 
@@ -89,16 +89,14 @@ define prelude as (
 
 define mark_regions as (
   $pV = limit
-  $p1 = limit
   $p2 = limit
   do (
-    gopast v  setmark pV  gopast non-v setmark p1
+    gopast v  setmark pV  gopast non-v
     gopast v  gopast non-v  setmark p2
   )
 )
 
 backwardmode (
-  define R1 as $p1 <= cursor
   define R2 as $p2 <= cursor
 
   define perfective_gerund as (
@@ -108,17 +106,17 @@ backwardmode (
       'вшись'  // оберіга|вшись спакува|вшись
       'вшися'  // оберіга|вшися сподіва|вшися
                // ('а' or 'я' delete) ???
-      'учи'    // пиш|учи       рев|учи
-      'ючи'    // ся|ючи        підпису|ючи
-      'ючись'  // змага|ючись
-      'ючися'  // навча|ючися
-      'ачи'    // бач|ачи
-      'ачись'  // бач|ачись
-      'ачися'  // бач|ачися
-      'лячи'   // роб|лячи      люб|лячи
-      'лячись' // бав|лячись
-      'лячися' // бав|лячися
-      'ячи'    // сид|ячи       вовтуз|ячи
+      'учи'
+      'ючи'
+      'ючись'
+      'ючися'
+      'ачи'
+      'ачись'
+      'ачися'
+      'лячи'
+      'лячись'
+      'лячися'
+      'ячи'
       'ячись'  // ???
       'ячися'  // ???
         (delete)
@@ -166,10 +164,10 @@ backwardmode (
 
   define reflexive as (
     [substring] among (
-      'ся'    // осік|ся
-      'сь'    // недонавчи|сь
-      'ється' // смі|ється
-      'еться' // спиш|еться
+      'ся'
+      'сь'
+      'ється'
+      'еться'
         (delete)
     )
   )
@@ -208,17 +206,6 @@ backwardmode (
 
   define common_avn as (
     [substring] among (
-      // adj
-      // зелен|а  зелен|е   зелен|і   зелен|у  верхн|ю  верхн|я
-
-      // verb
-      // писа|в   пиш|е     чита|є    чита|й   пиш|у    чита|ю
-
-      // noun
-      // вод|а    пісн|е    вод|и     вод|і    сара|й
-      // вод|о    вод|у     совіст|ь  пісн|ю   пісн|я
-      // ген|ій   вод|ою
-
       'а' 'в' 'е' 'є' 'и' 'і'
       'й' 'о' 'у' 'ь' 'ю' 'я'
       'ій' 'ою'
@@ -228,8 +215,8 @@ backwardmode (
 
   define derivational as (
     [substring] R2 among (
-      'іст'  // безтурботн|іст.ю
-      'ост'  // безтурботн|ост.і
+      'іст'
+      'ост'
         (delete)
     )
   )
@@ -250,10 +237,6 @@ backwardmode (
 )
 
 define stem as (
-  // Normalise {e"} to е.  The documentation has long suggested the user
-  // should do this before calling the stemmer - we now do it for them.
-  // do repeat ( goto (['{e"}']) <- 'е' )
-
   do prelude
   do mark_regions
 
@@ -271,5 +254,3 @@ define stem as (
     // do tidy_up
   )
 )
-
-
