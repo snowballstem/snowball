@@ -1,0 +1,246 @@
+routines (
+  R2
+  lower_case
+  un_accent
+  exception
+  mark_p1
+  mark_p2  
+  prefixes
+  suffixes
+  end_vowel
+)
+
+externals ( stem )
+integers ( p1 p2 )
+groupings ( vowel )
+
+stringescapes {}
+
+stringdef A"   '{U+00C1}'    // dlhe a
+stringdef A:   '{U+00C4}'    // siroke a
+stringdef C<   '{U+010C}'   // c s makcenom
+stringdef D<   '{U+010E}'   // d s makcenom
+stringdef E"   '{U+00C9}'    // e s dlznom
+stringdef E<   '{U+011A}'   // e s makcenom
+stringdef I"   '{U+00CD}'    // i s dlznom
+stringdef L"   '{U+0139}'   // l s dlznom
+stringdef L<   '{U+013E}'   // l s makcenom
+stringdef N<   '{U+013D}'   // n s makcenom
+stringdef O>   '{U+00D4}'    // o s vokanom
+stringdef O"   '{U+00D3}'    // o s dlznom
+stringdef R"   '{U+0154}'   // r s dlznom
+stringdef R<   '{U+0158}'   // r s makcenom
+stringdef S<   '{U+0160}'   // s s makcenom
+stringdef T<   '{U+0164}'   // t s makcenom
+stringdef U"   '{U+00DA}'    // u s dlznom
+stringdef U^   '{U+016E}'   // u s kruzkom
+stringdef Y"   '{U+00DD}'    // y s dlznom
+stringdef Z<   '{U+017D}'   // z s makcenom
+
+stringdef a"   '{U+00E1}'    // dlhe a
+stringdef a:   '{U+00E4}'    // siroke a
+stringdef c<   '{U+010D}'   // c s makcenom
+stringdef d<   '{U+010F}'   // d s makcenom
+stringdef e"   '{U+00E9}'    // e s dlznom
+stringdef e<   '{U+011B}'   // e s makcenom
+stringdef i"   '{U+00ED}'    // i s dlznom
+stringdef l"   '{U+013A}'   // l s dlznom
+stringdef l<   '{U+013E}'   // l s makcenom
+stringdef n<   '{U+0148}'   // n s makcenom
+stringdef o>   '{U+00F4}'    // o s vokanom
+stringdef o"   '{U+00F3}'    // o s dlznom
+stringdef r"   '{U+0155}'   // r s dlznom
+stringdef r<   '{U+0159}'   // r s makcenom
+stringdef s<   '{U+0161}'   // s s makcenom
+stringdef t<   '{U+0165}'   // t s makcenom
+stringdef u"   '{U+00FA}'    // u s dlznom
+stringdef u^   '{U+016F}'   // u s kruzkom
+stringdef y"   '{U+00FD}'    // y s dlznom
+stringdef z<   '{U+017E}'   // z s makcenom
+stringdef ia   'ia'        // ia
+stringdef ie   'ie'        // ie
+stringdef iu   'iu'        // iu
+
+define vowel 'aeiyou'
+
+define un_accent as repeat (
+	[substring] among (
+		'{a"}' (<-'a')
+		'{a:}' (<-'a')
+		'{c<}' (<-'c')
+		'{d<}' (<-'d')
+		'{e"}' (<-'e')
+		'{e<}' (<-'e')
+		'{i"}' (<-'i')
+		'{l"}' (<-'l')
+		'{l<}' (<-'l')
+		'{n<}' (<-'n')
+		'{o>}' (<-'o')
+		'{o"}' (<-'o')
+		'{r"}' (<-'r')
+		'{r<}' (<-'r')
+		'{s<}' (<-'s')
+		'{t<}' (<-'t')
+		'{u"}' (<-'u')
+		'{u^}' (<-'u')
+		'{y"}' (<-'y')
+		'{z<}' (<-'z')
+		'' (next)
+	)
+)
+
+define lower_case as repeat (
+	[substring] among (
+		'{A"}' (<-'{a"}')
+		'{A:}' (<-'{a:}')
+		'{C<}' (<-'{c<}')
+		'{D<}' (<-'{d<}')
+		'{E"}' (<-'{e"}')
+		'{E<}' (<-'{e<}')
+		'{I"}' (<-'{i"}')
+		'{L"}' (<-'{l"}')
+		'{L<}' (<-'{l<}')
+		'{N<}' (<-'{n<}')
+		'{O>}' (<-'{o>}')
+		'{O"}' (<-'{o"}')
+		'{R"}' (<-'{r"}')
+		'{R<}' (<-'{r<}')
+		'{S<}' (<-'{s<}')
+		'{T<}' (<-'{t<}')
+		'{U"}' (<-'{u"}')
+		'{U^}' (<-'{u^}')
+		'{Y"}' (<-'{y"}')
+		'{Z<}' (<-'{z<}')
+		'' (next)
+	)
+)
+
+define exception as (
+    [substring] atlimit among (
+        /* specialne */
+        'som' 'si' 'je'
+		'sme' 'ste' 'su'
+		'bol' 'bola' 'bolo'
+		'bud' 'budte' 'budme' 'budu'
+		'budem' 'budes' 'bude' 'budeme' 'budete'
+        (<-'byt')
+
+        'mam' 'mas' 'ma' 'mame' 'mate' 'maju'
+		'mal' 'mala' 'malo' 'mali'
+		'maj' 'majme' 'majte'
+        (<-'mat')
+
+        'idem' 'ides' 'ide' 'ideme' 'idete' 'idu'
+		'isiel' 'siel' 'isla' 'sla' 'islo' 'slo' 'isli' 'sli'
+		'chod' 'chodte' 'pod' 'podme' 'podte'
+		'pojdem' 'pojdes' 'pojde' 'pojdeme' 'pojdete' 'pojdu'		
+        'iduc' 'iduca' 'iduce' 'iduci'
+        (<-'ist')
+
+        'jem' 'jes' 'jedia' 'jeme' 'jete'
+		'jedol' 'jedla' 'jedlo' 'jedli'
+        'jedz' 'jedzte' 'jedzme'
+        (<-'jest')
+
+		'babiek' 'babicka'
+		(<- 'babk')
+
+		'dlan'
+		(<- 'dlan')
+
+		'matka' 'maticka' 'mamka' 'mamicka'
+		(<- 'mam')
+
+		'majetok'
+		(<- 'majetk')
+
+		'meste' 'miest'
+		(<- 'mest')
+
+		'sral' 'srali'
+		(<- 'ser')
+
+		'zien'
+		(<- 'zen')
+    )
+)
+
+define mark_p1 as (
+    $p1 = limit
+	gopast vowel gopast non-vowel setmark p1
+)
+
+define prefixes as (
+	do (
+		[substring] among (
+			'proti'
+			(
+				$p1 > 4 delete
+			)
+			'bez' 'cez' 'naj' 'nad' 'pod' 'pre' 'pri' 'roz'
+			(
+				$p1 > 2 delete
+			)
+			'do' 'od' 'ob' 'po' 'ne' 'vy' 'vz' 'za'
+			(
+				$p1 > 1 delete
+			)
+		)
+	)
+)
+
+backwardmode (
+
+    define R2 as $p2 <= cursor
+
+	define mark_p2 as (
+		$p2 = limit
+	)
+
+    define suffixes as (
+		do mark_p2
+        do (
+            [substring] R2 among (
+				'ejsieho' 'ejsiemu'
+				'ejsich' 'ejsimi' 'inovia' 'encoch' 'encami'
+				'ejsom' 'ejsim' 'ejsia' 'ejsie' 'ejsej' 'eniec'
+				'ejsiu' 'ejsou' 'inych' 'inymi' 'ovych' 'ovymi'
+				'inami' 'inovi' 'inoch' 'atami' 'atach' 'encom'
+				'avame' 'avate' 'avaju' 'ovala' 'ovalo' 'ovali'
+				'ujeme' 'ujete'
+				'ejsi' 'iemu' 'ieho' 'inmu' 'inho' 'inej' 'ence'
+				'inou' 'inov' 'inom' 'inym' 'ovia' 'iach' 'atom'
+				'ovho' 'ovej' 'ovou' 'ovym' 'ovmu' 'ovom' 'atam'
+				'ieme' 'iete' 'avam' 'avas' 'oval' 'ujem' 'ujes'
+				'ujme' 'ujte' 'ujuc'
+				'ovi' 'ovy' 'och' 'ami' 'ach' 'iam'	'eho' 'ete'
+				'ych' 'ich' 'ymi' 'imi' 'ini' 'ata' 'atu' 'uju'
+				'ina' 'inu' 'ino' 'ine' 'sie' 'emu' 'ati' 'uje'
+				'ime' 'ite' 'ila' 'ilo' 'ili' 'iem' 'ies'
+				'ali' 'ala' 'alo' 'ame' 'ate' 'aju' 'eme'
+				'ove' 'ovu' 'ovo' 'jte' 'jme' 'ska'
+				'ym' 'im' 'ia' 'ie' 'ej' 'iu' 'om' 'ou'
+				'ho' 'mu' 'ov' 'mi' 'am' 'in' 'at' 'is' 'il'
+				'va' 'vu' 've' 'vo' 'al' 'es' 'it' 'as' 'te'
+				'me'
+				'v' 'n' 'a' 'm' 'i'	'u' 'e'  'y'
+                (delete)
+            )
+        )
+    )
+
+    define end_vowel as (
+        [vowel] (delete)
+    )	
+)
+
+define stem as (
+  do lower_case
+  do un_accent
+  do mark_p1
+  do prefixes
+  exception or backwards (
+	  do suffixes
+	  do end_vowel
+  )
+)
