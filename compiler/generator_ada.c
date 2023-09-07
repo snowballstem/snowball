@@ -621,15 +621,13 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    write_declare(g, "   ~B0 : Integer", p);
-    w(g, "~MFor ~B0 := ");
+    w(g, "~Mfor ~B0 in reverse 1 .. ");
     generate_AE(g, p->AE);
-    writef(g, " DownTo 1 Do~N", p);
-    writef(g, "~{", p);
+    writef(g, " loop~N~+", p);
 
     generate(g, p->left);
 
-    w(g, "~}");
+    w(g, "~-~Mend loop;~N");
     str_delete(loopvar);
     g->unreachable = false;
 }
