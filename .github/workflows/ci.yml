@@ -85,10 +85,11 @@ jobs:
         - name: Windows (C)
           os: windows-latest
           c_tests: y
+        - name: Windows (Go)
+          os: windows-latest
+          GO: go
           MAKE: mingw32-make
-#    - os: windows
-#      language: go
-#      env: GO=go MAKE=mingw32-make
+          mingw64_packages: 'mingw-w64-ucrt-x86_64-go'
 
       fail-fast: false
 
@@ -123,9 +124,12 @@ jobs:
       uses: hendrikmuhs/ccache-action@v1
       with:
         key: ${{ matrix.name }}
-    - name: Install packages
+    - name: Install Ubuntu packages
       if: matrix.apt_packages
       run: sudo apt-get install -y ${{ matrix.apt_packages }}
+    - name: Install mingw64 packages
+      if: matrix.mingw64_packages
+      run: pacman -S ${{ matrix.mingw64_packages }}
     - name: Build
       run: $MAKE CC="$CC"
     - name: Test C dist
@@ -159,7 +163,7 @@ jobs:
     - name: Test Go
       if: matrix.GO
       run: |
-        go mod init snowball
+        go mod init github.com/snowballstem/snowball
         $MAKE check_go GO="${{ matrix.GO }}"
     - name: Test Pascal
       if: matrix.FPC
