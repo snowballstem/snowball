@@ -1,0 +1,177 @@
+name: CI
+
+# Use bash by default on all platforms.
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    paths-ignore:
+      - '*.rst'
+      - NEWS
+  pull_request:
+    branches: master
+    paths-ignore:
+      - '*.rst'
+      - NEWS
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+        - name: "C distribution build"
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+        - name: "C distribution build (clang)"
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+          CC: clang
+        - name: "C"
+          c_tests: y
+          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+        - name: "C (clang)"
+          c_tests: y
+          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          CC: clang
+        - name: java
+          JAVA: java
+          JAVAC: javac
+        - name: go_old
+          os: 'ubuntu-20.04'
+          # 22.04: golang-1.13 17 18 20
+          apt_packages: 'golang-1.13'
+          GO: go
+        - name: go_new
+          # 22.04: golang-1.13 17 18 20
+          apt_packages: 'golang-1.20'
+          GO: go
+        - name: javascript_node
+          NODE: node
+          apt_packages: 'nodejs'
+        - name: rust
+          RUST: rust
+          apt_packages: 'rustc'
+        - name: csharp
+          MCS: mcs
+          apt_packages: 'mono-devel'
+        - name: Pascal
+          FPC: fpc
+          apt_packages: 'fpc'
+        # The pure Python versions run slowly so we need to thin the testdata
+        # for languages such as Arabic where there's a lot, or else the build
+        # hits the travis time limit.  With pypy, it's enough faster than we
+        # can run the full tests.
+        - name: Python 3.8
+          PYTHON: python3.8
+          os: 'ubuntu-20.04'
+          apt_packages: 'python3.8'
+          THIN_FACTOR: 10
+        - name: Python 3.10
+          PYTHON: python3.10
+          os: 'ubuntu-22.04'
+          apt_packages: 'python3.10'
+          THIN_FACTOR: 10
+        - name: Python (pypy3)
+          PYTHON: pypy3
+          apt_packages: 'pypy3'
+        - name: Ada
+          gprbuild: gprbuild
+          apt_packages: 'gnat gprbuild'
+        - name: Windows (C)
+          os: windows-latest
+          c_tests: y
+          ccache: sccache
+        - name: Windows (Go)
+          os: windows-latest
+          GO: go
+          MAKE: mingw32-make
+          mingw64_packages: 'mingw-w64-ucrt-x86_64-go'
+          ccache: sccache
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+
+    env:
+      CC: ${{ matrix.CC || 'gcc' }}
+      MAKE: ${{ matrix.MAKE || 'make' }}
+      STEMMING_DATA: 'snowball-data'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Checkout data
+      run: |
+        # Try to check out a branch of the same name from the snowball-data
+        # repo sibling of this snowball repo, so that PRs requiring changes to
+        # both can be CI tested easily.
+        #
+        # If that fails, just use the standard snowball-data repo's default
+        # branch.
+        git status
+        git remote -v
+        env|sort
+        GH_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
+        GH_REPO_OWNER=${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}
+        GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
+        echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
+        git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || { echo "Trying default branch from snowball/snowball-data"; git clone --depth=1 https://github.com/snowballstem/snowball-data.git; }
+    - name: Install CCache
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: ${{ matrix.name }}
+        variant: ${{ matrix.ccache || 'ccache' }}
+    - name: Install Ubuntu packages
+      if: matrix.apt_packages
+      run: sudo apt-get install -y ${{ matrix.apt_packages }}
+    - name: Install mingw64 packages
+      if: matrix.mingw64_packages
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ucrt64
+        install: base-devel ${{ matrix.mingw64_packages }}
+    - name: Build
+      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
+    - name: Test C dist
+      if: matrix.CFLAGS_DIST_BUILD
+      run: |
+        pip install setuptools
+        $MAKE dist
+        mkdir tmp
+        cd tmp
+        tar xf ../dist/libstemmer_c-*.tar.gz
+        cd libstemmer_c-*
+        $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}"
+    - name: Test C
+      if: matrix.c_tests
+      run: $MAKE check CC="$CC"
+    - name: Test Python
+      if: matrix.PYTHON
+      run: $MAKE check_python python="${{ matrix.PYTHON }}"
+    - name: Test Java
+      if: matrix.JAVA && matrix.JAVAC
+      run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
+    - name: Test C#
+      if: matrix.MCS
+      run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
+    - name: Test Javascript
+      if: matrix.NODE
+      run: $MAKE check_js NODE="${{ matrix.NODE }}"
+    - name: Test Rust
+      if: matrix.RUST
+      run: $MAKE check_rust RUST="${{ matrix.RUST }}"
+    - name: Test Go
+      if: matrix.GO
+      run: |
+        go mod init github.com/snowballstem/snowball
+        $MAKE check_go GO="${{ matrix.GO }}"
+    - name: Test Pascal
+      if: matrix.FPC
+      run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
+    - name: Test Ada
+      if: matrix.gprbuild
+      run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
