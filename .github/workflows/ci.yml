@@ -19,8 +19,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-##env:
-
 jobs:
   build:
     strategy:
@@ -85,11 +83,13 @@ jobs:
         - name: Windows (C)
           os: windows-latest
           c_tests: y
+          ccache: sccache
         - name: Windows (Go)
           os: windows-latest
           GO: go
           MAKE: mingw32-make
           mingw64_packages: 'mingw-w64-ucrt-x86_64-go'
+          ccache: sccache
 
       fail-fast: false
 
@@ -124,14 +124,18 @@ jobs:
       uses: hendrikmuhs/ccache-action@v1
       with:
         key: ${{ matrix.name }}
+        variant: ${{ matrix.ccache || 'ccache' }}
     - name: Install Ubuntu packages
       if: matrix.apt_packages
       run: sudo apt-get install -y ${{ matrix.apt_packages }}
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
-      run: pacman -S ${{ matrix.mingw64_packages }}
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ucrt64
+        install: base-devel ${{ matrix.mingw64_packages }}
     - name: Build
-      run: $MAKE CC="$CC"
+      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
