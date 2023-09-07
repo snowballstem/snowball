@@ -68,12 +68,12 @@ jobs:
         # can run the full tests.
         - name: Python 3.8
           PYTHON: python3.8
-          os: 'ubuntu-20.02'
+          os: 'ubuntu-20.04'
           apt_packages: 'python3.8'
           THIN_FACTOR: 10
         - name: Python 3.10
           PYTHON: python3.10
-          os: 'ubuntu-22.02'
+          os: 'ubuntu-22.04'
           apt_packages: 'python3.10'
           THIN_FACTOR: 10
         - name: Python (pypy3)
@@ -159,7 +159,7 @@ jobs:
     - name: Test Go
       if: matrix.GO
       run: |
-        export GO111MODULE=auto
+        go mod init snowball
         $MAKE check_go GO="${{ matrix.GO }}"
     - name: Test Pascal
       if: matrix.FPC
