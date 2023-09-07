@@ -1,5 +1,10 @@
 name: CI
 
+# Use bash by default on all platforms.
+defaults:
+  run:
+    shell: bash
+
 on:
   push:
     paths-ignore:
@@ -57,23 +62,23 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
-#    # The pure Python versions run slowly so we need to thin the testdata
-#    # for languages such as Arabic where there's a lot, or else the build
-#    # hits the travis time limit.  With pypy, it's enough faster than we
-#    # can run the full tests.
-#    - language: python
-#      python: "3.9"
-#      env: PYTHON=python THIN_FACTOR=10
-#    - language: python
-#      python: "3.7"
-#      env: PYTHON=python THIN_FACTOR=10
-#    - language: python
-#      python: "3.6"
-#      env: PYTHON=python THIN_FACTOR=10
-#    - language: python
-#      python: "pypy3.7-7.3.5"
-#      env: PYTHON=python
-#      dist: bionic
+        # The pure Python versions run slowly so we need to thin the testdata
+        # for languages such as Arabic where there's a lot, or else the build
+        # hits the travis time limit.  With pypy, it's enough faster than we
+        # can run the full tests.
+        - name: Python 3.8
+          PYTHON: python3.8
+          os: 'ubuntu-20.02'
+          apt_packages: 'python3.8'
+          THIN_FACTOR: 10
+        - name: Python 3.10
+          PYTHON: python3.10
+          os: 'ubuntu-22.02'
+          apt_packages: 'python3.10'
+          THIN_FACTOR: 10
+        - name: Python (pypy3)
+          PYTHON: pypy3
+          apt_packages: 'pypy3'
         - name: Ada
           gprbuild: gprbuild
           apt_packages: 'gnat gprbuild'
@@ -89,7 +94,10 @@ jobs:
 
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
 
-    #env:
+    env:
+      CC: ${{ matrix.CC || 'gcc' }}
+      MAKE: ${{ matrix.MAKE || 'make' }}
+      STEMMING_DATA: 'snowball-data'
 
     steps:
     - name: Checkout
@@ -119,18 +127,43 @@ jobs:
       if: matrix.apt_packages
       run: sudo apt-get install -y ${{ matrix.apt_packages }}
     - name: Build
+      run: $MAKE CC="$CC"
+    - name: Test C dist
+      if: matrix.CFLAGS_DIST_BUILD
       run: |
-        export CC=${{ matrix.CC || 'gcc' }}
-        export MAKE=${{ matrix.MAKE || 'make' }}
-        export STEMMING_DATA=snowball-data
-        $MAKE CC="$CC"
-        test -z "${{ matrix.CFLAGS_DIST_BUILD }}" || { pip install setuptools && $MAKE dist && mkdir tmp && cd tmp && tar xf ../dist/libstemmer_c-*.tar.gz && cd libstemmer_c-* && $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}" ; }
-        test -z "${{ matrix.c_tests }}" || $MAKE check CC="$CC"
-        test -z "${{ matrix.PYTHON }}" || $MAKE check_python python="${{ matrix.PYTHON }}"
-        test -z "${{ matrix.JAVA }}" -o -z "${{ matrix.JAVAC }}" || $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
-        test -z "${{ matrix.MCS }}" || $MAKE check_csharp MCS="${{ matrix.MCS }}"
-        test -z "${{ matrix.NODE }}" || $MAKE check_js NODE="${{ matrix.NODE }}"
-        test -z "${{ matrix.RUST }}" || $MAKE check_rust RUST="${{ matrix.RUST }}"
-        test -z "${{ matrix.GO }}" || $MAKE check_go GO="${{ matrix.GO }}"
-        test -z "${{ matrix.FPC }}" || $MAKE check_pascal FPC="${{ matrix.FPC }}"
-        test -z "${{ matrix.gprbuild }}" || $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
+        pip install setuptools
+        $MAKE dist
+        mkdir tmp
+        cd tmp
+        tar xf ../dist/libstemmer_c-*.tar.gz
+        cd libstemmer_c-*
+        $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}"
+    - name: Test C
+      if: matrix.c_tests
+      run: $MAKE check CC="$CC"
+    - name: Test Python
+      if: matrix.PYTHON
+      run: $MAKE check_python python="${{ matrix.PYTHON }}"
+    - name: Test Java
+      if: matrix.JAVA && matrix.JAVAC
+      run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
+    - name: Test C#
+      if: matrix.MCS
+      run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
+    - name: Test Javascript
+      if: matrix.NODE
+      run: $MAKE check_js NODE="${{ matrix.NODE }}"
+    - name: Test Rust
+      if: matrix.RUST
+      run: $MAKE check_rust RUST="${{ matrix.RUST }}"
+    - name: Test Go
+      if: matrix.GO
+      run: |
+        export GO111MODULE=auto
+        $MAKE check_go GO="${{ matrix.GO }}"
+    - name: Test Pascal
+      if: matrix.FPC
+      run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
+    - name: Test Ada
+      if: matrix.gprbuild
+      run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
