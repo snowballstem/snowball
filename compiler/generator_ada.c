@@ -533,16 +533,15 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->S[1] = complement ? "In" : "Out";
-    g->S[2] = g->options->encoding == ENC_UTF8 ? "" : "";
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
     if (is_goto) {
-        writef(g, "~M~S1_Grouping~S0~S2 (Z, ~V0, ~I0, ~I1, True, C);", p);
+        writef(g, "~M~S1_Grouping~S0 (Z, ~V0, ~I0, ~I1, True, C);", p);
         write_failure_if(g, "C < 0", p);
     } else {
         writef(g, "~C"
-              "~M~S1_Grouping~S0~S2 (Z, ~V0, ~I0, ~I1, True, C);~N", p);
+              "~M~S1_Grouping~S0 (Z, ~V0, ~I0, ~I1, True, C);~N", p);
         write_failure_if(g, "C < 0", p);
         
         if (p->mode == m_forward)
@@ -721,20 +720,9 @@ static void generate_atmark(struct generator * g, struct node * p) {
 
 static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    if (g->options->encoding == ENC_UTF8) {
-        w(g, "~MC := Skip_Utf8~S0 (Z, ");
-        generate_AE(g, p->AE); writef(g, ");~C~N", p);
-        write_failure_if(g, "C < 0", p);
-    } else {
-        w(g, "~MC := Z.C ~S0 ");
-        generate_AE(g, p->AE);
-        writef(g, ";~C~N", p);
-        if (p->mode == m_forward) {
-            write_failure_if(g, "C > Z.L or C < Z.C", p);
-        } else {
-            write_failure_if(g, "C < Z.Lb or C > Z.C", p);
-        }
-    }
+    w(g, "~MC := Skip_Utf8~S0 (Z, ");
+    generate_AE(g, p->AE); writef(g, ");~C~N", p);
+    write_failure_if(g, "C < 0", p);
     writef(g, "~MZ.C := C;~N", p);
 }
 
@@ -1020,11 +1008,10 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->S[1] = complement ? "Out_" : "In_";
-    g->S[2] = g->options->encoding == ENC_UTF8 ? "" : "";
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    writef(g, "~M~S1Grouping~S0~S2 (Z, ~V0, ~I0, ~I1, False, C);~N", p);
+    writef(g, "~M~S1Grouping~S0 (Z, ~V0, ~I0, ~I1, False, C);~N", p);
     write_failure_if(g, "C /= 0", p);
 }
 
