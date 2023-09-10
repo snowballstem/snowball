@@ -1053,6 +1053,14 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
+        /* We dispatch the integer result in `among_var` with an if-chain,
+         * which is O(n) unless Python has a special optimisation (and
+         * profiling with the `timeit` module suggests it doesn't).  There
+         * doesn't appear to be a good alternative in Python (3.10 added
+         * `match` but that seems to be aimed more at pattern matching rather
+         * than O(1) dispatch of an integer and it was actually slower when we
+         * tried generating it here).
+         */
         int i;
         for (i = 1; i <= x->command_count; i++) {
             if (i == x->command_count && x->nocommand_count == 0) {
