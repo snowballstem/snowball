@@ -512,11 +512,10 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
-    g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
     g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.go_~S1_grouping~S0~S2(~n.~W0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.go_~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
             w(g, "~Mself.cursor += 1~N");
