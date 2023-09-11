@@ -686,7 +686,7 @@ check_js_%: $(STEMMING_DATA)/%
 check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python"
+	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for Python (THIN_FACTOR=$(THIN_FACTOR))"
 	@cd python_check && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) > tmp.in; \
 	  $(python) stemwords.py -c utf8 -l `echo $<|sed 's!.*/!!'` -i tmp.in -o $(PWD)/tmp.txt; \

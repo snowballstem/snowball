@@ -152,7 +152,7 @@ jobs:
       run: $MAKE check CC="$CC"
     - name: Test Python
       if: matrix.PYTHON
-      run: $MAKE check_python python="${{ matrix.PYTHON }}"
+      run: $MAKE check_python python="${{ matrix.PYTHON }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
     - name: Test Java
       if: matrix.JAVA && matrix.JAVAC
       run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
