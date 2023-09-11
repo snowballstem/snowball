@@ -932,15 +932,28 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
     w(g, ";~N");
 }
 
-static void generate_integer_test(struct generator * g, struct node * p, char * s) {
+static void generate_integer_test(struct generator * g, struct node * p) {
 
-    w(g, "~MIf Not (");
+    const char * s;
+    // We want the inverse of the snowball test here.
+    switch (p->type) {
+        case c_eq: s = "<>"; break;
+        case c_ne: s = "="; break;
+        case c_gr: s = "<="; break;
+        case c_ge: s = "<"; break;
+        case c_ls: s = ">="; break;
+        case c_le: s = ">"; break;
+        default:
+            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
+            exit(1);
+    }
+    w(g, "~MIf ");
     generate_AE(g, p->left);
     write_char(g, ' ');
     write_string(g, s);
     write_char(g, ' ');
     generate_AE(g, p->AE);
-    w(g, ") Then~N");
+    w(g, " Then~N");
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -1159,12 +1172,14 @@ static void generate(struct generator * g, struct node * p) {
         case c_minusassign:   generate_integer_assign(g, p, "-"); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*"); break;
         case c_divideassign:  generate_integer_assign(g, p, "div"); break;
-        case c_eq:            generate_integer_test(g, p, "="); break;
-        case c_ne:            generate_integer_test(g, p, "<>"); break;
-        case c_gr:            generate_integer_test(g, p, ">"); break;
-        case c_ge:            generate_integer_test(g, p, ">="); break;
-        case c_ls:            generate_integer_test(g, p, "<"); break;
-        case c_le:            generate_integer_test(g, p, "<="); break;
+        case c_eq:
+        case c_ne:
+        case c_gr:
+        case c_ge:
+        case c_ls:
+        case c_le:
+            generate_integer_test(g, p);
+            break;
         case c_call:          generate_call(g, p); break;
         case c_grouping:      generate_grouping(g, p, false); break;
         case c_non:           generate_grouping(g, p, true); break;
