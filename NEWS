@@ -229,7 +229,7 @@ Code generation improvements
   + Don't generate anything for an unused `grouping`.
 
   + Stop warning "grouping X defined but not used" for a `grouping` which is
-    only used to define other another `grouping`.
+    only used to define another `grouping`.
 
 * C/C++:
 
