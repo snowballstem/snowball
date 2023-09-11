@@ -60,20 +60,21 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
-        # The pure Python versions run slowly so we need to thin the testdata
-        # for languages such as Arabic where there's a lot, or else the build
-        # hits the travis time limit.  With pypy, it's enough faster than we
-        # can run the full tests.
         - name: Python 3.8
           PYTHON: python3.8
           os: 'ubuntu-20.04'
           apt_packages: 'python3.8'
-          THIN_FACTOR: 10
+          # The pure Python versions run slowly - when we used travis for CI
+          # we used to need to thin the testdata for languages such as Arabic
+          # where there's a lot to avoid the build exceeding the maximum time
+          # allowed for a CI job.  GHA allows jobs to take up to 6 hours so
+          # we should no longer need to do this.
+          #THIN_FACTOR: 10
         - name: Python 3.10
           PYTHON: python3.10
           os: 'ubuntu-22.04'
           apt_packages: 'python3.10'
-          THIN_FACTOR: 10
+          #THIN_FACTOR: 10
         - name: Python (pypy3)
           PYTHON: pypy3
           apt_packages: 'pypy3'
