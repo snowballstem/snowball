@@ -69,12 +69,12 @@ jobs:
           # where there's a lot to avoid the build exceeding the maximum time
           # allowed for a CI job.  GHA allows jobs to take up to 6 hours so
           # we should no longer need to do this.
-          #THIN_FACTOR: 10
+          THIN_FACTOR: 1
         - name: Python 3.10
           PYTHON: python3.10
           os: 'ubuntu-22.04'
           apt_packages: 'python3.10'
-          #THIN_FACTOR: 10
+          THIN_FACTOR: 1
         - name: Python (pypy3)
           PYTHON: pypy3
           apt_packages: 'pypy3'
