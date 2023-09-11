@@ -1046,16 +1046,16 @@ static void generate_among(struct generator * g, struct node * p) {
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
         int i;
-        w(g, "~M");
+        w(g, "~Mmatch among_var {~N~+");
         for (i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
-            if (i > 1) w(g, " else ");
-            w(g, "if among_var == ~I0 {~N~+");
+            w(g, "~M~I0 => {~N~+");
             generate(g, x->commands[i - 1]);
-            w(g, "~-~M}");
+            w(g, "~-~M}~N");
             g->unreachable = false;
         }
-        w(g, "~N");
+        w(g, "~M_ => ()~N");
+        w(g, "~-~M}~N");
     }
 }
 
