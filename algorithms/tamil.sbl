@@ -158,30 +158,24 @@ define fix_ending as (
 )
 
 define remove_pronoun_prefixes as (
- unset found_a_match
  [ among('{a}' '{i}' '{u}') among('{ka}' '{ca}' '{tha}' '{va}' '{na}' '{pa}' '{ma}' '{ya}' '{nga}' '{nya}') '{pulli}' ] delete
- (set found_a_match)
  do fix_va_start
 )
 
 define remove_plural_suffix as (
- unset found_a_match
  backwards (
   ( [ '{vs_u}{nga}{pulli}{ka}{lla}{pulli}' (test not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}')) ] <- '{pulli}' ) or
   ( [ '{rra}{pulli}{ka}{lla}{pulli}' ] <- '{la}{pulli}' ) or
   ( [ '{tta}{pulli}{ka}{lla}{pulli}' ] <- '{lla}{pulli}' ) or
   ( [ '{ka}{lla}{pulli}' ] delete )
-  (set found_a_match)
  )
 )
 
 define remove_question_suffixes as (
  has_min_length
- unset found_a_match
  backwards (
   do (
    [ among('{vs_oo}' '{vs_ee}' '{vs_aa}') ] <- '{pulli}'
-   (set found_a_match)
   )
  )
  do fix_endings
@@ -189,18 +183,14 @@ define remove_question_suffixes as (
 
 define remove_command_suffixes as (
  has_min_length
- unset found_a_match
  backwards (
   [ among('{pa}{vs_i}' '{va}{vs_i}') ] delete
-  (set found_a_match)
  )
 )
 
 define remove_um as (
- unset found_a_match
  has_min_length
  backwards ( [ '{vs_u}{ma}{pulli}' ] <- '{pulli}'
-    (set found_a_match)
     )
  do fix_ending
 )
@@ -209,7 +199,6 @@ define remove_common_word_endings as (
  // These are not suffixes actually but are
  // some words that are attached to other words
  // but can be removed for stemming
- unset found_a_match
  has_min_length
  backwards (
   test ( [ '{vs_u}{tta}{nnna}{pulli}' or
@@ -226,7 +215,6 @@ define remove_common_word_endings as (
      ('{la}{pulli}{la}' test (not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
      '{vs_e}{nnna}' or
      '{vs_aa}{ka}{vs_i}' ] <- '{pulli}'
-     (set found_a_match)
      )
   or
   test ( [ among('{pa}{tta}{vs_u}'
@@ -243,14 +231,12 @@ define remove_common_word_endings as (
      '{ta}{vs_aa}{nnna}'
      '{vs_e}{la}{pulli}{la}{vs_aa}{ma}{pulli}')
     ] delete
-    (set found_a_match)
     )
  )
  do fix_endings
 )
 
 define remove_vetrumai_urupukal as (
- unset found_a_match
  unset found_vetrumai_urupu
  has_min_length
  backwards (
@@ -294,7 +280,6 @@ define remove_vetrumai_urupukal as (
    or
    test ([ '{vs_ii}' ] <- '{vs_i}')
   )
-  (set found_a_match)
   (set found_vetrumai_urupu)
   do ( [ '{vs_i}{nnna}{pulli}' ] <- '{pulli}' )
  )
