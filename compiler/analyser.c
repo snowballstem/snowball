@@ -942,7 +942,8 @@ static struct node * read_C(struct analyser * a) {
             return C_style(a, "A", token);
         case c_hop: {
             struct node * n = C_style(a, "A", token);
-            if (n->AE->type == c_number) {
+            // n->AE is NULL after a syntax error, e.g. `hop hop`.
+            if (n->AE && n->AE->type == c_number) {
                 if (n->AE->number < 0) {
                     fprintf(stderr,
                             "%s:%d: warning: hop %d now signals f (as was "
