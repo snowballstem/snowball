@@ -135,7 +135,7 @@ define fix_ending as (
   or
   ( [ '{tta}{pulli}{tta}{pulli}' ] <- '{tta}{vs_u}' )
   or
-  ( found_vetrumai_urupu [ '{ta}{pulli}{ta}{pulli}' (test not '{vs_ai}') ] <- '{ma}{pulli}' ] )
+  ( found_vetrumai_urupu [ '{ta}{pulli}{ta}{pulli}' ] not '{vs_ai}' <- '{ma}{pulli}' )
   or
   ( [ '{vs_u}{ka}{pulli}' or '{vs_u}{ka}{pulli}{ka}{pulli}' ] <- '{pulli}' )
   or
@@ -149,13 +149,13 @@ define fix_ending as (
   or
   ( [ among('{va}' '{ya}' '{va}{pulli}') ] delete )
   or
-  ( [ '{nnna}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) ] delete )
+  ( [ '{nnna}{vs_u}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}') ] delete )
   or
-  ( [ '{nga}{pulli}' (test not '{vs_ai}')] <- '{ma}{pulli}' )
+  ( [ '{nga}{pulli}' not '{vs_ai}' ] <- '{ma}{pulli}' )
   or
   ( [ '{nga}{pulli}' ] delete )
   or
-  ( [ '{pulli}' (test (among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}') or '{pulli}')) ] delete )
+  ( [ '{pulli}' test (among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}') or '{pulli}') ] delete )
   )
 )
 
@@ -166,7 +166,7 @@ define remove_pronoun_prefixes as (
 
 define remove_plural_suffix as (
  backwards (
-  ( [ '{vs_u}{nga}{pulli}{ka}{lla}{pulli}' (test not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}')) ] <- '{pulli}' ) or
+  ( [ '{vs_u}{nga}{pulli}{ka}{lla}{pulli}' not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') ] <- '{pulli}' ) or
   ( [ '{rra}{pulli}{ka}{lla}{pulli}' ] <- '{la}{pulli}' ) or
   ( [ '{tta}{pulli}{ka}{lla}{pulli}' ] <- '{lla}{pulli}' ) or
   ( [ '{ka}{lla}{pulli}' ] delete )
@@ -214,7 +214,7 @@ define remove_common_word_endings as (
      '{vs_u}{tta}{vs_ai}{ya}' or
      '{vs_u}{tta}{vs_ai}' or
      '{vs_e}{nnna}{vs_u}{ma}{pulli}' or
-     ('{la}{pulli}{la}' test (not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+     ('{la}{pulli}{la}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) or
      '{vs_e}{nnna}' or
      '{vs_aa}{ka}{vs_i}' ] <- '{pulli}'
      )
@@ -246,7 +246,7 @@ define remove_vetrumai_urupukal as (
     test ( ['{nnna}{vs_ai}'] delete )
    or
     test ([ ( '{vs_i}{nnna}{vs_ai}' or
-     '{vs_ai}' (test not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}'))) or
+     '{vs_ai}' (not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}'))) or
       ( '{vs_ai}' (test (among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') '{pulli}')))
     ] <- '{pulli}'
     )
@@ -256,7 +256,7 @@ define remove_vetrumai_urupukal as (
             '{vs_oo}{tta}{vs_u}' or
             '{vs_i}{la}{pulli}' or
             '{vs_i}{rra}{pulli}' or
-            ('{vs_i}{nnna}{pulli}' (test not '{ma}')) or
+            ('{vs_i}{nnna}{pulli}' not '{ma}') or
             '{vs_i}{nnna}{pulli}{rra}{vs_u}' or
             '{vs_i}{ra}{vs_u}{na}{pulli}{ta}{vs_u}' or
             '{va}{vs_i}{tta}' or
@@ -264,7 +264,7 @@ define remove_vetrumai_urupukal as (
             '{vs_aa}{la}{pulli}' or
             '{vs_u}{tta}{vs_ai}' or
             '{vs_aa}{ma}{la}{pulli}' or
-            ('{la}{pulli}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+            ('{la}{pulli}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) or
             '{vs_u}{lla}{pulli}'
            ] <- '{pulli}'
      )
@@ -276,7 +276,7 @@ define remove_vetrumai_urupukal as (
            '{ma}{vs_ee}{rra}{pulli}' or
            '{ka}{vs_ii}{llla}{pulli}' or
            '{pa}{vs_i}{nnna}{pulli}' or
-           ('{ta}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')))
+           ('{ta}{vs_u}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))
           ] delete
       )
    or
@@ -312,7 +312,7 @@ define remove_tense_suffix as (
             '{nnna}{vs_aa}{nnna}{pulli}' or
             '{nnna}{vs_aa}{lla}{pulli}' or
             '{nnna}{vs_aa}{ra}{pulli}' or
-            ('{va}{nnna}{pulli}' test (not among('{a}' '{aa}' '{i}' '{ii}' '{u}' '{uu}' '{e}' '{ee}' '{ai}' '{o}' '{oo}' '{au}')) ) or
+            ('{va}{nnna}{pulli}' not among('{a}' '{aa}' '{i}' '{ii}' '{u}' '{uu}' '{e}' '{ee}' '{ai}' '{o}' '{oo}' '{au}') ) or
             '{nnna}{lla}{pulli}' or
             '{va}{lla}{pulli}' or
             '{nnna}{ra}{pulli}' or
@@ -321,7 +321,7 @@ define remove_tense_suffix as (
             '{pa}{nnna}{pulli}' or
             '{pa}{lla}{pulli}' or
             '{pa}{ra}{pulli}' or
-            ('{ta}{vs_u}' (test not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}'))) or
+            ('{ta}{vs_u}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) or
             '{vs_i}{rra}{pulli}{rra}{vs_u}' or
             '{pa}{ma}{pulli}' or
             '{nnna}{ma}{pulli}' or
@@ -336,7 +336,7 @@ define remove_tense_suffix as (
        )
    or
    test ( [
-           ('{vs_aa}{nnna}{pulli}' test (not '{ca}')) or
+           ('{vs_aa}{nnna}{pulli}' not '{ca}') or
            '{vs_aa}{lla}{pulli}' or
            '{vs_aa}{ra}{pulli}' or
            '{vs_ee}{nnna}{pulli}' or
@@ -358,7 +358,7 @@ define remove_tense_suffix as (
       (set found_a_match)
       )
    or
-   test ( ([ '{ka}{vs_u}' or '{ta}{vs_u}' ) (test '{pulli}') ] delete
+   test ( [ '{ka}{vs_u}' or '{ta}{vs_u}' test '{pulli}' ] delete
       (set found_a_match)
       )
   )
