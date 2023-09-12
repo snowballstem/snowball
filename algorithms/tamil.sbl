@@ -141,8 +141,6 @@ define fix_ending as (
   or
   ( [ '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') ] delete )
   or
-  ( [ '{vs_u}{ka}{pulli}' ] <- '{pulli}' )
-  or
   ( [ '{pulli}' among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') ] delete )
   or
   ( [ '{pulli}' (among('{ya}' '{ra}' '{la}' '{va}' '{zha}' '{lla}') or among('{nga}' '{nya}' '{nna}' '{na}' '{ma}' '{nnna}')) '{pulli}' ] <- '{pulli}' )
