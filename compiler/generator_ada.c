@@ -234,6 +234,37 @@ static void writef(struct generator * g, const char * input, struct node * p) {
     }
 }
 
+static int need_c_var(struct node *p) {
+    while (p) {
+        switch (p->type) {
+            case c_attach:
+            case c_gopast:
+            case c_goto:
+            case c_grouping:
+            case c_hop:
+            case c_literalstring:
+            case c_next:
+            case c_non:
+                return 1;
+            case c_assign:
+                // Only uses variable C in forward mode.
+                if (p->mode == m_forward) return 1;
+                break;
+            case c_name:
+                if (p->name->type == t_string) return 1;
+                break;
+        }
+        if (p->left && need_c_var(p->left)) {
+            return 1;
+        }
+        if (p->aux && need_c_var(p->aux)) {
+            return 1;
+        }
+        p = p->right;
+    }
+    return 0;
+}
+
 static void w(struct generator * g, const char * s) {
     writef(g, s, 0);
 }
@@ -1087,7 +1118,9 @@ static void generate_define(struct generator * g, struct node * p) {
         default:
             generate(g, p->left);
             if (!g->unreachable) w(g, "~N~MResult := True;~N");
-            str_append_string(saved_output, "      C : Result_Index;\n");
+            if (need_c_var(p->left)) {
+                str_append_string(saved_output, "      C : Result_Index;\n");
+            }
             if (need_among_var(p->left)) {
                 str_append_string(saved_output, "      A : Integer;\n");
             }
