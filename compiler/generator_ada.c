@@ -241,13 +241,16 @@ static void w(struct generator * g, const char * s) {
 static int need_among_var(struct node *p) {
 
     while (p) {
-        if (p->type == c_substring || p->type == c_among) {
+        if (p->type == c_among) {
             return 1;
         }
-        if (p->right && need_among_var(p->right)) {
+        if (p->left && need_among_var(p->left)) {
             return 1;
         }
-        p = p->left;
+        if (p->aux && need_among_var(p->aux)) {
+            return 1;
+        }
+        p = p->right;
     }
     return 0;
 }
@@ -1085,7 +1088,7 @@ static void generate_define(struct generator * g, struct node * p) {
             generate(g, p->left);
             if (!g->unreachable) w(g, "~N~MResult := True;~N");
             str_append_string(saved_output, "      C : Result_Index;\n");
-            if (need_among_var(p->left) || 1) {
+            if (need_among_var(p->left)) {
                 str_append_string(saved_output, "      A : Integer;\n");
             }
             break;
