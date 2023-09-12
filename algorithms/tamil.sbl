@@ -101,10 +101,12 @@ define has_min_length as (
 )
 
 define fix_va_start as (
- (try '{va}{vs_oo}' and [ '{va}{vs_oo}' ] <- '{oo}' ) or
- (try '{va}{vs_o}' and [ '{va}{vs_o}' ] <- '{o}' ) or
- (try '{va}{vs_u}' and [ '{va}{vs_u}' ] <- '{u}' ) or
- (try '{va}{vs_uu}' and [ '{va}{vs_uu}' ] <- '{uu}' )
+ [substring] among (
+  '{va}{vs_oo}' ( <- '{oo}' )
+  '{va}{vs_o}'  ( <- '{o}' )
+  '{va}{vs_u}'  ( <- '{u}' )
+  '{va}{vs_uu}' ( <- '{uu}' )
+ )
 )
 
 define fix_endings as (
