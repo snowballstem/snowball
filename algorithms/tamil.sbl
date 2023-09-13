@@ -360,7 +360,7 @@ define remove_tense_suffix as (
       (set found_a_match)
       )
    or
-   test ( [ '{ka}{vs_u}' or '{ta}{vs_u}' test '{pulli}' ] delete
+   test ( [ '{ka}{vs_u}' test '{pulli}' ] delete
       (set found_a_match)
       )
   )
