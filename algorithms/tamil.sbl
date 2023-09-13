@@ -213,8 +213,7 @@ define remove_common_word_endings as (
      '{vs_u}{tta}{vs_ai}' or
      '{vs_e}{nnna}{vs_u}{ma}{pulli}' or
      ('{la}{pulli}{la}' not among('{vs_aa}' '{vs_i}' '{vs_ii}' '{vs_e}' '{vs_ee}' '{vs_u}' '{vs_uu}' '{vs_ai}')) or
-     '{vs_e}{nnna}' or
-     '{vs_aa}{ka}{vs_i}' ] <- '{pulli}'
+     '{vs_e}{nnna}' ] <- '{pulli}'
      )
   or
   test ( [ among('{pa}{tta}{vs_u}'
