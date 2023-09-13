@@ -243,8 +243,7 @@ define remove_vetrumai_urupukal as (
   (
     test ( ['{nnna}{vs_ai}'] delete )
    or
-    test ([ ( '{vs_i}{nnna}{vs_ai}' or
-     '{vs_ai}' (not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}'))) or
+    test ([ ( '{vs_ai}' (not among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}'))) or
       ( '{vs_ai}' (test (among('{ka}' '{ca}' '{tta}' '{tha}' '{pa}' '{rra}') '{pulli}')))
     ] <- '{pulli}'
     )
