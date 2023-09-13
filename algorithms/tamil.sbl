@@ -273,7 +273,6 @@ define remove_vetrumai_urupukal as (
        '{ma}{vs_ee}{la}{pulli}'
        '{ma}{vs_ee}{rra}{pulli}'
        '{ka}{vs_ii}{llla}{pulli}'
-       '{pa}{vs_i}{nnna}{pulli}'
          (delete)
        '{ta}{vs_u}'
          (
