@@ -509,6 +509,7 @@ extern const char * name_of_token(int code) {
         case c_grouping:     return "grouping";
         case c_call:         return "call";
         case c_booltest:     return "Boolean test";
+        case c_functionend:  return "Function end";
         case -2:             return "start of text";
         case -1:             return "end of text";
         default:             return "?";

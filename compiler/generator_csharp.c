@@ -1,4 +1,4 @@
-
+#include <assert.h>
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
@@ -934,37 +934,74 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 static void generate_integer_test(struct generator * g, struct node * p) {
 
     const char * s;
-    // We want the inverse of the snowball test here.
-    switch (p->type) {
-        case c_eq: s = "!="; break;
-        case c_ne: s = "=="; break;
-        case c_gr: s = "<="; break;
-        case c_ge: s = "<"; break;
-        case c_ls: s = ">="; break;
-        case c_le: s = ">"; break;
-        default:
-            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
-            exit(1);
+    int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
+    if (optimise_to_return) {
+        w(g, "~Mreturn ");
+        switch (p->type) {
+            case c_eq: s = "=="; break;
+            case c_ne: s = "!="; break;
+            case c_gr: s = ">"; break;
+            case c_ge: s = ">="; break;
+            case c_ls: s = "<"; break;
+            case c_le: s = "<="; break;
+            default:
+                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
+                exit(1);
+        }
+        p->right = NULL;
+    } else {
+        w(g, "~Mif (");
+        // We want the inverse of the snowball test here.
+        switch (p->type) {
+            case c_eq: s = "!="; break;
+            case c_ne: s = "=="; break;
+            case c_gr: s = "<="; break;
+            case c_ge: s = "<"; break;
+            case c_ls: s = ">="; break;
+            case c_le: s = ">"; break;
+            default:
+                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
+                exit(1);
+        }
     }
-    w(g, "~Mif (");
     generate_AE(g, p->left);
     write_char(g, ' ');
     write_string(g, s);
     write_char(g, ' ');
     generate_AE(g, p->AE);
-    w(g, ")~N");
-    write_block_start(g);
-    write_failure(g);
-    write_block_end(g);
+    if (optimise_to_return) {
+        w(g, ";~N");
+    } else {
+        w(g, ")~N");
+        write_block_start(g);
+        write_failure(g);
+        write_block_end(g);
+    }
 }
 
 static void generate_call(struct generator * g, struct node * p) {
 
+    int signals = check_possible_signals_list(g, p->name->definition, 0);
     write_comment(g, p);
     g->V[0] = p->name;
-    w(g, "~Mif (!~V0())~N~+");
-    write_failure(g);
-    w(g, "~-");
+    if (g->failure_keep_count == 0 && g->failure_label == x_return &&
+        (signals == 0 || (p->right && p->right->type == c_functionend))) {
+        /* Always fails or tail call. */
+        writef(g, "~Mreturn ~V0();~N", p);
+        return;
+    }
+    if (signals == 1) {
+        /* Always succeeds. */
+        writef(g, "~M~V0();~N", p);
+    } else if (signals == 0) {
+        /* Always fails. */
+        writef(g, "~M~V0();~N", p);
+        write_failure(g);
+    } else {
+        w(g, "~Mif (!~V0())~N~+");
+        write_failure(g);
+        w(g, "~-");
+    }
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -1017,13 +1054,24 @@ static void generate_define(struct generator * g, struct node * p) {
     g->failure_label = x_return;
     g->label_used = 0;
     g->keep_count = 0;
+    int signals = check_possible_signals_list(g, p->left, 0);
     generate(g, p->left);
-    w(g, "~Mreturn true;~N");
+    if (p->left->right) {
+        assert(p->left->right->type == c_functionend);
+        if (signals) {
+            generate(g, p->left->right);
+        }
+    }
     w(g, "~}");
 
     str_append(saved_output, g->outbuf);
     str_delete(g->outbuf);
     g->outbuf = saved_output;
+}
+
+static void generate_functionend(struct generator * g, struct node * p) {
+    (void)p;
+    w(g, "~Mreturn true;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
@@ -1155,6 +1203,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;
+        case c_functionend:   generate_functionend(g, p); break;
         default: fprintf(stderr, "%d encountered\n", p->type);
                  exit(1);
     }

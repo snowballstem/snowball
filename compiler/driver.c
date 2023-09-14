@@ -486,7 +486,6 @@ extern int main(int argc, char * argv[]) {
             read_program(a);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
-            close_tokeniser(t);
             if (!o->syntax_tree) {
                 struct generator * g;
 
@@ -598,6 +597,7 @@ extern int main(int argc, char * argv[]) {
 #endif
                 close_generator(g);
             }
+            close_tokeniser(t);
             close_analyser(a);
         }
         lose_b(u);

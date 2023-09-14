@@ -1,4 +1,4 @@
-
+#include <assert.h>
 #include <stdio.h>   /* printf etc */
 #include <stdlib.h>  /* exit */
 #include <string.h>  /* memmove */
@@ -1289,6 +1289,13 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     get_token(a, c_as);
     p->left = read_C(a);
     if (q) q->definition = p->left;
+    /* We should get a node with a NULL right pointer from read_C() for the
+     * routine's code.  We synthesise a "functionend" node there so
+     * optimisations such as dead code elimination and tail call optimisation
+     * can easily see where the function ends.
+     */
+    assert(p->left->right == NULL);
+    p->left->right = new_node(a, c_functionend);
 
     if (a->substring != 0) {
         error2(a, e_unresolved_substring, a->substring->line_number);

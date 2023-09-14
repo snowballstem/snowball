@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
@@ -1006,48 +1007,80 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 static void generate_integer_test(struct generator * g, struct node * p) {
 
     const char * s;
-    // We want the inverse of the snowball test here.
-    switch (p->type) {
-        case c_eq: s = "/="; break;
-        case c_ne: s = "="; break;
-        case c_gr: s = "<="; break;
-        case c_ge: s = "<"; break;
-        case c_ls: s = ">="; break;
-        case c_le: s = ">"; break;
-        default:
-            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
-            exit(1);
+    int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
+    if (optimise_to_return) {
+        w(g, "~MResult := (");
+        switch (p->type) {
+            case c_eq: s = "="; break;
+            case c_ne: s = "/="; break;
+            case c_gr: s = ">"; break;
+            case c_ge: s = ">="; break;
+            case c_ls: s = "<"; break;
+            case c_le: s = "<="; break;
+            default:
+                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
+                exit(1);
+        }
+        p->right = NULL;
+    } else {
+        w(g, "~Mif ");
+        // We want the inverse of the snowball test here.
+        switch (p->type) {
+            case c_eq: s = "/="; break;
+            case c_ne: s = "="; break;
+            case c_gr: s = "<="; break;
+            case c_ge: s = "<"; break;
+            case c_ls: s = ">="; break;
+            case c_le: s = ">"; break;
+            default:
+                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
+                exit(1);
+        }
     }
-    w(g, "~Mif ");
     generate_AE(g, p->left);
     write_char(g, ' ');
     write_string(g, s);
     write_char(g, ' ');
     generate_AE(g, p->AE);
-    w(g, " then~+~N");
-    write_failure(g);
-    w(g, "~-~Mend if;~N");
-    g->unreachable = false;
-}
-
-static void generate_integer_function(struct generator * g, struct node * p, char * s) {
-
-    w(g, "~MResult := (");
-    generate_AE(g, p->left);
-    write_char(g, ' ');
-    write_string(g, s);
-    write_char(g, ' ');
-    generate_AE(g, p->AE);
-    w(g, ");~N");
-    g->unreachable = false;
+    if (optimise_to_return) {
+        w(g, ");~N");
+    } else {
+        w(g, " then~+~N");
+        write_failure(g);
+        w(g, "~-~Mend if;~N");
+        g->unreachable = false;
+    }
 }
 
 static void generate_call(struct generator * g, struct node * p) {
 
+    int signals = check_possible_signals_list(g, p->name->definition, 0);
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 (Z, Result);~N", p);
-    write_failure_if(g, "not Result", p);
+    if (g->failure_keep_count == 0 && g->failure_label == x_return) {
+        if (p->right && p->right->type == c_functionend) {
+            /* Tail call. */
+            writef(g, "~M~V0 (Z, Result);~N", p);
+            return;
+        }
+        if (signals == 0) {
+            /* Always fails. */
+            writef(g, "~M~V0 (Z, Result)~N", p);
+            w(g, "~Mreturn~N");
+            return;
+        }
+    }
+    if (signals == 1) {
+        /* Always succeeds. */
+        writef(g, "~M~V0 (Z, Result)~N", p);
+    } else if (signals == 0) {
+        /* Always fails. */
+        writef(g, "~M~V0 (Z, Result)~N", p);
+        write_failure(g);
+    } else {
+        writef(g, "~M~V0 (Z, Result);~N", p);
+        write_failure_if(g, "not Result", p);
+    }
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -1092,6 +1125,12 @@ static void generate_define(struct generator * g, struct node * p) {
     /* Generate function header. */
     g->V[0] = p->name;
     w(g, "~N~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
+    if (need_c_var(p->left)) {
+        w(g, "~M~MC : Result_Index;~N");
+    }
+    if (need_among_var(p->left)) {
+        w(g, "~M~MA : Integer;~N");
+    }
 
     /* Save output*/
     saved_output = g->outbuf;
@@ -1108,23 +1147,13 @@ static void generate_define(struct generator * g, struct node * p) {
 
     /* Generate function body. */
     w(g, "~{");
-    switch (p->left->type) {
-        case c_eq:            generate_integer_function(g, p->left, "="); break;
-        case c_ne:            generate_integer_function(g, p->left, "/="); break;
-        case c_gr:            generate_integer_function(g, p->left, ">"); break;
-        case c_ge:            generate_integer_function(g, p->left, ">="); break;
-        case c_ls:            generate_integer_function(g, p->left, "<"); break;
-        case c_le:            generate_integer_function(g, p->left, "<="); break;
-        default:
-            generate(g, p->left);
-            if (!g->unreachable) w(g, "~N~MResult := True;~N");
-            if (need_c_var(p->left)) {
-                str_append_string(saved_output, "      C : Result_Index;\n");
-            }
-            if (need_among_var(p->left)) {
-                str_append_string(saved_output, "      A : Integer;\n");
-            }
-            break;
+    int signals = check_possible_signals_list(g, p->left, 0);
+    generate(g, p->left);
+    if (p->left->right) {
+        assert(p->left->right->type == c_functionend);
+        if (signals) {
+            generate(g, p->left->right);
+        }
     }
     g->V[0] = p->name;
     w(g, "~-~Mend ~W0;~N");
@@ -1138,6 +1167,11 @@ static void generate_define(struct generator * g, struct node * p) {
     str_delete(g->outbuf);
     g->declarations = saved_declarations;
     g->outbuf = saved_output;
+}
+
+static void generate_functionend(struct generator * g, struct node * p) {
+    (void)p;
+    w(g, "~N~MResult := True;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
@@ -1408,6 +1442,7 @@ static void generate(struct generator * g, struct node * p) {
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;
+        case c_functionend:   generate_functionend(g, p); break;
         default: fprintf(stderr, "%d encountered\n", p->type);
                  exit(1);
     }

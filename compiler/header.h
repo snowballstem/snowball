@@ -92,6 +92,7 @@ enum token_codes {
     c_call,
     c_grouping,
     c_booltest,
+    c_functionend,
 
     NUM_TOKEN_CODES
 };
@@ -378,6 +379,8 @@ extern void write_start_comment(struct generator * g,
 
 extern int K_needed(struct generator * g, struct node * p);
 extern int repeat_restore(struct generator * g, struct node * p);
+extern int check_possible_signals_list(struct generator * g,
+                                       struct node * p, int call_depth);
 
 /* Generator for C code. */
 extern void generate_program_c(struct generator * g);
