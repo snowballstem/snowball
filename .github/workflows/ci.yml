@@ -59,6 +59,9 @@ jobs:
           apt_packages: 'mono-devel'
         - name: Pascal
           FPC: fpc
+          # 2023-09-14 ubuntu-latest package install fails with:
+          # E: Failed to fetch mirror+file:/etc/apt/apt-mirrors.txt/pool/main/f/flac/libflac8_1.3.3-2ubuntu0.1_amd64.deb  404  Not Found [IP: 52.154.174.208 80]
+          os: 'ubuntu-22.04'
           apt_packages: 'fpc'
         - name: Python 3.8
           PYTHON: python3.8
