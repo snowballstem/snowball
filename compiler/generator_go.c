@@ -876,9 +876,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     g->B[0] = str_data(savevar_env);
     writef(g, "~Mvar ~B0 = env.Clone()~N"
-              "~Menv.SetCurrent(~V0)~N"
-              "~Menv.Cursor = 0~N"
-              "~Menv.Limit = len(env.Current())~N", p);
+              "~Menv.SetCurrent(~V0)~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
