@@ -36,7 +36,7 @@
             char p[10];
             for (i = 0; i < 100; i++) {
                 sprintf(p, " %d", i);
-                add_sz_to_b(b, p);
+                add_s_to_b(b, p);
             }
         }
 
@@ -143,10 +143,11 @@ extern char * b_to_s(const symbol * p) {
     return s;
 }
 
-/* Add a string with given length to a block. If p = 0 the
+/* To add a zero terminated string to a block. If p = 0 the
    block is created. */
 
-extern symbol * add_s_to_b(symbol * p, const char * s, int n) {
+extern symbol * add_s_to_b(symbol * p, const char * s) {
+    int n = strlen(s);
     int k;
     if (p == 0) p = create_b(n);
     k = SIZE(p);
@@ -159,29 +160,6 @@ extern symbol * add_s_to_b(symbol * p, const char * s, int n) {
         for (i = 0; i < n; i++) p[i + k] = s[i];
     }
     SIZE(p) += n;
-    return p;
-}
-
-/* Add a zero terminated string to a block. If p = 0 the
-   block is created. */
-
-extern symbol * add_sz_to_b(symbol * p, const char * s) {
-    return add_s_to_b(p, s, strlen(s));
-}
-
-/* Add a single character to a block. If p = 0 the
-   block is created. */
-
-extern symbol * add_char_to_b(symbol * p, symbol ch) {
-    int k;
-    if (p == 0) p = create_b(1);
-    k = SIZE(p);
-    {
-        int x = k + 1 - CAPACITY(p);
-        if (x > 0) p = increase_capacity(p, x);
-    }
-    p[k] = ch;
-    SIZE(p)++;
     return p;
 }
 
@@ -238,7 +216,7 @@ extern void str_append_b_tail(struct str * str, const symbol * q, int skip) {
 /* Append a (char *, null terminated) string to a str. */
 extern void str_append_string(struct str * str, const char * s) {
 
-    str->data = add_sz_to_b(str->data, s);
+    str->data = add_s_to_b(str->data, s);
 }
 
 /* Append an integer to a str. */

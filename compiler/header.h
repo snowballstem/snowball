@@ -25,11 +25,7 @@ extern symbol * move_to_b(symbol * p, int n, const symbol * q);
 extern symbol * add_to_b(symbol * p, int n, const symbol * q);
 extern symbol * copy_b(const symbol * p);
 extern char * b_to_s(const symbol * p);
-extern symbol * add_s_to_b(symbol * p, const char * s, int n);
-extern symbol * add_sz_to_b(symbol * p, const char * s);
-extern symbol * add_char_to_b(symbol * p, symbol ch);
-// "" LIT is a trick to make compilation fail if LIT is not a string literal.
-#define add_literal_to_b(P, LIT) add_s_to_b(P, "" LIT, sizeof(LIT))
+extern symbol * add_s_to_b(symbol * p, const char * s);
 
 #define MOVE_TO_B(B, LIT) \
     move_to_b(B, sizeof(LIT) / sizeof(LIT[0]), LIT)
