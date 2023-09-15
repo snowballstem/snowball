@@ -146,7 +146,7 @@ extern void disable_token(struct tokeniser * t, int code);
 extern void close_tokeniser(struct tokeniser * t);
 
 extern int space_count;
-extern void * check_malloc(int n);
+extern void * check_malloc(size_t n);
 extern void check_free(void * p);
 
 struct node;

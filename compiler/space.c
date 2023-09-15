@@ -105,9 +105,18 @@ extern symbol * copy_b(const symbol * p) {
 
 int space_count = 0;
 
-extern void * check_malloc(int n) {
+static void * xmalloc(size_t n) {
+    void * result = malloc(n);
+    if (result == NULL) {
+        fprintf(stderr, "Failed to allocate %lu bytes\n", (unsigned long)n);
+        exit(1);
+    }
+    return result;
+}
+
+extern void * check_malloc(size_t n) {
     space_count++;
-    return malloc(n);
+    return xmalloc(n);
 }
 
 extern void check_free(void * p) {
@@ -119,7 +128,7 @@ extern void check_free(void * p) {
 
 extern char * b_to_s(const symbol * p) {
     int n = SIZE(p);
-    char * s = (char *)malloc(n + 1);
+    char * s = (char *)xmalloc(n + 1);
     {
         int i;
         for (i = 0; i < n; i++) {
@@ -165,7 +174,7 @@ struct str {
 /* Create a new string. */
 extern struct str * str_new(void) {
 
-    struct str * output = (struct str *) malloc(sizeof(struct str));
+    struct str * output = (struct str *) xmalloc(sizeof(struct str));
     output->data = create_b(0);
     return output;
 }
