@@ -78,16 +78,6 @@ static int find_word(int n, const byte * p) {
     return -1;
 }
 
-static int eq_s(struct tokeniser * t, const char * s) {
-    int l = strlen(s);
-    if (SIZE(t->p) - t->c < l) return false;
-    {
-        int i;
-        for (i = 0; i < l; i++) if (t->p[t->c + i] != s[i]) return false;
-    }
-    t->c += l; return true;
-}
-
 static int white_space(struct tokeniser * t, int ch) {
     switch (ch) {
         case '\n':
@@ -371,18 +361,28 @@ extern int read_token(struct tokeniser * t) {
             case c_comment1: /*  slash-slash comment */
                 while (t->c < SIZE(p) && p[t->c] != '\n') t->c++;
                 continue;
-            case c_comment2: /* slash-star comment */
+            case c_comment2: { /* slash-star comment */
+                // Scan for a '*' stopping one before the end since we need a
+                // '/' to follow it to close the comment.
+                int size_less_one = SIZE(p) - 1;
+                int c = p->c;
                 while (true) {
-                    if (t->c >= SIZE(p)) {
+                    if (c >= size_less_one) {
                         error1(t, "/* comment not terminated");
                         t->token = -1;
                         return -1;
                     }
-                    if (p[t->c] == '\n') t->line_number++;
-                    if (eq_s(t, "*/")) break;
-                    t->c++;
+                    if (p[c] == '\n') {
+                        t->line_number++;
+                    } else if (p[c] == '*' && p[c + 1] == '/') {
+                        // Found '*/' to end of comment.
+                        p->c = c + 2;
+                        break;
+                    }
+                    ++c;
                 }
                 continue;
+            }
             case c_stringescapes: {
                 int ch1 = next_real_char(t);
                 int ch2 = next_real_char(t);
