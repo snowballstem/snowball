@@ -239,8 +239,8 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
                 {
                     NEW(include, p);
-                    symbol * b = add_s_to_b(0, argv[i++]);
-                    b = add_s_to_b(b, "/");
+                    symbol * b = add_sz_to_b(0, argv[i++]);
+                    b = add_char_to_b(b, '/');
                     p->next = 0; p->b = b;
 
                     if (o->includes == 0) o->includes = p; else
@@ -496,12 +496,12 @@ extern int main(int argc, char * argv[]) {
                 }
                 g = create_generator(a, o);
                 if (o->make_lang == LANG_C || o->make_lang == LANG_CPLUSPLUS) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".h");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".h");
                     o->output_h = get_output(b);
                     b[SIZE(b) - 1] = 'c';
                     if (o->make_lang == LANG_CPLUSPLUS) {
-                        b = add_s_to_b(b, "c");
+                        b = add_char_to_b(b, 'c');
                     }
                     o->output_src = get_output(b);
                     lose_b(b);
@@ -512,8 +512,8 @@ extern int main(int argc, char * argv[]) {
                 }
 #ifndef DISABLE_JAVA
                 if (o->make_lang == LANG_JAVA) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".java");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".java");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_java(g);
@@ -522,8 +522,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_PASCAL
                 if (o->make_lang == LANG_PASCAL) {
-                    symbol *b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".pas");
+                    symbol *b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".pas");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_pascal(g);
@@ -532,8 +532,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_PYTHON
                 if (o->make_lang == LANG_PYTHON) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".py");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".py");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_python(g);
@@ -542,8 +542,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".js");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".js");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_js(g);
@@ -552,8 +552,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_CSHARP
                 if (o->make_lang == LANG_CSHARP) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".cs");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".cs");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_csharp(g);
@@ -562,8 +562,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_RUST
                 if (o->make_lang == LANG_RUST) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".rs");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".rs");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_rust(g);
@@ -572,8 +572,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_GO
                 if (o->make_lang == LANG_GO) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".go");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".go");
                     o->output_src = get_output(b);
                     lose_b(b);
                     generate_program_go(g);
@@ -582,8 +582,8 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_ADA
                 if (o->make_lang == LANG_ADA) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".ads");
+                    symbol * b = add_sz_to_b(0, s);
+                    b = add_literal_to_b(b, ".ads");
                     o->output_h = get_output(b);
                     b[SIZE(b) - 1] = 'b';
                     o->output_src = get_output(b);
