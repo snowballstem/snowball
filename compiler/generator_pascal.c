@@ -56,11 +56,11 @@ static void write_varname(struct generator * g, struct name * p) {
          * program authors to avoid naming externals which only differ by
          * case.
          */
-        int i, len = SIZE(p->b);
+        int i, len = SIZE(p->s);
         int lower_pending = 0;
         write_char(g, "SBIrxg"[p->type]);
         for (i = 0; i != len; ++i) {
-            int ch = p->b[i];
+            int ch = p->s[i];
             if (ch >= 'a' && ch <= 'z') {
                 ++lower_pending;
             } else if (ch >= 'A' && ch <= 'Z') {
@@ -74,7 +74,7 @@ static void write_varname(struct generator * g, struct name * p) {
 
         write_char(g, '_');
     }
-    write_b(g, p->b);
+    write_s(g, p->s);
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
@@ -247,7 +247,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '{': write_block_start(g); continue;
             case '}': write_block_end(g); continue;
             case 'S': write_string(g, g->S[input[i++] - '0']); continue;
-            case 'B': write_b(g, g->B[input[i++] - '0']); continue;
+            case 'B': write_s(g, g->B[input[i++] - '0']); continue;
             case 'I': write_int(g, g->I[input[i++] - '0']); continue;
             case 'V':
             case 'W': write_varname(g, g->V[input[i++] - '0']); continue;

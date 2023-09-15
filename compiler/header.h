@@ -20,15 +20,24 @@ typedef unsigned short symbol;
 extern symbol * create_b(int n);
 extern void report_b(FILE * out, const symbol * p);
 extern void lose_b(symbol * p);
-extern symbol * increase_capacity(symbol * p, int n);
-extern symbol * move_to_b(symbol * p, int n, const symbol * q);
-extern symbol * add_to_b(symbol * p, int n, const symbol * q);
+extern symbol * increase_capacity_b(symbol * p, int n);
+extern symbol * add_to_b(symbol * p, const symbol * q, int n);
 extern symbol * copy_b(const symbol * p);
-extern char * b_to_s(const symbol * p);
-extern symbol * add_s_to_b(symbol * p, const char * s);
+extern char * b_to_sz(const symbol * p);
+extern symbol * add_symbol_to_b(symbol * p, symbol ch);
 
-#define MOVE_TO_B(B, LIT) \
-    move_to_b(B, sizeof(LIT) / sizeof(LIT[0]), LIT)
+// These routines are like those above but work in byte instead of symbol.
+
+extern byte * create_s(int n);
+extern void report_s(FILE * out, const byte * p);
+extern void lose_s(byte * p);
+extern byte * increase_capacity_s(byte * p, int n);
+extern byte * copy_s(const byte * p);
+extern byte * add_s_to_s(byte * p, const char * s, int n);
+extern byte * add_sz_to_s(byte * p, const char * s);
+extern byte * add_char_to_s(byte * p, char ch);
+// "" LIT is a trick to make compilation fail if LIT is not a string literal.
+#define add_literal_to_s(P, LIT) add_s_to_s(P, "" LIT, sizeof(LIT) - 1)
 
 struct str; /* defined in space.c */
 
@@ -36,27 +45,27 @@ extern struct str * str_new(void);
 extern void str_delete(struct str * str);
 extern void str_append(struct str * str, const struct str * add);
 extern void str_append_ch(struct str * str, char add);
-extern void str_append_symbol(struct str * str, symbol add);
-extern void str_append_b(struct str * str, const symbol * q);
-extern void str_append_b_tail(struct str * str, const symbol * q, int skip);
+extern void str_append_s(struct str * str, const byte * q);
 extern void str_append_string(struct str * str, const char * s);
 extern void str_append_int(struct str * str, int i);
 extern void str_clear(struct str * str);
 extern void str_assign(struct str * str, const char * s);
 extern struct str * str_copy(const struct str * old);
-extern symbol * str_data(const struct str * str);
+extern byte * str_data(const struct str * str);
 extern int str_len(const struct str * str);
 extern int str_back(const struct str *str);
+extern void output_str(FILE * outfile, struct str * str);
+
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
-extern void output_str(FILE * outfile, struct str * str);
 
 typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
 
+/* stringdef name and value */
 struct m_pair {
 
     struct m_pair * next;
-    symbol * name;
+    byte * name;
     symbol * value;
 
 };
@@ -65,10 +74,13 @@ struct m_pair {
 struct input {
 
     struct input * next;
-    symbol * p;
+    byte * p;
     int c;
     char * file;
-    int file_needs_freeing;
+    // -1 : Release file with: lose_s((byte *)file)
+    //  0 : We don't own file.
+    //  1 : Release file with: free(file)
+    int file_owned;
     int line_number;
 
 };
@@ -76,7 +88,7 @@ struct input {
 struct include {
 
     struct include * next;
-    symbol * b;
+    byte * s;
 
 };
 
@@ -107,13 +119,19 @@ enum uplus_modes {
 struct tokeniser {
 
     struct input * next;
-    symbol * p;
+    byte * p;
     int c;
     char * file;
-    int file_needs_freeing;
+    // -1 : Release file with: lose_s((byte *)file)
+    //  0 : We don't own file.
+    //  1 : Release file with: free(file)
+    int file_owned;
     int line_number;
+
+    // Used for c_literalstring values.
     symbol * b;
-    symbol * b2;
+    // Used for c_name names.
+    byte * s;
     int number;
     int m_start;
     int m_end;
@@ -138,8 +156,8 @@ struct tokeniser {
     char token_disabled[NUM_TOKEN_CODES];
 };
 
-extern symbol * get_input(const char * filename);
-extern struct tokeniser * create_tokeniser(symbol * b, char * file);
+extern byte * get_input(const char * filename);
+extern struct tokeniser * create_tokeniser(byte * b, char * file);
 extern int read_token(struct tokeniser * t);
 extern const char * name_of_token(int code);
 extern void disable_token(struct tokeniser * t, int code);
@@ -154,7 +172,7 @@ struct node;
 struct name {
 
     struct name * next;
-    symbol * b;
+    byte * s;
     int type;                   /* t_string etc */
     int mode;                   /*    )_  for routines, externals */
     struct node * definition;   /*    )                           */
@@ -316,7 +334,7 @@ struct generator {
     int copy_from_count; /* count of calls to copy_from() */
 
     const char * S[10];  /* strings */
-    symbol * B[10];      /* blocks */
+    byte * B[10];        /* byte blocks */
     int I[10];           /* integers */
     struct name * V[5];  /* variables */
     symbol * L[5];       /* literals, used in formatted write */
@@ -368,7 +386,7 @@ extern void write_newline(struct generator * g);
 extern void write_string(struct generator * g, const char * s);
 extern void write_int(struct generator * g, int i);
 extern void write_symbol(struct generator * g, symbol s);
-extern void write_b(struct generator * g, symbol * b);
+extern void write_s(struct generator * g, const byte * b);
 extern void write_str(struct generator * g, struct str * str);
 
 extern void write_comment_content(struct generator * g, struct node * p);

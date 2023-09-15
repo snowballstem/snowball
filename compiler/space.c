@@ -17,30 +17,29 @@
 
         symbol * b = create_b(n);
             - create an empty block b with room for n symbols
-        b = increase_capacity(b, n);
+        b = increase_capacity_b(b, n);
             - increase the capacity of block b by n symbols (b may change)
         b2 = copy_b(b)
             - copy block b into b2
         lose_b(b);
             - lose block b
-        b = move_to_b(b, n, p);
-            - set the data in b to be the n symbols at address p
-        b = add_to_b(b, n, p);
+        b = add_to_b(b, p, n);
             - add the n symbols at address p to the end of the data in b
         SIZE(b)
             - is the number of symbols in b
-        For example:
+
+    For example:
 
         symbol * b = create_b(0);
-        {   int i;
-            char p[10];
-            for (i = 0; i < 100; i++) {
-                sprintf(p, " %d", i);
-                add_s_to_b(b, p);
+        {   symbol i;
+            for (i = 'A'; i <= 'Z'; i++) {
+                add_symbol_to_b(b, i);
             }
         }
 
-    and b contains " 0 1 2 ... 99" spaced out as symbols.
+    After running the above code b contains:
+
+        { (symbol)'A', (symbol)'B', ..., (symbol)'Z' }
 */
 
 /*  For a block b, SIZE(b) is the number of symbols so far written into it,
@@ -69,7 +68,7 @@ extern void report_b(FILE * out, const symbol * p) {
 }
 
 extern void output_str(FILE * outfile, struct str * str) {
-    report_b(outfile, str_data(str));
+    report_s(outfile, str_data(str));
 }
 
 extern void lose_b(symbol * p) {
@@ -77,29 +76,23 @@ extern void lose_b(symbol * p) {
     FREE((char *) p - HEAD);
 }
 
-extern symbol * increase_capacity(symbol * p, int n) {
+extern symbol * increase_capacity_b(symbol * p, int n) {
     symbol * q = create_b(CAPACITY(p) + n + EXTENDER);
     memmove(q, p, CAPACITY(p) * sizeof(symbol));
     SIZE(q) = SIZE(p);
     lose_b(p); return q;
 }
 
-extern symbol * move_to_b(symbol * p, int n, const symbol * q) {
-    int x = n - CAPACITY(p);
-    if (x > 0) p = increase_capacity(p, x);
-    memmove(p, q, n * sizeof(symbol)); SIZE(p) = n; return p;
-}
-
-extern symbol * add_to_b(symbol * p, int n, const symbol * q) {
+extern symbol * add_to_b(symbol * p, const symbol * q, int n) {
     int x = SIZE(p) + n - CAPACITY(p);
-    if (x > 0) p = increase_capacity(p, x);
+    if (x > 0) p = increase_capacity_b(p, x);
     memmove(p + SIZE(p), q, n * sizeof(symbol)); SIZE(p) += n; return p;
 }
 
 extern symbol * copy_b(const symbol * p) {
     int n = SIZE(p);
     symbol * q = create_b(n);
-    move_to_b(q, n, p);
+    add_to_b(q, p, n);
     return q;
 }
 
@@ -126,7 +119,7 @@ extern void check_free(void * p) {
 
 /* To convert a block to a zero terminated string:  */
 
-extern char * b_to_s(const symbol * p) {
+extern char * b_to_sz(const symbol * p) {
     int n = SIZE(p);
     char * s = (char *)xmalloc(n + 1);
     {
@@ -143,80 +136,133 @@ extern char * b_to_s(const symbol * p) {
     return s;
 }
 
-/* To add a zero terminated string to a block. If p = 0 the
+/* Add a single symbol to a block. If p = 0 the
    block is created. */
 
-extern symbol * add_s_to_b(symbol * p, const char * s) {
-    int n = strlen(s);
+extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
     int k;
-    if (p == 0) p = create_b(n);
+    if (p == 0) p = create_b(1);
+    k = SIZE(p);
+    {
+        int x = k + 1 - CAPACITY(p);
+        if (x > 0) p = increase_capacity_b(p, x);
+    }
+    p[k] = ch;
+    SIZE(p)++;
+    return p;
+}
+
+extern byte * create_s(int n) {
+    byte * p = (byte *) (HEAD + (byte *) MALLOC(HEAD + (n + 1)));
+    CAPACITY(p) = n;
+    SIZE(p) = 0;
+    return p;
+}
+
+extern void report_s(FILE * out, const byte * p) {
+    fwrite(p, 1, SIZE(p), out);
+}
+
+extern void lose_s(byte * p) {
+    if (p == 0) return;
+    FREE((byte *) p - HEAD);
+}
+
+extern byte * increase_capacity_s(byte * p, int n) {
+    byte * q = create_s(CAPACITY(p) + n + EXTENDER);
+    memmove(q, p, CAPACITY(p));
+    SIZE(q) = SIZE(p);
+    lose_s(p);
+    return q;
+}
+
+extern byte * copy_s(const byte * p) {
+    return add_s_to_s(NULL, (const char*)p, SIZE(p));
+}
+
+/* Add a string with given length to a byte block. If p = 0 the
+   block is created. */
+
+extern byte * add_s_to_s(byte * p, const char * s, int n) {
+    int k;
+    if (p == 0) p = create_s(n);
     k = SIZE(p);
     {
         int x = k + n - CAPACITY(p);
-        if (x > 0) p = increase_capacity(p, x);
+        if (x > 0) p = increase_capacity_s(p, x);
     }
-    {
-        int i;
-        for (i = 0; i < n; i++) p[i + k] = s[i];
-    }
+    memcpy(p + k, s, n);
     SIZE(p) += n;
     return p;
 }
 
+/* Add a zero terminated string to a byte block. If p = 0 the
+   block is created. */
+
+extern byte * add_sz_to_s(byte * p, const char * s) {
+    return add_s_to_s(p, s, strlen(s));
+}
+
+/* Add a single character to a byte block. If p = 0 the
+   block is created. */
+
+extern byte * add_char_to_s(byte * p, char ch) {
+    int k;
+    if (p == 0) p = create_s(1);
+    k = SIZE(p);
+    {
+        int x = k + 1 - CAPACITY(p);
+        if (x > 0) p = increase_capacity_s(p, x);
+    }
+    p[k] = ch;
+    SIZE(p)++;
+    return p;
+}
+
 /* The next section defines string handling capabilities in terms
-   of the lower level block handling capabilities of space.c */
+   of the lower level byte block handling capabilities of space.c */
 /* -------------------------------------------------------------*/
 
 struct str {
-    symbol * data;
+    byte * data;
 };
 
 /* Create a new string. */
 extern struct str * str_new(void) {
 
     struct str * output = (struct str *) xmalloc(sizeof(struct str));
-    output->data = create_b(0);
+    output->data = create_s(0);
     return output;
 }
 
 /* Delete a string. */
 extern void str_delete(struct str * str) {
 
-    lose_b(str->data);
+    lose_s(str->data);
     free(str);
 }
 
 /* Append a str to this str. */
 extern void str_append(struct str * str, const struct str * add) {
-
-    symbol * q = add->data;
-    str->data = add_to_b(str->data, SIZE(q), q);
+    byte * q = add->data;
+    str->data = add_s_to_s(str->data, (char *)q, SIZE(q));
 }
 
 /* Append a character to this str. */
 extern void str_append_ch(struct str * str, char add) {
-
-    symbol sym = (unsigned char)add;
-    str->data = add_to_b(str->data, 1, &sym);
+    str->data = add_char_to_s(str->data, add);
 }
 
-/* Append a low level block to a str. */
-extern void str_append_b(struct str * str, const symbol * q) {
+/* Append a low level byte block to a str. */
+extern void str_append_s(struct str * str, const byte * q) {
 
-    str->data = add_to_b(str->data, SIZE(q), q);
-}
-
-/* Append the tail of a low level block to a str. */
-extern void str_append_b_tail(struct str * str, const symbol * q, int skip) {
-    if (skip < 0 || skip >= SIZE(q)) return;
-
-    str->data = add_to_b(str->data, SIZE(q) - skip, q + skip);
+    str->data = add_s_to_s(str->data, (const char *)q, SIZE(q));
 }
 
 /* Append a (char *, null terminated) string to a str. */
 extern void str_append_string(struct str * str, const char * s) {
 
-    str->data = add_s_to_b(str->data, s);
+    str->data = add_sz_to_s(str->data, s);
 }
 
 /* Append an integer to a str. */
@@ -249,7 +295,7 @@ extern struct str * str_copy(const struct str * old) {
 }
 
 /* Get the data stored in this str. */
-extern symbol * str_data(const struct str * str) {
+extern byte * str_data(const struct str * str) {
 
     return str->data;
 }

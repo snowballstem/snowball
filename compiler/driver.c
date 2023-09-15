@@ -90,14 +90,14 @@ static void check_lim(int i, int argc) {
     }
 }
 
-static FILE * get_output(symbol * b) {
-    char * s = b_to_s(b);
-    FILE * output = fopen(s, "w");
+static FILE * get_output(byte * s) {
+    s[SIZE(s)] = 0;
+    const char * filename = (const char *)s;
+    FILE * output = fopen(filename, "w");
     if (output == 0) {
-        fprintf(stderr, "Can't open output %s\n", s);
+        fprintf(stderr, "Can't open output %s\n", filename);
         exit(1);
     }
-    free(s);
     return output;
 }
 
@@ -239,9 +239,9 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
                 {
                     NEW(include, p);
-                    symbol * b = add_s_to_b(0, argv[i++]);
-                    b = add_s_to_b(b, "/");
-                    p->next = 0; p->b = b;
+                    byte * s = add_sz_to_s(0, argv[i++]);
+                    s = add_char_to_s(s, '/');
+                    p->next = 0; p->s = s;
 
                     if (o->includes == 0) o->includes = p; else
                                           o->includes_end->next = p;
@@ -452,7 +452,7 @@ extern int main(int argc, char * argv[]) {
     argc = read_options(o, argc, argv);
     {
         char * file = argv[1];
-        symbol * u = get_input(file);
+        byte * u = get_input(file);
         if (u == 0) {
             fprintf(stderr, "Can't open input %s\n", file);
             exit(1);
@@ -477,7 +477,7 @@ extern int main(int argc, char * argv[]) {
                 q->p = u;
                 q->c = 0;
                 q->file = file;
-                q->file_needs_freeing = false;
+                q->file_owned = 0;
                 q->line_number = 1;
                 *next_input_ptr = q;
                 next_input_ptr = &(q->next);
@@ -489,22 +489,22 @@ extern int main(int argc, char * argv[]) {
             if (!o->syntax_tree) {
                 struct generator * g;
 
-                const char * s = o->output_file;
-                if (!s) {
+                const char * output_base = o->output_file;
+                if (!output_base) {
                     fprintf(stderr, "Please include the -o option\n");
                     print_arglist(1);
                 }
                 g = create_generator(a, o);
                 if (o->make_lang == LANG_C || o->make_lang == LANG_CPLUSPLUS) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".h");
-                    o->output_h = get_output(b);
-                    b[SIZE(b) - 1] = 'c';
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".h");
+                    o->output_h = get_output(s);
+                    s[SIZE(s) - 1] = 'c';
                     if (o->make_lang == LANG_CPLUSPLUS) {
-                        b = add_s_to_b(b, "c");
+                        s = add_char_to_s(s, 'c');
                     }
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    o->output_src = get_output(s);
+                    lose_s(s);
 
                     generate_program_c(g);
                     fclose(o->output_src);
@@ -512,82 +512,82 @@ extern int main(int argc, char * argv[]) {
                 }
 #ifndef DISABLE_JAVA
                 if (o->make_lang == LANG_JAVA) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".java");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".java");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_java(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_PASCAL
                 if (o->make_lang == LANG_PASCAL) {
-                    symbol *b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".pas");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".pas");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_pascal(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_PYTHON
                 if (o->make_lang == LANG_PYTHON) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".py");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".py");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_python(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".js");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".js");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_js(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_CSHARP
                 if (o->make_lang == LANG_CSHARP) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".cs");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".cs");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_csharp(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_RUST
                 if (o->make_lang == LANG_RUST) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".rs");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".rs");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_rust(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_GO
                 if (o->make_lang == LANG_GO) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".go");
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".go");
+                    o->output_src = get_output(s);
+                    lose_s(s);
                     generate_program_go(g);
                     fclose(o->output_src);
                 }
 #endif
 #ifndef DISABLE_ADA
                 if (o->make_lang == LANG_ADA) {
-                    symbol * b = add_s_to_b(0, s);
-                    b = add_s_to_b(b, ".ads");
-                    o->output_h = get_output(b);
-                    b[SIZE(b) - 1] = 'b';
-                    o->output_src = get_output(b);
-                    lose_b(b);
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".ads");
+                    o->output_h = get_output(s);
+                    s[SIZE(s) - 1] = 'b';
+                    o->output_src = get_output(s);
+                    lose_s(s);
 
                     generate_program_ada(g);
                     fclose(o->output_src);
@@ -600,12 +600,14 @@ extern int main(int argc, char * argv[]) {
             close_tokeniser(t);
             close_analyser(a);
         }
-        lose_b(u);
+        lose_s(u);
     }
     {   struct include * p = o->includes;
         while (p) {
             struct include * q = p->next;
-            lose_b(p->b); FREE(p); p = q;
+            lose_s(p->s);
+            FREE(p);
+            p = q;
         }
     }
     FREE(o->name);

@@ -46,9 +46,9 @@ static void write_varname(struct generator * g, struct name * p) {
         case t_integer: {
             int count = p->count;
             if (count < 0) {
-                fprintf(stderr, "Reference to optimised out variable ");
-                report_b(stderr, p->b);
-                fprintf(stderr, " attempted\n");
+                p->s[SIZE(p->s)] = 0;
+                fprintf(stderr, "Reference to optimised out variable %s attempted\n",
+                        p->s);
                 exit(1);
             }
             if (p->type == t_boolean) {
@@ -66,7 +66,7 @@ static void write_varname(struct generator * g, struct name * p) {
         default:
             write_char(g, ch); write_char(g, '_');
     }
-    write_b(g, p->b);
+    write_s(g, p->s);
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
@@ -140,7 +140,7 @@ void write_comment_content(struct generator * g, struct node * p) {
         case c_divideassign:
             if (p->name) {
                 write_char(g, '$');
-                write_b(g, p->name->b);
+                write_s(g, p->name->s);
                 write_char(g, ' ');
             }
             write_string(g, name_of_token(p->type));
@@ -160,7 +160,7 @@ void write_comment_content(struct generator * g, struct node * p) {
             write_string(g, name_of_token(p->type));
             if (p->name) {
                 write_char(g, ' ');
-                write_b(g, p->name->b);
+                write_s(g, p->name->s);
             }
     }
     write_string(g, ", line ");
@@ -1946,9 +1946,9 @@ static void generate_header_file(struct generator * g) {
                     int count = q->count;
                     if (count < 0) {
                         /* Unused variables should get removed from `names`. */
-                        fprintf(stderr, "Optimised out variable ");
-                        report_b(stderr, q->b);
-                        fprintf(stderr, " still in names list\n");
+                        q->s[SIZE(q->s)] = 0;
+                        fprintf(stderr, "Optimised out variable %s still in names list\n",
+                                q->s);
                         exit(1);
                     }
                     if (q->type == t_boolean) {
@@ -1960,7 +1960,7 @@ static void generate_header_file(struct generator * g) {
                     g->I[0] = count;
                     g->I[1] = "SIIrxg"[q->type];
                     w(g, "#define ~S0");
-                    write_b(g, q->b);
+                    write_s(g, q->s);
                     w(g, " (~c1[~I0])~N");
                 }
                 break;
@@ -2054,9 +2054,9 @@ extern void write_int(struct generator * g, int i) {
     str_append_int(g->outbuf, i);
 }
 
-extern void write_b(struct generator * g, symbol * b) {
+extern void write_s(struct generator * g, const byte * s) {
 
-    str_append_b(g->outbuf, b);
+    str_append_s(g->outbuf, s);
 }
 
 extern void write_str(struct generator * g, struct str * str) {
