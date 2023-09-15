@@ -78,12 +78,6 @@ static int find_word(int n, const byte * p) {
     return -1;
 }
 
-static int get_number(int n, const byte * p) {
-    int x = 0;
-    int i; for (i = 0; i < n; i++) x = 10*x + p[i] - '0';
-    return x;
-}
-
 static int eq_s(struct tokeniser * t, const char * s) {
     int l = strlen(s);
     if (SIZE(t->p) - t->c < l) return false;
@@ -254,18 +248,17 @@ static int next_token(struct tokeniser * t) {
                 t->s = add_s_to_s(t->s, (const char*)p + c0, c - c0);
                 code = c_name;
             }
-        } else
-        if (isdigit(ch)) {
-            int c0 = c;
-            while (c < SIZE(p) && isdigit(p[c])) c++;
-            t->number = get_number(c - c0, p + c0);
+        } else if (isdigit(ch)) {
+            int value = ch - '0';
+            while (++c < SIZE(p) && isdigit(p[c])) {
+                value = 10 * value + (p[c] - '0');
+            }
+            t->number = value;
             code = c_number;
-        } else
-        if (ch == '\'') {
+        } else if (ch == '\'') {
             c = read_literal_string(t, c + 1);
             code = c_literalstring;
-        } else
-        {
+        } else {
             int lim = smaller(2, SIZE(p) - c);
             int i;
             for (i = lim; i > 0; i--) {
