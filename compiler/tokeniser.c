@@ -365,7 +365,7 @@ extern int read_token(struct tokeniser * t) {
                 // Scan for a '*' stopping one before the end since we need a
                 // '/' to follow it to close the comment.
                 int size_less_one = SIZE(p) - 1;
-                int c = p->c;
+                int c = t->c;
                 while (true) {
                     if (c >= size_less_one) {
                         error1(t, "/* comment not terminated");
@@ -376,7 +376,7 @@ extern int read_token(struct tokeniser * t) {
                         t->line_number++;
                     } else if (p[c] == '*' && p[c + 1] == '/') {
                         // Found '*/' to end of comment.
-                        p->c = c + 2;
+                        t->c = c + 2;
                         break;
                     }
                     ++c;
