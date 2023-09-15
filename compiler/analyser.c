@@ -423,7 +423,10 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
         case c_sizeof: {
             int token = t->token;
             p = C_style(a, "S", token);
-            if (!p->literalstring) break;
+            if (!p->literalstring) {
+                if (p->name) p->name->value_used = true;
+                break;
+            }
 
             /* Replace lenof or sizeof on a literal string with a numeric
              * constant.
