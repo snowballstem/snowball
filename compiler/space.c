@@ -314,6 +314,14 @@ extern int str_back(const struct str *str) {
     return SIZE(str->data) ? str->data[SIZE(str->data) - 1] : -1;
 }
 
+/* Remove the last character of the str.
+ *
+ * Or do nothing if the string is empty.
+ */
+extern void str_pop(const struct str *str) {
+    if (SIZE(str->data)) --SIZE(str->data);
+}
+
 extern int get_utf8(const symbol * p, int * slot) {
     int b0, b1;
     b0 = *p++;

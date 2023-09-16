@@ -2040,6 +2040,12 @@ extern void write_char(struct generator * g, int ch) {
 }
 
 extern void write_newline(struct generator * g) {
+    /* Avoid generating trailing whitespace. */
+    while (true) {
+        int ch = str_back(g->outbuf);
+        if (ch != ' ' && ch != '\t') break;
+        str_pop(g->outbuf);
+    }
     str_append_ch(g->outbuf, '\n'); /* newline */
     g->line_count++;
 }

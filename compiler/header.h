@@ -54,6 +54,7 @@ extern struct str * str_copy(const struct str * old);
 extern byte * str_data(const struct str * str);
 extern int str_len(const struct str * str);
 extern int str_back(const struct str *str);
+extern void str_pop(const struct str *str);
 extern void output_str(FILE * outfile, struct str * str);
 
 extern int get_utf8(const symbol * p, int * slot);
