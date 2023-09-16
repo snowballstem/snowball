@@ -477,6 +477,11 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     q->number = p->number * r->number;
                     break;
                 case c_divide:
+                    if (r->number == 0) {
+                        fprintf(stderr, "%s:%d: Division by zero\n",
+				t->file, t->line_number);
+                        exit(1);
+                    }
                     q->number = p->number / r->number;
                     break;
                 default:
