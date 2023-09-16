@@ -1019,9 +1019,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 #ifdef OPTIMISATION_WARNINGS
         printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
 #endif
-        if (g->options->comments) {
-            writef(g, "~M~C", p);
-        }
+        writef(g, "~M~C", p);
         generate_GO_grouping(g, p->left, style, p->left->type == c_non);
         return;
     }
