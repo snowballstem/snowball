@@ -22,6 +22,8 @@ routines (
 	nu
 )
 
+stringescapes {}
+
 stringdef a" '{U+00E4}' //a-umlaut ä
 stringdef o" '{U+00F6}' //o-umlaut ö
 stringdef o' '{U+00F5}' //o with tilde õ
@@ -33,7 +35,6 @@ externals ( stem )
 booleans ( is_verb )
 integers ( p1 )
 groupings ( V1 RV KI GI)
-stringescapes {}
 
 define V1 'aeiou{o'}{a"}{o"}{u"}'
 define RV 'aeiuo'
