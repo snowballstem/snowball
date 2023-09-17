@@ -22,10 +22,10 @@ routines (
 	nu
 )
 
-stringdef a" hex 'E4' //a-umlaut ä
-stringdef o" hex 'F6' //o-umlaut ö
-stringdef o' hex 'F5' //o with tilde õ
-stringdef u" hex 'FC' //u-umlaut ü
+stringdef a" '{U+00E4}' //a-umlaut ä
+stringdef o" '{U+00F6}' //o-umlaut ö
+stringdef o' '{U+00F5}' //o with tilde õ
+stringdef u" '{U+00FC}' //u-umlaut ü
 
 externals ( stem )
 booleans ( is_verb )
