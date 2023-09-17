@@ -16,7 +16,7 @@ catalan         UTF_8,ISO_8859_1        catalan,ca,cat
 danish          UTF_8,ISO_8859_1        danish,da,dan
 dutch           UTF_8,ISO_8859_1        dutch,nl,dut,nld
 english         UTF_8,ISO_8859_1        english,en,eng
-estonian        UTF_8,ISO_8859_1        estonian,et,est
+estonian        UTF_8                   estonian,et,est
 finnish         UTF_8,ISO_8859_1        finnish,fi,fin
 french          UTF_8,ISO_8859_1        french,fr,fre,fra
 german          UTF_8,ISO_8859_1        german,de,ger,deu
