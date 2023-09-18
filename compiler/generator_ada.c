@@ -1330,8 +1330,6 @@ static void generate_among(struct generator * g, struct node * p) {
 
     if (x->substring == 0) generate_substring(g, p);
 
-    if (x->starter != 0) generate(g, x->starter);
-
     if (x->command_count == 1 && x->nocommand_count == 0) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);

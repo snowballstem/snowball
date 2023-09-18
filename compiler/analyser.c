@@ -738,11 +738,12 @@ static int compare_node(const struct node *p, const struct node *q) {
     return compare_node(p->right, q->right);
 }
 
-static void make_among(struct analyser * a, struct node * p, struct node * substring) {
+static struct node * make_among(struct analyser * a, struct node * p, struct node * substring) {
 
     NEW(among, x);
     NEWVEC(amongvec, v, p->number);
     struct node * q = p->left;
+    struct node * starter = 0;
     struct amongvec * w0 = v;
     struct amongvec * w1 = v;
     int result = 1;
@@ -756,11 +757,10 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->b = v;
     x->number = a->among_count++;
     x->function_count = 0;
-    x->starter = 0;
     x->nocommand_count = 0;
     x->amongvar_needed = false;
 
-    if (q->type == c_bra) { x->starter = q; q = q->right; }
+    if (q->type == c_bra) { starter = q; q = q->right; }
 
     while (q) {
         if (q->type == c_literalstring) {
@@ -866,16 +866,26 @@ static void make_among(struct analyser * a, struct node * p, struct node * subst
     x->literalstring_count = p->number;
     p->among = x;
 
-    x->substring = substring;
-    if (substring != 0) substring->among = x;
     if (x->command_count > 1 ||
-        (x->command_count == 1 && x->nocommand_count > 0) ||
-        x->starter != 0) {
+        (x->command_count == 1 && x->nocommand_count > 0)) {
         /* We need to set among_var rather than just checking if find_among*()
          * returns zero or not.
          */
         x->amongvar_needed = a->amongvar_needed = true;
     }
+    if (starter) {
+        starter->right = p;
+        if (substring) {
+            p = starter;
+        } else {
+            substring = new_node(a, c_substring);
+            substring->right = starter;
+            p = substring;
+        }
+    }
+    x->substring = substring;
+    if (substring != 0) substring->among = x;
+    return p;
 }
 
 static int
@@ -925,7 +935,7 @@ static struct node * read_among(struct analyser * a) {
                 continue;
             case c_ket:
                 if (p->number == 0) error(a, e_empty_among);
-                if (t->error_count == 0) make_among(a, p, substring);
+                if (t->error_count == 0) p = make_among(a, p, substring);
                 return p;
         }
         previous_token = token;

@@ -555,14 +555,6 @@ static int check_possible_signals(struct generator * g,
                 r = -1;
             }
 
-            if (x->starter != 0) {
-                int res = check_possible_signals(g, x->starter, call_depth);
-                if (res == 0)
-                    return res;
-                if (res < 0)
-                    r = res;
-            }
-
             if (x->command_count > 0) {
                 int trues = (x->nocommand_count > 0);
                 int falses = false;
@@ -1638,8 +1630,6 @@ static void generate_among(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     if (x->substring == 0) generate_substring(g, p);
-
-    if (x->starter != 0) generate(g, x->starter);
 
     if (x->command_count == 1 && x->nocommand_count == 0) {
         /* Only one outcome ("no match" already handled). */

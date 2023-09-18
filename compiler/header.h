@@ -219,7 +219,6 @@ struct among {
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* in this among */
     int amongvar_needed;      /* do we need to set among_var? */
-    struct node * starter;    /* i.e. among( (starter) 'string' ... ) */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
 };
