@@ -1,4 +1,4 @@
-    c_among = 4, c_and, c_as, c_assign, c_assignto, c_atleast,
+    c_among = 0, c_and, c_as, c_assign, c_assignto, c_atleast,
     c_atlimit, c_atmark, c_attach, c_backwardmode, c_backwards,
     c_booleans, c_bra, c_comment1, c_comment2, c_cursor, c_debug,
     c_decimal, c_define, c_delete, c_divide, c_divideassign, c_do,
