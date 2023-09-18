@@ -12,7 +12,7 @@ struct system_word {
 };
 
 
-/* ASCII collating assumed in syswords.c */
+/* ASCII collating assumed in syswords.h */
 
 #include "syswords.h"
 
