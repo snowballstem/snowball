@@ -174,7 +174,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
                             if (t->encoding == ENC_SINGLEBYTE) {
                                 /* Only ISO-8859-1 is handled this way - for
                                  * other single-byte character sets you need
-                                 * stringdef all the U+xxxx codes you use
+                                 * to stringdef all the U+xxxx codes you use
                                  * like - e.g.:
                                  *
                                  * stringdef U+0171   hex 'FB'
