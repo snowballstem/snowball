@@ -32,21 +32,21 @@ static void print_arglist(int exit_code) {
     FILE * f = exit_code ? stderr : stdout;
     fprintf(f, "Usage: snowball SOURCE_FILE... [OPTIONS]\n\n"
                "Supported options:\n"
-               "  -o[utput] file\n"
-               "  -s[yntax]\n"
+               "  -o, -output OUTPUT_BASE\n"
+               "  -s, -syntax\n"
                "  -comments\n"
 #ifndef DISABLE_JAVA
-               "  -j[ava]\n"
+               "  -j, -java\n"
 #endif
 #ifndef DISABLE_CSHARP
-               "  -cs[harp]\n"
+               "  -cs, -csharp\n"
 #endif
                "  -c++\n"
 #ifndef DISABLE_PASCAL
                "  -pascal\n"
 #endif
 #ifndef DISABLE_PYTHON
-               "  -py[thon]\n"
+               "  -py, -python\n"
 #endif
 #ifndef DISABLE_JS
                "  -js\n"
@@ -60,25 +60,25 @@ static void print_arglist(int exit_code) {
 #ifndef DISABLE_ADA
                "  -ada\n"
 #endif
-               "  -w[idechars]\n"
-               "  -u[tf8]\n"
-               "  -n[ame] class name\n"
-               "  -ep[refix] string\n"
-               "  -vp[refix] string\n"
-               "  -i[nclude] directory\n"
-               "  -r[untime] path to runtime headers\n"
-               "  -p[arentclassname] fully qualified parent class name\n"
+               "  -w, -widechars\n"
+               "  -u, -utf8\n"
+               "  -n, -name CLASS_NAME\n"
+               "  -ep, -eprefix EXTERNAL_PREFIX\n"
+               "  -vp, -vprefix VARIABLE_PREFIX\n"
+               "  -i, -include DIRECTORY\n"
+               "  -r, -runtime DIRECTORY\n"
+               "  -p, -parentclassname CLASS_NAME  fully qualified parent class name\n"
 #if !defined(DISABLE_JAVA) || !defined(DISABLE_CSHARP)
-               "  -P[ackage] package name for stemmers\n"
-               "  -S[tringclass] StringBuffer-compatible class\n"
-               "  -a[mongclass] fully qualified name of the Among class\n"
+               "  -P, -Package PACKAGE_NAME        package name for stemmers\n"
+               "  -S, -Stringclass STRING_CLASS    StringBuffer-compatible class\n"
+               "  -a, -amongclass AMONG_CLASS      fully qualified name of the Among class\n"
 #endif
 #ifndef DISABLE_GO
-               "  -gop[ackage] Go package name for stemmers\n"
-               "  -gor[untime] Go snowball runtime package\n"
+               "  -gop, -gopackage PACKAGE_NAME    Go package name for stemmers\n"
+               "  -gor, -goruntime PACKAGE_NAME    Go snowball runtime package\n"
 #endif
-               "  --help        display this help and exit\n"
-               "  --version     output version information and exit\n"
+               "  --help                           display this help and exit\n"
+               "  --version                        output version information and exit\n"
            );
     exit(exit_code);
 }
