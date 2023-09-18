@@ -84,8 +84,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_ada.c
 
 COMPILER_HEADERS = compiler/header.h \
-		   compiler/syswords.h \
-		   compiler/syswords2.h
+		   compiler/syswords.h
 
 RUNTIME_SOURCES  = runtime/api.c \
 		   runtime/utilities.c

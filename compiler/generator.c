@@ -131,6 +131,20 @@ static void write_margin(struct generator * g) {
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
+extern void write_c_relop(struct generator * g, int relop) {
+    switch (relop) {
+	case c_eq: write_string(g, " == "); break;
+	case c_ne: write_string(g, " != "); break;
+	case c_gr: write_string(g, " > "); break;
+	case c_ge: write_string(g, " >= "); break;
+	case c_ls: write_string(g, " < "); break;
+	case c_le: write_string(g, " <= "); break;
+	default:
+	    fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
+	    exit(1);
+    }
+}
+
 void write_comment_content(struct generator * g, struct node * p) {
     switch (p->type) {
         case c_mathassign:
@@ -1341,41 +1355,18 @@ static void generate_integer_assign(struct generator * g, struct node * p, char 
 
 static void generate_integer_test(struct generator * g, struct node * p) {
 
-    const char * s;
+    int relop = p->type;
     int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
     if (optimise_to_return) {
         w(g, "~Mreturn ");
-        switch (p->type) {
-            case c_eq: s = "=="; break;
-            case c_ne: s = "!="; break;
-            case c_gr: s = ">"; break;
-            case c_ge: s = ">="; break;
-            case c_ls: s = "<"; break;
-            case c_le: s = "<="; break;
-            default:
-                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
-                exit(1);
-        }
         p->right = NULL;
     } else {
         w(g, "~Mif (");
         // We want the inverse of the snowball test here.
-        switch (p->type) {
-            case c_eq: s = "!="; break;
-            case c_ne: s = "=="; break;
-            case c_gr: s = "<="; break;
-            case c_ge: s = "<"; break;
-            case c_ls: s = ">="; break;
-            case c_le: s = ">"; break;
-            default:
-                fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", p->type);
-                exit(1);
-        }
+	relop ^= 1;
     }
     generate_AE(g, p->left);
-    write_char(g, ' ');
-    write_string(g, s);
-    write_char(g, ' ');
+    write_c_relop(g, relop);
     generate_AE(g, p->AE);
     if (optimise_to_return) {
         w(g, ";~C");
