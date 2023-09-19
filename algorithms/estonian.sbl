@@ -55,7 +55,7 @@ backwardmode (
         setlimit tomark p1 for ([substring])
         test hop 4 //kingi -> kingi
         among(
-            'gi' ((GI and not LONGV) delete) //jooksemegi -> jookseme, bioloogi -> bioloogi
+            'gi' ((GI and not LONGV) delete) //jookse-me-gi, bioloogi -> bioloogi
             'ki' (KI delete) //kookki -> kook
         )
 
@@ -69,7 +69,7 @@ backwardmode (
             'mata' (delete)
             'takse' 'dakse' (delete) //impersonal: laul-dakse, luba-takse
             'taks' 'daks' (delete)   //impersonal conditional: laul-daks, saade-taks
-            'akse' (<-'a')           //impersonal: tulla-kse, süüa-kse, teha-kse, püüt-akse, leita-kse
+            'akse' (<-'a')           //impersonal: tulla-kse, süüa-kse (-> söö), teha-kse (-> tegi), püüta-kse, leita-kse
             'sime' (delete)          //pl1pst: saat-sime
             'site' (delete)          //pl2pst: saat-site
             'sin' (delete)           //sg1pst: laul-sin, saat-sin
@@ -87,7 +87,7 @@ backwardmode (
     define i_plural as (
         setlimit tomark p1 for ([substring])
         among(
-            'i' (RV) //raamatui -> raamatu, lapsikui -> lapsiku
+            'i' (RV) //raama-tu-i, lapsiku-i
         )
         delete
     )
@@ -113,16 +113,16 @@ backwardmode (
     define case_ending as (
         setlimit tomark p1 for ([substring])
         among(
-            'sse' (RV or LONGV) //illative: saapa-sse, tegemisse -> tegemisse
-            'st' (RV or LONGV) //elative: saapa-st, rohelist -> rohelist
-            'le' (RV or LONGV) //allative: raamatu-le
-            'lt' (RV or LONGV) //ablative: raamatu-lt
+            'sse' (RV or LONGV) //illative: saapa-sse
+            'st' (RV or LONGV) //elative: saapa-st and kapsas-t
+            'le' (RV or LONGV) //allative: raama-tu-le
+            'lt' (RV or LONGV) //ablative: raama-tu-lt
             'ga' (RV or LONGV) //komitatiive: õpetaja-ga
             'ks' (RV or LONGV) //translative: õpetaja-ks
             'ta' (RV or LONGV) //abessive and da-infinitive: õpetaja-ta and hüpa-ta
-            't' //partitiiv, raamatu-t and kapsas-t
-            's'  (RV or LONGV)//inessive and sg3pst: raamatu-s and sõiti-s
-            'l'  (RV or LONGV) //adessive: raamatu-l and kapsa-l.
+            't' //partitiiv, raamatu-t
+            's'  (RV or LONGV)//inessive and sg3pst: raama-tu-s and sõiti-s
+            'l'  (RV or LONGV) //adessive: raama-tu-l and kapsa-l.
         )
         delete
     )
@@ -135,9 +135,9 @@ backwardmode (
             'ikke' (<-'iku') //plural partitive: rahulikke -> rahuliku
             'ike' (<-'iku') //plural genitive: ohtlike -> ohtliku
             'sid' (not LONGV delete) //plural partitive and sg2pst and pl3pst: auto-sid and laul-sid (exludes plural nominative with words like gaasid, roosid)
-            'te' ((test hop 4 (('mis' <- 'e') or ('las' <- 'e') or ('lis' <- 'e') or (not 't' delete))) or (not 't' <-'t')) //plural genitive and pl2: ministri-te, olulis-te and saada-te, laula-te; also torte -> tort (if not in compound word) and kokkuvõtte -> kokkuvõte and roheliste -> rohelise, tegemiste -> tegemise, teadlaste -> teadlase
+            'te' ((test hop 4 (('mis' <- 'e') or ('las' <- 'e') or ('lis' <- 'e') or (not 't' delete))) or (not 't' <-'t')) //plural genitive and pl2: ministri-te, oluliste -> olulise and saada-te, laula-te; also torte -> tort (if not in compound word) and kokkuvõtte -> kokkuvõte and roheliste -> rohelise, tegemiste -> tegemise, teadlaste -> teadlase
             'de' ((RV or LONGV) delete) //plural genitive: lauda-de
-            'd' ((RV or LONGV) delete) //plural nominative: voodid -> voodi, rattaid -> rattai, lapsikuid -> lapsiku
+            'd' ((RV or LONGV) delete) //plural nominative: voodi-d, rattai-d (rata), lapsiku-i-d
         )
     )
 
@@ -160,7 +160,7 @@ backwardmode (
         delete
     )
 
-    define remove_double_kpt as (// undouble kpt consonant if 'C1C1V': mõtte(-le) -> mõte, hakka(-n) -> haka, haka(-nu-d) -> haka
+    define remove_double_kpt as (// undouble kpt consonant if 'C1C1V': mõtte(-le) -> mõte, hakka(-n) -> haka
         (V1) (double)
         and undouble
     )
@@ -169,7 +169,7 @@ backwardmode (
         setlimit tomark p1 for ([substring])
         among(
             'mai' (RV delete) //heleda-mai(-le)
-            'ma' (delete)  //tugeva-ma(-le) and ma-infinitive: sõit-ma
+            'ma' (delete)  //tuge-va-ma(-le) and ma-infinitive: sõit-ma
             'm' (RV delete) //kauge-i-m, rõõmsa-m
         )
     )
