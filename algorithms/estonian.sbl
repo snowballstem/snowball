@@ -205,7 +205,8 @@ define verb_exceptions as (
         'l{o"}{o"}n' 'l{o"}{o"}d' 'l{o"}{o"}b' 'l{o"}{o"}me' 'l{o"}{o"}te' 'l{o"}{o"}vad'  (<-'l{o"}{o"}')
         'l{o"}{o"}ksin' 'l{o"}{o"}ksid' 'l{o"}{o"}ks' 'l{o"}{o"}ksime' 'l{o"}{o"}ksite' (<-'l{o"}{o"}')
         'l{o"}{o"}mata' 'l{u"}{u"}akse' 'l{o"}{o"}dakse' 'l{o"}{o"}di' 'l{o"}{o"}ma' 'l{u"}{u"}a' (<-'l{o"}{o"}')
-        'l{o~}in' 'l{o~}id' 'l{o~}i' 'l{o~}ime' 'l{o~}ite' (<-'l{o"}i') //looma-lõi, lööma-lõi
+        // Both looma and lööma have these same past tense forms
+        'l{o~}in' 'l{o~}id' 'l{o~}i' 'l{o~}ime' 'l{o~}ite' (<-'l{o~}i')
         'loon' 'lood' 'loob' 'loome' 'loote' 'loovad' (<-'loo')
         'looksin' 'looksid' 'looks' 'looksime' 'looksite' (<-'loo')
         'loomata' 'luuakse' 'loodi' 'luua' 'looma' (<-'loo')
