@@ -58,9 +58,9 @@ routines (
   reflexive
   verb
   noun
-  common_avn
+  all_vowels
   derivational
-  // tidy_up
+  tidy_up
 )
 
 externals ( stem )
@@ -101,11 +101,9 @@ backwardmode (
 
   define perfective_gerund as (
     [substring] among (
-      '{v}'      // {d}{o}{n}{a}{p}{y}{s}{a}|{v}    {d}{o}{r}{o}{b}{y}|{v} {d}{o}{r}{o}{b}{y}|{v}
-      '{v}{sh}{y}'    // {n}{a}{p}{y}{s}{a}|{v}{sh}{y}    {z}{r}{o}{b}{y}|{v}{sh}{y}
-      '{v}{sh}{y}{s}{soft}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{soft} {s}{p}{a}{k}{u}{v}{a}|{v}{sh}{y}{s}{soft}
-      '{v}{sh}{y}{s}{ia}'  // {o}{b}{e}{r}{i}{gh}{a}|{v}{sh}{y}{s}{ia} {s}{p}{o}{d}{i}{v}{a}|{v}{sh}{y}{s}{ia}
-               // ('{a}' or '{ia}' delete) ???
+      '{v}{sh}{y}'   // {n}{a}{p}{y}{s}{a}|{v}{sh}{y}
+      '{v}{sh}{y}{s}{soft}'
+      '{v}{sh}{y}{s}{ia}'
       '{u}{ch}{y}'
       '{iu}{ch}{y}'
       '{iu}{ch}{y}{s}{soft}'
@@ -117,15 +115,25 @@ backwardmode (
       '{l}{ia}{ch}{y}{s}{soft}'
       '{l}{ia}{ch}{y}{s}{ia}'
       '{ia}{ch}{y}'
-      '{ia}{ch}{y}{s}{soft}'  // ???
-      '{ia}{ch}{y}{s}{ia}'  // ???
+      '{ia}{ch}{y}{s}{soft}'
+      '{ia}{ch}{y}{s}{ia}'
         (delete)
    )
   )
 
+  define reflexive as (
+    [substring] among (
+      '{ye}{t}{soft}{s}{ia}' // {s}{m}{i}|{ye}{t}{soft}{s}{ia}
+      '{e}{t}{soft}{s}{ia}'
+      '{s}{ia}'
+      '{s}{soft}'
+        (delete)
+    )
+  )
+
   define adjective as (
     [substring] among (
-      '{y}{i`}' '{o}{gh}{o}' '{o}{m}{u}' '{y}{m}' '{i}{m}'
+      '{y}{i`}' '{o}{gh}{o}' '{o}{m}{u}' '{y}{m}' '{i}{m}'                 // {z}{e}{l}|{e}{n}.{y}{i`}
       '{i}{sh}{y}{i`}' '{i}{sh}{o}{gh}{o}' '{i}{sh}{o}{m}{u}' '{i}{sh}{y}{m}' '{i}{sh}{i}{m}' '{i}{sh}{e}'
       '{o}{yi}' '{i}{i`}' '{o}{iu}'
       '{i}{sh}{a}' '{i}{sh}{o}{yi}' '{i}{sh}{i}{i`}' '{i}{sh}{u}' '{i}{sh}{o}{iu}'
@@ -134,7 +142,11 @@ backwardmode (
       '{soft}{o}{gh}{o}' '{soft}{o}{m}{u}'
       '{soft}{o}{yi}' '{soft}{o}{iu}'
       '{i}{kh}' '{i}{m}{y}'
-
+      '{o}{v}{a}' '{o}{v}{e}'
+      '{yi}{i`}' '{y}{yi}{i`}'
+      '{i`}{o}{m}{u}' '{y}{i`}{o}{m}{u}'
+      '{ye}{ye}' '{e}{ye}'
+      '{e}{n}{a}' '{e}{n}{i}' '{e}{n}{e}' '{e}{n}{u}'
       '{ia}{ch}{a}' '{ia}{ch}{e}' '{ia}{ch}{u}' '{ia}{ch}{i}'
       '{a}{ch}{a}' '{a}{ch}{e}' '{a}{ch}{u}' '{a}{ch}{i}'
       '{iu}{ch}{a}' '{iu}{ch}{e}' '{iu}{ch}{u}' '{iu}{ch}{i}'
@@ -148,51 +160,30 @@ backwardmode (
 
     try (
       [substring] among (
-        '{ia}{ch}'
-        '{a}{ch}'
-        '{iu}{ch}'
-        '{u}{ch}'
-          (delete)
-
-        // Need or needn't ?
-        // '{e}{n}' // {v}{t}{r}{a}{ch}|{e}{n}{y}{i`}  {v}{t}{r}{a}{ch}|{e}{n}{o}{gh}{o}   {v}{t}{r}{a}{ch}|{e}{n}{o}{m}{u}   {v}{t}{r}{a}{ch}|{e}{n}{y}{m}    {v}{t}{r}{a}{ch}|{e}{n}{i}{m}
-                // {v}{t}{r}{a}{ch}|{e}{n}{a}   {v}{t}{r}{a}{ch}|{e}{n}{e}     {v}{t}{r}{a}{ch}|{e}{n}{o}{yi}    {v}{t}{r}{a}{ch}|{e}{n}{i}{i`}    {v}{t}{r}{a}{ch}|{e}{n}{u}   {v}{t}{r}{a}{ch}|{e}{n}{o}{iu}
-                // {v}{t}{r}{a}{ch}|{e}{n}{i}   {v}{t}{r}{a}{ch}|{e}{n}{y}{kh}    {v}{t}{r}{a}{ch}|{e}{n}{y}{m}{y}
+        '{e}{n}' '{ia}{ch}' '{a}{ch}' '{iu}{ch}' '{u}{ch}' (delete) // {z}{e}{l}|{e}{n}.{y}{i`}
       )
-    )
-  )
-
-  define reflexive as (
-    [substring] among (
-      '{s}{ia}'
-      '{s}{soft}'
-      '{ye}{t}{soft}{s}{ia}'
-      '{e}{t}{soft}{s}{ia}'
-        (delete)
     )
   )
 
   define verb as (
     [substring] among (
-      '{t}{y}'
-      // '{t}{soft}'  // {r}{o}{b}{y}|{t}{soft} ???
+      '{a}{v}' '{a}{l}{y}' '{a}{l}{o}' '{a}{l}{a}' '{a}{t}{soft}' '{a}{t}{y}' // {p}{i}{z}{n}{a}{v}|{a}{v}
+      '{m}{e}'
       '{i}{t}{soft}'
-      '{t}{e}'
-
       '{i`}{t}{e}'
       '{l}{a}' '{l}{o}' '{l}{y}'
+      '{t}{y}' '{t}{soft}' '{t}{e}'
       '{ye}{sh}' '{ye}{m}{o}' '{ye}{t}{e}' '{iu}{t}{soft}'
       '{e}{sh}' '{e}{m}{o}' '{e}{t}{e}' '{u}{t}{soft}'
       '{l}{iu}' '{y}{sh}' '{y}{t}{soft}' '{y}{m}{o}' '{y}{t}{e}' '{l}{ia}{t}{soft}'
-      '{yi}{sh}' '{yi}{t}{soft}' '{yi}{m}{o}' '{yi}{t}{e}' '{ia}{t}{soft}'
-      '{a}{t}{soft}'
+      '{l}{ia}{t}{y}'
+      '{yi}{sh}' '{yi}{t}{soft}' '{yi}{m}{o}' '{yi}{t}{e}' '{ia}{t}{soft}' '{ia}{t}{y}'
         (delete)
     )
   )
-
   define noun as (
     [substring] among (
-      '{a}{m}' '{a}{m}{y}' '{a}{kh}'
+      '{a}{m}' '{a}{m}{y}' '{a}{kh}' // {v}{o}{d}|{a}{m}
       '{e}{iu}'
       '{ia}{m}' '{ia}{m}{y}' '{ia}{kh}'
       '{o}{v}{i}' '{o}{m}'
@@ -200,40 +191,45 @@ backwardmode (
       '{e}{n}{soft}'
       '{o}{i`}'
       '{i}{iu}' '{i}{yi}'
+      '{i}{v}'
+      '{e}{v}' '{o}{v}' '{e}{i`}' '{y}{ia}{m}' '{y}{ia}{kh}' '{y}{iu}'
+      '{i}{ia}{m}' '{i}{ia}{kh}'
+      '{y}{ia}' '{ye}{iu}' '{e}{v}{i}' '{ye}{m}' '{yi}{v}'
+      '{i}{ye}{iu}' '{y}{ye}{iu}' '{e}{ye}{iu}'
+      '{soft}{yi}' '{soft}{ye}' '{soft}{ye}{iu}' '{soft}{iu}' '{soft}{ia}'
         (delete)
     )
   )
 
-  define common_avn as (
+  define all_vowels as (
     [substring] among (
-      '{a}' '{v}' '{e}' '{ye}' '{y}' '{i}'
+      '{a}' '{v}' '{e}' '{ye}' '{y}' '{i}' // {v}{o}{d}|{a}
       '{i`}' '{o}' '{u}' '{soft}' '{iu}' '{ia}'
-      '{i}{i`}' '{o}{iu}'
         (delete)
     )
   )
 
+  // HERE!!!!
   define derivational as (
     [substring] R2 among (
-      '{i}{s}{t}'
+      '{i}{s}{t}' // {n}{e}{z}{a}{l}{e}{zh}{n}|{i}{s}{t}.{t}{iu}
       '{o}{s}{t}'
+      '{e}{n}{soft}{k}'
         (delete)
     )
   )
 
-  // define tidy_up as (
-  //     [substring] among (
-  //         // '{e}{i`}{sh}'
-  //         // '{e}{i`}{sh}{e}'  // superlative forms
-  //         //    (delete
-  //         //     ['{n}'] '{n}' delete
-  //         //    )
-  //         // '{n}'
-  //         //    ('{n}' delete) // e.g. -nno endings
-  //         // '{'}'
-  //         //    (delete)  // with some slight false conflations
-  //     )
-  // )
+  define tidy_up as (
+    [substring] among (
+      '{d}' ('{d}' delete) // {u}{s}{e}{v}{l}{a}{d}|{d}.{ia}{m}
+      '{zh}' ('{zh}' delete)
+      '{l}' ('{l}' delete)
+      '{n}' ('{n}' delete)
+      '{s}' ('{s}' delete)
+      '{t}' ('{t}' delete)
+      '{ch}' ('{ch}' delete)
+    )
+  )
 )
 
 define stem as (
@@ -246,11 +242,11 @@ define stem as (
       (
         try reflexive
 
-        adjectival or verb or noun or common_avn
+        adjectival or verb or noun or all_vowels
       )
     )
 
     do derivational
-    // do tidy_up
+    do tidy_up
   )
 )

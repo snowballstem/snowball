@@ -58,9 +58,9 @@ routines (
   reflexive
   verb
   noun
-  common_avn
+  all_vowels
   derivational
-  // tidy_up
+  tidy_up
 )
 
 externals ( stem )
@@ -101,11 +101,9 @@ backwardmode (
 
   define perfective_gerund as (
     [substring] among (
-      'в'      // донаписа|в    дороби|в дороби|в
-      'вши'    // написа|вши    зроби|вши
-      'вшись'  // оберіга|вшись спакува|вшись
-      'вшися'  // оберіга|вшися сподіва|вшися
-               // ('а' or 'я' delete) ???
+      'вши'   // написа|вши
+      'вшись'
+      'вшися'
       'учи'
       'ючи'
       'ючись'
@@ -117,15 +115,25 @@ backwardmode (
       'лячись'
       'лячися'
       'ячи'
-      'ячись'  // ???
-      'ячися'  // ???
+      'ячись'
+      'ячися'
         (delete)
    )
   )
 
+  define reflexive as (
+    [substring] among (
+      'ється' // смі|ється
+      'еться'
+      'ся'
+      'сь'
+        (delete)
+    )
+  )
+
   define adjective as (
     [substring] among (
-      'ий' 'ого' 'ому' 'им' 'ім'
+      'ий' 'ого' 'ому' 'им' 'ім'                 // зел|ен.ий
       'іший' 'ішого' 'ішому' 'ішим' 'ішім' 'іше'
       'ої' 'ій' 'ою'
       'іша' 'ішої' 'ішій' 'ішу' 'ішою'
@@ -134,7 +142,11 @@ backwardmode (
       'ього' 'ьому'
       'ьої' 'ьою'
       'іх' 'іми'
-
+      'ова' 'ове'
+      'їй' 'иїй'
+      'йому' 'ийому'
+      'єє' 'еє'
+      'ена' 'ені' 'ене' 'ену'
       'яча' 'яче' 'ячу' 'ячі'
       'ача' 'аче' 'ачу' 'ачі'
       'юча' 'юче' 'ючу' 'ючі'
@@ -148,51 +160,30 @@ backwardmode (
 
     try (
       [substring] among (
-        'яч'
-        'ач'
-        'юч'
-        'уч'
-          (delete)
-
-        // Need or needn't ?
-        // 'ен' // втрач|ений  втрач|еного   втрач|еному   втрач|еним    втрач|енім
-                // втрач|ена   втрач|ене     втрач|еної    втрач|еній    втрач|ену   втрач|еною
-                // втрач|ені   втрач|ених    втрач|еними
+        'ен' 'яч' 'ач' 'юч' 'уч' (delete) // зел|ен.ий
       )
-    )
-  )
-
-  define reflexive as (
-    [substring] among (
-      'ся'
-      'сь'
-      'ється'
-      'еться'
-        (delete)
     )
   )
 
   define verb as (
     [substring] among (
-      'ти'
-      // 'ть'  // роби|ть ???
+      'ав' 'али' 'ало' 'ала' 'ать' 'ати' // пізнав|ав
+      'ме'
       'іть'
-      'те'
-
       'йте'
       'ла' 'ло' 'ли'
+      'ти' 'ть' 'те'
       'єш' 'ємо' 'єте' 'ють'
       'еш' 'емо' 'ете' 'уть'
       'лю' 'иш' 'ить' 'имо' 'ите' 'лять'
-      'їш' 'їть' 'їмо' 'їте' 'ять'
-      'ать'
+      'ляти'
+      'їш' 'їть' 'їмо' 'їте' 'ять' 'яти'
         (delete)
     )
   )
-
   define noun as (
     [substring] among (
-      'ам' 'ами' 'ах'
+      'ам' 'ами' 'ах' // вод|ам
       'ею'
       'ям' 'ями' 'ях'
       'ові' 'ом'
@@ -200,40 +191,45 @@ backwardmode (
       'ень'
       'ой'
       'ію' 'ії'
+      'ів'
+      'ев' 'ов' 'ей' 'иям' 'иях' 'ию'
+      'іям' 'іях'
+      'ия' 'єю' 'еві' 'єм' 'їв'
+      'ією' 'иєю' 'еєю'
+      'ьї' 'ьє' 'ьєю' 'ью' 'ья'
         (delete)
     )
   )
 
-  define common_avn as (
+  define all_vowels as (
     [substring] among (
-      'а' 'в' 'е' 'є' 'и' 'і'
+      'а' 'в' 'е' 'є' 'и' 'і' // вод|а
       'й' 'о' 'у' 'ь' 'ю' 'я'
-      'ій' 'ою'
         (delete)
     )
   )
 
+  // HERE!!!!
   define derivational as (
     [substring] R2 among (
-      'іст'
+      'іст' // незалежн|іст.тю
       'ост'
+      'еньк'
         (delete)
     )
   )
 
-  // define tidy_up as (
-  //     [substring] among (
-  //         // 'ейш'
-  //         // 'ейше'  // superlative forms
-  //         //    (delete
-  //         //     ['н'] 'н' delete
-  //         //    )
-  //         // 'н'
-  //         //    ('н' delete) // e.g. -nno endings
-  //         // '{'}'
-  //         //    (delete)  // with some slight false conflations
-  //     )
-  // )
+  define tidy_up as (
+    [substring] among (
+      'д' ('д' delete) // усевлад|д.ям
+      'ж' ('ж' delete)
+      'л' ('л' delete)
+      'н' ('н' delete)
+      'с' ('с' delete)
+      'т' ('т' delete)
+      'ч' ('ч' delete)
+    )
+  )
 )
 
 define stem as (
@@ -246,11 +242,11 @@ define stem as (
       (
         try reflexive
 
-        adjectival or verb or noun or common_avn
+        adjectival or verb or noun or all_vowels
       )
     )
 
     do derivational
-    // do tidy_up
+    do tidy_up
   )
 )
