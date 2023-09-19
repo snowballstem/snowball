@@ -120,8 +120,8 @@ backwardmode (
             'ga' (RV or LONGV) //komitatiive: õpetaja-ga
             'ks' (RV or LONGV) //translative: õpetaja-ks
             'ta' (RV or LONGV) //abessive and da-infinitive: õpetaja-ta and hüpa-ta
-            't' //partitiiv, raamatu-t
-            's'  (RV or LONGV)//inessive and sg3pst: raama-tu-s and sõiti-s
+            't'  (test hop 4)  //partitiiv, raamatu-t
+            's'  (RV or LONGV) //inessive and sg3pst: raama-tu-s and sõiti-s
             'l'  (RV or LONGV) //adessive: raama-tu-l and kapsa-l.
         )
         delete
