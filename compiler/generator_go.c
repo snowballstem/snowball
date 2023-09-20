@@ -933,7 +933,7 @@ static void generate_call(struct generator * g, struct node * p) {
     if (g->failure_keep_count == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
         /* Always fails or tail call. */
-        writef(g, "~Mreturn ~W0(env, context)", p);
+        writef(g, "~Mreturn ~W0(env, context)~N", p);
         return;
     }
     if (signals == 1) {
