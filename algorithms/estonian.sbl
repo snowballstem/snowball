@@ -257,8 +257,9 @@ define verb_exceptions as (
 
 
 define stem as (
-    do mark_regions
     not verb_exceptions
+    // p1 isn't used by verb_exceptions
+    do mark_regions
     backwards (
         do emphasis
         do ( verb or substantive )
