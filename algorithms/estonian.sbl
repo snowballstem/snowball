@@ -11,9 +11,7 @@ routines (
     case_ending
     emphasis
     plural_three_first_cases
-    remove_double_kpt
-    double
-    undouble
+    undouble_kpt
     i_plural
     degrees
     substantive
@@ -150,14 +148,6 @@ backwardmode (
         )
     )
 
-    define double as (
-        test among('kk' 'tt' 'pp')
-    )
-
-    define undouble as (
-        next [hop 1] delete
-    )
-
     define nu as (
         setlimit tomark p1 for ([substring])
         among(
@@ -169,9 +159,15 @@ backwardmode (
         delete
     )
 
-    define remove_double_kpt as (// undouble kpt consonant if 'C1C1V': mõtte(-le) -> mõte, hakka(-n) -> haka
-        (V1) (double)
-        and undouble
+    define undouble_kpt as (
+        // undouble '-C1C1V' where C1 is k, p or t:
+        // mõtte(-le) -> mõte, hakka(-n) -> haka
+        V1
+        [substring] among(
+            'kk' (<- 'k')
+            'pp' (<- 'p')
+            'tt' (<- 't')
+        )
     )
 
     define degrees as (
@@ -263,7 +259,7 @@ define stem as (
     backwards (
         do emphasis
         do ( verb or substantive )
-        do remove_double_kpt
+        do undouble_kpt
 
     )
 )
