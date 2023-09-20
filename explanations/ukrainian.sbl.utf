@@ -52,13 +52,16 @@ stringdef a_prime           '{U+2032}' // ′
 routines (
   prelude
   mark_regions R2
+  min_len
+  short_word
+  long_word
   perfective_gerund
   adjective
   adjectival
   reflexive
   verb
   noun
-  all_vowels
+  remove_last_letter
   derivational
   tidy_up
 )
@@ -91,8 +94,8 @@ define mark_regions as (
   $pV = limit
   $p2 = limit
   do (
-    gopast v  setmark pV  gopast non-v
-    gopast v  gopast non-v  setmark p2
+    gopast v   setmark pV     gopast non-v
+    gopast v   gopast non-v   setmark p2
   )
 )
 
@@ -201,9 +204,9 @@ backwardmode (
     )
   )
 
-  define all_vowels as (
+  define remove_last_letter as (
     [substring] among (
-      'а' 'в' 'е' 'є' 'и' 'і' // вод|а
+      'а' 'в' 'е' 'є' 'и' 'і' // NOUN: вод|а, VERB: вчи|в
       'й' 'о' 'у' 'ь' 'ю' 'я'
         (delete)
     )
@@ -230,6 +233,26 @@ backwardmode (
       'ч' ('ч' delete)
     )
   )
+
+  define min_len as (
+    $(len >= 4)
+  )
+
+  define short_word as (
+    $(len == 4) and remove_last_letter
+  )
+
+  define long_word as (
+    do (
+      perfective_gerund or (
+        try reflexive
+
+        adjectival or verb or noun or remove_last_letter
+      )
+    )
+
+    do derivational
+  )
 )
 
 define stem as (
@@ -237,16 +260,10 @@ define stem as (
   do mark_regions
 
   backwards setlimit tomark pV for (
-    do (
-      perfective_gerund or
-      (
-        try reflexive
+    min_len
 
-        adjectival or verb or noun or all_vowels
-      )
-    )
+    short_word or long_word
 
-    do derivational
     do tidy_up
   )
 )

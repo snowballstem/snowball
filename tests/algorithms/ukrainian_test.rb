@@ -212,7 +212,7 @@ noun = {
   'ьї ьє ьєю ью ья'     => %w[лазан|ьї     лазан|ьє     лазан|ьєю   лазан|ью  лазан|ья],
 }
 
-adj_verb_noun = {
+adj_verb_noun = { # remove_last_letter
   # adj
   'а е і у ю я'   => %w[зел|ен.а   зел|ен.е   зел|ен.і   зел|ен.у  верхн|ю  верхн|я],
   # verb
@@ -336,52 +336,6 @@ need_to_approve_2 = {
   'витанцьовувати' => 'витанцьов',
 }
 
-need_to_approve_3 = {
-  # для слів менше/рівне 3-м літерам не змінювати нічого
-  'а' => 'а',
-  'і' => 'і',
-  'у' => 'у',
-  'в' => 'в',
-  'на' => 'на',
-  'по' => 'по',
-  'до' => 'до',
-  'ні' => 'ні',
-  'але' => 'але',
-  'був' => 'був',
-  'рік' => 'рік',
-  'кіт' => 'кіт',
-  'ніж' => 'ніж',
-  'так' => 'так',
-
-  # слова із 4-х літер - вдсікати останню літеру 'а в е є и і й о у ь ю я'
-  'бува' => 'був',
-  'віче' => 'віч',
-  'наче' => 'нач',
-  'паче' => 'пач',
-  # року,
-  # році,
-  # роче,
-  # роки,
-  # ріка
-  #   ріка, ріки, ріці, ріку, , ріці, ріко, ріки,  , ріки, , , ріки
-
-  # для слів більше 4х літер усі правила
-  # рокові,
-  # роком,
-  # років, рокам, роками, роках,
-  # рікою рікам ріками ріках
-  # річка, річку, річкою, річці, річко, річки, річок, річкам, річками, річках
-  # рікша
-  # відер
-  # відра
-
-
-  'неначе' => 'неначе',
-  'одначе' => 'одначе',
-
-  'пірʼя' => 'пір'
-}
-
 $all_tests = []
 $errors = {}
 
@@ -389,6 +343,10 @@ require 'yaml'
 
 def yml_h_tests(file)
   YAML.load_file(file)
+end
+
+def txt_tests(file)
+  IO.read(file).split
 end
 
 def incorrect_stem_msg(result_stem, word, stem)
@@ -437,7 +395,7 @@ end
 end
 
 [
-  [exceptions, 'exceptions']
+  [exceptions, 'exceptions'],
   # [yml_h_tests('./algorithms/uk_test_pairs_N1.yml'), 'uk_test_pairs_N1.yml']
 ].each do |words_set, set_name|
   words_set.each do |word, test_case|
@@ -448,6 +406,24 @@ end
     $errors[set_name] << incorrect_stem_msg(result_stem, word, stem) if result_stem != stem
   end
 end
+
+[
+  [txt_tests('./algorithms/uk_test_01_one_two_three_size.txt'), '01_one_two_three_size'],
+  [txt_tests('./algorithms/uk_test_02_four_size.txt'), '02_four_size'],
+  [txt_tests('./algorithms/uk_test_03_test_victory.txt'), '03_test_victory'], # check and fix
+  [txt_tests('./algorithms/uk_test_04_test_popular.txt'), '04_popular'], # check and fix
+].each do |test_words, set_name|
+  test_words.each do |test_word|
+    stem, ending = test_word.to_s.split('|')
+    word =[stem, ending].join('')
+    $all_tests << word
+    result_stem = (`echo "#{word}" | ../stemwords -l uk `).strip
+    $errors[set_name] ||= []
+    $errors[set_name] << incorrect_stem_msg(result_stem, word, stem) if result_stem != stem
+  end
+end
+
+
 
 if $errors.values.all?(&:empty?)
   puts("#{$all_tests.count} test(s) passed successfully!")
