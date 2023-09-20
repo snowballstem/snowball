@@ -467,39 +467,17 @@ static int check_possible_signals(struct generator * g,
             return res;
         }
         case c_and: {
-            /* Gives same signal as p->left, but we want to warn. */
-            struct node * q;
-            int and_always_t = true;
-            for (q = p->left; q; q = q->right) {
-                // Just check this node - q->right is a separate clause of
-                // the AND.
-                int res = check_possible_signals(g, q, call_depth);
-                if (res == 0) {
-                    // If any clause of the AND always signals f, then the AND
-                    // always signals f.
-                    if (q->right) {
-                        fprintf(stderr, "%s:%d: warning: command always signals f here so rest of 'and' is dead code\n",
-                                g->analyser->tokeniser->file, q->line_number);
-                        q->right = NULL;
-                    }
-                    return 1;
-                }
-                if (res < 0) {
-                    and_always_t = false;
-                }
-            }
-            if (and_always_t) {
-                // If every clause of the AND always signals t, then the AND
-                // always signals t.
+            /* Gives same signal as list p->left. */
+            int r = check_possible_signals_list(g, p->left, p->type, call_depth);
+            if (r == 1) {
                 fprintf(stderr, "%s:%d: warning: every command in this 'and' always signals t\n",
                        g->analyser->tokeniser->file, p->line_number);
-                return 1;
             }
-            return -1;
+            return r;
         }
         case c_bra:
-            /* Gives same signal as p->left. */
-            return check_possible_signals_list(g, p->left, call_depth);
+            /* Gives same signal as list p->left. */
+            return check_possible_signals_list(g, p->left, p->type, call_depth);
         case c_atleast:
         case c_backwards:
         case c_loop:
@@ -518,7 +496,7 @@ static int check_possible_signals(struct generator * g,
                  */
                 return -1;
             }
-            return check_possible_signals_list(g, p->name->definition,
+            return check_possible_signals_list(g, p->name->definition, c_define,
                                                call_depth + 1);
         case c_gopast:
         case c_goto:
@@ -634,12 +612,21 @@ static int check_possible_signals(struct generator * g,
 // Return 0 for always f.
 // Return 1 for always t.
 // Return -1 for don't know (or can raise t or f).
-int check_possible_signals_list(struct generator * g,
-                                struct node * p, int call_depth) {
+int check_possible_signals_list(struct generator * g, struct node * p,
+                                int type, int call_depth) {
     int r = 1;
     while (p) {
         int res = check_possible_signals(g, p, call_depth);
-        if (res == 0) return res;
+        if (res == 0) {
+            // If any command always signals f, then the list always signals f.
+            if (p->right) {
+                fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is dead code\n",
+                        g->analyser->tokeniser->file, p->line_number,
+                        (type == c_and ? "'and'" : "command list"));
+                p->right = NULL;
+            }
+            return res;
+        }
         if (res < 0) r = res;
         p = p->right;
     }
@@ -1377,7 +1364,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 
 static void generate_call(struct generator * g, struct node * p) {
 
-    int signals = check_possible_signals_list(g, p->name->definition, 0);
+    int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
     g->V[0] = p->name;
     if (g->failure_keep_count == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
@@ -1471,7 +1458,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->failure_label = x_return;
     g->label_used = 0;
     g->keep_count = 0;
-    int signals = check_possible_signals_list(g, p->left, 0);
+    int signals = check_possible_signals_list(g, p->left, c_define, 0);
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
