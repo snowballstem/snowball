@@ -162,7 +162,11 @@ backwardmode (
     define undouble_kpt as (
         // undouble '-C1C1V' where C1 is k, p or t:
         // mõtte(-le) -> mõte, hakka(-n) -> haka
-        V1
+        //
+        // We only undouble if the vowel is in R1 to avoid modifying short
+        // non-words (mostly to avoid modifying acronyms/initialisms which such
+        // as "PPE").
+        V1 $(p1 <= cursor)
         [substring] among(
             'kk' (<- 'k')
             'pp' (<- 'p')
