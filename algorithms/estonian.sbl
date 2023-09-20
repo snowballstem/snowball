@@ -32,7 +32,6 @@ stringdef s* '{U+0161}' //s-caron š
 stringdef z* '{U+017E}' //z-caron ž
 
 externals ( stem )
-booleans ( is_verb )
 integers ( p1 )
 groupings ( V1 RV KI GI)
 
@@ -61,6 +60,7 @@ backwardmode (
 
     )
 
+    // Signals t is a replacement was made; f otherwise.
     define verb as (
         setlimit tomark p1 for ([substring])
         among(
@@ -78,7 +78,6 @@ backwardmode (
             'n' (V1 delete)          //sg1prs: kirjuta-n
             'b' (V1 delete)          //sg3prs: laula-b
         )
-        set is_verb
     )
 
     define LONGV as
@@ -260,11 +259,9 @@ define verb_exceptions as (
 define stem as (
     do mark_regions
     not verb_exceptions
-    unset is_verb
     backwards (
         do emphasis
-        do verb
-        try (not is_verb do substantive)
+        do ( verb or substantive )
         do remove_double_kpt
 
     )
