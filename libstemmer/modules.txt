@@ -52,9 +52,6 @@ porter          UTF_8,ISO_8859_1        porter			english
 # intended for general use, and use of them is is not fully supported.  These
 # algorithms are:
 #
-# german2          - This is a slight modification of the german stemmer.
-#german2          UTF_8,ISO_8859_1        german2		german
-#
 # kraaij_pohlmann  - This is a different dutch stemmer.
 #kraaij_pohlmann  UTF_8,ISO_8859_1        kraaij_pohlmann	dutch
 #

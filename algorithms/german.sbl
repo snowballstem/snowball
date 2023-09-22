@@ -32,16 +32,22 @@ define st_ending s_ending - 'r'
 
 define prelude as (
 
-    test repeat (
-        (
-            ['{ss}'] <- 'ss'
-        ) or next
-    )
-
-    repeat goto (
+    test repeat goto (
         v [('u'] v <- 'U') or
            ('y'] v <- 'Y')
     )
+
+    repeat (
+        [substring] among(
+            '{ss}' (<- 'ss')
+            'ae'   (<- '{a"}')
+            'oe'   (<- '{o"}')
+            'ue'   (<- '{u"}')
+            'qu'   ()
+            ''     (next)
+        )
+    )
+
 )
 
 define mark_regions as (
