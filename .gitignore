@@ -9,6 +9,7 @@
 /libstemmer/modules.h
 /libstemmer/modules_utf8.h
 /libstemmer.a
+/libstemmer.so*
 /snowball
 /src_c
 /stemtest

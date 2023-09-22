@@ -1,0 +1,6 @@
+SB_STEMMER_0 {
+    global:
+        sb_stemmer_*;
+    local:
+        *;
+};
