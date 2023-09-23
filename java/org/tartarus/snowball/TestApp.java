@@ -19,15 +19,26 @@ public class TestApp {
         System.err.println("Usage: TestApp <algorithm> [<input file>] [-o <output file>]");
     }
 
+    private static SnowballStemmer getStemmer(String lang) {
+        try {
+            String c = "org.tartarus.snowball.ext." + lang + "Stemmer";
+            return (SnowballStemmer) Class.forName(c).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
     public static void main(String [] args) throws Throwable {
         if (args.length < 1) {
             usage();
             return;
         }
 
-	Class stemClass = Class.forName("org.tartarus.snowball.ext." +
-					args[0] + "Stemmer");
-        SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
+        SnowballStemmer stemmer = getStemmer(args[0]);
+        if (stemmer == null) {
+            System.err.println("Stemmer " + args[0] + " not found");
+            return;
+        }
 
 	int arg = 1;
 

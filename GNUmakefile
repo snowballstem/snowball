@@ -10,6 +10,7 @@ endif
 
 c_src_dir = src_c
 
+JAVACFLAGS ?=
 JAVAC ?= javac
 JAVA ?= java
 java_src_main_dir = java/org/tartarus/snowball
@@ -563,7 +564,7 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@rm tmp.txt
 
 .java.class:
-	cd java && $(JAVAC) `echo "$<"|sed 's,^java/,,'`
+	cd java && $(JAVAC) $(JAVACFLAGS) `echo "$<"|sed 's,^java/,,'`
 
 check_java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 	$(MAKE) do_check_java
