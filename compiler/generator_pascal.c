@@ -105,9 +105,9 @@ static void write_relop(struct generator * g, int relop) {
     switch (relop) {
 	case c_eq: write_string(g, " = "); break;
 	case c_ne: write_string(g, " <> "); break;
-	case c_gr: write_string(g, " > "); break;
+	case c_gt: write_string(g, " > "); break;
 	case c_ge: write_string(g, " >= "); break;
-	case c_ls: write_string(g, " < "); break;
+	case c_lt: write_string(g, " < "); break;
 	case c_le: write_string(g, " <= "); break;
 	default:
 	    fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
@@ -1218,9 +1218,9 @@ static void generate(struct generator * g, struct node * p) {
         case c_divideassign:  generate_integer_assign(g, p, "div"); break;
         case c_eq:
         case c_ne:
-        case c_gr:
+        case c_gt:
         case c_ge:
-        case c_ls:
+        case c_lt:
         case c_le:
             generate_integer_test(g, p);
             break;

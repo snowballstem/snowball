@@ -1200,9 +1200,9 @@ static void generate(struct generator * g, struct node * p) {
             break;
         case c_eq:
         case c_ne:
-        case c_gr:
+        case c_gt:
         case c_ge:
-        case c_ls:
+        case c_lt:
         case c_le:
             generate_integer_test(g, p);
             break;

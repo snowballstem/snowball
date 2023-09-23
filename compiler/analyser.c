@@ -331,9 +331,9 @@ static int read_AE_test(struct analyser * a) {
         case c_divideassign:
         case c_eq:
         case c_ne:
-        case c_gr:
+        case c_gt:
         case c_ge:
-        case c_ls:
+        case c_lt:
         case c_le: return t->token;
         default: error(a, e_unexpected_token); t->token_held = true; return c_eq;
     }
@@ -1115,9 +1115,9 @@ static struct node * read_C(struct analyser * a) {
                         /* FALLTHRU */
                     case c_eq:
                     case c_ne:
-                    case c_gr:
+                    case c_gt:
                     case c_ge:
-                    case c_ls:
+                    case c_lt:
                     case c_le: {
                         struct node * lhs = n;
                         struct node * rhs = read_AE(a, 0, 0);
@@ -1131,13 +1131,13 @@ static struct node * read_C(struct analyser * a) {
                                 case c_ne:
                                     result = (lhs->number != rhs->number);
                                     break;
-                                case c_gr:
+                                case c_gt:
                                     result = (lhs->number > rhs->number);
                                     break;
                                 case c_ge:
                                     result = (lhs->number >= rhs->number);
                                     break;
-                                case c_ls:
+                                case c_lt:
                                     result = (lhs->number < rhs->number);
                                     break;
                                 case c_le:
@@ -1199,9 +1199,9 @@ static struct node * read_C(struct analyser * a) {
                     switch (p->type) {
                         case c_eq:
                         case c_ne:
-                        case c_gr:
+                        case c_gt:
                         case c_ge:
-                        case c_ls:
+                        case c_lt:
                         case c_le:
                             p->left = new_node(a, c_name);
                             p->left->name = q;

@@ -97,8 +97,8 @@ enum token_codes {
     /* The relational operator token values are chosen such that we can
      * invert the relation with a simple xor with 1.
      */
-    c_gr = 0, c_le,
-    c_ge, c_ls,
+    c_gt = 0, c_le,
+    c_ge, c_lt,
     c_eq, c_ne,
 
     /* Other token values just need to be unique. */
