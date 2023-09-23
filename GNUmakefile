@@ -169,7 +169,7 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 
-CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
 CPPFLAGS=
 
 INCLUDES=-Iinclude
