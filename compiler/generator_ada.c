@@ -1293,7 +1293,9 @@ static void generate_substring(struct generator * g, struct node * p) {
             } else {
                 writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
             }
-            write_failure_if(g, "A = 0", p);
+            if (!x->always_matches) {
+                write_failure_if(g, "A = 0", p);
+            }
             call_done = 1;
         } else {
             writef(g, "~f~C", p);
@@ -1311,7 +1313,9 @@ static void generate_substring(struct generator * g, struct node * p) {
         } else {
             writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
         }
-        write_failure_if(g, "A = 0", p);
+        if (!x->always_matches) {
+            write_failure_if(g, "A = 0", p);
+        }
     }
 }
 

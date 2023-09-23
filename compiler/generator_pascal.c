@@ -1111,11 +1111,15 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    if (!x->amongvar_needed) {
-        write_failure_if(g, "FindAmong~S0(a_~I0, ~I1) = 0", p);
-    } else {
+    if (x->amongvar_needed) {
         writef(g, "~MAmongVar := FindAmong~S0(a_~I0, ~I1);~N", p);
-        write_failure_if(g, "AmongVar = 0", p);
+        if (!x->always_matches) {
+            write_failure_if(g, "AmongVar = 0", p);
+        }
+    } else if (x->always_matches) {
+        writef(g, "~MFindAmong~S0(a_~I0, ~I1);~N", p);
+    } else {
+        write_failure_if(g, "FindAmong~S0(a_~I0, ~I1) = 0", p);
     }
 }
 

@@ -1072,11 +1072,15 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
 
-    if (!x->amongvar_needed) {
-        write_failure_if(g, "self.find_among~S0(~n.a_~I0) == 0", p);
-    } else {
+    if (x->amongvar_needed) {
         writef(g, "~Mamong_var = self.find_among~S0(~n.a_~I0)~N", p);
-        write_failure_if(g, "among_var == 0", p);
+        if (!x->always_matches) {
+            write_failure_if(g, "among_var == 0", p);
+        }
+    } else if (x->always_matches) {
+        writef(g, "~Mself.find_among~S0(~n.a_~I0)~N", p);
+    } else {
+        write_failure_if(g, "self.find_among~S0(~n.a_~I0) == 0", p);
     }
 }
 

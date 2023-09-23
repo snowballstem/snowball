@@ -1569,13 +1569,18 @@ static void generate_substring(struct generator * g, struct node * p) {
 #endif
     }
 
-    if (!x->amongvar_needed) {
-        writef(g, "~Mif (!(find_among~S0(z, a_~I0, ~I1))) ~f", p);
-        writef(g, shown_comment ? "~N" : "~C", p);
-    } else {
+    if (x->amongvar_needed) {
         writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1);", p);
         writef(g, shown_comment ? "~N" : "~C", p);
-        writef(g, "~Mif (!(among_var)) ~f~N", p);
+        if (!x->always_matches) {
+            writef(g, "~Mif (!among_var) ~f~N", p);
+        }
+    } else if (x->always_matches) {
+        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1);", p);
+        writef(g, shown_comment ? "~N" : "~C", p);
+    } else {
+        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1)) ~f", p);
+        writef(g, shown_comment ? "~N" : "~C", p);
     }
 }
 
