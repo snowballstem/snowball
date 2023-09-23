@@ -39,6 +39,7 @@ jobs:
         - name: java
           JAVA: java
           JAVAC: javac
+          JAVACFLAGS: '-Xlint:all -Werror'
         - name: go_old
           os: 'ubuntu-20.04'
           # 22.04: golang-1.13 17 18 20
