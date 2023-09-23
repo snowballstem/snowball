@@ -466,15 +466,7 @@ static int check_possible_signals(struct generator * g,
                 return res2;
             return res;
         }
-        case c_and: {
-            /* Gives same signal as list p->left. */
-            int r = check_possible_signals_list(g, p->left, p->type, call_depth);
-            if (r == 1) {
-                fprintf(stderr, "%s:%d: warning: every command in this 'and' always signals t\n",
-                       g->analyser->tokeniser->file, p->line_number);
-            }
-            return r;
-        }
+        case c_and:
         case c_bra:
             /* Gives same signal as list p->left. */
             return check_possible_signals_list(g, p->left, p->type, call_depth);
@@ -576,7 +568,7 @@ static int check_possible_signals(struct generator * g,
         }
         case c_or: {
             struct node * q;
-            int or_always_f = true;
+            int r = 0;
             for (q = p->left; q; q = q->right) {
                 // Just check this node - q->right is a separate clause of
                 // the OR.
@@ -592,17 +584,10 @@ static int check_possible_signals(struct generator * g,
                     return 1;
                 }
                 if (res < 0) {
-                    or_always_f = false;
+                    r = res;
                 }
             }
-            if (or_always_f) {
-                // If every clause of the OR always signals f, then the OR
-                // always signals f.
-                fprintf(stderr, "%s:%d: warning: every command in this 'or' always signals f\n",
-                       g->analyser->tokeniser->file, p->line_number);
-                return 0;
-            }
-            return -1;
+            return r;
         }
         default:
             return -1;
