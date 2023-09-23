@@ -384,6 +384,7 @@ dist_libstemmer_c: \
             $(LIBSTEMMER_EXTRA) \
 	    $(C_LIB_SOURCES) \
             $(C_LIB_HEADERS) \
+	    $(COMMON_FILES) \
             libstemmer/mkinc.mak \
             libstemmer/mkinc_utf8.mak
 	destname=libstemmer_c-$(SNOWBALL_VERSION); \
@@ -428,6 +429,7 @@ dist_libstemmer_c: \
 
 # Make a distribution of all the sources required to compile the Java library.
 dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+	    $(COMMON_FILES) \
             $(LIBSTEMMER_EXTRA) \
 	    $(JAVA_SOURCES)
 	destname=libstemmer_java-$(SNOWBALL_VERSION); \
@@ -450,6 +452,7 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 
 # Make a distribution of all the sources required to compile the C# library.
 dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+	    $(COMMON_FILES) \
             $(LIBSTEMMER_EXTRA) \
 	    $(CSHARP_SOURCES)
 	destname=libstemmer_csharp-$(SNOWBALL_VERSION); \
@@ -468,7 +471,7 @@ dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
-dist_libstemmer_python: $(PYTHON_SOURCES)
+dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
 	destname=snowballstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
@@ -485,7 +488,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES)
 	(cd $${dest} && $(python) setup.py sdist bdist_wheel && cp dist/*.tar.gz dist/*.whl ..) && \
 	rm -rf $${dest}
 
-dist_libstemmer_js: $(JS_SOURCES)
+dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	destname=jsstemmer-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
