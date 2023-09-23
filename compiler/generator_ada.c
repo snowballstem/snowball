@@ -304,19 +304,6 @@ static int need_among_var(struct node *p) {
     return 0;
 }
 
-static int need_among_handler(struct among *a) {
-    int i;
-    struct amongvec * v = a->b;
-
-    for (i = 0; i < a->literalstring_count; i++, v++) {
-        if (v->function != 0) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
 static void generate_AE(struct generator * g, struct node * p) {
     const char * s;
     switch (p->type) {
@@ -1179,7 +1166,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     symbol cases[2];
     int shortest_size = INT_MAX;
     int call_done = 0;
-    int need_handler = need_among_handler(x);
+    int need_among_handler = (x->function_count > 0);
 
     write_comment(g, p);
 
@@ -1288,7 +1275,7 @@ static void generate_substring(struct generator * g, struct node * p) {
              */
             g->I[4] = among_cases[empty_case].result;
             writef(g, "~MA := ~I4;~-~N~Melse~+~C", p);
-            if (need_handler) {
+            if (need_among_handler) {
                 writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
             } else {
                 writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
@@ -1308,7 +1295,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (!call_done) {
-        if (need_handler) {
+        if (need_among_handler) {
             writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
         } else {
             writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
@@ -1462,7 +1449,7 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 static void generate_method_decls(struct generator * g, enum name_types type) {
     struct name * q;
     struct among * a = g->analyser->amongs;
-    int need_handler = 0;
+    int need_among_handler = 0;
 
     for (q = g->analyser->names; q; q = q->next) {
         if ((enum name_types)q->type == type) {
@@ -1470,11 +1457,11 @@ static void generate_method_decls(struct generator * g, enum name_types type) {
         }
     }
 
-    while (a != 0 && need_handler == 0) {
-        need_handler = need_among_handler(a);
+    while (a != 0 && need_among_handler == 0) {
+        need_among_handler = (a->function_count > 0);
         a = a->next;
     }
-    if (need_handler) {
+    if (need_among_handler) {
         w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
     }
 }
