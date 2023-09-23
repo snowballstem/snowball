@@ -20,7 +20,7 @@ public class TestApp {
     }
 
     public static void main(String [] args) throws Throwable {
-	if (args.length < 2) {
+        if (args.length < 1) {
             usage();
             return;
         }
