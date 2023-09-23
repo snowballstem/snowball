@@ -759,6 +759,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->function_count = 0;
     x->nocommand_count = 0;
     x->amongvar_needed = false;
+    x->always_matches = false;
 
     if (q->type == c_bra) { starter = q; q = q->right; }
 
@@ -778,7 +779,12 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 check_routine_mode(a, function, direction);
                 x->function_count++;
             } else {
-                w1->function = 0;
+                w1->function = NULL;
+                if (w1->size == 0) {
+                    // This among contains the empty string without a gating
+                    // function so it will always match.
+                    x->always_matches = true;
+                }
             }
             w1++;
         } else if (q->left == 0) {

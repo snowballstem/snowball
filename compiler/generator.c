@@ -514,12 +514,7 @@ static int check_possible_signals(struct generator * g,
             return -1;
         case c_substring: {
             struct among * x = p->among;
-
-            if (x->literalstring_count > 0 &&
-                x->b[0].size == 0 &&
-                x->b[0].function == NULL) {
-                /* This substring can't fail since its among contains the empty
-                 * string without a gating function. */
+            if (x->always_matches) {
                 return 1;
             }
             return -1;
@@ -529,11 +524,7 @@ static int check_possible_signals(struct generator * g,
             int r = 1;
 
             if (x->substring == 0) {
-                if (x->literalstring_count > 0 &&
-                    x->b[0].size == 0 &&
-                    x->b[0].function == NULL) {
-                    /* The implicit substring can't fail since its among
-                     * contains the empty string without a gating function. */
+                if (x->always_matches) {
                     return 1;
                 }
                 r = -1;

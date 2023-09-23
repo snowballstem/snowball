@@ -241,6 +241,7 @@ struct among {
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* in this among */
     int amongvar_needed;      /* do we need to set among_var? */
+    int always_matches;       /* will this among always match? */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
 };
