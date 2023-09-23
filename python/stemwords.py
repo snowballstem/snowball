@@ -36,8 +36,7 @@ def main():
         language = 'English'
         show_help = False
         while len(argv):
-            arg = argv[0]
-            argv = argv[1:]
+            arg = argv.pop(0)
             if arg == '-h':
                 show_help = True
                 break
@@ -49,25 +48,22 @@ def main():
                 if len(argv) == 0:
                     show_help = True
                     break
-                language = argv[0]
-                argv = argv[1:]
+                language = argv.pop(0)
             elif arg == "-i":
                 if len(argv) == 0:
                     show_help = True
                     break
-                input = argv[0]
-                argv = argv[1:]
+                input = argv.pop(0)
             elif arg == "-o":
                 if len(argv) == 0:
                     show_help = True
                     break
-                output = argv[0]
-                argv = argv[1:]
+                output = argv.pop(0)
             elif arg == "-c":
                 if len(argv) == 0:
                     show_help = True
                     break
-                encoding = argv[0]
+                encoding = argv.pop(0)
         if show_help or input == '' or output == '':
             usage()
         else:
