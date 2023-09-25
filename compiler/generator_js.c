@@ -907,7 +907,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~C~N"
-              "~Mvar /** !Object */ ~B0 = new BaseStemmer();~N", p);
+              "~Mvar /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(base);~N", p);
 
     ++g->copy_from_count;
