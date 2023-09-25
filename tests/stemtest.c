@@ -1,5 +1,4 @@
-/* This is a simple program which uses libstemmer to provide a command
- * line interface for stemming using any of the algorithms provided.
+/* Unit tests for handling of cases the vocabularies don't cover.
  */
 
 #include <stdio.h>
@@ -20,16 +19,20 @@ static const struct testcase {
     /* Expected output string (0 means same as input) */
     const char * expect;
 } testcases[] = {
+    // Regression tests for C support code bug decoding 4 byte UTF-8 sequences.
+    // https://github.com/snowballstem/snowball/issues/138
     { "en", 0,
       "a" EMOJI_FACE_THROWING_A_KISS "ing",
       "a" EMOJI_FACE_THROWING_A_KISS "e" },
     { "en", 0, U_40079 "wing", 0 },
     // The Finnish stemmer used to damage numbers ending with two or more of
-    // the same digit: https://github.com/snowballstem/snowball/issues/66
+    // the same digit.  Regression test, applied to all stemmers.
+    // https://github.com/snowballstem/snowball/issues/66
     { 0, 0, "2000", 0 },
     { 0, 0, "999", 0 },
     { 0, 0, "1000000000", 0 },
-    // The Danish stemmer used to damage a number at the end of a word:
+    // The Danish stemmer used to damage a number at the end of a word.
+    // Regression test, applied to all stemmers.
     // https://github.com/snowballstem/snowball/issues/81
     { 0, 0, "space1999", 0 },
     { 0, 0, "hal9000", 0 },
