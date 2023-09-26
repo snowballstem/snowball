@@ -1,5 +1,5 @@
 /**@constructor*/
-BaseStemmer = function() {
+const BaseStemmer = function() {
     this.setCurrent = function(value) {
         this.current = value;
         this.cursor = 0;
@@ -292,3 +292,5 @@ BaseStemmer = function() {
         return this.current.slice(0, this.limit);
     };
 };
+
+if (typeof module === 'object' && module.exports) module.exports = BaseStemmer;

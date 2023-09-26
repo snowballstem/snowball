@@ -151,7 +151,8 @@ CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.
 PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
-JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js)
+JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
+	$(js_output_dir)/base-stemmer.js
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -342,6 +343,10 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 	o="$(js_output_dir)/$${l}-stemmer"; \
 	echo "./snowball $< -js -o $${o}"; \
 	./snowball $< -js -o $${o}
+
+$(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
+	@mkdir -p $(js_output_dir)
+	cp $< $@
 
 $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)
@@ -668,7 +673,7 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-export NODE_PATH = $(js_runtime_dir):$(js_output_dir)
+export NODE_PATH = $(js_output_dir)
 
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of `echo $<|sed 's!.*/!!'` stemmer for JS"

@@ -27,11 +27,10 @@ with node:
 
 .. code-block:: javascript
 
-    const stemmer = require('base-stemmer.js');
-    const english_stemmer = require('english-stemmer.js');
+    var EnglishStemmer = require('english-stemmer.js');
 
     var stemmer = new EnglishStemmer();
-    alert(stemmer.stemWord("testing"));
+    console.log(stemmer.stemWord("testing"));
 
 You'll need to bundle ``base-stemmer.js`` and whichever languages you want
 stemmers for (e.g. ``english-stemmer.js`` for English).
