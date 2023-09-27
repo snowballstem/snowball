@@ -1,5 +1,18 @@
+// @ts-check
+
 /**@constructor*/
 const BaseStemmer = function() {
+    /** @protected */
+    this.current = '';
+    this.cursor = 0;
+    this.limit = 0;
+    this.limit_backward = 0;
+    this.bra = 0;
+    this.ket = 0;
+
+    /**
+     * @param {string} value
+     */
     this.setCurrent = function(value) {
         this.current = value;
         this.cursor = 0;
@@ -9,11 +22,18 @@ const BaseStemmer = function() {
         this.ket = this.limit;
     };
 
+    /**
+     * @return {string}
+     */
     this.getCurrent = function() {
         return this.current;
     };
 
+    /**
+     * @param {BaseStemmer} other
+     */
     this.copy_from = function(other) {
+        /** @protected */
         this.current          = other.current;
         this.cursor           = other.cursor;
         this.limit            = other.limit;
@@ -22,7 +42,14 @@ const BaseStemmer = function() {
         this.ket              = other.ket;
     };
 
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.in_grouping = function(s, min, max) {
+        /** @protected */
         if (this.cursor >= this.limit) return false;
         var ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) return false;
@@ -32,7 +59,14 @@ const BaseStemmer = function() {
         return true;
     };
 
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.in_grouping_b = function(s, min, max) {
+        /** @protected */
         if (this.cursor <= this.limit_backward) return false;
         var ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) return false;
@@ -42,7 +76,14 @@ const BaseStemmer = function() {
         return true;
     };
 
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.out_grouping = function(s, min, max) {
+        /** @protected */
         if (this.cursor >= this.limit) return false;
         var ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) {
@@ -57,7 +98,14 @@ const BaseStemmer = function() {
         return false;
     };
 
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.out_grouping_b = function(s, min, max) {
+        /** @protected */
         if (this.cursor <= this.limit_backward) return false;
         var ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) {
@@ -72,8 +120,13 @@ const BaseStemmer = function() {
         return false;
     };
 
+    /**
+     * @param {string} s
+     * @return {boolean}
+     */
     this.eq_s = function(s)
     {
+        /** @protected */
         if (this.limit - this.cursor < s.length) return false;
         if (this.current.slice(this.cursor, this.cursor + s.length) != s)
         {
@@ -83,8 +136,13 @@ const BaseStemmer = function() {
         return true;
     };
 
+    /**
+     * @param {string} s
+     * @return {boolean}
+     */
     this.eq_s_b = function(s)
     {
+        /** @protected */
         if (this.cursor - this.limit_backward < s.length) return false;
         if (this.current.slice(this.cursor - s.length, this.cursor) != s)
         {
@@ -94,8 +152,13 @@ const BaseStemmer = function() {
         return true;
     };
 
-    /** @return {number} */ this.find_among = function(v)
+    /**
+     * @param {Among[]} v
+     * @return {number}
+     */
+    this.find_among = function(v)
     {
+        /** @protected */
         var i = 0;
         var j = v.length;
 
@@ -165,8 +228,13 @@ const BaseStemmer = function() {
     };
 
     // find_among_b is for backwards processing. Same comments apply
+    /**
+     * @param {Among[]} v
+     * @return {number}
+     */
     this.find_among_b = function(v)
     {
+        /** @protected */
         var i = 0;
         var j = v.length
 
@@ -232,8 +300,15 @@ const BaseStemmer = function() {
     /* to replace chars between c_bra and c_ket in this.current by the
      * chars in s.
      */
+    /**
+     * @param {number} c_bra
+     * @param {number} c_ket
+     * @param {string} s
+     * @return {number}
+     */
     this.replace_s = function(c_bra, c_ket, s)
     {
+        /** @protected */
         var adjustment = s.length - (c_ket - c_bra);
         this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
         this.limit += adjustment;
@@ -242,8 +317,12 @@ const BaseStemmer = function() {
         return adjustment;
     };
 
+    /**
+     * @return {boolean}
+     */
     this.slice_check = function()
     {
+        /** @protected */
         if (this.bra < 0 ||
             this.bra > this.ket ||
             this.ket > this.limit ||
@@ -254,8 +333,13 @@ const BaseStemmer = function() {
         return true;
     };
 
+    /**
+     * @param {number} c_bra
+     * @return {boolean}
+     */
     this.slice_from = function(s)
     {
+        /** @protected */
         var result = false;
         if (this.slice_check())
         {
@@ -265,20 +349,34 @@ const BaseStemmer = function() {
         return result;
     };
 
+    /**
+     * @return {boolean}
+     */
     this.slice_del = function()
     {
+        /** @protected */
         return this.slice_from("");
     };
 
+    /**
+     * @param {number} c_bra
+     * @param {number} c_ket
+     * @param {string} s
+     */
     this.insert = function(c_bra, c_ket, s)
     {
+        /** @protected */
         var adjustment = this.replace_s(c_bra, c_ket, s);
         if (c_bra <= this.bra) this.bra += adjustment;
         if (c_bra <= this.ket) this.ket += adjustment;
     };
 
+    /**
+     * @return {string}
+     */
     this.slice_to = function()
     {
+        /** @protected */
         var result = '';
         if (this.slice_check())
         {
@@ -287,8 +385,12 @@ const BaseStemmer = function() {
         return result;
     };
 
+    /**
+     * @return {string}
+     */
     this.assign_to = function()
     {
+        /** @protected */
         return this.current.slice(0, this.limit);
     };
 };

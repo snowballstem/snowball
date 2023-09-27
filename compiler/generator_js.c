@@ -1221,11 +1221,21 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-
-    w(g, "/**@constructor*/~N"
-         "var ~n = function() {~+~N"
-         "~Mconst ~P = require('./base-stemmer.js');~N"
-         "~Mvar base = new ~P();~N");
+    if (g->options->js_esm) {
+        w(g, "// deno-lint-ignore-file~N"
+             "import ~P from './base-stemmer.mjs'~N"
+             "~N"
+             "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
+             "~N"
+             "/** @type {{ new(): Stemmer }} */~N"
+             "const ~n = function() {~+~N"
+             "~Mvar base = new ~P();~N");
+    } else {
+        w(g, "/**@constructor*/~N"
+             "var ~n = function() {~+~N"
+             "~Mconst ~P = require('./base-stemmer.js');~N"
+             "~Mvar base = new ~P();~N");
+    }
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1237,8 +1247,13 @@ static void generate_class_end(struct generator * g) {
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
     w(g, "~-};~N");
-    w(g, "~N");
-    w(g, "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+    if (g->options->js_esm) {
+        w(g, "~N"
+             "export default ~n~N");
+    } else {
+        w(g, "~N"
+             "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+    }
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
