@@ -326,6 +326,26 @@ namespace Snowball
         /// <summary>
         ///   Determines if the current buffer contains the
         ///   string s, starting from the current position and
+        ///   going forward.
+        /// </summary>
+        protected bool eq_s(StringBuilder s)
+        {
+            if (limit - cursor < s.Length)
+                return false;
+
+            for (int i = 0; i != s.Length; i++)
+            {
+                if (current[cursor + i] != s[i])
+                    return false;
+            }
+
+            cursor += s.Length;
+            return true;
+        }
+
+        /// <summary>
+        ///   Determines if the current buffer contains the
+        ///   string s, starting from the current position and
         ///   going backwards.
         /// </summary>
         protected bool eq_s_b(String s)
