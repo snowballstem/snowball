@@ -15,7 +15,7 @@ for pyscript in os.listdir(python_out_folder):
     match = filematch.match(pyscript)
     if (match):
         langname = match.group(1)
-        titlecase = langname.title()
+        titlecase = re.sub(r"_", "", langname.title())
         languages.append("    '%(lang)s': %(title)sStemmer," % {'lang': langname, 'title': titlecase})
         imports.append('from .%(lang)s_stemmer import %(title)sStemmer' % {'lang': langname, 'title': titlecase})
 imports.sort()
