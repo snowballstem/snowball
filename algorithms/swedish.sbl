@@ -9,7 +9,7 @@ externals ( stem )
 
 integers ( p1 x )
 
-groupings ( v s_ending )
+groupings ( v s_ending ost_ending )
 
 stringescapes {}
 
@@ -22,6 +22,8 @@ stringdef o"   '{U+00F6}'
 define v 'aeiouy{a"}{ao}{o"}'
 
 define s_ending  'bcdfghjklmnoprtvy'
+
+define ost_ending 'iklnprtuv'
 
 define mark_regions as (
 
@@ -52,10 +54,11 @@ backwardmode (
         and ([next] delete)
     )
 
-    define other_suffix as setlimit tomark p1 for (
-        [substring] among(
+    define other_suffix as (
+        setlimit tomark p1 for ([substring])
+        among(
             'lig' 'ig' 'els' (delete)
-            'l{o"}st'        (<-'l{o"}s')
+            '{o"}st'         (ost_ending <-'{o"}s')
             'fullt'          (<-'full')
         )
     )
