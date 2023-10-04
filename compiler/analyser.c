@@ -1331,7 +1331,13 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         NEW(grouping, p);
         if (a->groupings == 0) a->groupings = p; else a->groupings_end->next = p;
         a->groupings_end = p;
-        if (q) q->grouping = p;
+        if (q) {
+            if (q->grouping != 0) {
+                error(a, e_redefined);
+                FREE(q->grouping);
+            }
+            q->grouping = p;
+        }
         p->next = 0;
         p->name = q;
         p->line_number = a->tokeniser->line_number;
