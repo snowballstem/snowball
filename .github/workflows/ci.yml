@@ -116,9 +116,10 @@ jobs:
         # branch.
         git status
         git remote -v
+        git show "$GITHUB_REF_NAME"
         env|sort
         GH_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
-        GH_REPO_OWNER=${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}
+        GH_REPO_OWNER=${GITHUB_ACTOR:-${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}}
         GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
         echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
         git clone --depth=1 -b "$GH_BRANCH" "$GH_REPO_URL" || { echo "Trying default branch from snowball/snowball-data"; git clone --depth=1 https://github.com/snowballstem/snowball-data.git; }
