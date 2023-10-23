@@ -100,7 +100,7 @@ static void write_declare(struct generator * g,
                           struct node * p) {
     struct str * temp = g->outbuf;
     g->outbuf = g->declarations;
-    write_string(g, "   ");
+    write_string(g, "      ");
     writef(g, declaration, p);
     write_string(g, ";");
     write_newline(g);
@@ -138,7 +138,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "Z.L - ";
-    write_declare(g, "   ~B0 : Char_Index", p);
+    write_declare(g, "~B0 : Char_Index", p);
     writef(g, "~M~B0 := ~S1Z.C;~N" , p);
 }
 
@@ -715,7 +715,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
     w(g, "~{");
     g->B[0] = str_data(loopvar);
 
-    write_declare(g, "   ~B0 : Integer", p);
+    write_declare(g, "~B0 : Integer", p);
     w(g, "~M~B0 := ");
     generate_AE(g, p->AE);
     w(g, ";~N");
@@ -862,7 +862,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * varname = vars_newname(g);
 
     g->B[0] = str_data(varname);
-    write_declare(g, "   ~B0 : Integer", p);
+    write_declare(g, "~B0 : Integer", p);
     if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
