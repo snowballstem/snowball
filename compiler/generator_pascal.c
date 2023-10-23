@@ -914,7 +914,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_declare(g, "~B0_Ket : Integer", p);
     writef(g, "~{"
               "~M~B0_Current := FCurrent;~N"
-              "{ ~M~B0_Current := Copy(FCurrent, 1, FLimit); }~N"
               "~M~B0_Cursor := FCursor;~N"
               "~M~B0_Limit := FLimit;~N"
               "~M~B0_BkLimit := FBkLimit;~N"
