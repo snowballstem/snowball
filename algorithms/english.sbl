@@ -13,10 +13,11 @@ routines (
 
 externals ( stem )
 
-groupings ( v v_WXY valid_LI )
+groupings ( aeo v v_WXY valid_LI )
 
 stringescapes {}
 
+define aeo      'aeo'
 define v        'aeiouy'
 define v_WXY    v + 'wxY'
 
@@ -78,14 +79,17 @@ backwardmode (
             'ed' 'edly' 'ing' 'ingly'
                 (
                 test gopast v  delete
-                test substring among(
-                    'at' 'bl' 'iz'
-                         (<+ 'e')
-                    'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
-                    // ignoring double c, h, j, k, q, v, w, and x
-                         ([next]  delete)
-                    ''   (atmark p1  test shortv  <+ 'e')
+                [] test (
+                    substring among(
+                        'at' 'bl' 'iz'
+                             (fail(<- 'e'))
+                        'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
+                        // ignoring double c, h, j, k, q, v, w, and x
+                             (not (aeo atlimit))
+                        ''   (fail(atmark p1  test shortv  <- 'e'))
+                    )
                 )
+                [next]  delete
             )
         )
     )
