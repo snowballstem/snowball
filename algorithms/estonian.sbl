@@ -26,8 +26,8 @@ stringdef a" '{U+00E4}' //a-umlaut ä
 stringdef o" '{U+00F6}' //o-umlaut ö
 stringdef o~ '{U+00F5}' //o with tilde õ
 stringdef u" '{U+00FC}' //u-umlaut ü
-stringdef s* '{U+0161}' //s-caron š
-stringdef z* '{U+017E}' //z-caron ž
+stringdef sv '{U+0161}' //s-caron š
+stringdef zv '{U+017E}' //z-caron ž
 
 externals ( stem )
 integers ( p1 )
@@ -35,7 +35,7 @@ groupings ( V1 RV KI GI)
 
 define V1 'aeiou{o~}{a"}{o"}{u"}'
 define RV 'aeiuo'
-define KI 'kptgbdshf{s*}z{z*}'
+define KI 'kptgbdshf{sv}z{zv}'
 define GI 'cjlmnqrvwxaeiou{o~}{a"}{o"}{u"}'
 
 define mark_regions as (
