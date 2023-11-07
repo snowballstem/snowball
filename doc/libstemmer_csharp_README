@@ -39,6 +39,9 @@ mcs -target:exe -out:stemwords.exe -r:snowballstemmer.dll csharp/Stemwords/Progr
 Using the library
 =================
 
+The stemming algorithms generally expect the input text to use composed accents
+(Unicode NFC or NFKC) and to have been folded to lower case already.
+
 There is currently no formal documentation on the use of the C# version
 of the library. Additionally, its interface is not guaranteed to be
 stable.

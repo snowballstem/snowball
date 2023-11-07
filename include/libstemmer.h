@@ -57,6 +57,10 @@ void                sb_stemmer_delete(struct sb_stemmer * stemmer);
 
 /** Stem a word.
  *
+ *  The stemming algorithms generally expect the input text to use composed
+ *  accents (Unicode NFC or NFKC) and to have been folded to lower case
+ *  already.
+ *
  *  The return value is owned by the stemmer - it must not be freed or
  *  modified, and it will become invalid when the stemmer is called again,
  *  or if the stemmer is freed.

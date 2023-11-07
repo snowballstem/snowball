@@ -50,6 +50,9 @@ files for the UTF-8 only version of the library.
 Using the library
 =================
 
+The stemming algorithms generally expect the input text to use composed accents
+(Unicode NFC or NFKC) and to have been folded to lower case already.
+
 The library provides a simple C API.  Essentially, a new stemmer can
 be obtained by using "sb_stemmer_new".  "sb_stemmer_stem" is then
 used to stem a word, "sb_stemmer_length" returns the stemmed

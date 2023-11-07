@@ -25,6 +25,9 @@ stemming algorithms likely aren't the right answer.
 How to use library
 ------------------
 
+The stemming algorithms generally expect the input text to use composed accents
+(Unicode NFC or NFKC) and to have been folded to lower case already.
+
 The ``snowballstemmer`` module has two functions.
 
 The ``snowballstemmer.algorithms`` function returns a list of available

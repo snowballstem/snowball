@@ -22,6 +22,9 @@ stemming algorithms likely aren't the right answer.
 How to use library
 ------------------
 
+The stemming algorithms generally expect the input text to use composed accents
+(Unicode NFC or NFKC) and to have been folded to lower case already.
+
 You can use each stemming modules from Javascript code - e.g to use them
 with node:
 
