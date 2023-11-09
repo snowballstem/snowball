@@ -84,7 +84,11 @@ backwardmode (
     define standard_suffix as (
         do (
             [substring] R1 among(
-                'em' 'ern' 'er'
+                'em'
+                (   not 'syst'
+                    delete
+                )
+                'ern' 'er'
                 (   delete
                 )
                 'e' 'en' 'es'
