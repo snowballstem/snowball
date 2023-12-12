@@ -415,7 +415,7 @@ static int slice_check(struct SN_env * z) {
         z->p == NULL ||
         z->l > SIZE(z->p)) /* this line could be removed */
     {
-#if 1
+#if 0
         fprintf(stderr, "faulty slice operation:\n");
         debug(z, -1, 0);
 #endif
@@ -490,7 +490,7 @@ extern int len_utf8(const symbol * p) {
     return len;
 }
 
-#if 1
+#if 0
 extern void debug(struct SN_env * z, int number, int line_count) {
     int i;
     int limit = SIZE(z->p);
