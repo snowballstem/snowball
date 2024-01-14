@@ -45,11 +45,12 @@ for lang in langs:
     if lang_titlecase not in ('Armenian', 'Yiddish'):
         classifiers.append('Natural Language :: ' + lang_titlecase)
 
+python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*'
+
 classifiers.extend([
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.4',
