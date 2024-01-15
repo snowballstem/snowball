@@ -113,17 +113,20 @@ static int read_literal_string(struct tokeniser * t, int c) {
             /* Inside insert characters. */
             int c0 = c;
             int newlines = false; /* no newlines as yet */
-            int black_found = false; /* no printing chars as yet */
+            int all_whitespace = true; /* no printing chars as yet */
             while (true) {
                 if (c >= SIZE(p)) { error2(t, "'"); return c; }
-                ch = p[c]; c++;
-                if (ch == t->m_end) break;
-                if (!white_space(t, ch)) black_found = true;
-                if (ch == '\n') newlines = true;
-                if (newlines && black_found) {
-                    error1(t, "string not terminated");
-                    return c;
+                ch = p[c];
+                if (ch == '\n') {
+                    if (!all_whitespace) {
+                        error1(t, "string not terminated");
+                        return c;
+                    }
+                    newlines = true;
                 }
+                c++;
+                if (ch == t->m_end) break;
+                if (!white_space(t, ch)) all_whitespace = false;
             }
             if (!newlines) {
                 int n = c - c0 - 1;    /* macro size */
