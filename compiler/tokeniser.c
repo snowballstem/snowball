@@ -207,7 +207,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
                      * strings, but historically it's worked for single-byte
                      * and UTF-8 if the source encoding matches what the
                      * generated stemmer works in and it seems unfair to just
-                     * suddenly make this a hard error.`
+                     * suddenly make this a hard error.
                      */
                     fprintf(stderr,
                             "%s:%d: warning: Non-ASCII literal strings aren't "
