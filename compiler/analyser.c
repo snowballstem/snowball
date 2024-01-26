@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>  /* for INT_MAX */
 #include <stdio.h>   /* printf etc */
 #include <stdlib.h>  /* exit */
 #include <string.h>  /* memmove */
@@ -760,6 +761,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->nocommand_count = 0;
     x->amongvar_needed = false;
     x->always_matches = false;
+    x->shortest_size = INT_MAX;
 
     if (q->type == c_bra) { starter = q; q = q->right; }
 
@@ -846,6 +848,8 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         symbol * b = w0->b;
         int size = w0->size;
         struct amongvec * w;
+
+        if (size && size < x->shortest_size) x->shortest_size = size;
 
         for (w = w0 - 1; w >= v; w--) {
             if (w->size < size && memcmp(w->b, b, w->size * sizeof(symbol)) == 0) {

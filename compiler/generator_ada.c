@@ -3,7 +3,6 @@
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
 #include <ctype.h>
-#include <limits.h>
 #include "header.h"
 
 /* prototypes */
@@ -1164,7 +1163,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
-    int shortest_size = INT_MAX;
+    int shortest_size = x->shortest_size;
     int call_done = 0;
     int need_among_handler = (x->function_count > 0);
 
@@ -1180,13 +1179,6 @@ static void generate_substring(struct generator * g, struct node * p) {
      * In backward mode, we can't match if there are fewer characters before
      * the current position than the minimum length.
      */
-    for (c = 0; c < x->literalstring_count; ++c) {
-        int size = among_cases[c].size;
-        if (size != 0 && size < shortest_size) {
-            shortest_size = size;
-        }
-    }
-
     for (c = 0; c < x->literalstring_count; ++c) {
         symbol ch;
         if (among_cases[c].size == 0) {

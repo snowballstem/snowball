@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <limits.h>  /* for INT_MAX */
 #include <stdio.h>   /* for fprintf etc */
 #include <stdlib.h>  /* for free etc */
 #include <string.h>  /* for strlen */
@@ -1460,7 +1459,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
-    int shortest_size = INT_MAX;
+    int shortest_size = x->shortest_size;
     int shown_comment = 0;
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
@@ -1474,13 +1473,6 @@ static void generate_substring(struct generator * g, struct node * p) {
      * In backward mode, we can't match if there are fewer characters before
      * the current position than the minimum length.
      */
-    for (c = 0; c < x->literalstring_count; ++c) {
-        int size = among_cases[c].size;
-        if (size != 0 && size < shortest_size) {
-            shortest_size = size;
-        }
-    }
-
     for (c = 0; c < x->literalstring_count; ++c) {
         symbol ch;
         if (among_cases[c].size == 0) {

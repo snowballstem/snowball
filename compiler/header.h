@@ -242,6 +242,7 @@ struct among {
     int function_count;       /* in this among */
     int amongvar_needed;      /* do we need to set among_var? */
     int always_matches;       /* will this among always match? */
+    int shortest_size;        /* smallest non-zero string length in this among */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
 };
