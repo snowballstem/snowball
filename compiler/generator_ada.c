@@ -1466,32 +1466,13 @@ static void generate_method_decls(struct generator * g, enum name_types type) {
     }
 }
 
-static int has_string_variable(struct generator * g) {
-    struct name * q;
-    for (q = g->analyser->names; q; q = q->next) {
-        g->V[0] = q;
-        if (q->type == t_string) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
 static void generate_member_decls(struct generator * g) {
-    struct name * q;
-    int count = 0;
-
-    
-    for (q = g->analyser->names; q; q = q->next) {
-        if (q->type == t_string || q->type == t_integer || q->type == t_boolean)
-            count++;
-    }
-
     w(g, "   type Context_Type is new Stemmer.Context_Type with");
-    if (count > 0) {
+    if (g->analyser->name_count[t_string] > 0 ||
+        g->analyser->name_count[t_integer] > 0 ||
+        g->analyser->name_count[t_boolean] > 0) {
         w(g, " record~N~+");
-        for (q = g->analyser->names; q; q = q->next) {
+        for (struct name * q = g->analyser->names; q; q = q->next) {
             g->V[0] = q;
             switch (q->type) {
                 case t_string:
@@ -1737,7 +1718,7 @@ extern void generate_program_ada(struct generator * g) {
 
     g->margin = 0;
     write_start_comment(g, "--  ", NULL);
-    if (has_string_variable(g)) {
+    if (g->analyser->name_count[t_string]) {
         w(g, "private with Ada.Strings.Unbounded;~N");
     }
     w(g, "package Stemmer.");
