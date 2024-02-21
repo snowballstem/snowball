@@ -1,0 +1,117 @@
+/*
+ * Persian Stemming Algorithm
+ * Author: https://saeiddrv.com
+*/
+
+stringdef alef    '{U+0627}'
+stringdef be      '{U+0628}'
+stringdef pe      '{U+067E}'
+stringdef te      '{U+062A}'
+stringdef se      '{U+0633}'
+stringdef jim     '{U+062C}'
+stringdef che     '{U+0686}'
+stringdef he      '{U+0647}'
+stringdef khe     '{U+062E}'
+stringdef dal     '{U+062F}'
+stringdef zal     '{U+0630}'
+stringdef re      '{U+0631}'
+stringdef ze      '{U+0632}'
+stringdef zhe     '{U+0698}'
+stringdef sin     '{U+0633}'
+stringdef shin    '{U+0634}'
+stringdef sad     '{U+0635}'
+stringdef zad     '{U+0636}'
+stringdef ta      '{U+0637}'
+stringdef za      '{U+0638}'
+stringdef ain     '{U+0639}'
+stringdef ghain   '{U+063A}'
+stringdef fe      '{U+0641}'
+stringdef ghaf    '{U+0642}'
+stringdef kaf     '{U+06A9}'
+stringdef gaf     '{U+06AF}'
+stringdef lam     '{U+0644}'
+stringdef mim     '{U+0645}'
+stringdef nun     '{U+0646}'
+stringdef vav     '{U+0648}'
+stringdef heh     '{U+0647}'
+stringdef ye      '{U+06CC}'
+
+
+routines (
+    Normalize
+    Prefix
+    Suffix_Noun
+    Suffix_Verb
+    Suffix_Adjective
+    Post_Normalize
+)
+
+
+externals ( stem )
+
+
+groupings ()
+
+
+define Normalize as (
+    do repeat (
+        [substring] among (
+            '{U+06A9}' '{U+0643}' ( <- '{kaf}' ) // Normalize Kaf
+            '{U+06AF}' '{U+06A9}' ( <- '{gaf}' ) // Normalize Gaf
+            '{U+06CC}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
+            '{U+0647}' '{U+0629}' ( <- '{he}'  )  // Normalize Heh
+            '{U+0627}' '{U+0622}' '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
+            '{U+0648}' '{U+0624}' ( <- '{vav}' )  // Normalize Waw and Waw with Hamza above
+            '{U+06CC}' '{U+0626}' ( <- '{ye}' )   // Normalize Ye and Ye with Hamza above
+        )
+    )
+)
+
+
+define Prefix as (
+    [substring] among (
+        '{be}{alef}{ze}' (delete)  // baaz
+        '{be}{ye}' (delete)        // bii
+        '{be}{re}' (delete)        // bar
+        '{pe}{ye}{shin}' (delete)  // pish
+        '{pe}{re}' (delete)        // por
+        '{pe}{sin}' (delete)       // pas
+        '{dal}{re}' (delete)       // dar
+        '{ze}{ye}{re}' (delete)    // ziir
+        '{sin}{re}' (delete)       // sar
+        '{fe}{re}{alef}' (delete)  // faraa
+        '{he}{mim}' (delete)       // ham
+        '{nun}{alef}' (delete)     // naa
+    )
+)
+
+
+define Suffix_Noun as (
+    [substring] among (
+        '{he}{alef}' (delete)  // haa
+        '{alef}{nun}' (delete) // aan
+        '{alef}{te}' (delete)  // aat
+    )
+)
+
+define Suffix_Verb as (
+    [substring] among (
+        // Past tense
+        '{ye}{mim}' '{ye}{ye}' '{ye}{ye}{dal}' '{nun}{dal}' (delete)
+        // Present tense
+        '{mim}' '{ye}' '{dal}' '{ye}{mim}' '{ye}{dal}' '{nun}{dal}' (delete)
+    )
+)
+
+define Suffix_Adjective as (
+    [substring] among (
+        '{te}{re}' (delete) // tar (comparative)
+        '{te}{re}{ye}{nun}' (delete)  // tarin (superlative)
+    )
+)
+
+define stem as (
+    do Normalize
+    do Prefix
+    do Suffix_Noun or Suffix_Verb or Suffix_Adjective
+)
