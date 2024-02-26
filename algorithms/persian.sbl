@@ -56,13 +56,11 @@ groupings ()
 define Normalize as (
     do repeat (
         [substring] among (
-            '{U+06A9}' '{U+0643}' ( <- '{kaf}' ) // Normalize Kaf
-            '{U+06AF}' '{U+06A9}' ( <- '{gaf}' ) // Normalize Gaf
-            '{U+06CC}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
-            '{U+0647}' '{U+0629}' ( <- '{he}'  )  // Normalize Heh
-            '{U+0627}' '{U+0622}' '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
-            '{U+0648}' '{U+0624}' ( <- '{vav}' )  // Normalize Waw and Waw with Hamza above
-            '{U+06CC}' '{U+0626}' ( <- '{ye}' )   // Normalize Ye and Ye with Hamza above
+            '{U+0643}' ( <- '{kaf}' ) // Normalize Kaf
+            '{U+0626}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
+            '{U+0629}' ( <- '{he}'  )  // Normalize Heh
+            '{U+0622}' '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
+            '{U+0624}' ( <- '{vav}' )  // Normalize Waw and Waw with Hamza above
         )
     )
 )
