@@ -3,6 +3,7 @@
  * Author: https://saeiddrv.com
 */
 
+stringdef aa      '{U+0622}'
 stringdef alef    '{U+0627}'
 stringdef be      '{U+0628}'
 stringdef pe      '{U+067E}'
@@ -44,13 +45,11 @@ routines (
     Suffix_Verb
     Suffix_Adjective
     Post_Normalize
+    Exception
 )
 
 
 externals ( stem )
-
-
-groupings ()
 
 
 define Normalize as (
@@ -59,7 +58,7 @@ define Normalize as (
             '{U+0643}' ( <- '{kaf}' ) // Normalize Kaf
             '{U+0626}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
             '{U+0629}' ( <- '{he}'  )  // Normalize Heh
-            '{U+0622}' '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
+            '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
             '{U+0624}' ( <- '{vav}' )  // Normalize Waw and Waw with Hamza above
         )
     )
@@ -68,36 +67,42 @@ define Normalize as (
 
 define Prefix as (
     [substring] among (
-        '{be}{alef}{ze}' (delete)  // baaz
-        '{be}{ye}' (delete)        // bii
-        '{be}{re}' (delete)        // bar
-        '{pe}{ye}{shin}' (delete)  // pish
-        '{pe}{re}' (delete)        // por
-        '{pe}{sin}' (delete)       // pas
-        '{dal}{re}' (delete)       // dar
-        '{ze}{ye}{re}' (delete)    // ziir
-        '{sin}{re}' (delete)       // sar
-        '{fe}{re}{alef}' (delete)  // faraa
-        '{he}{mim}' (delete)       // ham
-        '{nun}{alef}' (delete)     // naa
+        '{be}{ye}{shin}' (delete)       // bish
+        '{be}{ye}' ($(len > 3)delete)   // bii
+        '{pe}{ye}{shin}' (delete)       // pish
+        '{pe}{sin}' (delete)            // pas
+        '{ze}{ye}{re}' (delete)         // ziir
+        '{he}{mim}' (delete)            // ham
+        '{nun}{alef}' (delete)          // naa
+        '{mim}{ye}' (delete)            // mii
     )
 )
 
 
 define Suffix_Noun as (
     [substring] among (
-        '{he}{alef}' (delete)  // haa
-        '{alef}{nun}' (delete) // aan
-        '{alef}{te}' (delete)  // aat
+        '{gaf}{alef}{heh}' (delete)       // gaah
+        '{he}{alef}{ye}' (delete)         // haaye
+        '{he}{alef}' (delete)             // haa
+        '{alef}{te}' (delete)             // aat
+        '{sin}{te}{alef}{nun}' (delete)   // setan
+        '{ye}{te}' (delete)               // yat
+
+        '{gaf}{alef}{nun}' ( <- '{he}'  ) // gaan -> h
     )
 )
 
 define Suffix_Verb as (
     [substring] among (
-        // Past tense
-        '{ye}{mim}' '{ye}{ye}' '{ye}{ye}{dal}' '{nun}{dal}' (delete)
-        // Present tense
-        '{mim}' '{ye}' '{dal}' '{ye}{mim}' '{ye}{dal}' '{nun}{dal}' (delete)
+        '{ye}{mim}' (delete)
+        '{ye}{ye}' (delete)
+        '{ye}{ye}{dal}' (delete)
+        '{nun}{dal}' (delete)
+        '{mim}' (delete)
+        '{ye}' (delete)
+        '{ye}{mim}' (delete)
+        '{ye}{dal}' (delete)
+        '{nun}{dal}' (delete)
     )
 )
 
@@ -108,8 +113,41 @@ define Suffix_Adjective as (
     )
 )
 
+define Exception as (
+    [substring] among (
+        '{sin}{ye}'
+        '{dal}{re}'
+        '{alef}{ye}{nun}'
+        '{alef}{ye}'
+        '{be}{re}'
+        '{nun}{alef}{mim}'
+        '{pe}{sin}'
+        '{alef}{sin}{te}{alef}{nun}'
+        '{be}{re}{alef}{ye}'
+        '{pe}{ye}{vav}{nun}{dal}'
+        '{mim}{ye}{lam}{alef}{dal}{ye}'
+        '{mim}{lam}{ye}'
+        '{che}{nun}{dal}'
+        '{be}{re}{khe}{ye}'
+        '{he}{mim}{ye}{nun}'
+        '{he}{mim}{alef}{nun}'
+        '{he}{mim}{he}'
+        '{mim}{te}{re}'
+        '{te}{ye}{mim}'
+        '{sin}{lam}{alef}{mim}'
+        '{alef}{sin}{lam}{alef}{mim}'
+        '{ye}{ain}{nun}{ye}'
+        '{aa}{lam}{be}{vav}{mim}'
+    )
+)
+
 define stem as (
-    do Normalize
-    do Prefix
-    do Suffix_Noun or Suffix_Verb or Suffix_Adjective
+    Exception
+    or (
+        do Normalize
+        do Prefix
+        do Suffix_Noun
+        do Suffix_Adjective
+        do Suffix_Verb
+    )
 )
