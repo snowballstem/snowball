@@ -39,13 +39,12 @@ stringdef ye      '{U+06CC}'
 
 
 routines (
+    Exception
     Normalize
     Prefix
     Suffix_Noun
-    Suffix_Verb
     Suffix_Adjective
-    Post_Normalize
-    Exception
+    Suffix_Verb
 )
 
 
@@ -55,11 +54,11 @@ externals ( stem )
 define Normalize as (
     do repeat (
         [substring] among (
-            '{U+0643}' ( <- '{kaf}' ) // Normalize Kaf
+            '{U+0643}' ( <- '{kaf}' )             // Normalize Kaf
             '{U+0626}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
-            '{U+0629}' ( <- '{he}'  )  // Normalize Heh
+            '{U+0629}' ( <- '{he}'  )             // Normalize Heh
             '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
-            '{U+0624}' ( <- '{vav}' )  // Normalize Waw and Waw with Hamza above
+            '{U+0624}' ( <- '{vav}' )             // Normalize Waw and Waw with Hamza above
         )
     )
 )
@@ -97,10 +96,8 @@ define Suffix_Verb as (
         '{ye}{mim}' (delete)
         '{ye}{ye}' (delete)
         '{ye}{ye}{dal}' (delete)
-        '{nun}{dal}' (delete)
         '{mim}' (delete)
         '{ye}' (delete)
-        '{ye}{mim}' (delete)
         '{ye}{dal}' (delete)
         '{nun}{dal}' (delete)
     )
@@ -115,34 +112,34 @@ define Suffix_Adjective as (
 
 define Exception as (
     [substring] among (
-        '{sin}{ye}'
-        '{dal}{re}'
-        '{alef}{ye}{nun}'
-        '{alef}{ye}'
-        '{be}{re}'
-        '{nun}{alef}{mim}'
-        '{pe}{sin}'
-        '{alef}{sin}{te}{alef}{nun}'
-        '{be}{re}{alef}{ye}'
-        '{pe}{ye}{vav}{nun}{dal}'
-        '{mim}{ye}{lam}{alef}{dal}{ye}'
-        '{mim}{lam}{ye}'
-        '{che}{nun}{dal}'
-        '{be}{re}{khe}{ye}'
-        '{he}{mim}{ye}{nun}'
-        '{he}{mim}{alef}{nun}'
-        '{he}{mim}{he}'
-        '{mim}{te}{re}'
-        '{te}{ye}{mim}'
-        '{sin}{lam}{alef}{mim}'
-        '{alef}{sin}{lam}{alef}{mim}'
-        '{ye}{ain}{nun}{ye}'
-        '{aa}{lam}{be}{vav}{mim}'
+        '{sin}{ye}' ()
+        '{dal}{re}' ()
+        '{alef}{ye}{nun}' ()
+        '{alef}{ye}' ()
+        '{be}{re}' ()
+        '{nun}{alef}{mim}' ()
+        '{pe}{sin}' ()
+        '{alef}{sin}{te}{alef}{nun}' ()
+        '{be}{re}{alef}{ye}' ()
+        '{pe}{ye}{vav}{nun}{dal}' ()
+        '{mim}{ye}{lam}{alef}{dal}{ye}' ()
+        '{mim}{lam}{ye}' ()
+        '{che}{nun}{dal}' ()
+        '{be}{re}{khe}{ye}' ()
+        '{he}{mim}{ye}{nun}' ()
+        '{he}{mim}{alef}{nun}' ()
+        '{he}{mim}{he}' ()
+        '{mim}{te}{re}' ()
+        '{te}{ye}{mim}' ()
+        '{sin}{lam}{alef}{mim}' ()
+        '{alef}{sin}{lam}{alef}{mim}' ()
+        '{ye}{ain}{nun}{ye}' ()
+        '{aa}{lam}{be}{vav}{mim}' ()
     )
 )
 
 define stem as (
-    Exception
+    ( Exception )
     or (
         do Normalize
         do Prefix
