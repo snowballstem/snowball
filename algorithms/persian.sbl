@@ -1,0 +1,172 @@
+/*
+ * Persian Stemming Algorithm
+ * Author: https://saeiddrv.com
+*/
+
+stringescapes { }
+
+stringdef aa      '{U+0622}'
+stringdef alef    '{U+0627}'
+stringdef be      '{U+0628}'
+stringdef pe      '{U+067E}'
+stringdef te      '{U+062A}'
+stringdef se      '{U+0633}'
+stringdef jim     '{U+062C}'
+stringdef che     '{U+0686}'
+stringdef he      '{U+0647}'
+stringdef khe     '{U+062E}'
+stringdef dal     '{U+062F}'
+stringdef zal     '{U+0630}'
+stringdef re      '{U+0631}'
+stringdef ze      '{U+0632}'
+stringdef zhe     '{U+0698}'
+stringdef sin     '{U+0633}'
+stringdef shin    '{U+0634}'
+stringdef sad     '{U+0635}'
+stringdef zad     '{U+0636}'
+stringdef ta      '{U+0637}'
+stringdef za      '{U+0638}'
+stringdef ain     '{U+0639}'
+stringdef ghain   '{U+063A}'
+stringdef fe      '{U+0641}'
+stringdef ghaf    '{U+0642}'
+stringdef kaf     '{U+06A9}'
+stringdef gaf     '{U+06AF}'
+stringdef lam     '{U+0644}'
+stringdef mim     '{U+0645}'
+stringdef nun     '{U+0646}'
+stringdef vav     '{U+0648}'
+stringdef heh     '{U+0647}'
+stringdef ye      '{U+06CC}'
+
+
+routines (
+    Exception
+    Normalize
+    Prefix
+    Suffix_Noun
+    Suffix_Adjective
+    Suffix_Verb
+    Suffix_Normalize
+)
+
+
+externals ( stem )
+
+
+groupings (  )
+
+
+define Normalize as (
+    do repeat (
+        [substring] among (
+            '{U+0643}' ( <- '{kaf}' )             // Normalize Kaf
+            '{U+0626}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
+            '{U+0629}' ( <- '{he}'  )             // Normalize Heh
+            '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
+            '{U+0624}' ( <- '{vav}' )             // Normalize Waw and Waw with Hamza above
+
+
+            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
+        )
+    )
+)
+
+
+define Prefix as (
+    [substring] among (
+        '{be}{ye}{shin}' (delete)       // bish
+        '{be}{ye}' ($(len > 3) delete)  // bii
+        '{pe}{ye}{shin}' (delete)       // pish
+        '{pe}{sin}' (delete)            // pas
+        '{ze}{ye}{re}' (delete)         // ziir
+        '{he}{mim}' (delete)            // ham
+        '{nun}{alef}' (delete)          // naa
+        '{mim}{ye}' ($(len > 3) delete) // mii
+    )
+)
+
+
+define Suffix_Noun as (
+    do backwards (
+        [substring] among (
+            '{gaf}{alef}{heh}' (delete)       // gaah
+            '{he}{alef}{ye}' (delete)         // haaye
+            '{he}{alef}' (delete)             // haa
+            '{alef}{te}' (delete)             // aat
+            '{sin}{te}{alef}{nun}' (delete)   // setan
+            '{ye}{te}' (delete)               // yat
+        )
+    )
+)
+
+define Suffix_Verb as (
+    do backwards (
+        [substring] among (
+            '{ye}{mim}' ($(len > 3) delete)
+            '{ye}{ye}' (delete)
+            '{ye}{ye}{dal}' (delete)
+            '{mim}' ($(len > 2) delete)
+            '{ye}' ($(len > 2) delete)
+            '{ye}{dal}' ($(len > 3) delete)
+            '{nun}{dal}' ($(len > 3) delete)
+        )
+    )
+)
+
+define Suffix_Adjective as (
+    do backwards (
+        [substring] among (
+            '{te}{re}' (delete)           // tar (comparative)
+            '{te}{re}{ye}{nun}' (delete)  // tarin (superlative)
+        )
+    )
+)
+
+define Suffix_Normalize as (
+    do backwards (
+        [substring] among (
+            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
+        )
+    )
+)
+
+define Exception as (
+    [substring] among (
+        '{sin}{ye}' ()
+        '{dal}{re}' ()
+        '{alef}{ye}{nun}' ()
+        '{alef}{ye}' ()
+        '{be}{re}' ()
+        '{nun}{alef}{mim}' ()
+        '{pe}{sin}' ()
+        '{alef}{sin}{te}{alef}{nun}' ()
+        '{be}{re}{alef}{ye}' ()
+        '{pe}{ye}{vav}{nun}{dal}' ()
+        '{mim}{ye}{lam}{alef}{dal}{ye}' ()
+        '{mim}{lam}{ye}' ()
+        '{che}{nun}{dal}' ()
+        '{be}{re}{khe}{ye}' ()
+        '{he}{mim}{ye}{nun}' ()
+        '{he}{mim}{alef}{nun}' ()
+        '{he}{mim}{he}' ()
+        '{mim}{te}{re}' ()
+        '{te}{ye}{mim}' ()
+        '{sin}{lam}{alef}{mim}' ()
+        '{alef}{sin}{lam}{alef}{mim}' ()
+        '{ye}{ain}{nun}{ye}' ()
+        '{aa}{lam}{be}{vav}{mim}' ()
+    )
+)
+
+define stem as (
+    ( Exception )
+    or (
+        do Normalize
+        do Prefix
+        do Suffix_Noun
+        do Suffix_Adjective
+        do Suffix_Verb
+        do Suffix_Normalize
+    )
+)
