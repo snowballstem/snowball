@@ -3,6 +3,8 @@
  * Author: https://saeiddrv.com
 */
 
+stringescapes { }
+
 stringdef aa      '{U+0622}'
 stringdef alef    '{U+0627}'
 stringdef be      '{U+0628}'
@@ -45,10 +47,14 @@ routines (
     Suffix_Noun
     Suffix_Adjective
     Suffix_Verb
+    Suffix_Normalize
 )
 
 
 externals ( stem )
+
+
+groupings (  )
 
 
 define Normalize as (
@@ -59,6 +65,9 @@ define Normalize as (
             '{U+0629}' ( <- '{he}'  )             // Normalize Heh
             '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
             '{U+0624}' ( <- '{vav}' )             // Normalize Waw and Waw with Hamza above
+
+
+            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
         )
     )
 )
@@ -67,46 +76,58 @@ define Normalize as (
 define Prefix as (
     [substring] among (
         '{be}{ye}{shin}' (delete)       // bish
-        '{be}{ye}' ($(len > 3)delete)   // bii
+        '{be}{ye}' ($(len > 3) delete)  // bii
         '{pe}{ye}{shin}' (delete)       // pish
         '{pe}{sin}' (delete)            // pas
         '{ze}{ye}{re}' (delete)         // ziir
         '{he}{mim}' (delete)            // ham
         '{nun}{alef}' (delete)          // naa
-        '{mim}{ye}' (delete)            // mii
+        '{mim}{ye}' ($(len > 3) delete) // mii
     )
 )
 
 
 define Suffix_Noun as (
-    [substring] among (
-        '{gaf}{alef}{heh}' (delete)       // gaah
-        '{he}{alef}{ye}' (delete)         // haaye
-        '{he}{alef}' (delete)             // haa
-        '{alef}{te}' (delete)             // aat
-        '{sin}{te}{alef}{nun}' (delete)   // setan
-        '{ye}{te}' (delete)               // yat
-
-        '{gaf}{alef}{nun}' ( <- '{he}'  ) // gaan -> h
+    do backwards (
+        [substring] among (
+            '{gaf}{alef}{heh}' (delete)       // gaah
+            '{he}{alef}{ye}' (delete)         // haaye
+            '{he}{alef}' (delete)             // haa
+            '{alef}{te}' (delete)             // aat
+            '{sin}{te}{alef}{nun}' (delete)   // setan
+            '{ye}{te}' (delete)               // yat
+        )
     )
 )
 
 define Suffix_Verb as (
-    [substring] among (
-        '{ye}{mim}' (delete)
-        '{ye}{ye}' (delete)
-        '{ye}{ye}{dal}' (delete)
-        '{mim}' (delete)
-        '{ye}' (delete)
-        '{ye}{dal}' (delete)
-        '{nun}{dal}' (delete)
+    do backwards (
+        [substring] among (
+            '{ye}{mim}' ($(len > 3) delete)
+            '{ye}{ye}' (delete)
+            '{ye}{ye}{dal}' (delete)
+            '{mim}' ($(len > 2) delete)
+            '{ye}' ($(len > 2) delete)
+            '{ye}{dal}' ($(len > 3) delete)
+            '{nun}{dal}' ($(len > 3) delete)
+        )
     )
 )
 
 define Suffix_Adjective as (
-    [substring] among (
-        '{te}{re}' (delete) // tar (comparative)
-        '{te}{re}{ye}{nun}' (delete)  // tarin (superlative)
+    do backwards (
+        [substring] among (
+            '{te}{re}' (delete)           // tar (comparative)
+            '{te}{re}{ye}{nun}' (delete)  // tarin (superlative)
+        )
+    )
+)
+
+define Suffix_Normalize as (
+    do backwards (
+        [substring] among (
+            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
+        )
     )
 )
 
@@ -146,5 +167,6 @@ define stem as (
         do Suffix_Noun
         do Suffix_Adjective
         do Suffix_Verb
+        do Suffix_Normalize
     )
 )
