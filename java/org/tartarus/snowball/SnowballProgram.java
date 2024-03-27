@@ -28,7 +28,7 @@ public class SnowballProgram implements Serializable {
      */
     public String getCurrent()
     {
-        return new String(current, 0, limit);
+        return new String(current, 0, length);
     }
 
     /**
@@ -344,12 +344,10 @@ public class SnowballProgram implements Serializable {
 
     protected void slice_check()
     {
-	if (bra < 0 ||
-	    bra > ket ||
-	    ket > limit)
-	{
-	     throw new IllegalArgumentException("faulty slice operation: bra=" + bra + ",ket=" + ket + ",limit=" + limit);
-	}
+	assert bra >= 0 : "bra=" + bra;
+	assert bra <= ket : "bra=" + bra + ",ket=" + ket;
+	assert limit <= length : "limit=" + limit + ",length=" + length;
+	assert ket <= limit : "ket=" + ket + ",limit=" + limit;
     }
 
     protected void slice_from(CharSequence s)
