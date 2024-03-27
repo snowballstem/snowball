@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class TestApp {
     private static void usage()
@@ -66,20 +67,24 @@ public class TestApp {
 	Writer output = new OutputStreamWriter(outstream, StandardCharsets.UTF_8);
 	output = new BufferedWriter(output);
 
-	StringBuffer input = new StringBuffer();
+	char [] input = new char[8];
+	int length = 0;
 	int character;
 	while ((character = reader.read()) != -1) {
 	    char ch = (char) character;
 	    if (Character.isWhitespace(ch)) {
-		stemmer.setCurrent(input.toString());
+		stemmer.setCurrent(input, length);
 		stemmer.stem();
-		output.write(stemmer.getCurrent());
+		output.write(stemmer.getCurrentBuffer(), 0, stemmer.getCurrentBufferLength());
 		output.write('\n');
-		input.delete(0, input.length());
+		length = 0;
 	    } else {
-		input.append(ch < 127 ? Character.toLowerCase(ch) : ch);
+		if (length == input.length) {
+			input = Arrays.copyOf(input, length + 1);
+		}
+		input[length++] = ch < 127 ? Character.toLowerCase(ch) : ch;
 	    }
 	}
-	output.flush();
+	output.close();
     }
 }

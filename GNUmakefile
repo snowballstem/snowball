@@ -12,7 +12,7 @@ c_src_dir = src_c
 
 JAVACFLAGS ?=
 JAVAC ?= javac
-JAVA ?= java
+JAVA ?= java -ea
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
