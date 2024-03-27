@@ -9,7 +9,6 @@ import java.io.Serializable;
 public class SnowballProgram implements Serializable {
     protected SnowballProgram()
     {
-	current = new char[8];
 	setCurrent("");
     }
 
