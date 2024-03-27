@@ -272,7 +272,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             break;
         case c_len: /* Same as size() for Java. */
         case c_size:
-            w(g, "limit");
+            w(g, "length");
             break;
     }
 }
