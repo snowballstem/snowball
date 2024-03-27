@@ -1194,9 +1194,11 @@ static void generate_class_begin(struct generator * g) {
     w(g, g->options->parent_class_name);
     w(g, " {~+~N"
          "~N"
-         "~Mprivate static final long serialVersionUID = 1L;~N"
-         "~Mprivate static final java.lang.invoke.MethodHandles.Lookup methodObject = java.lang.invoke.MethodHandles.lookup();~N"
-         "~N");
+         "~Mprivate static final long serialVersionUID = 1L;~N");
+    if (g->analyser->among_with_function_count > 0) {
+        w(g, "~Mprivate static final java.lang.invoke.MethodHandles.Lookup methodObject = java.lang.invoke.MethodHandles.lookup();~N");
+    }
+    w(g, "~N");
 }
 
 static void generate_class_end(struct generator * g) {

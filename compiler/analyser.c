@@ -895,6 +895,9 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     }
     x->substring = substring;
     if (substring != 0) substring->among = x;
+
+    if (x->function_count > 0) ++a->among_with_function_count;
+
     return p;
 }
 
@@ -1612,6 +1615,7 @@ extern struct analyser * create_analyser(struct tokeniser * t) {
     a->program = 0;
     a->amongs = 0;
     a->among_count = 0;
+    a->among_with_function_count = 0;
     a->groupings = 0;
     a->mode = m_forward;
     a->modifyable = true;

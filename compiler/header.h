@@ -310,6 +310,7 @@ struct analyser {
     struct among * amongs_end;
     int among_count;
     int amongvar_needed;      /* used in reading routine definitions */
+    int among_with_function_count; /* number of amongs with functions */
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
