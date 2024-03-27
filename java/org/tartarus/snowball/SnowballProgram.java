@@ -2,6 +2,7 @@
 package org.tartarus.snowball;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Base class for a snowball stemmer
@@ -313,16 +314,6 @@ public class SnowballProgram implements Serializable {
 	}
     }
 
-    // mini version of ArrayUtil.oversize from lucene, specialized to chars
-    static int oversize(int minTargetSize) {
-	int extra = minTargetSize >> 3;
-	if (extra < 3) {
-	    extra = 3;
-	}
-	int newSize = minTargetSize + extra;
-	return (newSize + 3) & 0x7ffffffc;
-    }
-
     /* to replace chars between c_bra and c_ket in current by the
      * chars in s.
      */
@@ -332,9 +323,7 @@ public class SnowballProgram implements Serializable {
 	final int newLength = limit + adjustment;
 	//resize if necessary
 	if (newLength > current.length) {
-	    char[] newBuffer = new char[oversize(newLength)];
-	    System.arraycopy(current, 0, newBuffer, 0, limit);
-	    current = newBuffer;
+	    current = Arrays.copyOf(current, newLength);
 	}
 	// if the substring being replaced is longer or shorter than the
 	// replacement, need to shift things around
