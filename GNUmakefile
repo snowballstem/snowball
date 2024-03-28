@@ -57,6 +57,22 @@ endif
 ICONV = iconv
 #ICONV = python ./iconv.py
 
+# Where the data files are located - assumes their repo is checked out as
+# a sibling to this one.
+STEMMING_DATA ?= ../snowball-data
+STEMMING_DATA_ABS := $(abspath $(STEMMING_DATA))
+
+# Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
+THIN_FACTOR ?= 3
+
+ifneq (1,$(THIN_FACTOR))
+ifneq (,$(THIN_FACTOR))
+# Command to thin out the testdata.  Used for Python tests, which otherwise
+# take a long time (unless you use pypy).
+THIN_TEST_DATA := |awk '(FNR % $(THIN_FACTOR) == 0){print}'
+endif
+endif
+
 tarball_ext = .tar.gz
 
 # algorithms.mk is generated from libstemmer/modules.txt and defines:
@@ -205,6 +221,14 @@ clean:
 	-rmdir $(python_output_dir)
 	-rmdir $(js_output_dir)
 
+update_version:
+	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/' \
+		compiler/header.h \
+		csharp/Snowball/AssemblyInfo.cs \
+		python/setup.py
+
+.PHONY: all clean update_version
+
 snowball$(EXEEXT): $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
@@ -311,6 +335,8 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
+
+.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
 
 # Make a full source distribution
 dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
@@ -469,6 +495,12 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
+###############################################################################
+# C
+###############################################################################
+
+.PHONY: check check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
 check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_stemtest: stemtest$(EXEEXT)
@@ -481,11 +513,6 @@ check_iso_8859_1: $(ISO_8859_1_algorithms:%=check_iso_8859_1_%)
 check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)
 
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
-
-# Where the data files are located - assumes their repo is checked out as
-# a sibling to this one.
-STEMMING_DATA ?= ../snowball-data
-STEMMING_DATA_ABS := $(abspath $(STEMMING_DATA))
 
 check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with UTF-8"
@@ -525,10 +552,18 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
+###############################################################################
+# Java
+###############################################################################
+
+.PHONY: java check_java do_check_java
+
+java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
+
 .java.class:
 	cd java && $(JAVAC) $(JAVACFLAGS) `echo "$<"|sed 's,^java/,,'`
 
-check_java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
+check_java: java
 	$(MAKE) do_check_java
 
 do_check_java: $(libstemmer_algorithms:%=check_java_%)
@@ -548,7 +583,15 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_csharp: csharp_stemwords$(EXEEXT)
+###############################################################################
+# C#
+###############################################################################
+
+.PHONY: csharp check_csharp do_check_csharp
+
+csharp: csharp_stemwords$(EXEEXT)
+
+check_csharp: csharp
 	$(MAKE) do_check_csharp
 
 do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
@@ -568,7 +611,15 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_pascal: pascal/stemwords
+###############################################################################
+# Pascal
+###############################################################################
+
+.PHONY: pascal check_pascal do_check_pascal
+
+pascal: pascal/stemwords
+
+check_pascal: pascal
 	$(MAKE) do_check_pascal
 
 do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
@@ -581,20 +632,48 @@ check_pascal_%: $(STEMMING_DATA_ABS)/%
 	    $(DIFF) -u - tmp.txt
 	@rm tmp.txt
 
-check_js: $(JS_SOURCES) $(libstemmer_algorithms:%=check_js_%)
+###############################################################################
+# Javascript
+###############################################################################
 
-# Keep one in $(THIN_FACTOR) entries from gzipped vocabularies.
-THIN_FACTOR ?= 3
+.PHONY: js check_js do_check_js
 
-ifneq (1,$(THIN_FACTOR))
-ifneq (,$(THIN_FACTOR))
-# Command to thin out the testdata.  Used for Python tests, which otherwise
-# take a long time (unless you use pypy).
-THIN_TEST_DATA := |awk '(FNR % $(THIN_FACTOR) == 0){print}'
-endif
-endif
+js: $(JS_SOURCES)
 
-check_rust: $(RUST_SOURCES) $(libstemmer_algorithms:%=check_rust_%)
+check_js: js
+	$(MAKE) do_check_js
+
+do_check_js: $(libstemmer_algorithms:%=check_js_%)
+
+check_js_%: export NODE_PATH=$(js_output_dir)
+check_js_%: $(STEMMING_DATA)/%
+	@echo "Checking output of $* stemmer for JS"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(NODE) javascript/stemwords.js -l $* -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(NODE) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(DIFF) -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+###############################################################################
+# Rust
+###############################################################################
+
+.PHONY: rust check_rust do_check_rust
+
+rust: $(RUST_SOURCES)
+
+check_rust: rust
+	$(MAKE) do_check_rust
+
+do_check_rust: $(libstemmer_algorithms:%=check_rust_%)
 
 check_rust_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Rust"
@@ -612,7 +691,18 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-check_go: $(GO_SOURCES) $(libstemmer_algorithms:%=check_go_%)
+###############################################################################
+# Go
+###############################################################################
+
+.PHONY: go check_go do_check_go
+
+go: $(GO_SOURCES)
+
+check_go: go
+	$(MAKE) do_check_go
+
+do_check_go: $(libstemmer_algorithms:%=check_go_%)
 
 check_go_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Go"
@@ -630,25 +720,16 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@rm tmp.txt
 
-export NODE_PATH = $(js_output_dir)
+###############################################################################
+# Python
+###############################################################################
 
-check_js_%: $(STEMMING_DATA)/%
-	@echo "Checking output of $* stemmer for JS"
-	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(NODE) javascript/stemwords.js -l $* -i tmp.in -o tmp.txt; \
-	  rm tmp.in; \
-	else \
-	  $(NODE) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
-	fi
-	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
-	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
-	fi
-	@rm tmp.txt
+.PHONY: python check_python do_check_python
 
-check_python: check_python_stemwords $(libstemmer_algorithms:%=check_python_%)
+python: check_python_stemwords
+
+check_python: python
+	$(MAKE) $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Python (THIN_FACTOR=$(THIN_FACTOR))"
@@ -673,13 +754,15 @@ check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
 
-update_version:
-	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/' \
-		compiler/header.h \
-		csharp/Snowball/AssemblyInfo.cs \
-		python/setup.py
+###############################################################################
+# Ada
+###############################################################################
 
-check_ada: ada/bin/stemwords
+.PHONY: ada check_ada do_check_ada
+
+ada: ada/bin/stemwords
+
+check_ada: ada
 	$(MAKE) do_check_ada
 
 do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
