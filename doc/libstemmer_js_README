@@ -6,7 +6,7 @@ What is Stemming?
 
 Stemming maps different forms of the same word to a common "stem" - for
 example, the English stemmer maps *connection*, *connections*, *connective*,
-*connected*, and *connecting* to *connect*.  So a searching for *connected*
+*connected*, and *connecting* to *connect*.  So a search for *connected*
 would also find documents which only have the other forms.
 
 This stem form is often a word itself, but this is not always the case as this
