@@ -561,7 +561,7 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 
 .java.class:
-	cd java && $(JAVAC) $(JAVACFLAGS) `echo "$<"|sed 's,^java/,,'`
+	cd java && $(JAVAC) $(JAVACFLAGS) $(patsubst java/%,%,$<)
 
 check_java: java
 	$(MAKE) do_check_java
