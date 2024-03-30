@@ -447,7 +447,7 @@ static int check_possible_signals(struct generator * g,
             if (res >= 0)
                 res = !res;
             if (res == 0 && p->right) {
-                fprintf(stderr, "%s:%d: warning: 'not' always signals f so following commands are dead code\n",
+                fprintf(stderr, "%s:%d: warning: 'not' always signals f so following commands are unreachable\n",
                         g->analyser->tokeniser->file, p->line_number);
                 p->right = NULL;
             }
@@ -567,7 +567,7 @@ static int check_possible_signals(struct generator * g,
                     // If any clause of the OR always signals t, then the OR
                     // always signals t.
                     if (q->right) {
-                        fprintf(stderr, "%s:%d: warning: command always signals t here so rest of 'or' is dead code\n",
+                        fprintf(stderr, "%s:%d: warning: command always signals t here so rest of 'or' is unreachable\n",
                                 g->analyser->tokeniser->file, q->line_number);
                         q->right = NULL;
                     }
@@ -595,7 +595,7 @@ int check_possible_signals_list(struct generator * g, struct node * p,
         if (res == 0) {
             // If any command always signals f, then the list always signals f.
             if (p->right) {
-                fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is dead code\n",
+                fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is unreachable\n",
                         g->analyser->tokeniser->file, p->line_number,
                         (type == c_and ? "'and'" : "command list"));
                 p->right = NULL;
