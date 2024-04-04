@@ -40,6 +40,15 @@ stringdef heh     '{U+0647}'
 stringdef ye      '{U+06CC}'
 
 
+stringdef ar_kaf                     '{U+0643}'
+stringdef ar_ye                      '{U+064A}'
+stringdef ar_ye_with_hamza_above     '{U+0626}'
+stringdef ar_he_marbuta              '{U+0629}'
+stringdef ar_alef_with_hamza_below   '{U+0625}'
+stringdef ar_alef_with_hamza_above   '{U+0623}'
+stringdef ar_vav_with_hamza_above    '{U+0624}'
+
+
 routines (
     Exception
     Normalize
@@ -60,11 +69,11 @@ groupings (  )
 define Normalize as (
     do repeat (
         [substring] among (
-            '{U+0643}' ( <- '{kaf}' )             // Normalize Kaf
-            '{U+0626}' '{U+064A}' ( <- '{ye}'  )  // Normalize Ye
-            '{U+0629}' ( <- '{he}'  )             // Normalize Heh
-            '{U+0623}' '{U+0625}' ( <- '{alef}' ) // Normalize Alef
-            '{U+0624}' ( <- '{vav}' )             // Normalize Waw and Waw with Hamza above
+            '{ar_kaf}' ( <- '{kaf}' )
+            '{ar_ye_with_hamza_above}' '{ar_ye}' ( <- '{ye}'  )
+            '{ar_he_marbuta}' ( <- '{he}'  )
+            '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' ( <- '{alef}' )
+            '{ar_vav_with_hamza_above}' ( <- '{vav}' )
 
 
             '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
@@ -133,29 +142,29 @@ define Suffix_Normalize as (
 
 define Exception as (
     [substring] among (
-        '{sin}{ye}' ()
-        '{dal}{re}' ()
-        '{alef}{ye}{nun}' ()
-        '{alef}{ye}' ()
-        '{be}{re}' ()
-        '{nun}{alef}{mim}' ()
-        '{pe}{sin}' ()
-        '{alef}{sin}{te}{alef}{nun}' ()
-        '{be}{re}{alef}{ye}' ()
-        '{pe}{ye}{vav}{nun}{dal}' ()
-        '{mim}{ye}{lam}{alef}{dal}{ye}' ()
-        '{mim}{lam}{ye}' ()
-        '{che}{nun}{dal}' ()
-        '{be}{re}{khe}{ye}' ()
-        '{he}{mim}{ye}{nun}' ()
-        '{he}{mim}{alef}{nun}' ()
-        '{he}{mim}{he}' ()
-        '{mim}{te}{re}' ()
-        '{te}{ye}{mim}' ()
-        '{sin}{lam}{alef}{mim}' ()
-        '{alef}{sin}{lam}{alef}{mim}' ()
-        '{ye}{ain}{nun}{ye}' ()
-        '{aa}{lam}{be}{vav}{mim}' ()
+        '{sin}{ye}'
+        '{dal}{re}'
+        '{alef}{ye}{nun}'
+        '{alef}{ye}'
+        '{be}{re}'
+        '{nun}{alef}{mim}'
+        '{pe}{sin}'
+        '{alef}{sin}{te}{alef}{nun}'
+        '{be}{re}{alef}{ye}'
+        '{pe}{ye}{vav}{nun}{dal}'
+        '{mim}{ye}{lam}{alef}{dal}{ye}'
+        '{mim}{lam}{ye}'
+        '{che}{nun}{dal}'
+        '{be}{re}{khe}{ye}'
+        '{he}{mim}{ye}{nun}'
+        '{he}{mim}{alef}{nun}'
+        '{he}{mim}{he}'
+        '{mim}{te}{re}'
+        '{te}{ye}{mim}'
+        '{sin}{lam}{alef}{mim}'
+        '{alef}{sin}{lam}{alef}{mim}'
+        '{ye}{ain}{nun}{ye}'
+        '{aa}{lam}{be}{vav}{mim}'
     )
 )
 
