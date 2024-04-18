@@ -229,6 +229,9 @@ update_version:
 
 .PHONY: all clean update_version
 
+$(STEMMING_DATA)/% $(STEMMING_DATA_ABS)/%:
+	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
+
 snowball$(EXEEXT): $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
