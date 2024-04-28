@@ -1,0 +1,20 @@
+externals ( stem )
+
+stringescapes {}
+
+stringdef a-   '{U+0101}'  // ā
+stringdef i-   '{U+012B}'  // ī
+stringdef u-   '{U+016B}'  // ū
+stringdef m1   '{U+1E41}'  // ṁ
+stringdef m2   '{U+1E43}'  // ṃ
+
+define stem as (
+  backwards (
+    [substring] delete among (
+        'm{a-}na' 'anta' 'onta' 'unta' 'enta' 'issa'
+        'ati' '{a-}ti' 'ant' 'esi' '{a-}si' 'eti'
+        'a{m1}' 'a{m2}' 'u{m1}' 'u{m2}' 'i{m1}' 'i{m2}'
+        'i' '{i-}' 'a' '{a-}' 'o' 'u' '{u-}'
+    )
+  )
+)
