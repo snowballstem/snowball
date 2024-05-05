@@ -1,0 +1,115 @@
+routines (
+  RV R1
+  palatalise
+  mark_regions
+  do_possessive
+  do_case
+)
+
+externals ( stem )
+
+integers ( pV p1 )
+
+groupings ( v )
+
+stringescapes {}
+
+stringdef a' '{U+00E1}'
+stringdef c^ '{U+010D}'
+stringdef d^ '{U+010F}'
+stringdef e' '{U+00E9}'
+stringdef e^ '{U+011B}'
+stringdef i' '{U+00ED}'
+stringdef n^ '{U+0148}'
+stringdef o' '{U+00F3}'
+stringdef r^ '{U+0159}'
+stringdef s^ '{U+0161}'
+stringdef t^ '{U+0165}'
+stringdef u' '{U+00FA}'
+stringdef u* '{U+016F}'
+stringdef y' '{U+00FD}'
+stringdef z^ '{U+017E}'
+
+define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
+
+define mark_regions as (
+
+    $pV = limit
+    $p1 = limit
+
+    do (
+        gopast non-v setmark pV
+        gopast non-v gopast v setmark p1
+    )
+)
+
+backwardmode (
+
+  define RV as $pV <= cursor
+  define R1 as $p1 <= cursor
+
+  define palatalise as (
+    [substring] RV among (
+      'ci' 'ce' '{c^}i' '{c^}'
+      (<- 'k')
+      'zi' 'ze' '{z^}i' '{z^}e'
+      (<- 'h')
+      '{c^}t{e^}' '{c^}ti' '{c^}t{e'}'
+      (<- 'ck')
+      '{s^}t{e^}' '{s^}ti' '{s^}t{e'}'
+      (<- 'sk')
+    )
+  )
+
+  define do_possessive as (
+    [substring] RV among (
+      'ov' '{u*}v'
+      (delete)
+      'in'
+      (
+        delete
+        try palatalise
+      )
+    )
+  )
+
+  define do_case as (
+    [substring] R1 among (
+      'atech'
+      '{e^}tem' 'at{u*}m'
+      '{a'}ch' '{y'}ch' 'ov{e'}' '{y'}mi'
+      'ata' 'aty' 'ama' 'ami' 'ovi'
+      'at' '{a'}m' 'os' 'us' '{u*}m' '{y'}m' 'mi' 'ou'
+      'u' 'y' '{u*}' 'a' 'o' '{a'}' '{e'}' '{y'}'
+      (delete)
+      'ech' 'ich' '{i'}ch'
+      '{e'}ho' '{e^}mi' '{e'}mu' '{e^}te' '{e^}ti' '{i'}ho' '{i'}mi'
+      'emi' 'iho' 'imu'
+      '{e'}m' '{i'}m' 'es'
+      'e' 'i' '{i'}' '{e^}'
+      (
+        delete
+        try palatalise
+      )
+      'em'
+      (
+        <- 'e'
+        try palatalise
+      )
+    )
+  )
+)
+
+define stem as (
+  do mark_regions
+  backwards (
+    do_case
+    do_possessive
+  )
+)
+
+// Ljiljana Dolamic and Jacques Savoy. 2009.
+// Indexing and stemming approaches for the Czech language.
+// Inf. Process. Manage. 45, 6 (November 2009), 714-720.
+// based on Java code by Ljiljana Dolamic:
+// http://members.unine.ch/jacques.savoy/clef/CzechStemmerLight.txt
