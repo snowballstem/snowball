@@ -76,6 +76,11 @@ jobs:
           os: 'ubuntu-22.04'
           apt_packages: 'python3.10'
           THIN_FACTOR: 1
+        - name: Python 3.12
+          PYTHON: python3.12
+          os: 'ubuntu-24.04'
+          apt_packages: 'python3.12'
+          THIN_FACTOR: 1
         - name: Python (pypy3)
           PYTHON: pypy3
           apt_packages: 'pypy3'
