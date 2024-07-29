@@ -41,13 +41,12 @@ jobs:
           JAVAC: javac
           JAVACFLAGS: '-Xlint:all -Werror'
         - name: go_old
-          os: 'ubuntu-20.04'
-          # 22.04: golang-1.13 17 18 20
+          os: 'ubuntu-22.04'
           apt_packages: 'golang-1.13'
           GO: go
         - name: go_new
-          # 22.04: golang-1.13 17 18 20
-          apt_packages: 'golang-1.20'
+          os: 'ubuntu-24.04'
+          apt_packages: 'golang-1.22'
           GO: go
         - name: javascript_node
           NODE: node
