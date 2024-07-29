@@ -973,13 +973,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     struct str * saved_output = g->outbuf;
 
-    /* We currently make functions used in among public as this seems to
-     * be required to allow the SnowballProgram base class to invoke them.
-     * FIXME: Is this avoidable?
-     */
-    if (q->used_in_among) {
-        g->S[0] = "public";
-    } else if (q->type == t_routine) {
+    if (q->type == t_routine) {
         g->S[0] = "private";
     } else {
         w(g, "~N~M@Override");
