@@ -78,7 +78,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
         }
     }
 error:
-    if (b != 0) free(b);
+    free(b);
     return;
 }
 
