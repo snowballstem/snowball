@@ -1225,7 +1225,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     g->I[0] = x->number;
 
-    w(g, "~Mprivate final static Among a_~I0[] = {~N~+");
+    w(g, "~Mprivate final static Among[] a_~I0 = {~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1271,7 +1271,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
-    w(g, "~Mprivate static final char ~V0[] = {");
+    w(g, "~Mprivate static final char[] ~V0 = {");
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");

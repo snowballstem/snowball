@@ -29,7 +29,7 @@ public class TestApp {
         }
     }
 
-    public static void main(String [] args) throws Throwable {
+    public static void main(String[] args) throws Throwable {
         if (args.length < 1) {
             usage();
             return;
@@ -67,7 +67,7 @@ public class TestApp {
 	Writer output = new OutputStreamWriter(outstream, StandardCharsets.UTF_8);
 	output = new BufferedWriter(output);
 
-	char [] input = new char[8];
+	char[] input = new char[8];
 	int length = 0;
 	int character;
 	while ((character = reader.read()) != -1) {

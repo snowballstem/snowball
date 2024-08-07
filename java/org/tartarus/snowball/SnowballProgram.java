@@ -103,7 +103,7 @@ public class SnowballProgram implements Serializable {
 	ket              = other.ket;
     }
 
-    protected boolean in_grouping(char [] s, int min, int max)
+    protected boolean in_grouping(char[] s, int min, int max)
     {
 	if (cursor >= limit) return false;
 	char ch = current[cursor];
@@ -114,7 +114,7 @@ public class SnowballProgram implements Serializable {
 	return true;
     }
 
-    protected boolean in_grouping_b(char [] s, int min, int max)
+    protected boolean in_grouping_b(char[] s, int min, int max)
     {
 	if (cursor <= limit_backward) return false;
 	char ch = current[cursor - 1];
@@ -125,7 +125,7 @@ public class SnowballProgram implements Serializable {
 	return true;
     }
 
-    protected boolean out_grouping(char [] s, int min, int max)
+    protected boolean out_grouping(char[] s, int min, int max)
     {
 	if (cursor >= limit) return false;
 	char ch = current[cursor];
@@ -141,7 +141,7 @@ public class SnowballProgram implements Serializable {
 	return false;
     }
 
-    protected boolean out_grouping_b(char [] s, int min, int max)
+    protected boolean out_grouping_b(char[] s, int min, int max)
     {
 	if (cursor <= limit_backward) return false;
 	char ch = current[cursor - 1];
@@ -179,7 +179,7 @@ public class SnowballProgram implements Serializable {
 	return true;
     }
 
-    protected int find_among(Among v[])
+    protected int find_among(Among[] v)
     {
 	int i = 0;
 	int j = v.length;
@@ -248,7 +248,7 @@ public class SnowballProgram implements Serializable {
     }
 
     // find_among_b is for backwards processing. Same comments apply
-    protected int find_among_b(Among v[])
+    protected int find_among_b(Among[] v)
     {
 	int i = 0;
 	int j = v.length;
