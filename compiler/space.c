@@ -72,7 +72,7 @@ extern void output_str(FILE * outfile, struct str * str) {
 }
 
 extern void lose_b(symbol * p) {
-    if (p == 0) return;
+    if (p == NULL) return;
     FREE((char *) p - HEAD);
 }
 
@@ -141,7 +141,7 @@ extern char * b_to_sz(const symbol * p) {
 
 extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
     int k;
-    if (p == 0) p = create_b(1);
+    if (p == NULL) p = create_b(1);
     k = SIZE(p);
     {
         int x = k + 1 - CAPACITY(p);
@@ -164,7 +164,7 @@ extern void report_s(FILE * out, const byte * p) {
 }
 
 extern void lose_s(byte * p) {
-    if (p == 0) return;
+    if (p == NULL) return;
     FREE((byte *) p - HEAD);
 }
 
@@ -185,7 +185,7 @@ extern byte * copy_s(const byte * p) {
 
 extern byte * add_s_to_s(byte * p, const char * s, int n) {
     int k;
-    if (p == 0) p = create_s(n);
+    if (p == NULL) p = create_s(n);
     k = SIZE(p);
     {
         int x = k + n - CAPACITY(p);
@@ -208,7 +208,7 @@ extern byte * add_sz_to_s(byte * p, const char * s) {
 
 extern byte * add_char_to_s(byte * p, char ch) {
     int k;
-    if (p == 0) p = create_s(1);
+    if (p == NULL) p = create_s(1);
     k = SIZE(p);
     {
         int x = k + 1 - CAPACITY(p);

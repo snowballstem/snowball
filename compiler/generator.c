@@ -301,7 +301,7 @@ static void write_check_limit(struct generator * g, struct node * p) {
 
 static void write_data_address(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
-    if (b != 0) {
+    if (b != NULL) {
         write_int(g, SIZE(b)); w(g, ", ");
         wlitref(g, b);
     } else {
@@ -344,7 +344,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case '$': /* insert_s, insert_v etc */
-                write_char(g, p->literalstring == 0 ? 'v' : 's');
+                write_char(g, p->literalstring == NULL ? 'v' : 's');
                 continue;
             case 'p': write_string(g, g->options->externals_prefix); continue;
         }
@@ -352,7 +352,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 }
 
 static void w(struct generator * g, const char * s) {
-    writef(g, s, 0);
+    writef(g, s, NULL);
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
@@ -524,7 +524,7 @@ static int check_possible_signals(struct generator * g,
             struct among * x = p->among;
             int r = 1;
 
-            if (x->substring == 0) {
+            if (x->substring == NULL) {
                 if (x->always_matches) {
                     return 1;
                 }
@@ -765,7 +765,7 @@ static void generate_and(struct generator * g, struct node * p) {
     p = p->left;
     while (p) {
         generate(g, p);
-        if (keep_c && p->right != 0) {
+        if (keep_c && p->right != NULL) {
             w(g, "~M"); wrestore(g, p, keep_c); w(g, "~N");
         }
         p = p->right;
@@ -1587,7 +1587,7 @@ static void generate_among(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
 
-    if (x->substring == 0) generate_substring(g, p);
+    if (x->substring == NULL) generate_substring(g, p);
 
     if (x->command_count == 1 && x->nocommand_count == 0) {
         /* Only one outcome ("no match" already handled). */
@@ -1793,7 +1793,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
                 w(g, "s_~I0_~I1,");
             }
             w(g, " ~I3, ~I4, ");
-            if (v->function == 0) {
+            if (v->function == NULL) {
                 write_char(g, '0');
             } else {
                 write_varname(g, v->function);

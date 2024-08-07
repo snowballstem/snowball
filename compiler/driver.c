@@ -99,7 +99,7 @@ static FILE * get_output(byte * s) {
     s[SIZE(s)] = 0;
     const char * filename = (const char *)s;
     FILE * output = fopen(filename, "w");
-    if (output == 0) {
+    if (output == NULL) {
         fprintf(stderr, "Can't open output %s\n", filename);
         exit(1);
     }
@@ -117,13 +117,13 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
     /* set defaults: */
 
-    o->output_file = 0;
+    o->output_file = NULL;
     o->syntax_tree = false;
     o->comments = false;
     o->js_esm = false;
     o->externals_prefix = NULL;
-    o->variables_prefix = 0;
-    o->runtime_path = 0;
+    o->variables_prefix = NULL;
+    o->runtime_path = NULL;
     o->parent_class_name = NULL;
     o->string_class = NULL;
     o->among_class = NULL;
@@ -131,8 +131,8 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
     o->name = NULL;
     o->make_lang = LANG_C;
-    o->includes = 0;
-    o->includes_end = 0;
+    o->includes = NULL;
+    o->includes_end = NULL;
     o->encoding = ENC_SINGLEBYTE;
 
     /* read options: */
@@ -257,12 +257,15 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
                 {
                     NEW(include, p);
-                    byte * s = add_sz_to_s(0, argv[i++]);
+                    byte * s = add_sz_to_s(NULL, argv[i++]);
                     s = add_char_to_s(s, '/');
-                    p->next = 0; p->s = s;
+                    p->next = NULL; p->s = s;
 
-                    if (o->includes == 0) o->includes = p; else
-                                          o->includes_end->next = p;
+                    if (o->includes == NULL) {
+                        o->includes = p;
+                    } else {
+                        o->includes_end->next = p;
+                    }
                     o->includes_end = p;
                 }
                 continue;
@@ -471,7 +474,7 @@ extern int main(int argc, char * argv[]) {
     {
         char * file = argv[1];
         byte * u = get_input(file);
-        if (u == 0) {
+        if (u == NULL) {
             fprintf(stderr, "Can't open input %s\n", file);
             exit(1);
         }
@@ -488,7 +491,7 @@ extern int main(int argc, char * argv[]) {
                 NEW(input, q);
                 file = argv[i];
                 u = get_input(file);
-                if (u == 0) {
+                if (u == NULL) {
                     fprintf(stderr, "Can't open input %s\n", file);
                     exit(1);
                 }
@@ -514,7 +517,7 @@ extern int main(int argc, char * argv[]) {
                 }
                 g = create_generator(a, o);
                 if (o->make_lang == LANG_C || o->make_lang == LANG_CPLUSPLUS) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".h");
                     o->output_h = get_output(s);
                     s[SIZE(s) - 1] = 'c';
@@ -530,7 +533,7 @@ extern int main(int argc, char * argv[]) {
                 }
 #ifndef DISABLE_JAVA
                 if (o->make_lang == LANG_JAVA) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".java");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -540,7 +543,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_PASCAL
                 if (o->make_lang == LANG_PASCAL) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".pas");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -550,7 +553,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_PYTHON
                 if (o->make_lang == LANG_PYTHON) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".py");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -560,7 +563,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     if (o->js_esm) {
                         s = add_literal_to_s(s, ".mjs");
                     } else {
@@ -574,7 +577,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_CSHARP
                 if (o->make_lang == LANG_CSHARP) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".cs");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -584,7 +587,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_RUST
                 if (o->make_lang == LANG_RUST) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".rs");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -594,7 +597,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_GO
                 if (o->make_lang == LANG_GO) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".go");
                     o->output_src = get_output(s);
                     lose_s(s);
@@ -604,7 +607,7 @@ extern int main(int argc, char * argv[]) {
 #endif
 #ifndef DISABLE_ADA
                 if (o->make_lang == LANG_ADA) {
-                    byte * s = add_sz_to_s(0, output_base);
+                    byte * s = add_sz_to_s(NULL, output_base);
                     s = add_literal_to_s(s, ".ads");
                     o->output_h = get_output(s);
                     s[SIZE(s) - 1] = 'b';

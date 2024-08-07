@@ -235,7 +235,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 }
 
 static void w(struct generator * g, const char * s) {
-    writef(g, s, 0);
+    writef(g, s, NULL);
 }
 
 static void generate_AE(struct generator * g, struct node * p) {
@@ -306,7 +306,7 @@ static void generate_and(struct generator * g, struct node * p) {
     while (p) {
         generate(g, p);
         if (g->unreachable) break;
-        if (keep_c && p->right != 0) write_restorecursor(g, p, savevar);
+        if (keep_c && p->right != NULL) write_restorecursor(g, p, savevar);
         p = p->right;
     }
     str_delete(savevar);
@@ -331,13 +331,13 @@ static void generate_or(struct generator * g, struct node * p) {
     p = p->left;
     str_clear(g->failure_str);
 
-    if (p == 0) {
-        /* p should never be 0 after an or: there should be at least two
+    if (p == NULL) {
+        /* p should never be NULL after an or: there should be at least two
          * sub nodes. */
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
     }
-    while (p->right != 0) {
+    while (p->right != NULL) {
         int label = new_label(g);
         g->failure_label = label;
         wsetlab_begin(g, label);
@@ -579,7 +579,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     generate(g, p->left);
 
     if (!g->unreachable) {
-        if (loopvar != 0) {
+        if (loopvar != NULL) {
             g->B[0] = str_data(loopvar);
             w(g, "~M~B0 -= 1;~N");
         }
@@ -741,7 +741,7 @@ static void generate_address(struct generator * g, struct node * p) {
      * of type &'static str so we can pass them by value.
      */
     symbol * b = p->literalstring;
-    if (b != 0) {
+    if (b != NULL) {
         write_literal_string(g, b);
     } else {
         write_char(g, '&');
@@ -1067,7 +1067,7 @@ static void generate_among(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
 
-    if (x->substring == 0) generate_substring(g, p);
+    if (x->substring == NULL) generate_substring(g, p);
 
     if (x->command_count == 1 && x->nocommand_count == 0) {
         /* Only one outcome ("no match" already handled). */
@@ -1227,7 +1227,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             g->S[0] = ",";
 
             w(g, "~MAmong(~L0, ~I0, ~I1, ");
-            if (v->function != 0) {
+            if (v->function != NULL) {
                 w(g, "Some(&");
                 write_varname(g, v->function);
                 w(g, ")");
@@ -1306,7 +1306,7 @@ static void generate_members(struct generator * g) {
 static void generate_methods(struct generator * g) {
 
     struct node * p = g->analyser->program;
-    while (p != 0) {
+    while (p != NULL) {
         generate(g, p);
         g->unreachable = false;
         p = p->right;

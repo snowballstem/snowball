@@ -32,7 +32,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                     sb_symbol * newb;
                     newb = (sb_symbol *)
                             realloc(b, (lim + INC) * sizeof(sb_symbol));
-                    if (newb == 0) goto error;
+                    if (newb == NULL) goto error;
                     b = newb;
                     lim = lim + INC;
                 }
@@ -114,8 +114,8 @@ usage(int n)
 int
 main(int argc, char * argv[])
 {
-    const char * in = 0;
-    const char * out = 0;
+    const char * in = NULL;
+    const char * out = NULL;
     FILE * f_in;
     FILE * f_out;
     struct sb_stemmer * stemmer;
@@ -172,20 +172,20 @@ main(int argc, char * argv[])
     }
 
     /* prepare the files */
-    f_in = (in == 0) ? stdin : fopen(in, "r");
-    if (f_in == 0) {
+    f_in = (in == NULL) ? stdin : fopen(in, "r");
+    if (f_in == NULL) {
         fprintf(stderr, "file %s not found\n", in);
         exit(1);
     }
-    f_out = (out == 0) ? stdout : fopen(out, "w");
-    if (f_out == 0) {
+    f_out = (out == NULL) ? stdout : fopen(out, "w");
+    if (f_out == NULL) {
         fprintf(stderr, "file %s cannot be opened\n", out);
         exit(1);
     }
 
     /* do the stemming process: */
     stemmer = sb_stemmer_new(language, charenc);
-    if (stemmer == 0) {
+    if (stemmer == NULL) {
         if (charenc == NULL) {
             fprintf(stderr, "language `%s' not available for stemming\n", language);
             exit(1);
@@ -197,8 +197,8 @@ main(int argc, char * argv[])
     stem_file(stemmer, f_in, f_out);
     sb_stemmer_delete(stemmer);
 
-    if (in != 0) (void) fclose(f_in);
-    if (out != 0) (void) fclose(f_out);
+    if (in != NULL) (void) fclose(f_in);
+    if (out != NULL) (void) fclose(f_out);
 
     return 0;
 }

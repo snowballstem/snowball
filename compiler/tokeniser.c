@@ -24,7 +24,7 @@ static int smaller(int a, int b) { return a < b ? a : b; }
 
 extern byte * get_input(const char * filename) {
     FILE * input = fopen(filename, "r");
-    if (input == 0) { return 0; }
+    if (input == NULL) { return NULL; }
     {
         byte * u = create_s(INITIAL_INPUT_BUFFER_SIZE);
         int size = 0;
@@ -54,11 +54,11 @@ static void error(struct tokeniser * t, const char * s1, byte * p, int n, const 
 }
 
 static void error1(struct tokeniser * t, const char * s) {
-    error(t, s, 0,0, 0);
+    error(t, s, NULL, 0, NULL);
 }
 
 static void error2(struct tokeniser * t, const char * s) {
-    error(t, "unexpected end of text after ", 0,0, s);
+    error(t, "unexpected end of text after ", NULL, 0, s);
 }
 
 static int compare_words(int m, const byte * p, int n, const byte * q) {
@@ -97,7 +97,7 @@ static symbol * find_in_m(struct tokeniser * t, int n, byte * p) {
         byte * name = q->name;
         if (n == SIZE(name) && memcmp(name, p, n) == 0) return q->value;
     }
-    return 0;
+    return NULL;
 }
 
 static int read_literal_string(struct tokeniser * t, int c) {
@@ -132,7 +132,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
                 int n = c - c0 - 1;    /* macro size */
                 int firstch = p[c0];
                 symbol * q = find_in_m(t, n, p + c0);
-                if (q == 0) {
+                if (q == NULL) {
                     if (n == 1 && (firstch == '\'' || firstch == t->m_start))
                         t->b = add_symbol_to_b(t->b, p[c0]);
                     else if (n >= 3 && firstch == 'U' && p[c0 + 1] == '+') {
@@ -147,7 +147,7 @@ static int read_literal_string(struct tokeniser * t, int c) {
                             }
                             q = find_in_m(t, n, uc);
                             lose_s(uc);
-                            if (q != 0) {
+                            if (q != NULL) {
                                 t->b = add_to_b(t->b, q, SIZE(q));
                                 continue;
                             }
@@ -443,7 +443,7 @@ extern int read_token(struct tokeniser * t) {
                     char * file = b_to_sz(t->b);
                     int file_owned = 1;
                     byte * u = get_input(file);
-                    if (u == 0) {
+                    if (u == NULL) {
                         struct include * r;
                         for (r = t->includes; r; r = r->next) {
                             byte * s = copy_s(r->s);
@@ -457,10 +457,10 @@ extern int read_token(struct tokeniser * t) {
                             file = (char*)s;
                             file_owned = -1;
                             u = get_input(file);
-                            if (u != 0) break;
+                            if (u != NULL) break;
                         }
                     }
-                    if (u == 0) {
+                    if (u == NULL) {
                         error(t, "Can't get '", (byte *)file, strlen(file), "'");
                         exit(1);
                     }
@@ -520,7 +520,7 @@ extern void disable_token(struct tokeniser * t, int code) {
 
 extern struct tokeniser * create_tokeniser(byte * p, char * file) {
     NEW(tokeniser, t);
-    t->next = 0;
+    t->next = NULL;
     t->p = p;
     t->c = 0;
     t->file = file;
@@ -529,7 +529,7 @@ extern struct tokeniser * create_tokeniser(byte * p, char * file) {
     t->b = create_b(0);
     t->s = create_s(0);
     t->m_start = -1;
-    t->m_pairs = 0;
+    t->m_pairs = NULL;
     t->get_depth = 0;
     t->error_count = 0;
     t->token_held = false;
