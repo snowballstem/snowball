@@ -180,7 +180,7 @@ static void write_failure(struct generator * g) {
     }
 }
 
-static void write_failure_if(struct generator * g, char * s, struct node * p) {
+static void write_failure_if(struct generator * g, const char * s, struct node * p) {
 
     writef(g, "~Mif ", p);
     writef(g, s, p);
@@ -892,7 +892,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_delete(savevar_env);
 }
 
-static void generate_integer_assign(struct generator * g, struct node * p, char * s) {
+static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
 
     g->V[0] = p->name;
     g->S[0] = s;

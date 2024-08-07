@@ -117,7 +117,7 @@ static void write_relop(struct generator * g, int relop) {
 
 /* Write a variable declaration. */
 static void write_declare(struct generator * g,
-                          char * declaration,
+                          const char * declaration,
                           struct node * p) {
     struct str * temp = g->outbuf;
     g->outbuf = g->declarations;
@@ -217,7 +217,7 @@ static void write_failure(struct generator * g) {
     g->unreachable = true;
 }
 
-static void write_failure_if(struct generator * g, char * s, struct node * p) {
+static void write_failure_if(struct generator * g, const char * s, struct node * p) {
 
     writef(g, "~MIf (", p);
     writef(g, s, p);
@@ -932,7 +932,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_delete(savevar);
 }
 
-static void generate_integer_assign(struct generator * g, struct node * p, char * s) {
+static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
 
     g->V[0] = p->name;
     w(g, "~M~W0 := ");

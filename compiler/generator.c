@@ -1315,7 +1315,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
           "~Mif (failure) ~f~N~}", p);
 }
 
-static void generate_integer_assign(struct generator * g, struct node * p, char * s) {
+static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
 
     g->V[0] = p->name;
     g->S[0] = s;
