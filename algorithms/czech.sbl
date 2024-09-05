@@ -50,7 +50,7 @@ backwardmode (
 
   define palatalise as (
     [substring] RV among (
-      'ci' 'ce' '{c^}i' '{c^}'
+      'ci' 'ce' '{c^}i' '{c^}e'
       (<- 'k')
       'zi' 'ze' '{z^}i' '{z^}e'
       (<- 'h')
