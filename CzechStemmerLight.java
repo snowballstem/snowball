@@ -184,7 +184,7 @@ public class CzechStemmerLight {
 				    buffer.substring( len-2,len).equals("\u00e9m")||    //-ém
 				    buffer.substring( len-2,len).equals("\u00edm")){   //-ím
 			
-			            buffer.delete( len- 2 , len);
+			            buffer.delete( len- 1 , len);
 			            palatalise(buffer);
 			            return;
 			        }
