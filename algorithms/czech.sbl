@@ -54,9 +54,9 @@ backwardmode (
       (<- 'k')
       'zi' 'ze' '{z^}i' '{z^}e'
       (<- 'h')
-      '{c^}t{e^}' '{c^}ti' '{c^}t{e'}'
+      '{c^}t{e^}' '{c^}ti' '{c^}t{i'}'
       (<- 'ck')
-      '{s^}t{e^}' '{s^}ti' '{s^}t{e'}'
+      '{s^}t{e^}' '{s^}ti' '{s^}t{i'}'
       (<- 'sk')
     )
   )
