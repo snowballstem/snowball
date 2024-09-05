@@ -77,11 +77,11 @@ public class CzechStemmerLight {
 		    buffer.replace(len- 3 ,len, "ck");
 		    return;
 		}
-		if( buffer.substring( len- 2 ,len).equals("\u0161t\u011b")||  //-ště
-		    buffer.substring( len- 2 ,len).equals("\u0161ti")||       //-šti
-		    buffer.substring( len- 2 ,len).equals("\u0161t\u00ed")){  //-ští
+		if( buffer.substring( len- 3 ,len).equals("\u0161t\u011b")||  //-ště
+		    buffer.substring( len- 3 ,len).equals("\u0161ti")||       //-šti
+		    buffer.substring( len- 3 ,len).equals("\u0161t\u00ed")){  //-ští
 						
-		    buffer.replace(len- 2 ,len, "sk");
+		    buffer.replace(len- 3 ,len, "sk");
 		    return;
 		}
 		buffer.delete( len- 1 , len);
