@@ -2,8 +2,8 @@ routines (
   RV R1
   palatalise
   mark_regions
-  do_possessive
-  do_case
+  possessive_suffix
+  case_suffix
 )
 
 externals ( stem )
@@ -61,7 +61,7 @@ backwardmode (
     )
   )
 
-  define do_possessive as (
+  define possessive_suffix as (
     [substring] RV among (
       'ov' '{u*}v'
       (delete)
@@ -73,7 +73,7 @@ backwardmode (
     )
   )
 
-  define do_case as (
+  define case_suffix as (
     [substring] R1 among (
       'atech'
       '{e^}tem' 'at{u*}m'
@@ -103,8 +103,8 @@ backwardmode (
 define stem as (
   do mark_regions
   backwards (
-    do_case
-    do_possessive
+    do case_suffix
+    do possessive_suffix
   )
 )
 
