@@ -1,6 +1,9 @@
 routines (
   RV R1
-  palatalise
+  palatalise_e
+  palatalise_ecaron
+  palatalise_i
+  palatalise_iacute
   mark_regions
   possessive_suffix
   case_suffix
@@ -48,16 +51,33 @@ backwardmode (
   define RV as $pV <= cursor
   define R1 as $p1 <= cursor
 
-  define palatalise as (
-    [substring] RV among (
-      'ci' 'ce' '{c^}i' '{c^}e'
-      (<- 'k')
-      'zi' 'ze' '{z^}i' '{z^}e'
-      (<- 'h')
-      '{c^}t{e^}' '{c^}ti' '{c^}t{i'}'
-      (<- 'ck')
-      '{s^}t{e^}' '{s^}ti' '{s^}t{i'}'
-      (<- 'sk')
+  define palatalise_e as (
+    [substring] among (
+      'c' '{c^}' (<- 'k')
+      'z' '{z^}' (<- 'h')
+    )
+  )
+
+  define palatalise_ecaron as (
+    [substring] among (
+      '{c^}t' (<- 'ck')
+      '{s^}t' (<- 'sk')
+    )
+  )
+
+  define palatalise_i as (
+    [substring] among (
+      'c' '{c^}' (<- 'k')
+      'z' '{z^}' (<- 'h')
+      '{c^}t' (<- 'ck')
+      '{s^}t' (<- 'sk')
+    )
+  )
+
+  define palatalise_iacute as (
+    [substring] among (
+      '{c^}t' (<- 'ck')
+      '{s^}t' (<- 'sk')
     )
   )
 
@@ -68,33 +88,40 @@ backwardmode (
       'in'
       (
         delete
-        try palatalise
+        try palatalise_i
       )
     )
   )
 
   define case_suffix as (
-    [substring] R1 among (
+    setlimit tomark p1 for ( [substring] ) among (
       'atech'
-      '{e^}tem' 'at{u*}m'
+      'at{u*}m'
       '{a'}ch' '{y'}ch' 'ov{e'}' '{y'}mi'
       'ata' 'aty' 'ama' 'ami' 'ovi'
       'at' '{a'}m' 'os' 'us' '{u*}m' '{y'}m' 'mi' 'ou'
+      '{e'}ho' '{e'}m' '{e'}mu'
       'u' 'y' '{u*}' 'a' 'o' '{a'}' '{e'}' '{y'}'
       (delete)
-      'ech' 'ich' '{i'}ch'
-      '{e'}ho' '{e^}mi' '{e'}mu' '{e^}te' '{e^}ti' '{i'}ho' '{i'}mi'
-      'emi' 'iho' 'imu'
-      '{e'}m' '{i'}m' 'es'
-      'e' 'i' '{i'}' '{e^}'
+      '{e^}' '{e^}tem' '{e^}mi' '{e^}te' '{e^}ti'
       (
         delete
-        try palatalise
+        try palatalise_ecaron
       )
-      'em'
+      'e' 'ech' 'em' 'emi' 'es' 'ete' 'etem' // 'eti'
       (
-        <- 'e'
-        try palatalise
+        delete
+        try palatalise_e
+      )
+      'i' 'ich' 'iho' 'imu'
+      (
+        delete
+        try palatalise_i
+      )
+      '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi'
+      (
+        delete
+        try palatalise_iacute
       )
     )
   )
