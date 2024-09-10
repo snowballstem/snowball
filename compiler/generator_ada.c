@@ -1099,11 +1099,14 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 }
 
 static void generate_define(struct generator * g, struct node * p) {
+    struct name * q = p->name;
+    if (q->type == t_routine && !q->used) return;
+
     struct str *saved_output;
     struct str *saved_declarations;
 
     /* Generate function header. */
-    g->V[0] = p->name;
+    g->V[0] = q;
     w(g, "~N~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
     if (need_c_var(p->left)) {
         w(g, "~M~MC : Result_Index;~N");
@@ -1135,7 +1138,7 @@ static void generate_define(struct generator * g, struct node * p) {
             generate(g, p->left->right);
         }
     }
-    g->V[0] = p->name;
+    g->V[0] = q;
     w(g, "~-~Mend ~W0;~N");
 
     if (g->var_number) {

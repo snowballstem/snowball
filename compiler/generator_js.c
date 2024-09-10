@@ -1017,6 +1017,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
+    if (q->type == t_routine && !q->used) return;
 
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;

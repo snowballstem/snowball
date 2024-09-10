@@ -1546,10 +1546,10 @@ extern void read_program(struct analyser * a) {
                     fprintf(stderr, "declared but not defined\n");
                 } else {
                     fprintf(stderr, "defined but not used\n");
-                    q = q->next;
-                    *ptr = q;
-                    continue;
                 }
+                q = q->next;
+                *ptr = q;
+                continue;
             } else if (q->type == t_routine || q->type == t_grouping) {
                 /* It's OK to define a grouping but only use it to define other
                  * groupings.
@@ -1567,6 +1567,9 @@ extern void read_program(struct analyser * a) {
                             line_num,
                             name_of_name_type(q->type),
                             q->s);
+                    q = q->next;
+                    *ptr = q;
+                    continue;
                 }
             } else if (q->type == t_external) {
                 /* Unused is OK. */
