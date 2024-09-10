@@ -1,5 +1,5 @@
 routines (
-  RV R1
+  RV // R1
   palatalise_e
   palatalise_ecaron
   palatalise_i
@@ -49,7 +49,7 @@ define mark_regions as (
 backwardmode (
 
   define RV as $pV <= cursor
-  define R1 as $p1 <= cursor
+  // define R1 as $p1 <= cursor
 
   define palatalise_e as (
     [substring] among (
