@@ -85,7 +85,7 @@ backwardmode (
         do (
             [substring] R1 among(
                 'em'
-                (   not 'syst'
+                (   not 'syst' // don't remove -em from words ending -system
                     delete
                 )
                 'ern' 'er'
