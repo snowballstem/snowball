@@ -98,6 +98,9 @@ backwardmode (
                 's'
                 (   s_ending delete
                 )
+                'ln' 'lns'
+                (   <- 'l'
+                )
             )
         )
         do (
