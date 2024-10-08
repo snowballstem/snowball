@@ -118,7 +118,7 @@ backwardmode (
         delete
         try palatalise_i
       )
-      '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi'
+      '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
       (
         delete
         try palatalise_iacute
