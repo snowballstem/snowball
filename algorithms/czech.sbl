@@ -35,7 +35,14 @@ stringdef z^ '{U+017E}'
 
 define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
 
-define v_or_syllabic_c v + 'lr' //mn'
+// Some consonants in Czech can be syllabic - if these occur between two other
+// consonants then they act in a vowel-like way and it is helpful to include
+// them in the definition of R1.
+//
+// Some sources also list 'm' and 'n' as syllabic consonants for Czech but they
+// seem to be much rarer and including them makes no difference to the results
+// of stemming any words in our sample vocabulary list.
+define v_or_syllabic_c v + 'lr'
 
 define mark_regions as (
 
@@ -52,13 +59,15 @@ define mark_regions as (
         // A syllabic consonant must occur between two consonants, or be
         // preceded by a consonant and at the end of the word.
         //
-        // Instead of literally testing that, we check handle the first
-        // character specially, then we know that the character before is
-        // a consonant because otherwise we'd have stopped already.
+        // Instead of literally testing that, we handle the first character
+        // specially by only checking if it's a vowel; for subsequent
+        // characters we know that the character before is a consonant because
+        // otherwise we'd have stopped already.
         //
         // We also don't actually need to check the character after, since
         // if it's a vowel then that vowel means we'd end up at the same
-        // position after `gopast non-v` anyway.
+        // position after `gopast non-v` anyway, and if it's the end of the
+        // word then there's no non-v after it.
         (v or (next gopast v_or_syllabic_c)) gopast non-v
         setmark p1
         try($p1 < x  $p1 = x)  // at least 3
