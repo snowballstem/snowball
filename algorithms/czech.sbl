@@ -108,12 +108,12 @@ backwardmode (
         delete
         try palatalise_ecaron
       )
-      'e' 'ech' 'em' 'emi' 'es' 'ete' 'etem' // 'eti'
+      'e' 'ech' 'em' 'emi' 'ete' 'etem'
       (
         delete
         try palatalise_e
       )
-      'i' 'ich' 'iho' 'imu'
+      'i'
       (
         delete
         try palatalise_i
