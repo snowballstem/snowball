@@ -11,9 +11,9 @@ routines (
 
 externals ( stem )
 
-integers ( pV p1 )
+integers ( pV p1 x )
 
-groupings ( v )
+groupings ( v syllabic_c )
 
 stringescapes {}
 
@@ -35,14 +35,29 @@ stringdef z^ '{U+017E}'
 
 define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
 
+define syllabic_c 'lr' //mn'
+
 define mark_regions as (
 
     $pV = limit
     $p1 = limit
+    test(hop 3 setmark x)
 
     do (
         gopast non-v setmark pV
-        gopast non-v gopast v setmark p1
+        try($pV < x  $pV = x)  // at least 3
+    )
+
+    do (
+        // A syllabic consonant must occur between two consonants, or be
+        // preceded by a consonant and at the end of the word.
+        //
+        // However, we don't actually need to check the character after, since
+        // if it's a vowel then that vowel means we'd end up at the same
+        // position after `gopast non-v` anyway.
+        gopast ( v or (non-v syllabic_c) ) gopast non-v
+        setmark p1
+        try($p1 < x  $p1 = x)  // at least 3
     )
 )
 
