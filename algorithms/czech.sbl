@@ -1,5 +1,5 @@
 routines (
-  RV // R1
+  R1
   palatalise_e
   palatalise_ecaron
   palatalise_i
@@ -11,7 +11,7 @@ routines (
 
 externals ( stem )
 
-integers ( pV p1 x )
+integers ( p1 x )
 
 groupings ( v v_or_syllabic_c )
 
@@ -46,14 +46,8 @@ define v_or_syllabic_c v + 'lr'
 
 define mark_regions as (
 
-    $pV = limit
     $p1 = limit
     test(hop 3 setmark x)
-
-    do (
-        gopast non-v setmark pV
-        try($pV < x  $pV = x)  // at least 3
-    )
 
     do (
         // A syllabic consonant must occur between two consonants, or be
@@ -76,8 +70,7 @@ define mark_regions as (
 
 backwardmode (
 
-  define RV as $pV <= cursor
-  // define R1 as $p1 <= cursor
+  define R1 as $p1 <= cursor
 
   define palatalise_e as (
     [substring] among (
@@ -110,7 +103,7 @@ backwardmode (
   )
 
   define possessive_suffix as (
-    [substring] RV among (
+    [substring] R1 among (
       'ov' '{u*}v'
       (delete)
       'in'
