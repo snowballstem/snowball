@@ -1,9 +1,8 @@
 routines (
   R1
   palatalise_e
-  palatalise_ecaron
+  palatalise_ecaron_or_iacute
   palatalise_i
-  palatalise_iacute
   mark_regions
   possessive_suffix
   case_suffix
@@ -79,7 +78,7 @@ backwardmode (
     )
   )
 
-  define palatalise_ecaron as (
+  define palatalise_ecaron_or_iacute as (
     [substring] among (
       '{c^}t' (<- 'ck')
       '{s^}t' (<- 'sk')
@@ -90,13 +89,6 @@ backwardmode (
     [substring] among (
       'c' '{c^}' (<- 'k')
       'z' '{z^}' (<- 'h')
-      '{c^}t' (<- 'ck')
-      '{s^}t' (<- 'sk')
-    )
-  )
-
-  define palatalise_iacute as (
-    [substring] among (
       '{c^}t' (<- 'ck')
       '{s^}t' (<- 'sk')
     )
@@ -127,7 +119,7 @@ backwardmode (
       '{e^}' '{e^}tem' '{e^}mi' '{e^}te' '{e^}ti'
       (
         delete
-        try palatalise_ecaron
+        try palatalise_ecaron_or_iacute
       )
       'e' 'ech' 'em' 'emi' 'ete' 'etem'
       (
@@ -142,7 +134,7 @@ backwardmode (
       '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
       (
         delete
-        try palatalise_iacute
+        try palatalise_ecaron_or_iacute
       )
     )
   )
