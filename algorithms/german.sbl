@@ -89,6 +89,7 @@ backwardmode (
                     delete
                 )
                 'ern' 'er'
+                'erin' 'erinnen' // conflate female versions of nouns
                 (   delete
                 )
                 'e' 'en' 'es'
