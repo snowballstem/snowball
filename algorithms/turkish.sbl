@@ -1,7 +1,6 @@
 /* Stemmer for Turkish
  * author: Evren (Kapusuz) Çilden
  * email: evren.kapusuz at gmail.com
- * version: 1.0 (15.01.2007)
  *
  * stems nominal verb suffixes
  * stems nominal inflections
@@ -68,6 +67,8 @@ routines (
 
   post_process_last_consonants
   postlude
+
+  remove_proper_noun_suffix
 
   stem_nominal_verb_suffixes
   stem_noun_suffixes
@@ -439,6 +440,14 @@ backwardmode (
   )
 )
 
+define remove_proper_noun_suffix as (
+  // https://en.wikipedia.org/wiki/Turkish_language says "In modern
+  // Turkish orthography, an apostrophe is used to separate proper names
+  // from any suffixes" with the example "Türkiye'dir ("it is Turkey")".
+  // Therefore we truncate at the first apostrophe.
+  do (goto '{'}' [ tolimit ] delete)
+)
+
 // Test if there is more than one syllable.
 // In Turkish each vowel indicates a distinct syllable.
 define more_than_one_syllable_word as (
@@ -454,6 +463,8 @@ define postlude as (
 )
 
 define stem as (
+  do remove_proper_noun_suffix
+
   more_than_one_syllable_word
 
   backwards (
