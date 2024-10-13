@@ -1057,6 +1057,13 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, in
     g->failure_label = new_label(g);
     g->label_used = 0;
     g->failure_keep_count = 0;
+
+    int possible_signals = check_possible_signals_list(g, p->left, p->type, 0);
+    if (possible_signals != -1) {
+        fprintf(stderr, "%s:%d: warning: body of '%s' always signals '%c'\n",
+                g->analyser->tokeniser->file, p->line_number,
+                atleast_case ? "atleast" : "repeat", possible_signals ? 't' : 'f');
+    }
     generate(g, p->left);
 
     if (atleast_case) w(g, "~Mi--;~N");
