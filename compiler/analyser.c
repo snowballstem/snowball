@@ -970,6 +970,10 @@ static void check_modifyable(struct analyser * a) {
 }
 
 static int ae_uses_name(struct node * p, struct name * q) {
+    if (!p) {
+        // AE is NULL after a syntax error, e.g. `$x = $y`
+        return 0;
+    }
     switch (p->type) {
         case c_name:
         case c_lenof:
