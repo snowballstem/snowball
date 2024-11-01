@@ -1132,13 +1132,13 @@ static void generate_substring(struct generator * g, struct node * p) {
              */
         } else if (n_cases == 1) {
             g->I[4] = cases[0];
-            writef(g, " || ~S1 as i32 != ~I4 as i32", p);
+            writef(g, " || ~S1 as u8 != ~I4 as u8", p);
         } else if (n_cases == 2) {
             g->I[4] = cases[0];
             g->I[5] = cases[1];
-            writef(g, " || (~S1 as i32 != ~I4 as i32 && ~S1 as i32 != ~I5 as i32)", p);
+            writef(g, " || (~S1 as u8 != ~I4 as u8 && ~S1 as u8 != ~I5 as u8)", p);
         } else {
-            writef(g, " || ~S1 as i32 >> 5 != ~I2 as i32 || !((~I3 as i32 >> (~S1 as i32 & 0x1f)) & 1) != 0", p);
+            writef(g, " || ~S1 as u8 >> 5 != ~I2 as u8 || ((~I3 as i32 >> (~S1 as u8 & 0x1f)) & 1) == 0", p);
         }
         write_string(g, ") ");
         if (empty_case != -1) {
