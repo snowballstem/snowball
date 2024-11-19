@@ -171,8 +171,9 @@ static void write_failure(struct generator * g) {
             g->unreachable = true;
             break;
         default:
-            g->I[0] = g->failure_label;
-            w(g, "~Mbreak 'lab~I0;~N");
+            w(g, "~Mbreak 'lab");
+            write_int(g, g->failure_label);
+            w(g, ";~N");
             g->unreachable = true;
     }
 }
@@ -1046,11 +1047,116 @@ static void generate_functionend(struct generator * g, struct node * p) {
 static void generate_substring(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
+    int block = -1;
+    unsigned int bitmap = 0;
+    struct amongvec * among_cases = x->b;
+    int c;
+    int empty_case = -1;
+    int n_cases = 0;
+    symbol cases[2];
+    int shortest_size = x->shortest_size;
+    int block_opened = 0;
 
     write_comment(g, p);
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
+    g->I[1] = x->literalstring_count;
+
+    /* In forward mode with non-ASCII UTF-8 characters, the first byte
+     * of the string will often be the same, so instead look at the last
+     * common byte position.
+     *
+     * In backward mode, we can't match if there are fewer characters before
+     * the current position than the minimum length.
+     */
+    for (c = 0; c < x->literalstring_count; ++c) {
+        symbol ch;
+        if (among_cases[c].size == 0) {
+            empty_case = c;
+            continue;
+        }
+        if (p->mode == m_forward) {
+            ch = among_cases[c].b[shortest_size - 1];
+        } else {
+            ch = among_cases[c].b[among_cases[c].size - 1];
+        }
+        if (n_cases == 0) {
+            block = ch >> 5;
+        } else if (ch >> 5 != block) {
+            block = -1;
+            if (n_cases > 2) break;
+        }
+        if (block == -1) {
+            if (n_cases > 0 && ch == cases[0]) continue;
+            if (n_cases < 2) {
+                cases[n_cases++] = ch;
+            } else if (ch != cases[1]) {
+                ++n_cases;
+                break;
+            }
+        } else {
+            if ((bitmap & (1u << (ch & 0x1f))) == 0) {
+                bitmap |= 1u << (ch & 0x1f);
+                if (n_cases < 2) cases[n_cases] = ch;
+                ++n_cases;
+            }
+        }
+    }
+
+    if (block != -1 || n_cases <= 2) {
+        char buf[64];
+        g->I[2] = block;
+        g->I[3] = bitmap;
+        g->I[4] = shortest_size - 1;
+        if (p->mode == m_forward) {
+            sprintf(buf, "env.current.as_bytes()[(env.cursor + %d) as usize]", shortest_size - 1);
+            g->S[1] = buf;
+            if (shortest_size == 1) {
+                writef(g, "~Mif (env.cursor >= env.limit", p);
+            } else {
+                writef(g, "~Mif (env.cursor + ~I4 >= env.limit", p);
+            }
+        } else {
+            g->S[1] = "env.current.as_bytes()[(env.cursor - 1) as usize]";
+            if (shortest_size == 1) {
+                writef(g, "~Mif (env.cursor <= env.limit_backward", p);
+            } else {
+                writef(g, "~Mif (env.cursor - ~I4 <= env.limit_backward", p);
+            }
+        }
+        if (n_cases == 0) {
+            /* We get this for the degenerate case: among ( '' )
+             * This doesn't seem to be a useful construct, but it is
+             * syntactically valid.
+             */
+        } else if (n_cases == 1) {
+            g->I[4] = cases[0];
+            writef(g, " || ~S1 as u8 != ~I4 as u8", p);
+        } else if (n_cases == 2) {
+            g->I[4] = cases[0];
+            g->I[5] = cases[1];
+            writef(g, " || (~S1 as u8 != ~I4 as u8 && ~S1 as u8 != ~I5 as u8)", p);
+        } else {
+            writef(g, " || ~S1 as u8 >> 5 != ~I2 as u8 || ((~I3 as i32 >> (~S1 as u8 & 0x1f)) & 1) == 0", p);
+        }
+        write_string(g, ") ");
+        if (empty_case != -1) {
+            /* If the among includes the empty string, it can never fail
+             * so not matching the bitmap means we match the empty string.
+             */
+            g->I[4] = among_cases[empty_case].result;
+            writef(g, "{among_var = ~I4;}~N~Melse ", p);
+            write_block_start(g);
+            block_opened = 1;
+        } else {
+            writef(g, "~f~C", p);
+        }
+    } else {
+#ifdef OPTIMISATION_WARNINGS
+        printf("Couldn't shortcut among %d\n", x->number);
+#endif
+    }
 
     if (x->amongvar_needed) {
         writef(g, "~Mamong_var = env.find_among~S0(~A_~I0, context);~N", p);
@@ -1062,6 +1168,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else {
         write_failure_if(g, "env.find_among~S0(~A_~I0, context) == 0", p);
     }
+    if (block_opened) write_block_end(g);
 }
 
 static void generate_among(struct generator * g, struct node * p) {
