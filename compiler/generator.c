@@ -77,6 +77,14 @@ static void write_hexdigit(struct generator * g, int i) {
     str_append_ch(g->outbuf, "0123456789ABCDEF"[i & 0xF]); /* hexchar */
 }
 
+extern void write_hex4(struct generator * g, int ch) {
+    int i;
+    for (i = 0; i < 4; ++i) {
+        write_hexdigit(g, ch);
+        ch >>= 4;
+    }
+}
+
 static void write_hex(struct generator * g, int i) {
     if (i >> 4) write_hex(g, i >> 4);
     write_hexdigit(g, i); /* hex integer */

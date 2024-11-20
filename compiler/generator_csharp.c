@@ -43,20 +43,6 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_hexdigit(struct generator * g, int n) {
-
-    write_char(g, n < 10 ? n + '0' : n - 10 + 'A');
-}
-
-static void write_hex(struct generator * g, int ch) {
-
-    write_string(g, "\\u");
-    {
-        int i;
-        for (i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i & 0xf);
-    }
-}
-
 static void write_literal_string(struct generator * g, symbol * p) {
 
     int i;
@@ -67,7 +53,8 @@ static void write_literal_string(struct generator * g, symbol * p) {
             if (ch == '\"' || ch == '\\') write_string(g, "\\");
             write_char(g, ch);
         } else {
-            write_hex(g, ch);
+            write_string(g, "\\u");
+            write_hex4(g, ch);
         }
     }
     write_string(g, "\"");

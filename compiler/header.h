@@ -411,6 +411,7 @@ extern void write_char(struct generator * g, int ch);
 extern void write_newline(struct generator * g);
 extern void write_string(struct generator * g, const char * s);
 extern void write_int(struct generator * g, int i);
+extern void write_hex4(struct generator * g, int ch);
 extern void write_symbol(struct generator * g, symbol s);
 extern void write_s(struct generator * g, const byte * b);
 extern void write_str(struct generator * g, struct str * str);
