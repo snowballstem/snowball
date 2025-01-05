@@ -20,7 +20,7 @@ stringdef i    '{U+03B7}' // eta
 stringdef th   '{U+03B8}' // theta
 stringdef y    '{U+03B9}' // iota
 stringdef k    '{U+03BA}' // kappa
-stringdef l    '{U+03BB}' // lamda
+stringdef l    '{U+03BB}' // lambda
 stringdef m    '{U+03BC}' // mu
 stringdef n    '{U+03BD}' // nu
 stringdef x    '{U+03BE}' // xi
@@ -46,7 +46,7 @@ stringdef I    '{U+0397}' // Eta
 stringdef Th   '{U+0398}' // Theta
 stringdef Y    '{U+0399}' // Iota
 stringdef K    '{U+039A}' // Kappa
-stringdef L    '{U+039B}' // Lamda
+stringdef L    '{U+039B}' // Lambda
 stringdef M    '{U+039C}' // Mu
 stringdef N    '{U+039D}' // Nu
 stringdef X    '{U+039E}' // Xi
