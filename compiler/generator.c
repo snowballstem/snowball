@@ -79,10 +79,7 @@ static void write_hexdigit(struct generator * g, int i) {
 
 extern void write_hex4(struct generator * g, int ch) {
     int i;
-    for (i = 0; i < 4; ++i) {
-        write_hexdigit(g, ch);
-        ch >>= 4;
-    }
+    for (i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i);
 }
 
 static void write_hex(struct generator * g, int i) {
