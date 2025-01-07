@@ -50,7 +50,7 @@ stem_file(struct sb_stemmer * stemmer, FILE * f_in, FILE * f_out)
                 const sb_symbol * stemmed = sb_stemmer_stem(stemmer, b, i);
                 if (stemmed == NULL)
                 {
-                    fprintf(stderr, "Out of memory");
+                    fprintf(stderr, "Out of memory or internal error\n");
                     exit(1);
                 }
 
