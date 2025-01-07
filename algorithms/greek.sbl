@@ -210,11 +210,11 @@ backwardmode (
   )
 
   define steps3 as (
+    (['{y}{s}{a}'] atlimit <- '{y}{s}') or
     [substring] among (
       '{y}{s}{a}' '{y}{s}{e}{s}' '{y}{s}{e}' '{y}{s}{a}{m}{e}' '{y}{s}{a}{t}{e}' '{y}{s}{a}{n}' '{y}{s}{a}{n}{e}' (
         delete
         unset test1
-        ('{y}{s}{a}' atlimit <- '{y}{s}') or
         ([] substring atlimit among (
           '{a}{n}{a}{m}{p}{a}' '{a}{th}{r}{o}' '{e}{m}{p}{a}' '{e}{s}{e}' '{e}{s}{oo}{k}{l}{e}' '{e}{p}{a}' '{x}{a}{n}{a}{p}{a}' '{e}{p}{e}' '{p}{e}{r}{y}{p}{a}'
           '{s}{u}{n}{a}{th}{r}{o}' '{d}{a}{n}{e}' '{k}{l}{e}' '{ch}{a}{r}{t}{o}{p}{a}' '{e}{x}{a}{r}{ch}{a}' '{m}{e}{t}{e}{p}{e}' '{a}{p}{o}{k}{l}{e}'
