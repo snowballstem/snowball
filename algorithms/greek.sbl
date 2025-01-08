@@ -93,13 +93,13 @@ booleans ( test1 )
 groupings ( v v2 )
 
 routines ( tolower has_min_length
-           steps1 steps2 steps3 steps4 steps5 steps6 steps7
-           steps8 steps9 steps10
-           step1 step2a step2b step2c step2d step3 step4
-           step5a step5b step5c step5d step5e step5f
-           step5g step5h step5i
-           step5j step5k step5l step5m
-           step6 step7 )
+           step_s1 step_s2 step_s3 step_s4 step_s5 step_s6 step_s7
+           step_s8 step_s9 step_s10
+           step_1 step_2a step_2b step_2c step_2d step_3 step_4
+           step_5a step_5b step_5c step_5d step_5e step_5f
+           step_5g step_5h step_5i
+           step_5j step_5k step_5l step_5m
+           step_6 step_7 )
 
 define v '{a}{e}{i}{y}{o}{u}{oo}'
 define v2 '{a}{e}{i}{y}{o}{oo}'
@@ -162,7 +162,7 @@ backwardmode (
     )
   )
 
-  define step1 as (
+  define step_1 as (
     [substring] among (
       '{f}{a}{g}{y}{a}' '{f}{a}{g}{y}{o}{u}' '{f}{a}{g}{y}{oo}{n}' (<- '{f}{a}')
       '{s}{k}{a}{g}{y}{a}' '{s}{k}{a}{g}{y}{o}{u}' '{s}{k}{a}{g}{y}{oo}{n}' (<- '{s}{k}{a}')
@@ -179,7 +179,7 @@ backwardmode (
     unset test1
   )
 
-  define steps1 as (
+  define step_s1 as (
     [substring] among (
       '{y}{z}{a}' '{y}{z}{e}{s}' '{y}{z}{e}' '{y}{z}{a}{m}{e}' '{y}{z}{a}{t}{e}' '{y}{z}{a}{n}' '{y}{z}{a}{n}{e}' '{y}{z}{oo}' '{y}{z}{e}{y}{s}' '{y}{z}{e}{y}'
       '{y}{z}{o}{u}{m}{e}' '{y}{z}{e}{t}{e}' '{y}{z}{o}{u}{n}' '{y}{z}{o}{u}{n}{e}' (
@@ -197,7 +197,7 @@ backwardmode (
     )
   )
 
-  define steps2 as (
+  define step_s2 as (
     [substring] among (
       '{oo}{th}{i}{k}{a}' '{oo}{th}{i}{k}{e}{s}' '{oo}{th}{i}{k}{e}' '{oo}{th}{i}{k}{a}{m}{e}' '{oo}{th}{i}{k}{a}{t}{e}' '{oo}{th}{i}{k}{a}{n}' '{oo}{th}{i}{k}{a}{n}{e}' (
         delete
@@ -209,7 +209,7 @@ backwardmode (
     )
   )
 
-  define steps3 as (
+  define step_s3 as (
     (['{y}{s}{a}'] atlimit <- '{y}{s}') or
     [substring] among (
       '{y}{s}{a}' '{y}{s}{e}{s}' '{y}{s}{e}' '{y}{s}{a}{m}{e}' '{y}{s}{a}{t}{e}' '{y}{s}{a}{n}' '{y}{s}{a}{n}{e}' (
@@ -228,7 +228,7 @@ backwardmode (
     )
   )
 
-  define steps4 as (
+  define step_s4 as (
     [substring] among (
       '{y}{s}{oo}' '{y}{s}{e}{y}{s}' '{y}{s}{e}{y}' '{y}{s}{o}{u}{m}{e}' '{y}{s}{e}{t}{e}' '{y}{s}{o}{u}{n}' '{y}{s}{o}{u}{n}{e}' (
         delete
@@ -243,7 +243,7 @@ backwardmode (
     )
   )
 
-  define steps5 as (
+  define step_s5 as (
     [substring] among (
       '{y}{s}{t}{o}{s}' '{y}{s}{t}{o}{u}' '{y}{s}{t}{o}' '{y}{s}{t}{e}' '{y}{s}{t}{o}{y}' '{y}{s}{t}{oo}{n}' '{y}{s}{t}{o}{u}{s}' '{y}{s}{t}{i}' '{y}{s}{t}{i}{s}'
       '{y}{s}{t}{a}' '{y}{s}{t}{e}{s}' (
@@ -261,7 +261,7 @@ backwardmode (
     )
   )
 
-  define steps6 as (
+  define step_s6 as (
     [substring] among (
       '{y}{s}{m}{o}' '{y}{s}{m}{o}{y}' '{y}{s}{m}{o}{s}' '{y}{s}{m}{o}{u}' '{y}{s}{m}{o}{u}{s}' '{y}{s}{m}{oo}{n}' (
         delete
@@ -288,7 +288,7 @@ backwardmode (
     )
   )
 
-  define steps7 as (
+  define step_s7 as (
     [substring] among (
       '{a}{r}{a}{k}{y}' '{a}{r}{a}{k}{y}{a}' '{o}{u}{d}{a}{k}{y}' '{o}{u}{d}{a}{k}{y}{a}' (
         delete
@@ -301,7 +301,7 @@ backwardmode (
     )
   )
 
-  define steps8 as (
+  define step_s8 as (
     [substring] among (
       '{a}{k}{y}' '{a}{k}{y}{a}' '{y}{t}{s}{a}' '{y}{t}{s}{a}{s}' '{y}{t}{s}{e}{s}' '{y}{t}{s}{oo}{n}' '{a}{r}{a}{k}{y}' '{a}{r}{a}{k}{y}{a}' (
         delete
@@ -326,7 +326,7 @@ backwardmode (
     )
   )
 
-  define steps9 as (
+  define step_s9 as (
     [substring] among (
       '{y}{d}{y}{o}' '{y}{d}{y}{a}' '{y}{d}{y}{oo}{n}' (
         delete
@@ -341,7 +341,7 @@ backwardmode (
     )
   )
 
-  define steps10 as (
+  define step_s10 as (
     [substring] among (
       '{y}{s}{k}{o}{s}' '{y}{s}{k}{o}{u}' '{y}{s}{k}{o}' '{y}{s}{k}{e}' (
         delete
@@ -354,7 +354,7 @@ backwardmode (
     )
   )
 
-  define step2a as (
+  define step_2a as (
     [substring] among (
       '{a}{d}{e}{s}' '{a}{d}{oo}{n}' (delete)
     )
@@ -364,7 +364,7 @@ backwardmode (
     insert '{a}{d}'
   )
 
-  define step2b as (
+  define step_2b as (
     [substring] among (
       '{e}{d}{e}{s}' '{e}{d}{oo}{n}' (delete)
     )
@@ -373,7 +373,7 @@ backwardmode (
     )
   )
 
-  define step2c as (
+  define step_2c as (
     [substring] among (
       '{o}{u}{d}{e}{s}' '{o}{u}{d}{oo}{n}' (delete)
     )
@@ -383,7 +383,7 @@ backwardmode (
     )
   )
 
-  define step2d as (
+  define step_2d as (
     [substring] among (
       '{e}{oo}{s}' '{e}{oo}{n}' (delete unset test1)
     )
@@ -392,14 +392,14 @@ backwardmode (
     )
   )
 
-  define step3 as (
+  define step_3 as (
     [substring] among (
       '{y}{a}' '{y}{o}{u}' '{y}{oo}{n}' (delete unset test1)
     )
     ([] v <- '{y}')
   )
 
-  define step4 as (
+  define step_4 as (
     [substring] among (
        '{y}{k}{a}' '{y}{k}{o}' '{y}{k}{o}{u}' '{y}{k}{oo}{n}' (delete unset test1)
     )
@@ -413,7 +413,7 @@ backwardmode (
     )
   )
 
-  define step5a as (
+  define step_5a as (
     do ('{a}{g}{a}{m}{e}' atlimit <- '{a}{g}{a}{m}')
     do (
       [substring] among (
@@ -429,7 +429,7 @@ backwardmode (
     )
   )
 
-  define step5b as (
+  define step_5b as (
     do (
       [substring] among (
         '{a}{g}{a}{n}{e}' '{i}{s}{a}{n}{e}' '{o}{u}{s}{a}{n}{e}' '{y}{o}{n}{t}{a}{n}{e}' '{y}{o}{t}{a}{n}{e}' '{y}{o}{u}{n}{t}{a}{n}{e}' '{o}{n}{t}{a}{n}{e}' '{o}{t}{a}{n}{e}'
@@ -467,7 +467,7 @@ backwardmode (
     )
   )
 
-  define step5c as (
+  define step_5c as (
     do (
       [substring] among (
         '{i}{s}{e}{t}{e}' (delete unset test1)
@@ -491,7 +491,7 @@ backwardmode (
     )
   )
 
-  define step5d as (
+  define step_5d as (
     [substring] among (
       '{o}{n}{t}{a}{s}' '{oo}{n}{t}{a}{s}' (
         delete
@@ -502,7 +502,7 @@ backwardmode (
     )
   )
 
-  define step5e as (
+  define step_5e as (
     [substring] among (
       '{o}{m}{a}{s}{t}{e}' '{y}{o}{m}{a}{s}{t}{e}' (
         delete
@@ -512,7 +512,7 @@ backwardmode (
     )
   )
 
-  define step5f as (
+  define step_5f as (
     do (
       ['{y}{e}{s}{t}{e}']
       delete
@@ -530,7 +530,7 @@ backwardmode (
     )
   )
 
-  define step5g as (
+  define step_5g as (
     do (
       [substring] among (
         '{i}{th}{i}{k}{a}' '{i}{th}{i}{k}{e}{s}' '{i}{th}{i}{k}{e}' (delete unset test1)
@@ -550,7 +550,7 @@ backwardmode (
     )
   )
 
-  define step5h as (
+  define step_5h as (
     [substring] among (
       '{o}{u}{s}{a}' '{o}{u}{s}{e}{s}' '{o}{u}{s}{e}' (
         delete
@@ -570,7 +570,7 @@ backwardmode (
     )
   )
 
-  define step5i as (
+  define step_5i as (
     [substring] among (
       '{a}{g}{a}' '{a}{g}{e}{s}' '{a}{g}{e}' (
         delete
@@ -594,7 +594,7 @@ backwardmode (
     )
   )
 
-  define step5j as (
+  define step_5j as (
     [substring] among (
       '{i}{s}{e}' '{i}{s}{o}{u}' '{i}{s}{a}' (delete unset test1)
     )
@@ -603,7 +603,7 @@ backwardmode (
     )
   )
 
-  define step5k as (
+  define step_5k as (
     [substring] among (
       '{i}{s}{t}{e}' (delete unset test1)
     )
@@ -613,7 +613,7 @@ backwardmode (
     )
   )
 
-  define step5l as (
+  define step_5l as (
     [substring] among (
       '{o}{u}{n}{e}' '{i}{s}{o}{u}{n}{e}' '{i}{th}{o}{u}{n}{e}' (delete unset test1)
     )
@@ -622,7 +622,7 @@ backwardmode (
     )
   )
 
-  define step5m as (
+  define step_5m as (
     [substring] among (
       '{o}{u}{m}{e}' '{i}{s}{o}{u}{m}{e}' '{i}{th}{o}{u}{m}{e}' (delete unset test1)
     )
@@ -632,7 +632,7 @@ backwardmode (
     )
   )
 
-  define step6 as (
+  define step_6 as (
     do (
       [substring] among (
         '{m}{a}{t}{a}' '{m}{a}{t}{oo}{n}' '{m}{a}{t}{o}{s}' (<- '{m}{a}')
@@ -653,7 +653,7 @@ backwardmode (
     )
   )
 
-  define step7 as (
+  define step_7 as (
     [substring] among (
       '{e}{s}{t}{e}{r}' '{e}{s}{t}{a}{t}' '{o}{t}{e}{r}' '{o}{t}{a}{t}' '{u}{t}{e}{r}' '{u}{t}{a}{t}' '{oo}{t}{e}{r}' '{oo}{t}{a}{t}' (delete)
     )
@@ -665,37 +665,37 @@ define stem as (
       do tolower
       has_min_length
       set test1
-      do step1
-      do steps1
-      do steps2
-      do steps3
-      do steps4
-      do steps5
-      do steps6
-      do steps7
-      do steps8
-      do steps9
-      do steps10
-      do step2a
-      do step2b
-      do step2c
-      do step2d
-      do step3
-      do step4
-      do step5a
-      do step5b
-      do step5c
-      do step5d
-      do step5e
-      do step5f
-      do step5g
-      do step5h
-      do step5j
-      do step5i
-      do step5k
-      do step5l
-      do step5m
-      do step6
-      do step7
+      do step_1
+      do step_s1
+      do step_s2
+      do step_s3
+      do step_s4
+      do step_s5
+      do step_s6
+      do step_s7
+      do step_s8
+      do step_s9
+      do step_s10
+      do step_2a
+      do step_2b
+      do step_2c
+      do step_2d
+      do step_3
+      do step_4
+      do step_5a
+      do step_5b
+      do step_5c
+      do step_5d
+      do step_5e
+      do step_5f
+      do step_5g
+      do step_5h
+      do step_5j
+      do step_5i
+      do step_5k
+      do step_5l
+      do step_5m
+      do step_6
+      do step_7
     )
 )
