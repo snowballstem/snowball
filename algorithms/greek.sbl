@@ -414,7 +414,7 @@ backwardmode (
   )
 
   define step_5a as (
-    do ('{a}{g}{a}{m}{e}' atlimit <- '{a}{g}{a}{m}')
+    do (['{a}{g}{a}{m}{e}'] atlimit <- '{a}{g}{a}{m}')
     do (
       [substring] among (
         '{a}{g}{a}{m}{e}' '{i}{s}{a}{m}{e}' '{o}{u}{s}{a}{m}{e}' '{i}{k}{a}{m}{e}' '{i}{th}{i}{k}{a}{m}{e}' (delete unset test1)
