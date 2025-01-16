@@ -103,9 +103,9 @@ define mark_regions as (
   (
     try (
       // Replace past participle ge- at start of word
-      // Unless word starts with gelt- or gebn-
+      // Unless word starts with gelt- or gebn- or the whole word is ge
       ['{Giml}{Ayen}']
-      not ('{Lamed}{Tes}' or '{Beys}{Nun}') <- 'GE'
+      not ('{Lamed}{Tes}' or '{Beys}{Nun}' or atlimit) <- 'GE'
     )
 
     try (
