@@ -40,7 +40,9 @@ define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
 //
 // Some sources also list 'm' and 'n' as syllabic consonants for Czech but they
 // seem to be much rarer and including them makes no difference to the results
-// of stemming any words in our sample vocabulary list.
+// of stemming any words in our sample vocabulary list.  Checking on a larger
+// vocabulary list (also from wikipedia but with a lower cut-off frequency)
+// all but one of the affected words don't seem to actually be Czech words.
 define v_or_syllabic_c v + 'lr'
 
 define mark_regions as (
