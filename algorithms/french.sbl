@@ -1,4 +1,5 @@
 routines (
+           elisions
            prelude postlude mark_regions
            RV R1 R2
            standard_suffix
@@ -13,7 +14,7 @@ externals ( stem )
 
 integers ( pV p1 p2 )
 
-groupings ( v keep_with_s )
+groupings ( elision_char v keep_with_s )
 
 stringescapes {}
 
@@ -34,6 +35,14 @@ stringdef u^   '{U+00FB}'  // u-circumflex
 stringdef u`   '{U+00F9}'  // u-grave
 
 define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
+
+// Single character elisions
+define elision_char 'cdjlmnst'
+
+define elisions as
+(
+    [ (elision_char or 'qu') '{'}' ] not atlimit delete
+)
 
 define prelude as repeat goto (
 
@@ -226,6 +235,7 @@ backwardmode (
 
 define stem as (
 
+    do elisions
     do prelude
     do mark_regions
     backwards (
