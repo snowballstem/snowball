@@ -104,8 +104,12 @@ backwardmode (
         //
         // Elsewhere the paper defines V... as meaning "the stem starts with
         // a vowel" and K... as meaning "the stem starts with a consonant".
+        // The meaning of | isn't actually defined, but clearly means
+        // alternation.
         //
-        // In other places where it says X|Y... it seems the | binds more
+        // However nowhere is the precedence of | vs ... defined, and there
+        // isn't a standard precedence we could reasonably assume.  In other
+        // places where the paper says X|Y... it seems the | binds more
         // tightly, so it's (V|K)...cᵢcⱼ not V|(K...cᵢcⱼ).  That seems a bit
         // odd as the first letter must be either a vowel or a consonant, so
         // that really just means "ends cᵢcⱼ".  However, nowhere in the paper
@@ -118,7 +122,7 @@ backwardmode (
         // consistency with the prefix rules we might expect that the cᵢcⱼ
         // test is on what's left *after* removing the "i" suffix.
         //
-        // However, studying Indonesian wordlists and discussion with a native
+        // Studying Indonesian wordlists and discussion with a native
         // speaker leads us to conclude that the purpose of this check is to
         // protect words of foreign origin (e.g. "televisi", "organisasi",
         // "komunikasi") from stemming, and the common feature of these is
