@@ -61,9 +61,8 @@ jobs:
           FPC: fpc
           apt_packages: 'fpc'
         - name: Python 3.8
-          PYTHON: python3.8
-          os: 'ubuntu-20.04'
-          apt_packages: 'python3.8'
+          PYTHON_VERSION: 3.8
+          os: 'ubuntu-22.04'
           # The pure Python versions run slowly - when we used travis for CI
           # we used to need to thin the testdata for languages such as Arabic
           # where there's a lot to avoid the build exceeding the maximum time
@@ -185,9 +184,13 @@ jobs:
     - name: Test C
       if: matrix.c_tests
       run: $MAKE check CC="$CC"
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.PYTHON_VERSION }}
+      if: matrix.PYTHON_VERSION
     - name: Test Python
-      if: matrix.PYTHON
-      run: $MAKE check_python python="${{ matrix.PYTHON }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
+      if: matrix.PYTHON || matrix.PYTHON_VERSION
+      run: $MAKE check_python python="${{ matrix.PYTHON || 'python' }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
     - name: Test Java
       if: matrix.JAVA && matrix.JAVAC
       run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
