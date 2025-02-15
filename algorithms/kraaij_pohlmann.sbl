@@ -50,8 +50,8 @@ backwardmode (
             's'    (R1 not ('t' R1) C delete)
             'ies'  (R1 <-'ie')
             'es'
-                   (('ar' R1 C ] delete lengthen_V) or
-                    ('er' R1 C ] delete) or
+                   ((test ('ar' R1 C) delete lengthen_V) or
+                    (test ('er' R1 C) delete) or
                     (R1 C <-'e'))
 
             'aus'  (R1 V <-'au')
