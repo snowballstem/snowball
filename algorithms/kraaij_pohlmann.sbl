@@ -16,14 +16,44 @@ routines (
 
 externals ( stem )
 
-groupings ( v v_WX AOU AIOU )
+groupings ( v v_WX A AEIOU AIOU AOU E I O U )
 
 stringescapes {}
 
-define v        'aeiouy'
+/* special characters */
+
+stringdef a`   '{U+00E0}'
+stringdef a'   '{U+00E1}'
+stringdef a^   '{U+00E2}'
+stringdef a"   '{U+00E4}'
+stringdef e`   '{U+00E8}'
+stringdef e'   '{U+00E9}'
+stringdef e^   '{U+00EA}'
+stringdef e"   '{U+00EB}'
+stringdef i`   '{U+00EC}'
+stringdef i'   '{U+00ED}'
+stringdef i^   '{U+00EE}'
+stringdef i"   '{U+00EF}'
+stringdef o`   '{U+00F2}'
+stringdef o'   '{U+00F3}'
+stringdef o^   '{U+00F4}'
+stringdef o"   '{U+00F6}'
+stringdef u`   '{U+00F9}'
+stringdef u'   '{U+00FA}'
+stringdef u^   '{U+00FB}'
+stringdef u"   '{U+00FC}'
+
+define A        'a{a"}{a'}{a`}{a^}'
+define E        'e{e"}{e'}{e`}{e^}'
+define I        'i{i"}{i'}{i`}{i^}'
+define O        'o{o"}{o'}{o`}{o^}'
+define U        'u{u"}{u'}{u`}{u^}'
+define AOU      A + O + U
+
+define AIOU     A + I + O + U
+define AEIOU    A + E + I + O + U
+define v        AEIOU + 'y'
 define v_WX     v + 'wx'
-define AOU      'aou'
-define AIOU     'aiou'
 
 backwardmode (
 
@@ -36,7 +66,7 @@ backwardmode (
 
     define lengthen_V as do (
         non-v_WX [ (AOU] test (non-v or atlimit)) or
-                   ('e'] test (non-v or atlimit
+                   (E]   test (non-v or atlimit
                                not AIOU
                                not (next AIOU non-v)))
         ->ch insert ch
