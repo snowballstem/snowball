@@ -217,16 +217,26 @@ backwardmode (
 )
 
 define Lose_prefix as (
-    ['ge'] test hop 3 (goto v goto non-v)
+    ['ge'] test hop 3 test (goto v goto non-v)
     set GE_removed
     delete
+    do ( [substring] among (
+        '{e"}' (<-'e')
+        '{i"}' (<-'i')
+      )
+    )
 )
 
 define Lose_infix as (
     next
-    gopast (['ge']) test hop 3 (goto v goto non-v)
+    gopast (['ge']) test hop 3 test (goto v goto non-v)
     set GE_removed
     delete
+    do ( [substring] among (
+        '{e"}' (<-'e')
+        '{i"}' (<-'i')
+      )
+    )
 )
 
 define measure as (
