@@ -84,6 +84,8 @@ backwardmode (
                     (test ('er' R1 C) delete) or
                     (R1 C <-'e'))
 
+            '{e'}s'
+                   (R1 <-'{e'}')
             'aus'  (R1 V <-'au')
             'en'   (('hed' R1 ] <-'heid') or
                     ('nd' delete) or
