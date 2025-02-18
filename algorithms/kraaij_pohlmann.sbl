@@ -73,7 +73,7 @@ backwardmode (
                  ->ch insert ch)
             'e' '{e'}' '{e`}' '{e^}'
                 (test (non-v or atlimit
-                               not AIOU
+                               not (AIOU or (E atlimit))
                                not (next AIOU non-v))
                  ->ch insert ch)
             'e{e"}'
