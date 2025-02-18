@@ -264,16 +264,16 @@ define stem as (
     unset GE_removed
     do (Lose_prefix and measure)
     backwards (
-            do (GE_removed Step_1c)
+            do (GE_removed set stemmed Step_1c)
         )
     unset GE_removed
     do (Lose_infix and measure)
     backwards (
-            do (GE_removed Step_1c)
+            do (GE_removed set stemmed Step_1c)
         )
     backwards (
             do (Step_7 set stemmed )
-            do (stemmed or GE_removed Step_6)
+            do (stemmed Step_6)
         )
 )
 
