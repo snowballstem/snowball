@@ -66,6 +66,7 @@ backwardmode (
 
     define lengthen_V as do (
         non-v_WX [ (AOU] test (non-v or atlimit)) or
+                   ('{e"}'] test ('e' or 'i') <-'ee' []) or
                    (E]   test (non-v or atlimit
                                not AIOU
                                not (next AIOU non-v)))
