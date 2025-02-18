@@ -69,12 +69,12 @@ backwardmode (
             'a' '{a"}' '{a'}' '{a`}' '{a^}'
             'o' '{o"}' '{o'}' '{o`}' '{o^}'
             'u' '{u"}' '{u'}' '{u`}' '{u^}'
-                (test (non-v or atlimit)
+                (test (non-AEIOU or atlimit)
                  ->ch insert ch)
             'e' '{e'}' '{e`}' '{e^}'
-                (test (non-v or atlimit
+                (test (non-AEIOU or atlimit
                                not (AIOU or (E atlimit))
-                               not (next AIOU non-v))
+                               not (next AIOU non-AEIOU))
                  ->ch insert ch)
             'e{e"}'
                 (<-'e{e"}e')
