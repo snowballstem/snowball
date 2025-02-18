@@ -16,7 +16,7 @@ routines (
 
 externals ( stem )
 
-groupings ( v v_WX A AEIOU AIOU AOU E I O U )
+groupings ( v v_WX A AEIOU AIOU E I O U )
 
 stringescapes {}
 
@@ -48,7 +48,6 @@ define E        'e{e"}{e'}{e`}{e^}'
 define I        'i{i"}{i'}{i`}{i^}'
 define O        'o{o"}{o'}{o`}{o^}'
 define U        'u{u"}{u'}{u`}{u^}'
-define AOU      A + O + U
 
 define AIOU     A + I + O + U
 define AEIOU    A + E + I + O + U
@@ -65,12 +64,23 @@ backwardmode (
     define C  as test (not 'ij' non-v)
 
     define lengthen_V as do (
-        non-v_WX [ (AOU] test (non-v or atlimit)) or
-                   ('{e"}'] test ('e' or 'i') <-'ee' []) or
-                   (E]   test (non-v or atlimit
+        non-v_WX
+        [substring] among (
+            'a' '{a"}' '{a'}' '{a`}' '{a^}'
+            'o' '{o"}' '{o'}' '{o`}' '{o^}'
+            'u' '{u"}' '{u'}' '{u`}' '{u^}'
+                (test (non-v or atlimit)
+                 ->ch insert ch)
+            'e' '{e'}' '{e`}' '{e^}'
+                (test (non-v or atlimit
                                not AIOU
-                               not (next AIOU non-v)))
-        ->ch insert ch
+                               not (next AIOU non-v))
+                 ->ch insert ch)
+            'e{e"}'
+                (<-'e{e"}e')
+            'i{e"}'
+                (<-'iee')
+        )
     )
 
     define Step_1 as
