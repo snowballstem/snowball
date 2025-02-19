@@ -228,7 +228,7 @@ backwardmode (
 )
 
 define Lose_prefix as (
-    ['ge'] test hop 3 test (gopast ('ij' or v) goto non-v)
+    ['ge'] test hop 3 test (gopast ('ij' or v) repeat ('ij' or v) not atlimit)
     set GE_removed
     delete
     do ( [substring] among (
@@ -240,7 +240,7 @@ define Lose_prefix as (
 
 define Lose_infix as (
     next
-    gopast (['ge']) test hop 3 test (gopast ('ij' or v) goto non-v)
+    gopast (['ge']) test hop 3 test (gopast ('ij' or v) repeat ('ij' or v) not atlimit)
     set GE_removed
     delete
     do ( [substring] among (
