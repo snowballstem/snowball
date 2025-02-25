@@ -1075,9 +1075,21 @@ static void generate_among(struct generator * g, struct node * p) {
         w(g, "~Mswitch (among_var) {~N~+");
         for (i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
-            w(g, "~Mcase ~I0:~N~+");
+            /* Put a block around each case which seems to workaround bogus
+             * compiler errors (typically with repeat reports at the same
+             * location):
+             *
+             * dutchStemmer.generated.cs(543,25): error CS0165: Use of unassigned local variable `c5'
+             *
+             * The c5 variable is initialised at point of declaration and we
+             * don't `goto` into the block it is declared in from outside so
+             * this seems to be buggy code flow analysis in the compiler.
+             * Unclear where to usefully report mono bugs in 2025 so I've
+             * not tried.
+             */
+            w(g, "~Mcase ~I0: {~N~+");
             generate(g, x->commands[i - 1]);
-            w(g, "~Mbreak;~N~-");
+            w(g, "~Mbreak;~N~-}~N");
         }
         write_block_end(g);
     }
