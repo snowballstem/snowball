@@ -991,10 +991,10 @@ static void generate_call(struct generator * g, struct node * p) {
     }
     if (signals == 1) {
         /* Always succeeds. */
-        writef(g, "~M~V0~N", p);
+        writef(g, "~M~V0;~N", p);
     } else if (signals == 0) {
         /* Always fails. */
-        writef(g, "~M~V0~N", p);
+        writef(g, "~M~V0;~N", p);
         write_failure(g);
     } else {
         write_failure_if(g, "Not ~V0", p);
