@@ -763,7 +763,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->always_matches = false;
     x->shortest_size = INT_MAX;
 
-    if (q->type == c_bra) { starter = q; q = q->right; }
+    if (q->type == c_bra) {
+        starter = q;
+        p->left = q = q->right;
+    }
 
     while (q) {
         if (q->type == c_literalstring) {
