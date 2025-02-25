@@ -14,7 +14,7 @@ armenian        UTF_8                   armenian,hy,hye,arm
 basque          UTF_8,ISO_8859_1        basque,eu,eus,baq
 catalan         UTF_8,ISO_8859_1        catalan,ca,cat
 danish          UTF_8,ISO_8859_1        danish,da,dan
-dutch           UTF_8,ISO_8859_1        dutch,nl,dut,nld
+dutch           UTF_8,ISO_8859_1        dutch,nl,dut,nld,kraaij_pohlmann
 english         UTF_8,ISO_8859_1        english,en,eng
 estonian        UTF_8                   estonian,et,est
 finnish         UTF_8,ISO_8859_1        finnish,fi,fin
@@ -45,15 +45,19 @@ yiddish         UTF_8                   yiddish,yi,yid
 # should be used in preference.
 porter          UTF_8,ISO_8859_1        porter			english
 
+# This is Martin Porter's Dutch stemmer.  It was the default Dutch stemming
+# in Snowball 2.2.0 and earlier, but after user feedback and careful evaluation
+# we concluded that the Kraaij-Pohlmann Dutch stemmer was a better default.
+# We still provide this to help people who have a lot of existing data indexed
+# using it.
+dutch_porter    UTF_8,ISO_8859_1        dutch_porter            dutch
+
 # Some other stemmers in the snowball project are not included in the standard
 # distribution. To compile a libstemmer with them in, add them to this list,
 # and regenerate the distribution. (You will need a full source checkout for
 # this.) They are included in the snowball website as curiosities, but are not
 # intended for general use, and use of them is is not fully supported.  These
 # algorithms are:
-#
-# kraaij_pohlmann  - This is a different dutch stemmer.
-#kraaij_pohlmann  UTF_8,ISO_8859_1        kraaij_pohlmann	dutch
 #
 # lovins           - This is an english stemmer, but fairly outdated, and
 #                    only really applicable to a restricted type of input text

@@ -82,7 +82,7 @@ tarball_ext = .tar.gz
 # * KOI8_R_algorithms
 include algorithms.mk
 
-other_algorithms = kraaij_pohlmann lovins
+other_algorithms = lovins
 
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
