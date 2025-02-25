@@ -818,7 +818,9 @@ static void generate_address(struct generator * g, struct node * p) {
     if (b != NULL) {
         write_literal_string(g, b);
     } else {
-        write_varname(g, p->name);
+        w(g, "Ada.Strings.Unbounded.To_String (");
+        write_varref(g, p->name);
+        w(g, ")");
     }
 }
 
