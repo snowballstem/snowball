@@ -33,7 +33,6 @@ namespace Snowball
     using System.IO;
     using System.Reflection;
     using System.Linq;
-    using System.Text;
 
     /// <summary>
     ///   Snowball's Stemmer program.
