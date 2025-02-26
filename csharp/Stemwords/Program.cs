@@ -62,7 +62,7 @@ namespace Snowball
                     language = args[i + 1];
                 else if (args[i] == "-i")
                     inputName = args[i + 1];
-                if (args[i] == "-o")
+                else if (args[i] == "-o")
                     outputName = args[i + 1];
             }
 
