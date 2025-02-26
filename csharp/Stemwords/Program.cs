@@ -43,7 +43,7 @@ namespace Snowball
 
         private static void usage()
         {
-            Console.WriteLine("Usage: stemwords.exe -l <language> -i <input file> [-o <output file>]");
+            Console.WriteLine("Usage: stemwords.exe -l <language> [-i <input file>] [-o <output file>]");
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Snowball
                     outputName = args[i + 1];
             }
 
-            if (language == null || inputName == null)
+            if (language == null)
             {
                 usage();
                 return;
@@ -89,13 +89,17 @@ namespace Snowball
             Console.WriteLine("Using " + stemmer.GetType());
 
             TextWriter output = System.Console.Out;
-
             if (outputName != null)
                 output = new StreamWriter(outputName);
 
+            TextReader input = System.Console.In;
+            if (inputName != null)
+                input = new StreamReader(inputName);
 
-            foreach (var line in File.ReadAllLines(inputName))
+            while (true)
             {
+                var line = input.ReadLine();
+                if (line == null) break;
                 var o = stemmer.Stem(line);
                 output.WriteLine(o);
             }
