@@ -566,8 +566,8 @@ package body Stemmer with SPARK_Mode is
    begin
       Adjustment := S'Length - (C_Ket - C_Bra);
       if Adjustment > 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.Lb + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.Lb + 1);
+         Context.P (C_Bra + S'Length + 1 .. Context.L + Adjustment + 1)
+           := Context.P (C_Ket + 1 .. Context.L + 1);
       end if;
       if S'Length > 0 then
          Context.P (C_Bra + 1 .. C_Bra + S'Length) := S;
