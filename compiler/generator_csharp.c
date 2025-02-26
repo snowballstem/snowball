@@ -1089,7 +1089,7 @@ static void generate_among(struct generator * g, struct node * p) {
              */
             w(g, "~Mcase ~I0: {~N~+");
             generate(g, x->commands[i - 1]);
-            w(g, "~Mbreak;~N~-}~N");
+            w(g, "~Mbreak;~N~-~M}~N");
         }
         write_block_end(g);
     }
