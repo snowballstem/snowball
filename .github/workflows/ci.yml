@@ -174,7 +174,7 @@ jobs:
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
-        pip install setuptools
+        pip install setuptools build
         $MAKE dist
         mkdir tmp
         cd tmp
