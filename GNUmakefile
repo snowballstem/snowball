@@ -477,7 +477,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
 	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(COMMON_FILES) $(PYTHON_PACKAGE_FILES) $${dest} && \
-	(cd $${dest} && $(python) setup.py sdist bdist_wheel && cp dist/*.tar.gz dist/*.whl ..) && \
+	(cd $${dest} && $(python) -m build && cp dist/*.tar.gz dist/*.whl ..) && \
 	rm -rf $${dest}
 
 dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
