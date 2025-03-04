@@ -60,8 +60,8 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
-        - name: Python 3.8
-          PYTHON_VERSION: 3.8
+        - name: Python 3.7
+          PYTHON_VERSION: 3.7
           os: 'ubuntu-22.04'
           # The pure Python versions run slowly - when we used travis for CI
           # we used to need to thin the testdata for languages such as Arabic
