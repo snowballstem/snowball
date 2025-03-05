@@ -135,6 +135,7 @@ PYTHON_SAMPLE_SOURCES = python/testapp.py \
 		        python/stemwords.py
 
 PYTHON_PACKAGE_FILES = python/MANIFEST.in \
+		       python/pyproject.toml \
 		       python/setup.py \
 		       python/setup.cfg
 
