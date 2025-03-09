@@ -16,6 +16,7 @@ catalan         UTF_8,ISO_8859_1        catalan,ca,cat
 danish          UTF_8,ISO_8859_1        danish,da,dan
 dutch           UTF_8,ISO_8859_1        dutch,nl,dut,nld,kraaij_pohlmann
 english         UTF_8,ISO_8859_1        english,en,eng
+esperanto       UTF_8                   esperanto,eo,epo
 estonian        UTF_8                   estonian,et,est
 finnish         UTF_8,ISO_8859_1        finnish,fi,fin
 french          UTF_8,ISO_8859_1        french,fr,fre,fra
