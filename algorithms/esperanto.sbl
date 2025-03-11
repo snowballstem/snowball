@@ -5,10 +5,10 @@ routines (
     correlative
     final_apostrophe
     initial_apostrophe
-    long_pronoun
     long_word
     merged_numeral
     not_after_letter
+    pronoun
     standard_suffix
     ujn_suffix
     uninflected
@@ -65,11 +65,16 @@ define initial_apostrophe as (
     ['{'}'] 'st' among('as' 'i' 'is' 'os' 'u' 'us') atlimit <- 'e'
 )
 
-define long_pronoun as (
-    among('ili' 'i{s^}i' 'ivi') [try 'n'] atlimit delete
-)
-
 backwardmode (
+    define pronoun as (
+        [try 'n']
+        among(
+            'ci' 'gi' '{g^}i' 'hi' 'ili' 'i{s^}i' 'ivi' 'li' 'mal{s^}i' 'mi' 'ni'
+            'oni' 'ri' 'si' '{s^}i' '{s^}li' 'vi'
+        )
+        (atlimit or '-') delete
+    )
+
     define final_apostrophe as (
         ['{'}']
         ('l' atlimit <- 'a') or
@@ -79,21 +84,21 @@ backwardmode (
                 'adi' 'almen' 'amb' 'ank' 'ankor' 'anstat' 'anta{u+}hier' 'apen'
                 'bald' '{c^}irk' 'hier' 'hodi' 'kontr' 'kvaz' 'malbald' 'malgr'
                 'morg' 'postmorg' 'presk' 'tut{c^}irk'
-            ) atlimit <- 'a{u+}'
+            ) (atlimit or '-') <- 'a{u+}'
         ) or
         (<- 'o')
     )
 
     define ujn_suffix as (
-        [ try 'n' try 'j' ] among('aliu' 'kelkiu' 'unu') atlimit delete
+        [try 'n' try 'j'] among('aliu' 'unu') (atlimit or '-') delete
     )
 
     define uninflected as (
         among(
             'aha' 'amen' 'dirlididi' 'disde' 'ehe' 'ekde' 'elde' 'haha'
             'haleluja' 'hola' 'hosana' 'hura' '{h^}a{h^}a' 'mal{c^}i' 'malkaj'
-            'malpli' 'maltra' 'maltre' 'maltro' 'minus' 'muu' 'oho' 'oni'
-            'tamen' 'uhu'
+            'malpli' 'maltra' 'maltre' 'maltro' 'minus' 'muu' 'oho' 'tamen'
+            'uhu'
         )
         (atlimit or '-')
     )
@@ -109,8 +114,8 @@ backwardmode (
         test (
             ((try 'n'] 'e') or (try 'n' try 'j'] aou))
             'i'
-            try ('k' or 't' or '{c^}' or 'nen')
-            atlimit
+            try among('{c^}' 'k' 'kelk' 'mult' 'nen' 'samt' 't')
+            (atlimit or '-')
         )
         delete
     )
@@ -139,8 +144,8 @@ backwardmode (
 define stem as (
     test canonical_form
     do initial_apostrophe
-    not long_pronoun
     backwards (
+        not pronoun
         do final_apostrophe
         not correlative
         not uninflected
