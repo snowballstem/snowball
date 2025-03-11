@@ -65,6 +65,7 @@ externals ( stem )
 
 groupings (  )
 
+
 define Normalize as (
     do repeat (
         [substring] among (
@@ -73,8 +74,6 @@ define Normalize as (
             '{ar_he_marbuta}' ( <- '{he}' next )
             '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' ( <- '{alef}' next )
             '{ar_vav_with_hamza_above}' ( <- '{vav}' next )
-
-
             '{gaf}{alef}{nun}' ( <- '{he}' next )     // gaan -> he
         )
     )
@@ -164,6 +163,9 @@ define Exception as (
         '{alef}{sin}{lam}{alef}{mim}'
         '{ye}{ain}{nun}{ye}'
         '{aa}{lam}{be}{vav}{mim}'
+        '{he}{sin}{te}{mim}'
+        '{nun}{ye}{sin}{te}{mim}'
+        '{be}{vav}{dal}{mim}'
     )
 )
 
