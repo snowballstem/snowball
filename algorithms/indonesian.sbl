@@ -112,9 +112,11 @@ backwardmode (
         // places where the paper says X|Y... it seems the | binds more
         // tightly, so it's (V|K)...cᵢcⱼ not V|(K...cᵢcⱼ).  That seems a bit
         // odd as the first letter must be either a vowel or a consonant, so
-        // that really just means "ends cᵢcⱼ".  However, nowhere in the paper
-        // uses or defines a notation such as ...X, which may explain this
-        // seemingly redundant way of specifying this.
+        // that really just means "ends cᵢcⱼ" (and has at least one letter
+        // before cᵢ but we only call SUFFIX_I_OK if $measure > 2 which
+        // ensures that part).  However, nowhere in the paper uses or defines
+        // a notation such as ...X, which may explain this seemingly redundant
+        // way of specifying this.
         //
         // The conditions elsewhere on prefix removal (e.g. V...) are clearly
         // on the stem left after the prefix is removed.  None of the other
