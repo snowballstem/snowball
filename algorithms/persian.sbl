@@ -65,18 +65,17 @@ externals ( stem )
 
 groupings (  )
 
-
 define Normalize as (
     do repeat (
         [substring] among (
-            '{ar_kaf}' ( <- '{kaf}' )
-            '{ar_ye_with_hamza_above}' '{ar_ye}' ( <- '{ye}'  )
-            '{ar_he_marbuta}' ( <- '{he}'  )
-            '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' ( <- '{alef}' )
-            '{ar_vav_with_hamza_above}' ( <- '{vav}' )
+            '{ar_kaf}' ( <- '{kaf}' next )
+            '{ar_ye_with_hamza_above}' '{ar_ye}' ( <- '{ye}' next )
+            '{ar_he_marbuta}' ( <- '{he}' next )
+            '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' ( <- '{alef}' next )
+            '{ar_vav_with_hamza_above}' ( <- '{vav}' next )
 
 
-            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
+            '{gaf}{alef}{nun}' ( <- '{he}' next )     // gaan -> he
         )
     )
 )
@@ -135,7 +134,7 @@ define Suffix_Adjective as (
 define Suffix_Normalize as (
     do backwards (
         [substring] among (
-            '{gaf}{alef}{nun}' ( <- '{he}'  )     // gaan -> he
+            '{gaf}{alef}{nun}' ( <- '{he}' next )     // gaan -> he
         )
     )
 )
