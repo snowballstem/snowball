@@ -1591,6 +1591,7 @@ static void generate_methods(struct generator * g) {
     struct node * p = g->analyser->program;
     while (p != NULL) {
         generate(g, p);
+        g->unreachable = false;
         p = p->right;
     }
 }
