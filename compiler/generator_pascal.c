@@ -1291,38 +1291,52 @@ static void generate_method_decls(struct generator * g) {
     }
     w(g, "~-");
 
-    w(g, "~Mprivate~N~+");
+    int first = true;
     for (q = g->analyser->names; q; q = q->next) {
         if (q->type == t_routine) {
+            if (first) {
+                w(g, "~Mprivate~N~+");
+                first = false;
+            }
             generate_method_decl(g, q);
         }
     }
-    w(g, "~-");
+    if (!first) w(g, "~-");
 }
 
 static void generate_member_decls(struct generator * g) {
     struct name * q;
-    w(g, "~Mprivate~N~+");
+    int first = true;
     for (q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "~M~W0 : AnsiString;~N");
-                break;
             case t_integer:
-                w(g, "~M~W0 : Integer;~N");
-                break;
             case t_boolean:
-                w(g, "~M~W0 : Boolean;~N");
-                break;
+                if (first) {
+                    w(g, "~Mprivate~N~+");
+                    first = false;
+                }
+                switch (q->type) {
+                    case t_string:
+                        w(g, "~M~W0 : AnsiString;~N");
+                        break;
+                    case t_integer:
+                        w(g, "~M~W0 : Integer;~N");
+                        break;
+                    case t_boolean:
+                        w(g, "~M~W0 : Boolean;~N");
+                        break;
+                }
         }
     }
 
-    w(g, "~-");
+    if (!first) w(g, "~-");
 }
 
 static void generate_among_decls(struct generator * g) {
     struct among *a = g->analyser->amongs;
+    if (a == NULL) return;
 
     w(g, "~Mprivate~N~+");
 
