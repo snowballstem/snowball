@@ -1246,7 +1246,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     g->I[0] = x->number;
 
-    w(g, "~Ma_~I0 = [~N~+");
+    w(g, "~N~Ma_~I0 = [~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1257,19 +1257,14 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
             w(g, "~MAmong(~L0, ~I0, ~I1");
             if (v->function != NULL) {
-                w(g, ", \"");
-                if (v->function->type == t_routine) {
-                    /* Need to use mangled version of private name here. */
-                    w(g, "_~n");
-                }
+                w(g, ", ");
                 write_varname(g, v->function);
-                w(g, "\"");
             }
             w(g, ")~S0~N");
             v++;
         }
     }
-    w(g, "~-~M]~N~N");
+    w(g, "~-~M]~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -1363,11 +1358,12 @@ extern void generate_program_python(struct generator * g) {
     }
     generate_class_begin(g);
 
-    generate_amongs(g);
     generate_groupings(g);
 
     generate_members(g);
     generate_methods(g);
+
+    generate_amongs(g);
 
     generate_label_classes(g);
 

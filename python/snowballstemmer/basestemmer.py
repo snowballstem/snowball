@@ -183,8 +183,7 @@ class BaseStemmer(object):
                 self.cursor = c + len(w.s)
                 if w.method is None:
                     return w.result
-                method = getattr(self, w.method)
-                res = method()
+                res = w.method(self)
                 self.cursor = c + len(w.s)
                 if res:
                     return w.result
@@ -241,8 +240,7 @@ class BaseStemmer(object):
                 self.cursor = c - len(w.s)
                 if w.method is None:
                     return w.result
-                method = getattr(self, w.method)
-                res = method()
+                res = w.method(self)
                 self.cursor = c - len(w.s)
                 if res:
                     return w.result
