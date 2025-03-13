@@ -755,6 +755,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     if (a->amongs == NULL) a->amongs = x; else a->amongs_end->next = x;
     a->amongs_end = x;
     x->next = NULL;
+    x->node = p;
     x->b = v;
     x->number = a->among_count++;
     x->function_count = 0;

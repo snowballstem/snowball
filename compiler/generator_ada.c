@@ -1110,12 +1110,15 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str *saved_output;
     struct str *saved_declarations;
 
     /* Generate function header. */
     g->V[0] = q;
-    w(g, "~N~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
+    w(g, "~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
     if (need_c_var(p->left)) {
         w(g, "~M~MC : Result_Index;~N");
     }
@@ -1529,6 +1532,7 @@ static int generate_among_table(struct generator * g, struct among * x, int star
     int i;
     struct amongvec * v = x->b;
 
+    write_comment(g, x->node);
     g->I[0] = x->number;
 
     g->I[1] = x->literalstring_count - 1;

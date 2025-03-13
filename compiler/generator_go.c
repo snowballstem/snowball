@@ -990,16 +990,19 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str * saved_output = g->outbuf;
 
     g->V[0] = q;
 
     if (q->type == t_routine) {
-        w(g, "~N~Mfunc ~W0(env *snowballRuntime.Env, ctx interface{}) bool {~+~N");
+        w(g, "~Mfunc ~W0(env *snowballRuntime.Env, ctx interface{}) bool {~+~N");
         w(g, "~Mcontext := ctx.(*Context)~N");
         w(g, "~M_ = context~N");
     } else {
-        w(g, "~N~Mfunc ~W0(env *snowballRuntime.Env) bool {~+~N");
+        w(g, "~Mfunc ~W0(env *snowballRuntime.Env) bool {~+~N");
         generate_setup_context(g);
     }
     if (p->amongvar_needed) w(g, "~Mvar among_var int32~N");
@@ -1192,6 +1195,7 @@ static void generate_class_begin(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 

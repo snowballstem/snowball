@@ -1001,6 +1001,9 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str * saved_output = g->outbuf;
 
     if (q->type == t_routine) {
@@ -1009,7 +1012,7 @@ static void generate_define(struct generator * g, struct node * p) {
         g->S[0] = "protected override";
     }
     g->V[0] = q;
-    w(g, "~N~M~S0 bool ~V0()~N~M{~+~N");
+    w(g, "~M~S0 bool ~V0()~N~M{~+~N");
 
     g->outbuf = str_new();
 
@@ -1237,6 +1240,8 @@ static void generate_class_end(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x, const char * type) {
+    write_newline(g);
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 
@@ -1261,7 +1266,7 @@ static void generate_among_table(struct generator * g, struct among * x, const c
             v++;
         }
     }
-    w(g, "~-~M};~N~N");
+    w(g, "~-~M};~N");
 }
 
 static void generate_amongs(struct generator * g) {

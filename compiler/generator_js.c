@@ -1009,15 +1009,18 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
 
     g->V[0] = q;
     if (q->type == t_routine) {
-        w(g, "~N~M/** @return {boolean} */~N"
+        w(g, "~M/** @return {boolean} */~N"
              "~Mfunction ~W0() {~+~N");
     } else {
-        w(g, "~N~Mthis.~W0 = /** @return {boolean} */ function() {~+~N");
+        w(g, "~Mthis.~W0 = /** @return {boolean} */ function() {~+~N");
     }
 
     g->outbuf = str_new();
@@ -1231,6 +1234,7 @@ static void generate_class_begin(struct generator * g) {
              "~Mconst ~P = require('./base-stemmer.js');~N"
              "~Mvar base = new ~P();~N");
     }
+    write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1252,6 +1256,7 @@ static void generate_class_end(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 

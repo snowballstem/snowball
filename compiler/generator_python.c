@@ -1019,12 +1019,16 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
+
+    write_newline(g);
+    write_comment(g, p);
+
     g->next_label = 0;
 
     struct str * saved_output = g->outbuf;
 
     g->V[0] = q;
-    w(g, "~N~Mdef ~W0(self):~+~N");
+    w(g, "~Mdef ~W0(self):~+~N");
 
     g->outbuf = str_new();
 
@@ -1247,12 +1251,14 @@ static void generate_class_begin(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_newline(g);
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
 
-    w(g, "~N~Ma_~I0 = [~N~+");
+    w(g, "~Ma_~I0 = [~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {

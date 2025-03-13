@@ -962,6 +962,9 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str * saved_output = g->outbuf;
 
     if (q->type == t_routine) {
@@ -971,7 +974,7 @@ static void generate_define(struct generator * g, struct node * p) {
         g->S[0] = "public";
     }
     g->V[0] = q;
-    w(g, "~N~M~S0 boolean ~V0() {~+~N");
+    w(g, "~M~S0 boolean ~V0() {~+~N");
 
     g->outbuf = str_new();
 
@@ -1187,12 +1190,13 @@ static void generate_class_begin(struct generator * g) {
     if (g->analyser->among_with_function_count > 0) {
         w(g, "~Mprivate static final java.lang.invoke.MethodHandles.Lookup methodObject = java.lang.invoke.MethodHandles.lookup();~N");
     }
+    write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
 
     w(g, "~N}");
-    w(g, "~N~N");
+    w(g, "~N");
 }
 
 static void generate_equals(struct generator * g) {
@@ -1213,6 +1217,7 @@ static void generate_equals(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 

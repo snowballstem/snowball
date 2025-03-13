@@ -166,6 +166,13 @@ void write_comment_content(struct generator * g, struct node * p) {
             write_string(g, name_of_token(p->type));
             write_string(g, " <integer expression>)");
             break;
+        case c_define:
+            if (p->mode == m_forward) {
+                write_string(g, "forwardmode ");
+            } else {
+                write_string(g, "backwardmode ");
+            }
+            /* FALLTHRU */
         default:
             write_string(g, name_of_token(p->type));
             if (p->name) {
@@ -1457,15 +1464,16 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
+
+    write_newline(g);
+    write_comment(g, p);
+
     g->next_label = 0;
 
     g->S[0] = q->type == t_routine ? "static" : "extern";
     g->V[0] = q;
 
-    w(g, "~N~S0 int ~V0(struct SN_env * z) {");
-    if (g->options->comments) {
-        write_string(g, p->mode == m_forward ? " /* forwardmode */" : " /* backwardmode */");
-    }
+    w(g, "~S0 int ~V0(struct SN_env * z) {");
     w(g, "~N~+");
     if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     g->failure_keep_count = 0;
@@ -1788,6 +1796,7 @@ static void generate_routine_headers(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_comment(g, x->node);
 
     struct amongvec * v = x->b;
 
@@ -1805,7 +1814,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     }
 
     g->I[1] = x->literalstring_count;
-    w(g, "~N~Mstatic const struct among a_~I0[~I1] =~N{~N");
+    w(g, "~Mstatic const struct among a_~I0[~I1] =~N{~N");
 
     v = x->b;
     {

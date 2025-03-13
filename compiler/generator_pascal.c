@@ -1036,12 +1036,15 @@ static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
     if (q->type == t_routine && !q->used) return;
 
+    write_newline(g);
+    write_comment(g, p);
+
     struct str *saved_output;
     struct str *saved_declarations;
 
     /* Generate function header. */
     g->V[0] = q;
-    w(g, "~N~MFunction T~n.~W0 : Boolean;~N");
+    w(g, "~MFunction T~n.~W0 : Boolean;~N");
 
     /* Save output*/
     saved_output = g->outbuf;
@@ -1357,6 +1360,7 @@ static void generate_among_decls(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_comment(g, x->node);
     int i;
     struct amongvec * v = x->b;
 
