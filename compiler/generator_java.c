@@ -1187,7 +1187,6 @@ static void generate_class_begin(struct generator * g) {
     if (g->analyser->among_with_function_count > 0) {
         w(g, "~Mprivate static final java.lang.invoke.MethodHandles.Lookup methodObject = java.lang.invoke.MethodHandles.lookup();~N");
     }
-    w(g, "~N");
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1211,7 +1210,6 @@ static void generate_equals(struct generator * g) {
     w(g, g->options->name);
     w(g, ".class.getName().hashCode();~N"
          "~-~M}~N");
-    w(g, "~N~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
@@ -1284,6 +1282,7 @@ static void generate_groupings(struct generator * g) {
 }
 
 static void generate_members(struct generator * g) {
+    int wrote_members = false;
 
     struct name * q;
     for (q = g->analyser->names; q; q = q->next) {
@@ -1295,16 +1294,19 @@ static void generate_members(struct generator * g) {
                 w(g, " ~W0 = new ");
                 w(g, g->options->string_class);
                 w(g, "();~N");
+                wrote_members = true;
                 break;
             case t_integer:
                 w(g, "~Mprivate int ~W0;~N");
+                wrote_members = true;
                 break;
             case t_boolean:
                 w(g, "~Mprivate boolean ~W0;~N");
+                wrote_members = true;
                 break;
         }
     }
-    w(g, "~N");
+    if (wrote_members) w(g, "~N");
 }
 
 static void generate_methods(struct generator * g) {
