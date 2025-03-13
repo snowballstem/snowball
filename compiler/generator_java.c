@@ -1321,6 +1321,8 @@ extern void generate_program_java(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
+    w(g, "~+");
+
     generate_amongs(g);
     generate_groupings(g);
 
@@ -1329,6 +1331,8 @@ extern void generate_program_java(struct generator * g) {
     generate_equals(g);
 
     generate_class_end(g);
+
+    w(g, "~-");
 
     {
         /* We need to call generate_class_begin() after we've generated the
