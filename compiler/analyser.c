@@ -38,26 +38,27 @@ static struct node * C_style(struct analyser * a, const char * s, int token);
 
 static void print_node_(struct node * p, int n, const char * s) {
 
-    int i;
-    for (i = 0; i < n; i++) fputs(i == n - 1 ? s : "  ", stdout);
-    printf("%s ", name_of_token(p->type));
-    if (p->name) report_s(stdout, p->name->s);
+    printf("%*s%s", n * 2, s, name_of_token(p->type));
+    if (p->name) {
+        putchar(' ');
+        report_s(stdout, p->name->s);
+    }
     if (p->literalstring) {
-        printf("'");
+        printf(" '");
         report_b(stdout, p->literalstring);
         printf("'");
     } else if (p->type == c_number) {
-        printf("%d", p->number);
+        printf(" %d", p->number);
     }
     printf("\n");
     if (p->AE) print_node_(p->AE, n+1, "# ");
-    if (p->left) print_node_(p->left, n+1, "  ");
+    if (p->left) print_node_(p->left, n+1, "");
     if (p->aux) print_node_(p->aux, n+1, "@ ");
-    if (p->right) print_node_(p->right, n, "  ");
+    if (p->right) print_node_(p->right, n, "");
 }
 
 extern void print_program(struct analyser * a) {
-    print_node_(a->program, 0, "  ");
+    print_node_(a->program, 0, "");
 }
 
 static struct node * new_node(struct analyser * a, int type) {
