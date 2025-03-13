@@ -1162,7 +1162,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
 static void generate_functionend(struct generator * g, struct node * p) {
     (void)p;
-    w(g, "~N~MResult := True;~N");
+    w(g, "~MResult := True;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
