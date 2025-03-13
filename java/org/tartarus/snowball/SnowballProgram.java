@@ -10,7 +10,11 @@ import java.util.Arrays;
 public class SnowballProgram implements Serializable {
     protected SnowballProgram()
     {
-	setCurrent("");
+        cursor = 0;
+        length = limit = 0;
+        limit_backward = 0;
+        bra = cursor;
+        ket = limit;
     }
 
     static final long serialVersionUID = 2016072500L;
@@ -106,7 +110,7 @@ public class SnowballProgram implements Serializable {
     protected boolean in_grouping(char[] s, int min, int max)
     {
 	if (cursor >= limit) return false;
-	char ch = current[cursor];
+	int ch = current[cursor];
 	if (ch > max || ch < min) return false;
 	ch -= min;
 	if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
@@ -117,7 +121,7 @@ public class SnowballProgram implements Serializable {
     protected boolean in_grouping_b(char[] s, int min, int max)
     {
 	if (cursor <= limit_backward) return false;
-	char ch = current[cursor - 1];
+	int ch = current[cursor - 1];
 	if (ch > max || ch < min) return false;
 	ch -= min;
 	if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
@@ -128,7 +132,7 @@ public class SnowballProgram implements Serializable {
     protected boolean out_grouping(char[] s, int min, int max)
     {
 	if (cursor >= limit) return false;
-	char ch = current[cursor];
+	int ch = current[cursor];
 	if (ch > max || ch < min) {
 	    cursor++;
 	    return true;
@@ -144,7 +148,7 @@ public class SnowballProgram implements Serializable {
     protected boolean out_grouping_b(char[] s, int min, int max)
     {
 	if (cursor <= limit_backward) return false;
-	char ch = current[cursor - 1];
+	int ch = current[cursor - 1];
 	if (ch > max || ch < min) {
 	    cursor--;
 	    return true;
