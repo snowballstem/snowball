@@ -899,8 +899,8 @@ static void generate_test(struct generator * g, struct node * p) {
         w(g, p->mode == m_forward ? "~{int c_test" :
                                     "~{int m_test");
         write_int(g, keep_c);
-        w(g, p->mode == m_forward ? " = z->c;" :
-                                    " = z->l - z->c;");
+        w(g, p->mode == m_forward ? " = z->c;~N" :
+                                    " = z->l - z->c;~N");
     }
 
     generate(g, p->left);
