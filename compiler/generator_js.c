@@ -182,6 +182,7 @@ static void write_check_limit(struct generator * g, struct node * p) {
 
 /* Formatted write. */
 static void writef(struct generator * g, const char * input, struct node * p) {
+    (void)p;
     int i = 0;
     int l = strlen(input);
 
@@ -193,7 +194,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
         }
         switch (input[i++]) {
             default: write_char(g, input[i - 1]); continue;
-            case 'C': write_comment(g, p); continue;
             case 'f': write_block_start(g);
                       write_failure(g);
                       g->unreachable = false;
@@ -484,6 +484,12 @@ static void generate_do(struct generator * g, struct node * p) {
     str_delete(savevar);
 }
 
+static void generate_next(struct generator * g, struct node * p) {
+    write_comment(g, p);
+    write_check_limit(g, p);
+    write_inc_cursor(g, p);
+}
+
 static void generate_GO(struct generator * g, struct node * p, int style) {
 
     int end_unreachable = false;
@@ -675,14 +681,6 @@ static void generate_delete(struct generator * g, struct node * p) {
               "~M}~N", p);
 }
 
-
-static void generate_next(struct generator * g, struct node * p) {
-
-    write_comment(g, p);
-    write_check_limit(g, p);
-    write_inc_cursor(g, p);
-}
-
 static void generate_tolimit(struct generator * g, struct node * p) {
 
     write_comment(g, p);
@@ -819,6 +817,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
          * restore c.
          */
         struct node * q = p->left;
+        write_comment(g, q);
         g->S[0] = q->mode == m_forward ? ">" : "<";
         w(g, "~Mif (base.cursor ~S0 "); generate_AE(g, q->AE); w(g, ")~N");
         write_block_start(g);
@@ -890,10 +889,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 /* dollar sets snowball up to operate on a string variable as if it were the
  * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
+    write_comment(g, p);
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~{~C~N"
+    writef(g, "~{~N"
               "~Mvar /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(base);~N", p);
 
@@ -920,6 +920,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
 
+    write_comment(g, p);
     g->V[0] = p->name;
     g->S[0] = s;
     w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); w(g, ";~N");
@@ -927,6 +928,7 @@ static void generate_integer_assign(struct generator * g, struct node * p, const
 
 static void generate_integer_test(struct generator * g, struct node * p) {
 
+    write_comment(g, p);
     int relop = p->type;
     int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
     if (optimise_to_return) {
@@ -976,6 +978,7 @@ static void generate_call(struct generator * g, struct node * p) {
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
+    write_comment(g, p);
 
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
@@ -1078,7 +1081,11 @@ static void generate_among(struct generator * g, struct node * p) {
 
     struct among * x = p->among;
 
-    if (x->substring == NULL) generate_substring(g, p);
+    if (x->substring == NULL) {
+        generate_substring(g, p);
+    } else {
+        write_comment(g, p);
+    }
 
     if (x->command_count == 1 && x->nocommand_count == 0) {
         /* Only one outcome ("no match" already handled). */
