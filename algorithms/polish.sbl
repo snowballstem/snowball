@@ -1,0 +1,179 @@
+stringescapes {}
+
+stringdef a' '{U+0105}' 
+stringdef e' '{U+0119}' 
+stringdef l' '{U+0142}' 
+stringdef s' '{U+015b}' 
+stringdef c' '{U+0107}' 
+stringdef o' '{U+00f3}' 
+
+
+
+
+externals (stem)
+
+
+routines (
+	remove_nouns
+	remove_dimunitive
+	remove_superlative_ends
+	remove_adjective_ends
+	remove_verbs_ends
+	remove_adverbs_ends
+	remove_plural_forms
+	remove_general_ends
+)
+
+
+backwardmode (
+	define remove_nouns as (
+		(
+			$(len > 7)
+			[substring] among (
+				'zacja' 'zacj{a'}' 'zacji'
+					(<- 'z')
+			)
+		) or (
+			$(len > 6)
+			[substring] among (
+				'acja' 'acji' 'acj{a'}' 'tach' 'anie' 'enie' 'eniu' 'aniu'
+					(delete)
+				'tyka'
+					(<- 'ty')
+			)
+		) or (
+			$(len > 5)
+			[substring] among (
+				'ach' 'ami' 'nia' 'niu' 'cia' 'ciu'
+				'ce' 'ta'
+					(delete)
+				'cji' 'cja' 'cj{a'}'
+					(<- 'c')
+			)
+		)
+	)
+
+	define remove_dimunitive as (
+		(
+			$(len > 6)
+			[substring] among (
+				'eczek' 'iczek' 'iszek' 'aszek' 'uszek'
+					(delete)
+				'enek'
+					(<- 'en')
+				'ejek'
+					(<- 'ej')
+				'erek'
+					(<- 'er')
+			)
+		) or (
+			$(len > 4)
+			[substring] among (
+				'ek' 'ak'
+					(delete)
+			)
+		)
+	)
+
+	define remove_adjective_ends as (
+		(
+			$(len > 6)
+			[substring] among (
+				'czny'
+					(delete)
+			)
+		) or (
+			$(len > 5)
+			[substring] among (
+				'owy' 'owa' 'owe' 'ych' 'ego'
+				'ej'
+					(delete)
+			)
+		)
+	)
+
+	define remove_verbs_ends as (
+		(
+			$(len > 5)
+			[substring] among (
+				'bym' // 'by{s'}'
+				'esz' 'asz' 'cie' 'e{s'}{c'}' 'a{s'}c' '{l'}em' 'amy' 'emy'
+					(delete)
+			)
+		) or (
+			$(len > 3)
+			[substring] among (
+				'a{c'}' 'e{c'}' 'em' 'am' 'a{l'}' 'i{l'}' 'i{c'}' '{a'}c'
+					(delete)
+				'aj'
+					(<- 'a')
+			)
+		)
+	)
+
+	define remove_adverbs_ends as (
+		(
+			$(len > 4)
+			[substring] among (
+				'nie'
+					(<- 'n')
+				'wie'
+					(<- 'w')
+				//'rze'
+				//	(<- 'r')
+			)
+		)
+	)
+
+	define remove_plural_forms as (
+		(
+			$(len > 4)
+			[substring] among (
+				'{o'}w' 'om'
+				'ami'
+					(delete)
+			)
+		)
+	)
+
+	define remove_general_ends as (
+		(
+			$(len > 4)
+			[substring] among (
+				'ia' 'ie'
+				'u' '{a'}' 'i' 'a' '{e'}' 'y' '{l'}'
+					(delete)
+			)
+		)
+	)
+)
+
+define remove_superlative_ends as (
+	test (
+		['naj'] (
+			backwards (
+				[substring] among (
+					'sze' 'szy' 'szych'
+					// Add more forms like 'szego', 'szemu', etc?
+						(delete)
+				)
+			)
+		)
+	)
+	['naj'] delete
+)
+
+define stem as (
+	backwards (
+		do remove_nouns
+		do remove_dimunitive
+	)
+	remove_superlative_ends or (backwards do remove_adjective_ends)
+	backwards (
+		do remove_verbs_ends
+		do remove_adverbs_ends
+		do remove_plural_forms
+		do remove_general_ends
+	)
+)
+
