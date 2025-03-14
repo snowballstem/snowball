@@ -72,8 +72,8 @@ def main():
 
 def stemming(lang, input, output, encoding, pretty):
     stemmer = snowballstemmer.stemmer(lang)
-    with codecs.open(output, "w", encoding) as outfile:
-        with codecs.open(input, "r", encoding) as infile:
+    with codecs.open(input, "r", encoding) as infile:
+        with codecs.open(output, "w", encoding) as outfile:
             for original in infile.readlines():
                 original = original.strip()
                 # Convert only ASCII-letters to lowercase, to match C behavior
