@@ -1,229 +1,226 @@
+/* Based on the Polish stemming algorithm developed by Błażej Kubiński,
+ * which can be found at https://github.com/Tutanchamon/pl_stemmer.
+ *
+ * The first Snowball implementation was written by Tomasz Łysiak, rewritten
+ * and modified by Dmitry Shachnev.
+ */
+
 stringescapes {}
 
-stringdef a' '{U+0105}' 
-stringdef e' '{U+0119}' 
-stringdef l' '{U+0142}' 
-stringdef s' '{U+015b}' 
-stringdef c' '{U+0107}' 
-stringdef o' '{U+00f3}' 
-
-
+stringdef ak '{U+0105}' // ą a + ogonek
+stringdef ek '{U+0119}' // ę e + ogonek
+stringdef l/ '{U+0142}' // ł l + stroke
+stringdef s' '{U+015b}' // ś s + acute (kreska)
+stringdef c' '{U+0107}' // ć c + acute (kreska)
+stringdef o' '{U+00f3}' // ó o + acute (kreska)
 
 
 externals (stem)
-integers (pos)
 
 
-routines (remove_nouns remove_dimunitive remove_adjective_ends remove_verbs_ends remove_adverbs_ends 
-	remove_plural_forms remove_general_ends)
-
-
-define remove_nouns as (
-			($(len > 7)
-			test ($pos = (len - 5)
-			hop pos
-			('zacja' or 'zacja' or 'zacji'))
-			($pos = (len - 4)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 6)
-			test($pos = (len - 4)
-			hop pos
-			('acja' or 'acji' or 'acj{a'}' or 'tach' or 'anie' or 'enie' or 'eniu' or 'aniu'))
-			($pos = (len -4)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 6)
-			test($pos = (len - 4)
-			hop pos
-			('tyka'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete))
-			) or
-			($(len > 5)
-			test ($pos = (len - 3)
-			hop pos
-			('ach' or 'ami' or 'nia' or 'niu' or 'cia' or 'ciu'))
-			($pos = (len -3)
-			hop pos
-			([tolimit] delete))
-			) or
-			($(len > 5)
-			test ($pos = (len - 3)
-			hop pos
-			('cji' or 'cja' or 'cj{a'}'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete ))) or
-			($(len > 5)
-			test($pos = (len - 2)
-			hop pos
-			('ce' or 'ta'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete))
-			)
-
+routines (
+  remove_nouns
+  remove_diminutive
+  remove_superlative_ends
+  remove_adjective_ends
+  remove_verbs_ends
+  remove_adverbs_ends
+  remove_plural_forms
+  remove_general_ends
 )
 
-define remove_dimunitive as (
-		($(len > 6)
-		test ($pos = (len - 5)
-		hop pos
-		('eczek'  or 'iczek' or 'iszek' or 'aszek' or 'uszek')) 
-		($pos = (len - 5)
-		hop pos
-		([tolimit] delete))) or
-		($(len > 6)
-		test ($pos = (len - 4)
-		hop pos
-		('enek' or 'ejek' or 'erek'))
-		($pos = (len - 2)
-		hop pos
-		([tolimit] delete))) or
-		($(len > 4)
-		test ($pos = (len - 2)
-		hop pos
-		('ek' or 'ak'))
-		($pos = (len -2)
-		hop pos
-		([tolimit] delete))
-		)
+
+backwardmode (
+  define remove_nouns as (
+    (
+      $(len > 6)
+      [substring] among (
+        // Borrowed words that match English -ation, e.g. fortyfikacja (fortification).
+        'acja'     // nominative
+        'acji'     // genitive/dative/locative
+        'acj{ak}'  // accusative
+        // Plural locative ending of (rare) words ending with -ę, e.g. zwierzę - zwierzętach.
+        // TODO: It can also be roots ending with -t and -ach ending, e.g. pirat - piratach.
+        'tach'
+        // Verbal nouns, e.g. czytanie, narodzenie.
+        'anie' 'enie'  // nominative
+        'aniu' 'eniu'  // dative/locative
+          (delete)
+        // Borrowed words that match English -tics, e.g. lingwistyka (linguistics).
+        'tyka'
+          (<- 'ty')
+      )
+    ) or (
+      $(len > 5)
+      [substring] among (
+        'ach'  // plural locative
+        'ami'  // plural instrumental
+        'nia'  // genitive of words ending with -nie, e.g. czytanie - czytania
+        'niu'  // dative/locative of words ending with -nie, e.g. czytanie - czytaniu
+        'cia'  // genitive of words ending with -cie, e.g. ukrycie - ukrycia
+        'ciu'  // dative/locative of words ending with -cie, e.g. ukrycie - ukryciu
+        'ce'   // dative/locative of words ending with -ka, e.g. muzyka - muzyce
+        'ta'   // nominative/accusative plural of (rare) words ending with -ę, e.g. zwierzę - zwierzęta
+          (delete)
+        // Borrowed words that match English -tion, e.g. intencja (intention).
+        'cja'     // nominative
+        'cji'     // genitive/dative/locative
+        'cj{ak}'  // accusative
+          (<- 'c')
+      )
+    )
+  )
+
+  define remove_diminutive as (
+    (
+      $(len > 6)
+      [substring] among (
+        'eczek'  // e.g. człowieczek (diminutive of człowiek)
+        'iczek'  // e.g. czajniczek (diminutive of czajnik)
+        'iszek'  // e.g. braciszek (diminutive of brat)
+        'aszek'  // e.g. młodzieniaszek (diminutive of młodzieniec)
+        'uszek'  // e.g. kwiatuszek (diminutive of kwiat)
+          (delete)
+      )
+    ) or (
+      $(len > 4)
+      [substring] among (
+        'ek'  // e.g. ogródek (diminutive of ogród)
+        'ak'  // e.g. gęsiak (diminutive of gęś)
+          (delete)
+      )
+    )
+  )
+
+  define remove_adjective_ends as (
+    (
+      $(len > 6)
+      [substring] among (
+        // -cz- is part of the root, -n- is a d-suffix, -y is nominative ending
+        // e.g. słoneczny (sunny, from słońce)
+        'czny'
+          (delete)
+      )
+    ) or (
+      $(len > 5)
+      [substring] among (
+        'owy' 'owa' 'owe'  // E.g. planowy (masculine), planowa (feminine), planowe (neuter)
+        'ych'  // genitive/accusative/locative plural
+        'ego'  // genitive/accusative singular (masculine)
+        'ej'   // genitive/dative/locative singular (feminine)
+          (delete)
+      )
+    )
+  )
+
+  define remove_verbs_ends as (
+    (
+      $(len > 5)
+      [substring] among (
+        'bym'        // conditional 1st person singular, e.g. czytał(a)bym
+                     // TODO: maybe also add 'by{s'}' for 2nd person?
+        'esz'        // present 2nd person singular, e.g. piszesz
+        'asz'        // present 2nd person singular, e.g. czytasz
+        'cie'        // present 2nd person plural, e.g. czytacie
+        'e{s'}{c'}'  // infinitive, e.g. przynieść
+        'a{s'}c'     // TODO: should it be 'a{s'}{c'}'? E.g. popaść (also infinitive)
+        '{l/}em'     // past 1st person singular masculine, e.g. czytałem
+        'emy'        // present 1st person plural, e.g. piszemy
+        'amy'        // present 1st person plural, e.g. czytamy
+          (delete)
+      )
+    ) or (
+      $(len > 3)
+      [substring] among (
+        'a{c'}'  // infinitive, e.g. czytać
+        'e{c'}'  // infinitive, e.g. chcieć
+        'i{c'}'  // infinitive, e.g. wozić
+        'em'     // past 1st person singular masculine, e.g. czytałem
+        'am'     // past 1st person singular feminine, e.g. czytałam
+        'a{l/}'  // past 3rd person singular masculine, e.g. czytał
+        'i{l/}'  // past 3rd person singular masculine, e.g. woził
+        '{ak}c'  // contemporary adverbial participle (transgressive), e.g. czytając
+          (delete)
+        'aj'     // imperative, e.g. czytaj
+          (<- 'a')
+      )
+    )
+  )
+
+  define remove_adverbs_ends as (
+    (
+      $(len > 4)
+      [substring] among (
+        'nie'  // e.g. dokładnie
+          (<- 'n')
+        'wie'  // e.g. możliwie
+          (<- 'w')
+        //'rze'  // e.g. dobrze
+        //  (<- 'r')
+      )
+    )
+  )
+
+  define remove_plural_forms as (
+    (
+      $(len > 4)
+      [substring] among (
+        '{o'}w'  // genitive plural, e.g. włos - włosów
+        'om'     // dative plural, e.g. włos - włosom
+        'ami'    // instrumental plural, e.g. włos - włosami
+          (delete)
+      )
+    )
+  )
+
+  define remove_general_ends as (
+    (
+      $(len > 4)
+      [substring] among (
+        // These vowel endings can appear in different contexts
+        'ia'    // e.g. słonia (genitive singular of słoń)
+        'ie'    // e.g. słonie (nominative plural of słoń)
+        'u'     // e.g. stołu (genitive singular of stół)
+        '{ak}'  // e.g. książką (noun, instrumental) or piszą (verb, present 3rd person plural)
+        '{ek}'  // e.g. książkę (noun, accusative) or piszę (verb, present 1st person singular)
+        'i'     // e.g. książki (nominative plural of książka)
+        'a'     // e.g. kobieta (nominative singular)
+        'y'     // e.g. kobiety (nominative plural of kobieta)
+        '{l/}'  // e.g. napadł (past 3rd person singular masculine of napaść)
+          (delete)
+      )
+    )
+  )
 )
 
-define remove_adjective_ends as (
-				($(len > 7)
-				test (('naj')
-				$pos = (limit - cursor - 3)
-				hop pos
-				('sze' or 'szy'))
-				(([hop 3] delete)
-				$pos = (limit - cursor - 3)
-				hop pos
-				([tolimit] delete))) or 
-				($(len > 7)
-				test (('naj')
-				$pos = (limit - cursor - 5)
-				hop pos
-				('szych'))
-				(([hop 3] delete)
-				$pos = (len - 5)
-				hop pos
-				([tolimit] delete))) or 
-				($(len > 6)
-				test ($pos = limit - 4
-				hop pos
-				('czny'))
-				($pos = (len - 4)
-				hop pos
-				([tolimit] delete))
-				) or
-				($(len > 5)
-				test($pos = (len - 3)
-				hop pos
-				('owy' or 'owa' or 'owe' or 'ych' or 'ego'))
-				($pos = (len - 3)
-				hop pos
-				([tolimit] delete))) or
-				($(len > 5)
-				test ($pos = (len - 2)
-				hop pos
-				('ej'))
-				($pos = (len - 2)
-				hop pos
-				([tolimit] delete)))
-)
-
-define remove_verbs_ends as(
-			($(len > 5)
-			test ($pos = (limit - 3)
-			hop pos
-			('bym'))
-			($pos = (len - 3)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 5)
-			test ($pos = (len - 3)
-			hop pos
-			('esz' or 'asz' or 'cie' or 'e{s'}{c'}' or 'a{s'}c' or '{l'}em' or 'amy' or 'emy'))
-			($pos = (len - 3)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 3)
-			test ($pos = (len - 2)
-			hop pos
-			('a{c'}' or 'e{c'}' or 'em' or 'am' or 'a{l'}' or 'i{l'}' or 'i{c'}' or '{a'}c'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 3)
-			test ($pos = (len - 2)
-			hop pos
-			('aj'))
-			($pos = (len -1)
-			hop pos
-			([tolimit] delete)))
-)
-
-define remove_adverbs_ends as (
-			($(len > 4)
-			test ($pos = (len - 3)
-			hop pos
-			('nie' or 'wie'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 4)
-			test ($pos = (len - 2)
-			hop pos
-			('rze'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete)))
-)
-
-define remove_plural_forms as (
-			($(len > 4)
-			test ($pos = (len - 2)
-			hop pos
-			('{o'}w' or 'om'))
-			($pos = (len - 2)
-			hop pos
-			([tolimit] delete))) or
-			($(len > 4)
-			test ($pos = (len - 3)
-			hop pos
-			('ami'))
-			($pos = (len -3)
-			hop pos
-			([tolimit] delete)))
-)
-
-define remove_general_ends as (
-		($(len > 4)
-		test ($pos = (len - 2)
-		hop pos
-		('ia' or 'ie'))
-		($pos = (len - 2)
-		hop pos
-		([tolimit] delete))) or
-		($(len > 4)
-		test ($pos = (len - 1)
-		hop pos
-		('u' or '{a'}' or 'i' or 'a' or '{e'}' or 'y' or '{l'}'))
-		($pos = (len - 1)
-		hop pos
-		([tolimit] delete)))
+define remove_superlative_ends as (
+  test (
+    ['naj'] (
+      backwards (
+        [substring] among (
+          'sze'    // adverb, e.g. w najlepsze
+          'szy'    // nominative singular masculine, e.g. najlepszy
+          'szych'  // genitive plural, e.g. najlepszych
+          // TODO: Add more forms like 'szego', 'szemu', etc?
+            (delete)
+        )
+      )
+    )
+  )
+  [tomark sizeof 'naj'] delete
 )
 
 define stem as (
-		do remove_nouns
-		do remove_dimunitive
-		do remove_adjective_ends
-		do remove_verbs_ends
-		do remove_adverbs_ends
-		do remove_plural_forms
-		do remove_general_ends
+  backwards (
+    do remove_nouns
+    do remove_diminutive
+  )
+  remove_superlative_ends or (backwards do remove_adjective_ends)
+  backwards (
+    do remove_verbs_ends
+    do remove_adverbs_ends
+    do remove_plural_forms
+    do remove_general_ends
+  )
 )
 
