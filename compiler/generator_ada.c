@@ -32,7 +32,7 @@ static void write_varname(struct generator * g, struct name * p) {
     if (p->type != t_external) {
         write_char(g, "SBIRXG"[p->type]);
         write_char(g, '_');
-    }   
+    }
 
     {
         char save_initial = p->s[0];
@@ -80,15 +80,15 @@ static void write_margin(struct generator * g) {
 
 static void write_relop(struct generator * g, int relop) {
     switch (relop) {
-	case c_eq: write_string(g, " = "); break;
-	case c_ne: write_string(g, " /= "); break;
-	case c_gt: write_string(g, " > "); break;
-	case c_ge: write_string(g, " >= "); break;
-	case c_lt: write_string(g, " < "); break;
-	case c_le: write_string(g, " <= "); break;
-	default:
-	    fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
-	    exit(1);
+        case c_eq: write_string(g, " = "); break;
+        case c_ne: write_string(g, " /= "); break;
+        case c_gt: write_string(g, " > "); break;
+        case c_ge: write_string(g, " >= "); break;
+        case c_lt: write_string(g, " < "); break;
+        case c_le: write_string(g, " <= "); break;
+        default:
+            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
+            exit(1);
     }
 }
 
@@ -228,7 +228,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
         ch = input[i++];
         switch (ch) {
             case '~': write_char(g, '~'); continue;
-            case 'f': 
+            case 'f':
                       write_failure(g);
                       g->unreachable = false;
                       continue;
@@ -454,7 +454,7 @@ static void generate_or(struct generator * g, struct node * p) {
             wgotol(g, out_lab);
             end_unreachable = false;
         }
-        
+
         if (g->label_used)
             wsetl(g, g->failure_label);
         g->unreachable = false;
@@ -532,7 +532,7 @@ static void generate_try(struct generator * g, struct node * p) {
         savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
         restore_string(p, g->failure_str, savevar);
-    }    
+    }
 
     generate(g, p->left);
     if (g->label_used)
@@ -634,7 +634,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     } else {
         writef(g, "~M~S1_Grouping~S0 (Z, ~V0, ~I0, ~I1, True, C);~N", p);
         write_failure_if(g, "C < 0", p);
-        
+
         if (p->mode == m_forward)
             w(g, "~MZ.C := Z.C + C;~N");
         else
@@ -1068,7 +1068,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     } else {
         w(g, "~Mif ");
         // We want the inverse of the snowball test here.
-	relop ^= 1;
+        relop ^= 1;
     }
     generate_AE(g, p->left);
     write_relop(g, relop);
@@ -1622,7 +1622,7 @@ static int generate_amongs(struct generator * g) {
     struct among * a = g->analyser->amongs;
     int count;
     int start_pos;
-    
+
     w(g, "~MAmong_String : constant String := ~+");
     count = 0;
     while (a != NULL) {
@@ -1714,7 +1714,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
         for (j = 0; j < 8; j++) {
             if (need_comma)
                 w(g, ", ");
-                
+
             if (m & (1 << j)) {
                 w(g, "True");
             } else {
@@ -1724,7 +1724,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
         }
     }
     w(g, "~N~-~M);~N");
-    
+
     lose_b(map);
 }
 

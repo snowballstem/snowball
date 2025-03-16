@@ -125,11 +125,11 @@ GNU autotool framework (and in particular, automake and autoconf) as follows:
    libstemmer_c subdirectory of the top level directory of the project.
 
 2) Add a file "Makefile.am" to the unpacked libstemmer_c folder, containing:
-   
+
 noinst_LTLIBRARIES = libstemmer.la
 include $(srcdir)/mkinc.mak
 noinst_HEADERS = $(snowball_headers)
-libstemmer_la_SOURCES = $(snowball_sources) 
+libstemmer_la_SOURCES = $(snowball_sources)
 
 (You may also need to add other lines to this, for example, if you are using
 compiler options which are not compatible with compiling the libstemmer
@@ -147,5 +147,5 @@ SUBDIRS=libstemmer_c
 <name>_LIBADD = libstemmer_c/libstemmer.la
 
 (Where <name> is the name of the library or executable which links against
-libstemmer.) 
+libstemmer.)
 

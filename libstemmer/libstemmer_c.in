@@ -45,7 +45,7 @@ sb_stemmer_new(const char * algorithm, const char * charenc)
         if (strcmp(module->name, algorithm) == 0 && module->enc == enc) break;
     }
     if (module->name == NULL) return NULL;
-    
+
     stemmer = (struct sb_stemmer *) malloc(sizeof(struct sb_stemmer));
     if (stemmer == NULL) return NULL;
 

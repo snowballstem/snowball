@@ -129,15 +129,15 @@ static void write_margin(struct generator * g) {
 
 extern void write_c_relop(struct generator * g, int relop) {
     switch (relop) {
-	case c_eq: write_string(g, " == "); break;
-	case c_ne: write_string(g, " != "); break;
-	case c_gt: write_string(g, " > "); break;
-	case c_ge: write_string(g, " >= "); break;
-	case c_lt: write_string(g, " < "); break;
-	case c_le: write_string(g, " <= "); break;
-	default:
-	    fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
-	    exit(1);
+        case c_eq: write_string(g, " == "); break;
+        case c_ne: write_string(g, " != "); break;
+        case c_gt: write_string(g, " > "); break;
+        case c_ge: write_string(g, " >= "); break;
+        case c_lt: write_string(g, " < "); break;
+        case c_le: write_string(g, " <= "); break;
+        default:
+            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
+            exit(1);
     }
 }
 
@@ -1412,7 +1412,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     } else {
         w(g, "~Mif (");
         // We want the inverse of the snowball test here.
-	relop ^= 1;
+        relop ^= 1;
     }
     generate_AE(g, p->left);
     write_c_relop(g, relop);

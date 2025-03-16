@@ -481,7 +481,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                 case c_divide:
                     if (r->number == 0) {
                         fprintf(stderr, "%s:%d: Division by zero\n",
-				t->file, t->line_number);
+                                t->file, t->line_number);
                         exit(1);
                     }
                     q->number = p->number / r->number;
@@ -566,7 +566,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     // p / 0 is an error!
                     if (r->type == c_number && r->number == 0) {
                         fprintf(stderr, "%s:%d: Division by zero\n",
-				t->file, t->line_number);
+                                t->file, t->line_number);
                         exit(1);
                     }
                     break;
@@ -1131,7 +1131,7 @@ static struct node * read_C(struct analyser * a) {
                     case c_assign:
                         count_error(a);
                         fprintf(stderr, "%s:%d: Expected relational operator (did you mean '=='?)\n",
-				t->file, t->line_number);
+                                t->file, t->line_number);
                         /* Assume it was == to try to avoid an error avalanche. */
                         token = c_eq;
                         /* FALLTHRU */

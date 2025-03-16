@@ -44,7 +44,7 @@ yiddish         UTF_8                   yiddish,yi,yid
 # The porter algorithm is included in the libstemmer distribution to assist
 # with backwards compatibility, but for new systems the english algorithm
 # should be used in preference.
-porter          UTF_8,ISO_8859_1        porter			english
+porter          UTF_8,ISO_8859_1        porter                  english
 
 # This is Martin Porter's Dutch stemmer.  It was the default Dutch stemming
 # in Snowball 2.2.0 and earlier, but after user feedback and careful evaluation
@@ -63,4 +63,4 @@ dutch_porter    UTF_8,ISO_8859_1        dutch_porter            dutch
 # lovins           - This is an english stemmer, but fairly outdated, and
 #                    only really applicable to a restricted type of input text
 #                    (keywords in academic publications).
-#lovins           UTF_8,ISO_8859_1        lovins		english
+#lovins           UTF_8,ISO_8859_1        lovins                english

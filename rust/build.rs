@@ -41,7 +41,7 @@ fn main() {
                 .unwrap();
 
             writeln!(&mut lang_include_file, "pub mod {}_stemmer;", langname).unwrap();
-                
+
         }
     }
 

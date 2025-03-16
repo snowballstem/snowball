@@ -972,7 +972,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     } else {
         w(g, "~Mif (");
         // We want the inverse of the snowball test here.
-	relop ^= 1;
+        relop ^= 1;
     }
     generate_AE(g, p->left);
     // Relational operators are the same as C.

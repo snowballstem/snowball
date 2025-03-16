@@ -79,7 +79,7 @@ else
 function stemming (lang, input, output, encoding) {
     const lines = readline.createInterface({
         input: fs.createReadStream(input, encoding),
-	terminal: false
+        terminal: false
     });
     var out = fs.createWriteStream(output, encoding);
     var stemmer = create(lang);

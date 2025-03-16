@@ -45,7 +45,7 @@ Type
         Procedure SliceCheck;
         Procedure SliceFrom(s : AnsiString);
 
-        Function  ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;        
+        Function  ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;
         Procedure Insert(bra, ket : Integer; s : AnsiString);
 
         Function SliceTo : AnsiString;
@@ -262,7 +262,7 @@ Begin
             If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
-                Exit;   
+                Exit;
             End;
 
             res := w.Method;
