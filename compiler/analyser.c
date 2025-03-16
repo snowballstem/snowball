@@ -1060,7 +1060,18 @@ static struct node * read_C(struct analyser * a) {
             struct node * n = C_style(a, "A", token);
             // n->AE is NULL after a syntax error, e.g. `hop hop`.
             if (n->AE && n->AE->type == c_number) {
-                if (n->AE->number < 0) {
+                if (n->AE->number == 1) {
+                    // Convert `hop 1` to `next`.
+                    n->AE = NULL;
+                    n->type = c_next;
+                } else if (n->AE->number == 0) {
+                    fprintf(stderr,
+                            "%s:%d: warning: hop 0 is a no-op\n",
+                            a->tokeniser->file,
+                            n->AE->line_number);
+                    n->AE = NULL;
+                    n->type = c_true;
+                } else if (n->AE->number < 0) {
                     fprintf(stderr,
                             "%s:%d: warning: hop %d now signals f (as was "
                             "always documented) rather than moving the cursor "
@@ -1070,13 +1081,6 @@ static struct node * read_C(struct analyser * a) {
                             n->AE->number);
                     n->AE = NULL;
                     n->type = c_false;
-                } else if (n->AE->number == 0) {
-                    fprintf(stderr,
-                            "%s:%d: warning: hop 0 is a no-op\n",
-                            a->tokeniser->file,
-                            n->AE->line_number);
-                    n->AE = NULL;
-                    n->type = c_true;
                 }
             }
             return n;
