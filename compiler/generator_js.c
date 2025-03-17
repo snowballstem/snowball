@@ -88,7 +88,10 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "base.limit - ";
-    writef(g, "~Mvar /** number */ ~B0 = ~S1base.cursor;~N", p);
+    if(g->options->js_version == 2)
+        writef(g, "~Mlet /** number */ ~B0 = ~S1base.cursor;~N", p);
+    else
+        writef(g, "~Mvar /** number */ ~B0 = ~S1base.cursor;~N", p);
 }
 
 static void restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -641,7 +644,10 @@ static void generate_atleast(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~{");
     g->B[0] = str_data(loopvar);
-    w(g, "~Mvar ~B0 = ");
+    if(g->options->js_version == 2)
+        w(g, "~Mlet ~B0 = ");
+    else
+        w(g, "~Mvar ~B0 = ");
     generate_AE(g, p->AE);
     w(g, ";~N");
     {
@@ -696,7 +702,10 @@ static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
     g->I[0] = c_count;
-    w(g, "~{~Mvar /** number */ c~I0 = base.cursor ~S0 ");
+    if(g->options->js_version == 2)
+        w(g, "~{~Mlet /** number */ c~I0 = base.cursor ~S0 ");
+    else
+        w(g, "~{~Mvar /** number */ c~I0 = base.cursor ~S0 ");
     generate_AE(g, p->AE);
     w(g, ";~N");
 
@@ -801,7 +810,10 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~Mvar /** number */ c~I0 = base.cursor;~N");
+        if(g->options->js_version == 2)
+            w(g, "~{~Mlet /** number */ c~I0 = base.cursor;~N");
+        else
+            w(g, "~{~Mvar /** number */ c~I0 = base.cursor;~N");
     }
     writef(g, "~Mbase.insert(base.cursor, base.cursor, ", p);
     generate_address(g, p);
@@ -820,7 +832,10 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~Mvar /** number */ c~I0 = base.cursor;~N");
+        if (g->options->js_version == 2)
+            w(g, "~{~Mlet /** number */ c~I0 = base.cursor;~N");
+        else
+            w(g, "~{~Mvar /** number */ c~I0 = base.cursor;~N");
     }
     if (p->mode == m_forward) {
         writef(g, "~Mbase.insert(base.cursor, base.limit, ", p);
@@ -870,7 +885,10 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->unreachable = false;
 
         g->B[0] = str_data(varname);
-        w(g, "~Mvar /** number */ ~B0 = ");
+        if (g->options->js_version == 2)
+            w(g, "~Mlet /** number */ ~B0 = ");
+        else
+            w(g, "~Mvar /** number */ ~B0 = ");
         if (p->mode == m_forward) {
             w(g, "base.limit - base.cursor;~N");
             w(g, "~Mbase.limit = ");
@@ -895,7 +913,10 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         if (!g->unreachable) {
             g->B[0] = str_data(varname);
-            w(g, "~Mvar /** number */ ~B0 = ");
+            if(g->options->js_version == 2)
+                w(g, "~{~Mlet /** number */ ~B0 = ");
+            else
+                w(g, "~Mvar /** number */ ~B0 = ");
             if (p->mode == m_forward) {
                 w(g, "base.limit - base.cursor;~N");
                 w(g, "~Mbase.limit = base.cursor;~N");
@@ -937,8 +958,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~{~N"
-              "~Mvar /** !Object */ ~B0 = new ~P();~N", p);
+    if(g->options->js_version == 2)
+        writef(g, "~{~N"
+                  "~Mlet /** !Object */ ~B0 = new ~P();~N", p);
+    else
+        writef(g, "~{~N"
+                  "~Mvar /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(base);~N", p);
 
     ++g->copy_from_count;
@@ -1060,7 +1085,7 @@ static void generate_define(struct generator * g, struct node * p) {
     struct str * saved_declarations = g->declarations;
 
     g->V[0] = q;
-    if (q->type == t_routine) {
+    if (g->options->js_version == 2 || q->type == t_routine) {
         w(g, "~M/** @return {boolean} */~N"
              "~Mfunction ~W0() {~+~N");
     } else {
@@ -1074,7 +1099,10 @@ static void generate_define(struct generator * g, struct node * p) {
     g->var_number = 0;
 
     if (p->amongvar_needed) {
-        w(g, "~Mvar /** number */ among_var;~N");
+        if(g->options->js_version == 2)
+            w(g, "~Mlet /** number */ among_var;~N");
+        else
+            w(g, "~Mvar /** number */ among_var;~N");
     }
     str_clear(g->failure_str);
     g->failure_label = x_return;
@@ -1263,7 +1291,13 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    if (g->options->js_esm) {
+    if (g->options->js_version == 2) {
+        w(g, "import ~P from './base-stemmer-es6.mjs'~N"
+             "~N"
+             "const ~n = (() => {~+~N"
+             "~Mconst base = new ~P();~N");
+    }
+    else if (g->options->js_version == 1) {
         w(g, "// deno-lint-ignore-file~N"
              "import ~P from './base-stemmer.mjs'~N"
              "~N"
@@ -1283,14 +1317,26 @@ static void generate_class_begin(struct generator * g) {
 
 static void generate_class_end(struct generator * g) {
     w(g, "~N");
+    if(g->options->js_version == 2)
+        w(g, "~Mreturn class {~+~N");
     w(g, "~M/**@return{string}*/~N");
-    w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+    if(g->options->js_version == 2)
+        w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
+    else
+        w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
     w(g, "~Mbase.setCurrent(word);~N");
-    w(g, "~Mthis.stem();~N");
+    if(g->options->js_version == 2)
+        w(g, "~Mstem();~N");
+    else
+        w(g, "~Mthis.stem();~N");
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
-    w(g, "~-};~N");
-    if (g->options->js_esm) {
+    if(g->options->js_version == 2){
+        w(g, "~-~M};~N");
+        w(g, "~-})();~N");
+    } else
+        w(g, "~-};~N");
+    if (g->options->js_version == 2 || g->options->js_version == 1) {
         w(g, "~N"
              "export default ~n~N");
     } else {
@@ -1305,8 +1351,10 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-
-    w(g, "~M/** @const */ var a_~I0 = [~N~+");
+    if(g->options->js_version == 2)
+        w(g, "~Mconst a_~I0 = [~N~+");
+    else
+        w(g, "~M/** @const */ var a_~I0 = [~N~+");
     {
         int i;
         for (i = 0; i < x->literalstring_count; i++) {
@@ -1350,8 +1398,10 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
-
-    w(g, "~M/** @const */ var /** Array<int> */ ~W0 = [");
+    if(g->options->js_version == 2)
+        w(g, "~Mconst /** Array<int> */ ~W0 = [");
+    else
+        w(g, "~M/** @const */ var /** Array<int> */ ~W0 = [");
     for (i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
@@ -1375,13 +1425,22 @@ static void generate_members(struct generator * g) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
-                w(g, "~Mvar /** string */ ~W0 = '';~N");
+                if(g->options->js_version == 2)
+                    w(g, "~Mlet /** string */ ~W0 = '';~N");
+                else
+                    w(g, "~Mvar /** string */ ~W0 = '';~N");
                 break;
             case t_integer:
-                w(g, "~Mvar /** number */ ~W0 = 0;~N");
+                if(g->options->js_version == 2)
+                    w(g, "~Mlet /** number */ ~W0 = 0;~N");
+                else
+                    w(g, "~Mvar /** number */ ~W0 = 0;~N");
                 break;
             case t_boolean:
-                w(g, "~Mvar /** boolean */ ~W0 = false;~N");
+                if(g->options->js_version == 2)
+                    w(g, "~Mlet /** boolean */ ~W0 = false;~N");
+                else
+                    w(g, "~Mvar /** boolean */ ~W0 = false;~N");
                 break;
         }
     }

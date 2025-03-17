@@ -33,7 +33,7 @@ python_sample_dir = sample
 js_output_dir = js_out
 js_runtime_dir = javascript
 js_sample_dir = sample
-NODE ?= nodejs
+NODE ?= node
 
 cargo ?= cargo
 cargoflags ?= --release
@@ -120,9 +120,11 @@ CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 
 CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 
-JS_RUNTIME_SOURCES = javascript/base-stemmer.js
+JS_RUNTIME_SOURCES = javascript/base-stemmer.js \
+				javascript/base-stemmer-es6.js
 
-JS_SAMPLE_SOURCES = javascript/stemwords.js
+JS_SAMPLE_SOURCES = javascript/stemwords.js \
+				javascript/stemwords-es6.js
 
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
@@ -168,7 +170,10 @@ PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
-	$(js_output_dir)/base-stemmer.js
+	$(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer-es6.mjs) \
+	$(js_output_dir)/base-stemmer.js \
+	$(js_output_dir)/base-stemmer-es6.mjs \
+	$(js_output_dir)/stemwords-es6.mjs
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -332,6 +337,18 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
+	@mkdir -p $(js_output_dir)
+	cp $< $@
+
+$(js_output_dir)/%-stemmer-es6.mjs: algorithms/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(js_output_dir)
+	./snowball $< -js=es6 -o "$(js_output_dir)/$*-stemmer"
+
+$(js_output_dir)/base-stemmer-es6.mjs: $(js_runtime_dir)/base-stemmer-es6.mjs
+	@mkdir -p $(js_output_dir)
+	cp $< $@
+
+$(js_output_dir)/stemwords-es6.mjs: $(js_runtime_dir)/stemwords-es6.mjs
 	@mkdir -p $(js_output_dir)
 	cp $< $@
 
@@ -657,6 +674,21 @@ check_js_%: $(STEMMING_DATA)/%
 	  rm tmp.in; \
 	else \
 	  $(NODE) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(DIFF) -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+	@echo "Checking output of $* stemmer for JS (ES6)"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(NODE) $(js_output_dir)/stemwords-es6.mjs -l $* -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(NODE) $(js_output_dir)/stemwords-es6.mjs -l $* -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
