@@ -1620,6 +1620,7 @@ static int generate_among_table(struct generator * g, struct among * x, int star
 
 static int generate_amongs(struct generator * g) {
     struct among * a = g->analyser->amongs;
+    if (!a) return 0;
     int count;
     int start_pos;
 
