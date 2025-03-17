@@ -383,12 +383,15 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "Length_Utf8 (Z)");
             break;
         case c_size:
-            w(g, "Length (Z)");
+            w(g, "Z.Len");
             break;
         case c_lenof:
+            g->V[0] = p->name;
+            w(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V0))");
+            break;
         case c_sizeof:
             g->V[0] = p->name;
-            w(g, "Length_Utf8 (~V0)");
+            w(g, "Ada.Strings.Unbounded.Length (~V0)");
             break;
         default:
             break;
@@ -1620,6 +1623,7 @@ static int generate_among_table(struct generator * g, struct among * x, int star
 
 static int generate_amongs(struct generator * g) {
     struct among * a = g->analyser->amongs;
+    if (!a) return 0;
     int count;
     int start_pos;
 

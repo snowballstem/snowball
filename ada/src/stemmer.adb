@@ -38,6 +38,7 @@ package body Stemmer with SPARK_Mode is
                         Result   : out Boolean) is
    begin
       Context.P (1 .. Word'Length) := Word;
+      Context.Len := Word'Length;
       Context.C := 0;
       Context.L := Word'Length;
       Context.Lb := 0;
@@ -46,7 +47,7 @@ package body Stemmer with SPARK_Mode is
 
    function Get_Result (Context : in Context_Type'Class) return String is
    begin
-      return Context.P (1 .. Context.L);
+      return Context.P (1 .. Context.Len);
    end Get_Result;
 
    function Eq_S (Context : in Context_Type'Class;
@@ -73,18 +74,28 @@ package body Stemmer with SPARK_Mode is
       return S'Length;
    end Eq_S_Backward;
 
-   function Length (Context : in Context_Type'Class) return Natural is
-   begin
-      return Context.L - Context.Lb;
-   end Length;
-
    function Length_Utf8 (Context : in Context_Type'Class) return Natural is
       Count : Natural := 0;
       Pos   : Positive := 1;
       Val   : Byte;
    begin
-      while Pos <= Context.L loop
+      while Pos <= Context.Len loop
          Val := Character'Pos (Context.P (Pos));
+         Pos := Pos + 1;
+         if Val >= 16#C0# or Val < 16#80# then
+            Count := Count + 1;
+         end if;
+      end loop;
+      return Count;
+   end Length_Utf8;
+
+   function Length_Utf8 (S : in String) return Natural is
+      Count : Natural := 0;
+      Pos   : Positive := 1;
+      Val   : Byte;
+   begin
+      while Pos <= S'Length loop
+         Val := Character'Pos (S (Pos));
          Pos := Pos + 1;
          if Val >= 16#C0# or Val < 16#80# then
             Count := Count + 1;
@@ -464,7 +475,7 @@ package body Stemmer with SPARK_Mode is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C = 0 then
+      if Context.C <= Context.Lb then
          Result := -1;
          return;
       end if;
@@ -532,7 +543,7 @@ package body Stemmer with SPARK_Mode is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C = 0 then
+      if Context.C <= Context.Lb then
          Result := -1;
          return;
       end if;
@@ -566,16 +577,17 @@ package body Stemmer with SPARK_Mode is
    begin
       Adjustment := S'Length - (C_Ket - C_Bra);
       if Adjustment > 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.L + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.L + 1);
+         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
+           := Context.P (C_Ket + 1 .. Context.Len + 1);
       end if;
       if S'Length > 0 then
          Context.P (C_Bra + 1 .. C_Bra + S'Length) := S;
       end if;
       if Adjustment < 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.L + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.L + 1);
+         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
+           := Context.P (C_Ket + 1 .. Context.Len + 1);
       end if;
+      Context.Len := Context.Len + Adjustment;
       Context.L := Context.L + Adjustment;
       if Context.C >= C_Ket then
          Context.C := Context.C + Adjustment;
