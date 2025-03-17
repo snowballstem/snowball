@@ -121,10 +121,10 @@ CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 
 JS_RUNTIME_SOURCES = javascript/base-stemmer.js \
-				javascript/base-stemmer-es6.js
+				javascript/base-stemmer-es6.mjs
 
 JS_SAMPLE_SOURCES = javascript/stemwords.js \
-				javascript/stemwords-es6.js
+				javascript/stemwords-es6.mjs
 
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
