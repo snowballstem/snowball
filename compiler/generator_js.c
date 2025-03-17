@@ -914,7 +914,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         if (!g->unreachable) {
             g->B[0] = str_data(varname);
             if(g->options->js_version == 2)
-                w(g, "~{~Mlet /** number */ ~B0 = ");
+                w(g, "~Mlet /** number */ ~B0 = ");
             else
                 w(g, "~Mvar /** number */ ~B0 = ");
             if (p->mode == m_forward) {
