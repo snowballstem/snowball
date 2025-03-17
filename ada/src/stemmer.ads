@@ -138,9 +138,9 @@ private
                                 Value   : out Utf8_Type;
                                 Count   : out Natural);
 
-   function Length (Context : in Context_Type'Class) return Natural;
-
    function Length_Utf8 (Context : in Context_Type'Class) return Natural;
+
+   function Length_Utf8 (S : in String) return Natural;
 
    function Check_Among (Context : in Context_Type'Class;
                          Pos     : in Char_Index;
@@ -181,19 +181,17 @@ private
                       S          : in String;
                       Adjustment : out Integer) with
      Global => null,
-     Pre => C_Bra >= Context.Lb and C_Ket >= C_Bra and C_Ket <= Context.L;
+     Pre => C_Ket >= C_Bra;
 
    procedure Slice_Del (Context : in out Context_Type'Class) with
      Global => null,
-     Pre => Context.Bra >= Context.Lb and Context.Ket >= Context.Bra
-     and Context.Ket <= Context.L;
+     Pre => Context.Ket >= Context.Bra;
 
    procedure Slice_From (Context : in out Context_Type'Class;
                          Text    : in String) with
      Global => null,
-     Pre => Context.Bra >= Context.Lb and Context.Ket >= Context.Bra
-     and Context.Ket <= Context.L
-     and Context.L - Context.Lb + Text'Length + Context.Ket - Context.Bra < Context.P'Length;
+     Pre => Context.Ket >= Context.Bra
+     and Context.Len - (Context.Ket - Context.Bra) + Text'Length < Context.P'Length;
 
    function Slice_To (Context : in Context_Type'Class) return String;
 
@@ -202,13 +200,15 @@ private
                      C_Ket   : in Char_Index;
                      S       : in String) with
      Global => null,
-     Pre => C_Bra >= Context.Lb and C_Ket >= C_Bra and C_Ket <= Context.L;
+     Pre => C_Ket >= C_Bra
+     and Context.Len - (C_Ket - C_Bra) + S'Length < Context.P'Length;
 
    --  The context indexes follow the C paradigm: they start at 0 for the first character.
    --  This is necessary because several algorithms rely on this when they compare the
    --  cursor position ('C') or setup some markers from the cursor.
    type Context_Type is abstract tagged record
       C   : Char_Index := 0;
+      Len : Char_Index := 0;
       L   : Char_Index := 0;
       Lb  : Char_Index := 0;
       Bra : Char_Index := 0;
