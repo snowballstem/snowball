@@ -1,5 +1,4 @@
-
-class Among(object):
+class Among:
     def __init__(self, s, substring_i, result, method=None):
         """
         @ivar s search string
