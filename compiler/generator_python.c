@@ -56,7 +56,7 @@ static void write_varref(struct generator * g, struct name * p) {
 static void write_literal_string(struct generator * g, symbol * p) {
 
     int i;
-    write_string(g, "u\"");
+    write_char(g, '"');
     for (i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
@@ -67,7 +67,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_hex4(g, ch);
         }
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
@@ -294,12 +294,10 @@ static void generate_AE(struct generator * g, struct node * p) {
             /* Snowball specifies integer division with semantics matching C,
              * so Python's `/` or `//` isn't suitable (`//` would be in cases
              * where we knew that the arguments had the same sign).
-             *
-             * The `float(`...`)` is needed for Python2.
              */
-            write_string(g, "int(float(");
+            write_string(g, "int(");
             generate_AE(g, p->left);
-            write_string(g, ") / ");
+            write_string(g, " / ");
             generate_AE(g, p->right);
             write_char(g, ')');
             break;
@@ -955,8 +953,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
         g->outbuf = g->failure_str;
         g->V[0] = p->name;
         writef(g, "~V0 = self.current; ", p);
-        /* For Python 3, this can just be: super().copy_from(~B0) */
-        writef(g, "super(~n, self).copy_from(~B0)", p);
+        writef(g, "super().copy_from(~B0)", p);
         g->failure_str = g->outbuf;
         g->outbuf = saved_output;
     }
@@ -1237,11 +1234,9 @@ static void generate(struct generator * g, struct node * p) {
             /* Snowball specifies integer division with semantics matching C,
              * so Python's `/=` or `//=` isn't suitable (`//=` would be in
              * cases where we knew that the arguments had the same sign).
-             *
-             * The `float(`...`)` is needed for Python2.
              */
             g->V[0] = p->name;
-            w(g, "~M~V0 = int(float(~V0) / ");
+            w(g, "~M~V0 = int(~V0 / ");
             generate_AE(g, p->AE);
             w(g, ")~N");
             break;
