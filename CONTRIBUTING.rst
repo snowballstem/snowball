@@ -52,6 +52,8 @@ Some points to note about algorithm implementations:
 
     define foo 'oö'
 
+  It's OK to use UTF-8 in comments.
+
 * It's helpful to consistently use the same ``stringdef`` codes across the
   different stemmers - for languages using the latin alphabet our website has
   `guidance on what to use <https://snowballstem.org/codesets/guide.html>`_ and
