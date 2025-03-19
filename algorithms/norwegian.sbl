@@ -17,9 +17,13 @@ stringescapes {}
 
 stringdef ae   '{U+00E6}'
 stringdef ao   '{U+00E5}'
+stringdef e^   '{U+00EA}'  // e-circumflex
+stringdef o`   '{U+00F2}'  // o-grave
+stringdef o'   '{U+00F3}'  // o-acute
+stringdef o^   '{U+00F4}'  // o-circumflex
 stringdef o/   '{U+00F8}'
 
-define v 'aeiouy{ae}{ao}{o/}'
+define v 'ae{e^}io{o`}{o'}{o^}uy{ae}{ao}{o/}'
 
 define s_ending  'bcdfghjlmnoptvyz'
 
