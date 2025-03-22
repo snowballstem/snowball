@@ -103,6 +103,7 @@ backwardmode (
         'owy' 'owa' 'owe'  // E.g. planowy (masculine), planowa (feminine), planowe (neuter)
         'ych'  // genitive/accusative/locative plural
         'ego'  // genitive/accusative singular (masculine)
+        'emu'  // dative singular (masculine/neuter)
         'ej'   // genitive/dative/locative singular (feminine)
           (delete)
       )
@@ -136,6 +137,17 @@ backwardmode (
         'a{l/}'  // past 3rd person singular masculine, e.g. czytał
         'i{l/}'  // past 3rd person singular masculine, e.g. woził
         '{ak}c'  // contemporary adverbial participle (transgressive), e.g. czytając
+        // different forms of active adjectival participle, e.g. czytający (one who is reading)
+        '{ak}cy'     // nominative singular (masculine)
+        '{ak}cego'   // genitive singular (masculine/neuter)
+        '{ak}cemu'   // dative singular (masculine)
+        '{ak}cym'    // instrumental/locative singular (masculine)
+        '{ak}ca'     // nominative singular (feminine)
+        '{ak}cej'    // genitive/dative/locative singular (feminine)
+        '{ak}c{ak}'  // accusative singular (feminine)
+        '{ak}ce'     // nominative/accusative singular (neuter)
+        '{ak}cych'   // genitive plural
+        '{ak}cymi'   // instrumental plural
           (delete)
         'aj'     // imperative, e.g. czytaj
           (<- 'a')
@@ -195,9 +207,14 @@ define remove_superlative_ends as (
       backwards (
         [substring] among (
           'sze'    // adverb, e.g. w najlepsze
-          'szy'    // nominative singular masculine, e.g. najlepszy
+          'szy'    // nominative singular (masculine), e.g. najlepszy
+          'sza'    // nominative singular (feminine), e.g. najlepsza
+          'sz{ak}' // accusative singular (feminine), e.g. najlepszą
           'szych'  // genitive plural, e.g. najlepszych
-          // TODO: Add more forms like 'szego', 'szemu', etc?
+          'szego'  // genitive/accusative singular (masculine), e.g. najlepszego
+          'szemu'  // dative singular (masculine/neuter), e.g. najlepszemu
+          'szym'   // instrumental/locative singular (masculine/neuter), e.g. najlepszym
+          'szej'   // genitive/dative/locative singular (feminine), e.g. najlepszej
             (delete)
         )
       )
