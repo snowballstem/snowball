@@ -39,9 +39,6 @@ backwardmode (
         'acja'     // nominative
         'acji'     // genitive/dative/locative
         'acj{ak}'  // accusative
-        // Plural locative ending of (rare) words ending with -ę, e.g. zwierzę - zwierzętach.
-        // TODO: It can also be roots ending with -t and -ach ending, e.g. pirat - piratach.
-        'tach'
         // Verbal nouns, e.g. czytanie, narodzenie.
         'anie' 'enie'  // nominative
         'aniu' 'eniu'  // dative/locative
@@ -60,7 +57,6 @@ backwardmode (
         'cia'  // genitive of words ending with -cie, e.g. ukrycie - ukrycia
         'ciu'  // dative/locative of words ending with -cie, e.g. ukrycie - ukryciu
         'ce'   // dative/locative of words ending with -ka, e.g. muzyka - muzyce
-        'ta'   // nominative/accusative plural of (rare) words ending with -ę, e.g. zwierzę - zwierzęta
           (delete)
         // Borrowed words that match English -tion, e.g. intencja (intention).
         'cja'     // nominative
