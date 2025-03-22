@@ -111,16 +111,25 @@ backwardmode (
   )
 
   define remove_verbs_ends as (
+    do (
+      $(len > 6)
+      [substring] among (
+        // conditionals:
+        'bym'        // 1st person singular, e.g. czytał(a)bym
+        'by{s'}'     // 2nd person singular, e.g. czytał(a)byś
+        'by{s'}my'   // 1st person plural, e.g. czytalibyśmy
+        'by{s'}cie'  // 2nd person plural, e.g. czytalibyście
+          (delete)
+      )
+    )
     (
       $(len > 5)
       [substring] among (
-        'bym'        // conditional 1st person singular, e.g. czytał(a)bym
-                     // TODO: maybe also add 'by{s'}' for 2nd person?
         'esz'        // present 2nd person singular, e.g. piszesz
         'asz'        // present 2nd person singular, e.g. czytasz
         'cie'        // present 2nd person plural, e.g. czytacie
         'e{s'}{c'}'  // infinitive, e.g. przynieść
-        'a{s'}c'     // TODO: should it be 'a{s'}{c'}'? E.g. popaść (also infinitive)
+        'a{s'}{c'}'  // infinitive, e.g. popaść
         '{l/}em'     // past 1st person singular masculine, e.g. czytałem
         'emy'        // present 1st person plural, e.g. piszemy
         'amy'        // present 1st person plural, e.g. czytamy
