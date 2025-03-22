@@ -125,14 +125,20 @@ backwardmode (
     (
       $(len > 5)
       [substring] among (
-        'esz'        // present 2nd person singular, e.g. piszesz
-        'asz'        // present 2nd person singular, e.g. czytasz
-        'cie'        // present 2nd person plural, e.g. czytacie
-        'e{s'}{c'}'  // infinitive, e.g. przynieść
-        'a{s'}{c'}'  // infinitive, e.g. popaść
-        '{l/}em'     // past 1st person singular masculine, e.g. czytałem
-        'emy'        // present 1st person plural, e.g. piszemy
-        'amy'        // present 1st person plural, e.g. czytamy
+        'asz'  'esz'   // present 2nd person singular, e.g. czytasz, piszesz
+        'amy'  'emy'   // present 1st person plural, e.g. czytamy, piszemy
+        'acie' 'ecie'  // present 2nd person plural, e.g. czytacie, piszecie
+        'cie'          // imperative 2nd person plural, e.g. czytajcie, chodźcie
+        'e{s'}{c'}'    // infinitive, e.g. przynieść
+        'a{s'}{c'}'    // infinitive, e.g. popaść
+        'a{l/}em'       'i{l/}em'       // past 1st person singular masculine, e.g. czytałem, chodziłem
+        'a{l/}am'       'i{l/}am'       // past 1st person singular feminine, e.g. czytałam, chodziłam
+        'a{l/}e{s'}'    'i{l/}e{s'}'    // past 2nd person singular masculine, e.g. czytałeś, chodziłeś
+        'a{l/}a{s'}'    'i{l/}a{s'}'    // past 2nd person singular feminine, e.g. czytałaś, chodziłaś
+        'ali{s'}my'     'ili{s'}my'     // past 1st person plural virile, e.g. pisaliśmy, chodziliśmy
+        'a{l/}y{s'}my'  'i{l/}y{s'}my'  // past 1st person plural nonvirile, e.g. pisałyśmy, chodziłyśmy
+        'ali{s'}cie'    'ili{s'}cie'    // past 2nd person plural virile, e.g. pisaliście, chodziliście
+        'a{l/}y{s'}cie' 'i{l/}y{s'}cie' // past 2nd person plural nonvirile, e.g. pisałyście, chodziłyście
           (delete)
       )
     ) or (
