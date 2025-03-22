@@ -151,8 +151,8 @@ backwardmode (
           (<- 'n')
         'wie'  // e.g. możliwie
           (<- 'w')
-        //'rze'  // e.g. dobrze
-        //  (<- 'r')
+        'rze'  // e.g. dobrze
+          (<- 'r')
       )
     )
   )
