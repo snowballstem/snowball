@@ -38,7 +38,7 @@ define prelude as repeat (
         '{a~}' (<- 'a~')
         '{o~}' (<- 'o~')
         ''     (next)
-    ) //or next
+    )
 )
 
 define mark_regions as (
@@ -64,7 +64,7 @@ define postlude as repeat (
         'a~' (<- '{a~}')
         'o~' (<- '{o~}')
         ''   (next)
-    ) //or next
+    )
 )
 
 backwardmode (
