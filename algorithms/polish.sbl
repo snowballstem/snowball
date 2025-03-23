@@ -91,9 +91,6 @@ backwardmode (
 
   define remove_adjective_ends as (
     setlimit tomark p1 for ([substring]) among (
-      // -cz- is part of the root, -n- is a d-suffix, -y is nominative ending
-      // e.g. słoneczny (sunny, from słońce)
-      'czny'
       // declension of words with -ow- d-suffix, e.g. bobrowy
       'owy' 'owego' 'owemu' 'owym'  // masculine
       'owa' 'owej' 'ow{ak}'         // feminine
