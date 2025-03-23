@@ -78,11 +78,16 @@ backwardmode (
 
   define remove_diminutive as (
     setlimit tomark p1 for ([substring]) among (
-      'eczek'  // e.g. człowieczek (diminutive of człowiek)
-      'iczek'  // e.g. czajniczek (diminutive of czajnik)
-      'iszek'  // e.g. braciszek (diminutive of brat)
-      'aszek'  // e.g. młodzieniaszek (diminutive of młodzieniec)
-      'uszek'  // e.g. kwiatuszek (diminutive of kwiat)
+      'eczek' 'eczka' 'eczkowi' 'eczkiem' 'eczku'      // e.g. człowieczek (diminutive of człowiek)
+      'eczki' 'eczk{o'}w' 'eczkom' 'eczkami' 'eczkach' // plural
+      'iczek' 'iczka' 'iczkowi' 'iczkiem' 'iczku'      // e.g. czajniczek (diminutive of czajnik)
+      'iczki' 'iczk{o'}w' 'iczkom' 'iczkami' 'iczkach' // plural
+      'iszek' 'iszka' 'iszkowi' 'iszkiem' 'iszku'      // e.g. braciszek (diminutive of brat)
+      'iszki' 'iszk{o'}w' 'iszkom' 'iszkami' 'iszkach' // plural
+      'aszek' 'aszka' 'aszkowi' 'aszkiem' 'aszku'      // e.g. młodzieniaszek (diminutive of młodzieniec)
+      'aszki' 'aszk{o'}w' 'aszkom' 'aszkami' 'aszkach' // plural
+      'uszek' 'uszka' 'uszkowi' 'uszkiem' 'uszku'      // e.g. kwiatuszek (diminutive of kwiat)
+      'uszki' 'uszk{o'}w' 'uszkom' 'uszkami' 'uszkach' // plural
       'ek'     // e.g. ogródek (diminutive of ogród)
       'ak'     // e.g. gęsiak (diminutive of gęś)
         (delete)
