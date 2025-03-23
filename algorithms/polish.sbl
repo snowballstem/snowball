@@ -124,8 +124,9 @@ backwardmode (
       'a{c'}'        // infinitive, e.g. czytać
       'e{c'}'        // infinitive, e.g. chcieć
       'i{c'}'        // infinitive, e.g. wozić
-      'a{l/}em'       'i{l/}em'       // past 1st person singular masculine, e.g. czytałem, chodziłem
-      'a{l/}am'       'i{l/}am'       // past 1st person singular feminine, e.g. czytałam, chodziłam
+      '{ak}{c'}'     // infinitive, e.g. marznąć
+      'a{l/}em'       'i{l/}em' 'em'  // past 1st person singular masculine, e.g. czytałem, chodziłem, marzłem
+      'a{l/}am'       'i{l/}am' 'am'  // past 1st person singular feminine, e.g. czytałam, chodziłam, marzłam
       'a{l/}e{s'}'    'i{l/}e{s'}'    // past 2nd person singular masculine, e.g. czytałeś, chodziłeś
       'a{l/}a{s'}'    'i{l/}a{s'}'    // past 2nd person singular feminine, e.g. czytałaś, chodziłaś
       'ali{s'}my'     'ili{s'}my'     // past 1st person plural virile, e.g. pisaliśmy, chodziliśmy
@@ -133,8 +134,6 @@ backwardmode (
       'ali{s'}cie'    'ili{s'}cie'    // past 2nd person plural virile, e.g. pisaliście, chodziliście
       'a{l/}y{s'}cie' 'i{l/}y{s'}cie' // past 2nd person plural nonvirile, e.g. pisałyście, chodziłyście
       'a{l/}'         'i{l/}'         // past 3rd person singular masculine, e.g. czytał, chodził
-      'em'     // past 1st person singular masculine, e.g. czytałem
-      'am'     // past 1st person singular feminine, e.g. czytałam
       '{ak}c'      // contemporary adverbial participle (transgressive), e.g. czytając
       // different forms of active adjectival participle, e.g. czytający (one who is reading)
       '{ak}cy'     // nominative singular (masculine)
