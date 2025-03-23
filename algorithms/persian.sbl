@@ -132,13 +132,10 @@ define Normalize_Arabic_Characters as (
         (
             [substring] among (
                 '{ar_kaf}' ( <- '{kaf}')
-                '{ar_ye_with_hamza_above}' '{ar_ye}' ( <- '{ye}')
+                '{ar_ye}' '{ar_ye_with_hamza_above}' '{ye}{ye}' ( <- '{ye}')
                 '{ar_heh}' '{ar_he_marbuta}' '{ar_he_with_hamza_above}' ( <- '{heh}')
-                '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' ( <- '{alef}')
+                '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' '{alef}{alef}' ( <- '{alef}')
                 '{ar_vav_with_hamza_above}' ( <- '{vav}')
-
-                '{alef}{alef}' ( <- '{alef}')
-                '{ye}{ye}' ( <- '{ye}')
 
                 '' (next)
             )
@@ -185,7 +182,7 @@ define Remove_Prefix_Verbs as (
 
 define Remove_Prefix_Nouns as (
     [substring] among (
-        // '{be}{ye}' ($(len > 3) delete)         // bii (Makes some conflicts with other names)
+        // '{be}{ye}' ($(len > 3) delete)         // bii (Makes some conflicts with other nouns)
         '{be}{heh}' ($(len > 3) delete)        // beh
         '{pe}{ye}{shin}' ($(len > 4) delete)   // pish
         '{pe}{sin}' ($(len > 3) delete)        // pas
@@ -213,7 +210,7 @@ define Remove_Suffix_Verbs as (
     backwards (
         [substring] among (
             '{ye}{mim}' ($(len > 3) delete)
-            '{nun}{dal}' ($(len > 3) delete)
+            // '{nun}{dal}' ($(len > 3) delete) (Makes some conflicts with nouns, payvand)
             '{mim}' ($(len > 3) delete)
             '{ye}{dal}' ($(len > 3) delete)
             '{alef}{ye}{dal}' ($(len > 3) delete)
@@ -236,7 +233,7 @@ define Remove_Suffix_Adjectives as (
 )
 
 define Exceptions as (
-    [substring] among (
+    [substring] atlimit among (
         '{sin}{ye}'
         '{dal}{re}'
         '{alef}{ye}{nun}'
