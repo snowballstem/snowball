@@ -172,7 +172,6 @@ define Normalize_Nouns as (
             '{alef}{sin}{te}' '{shin}{dal}{heh}' ( $(len > 4) <- '' )     // ast, shodeh -> ''
             '{heh}{alef}{nun}' ( $(len > 4) <- '{heh}' )                  // haan -> heh (giyahan -> giyah)
             '{gaf}{alef}{nun}' ( $(len > 4) <- '{heh}')                   // gaan -> heh (setaregan -> setareh)
-            '' (next)
         )
     )
 )
