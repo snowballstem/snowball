@@ -94,7 +94,12 @@ backwardmode (
       // -cz- is part of the root, -n- is a d-suffix, -y is nominative ending
       // e.g. słoneczny (sunny, from słońce)
       'czny'
-      'owy' 'owa' 'owe'  // E.g. planowy (masculine), planowa (feminine), planowe (neuter)
+      // declension of words with -ow- d-suffix, e.g. bobrowy
+      'owy' 'owego' 'owemu' 'owym'  // masculine
+      'owa' 'owej' 'ow{ak}'         // feminine
+      'owe'                         // neuter
+      'owi' 'owych' 'owymi'         // plural
+      // general adjective endings
       'ych'  // genitive/accusative/locative plural
       'ego'  // genitive/accusative singular (masculine)
       'emu'  // dative singular (masculine/neuter)
