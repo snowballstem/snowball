@@ -42,7 +42,7 @@ define mark_regions as (
 
     $p1 = limit
 
-    goto V1 gopast non-V1  setmark p1
+    gopast V1  gopast non-V1  setmark p1
 )
 
 
