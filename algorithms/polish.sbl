@@ -111,6 +111,7 @@ backwardmode (
         'by{s'}'     // 2nd person singular, e.g. czytał(a)byś
         'by{s'}my'   // 1st person plural, e.g. czytalibyśmy
         'by{s'}cie'  // 2nd person plural, e.g. czytalibyście
+        'by'         // 3rd person singular/plural, e.g. czytał(a)by, czytaliby
           (delete)
       )
     )
@@ -129,11 +130,15 @@ backwardmode (
       'a{l/}am'       'i{l/}am' 'am'  // past 1st person singular feminine, e.g. czytałam, chodziłam, marzłam
       'a{l/}e{s'}'    'i{l/}e{s'}'    // past 2nd person singular masculine, e.g. czytałeś, chodziłeś
       'a{l/}a{s'}'    'i{l/}a{s'}'    // past 2nd person singular feminine, e.g. czytałaś, chodziłaś
-      'ali{s'}my'     'ili{s'}my'     // past 1st person plural virile, e.g. pisaliśmy, chodziliśmy
-      'a{l/}y{s'}my'  'i{l/}y{s'}my'  // past 1st person plural nonvirile, e.g. pisałyśmy, chodziłyśmy
-      'ali{s'}cie'    'ili{s'}cie'    // past 2nd person plural virile, e.g. pisaliście, chodziliście
-      'a{l/}y{s'}cie' 'i{l/}y{s'}cie' // past 2nd person plural nonvirile, e.g. pisałyście, chodziłyście
       'a{l/}'         'i{l/}'         // past 3rd person singular masculine, e.g. czytał, chodził
+      'a{l/}a'        'i{l/}a'        // past 3rd person singular feminine, e.g. czytała, chodziła
+      'a{l/}o'        'i{l/}o'        // past 3rd person singular neuter, e.g. czytało, chodziło
+      'ali{s'}my'     'ili{s'}my'     // past 1st person plural virile, e.g. czytaliśmy, chodziliśmy
+      'a{l/}y{s'}my'  'i{l/}y{s'}my'  // past 1st person plural nonvirile, e.g. czytałyśmy, chodziłyśmy
+      'ali{s'}cie'    'ili{s'}cie'    // past 2nd person plural virile, e.g. czytaliście, chodziliście
+      'a{l/}y{s'}cie' 'i{l/}y{s'}cie' // past 2nd person plural nonvirile, e.g. czytałyście, chodziłyście
+      'ali'           'ili'           // past 3rd person plural virile, e.g. czytali, chodzili
+      'a{l/}y'        'i{l/}y'        // past 3rd person plural nonvirile, e.g. czytały, chodziły
       '{ak}c'      // contemporary adverbial participle (transgressive), e.g. czytając
       // different forms of active adjectival participle, e.g. czytający (one who is reading)
       '{ak}cy'     // nominative singular (masculine)
