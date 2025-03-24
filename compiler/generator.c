@@ -1868,7 +1868,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
         for (i = 0; i < x->literalstring_count; i++) {
             g->I[1] = i;
             g->I[2] = v->size;
-            g->I[3] = v->i;
+            g->I[3] = (v->i >= 0 ? v->i - i : 0);
             g->I[4] = v->result;
             g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
