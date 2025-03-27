@@ -829,7 +829,8 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->command_count = result - 1;
     {
         NEWVEC(node*, commands, x->command_count);
-        memset(commands, 0, x->command_count * sizeof(struct node*));
+        for (int i = 0; i != x->command_count; ++i)
+            commands[i] = NULL;
         for (w0 = v; w0 < w1; w0++) {
             if (w0->result > 0) {
                 /* result == -1 when there's no command. */
