@@ -1014,7 +1014,7 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine) {
         g->S[0] = "private";
     } else {
-        w(g, "~N~M@Override");
+        w(g, "~M@Override~N");
         g->S[0] = "public";
     }
     g->V[0] = q;
@@ -1246,13 +1246,13 @@ static void generate_class_end(struct generator * g) {
 static void generate_equals(struct generator * g) {
 
     w(g, "~N"
-         "@Override~N"
+         "~M@Override~N"
          "~Mpublic boolean equals( Object o ) {~N"
          "~+~Mreturn o instanceof ");
     w(g, g->options->name);
     w(g, ";~N~-~M}~N"
          "~N"
-         "@Override~N"
+         "~M@Override~N"
          "~Mpublic int hashCode() {~N"
          "~+~Mreturn ");
     w(g, g->options->name);
