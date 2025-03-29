@@ -121,15 +121,6 @@ static void write_block_end(struct generator * g) {   /* block end */
     w(g, "~-~Mend;~N");
 }
 
-static void restore_string(struct node * p, struct str * out, struct str * savevar) {
-
-    str_clear(out);
-    str_append_string(out, "Z.C := ");
-    if (p->mode != m_forward) str_append_string(out, "Z.L - ");
-    str_append(out, savevar);
-    str_append_string(out, ";");
-}
-
 static void write_savecursor(struct generator * g, struct node * p,
                              struct str * savevar) {
     g->B[0] = str_data(savevar);
@@ -139,15 +130,17 @@ static void write_savecursor(struct generator * g, struct node * p,
     writef(g, "~M~B0 := ~S1Z.C;~N" , p);
 }
 
+static void append_restore_string(struct node * p, struct str * out, struct str * savevar) {
+
+    str_append_string(out, "Z.C := ");
+    if (p->mode != m_forward) str_append_string(out, "Z.L - ");
+    str_append(out, savevar);
+    str_append_string(out, ";");
+}
+
 static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
     write_margin(g);
-    if (p->mode == m_forward) {
-        write_string(g, "Z.C := ");
-    } else {
-        write_string(g, "Z.C := Z.L - ");
-    }
-    write_str(g, savevar);
-    write_string(g, ";");
+    append_restore_string(p, g->outbuf, savevar);
     write_newline(g);
 }
 
@@ -534,7 +527,7 @@ static void generate_try(struct generator * g, struct node * p) {
     if (keep_c) {
         savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
-        restore_string(p, g->failure_str, savevar);
+        append_restore_string(p, g->failure_str, savevar);
     }
 
     generate(g, p->left);

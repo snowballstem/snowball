@@ -98,30 +98,23 @@ static void write_block_end(struct generator * g)    /* block end */ {
 
 static void write_savecursor(struct generator * g, struct node * p,
                              struct str * savevar) {
-
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "env.Limit - ";
     writef(g, "~Mvar ~B0 = ~S1env.Cursor~N", p);
 }
 
-static void restore_string(struct node * p, struct str * out, struct str * savevar) {
+static void append_restore_string(struct node * p, struct str * out, struct str * savevar) {
 
-    str_clear(out);
     str_append_string(out, "env.Cursor = ");
     if (p->mode != m_forward) str_append_string(out, "env.Limit - ");
     str_append(out, savevar);
 }
 
-static void write_restorecursor(struct generator * g, struct node * p,
-                                struct str * savevar) {
-
-    struct str * temp = str_new();
+static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
     write_margin(g);
-    restore_string(p, temp, savevar);
-    write_str(g, temp);
+    append_restore_string(p, g->outbuf, savevar);
     write_newline(g);
-    str_delete(temp);
 }
 
 static void write_inc_cursor(struct generator * g, struct node * p) {
@@ -454,7 +447,7 @@ static void generate_try(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (keep_c) {
         write_savecursor(g, p, savevar);
-        restore_string(p, g->failure_str, savevar);
+        append_restore_string(p, g->failure_str, savevar);
     }
     wsetlab_begin(g, label);
     generate(g, p->left);
