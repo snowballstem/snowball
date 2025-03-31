@@ -1060,7 +1060,6 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;
-    g->keep_count = 0;
     int signals = check_possible_signals_list(g, p->left, c_define, 0);
     generate(g, p->left);
     if (p->left->right) {

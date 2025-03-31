@@ -918,8 +918,6 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         struct node * q = p->left;
         write_comment(g, q);
 
-        ++g->keep_count;
-
         g->S[0] = q->mode == m_forward ? ">" : "<";
 
         w(g, "~Mif Z.C ~S0 "); generate_AE(g, q->AE); writef(g, " then~N~+", q);
