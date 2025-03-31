@@ -107,7 +107,6 @@ static FILE * get_output(byte * s) {
 }
 
 static int read_options(struct options * o, int argc, char * argv[]) {
-    char * s;
     int i = 1;
     int new_argc = 1;
     /* Note down the last option used to specify an explicit encoding so
@@ -138,7 +137,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     /* read options: */
 
     while (i < argc) {
-        s = argv[i++];
+        char * s = argv[i++];
         if (s[0] != '-') {
             /* Non-option argument - shuffle down. */
             argv[new_argc++] = s;
@@ -257,9 +256,9 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
                 {
                     NEW(include, p);
-                    byte * s = add_sz_to_s(NULL, argv[i++]);
-                    s = add_char_to_s(s, '/');
-                    p->next = NULL; p->s = s;
+                    byte * include_dir = add_sz_to_s(NULL, argv[i++]);
+                    include_dir = add_char_to_s(include_dir, '/');
+                    p->next = NULL; p->s = include_dir;
 
                     if (o->includes == NULL) {
                         o->includes = p;
@@ -434,23 +433,23 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                      * underscore+letter or hyphen+letter to an upper case
                      * letter.
                      */
-                    size_t i, j = 0;
+                    size_t new_len = 0;
                     int uc_next = true;
-                    for (i = 0; i != len; ++i) {
-                        unsigned char ch = leaf[i];
+                    for (size_t j = 0; j != len; ++j) {
+                        unsigned char ch = leaf[j];
                         if (ch == '_' || ch == '-') {
                             uc_next = true;
                         } else {
                             if (uc_next) {
-                                new_name[j] = toupper(ch);
+                                new_name[new_len] = toupper(ch);
                                 uc_next = false;
                             } else {
-                                new_name[j] = ch;
+                                new_name[new_len] = ch;
                             }
-                            ++j;
+                            ++new_len;
                         }
                     }
-                    len = j;
+                    len = new_len;
                     break;
                 }
                 default:

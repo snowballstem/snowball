@@ -1125,13 +1125,12 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_dollar: {
-            struct tokeniser * t = a->tokeniser;
             read_token(t);
             if (t->token == c_bra) {
                 /* Handle newer $(AE REL_OP AE) syntax. */
                 struct node * n = read_AE(a, NULL, 0);
                 read_token(t);
-                int token = t->token;
+                token = t->token;
                 switch (token) {
                     case c_assign:
                         count_error(a);
