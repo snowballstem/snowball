@@ -1688,7 +1688,6 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     symbol * b = q->b;
     symbol * map = create_b(size);
     int i;
-    int count = 0;
     int need_comma = 0;
 
     for (i = 0; i < size; i++) map[i] = 0;
@@ -1703,7 +1702,6 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (i = 0; i < size; i++) {
         unsigned char m = map[i];
         int j;
-        count++;
         if (i != 0) {
             w(g, ",~N~M");
             need_comma = 0;
