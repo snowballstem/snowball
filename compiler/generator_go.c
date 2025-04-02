@@ -1141,13 +1141,10 @@ static void generate_debug(struct generator * g, struct node * p) {
 
 static void generate(struct generator * g, struct node * p) {
 
-    int a0;
-    struct str * a1;
-
     if (g->unreachable) return;
 
-    a0 = g->failure_label;
-    a1 = str_copy(g->failure_str);
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
 
     switch (p->type) {
         case c_define:        generate_define(g, p); break;
