@@ -24,7 +24,6 @@ static void wi3(struct generator * g, int i) {
     write_int(g, i); /* integer (width 3) */
 }
 
-
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
@@ -194,15 +193,16 @@ static void write_comment(struct generator * g, struct node * p) {
     write_newline(g);
 }
 
+/* margin + string */
 static void wms(struct generator * g, const char * s) {
-    write_margin(g); write_string(g, s);   } /* margin + string */
+    write_margin(g); write_string(g, s);
+}
 
-static void write_block_start(struct generator * g) { /* block start */
+static void write_block_start(struct generator * g) {
     w(g, "~M{~+~N");
 }
 
-static void write_block_end(struct generator * g) {    /* block end */
-
+static void write_block_end(struct generator * g) {
     if (g->line_labelled == g->line_count) { wms(g, ";"); write_newline(g); }
     w(g, "~-~M}~N");
 }
@@ -296,7 +296,6 @@ static void write_failure(struct generator * g, struct node * p) {          /* f
 
 /* if at limit fail */
 static void write_check_limit(struct generator * g, struct node * p) {
-
     write_string(g, p->mode == m_forward ? "if (z->c >= z->l) " :
                                  "if (z->c <= z->lb) ");
     write_failure(g, p);
@@ -859,7 +858,6 @@ static void generate_or(struct generator * g, struct node * p) {
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     writef(g, "~Mz->lb = z->c; z->c = z->l;~N", p);
     generate(g, p->left);
@@ -1527,6 +1525,8 @@ static void generate_define(struct generator * g, struct node * p) {
     g->label_used = 0;
     g->keep_count = 0;
     int signals = check_possible_signals_list(g, p->left, c_define, 0);
+
+    /* Generate function body. */
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
@@ -1847,49 +1847,40 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    {
-        int i;
-        for (i = 0; i < x->literalstring_count; i++) {
-            g->I[1] = i;
-            g->I[2] = v->size;
-            g->L[0] = v->b;
-            if (v->size)
-                w(g, "static const symbol s_~I0_~I1[~I2] = ~A0;~N");
-            v++;
-        }
+    for (int i = 0; i < x->literalstring_count; i++) {
+        g->I[1] = i;
+        g->I[2] = v[i].size;
+        g->L[0] = v[i].b;
+        if (v[i].size)
+            w(g, "static const symbol s_~I0_~I1[~I2] = ~A0;~N");
     }
 
     g->I[1] = x->literalstring_count;
     w(g, "~Mstatic const struct among a_~I0[~I1] = {~N");
 
-    v = x->b;
-    {
-        int i;
-        for (i = 0; i < x->literalstring_count; i++) {
-            g->I[1] = i;
-            g->I[2] = v->size;
-            g->I[3] = (v->i >= 0 ? v->i - i : 0);
-            g->I[4] = v->result;
-            g->S[0] = i < x->literalstring_count - 1 ? "," : "";
+    for (int i = 0; i < x->literalstring_count; i++) {
+        g->I[1] = i;
+        g->I[2] = v[i].size;
+        g->I[3] = (v[i].i >= 0 ? v[i].i - i : 0);
+        g->I[4] = v[i].result;
+        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            if (g->options->comments) {
-                w(g, "/*~J1 */ ");
-            }
-            w(g, "{ ~I2, ");
-            if (v->size == 0) {
-                w(g, "0,");
-            } else {
-                w(g, "s_~I0_~I1,");
-            }
-            w(g, " ~I3, ~I4, ");
-            if (v->function == NULL) {
-                write_char(g, '0');
-            } else {
-                write_varname(g, v->function);
-            }
-            w(g, "}~S0~N");
-            v++;
+        if (g->options->comments) {
+            w(g, "/*~J1 */ ");
         }
+        w(g, "{ ~I2, ");
+        if (v[i].size == 0) {
+            w(g, "0,");
+        } else {
+            w(g, "s_~I0_~I1,");
+        }
+        w(g, " ~I3, ~I4, ");
+        if (v[i].function == NULL) {
+            write_char(g, '0');
+        } else {
+            write_varname(g, v[i].function);
+        }
+        w(g, "}~S0~N");
     }
     w(g, "};~N~N");
 }

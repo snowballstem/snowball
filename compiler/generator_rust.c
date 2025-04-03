@@ -24,7 +24,6 @@ static struct str * vars_newname(struct generator * g) {
     return output;
 }
 
-
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
@@ -48,7 +47,6 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-
     int i = 0;
     write_string(g, "\"");
     while (i < SIZE(p)) {
@@ -67,7 +65,6 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_margin(struct generator * g) {
-
     int i;
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
@@ -81,18 +78,15 @@ static void write_comment(struct generator * g, struct node * p) {
 }
 
 static void write_block_start(struct generator * g) {
-
     w(g, "~+{~N");
 }
 
-static void write_block_end(struct generator * g)    /* block end */ {
-
+static void write_block_end(struct generator * g) {
     w(g, "~-~M}~N");
 }
 
 static void write_savecursor(struct generator * g, struct node * p,
                              struct str * savevar) {
-
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "env.limit - ";
@@ -114,14 +108,12 @@ static void write_restorecursor(struct generator * g, struct node * p, struct st
 }
 
 static void write_inc_cursor(struct generator * g, struct node * p) {
-
     write_margin(g);
     write_string(g, p->mode == m_forward ? "env.next_char();" : "env.previous_char();");
     write_newline(g);
 }
 
 static void wsetlab_begin(struct generator * g, int n) {
-
     g->I[0] = n;
     w(g, "~M'lab~I0: loop {~N~+");
 }
@@ -140,7 +132,6 @@ static void wgotol(struct generator * g, int n) {
 }
 
 static void write_failure(struct generator * g) {
-
     if (str_len(g->failure_str) != 0) {
         write_margin(g);
         write_str(g, g->failure_str);
@@ -172,7 +163,6 @@ static void write_failure_if(struct generator * g, const char * s, struct node *
 
 /* if at limit fail */
 static void write_check_limit(struct generator * g, struct node * p) {
-
     if (p->mode == m_forward) {
         write_failure_if(g, "env.cursor >= env.limit", p);
     } else {
@@ -310,7 +300,6 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 static void generate_bra(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     p = p->left;
     while (p) {
@@ -320,28 +309,33 @@ static void generate_bra(struct generator * g, struct node * p) {
 }
 
 static void generate_and(struct generator * g, struct node * p) {
-
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
     write_comment(g, p);
 
-    if (keep_c) write_savecursor(g, p, savevar);
+    if (savevar) write_savecursor(g, p, savevar);
 
     p = p->left;
     while (p) {
         generate(g, p);
         if (g->unreachable) break;
-        if (keep_c && p->right != NULL) write_restorecursor(g, p, savevar);
+        if (savevar && p->right != NULL) write_restorecursor(g, p, savevar);
         p = p->right;
     }
-    str_delete(savevar);
+
+    if (savevar) {
+        str_delete(savevar);
+    }
 }
 
 static void generate_or(struct generator * g, struct node * p) {
-
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
@@ -352,7 +346,7 @@ static void generate_or(struct generator * g, struct node * p) {
     write_comment(g, p);
     wsetlab_begin(g, out_lab);
 
-    if (keep_c) write_savecursor(g, p, savevar);
+    if (savevar) write_savecursor(g, p, savevar);
 
     p = p->left;
     str_clear(g->failure_str);
@@ -374,7 +368,7 @@ static void generate_or(struct generator * g, struct node * p) {
         }
         w(g, "~-~M}~N");
         g->unreachable = false;
-        if (keep_c) write_restorecursor(g, p, savevar);
+        if (savevar) write_restorecursor(g, p, savevar);
         p = p->right;
     }
 
@@ -387,11 +381,13 @@ static void generate_or(struct generator * g, struct node * p) {
     if (!end_unreachable) {
         g->unreachable = false;
     }
-    str_delete(savevar);
+
+    if (savevar) {
+        str_delete(savevar);
+    }
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     writef(g,"~Menv.limit_backward = env.cursor;~N"
              "~Menv.cursor = env.limit;~N", p);
@@ -401,9 +397,10 @@ static void generate_backwards(struct generator * g, struct node * p) {
 
 
 static void generate_not(struct generator * g, struct node * p) {
-
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
@@ -411,7 +408,7 @@ static void generate_not(struct generator * g, struct node * p) {
     g->failure_label = label;
 
     write_comment(g, p);
-    if (keep_c) {
+    if (savevar) {
         write_savecursor(g, p, savevar);
     }
 
@@ -430,21 +427,25 @@ static void generate_not(struct generator * g, struct node * p) {
 
     g->unreachable = false;
 
-    if (keep_c) write_restorecursor(g, p, savevar);
-    str_delete(savevar);
+    if (savevar) {
+        write_restorecursor(g, p, savevar);
+        str_delete(savevar);
+    }
 }
 
 
 static void generate_try(struct generator * g, struct node * p) {
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
     int label = new_label(g);
     g->failure_label = label;
     str_clear(g->failure_str);
 
     write_comment(g, p);
-    if (keep_c) {
+    if (savevar) {
         write_savecursor(g, p, savevar);
         append_restore_string(p, g->failure_str, savevar);
     }
@@ -453,25 +454,24 @@ static void generate_try(struct generator * g, struct node * p) {
     wsetlab_end(g, label);
     g->unreachable = false;
 
-    str_delete(savevar);
+    if (savevar) {
+        str_delete(savevar);
+    }
 }
 
 static void generate_set(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = true;~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = false;~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     generate(g, p->left);
     if (!g->unreachable) write_failure(g);
@@ -480,32 +480,35 @@ static void generate_fail(struct generator * g, struct node * p) {
 /* generate_test() also implements 'reverse' */
 
 static void generate_test(struct generator * g, struct node * p) {
-
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
     write_comment(g, p);
 
-    if (keep_c) {
+    if (savevar) {
         write_savecursor(g, p, savevar);
     }
 
     generate(g, p->left);
 
-    if (!g->unreachable) {
-        if (keep_c) {
+    if (savevar) {
+        if (!g->unreachable) {
             write_restorecursor(g, p, savevar);
         }
+        str_delete(savevar);
     }
-    str_delete(savevar);
 }
 
 static void generate_do(struct generator * g, struct node * p) {
+    struct str * savevar = NULL;
+    if (K_needed(g, p->left)) {
+        savevar = vars_newname(g);
+    }
 
-    struct str * savevar = vars_newname(g);
-    int keep_c = K_needed(g, p->left);
     write_comment(g, p);
-    if (keep_c) write_savecursor(g, p, savevar);
+    if (savevar) write_savecursor(g, p, savevar);
 
     if (p->left->type == c_call) {
         /* Optimise do <call> */
@@ -523,8 +526,10 @@ static void generate_do(struct generator * g, struct node * p) {
         g->unreachable = false;
     }
 
-    if (keep_c) write_restorecursor(g, p, savevar);
-    str_delete(savevar);
+    if (savevar) {
+        write_restorecursor(g, p, savevar);
+        str_delete(savevar);
+    }
 }
 
 static void generate_next(struct generator * g, struct node * p) {
@@ -534,19 +539,22 @@ static void generate_next(struct generator * g, struct node * p) {
 }
 
 static void generate_GO(struct generator * g, struct node * p, int style) {
-
-    int end_unreachable = false;
-    struct str * savevar = vars_newname(g);
-    int keep_c = style == 1 || repeat_restore(g, p->left);
+    write_comment(g, p);
 
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
+    int end_unreachable = false;
+
     int golab = new_label(g);
     g->I[0] = golab;
-    write_comment(g, p);
     w(g, "~M'golab~I0: loop {~N~+");
-    if (keep_c) write_savecursor(g, p, savevar);
+
+    struct str * savevar = NULL;
+    if (style == 1 || repeat_restore(g, p->left)) {
+        savevar = vars_newname(g);
+        write_savecursor(g, p, savevar);
+    }
 
     g->failure_label = new_label(g);
     str_clear(g->failure_str);
@@ -565,7 +573,10 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     }
     g->unreachable = false;
     w(g, "~-~M}~N");
-    if (keep_c) write_restorecursor(g, p, savevar);
+    if (savevar) {
+        write_restorecursor(g, p, savevar);
+        str_delete(savevar);
+    }
 
     g->failure_label = a0;
     str_delete(g->failure_str);
@@ -574,13 +585,10 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     write_check_limit(g, p);
     write_inc_cursor(g, p);
     write_block_end(g);
-
-    str_delete(savevar);
     g->unreachable = end_unreachable;
 }
 
 static void generate_loop(struct generator * g, struct node * p) {
-
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     w(g, "~Mfor _ in 0..");
@@ -595,14 +603,15 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-
-    struct str * savevar = vars_newname(g);
-    int keep_c = repeat_restore(g, p->left);
     int replab = new_label(g);
     g->I[0] = replab;
     writef(g, "~M'replab~I0: loop{~N~+", p);
 
-    if (keep_c) write_savecursor(g, p, savevar);
+    struct str * savevar = NULL;
+    if (repeat_restore(g, p->left)) {
+        savevar = vars_newname(g);
+        write_savecursor(g, p, savevar);
+    }
 
     g->failure_label = new_label(g);
     str_clear(g->failure_str);
@@ -622,11 +631,13 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     w(g, "~-~M}~N");
     g->unreachable = false;
 
-    if (keep_c) write_restorecursor(g, p, savevar);
+    if (savevar) {
+        write_restorecursor(g, p, savevar);
+        str_delete(savevar);
+    }
 
     g->I[0] = replab;
     w(g, "~Mbreak 'replab~I0;~N~-~M}~N");
-    str_delete(savevar);
 }
 
 static void generate_repeat(struct generator * g, struct node * p) {
@@ -635,8 +646,8 @@ static void generate_repeat(struct generator * g, struct node * p) {
 }
 
 static void generate_atleast(struct generator * g, struct node * p) {
-
     struct str * loopvar = vars_newname(g);
+
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
     w(g, "~Mlet mut ~B0 = ");
@@ -658,14 +669,12 @@ static void generate_atleast(struct generator * g, struct node * p) {
 }
 
 static void generate_setmark(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.cursor;~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
@@ -679,10 +688,8 @@ static void generate_tomark(struct generator * g, struct node * p) {
 }
 
 static void generate_atmark(struct generator * g, struct node * p) {
-
     write_comment(g, p);
-    w(g, "~Mif env.cursor != "); generate_AE(g, p->AE);
-    writef(g, " ", p);
+    w(g, "~Mif env.cursor != "); generate_AE(g, p->AE); writef(g, " ", p);
     write_block_start(g);
     write_failure(g);
     write_block_end(g);
@@ -706,7 +713,6 @@ static void generate_hop(struct generator * g, struct node * p) {
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     writef(g, "~Mif !env.slice_del() {~N"
               "~+~Mreturn false;~N~-"
@@ -714,14 +720,12 @@ static void generate_delete(struct generator * g, struct node * p) {
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "env.limit" : "env.limit_backward";
     writef(g, "~Menv.cursor = ~S0;~N", p);
 }
 
 static void generate_atlimit(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "env.limit" : "env.limit_backward";
     g->S[1] = p->mode == m_forward ? "<" : ">";
@@ -729,28 +733,24 @@ static void generate_atlimit(struct generator * g, struct node * p) {
 }
 
 static void generate_leftslice(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "env.bra" : "env.ket";
     writef(g, "~M~S0 = env.cursor;~N", p);
 }
 
 static void generate_rightslice(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "env.ket" : "env.bra";
     writef(g, "~M~S0 = env.cursor;~N", p);
 }
 
 static void generate_assignto(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.assign_to();~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~M~V0 = env.slice_to();~N"
@@ -759,7 +759,6 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 }
 
 static void generate_address(struct generator * g, struct node * p) {
-
     /* If we deal with a string variable which is of type String we need to
      * pass it by reference not by value.  Literalstrings on the other hand are
      * of type &'static str so we can pass them by value.
@@ -787,7 +786,6 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
@@ -806,9 +804,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     if (keep_c) w(g, "~Menv.cursor = c;~N");
 }
 
-
 static void generate_slicefrom(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     w(g, "~Mif !env.slice_from(");
     generate_address(g, p);
@@ -817,7 +813,6 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
-    struct str * savevar = vars_newname(g);
     struct str * varname = vars_newname(g);
     write_comment(g, p);
     if (p->left && p->left->type == c_tomark) {
@@ -846,7 +841,8 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             w(g, "~Mlet ~B0 = env.limit_backward;~N");
             w(g, "~Menv.limit_backward = ");
         }
-        generate_AE(g, q->AE); writef(g, ";~N", q);
+        generate_AE(g, q->AE);
+        writef(g, ";~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "env.limit += ");
@@ -858,7 +854,9 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append_string(g->failure_str, ";");
         }
     } else {
+        struct str * savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
+
         generate(g, p->left);
 
         if (!g->unreachable) {
@@ -882,6 +880,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
                 str_append_string(g->failure_str, ";");
             }
         }
+        str_delete(savevar);
     }
 
     if (!g->unreachable) {
@@ -894,17 +893,16 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         }
     }
     str_delete(varname);
-    str_delete(savevar);
 }
 
 /* dollar sets snowball up to operate on a string variable as if it were the
  * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
-
-    struct str * savevar_env = vars_newname(g);
     write_comment(g, p);
+
+    struct str * savevar = vars_newname(g);
     g->V[0] = p->name;
-    g->B[0] = str_data(savevar_env);
+    g->B[0] = str_data(savevar);
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Menv.set_current_s(~V0.clone());~N"
               "~Menv.cursor = 0;~N"
@@ -912,13 +910,13 @@ static void generate_dollar(struct generator * g, struct node * p) {
     generate(g, p->left);
     if (!g->unreachable) {
         g->V[0] = p->name;
-        g->B[0] = str_data(savevar_env);
+        g->B[0] = str_data(savevar);
         /* Update string variable. */
         w(g, "~M~V0 = env.current.clone().into_owned();~N");
         /* Reset env */
         w(g, "~M*env = ~B0;~N");
     }
-    str_delete(savevar_env);
+    str_delete(savevar);
 }
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
@@ -1035,10 +1033,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    struct str * saved_output = g->outbuf;
-
     g->V[0] = q;
-
     if (q->type == t_routine) {
         w(g, "~Mfn ~W0(env: &mut SnowballEnv, context: &mut Context) -> bool {~+~N");
     } else {
@@ -1046,6 +1041,9 @@ static void generate_define(struct generator * g, struct node * p) {
         generate_setup_context(g);
     }
     if (p->amongvar_needed) w(g, "~Mlet mut among_var;~N");
+
+    /* Save output. */
+    struct str * saved_output = g->outbuf;
     g->outbuf = str_new();
 
     g->next_label = 0;
@@ -1055,6 +1053,8 @@ static void generate_define(struct generator * g, struct node * p) {
     g->failure_label = x_return;
     g->unreachable = false;
     int signals = check_possible_signals_list(g, p->left, c_define, 0);
+
+    /* Generate function body. */
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
@@ -1075,6 +1075,7 @@ static void generate_functionend(struct generator * g, struct node * p) {
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
+    write_comment(g, p);
 
     struct among * x = p->among;
     int block = -1;
@@ -1086,8 +1087,6 @@ static void generate_substring(struct generator * g, struct node * p) {
     symbol cases[2];
     int shortest_size = x->shortest_size;
     int block_opened = 0;
-
-    write_comment(g, p);
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
@@ -1128,7 +1127,8 @@ static void generate_substring(struct generator * g, struct node * p) {
         } else {
             if ((bitmap & (1u << (ch & 0x1f))) == 0) {
                 bitmap |= 1u << (ch & 0x1f);
-                if (n_cases < 2) cases[n_cases] = ch;
+                if (n_cases < 2)
+                    cases[n_cases] = ch;
                 ++n_cases;
             }
         }
@@ -1243,7 +1243,6 @@ static void generate_false(struct generator * g, struct node * p) {
 }
 
 static void generate_debug(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
@@ -1342,7 +1341,6 @@ static void generate_allow_warnings(struct generator * g) {
 }
 
 static void generate_class_begin(struct generator * g) {
-
     w(g, "use snowball::SnowballEnv;~N");
     if (g->analyser->among_count > 0) {
         w(g, "use snowball::Among;~N~N");
@@ -1358,25 +1356,21 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[1] = x->literalstring_count;
 
     w(g, "~Mstatic A_~I0: &'static [Among<Context>; ~I1] = &[~N~+");
-    {
-        int i;
-        for (i = 0; i < x->literalstring_count; i++) {
-            g->I[0] = v->i;
-            g->I[1] = v->result;
-            g->L[0] = v->b;
-            g->S[0] = ",";
+    for (int i = 0; i < x->literalstring_count; i++) {
+        g->I[0] = v[i].i;
+        g->I[1] = v[i].result;
+        g->L[0] = v[i].b;
+        g->S[0] = ",";
 
-            w(g, "~MAmong(~L0, ~I0, ~I1, ");
-            if (v->function != NULL) {
-                w(g, "Some(&");
-                write_varname(g, v->function);
-                w(g, ")");
-            } else {
-              w(g, "None");
-            }
-            w(g, ")~S0~N");
-            v++;
+        w(g, "~MAmong(~L0, ~I0, ~I1, ");
+        if (v[i].function != NULL) {
+            w(g, "Some(&");
+            write_varname(g, v[i].function);
+            w(g, ")");
+        } else {
+          w(g, "None");
         }
+        w(g, ")~S0~N");
     }
     w(g, "~-~M];~N~N");
 }
@@ -1409,6 +1403,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
         if (i < size - 1) w(g, ", ");
     }
     w(g, "];~N~N");
+
     lose_b(map);
 }
 
@@ -1420,9 +1415,7 @@ static void generate_groupings(struct generator * g) {
     }
 }
 
-
 static void generate_members(struct generator * g) {
-
     struct name * q;
     w(g, "#[derive(Clone)]~N");
     w(g, "struct Context {~+~N");
@@ -1444,17 +1437,14 @@ static void generate_members(struct generator * g) {
 }
 
 static void generate_methods(struct generator * g) {
-
-    struct node * p = g->analyser->program;
-    while (p != NULL) {
+    struct node * p;
+    for (p = g->analyser->program; p; p = p->right) {
         generate(g, p);
         g->unreachable = false;
-        p = p->right;
     }
 }
 
 extern void generate_program_rust(struct generator * g) {
-
     g->outbuf = str_new();
     g->failure_str = str_new();
 

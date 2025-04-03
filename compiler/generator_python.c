@@ -26,7 +26,6 @@ static struct str * vars_newname(struct generator * g) {
     return output;
 }
 
-
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
@@ -54,7 +53,6 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-
     int i;
     write_string(g, "u\"");
     for (i = 0; i < SIZE(p); i++) {
@@ -71,7 +69,6 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_margin(struct generator * g) {
-
     int i;
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
 }
@@ -85,12 +82,10 @@ static void write_comment(struct generator * g, struct node * p) {
 }
 
 static void write_block_start(struct generator * g) {
-
     w(g, "~+~N");
 }
 
-static void write_block_end(struct generator * g)    /* block end */ {
-
+static void write_block_end(struct generator * g) {
     w(g, "~-");
 }
 
@@ -145,7 +140,6 @@ static void wgotol(struct generator * g, int n) {
 }
 
 static void write_failure(struct generator * g) {
-
     if (str_len(g->failure_str) != 0) {
         write_margin(g);
         write_str(g, g->failure_str);
@@ -176,7 +170,6 @@ static void write_failure_if(struct generator * g, const char * s, struct node *
 
 /* if at limit fail */
 static void write_check_limit(struct generator * g, struct node * p) {
-
     if (p->mode == m_forward) {
         write_failure_if(g, "self.cursor >= self.limit", p);
     } else {
@@ -320,7 +313,6 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 static void generate_bra(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     p = p->left;
     while (p) {
@@ -330,7 +322,6 @@ static void generate_bra(struct generator * g, struct node * p) {
 }
 
 static void generate_and(struct generator * g, struct node * p) {
-
     struct str * savevar = vars_newname(g);
     int keep_c = K_needed(g, p->left);
 
@@ -368,7 +359,7 @@ static void generate_or(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
 
     if (p == NULL) {
-        /* p should never be 0 after an or: there should be at least two
+        /* p should never be NULL after an or: there should be at least two
          * sub nodes. */
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
@@ -401,7 +392,6 @@ static void generate_or(struct generator * g, struct node * p) {
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     writef(g, "~Mself.limit_backward = self.cursor~N"
               "~Mself.cursor = self.limit~N", p);
@@ -411,7 +401,6 @@ static void generate_backwards(struct generator * g, struct node * p) {
 
 
 static void generate_not(struct generator * g, struct node * p) {
-
     struct str * savevar = vars_newname(g);
     int keep_c = K_needed(g, p->left);
 
@@ -1067,13 +1056,11 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    g->next_label = 0;
-
-    struct str * saved_output = g->outbuf;
-
     g->V[0] = q;
     w(g, "~Mdef ~W0(self):~+~N");
 
+    /* Save output. */
+    struct str * saved_output = g->outbuf;
     g->outbuf = str_new();
 
     g->next_label = 0;
@@ -1103,10 +1090,9 @@ static void generate_functionend(struct generator * g, struct node * p) {
 }
 
 static void generate_substring(struct generator * g, struct node * p) {
+    write_comment(g, p);
 
     struct among * x = p->among;
-
-    write_comment(g, p);
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
