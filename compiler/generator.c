@@ -10,6 +10,7 @@
 /* recursive use: */
 
 static void generate(struct generator * g, struct node * p);
+static void w(struct generator * g, const char * s);
 
 static int new_label(struct generator * g) {
     return g->next_label++;
@@ -197,15 +198,13 @@ static void wms(struct generator * g, const char * s) {
     write_margin(g); write_string(g, s);   } /* margin + string */
 
 static void write_block_start(struct generator * g) { /* block start */
-    wms(g, "{   ");
-    g->margin++;
+    w(g, "~M{~+~N");
 }
 
 static void write_block_end(struct generator * g) {    /* block end */
 
     if (g->line_labelled == g->line_count) { wms(g, ";"); write_newline(g); }
-    g->margin--;
-    wms(g, "}"); write_newline(g);
+    w(g, "~-~M}~N");
 }
 
 static void w(struct generator * g, const char * s);
@@ -808,7 +807,7 @@ static void generate_and(struct generator * g, struct node * p) {
     int keep_c = 0;
     write_comment(g, p);
     if (K_needed(g, p->left)) {
-        writef(g, "~{~k~N", p);
+        writef(g, "~{~M~k~N", p);
         keep_c = g->keep_count;
     }
     p = p->left;
@@ -833,7 +832,7 @@ static void generate_or(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     if (K_needed(g, p->left)) {
-        writef(g, "~{~k~N", p);
+        writef(g, "~{~M~k~N", p);
         keep_c = g->keep_count;
     }
     p = p->left;
@@ -877,7 +876,7 @@ static void generate_not(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (K_needed(g, p->left)) {
-        writef(g, "~{~k~N", p);
+        writef(g, "~{~M~k~N", p);
         keep_c = g->keep_count;
     }
 
@@ -908,7 +907,7 @@ static void generate_try(struct generator * g, struct node * p) {
     write_comment(g, p);
     int keep_c = 0;
     if (K_needed(g, p->left)) {
-        writef(g, "~{~k~N", p);
+        writef(g, "~{~M~k~N", p);
         keep_c = g->keep_count;
     }
     g->failure_keep_count = keep_c;
@@ -949,8 +948,8 @@ static void generate_test(struct generator * g, struct node * p) {
     int keep_c = 0;
     if (K_needed(g, p->left)) {
         keep_c = ++g->keep_count;
-        w(g, p->mode == m_forward ? "~{int c_test" :
-                                    "~{int m_test");
+        w(g, p->mode == m_forward ? "~{~Mint c_test" :
+                                    "~{~Mint m_test");
         write_int(g, keep_c);
         w(g, p->mode == m_forward ? " = z->c;~N" :
                                     " = z->l - z->c;~N");
@@ -970,7 +969,7 @@ static void generate_do(struct generator * g, struct node * p) {
     write_comment(g, p);
     int keep_c = 0;
     if (K_needed(g, p->left)) {
-        writef(g, "~{~k~N", p);
+        writef(g, "~{~M~k~N", p);
         keep_c = g->keep_count;
     }
 
@@ -978,7 +977,7 @@ static void generate_do(struct generator * g, struct node * p) {
         /* Optimise do <call> */
         write_comment(g, p->left);
         g->V[0] = p->left->name;
-        writef(g, "~{int ret = ~V0(z);~N", p->left);
+        writef(g, "~{~Mint ret = ~V0(z);~N", p->left);
         w(g, "~Mif (ret < 0) return ret;~N~}");
     } else {
         g->failure_label = new_label(g);
@@ -999,9 +998,9 @@ static void generate_next(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (g->options->encoding == ENC_UTF8) {
         if (p->mode == m_forward)
-            w(g, "~{int ret = skip_utf8(z->p, z->c, z->l, 1");
+            w(g, "~{~Mint ret = skip_utf8(z->p, z->c, z->l, 1");
         else
-            w(g, "~{int ret = skip_b_utf8(z->p, z->c, z->lb, 1");
+            w(g, "~{~Mint ret = skip_b_utf8(z->p, z->c, z->lb, 1");
         writef(g, ");~N"
               "~Mif (ret < 0) ~f~N"
               "~Mz->c = ret;~N"
@@ -1024,7 +1023,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     if (is_goto) {
         writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1) < 0) ~f~N", p);
     } else {
-        writef(g, "~{~N"
+        writef(g, "~{"
               "~Mint ret = ~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1);~N"
               "~Mif (ret < 0) ~f~N", p);
         if (p->mode == m_forward)
@@ -1054,7 +1053,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         return;
     }
 
-    w(g, "~Mwhile(1) {"); writef(g, "~N~+", p);
+    w(g, "~Mwhile(1) ~{");
 
     if (style == 1 || repeat_restore(g, p->left)) {
         writef(g, "~M~k~N", p);
@@ -1087,8 +1086,9 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
 static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~{int i; for (i = "); generate_AE(g, p->AE); writef(g, "; i > 0; i--)~N"
-            "~{", p);
+    w(g, "~{~Mint i; for (i = ");
+    generate_AE(g, p->AE);
+    writef(g, "; i > 0; i--) ~{", p);
 
     generate(g, p->left);
 
@@ -1138,7 +1138,7 @@ static void generate_repeat(struct generator * g, struct node * p) {
 
 static void generate_atleast(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~{int i = "); generate_AE(g, p->AE); writef(g, ";~N", p);
+    w(g, "~{~Mint i = "); generate_AE(g, p->AE); writef(g, ";~N", p);
     {
         int used = g->label_used;
         int a0 = g->failure_label;
@@ -1179,7 +1179,7 @@ static void generate_hop(struct generator * g, struct node * p) {
     if (g->options->encoding == ENC_UTF8) {
         g->S[0] = p->mode == m_forward ? "" : "_b";
         g->S[1] = p->mode == m_forward ? "z->l" : "z->lb";
-        w(g, "~{int ret = skip~S0_utf8(z->p, z->c, ~S1, ");
+        w(g, "~{~Mint ret = skip~S0_utf8(z->p, z->c, ~S1, ");
         generate_AE(g, p->AE);
         writef(g, ");~N", p);
         writef(g, "~Mif (ret < 0) ~f~N", p);
@@ -1205,7 +1205,7 @@ static void generate_hop(struct generator * g, struct node * p) {
                 writef(g, "~Mif (z->c < z->lb) ~f~N", p);
             }
         } else {
-            w(g, "~{int ret = z->c ~S0 ");
+            w(g, "~{~Mint ret = z->c ~S0 ");
             generate_AE(g, p->AE);
             writef(g, ";~N", p);
             if (p->mode == m_forward) {
@@ -1221,7 +1221,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~{int ret = slice_del(z);~N", p);
+    writef(g, "~{~Mint ret = slice_del(z);~N", p);
     writef(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -1270,10 +1270,10 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
-    writef(g, "~{int ret;~N", p);
-    if (keep_c) w(g, "~{int saved_c = z->c;~N");
-    writef(g, "~Mret = insert_~$(z, z->c, z->c, ~a);~N", p);
-    if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
+    writef(g, "~{", p);
+    if (keep_c) w(g, "~Mint saved_c = z->c;~N");
+    writef(g, "~Mint ret = insert_~$(z, z->c, z->c, ~a);~N", p);
+    if (keep_c) w(g, "~Mz->c = saved_c;~N");
     writef(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -1282,18 +1282,18 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     int keep_c = p->mode == m_forward; /* like 'attach' */
     write_comment(g, p);
-    writef(g, "~{int ret;~N", p);
-    if (keep_c) writef(g, "~{int saved_c = z->c;~N", p);
-    w(g, "~Mret = ");
+    writef(g, "~{", p);
+    if (keep_c) w(g, "~Mint saved_c = z->c;~N");
+    w(g, "~Mint ret = ");
     writef(g, keep_c ? "insert_~$(z, z->c, z->l, ~a);~N" : "insert_~$(z, z->lb, z->c, ~a);~N", p);
-    if (keep_c) w(g, "~Mz->c = saved_c;~N~}");
+    if (keep_c) w(g, "~Mz->c = saved_c;~N");
     writef(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~{int ret = slice_from_~$(z, ~a);~N", p);
+    writef(g, "~{~Mint ret = slice_from_~$(z, ~a);~N", p);
     writef(g, "~Mif (ret < 0) return ret;~N"
           "~}", p);
 }
@@ -1315,7 +1315,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         assert(q->right == NULL);
 
         ++g->keep_count;
-        writef(g, "~N~{int mlimit", p);
+        writef(g, "~N~{~Mint mlimit", p);
         write_int(g, g->keep_count);
         writef(g, ";~N", p);
         keep_c = g->keep_count;
@@ -1333,7 +1333,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         generate_AE(g, q->AE);
         w(g, ";~N");
     } else {
-        writef(g, "~{~K~N", p);
+        writef(g, "~{~M~K~N", p);
         keep_c = g->keep_count;
         generate(g, p->left);
 
@@ -1369,7 +1369,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     keep_token = ++g->keep_count;
     g->I[0] = keep_token;
-    writef(g, "~{struct SN_env env~I0 = * z;~N", p);
+    writef(g, "~{~Mstruct SN_env env~I0 = * z;~N", p);
     g->V[0] = p->name;
     /* Assume failure. */
     writef(g, "~Mint failure = 1;~N"
@@ -1435,7 +1435,7 @@ static void generate_call(struct generator * g, struct node * p) {
         writef(g, "~Mreturn ~V0(z);~N", p);
         return;
     }
-    writef(g, "~{int ret = ~V0(z);~N", p);
+    writef(g, "~{~Mint ret = ~V0(z);~N", p);
     if (g->failure_keep_count == 0 && g->failure_label == x_return) {
         /* Combine the two tests in this special case for better optimisation
          * and clearer generated code. */
@@ -1860,7 +1860,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     }
 
     g->I[1] = x->literalstring_count;
-    w(g, "~Mstatic const struct among a_~I0[~I1] =~N{~N");
+    w(g, "~Mstatic const struct among a_~I0[~I1] = {~N");
 
     v = x->b;
     {
