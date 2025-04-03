@@ -37,7 +37,6 @@ static struct node * C_style(struct analyser * a, const char * s, int token);
 
 
 static void print_node_(struct node * p, int n, const char * s) {
-
     printf("%*s%s", n * 2, s, name_of_token(p->type));
     if (p->name) {
         putchar(' ');
@@ -323,7 +322,6 @@ static symbol * new_literalstring(struct analyser * a) {
 }
 
 static int read_AE_test(struct analyser * a) {
-
     struct tokeniser * t = a->tokeniser;
     switch (read_token(t)) {
         case c_assign: return c_mathassign;
@@ -741,7 +739,6 @@ static int compare_node(const struct node *p, const struct node *q) {
 }
 
 static struct node * make_among(struct analyser * a, struct node * p, struct node * substring) {
-
     NEW(among, x);
     NEWVEC(amongvec, v, p->number);
     struct node * q = p->left;
@@ -964,7 +961,6 @@ static struct node * read_among(struct analyser * a) {
 }
 
 static struct node * read_substring(struct analyser * a) {
-
     struct node * p = new_node(a, c_substring);
     if (a->substring != NULL) error2(a, e_substring_preceded_by_substring, a->substring->line_number);
     a->substring = p;

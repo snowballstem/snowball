@@ -466,7 +466,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 }
 
 extern int main(int argc, char * argv[]) {
-
     int i;
     NEW(options, o);
     argc = read_options(o, argc, argv);
@@ -616,7 +615,6 @@ extern int main(int argc, char * argv[]) {
                     generate_program_ada(g);
                     fclose(o->output_src);
                     fclose(o->output_h);
-
                 }
 #endif
                 close_generator(g);

@@ -64,7 +64,6 @@ typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
 
 /* stringdef name and value */
 struct m_pair {
-
     struct m_pair * next;
     byte * name;
     symbol * value;
@@ -73,7 +72,6 @@ struct m_pair {
 
 /* struct input must be a prefix of struct tokeniser. */
 struct input {
-
     struct input * next;
     byte * p;
     int c;
@@ -87,7 +85,6 @@ struct input {
 };
 
 struct include {
-
     struct include * next;
     byte * s;
 
@@ -140,7 +137,6 @@ enum uplus_modes {
 
 /* struct input must be a prefix of struct tokeniser. */
 struct tokeniser {
-
     struct input * next;
     byte * p;
     int c;
@@ -193,7 +189,6 @@ extern void check_free(void * p);
 struct node;
 
 struct name {
-
     struct name * next;
     byte * s;
     int type;                   /* t_string etc */
@@ -209,18 +204,14 @@ struct name {
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
     int declaration_line_number;/* Line number of declaration */
-
 };
 
 struct literalstring {
-
     struct literalstring * next;
     symbol * b;
-
 };
 
 struct amongvec {
-
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
     struct node * action; /* the corresponding action */
@@ -228,11 +219,9 @@ struct amongvec {
     int result;      /* the numeric result for the case */
     int line_number; /* for diagnostics and stable sorting */
     struct name * function;
-
 };
 
 struct among {
-
     struct among * next;
     struct amongvec * b;      /* pointer to the amongvec */
     int number;               /* amongs are numbered 0, 1, 2 ... */
@@ -249,7 +238,6 @@ struct among {
 };
 
 struct grouping {
-
     struct grouping * next;
     symbol * b;               /* the characters of this group */
     int largest_ch;           /* character with max code */
@@ -259,7 +247,6 @@ struct grouping {
 };
 
 struct node {
-
     struct node * next;
     struct node * left;
     struct node * aux;     /* used in setlimit */
@@ -276,7 +263,6 @@ struct node {
 };
 
 enum name_types {
-
     t_size = 6,
 
     t_string = 0, t_boolean = 1, t_integer = 2, t_routine = 3, t_external = 4,
@@ -297,7 +283,6 @@ enum name_types {
 */
 
 struct analyser {
-
     struct tokeniser * tokeniser;
     struct node * nodes;
     struct name * names;
@@ -320,9 +305,7 @@ struct analyser {
 };
 
 enum analyser_modes {
-
     m_forward = 0, m_backward /*, m_integer */
-
 };
 
 extern void print_program(struct analyser * a);
@@ -332,7 +315,6 @@ extern void close_analyser(struct analyser * a);
 extern void read_program(struct analyser * a);
 
 struct generator {
-
     struct analyser * analyser;
     struct options * options;
     int unreachable;           /* 0 if code can be reached, 1 if current code
@@ -379,9 +361,7 @@ enum special_labels {
 };
 
 struct options {
-
     /* for the command line: */
-
     const char * output_file;
     char * name;
     FILE * output_src;

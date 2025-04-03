@@ -27,7 +27,6 @@ static void wi3(struct generator * g, int i) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-
     int ch = "SIIrxg"[p->type];
     switch (p->type) {
         case t_external:
@@ -94,7 +93,6 @@ static void wlitch(struct generator * g, int ch) {
 }
 
 static void wlitarray(struct generator * g, symbol * p) {  /* write literal array */
-
     write_string(g, "{ ");
     {
         int i;
@@ -107,7 +105,6 @@ static void wlitarray(struct generator * g, symbol * p) {  /* write literal arra
 }
 
 static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal array */
-
     if (SIZE(p) == 0) {
         write_char(g, '0');
     } else {
@@ -259,7 +256,6 @@ static void winc(struct generator * g, struct node * p) {     /* increment c */
 }
 
 static void wsetl(struct generator * g, int n) {
-
     g->margin--;
     wms(g, "lab"); write_int(g, n); write_char(g, ':'); write_newline(g);
     g->line_labelled = g->line_count;
@@ -1167,7 +1163,6 @@ static void generate_tomark(struct generator * g, struct node * p) {
 }
 
 static void generate_atmark(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     w(g, "~Mif (z->c != "); generate_AE(g, p->AE); writef(g, ") ~f~N", p);
 }
@@ -1264,7 +1259,6 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
-
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
@@ -1277,7 +1271,6 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-
     int keep_c = p->mode == m_forward; /* like 'attach' */
     write_comment(g, p);
     writef(g, "~{", p);
@@ -1392,7 +1385,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
 }
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     g->S[0] = s;
@@ -1400,7 +1392,6 @@ static void generate_integer_assign(struct generator * g, struct node * p, const
 }
 
 static void generate_integer_test(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     int relop = p->type;
     int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
@@ -1423,7 +1414,6 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 }
 
 static void generate_call(struct generator * g, struct node * p) {
-
     int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
     write_comment(g, p);
     g->V[0] = p->name;
@@ -1468,7 +1458,6 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->V[0] = p->name;
@@ -1666,7 +1655,6 @@ static void generate_substring(struct generator * g, struct node * p) {
 }
 
 static void generate_among(struct generator * g, struct node * p) {
-
     struct among * x = p->among;
 
     if (x->substring == NULL) {
@@ -1692,20 +1680,17 @@ static void generate_among(struct generator * g, struct node * p) {
 }
 
 static void generate_booltest(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->V[0] = p->name;
     writef(g, "~Mif (!(~V0)) ~f~N", p);
 }
 
 static void generate_false(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     writef(g, "~M~f~N", p);
 }
 
 static void generate_debug(struct generator * g, struct node * p) {
-
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
@@ -1713,7 +1698,6 @@ static void generate_debug(struct generator * g, struct node * p) {
 }
 
 static void generate(struct generator * g, struct node * p) {
-
     int used = g->label_used;
     int a0 = g->failure_label;
     int a1 = g->failure_keep_count;
@@ -1808,7 +1792,6 @@ void write_start_comment(struct generator * g,
 }
 
 static void generate_head(struct generator * g) {
-
     w(g, "#include \"");
     if (g->options->runtime_path) {
         write_string(g, g->options->runtime_path);
@@ -1895,7 +1878,6 @@ static void generate_amongs(struct generator * g) {
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
 
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
-
     int range = q->largest_ch - q->smallest_ch + 1;
     int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
@@ -1925,7 +1907,6 @@ static void generate_groupings(struct generator * g) {
 }
 
 static void generate_create(struct generator * g) {
-
     int * p = g->analyser->name_count;
     g->I[0] = p[t_string];
     g->I[1] = p[t_integer] + p[t_boolean];
@@ -1935,7 +1916,6 @@ static void generate_create(struct generator * g) {
 }
 
 static void generate_close(struct generator * g) {
-
     int * p = g->analyser->name_count;
     g->I[0] = p[t_string];
     w(g, "~Nextern void ~pclose_env(struct SN_env * z) { SN_close_env(z, ~I0); }~N~N");
@@ -1949,7 +1929,6 @@ static void generate_create_and_close_templates(struct generator * g) {
 }
 
 static void generate_header_file(struct generator * g) {
-
     struct name * q;
     const char * vp = g->options->variables_prefix;
     g->S[0] = vp;
@@ -2002,7 +1981,6 @@ static void generate_header_file(struct generator * g) {
 }
 
 extern void generate_program_c(struct generator * g) {
-
     g->outbuf = str_new();
     write_start_comment(g, "/* ", " */");
     generate_head(g);
@@ -2087,11 +2065,9 @@ extern void write_int(struct generator * g, int i) {
 }
 
 extern void write_s(struct generator * g, const byte * s) {
-
     str_append_s(g->outbuf, s);
 }
 
 extern void write_str(struct generator * g, struct str * str) {
-
     str_append(g->outbuf, str);
 }

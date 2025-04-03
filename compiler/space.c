@@ -229,7 +229,6 @@ struct str {
 
 /* Create a new string. */
 extern struct str * str_new(void) {
-
     struct str * output = (struct str *) xmalloc(sizeof(struct str));
     output->data = create_s(0);
     return output;
@@ -237,7 +236,6 @@ extern struct str * str_new(void) {
 
 /* Delete a string. */
 extern void str_delete(struct str * str) {
-
     lose_s(str->data);
     free(str);
 }
@@ -255,19 +253,16 @@ extern void str_append_ch(struct str * str, char add) {
 
 /* Append a low level byte block to a str. */
 extern void str_append_s(struct str * str, const byte * q) {
-
     str->data = add_s_to_s(str->data, (const char *)q, SIZE(q));
 }
 
 /* Append a (char *, null terminated) string to a str. */
 extern void str_append_string(struct str * str, const char * s) {
-
     str->data = add_sz_to_s(str->data, s);
 }
 
 /* Append an integer to a str. */
 extern void str_append_int(struct str * str, int i) {
-
     char s[30];
     sprintf(s, "%d", i);
     str_append_string(str, s);
@@ -275,20 +270,17 @@ extern void str_append_int(struct str * str, int i) {
 
 /* Clear a string */
 extern void str_clear(struct str * str) {
-
     SIZE(str->data) = 0;
 }
 
 /* Set a string */
 extern void str_assign(struct str * str, const char * s) {
-
     str_clear(str);
     str_append_string(str, s);
 }
 
 /* Copy a string. */
 extern struct str * str_copy(const struct str * old) {
-
     struct str * newstr = str_new();
     str_append(newstr, old);
     return newstr;
@@ -296,13 +288,11 @@ extern struct str * str_copy(const struct str * old) {
 
 /* Get the data stored in this str. */
 extern byte * str_data(const struct str * str) {
-
     return str->data;
 }
 
 /* Get the length of the str. */
 extern int str_len(const struct str * str) {
-
     return SIZE(str->data);
 }
 
