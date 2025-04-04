@@ -529,6 +529,24 @@ static void generate_next(struct generator * g, struct node * p) {
     write_inc_cursor(g, p);
 }
 
+static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
+    write_comment(g, p);
+
+    struct grouping * q = p->name->grouping;
+    g->S[0] = p->mode == m_forward ? "" : "_b";
+    g->S[1] = complement ? "in" : "out";
+    g->V[0] = p->name;
+    g->I[0] = q->smallest_ch;
+    g->I[1] = q->largest_ch;
+    write_failure_if(g, "!base.go_~S1_grouping~S0(~V0, ~I0, ~I1)", p);
+    if (!is_goto) {
+        if (p->mode == m_forward)
+            w(g, "~Mbase.cursor++;~N");
+        else
+            w(g, "~Mbase.cursor--;~N");
+    }
+}
+
 static void generate_GO(struct generator * g, struct node * p, int style) {
     write_comment(g, p);
 
@@ -1178,6 +1196,11 @@ static void generate(struct generator * g, struct node * p) {
         case c_do:            generate_do(g, p); break;
         case c_goto:          generate_GO(g, p, 1); break;
         case c_gopast:        generate_GO(g, p, 0); break;
+        case c_goto_grouping: generate_GO_grouping(g, p, 1, 0); break;
+        case c_gopast_grouping:
+                              generate_GO_grouping(g, p, 0, 0); break;
+        case c_goto_non:      generate_GO_grouping(g, p, 1, 1); break;
+        case c_gopast_non:    generate_GO_grouping(g, p, 0, 1); break;
         case c_repeat:        generate_repeat(g, p); break;
         case c_loop:          generate_loop(g, p); break;
         case c_atleast:       generate_atleast(g, p); break;

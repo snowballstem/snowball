@@ -125,6 +125,10 @@ enum token_codes {
     c_grouping,
     c_booltest,
     c_functionend,
+    c_goto_grouping,
+    c_gopast_grouping,
+    c_goto_non,
+    c_gopast_non,
 
     NUM_TOKEN_CODES
 };

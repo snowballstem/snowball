@@ -118,6 +118,19 @@ public class SnowballProgram implements Serializable {
         return true;
     }
 
+    protected boolean go_in_grouping(char[] s, int min, int max)
+    {
+        while (cursor < limit) {
+            int ch = current[cursor];
+            if (ch > max || ch < min)
+                return true;
+            ch -= min;
+            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return true;
+            cursor++;
+        }
+        return false;
+    }
+
     protected boolean in_grouping_b(char[] s, int min, int max)
     {
         if (cursor <= limit_backward) return false;
@@ -127,6 +140,18 @@ public class SnowballProgram implements Serializable {
         if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
         cursor--;
         return true;
+    }
+
+    protected boolean go_in_grouping_b(char[] s, int min, int max)
+    {
+        while (cursor > limit_backward) {
+            int ch = current[cursor - 1];
+            if (ch > max || ch < min) return true;
+            ch -= min;
+            if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return true;
+            cursor--;
+        }
+        return false;
     }
 
     protected boolean out_grouping(char[] s, int min, int max)
@@ -145,6 +170,21 @@ public class SnowballProgram implements Serializable {
         return false;
     }
 
+    protected boolean go_out_grouping(char[] s, int min, int max)
+    {
+        while (cursor < limit) {
+            int ch = current[cursor];
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >> 3] & (0X1 << (ch & 0X7))) != 0) {
+                    return true;
+                }
+            }
+            cursor++;
+        }
+        return false;
+    }
+
     protected boolean out_grouping_b(char[] s, int min, int max)
     {
         if (cursor <= limit_backward) return false;
@@ -157,6 +197,21 @@ public class SnowballProgram implements Serializable {
         if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) {
             cursor--;
             return true;
+        }
+        return false;
+    }
+
+    protected boolean go_out_grouping_b(char[] s, int min, int max)
+    {
+        while (cursor > limit_backward) {
+            int ch = current[cursor - 1];
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >> 3] & (0X1 << (ch & 0X7))) != 0) {
+                    return true;
+                }
+            }
+            cursor--;
         }
         return false;
     }

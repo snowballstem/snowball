@@ -65,6 +65,26 @@ const BaseStemmer = function() {
      * @param {number} max
      * @return {boolean}
      */
+    this.go_in_grouping = function(s, min, max) {
+        /** @protected */
+        while (this.cursor < this.limit) {
+            var ch = this.current.charCodeAt(this.cursor);
+            if (ch > max || ch < min)
+                return true;
+            ch -= min;
+            if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0)
+                return true;
+            this.cursor++;
+        }
+        return false;
+    };
+
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.in_grouping_b = function(s, min, max) {
         /** @protected */
         if (this.cursor <= this.limit_backward) return false;
@@ -74,6 +94,24 @@ const BaseStemmer = function() {
         if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return false;
         this.cursor--;
         return true;
+    };
+
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    this.go_in_grouping_b = function(s, min, max) {
+        /** @protected */
+        while (this.cursor > this.limit_backward) {
+            var ch = this.current.charCodeAt(this.cursor - 1);
+            if (ch > max || ch < min) return true;
+            ch -= min;
+            if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return true;
+            this.cursor--;
+        }
+        return false;
     };
 
     /**
@@ -104,6 +142,27 @@ const BaseStemmer = function() {
      * @param {number} max
      * @return {boolean}
      */
+    this.go_out_grouping = function(s, min, max) {
+        /** @protected */
+        while (this.cursor < this.limit) {
+            var ch = this.current.charCodeAt(this.cursor);
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) != 0) {
+                    return true;
+                }
+            }
+            this.cursor++;
+        }
+        return false;
+    };
+
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
     this.out_grouping_b = function(s, min, max) {
         /** @protected */
         if (this.cursor <= this.limit_backward) return false;
@@ -116,6 +175,27 @@ const BaseStemmer = function() {
         if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) {
             this.cursor--;
             return true;
+        }
+        return false;
+    };
+
+    /**
+     * @param {number[]} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    this.go_out_grouping_b = function(s, min, max) {
+        /** @protected */
+        while (this.cursor > this.limit_backward) {
+            var ch = this.current.charCodeAt(this.cursor - 1);
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) != 0) {
+                    return true;
+                }
+            }
+            this.cursor--;
         }
         return false;
     };

@@ -556,24 +556,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     write_comment(g, p);
 
     int used = g->label_used;
-
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
-
-    if (p->left->type == c_grouping || p->left->type == c_non) {
-        /* Special case for "goto" or "gopast" when used on a grouping or an
-         * inverted grouping - the movement of c by the matching action is
-         * exactly what we want! */
-#ifdef OPTIMISATION_WARNINGS
-        printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
-#endif
-        generate_GO_grouping(g, p->left, style, p->left->type == c_non);
-
-        g->failure_label = a0;
-        str_delete(g->failure_str);
-        g->failure_str = a1;
-        return;
-    }
 
     w(g, "~Mwhile (true)~N~{");
 
@@ -1155,6 +1139,11 @@ static void generate(struct generator * g, struct node * p) {
         case c_do:            generate_do(g, p); break;
         case c_goto:          generate_GO(g, p, 1); break;
         case c_gopast:        generate_GO(g, p, 0); break;
+        case c_goto_grouping: generate_GO_grouping(g, p, 1, 0); break;
+        case c_gopast_grouping:
+                              generate_GO_grouping(g, p, 0, 0); break;
+        case c_goto_non:      generate_GO_grouping(g, p, 1, 1); break;
+        case c_gopast_non:    generate_GO_grouping(g, p, 0, 1); break;
         case c_repeat:        generate_repeat(g, p); break;
         case c_loop:          generate_loop(g, p); break;
         case c_atleast:       generate_atleast(g, p); break;

@@ -518,8 +518,9 @@ static void generate_next(struct generator * g, struct node * p) {
 }
 
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
-    struct grouping * q = p->name->grouping;
     write_comment(g, p);
+
+    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     g->V[0] = p->name;
@@ -535,42 +536,21 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
 }
 
 static void generate_GO(struct generator * g, struct node * p, int style) {
-    int end_unreachable;
-    struct str * savevar;
-    int keep_c;
-
-    int a0;
-    struct str * a1;
-
-    int golab;
-    int label;
-
-    if (p->left->type == c_grouping || p->left->type == c_non) {
-        /* Special case for "goto" or "gopast" when used on a grouping or an
-         * inverted grouping - the movement of c by the matching action is
-         * exactly what we want! */
-#ifdef OPTIMISATION_WARNINGS
-        printf("Optimising %s %s\n", style ? "goto" : "gopast", p->left->type == c_non ? "non" : "grouping");
-#endif
-        write_comment(g, p);
-        generate_GO_grouping(g, p->left, style, p->left->type == c_non);
-        return;
-    }
-
-    end_unreachable = false;
-    savevar = vars_newname(g);
-    keep_c = style == 1 || repeat_restore(g, p->left);
-
-    a0 = g->failure_label;
-    a1 = str_copy(g->failure_str);
-
-    golab = new_label(g);
     write_comment(g, p);
+
+    int end_unreachable = false;
+    struct str * savevar = vars_newname(g);
+    int keep_c = style == 1 || repeat_restore(g, p->left);
+
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+
+    int golab = new_label(g);
     w(g, "~Mtry:~N~+"
              "~Mwhile True:~N~+");
     if (keep_c) write_savecursor(g, p, savevar);
 
-    label = new_label(g);
+    int label = new_label(g);
     g->failure_label = label;
     str_clear(g->failure_str);
     wsetlab_begin(g);
@@ -1146,6 +1126,11 @@ static void generate(struct generator * g, struct node * p) {
         case c_do:            generate_do(g, p); break;
         case c_goto:          generate_GO(g, p, 1); break;
         case c_gopast:        generate_GO(g, p, 0); break;
+        case c_goto_grouping: generate_GO_grouping(g, p, 1, 0); break;
+        case c_gopast_grouping:
+                              generate_GO_grouping(g, p, 0, 0); break;
+        case c_goto_non:      generate_GO_grouping(g, p, 1, 1); break;
+        case c_gopast_non:    generate_GO_grouping(g, p, 0, 1); break;
         case c_repeat:        generate_repeat(g, p); break;
         case c_loop:          generate_loop(g, p); break;
         case c_atleast:       generate_atleast(g, p); break;

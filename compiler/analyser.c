@@ -1038,10 +1038,45 @@ static struct node * read_C(struct analyser * a) {
         case c_fail:
         case c_test:
         case c_do:
-        case c_goto:
-        case c_gopast:
         case c_repeat:
             return C_style(a, "C", token);
+        case c_goto:
+        case c_gopast: {
+            struct node * subcommand = read_C(a);
+            if (subcommand->type == c_grouping || subcommand->type == c_non) {
+                /* We synthesise special command for "goto" or "gopast" when
+                 * used on a grouping or an inverted grouping - the movement of
+                 * c by the matching action is exactly what we want!
+                 *
+                 * Adding the tokens happens to give unique values (the code
+                 * would fail to compile if it didn't!)
+                 */
+                switch (token + subcommand->type) {
+                    case c_goto + c_grouping:
+                        subcommand->type = c_goto_grouping;
+                        break;
+                    case c_gopast + c_grouping:
+                        subcommand->type = c_gopast_grouping;
+                        break;
+                    case c_goto + c_non:
+                        subcommand->type = c_goto_non;
+                        break;
+                    case c_gopast + c_non:
+                        subcommand->type = c_gopast_non;
+                        break;
+                    default:
+                        fprintf(stderr, "Unexpected go/grouping combination: %s %s",
+                                name_of_token(token),
+                                name_of_token(subcommand->type));
+                        exit(1);
+                }
+                return subcommand;
+            }
+
+            struct node * p = new_node(a, token);
+            p->left = subcommand;
+            return p;
+        }
         case c_loop:
         case c_atleast:
             return C_style(a, "AC", token);
