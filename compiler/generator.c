@@ -536,6 +536,10 @@ static int check_possible_signals(struct generator * g,
                                                call_depth + 1);
         case c_gopast:
         case c_goto:
+        case c_goto_grouping:
+        case c_gopast_grouping:
+        case c_goto_non:
+        case c_gopast_non:
             /* FIXME: unless we can prove that c is either definitely atlimit
              * or definitely not atlimit... */
             return -1;
@@ -771,6 +775,10 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
             case c_next:
             case c_grouping:
             case c_non:
+            case c_goto_grouping:
+            case c_gopast_grouping:
+            case c_goto_non:
+            case c_gopast_non:
             case c_hop:
                 if (++score >= 2)
                     return score;
