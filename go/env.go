@@ -43,14 +43,13 @@ func (env *Env) SetCurrent(s string) {
 
 func (env *Env) ReplaceS(bra, ket int, s string) int32 {
 	adjustment := int32(len(s)) - (int32(ket) - int32(bra))
-	result, _ := splitAt(env.current, bra)
+	result := env.current[:bra]
+	result += s
 	rsplit := ket
 	if ket < bra {
 		rsplit = bra
 	}
-	_, rhs := splitAt(env.current, rsplit)
-	result += s
-	result += rhs
+	result += env.current[rsplit:]
 
 	newLim := int32(env.Limit) + adjustment
 	env.Limit = int(newLim)
