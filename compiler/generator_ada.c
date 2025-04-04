@@ -287,6 +287,10 @@ static int need_c_var(struct node *p) {
             case c_gopast:
             case c_goto:
             case c_grouping:
+            case c_goto_grouping:
+            case c_gopast_grouping:
+            case c_goto_non:
+            case c_gopast_non:
             case c_hop:
             case c_literalstring:
             case c_next:
