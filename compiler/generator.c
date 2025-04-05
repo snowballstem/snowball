@@ -200,7 +200,10 @@ static void write_block_start(struct generator * g) {
 }
 
 static void write_block_end(struct generator * g) {
-    if (g->line_labelled == g->line_count) { wms(g, ";"); write_newline(g); }
+    if (g->line_labelled == g->line_count) {
+        // Before C23, `;` is required between a label and the block end.
+        w(g, "~M;~N");
+    }
     w(g, "~-~M}~N");
 }
 
