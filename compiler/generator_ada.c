@@ -280,41 +280,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
     }
 }
 
-static int need_c_var(struct node *p) {
-    while (p) {
-        switch (p->type) {
-            case c_attach:
-            case c_gopast:
-            case c_goto:
-            case c_grouping:
-            case c_goto_grouping:
-            case c_gopast_grouping:
-            case c_goto_non:
-            case c_gopast_non:
-            case c_hop:
-            case c_literalstring:
-            case c_next:
-            case c_non:
-                return 1;
-            case c_assign:
-                // Only uses variable C in forward mode.
-                if (p->mode == m_forward) return 1;
-                break;
-            case c_name:
-                if (p->name->type == t_string) return 1;
-                break;
-        }
-        if (p->left && need_c_var(p->left)) {
-            return 1;
-        }
-        if (p->aux && need_c_var(p->aux)) {
-            return 1;
-        }
-        p = p->right;
-    }
-    return 0;
-}
-
 static void w(struct generator * g, const char * s) {
     writef(g, s, NULL);
 }
@@ -628,6 +593,7 @@ static void generate_next(struct generator * g, struct node * p) {
         w(g, "~MC := Skip_Utf8_Backward (Z);~N");
     write_failure_if(g, "C < 0", p);
     w(g, "~MZ.C := C;~N");
+    g->temporary_used = true;
 }
 
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
@@ -651,6 +617,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
         else
             w(g, "~MZ.C := Z.C - C;~N");
     }
+    g->temporary_used = true;
 }
 
 static void generate_GO(struct generator * g, struct node * p, int style) {
@@ -815,6 +782,7 @@ static void generate_hop(struct generator * g, struct node * p) {
     generate_AE(g, p->AE); writef(g, ");~N", p);
     write_failure_if(g, "C < 0", p);
     writef(g, "~MZ.C := C;~N", p);
+    g->temporary_used = true;
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -879,7 +847,10 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     writef(g, "~MInsert (Z, Z.C, Z.C, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) w(g, "~MZ.C := C;~N");
+    if (keep_c) {
+	w(g, "~MZ.C := C;~N");
+	g->temporary_used = true;
+    }
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
@@ -894,7 +865,10 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) w(g, "~MZ.C := C;~N");
+    if (keep_c) {
+	w(g, "~MZ.C := C;~N");
+	g->temporary_used = true;
+    }
 }
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
@@ -1121,6 +1095,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->I[1] = q->largest_ch;
     writef(g, "~M~S1Grouping~S0 (Z, ~V0, ~I0, ~I1, False, C);~N", p);
     write_failure_if(g, "C /= 0", p);
+    g->temporary_used = true;
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1129,6 +1104,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     g->V[0] = p->name;
     writef(g, "~MC := Eq_S~S0 (Z, Ada.Strings.Unbounded.To_String (~V0));", p);
     write_failure_if(g, "C = 0", p);
+    g->temporary_used = true;
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1143,6 +1119,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     } else {
         writef(g, "~MZ.C := Z.C - C;~N", p);
     }
+    g->temporary_used = true;
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -1152,22 +1129,13 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    struct str *saved_output;
-    struct str *saved_declarations;
-
     /* Generate function header. */
     g->V[0] = q;
     w(g, "~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
-    if (need_c_var(p->left)) {
-        w(g, "~M~MC : Result_Index;~N");
-    }
-    if (need_among_var(p->left)) {
-        w(g, "~M~MA : Integer;~N");
-    }
 
     /* Save output. */
-    saved_output = g->outbuf;
-    saved_declarations = g->declarations;
+    struct str *saved_output = g->outbuf;
+    struct str *saved_declarations = g->declarations;
     g->outbuf = str_new();
     g->declarations = str_new();
 
@@ -1180,6 +1148,7 @@ static void generate_define(struct generator * g, struct node * p) {
     /* Generate function body. */
     w(g, "~{");
     int signals = check_possible_signals_list(g, p->left, c_define, 0);
+    g->temporary_used = false;
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
@@ -1189,6 +1158,14 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     g->V[0] = q;
     w(g, "~-~Mend ~W0;~N");
+
+    if (g->temporary_used) {
+        str_append_string(saved_output, "      C : Result_Index;\n");
+    }
+
+    if (need_among_var(p->left)) {
+        str_append_string(saved_output, "      A : Integer;\n");
+    }
 
     if (g->var_number) {
         str_append(saved_output, g->declarations);
