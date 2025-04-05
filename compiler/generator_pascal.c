@@ -789,8 +789,8 @@ static void generate_hop(struct generator * g, struct node * p) {
         write_failure_if(g, "(C ~S1) Or (C ~S2 FCursor)", p);
     }
     writef(g, "~MFCursor := C;~N", p);
-    g->temporary_used = true;
     writef(g, "~}", p);
+    g->temporary_used = true;
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
@@ -1125,7 +1125,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->V[0] = q;
     w(g, "~MFunction T~n.~W0 : Boolean;~N");
 
-    /* Save output */
+    /* Save output. */
     struct str *saved_output = g->outbuf;
     struct str *saved_declarations = g->declarations;
     g->outbuf = str_new();
@@ -1137,10 +1137,10 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
-    int signals = check_possible_signals_list(g, p->left, c_define, 0);
 
     /* Generate function body. */
     w(g, "~{");
+    int signals = check_possible_signals_list(g, p->left, c_define, 0);
     g->temporary_used = false;
     generate(g, p->left);
     if (p->left->right) {
