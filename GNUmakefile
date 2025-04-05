@@ -23,6 +23,8 @@ csharp_src_dir = $(csharp_src_main_dir)/Algorithms
 csharp_sample_dir = csharp/Stemwords
 
 FPC ?= fpc
+# Enable warnings, info, notes; select "FILE:LINE:" diagnostic format.
+FPC_FLAGS ?= -veiwnr
 pascal_src_dir = pascal
 
 python ?= python3
@@ -273,7 +275,7 @@ pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
 	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
 
 pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
-	$(FPC) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
+	$(FPC) $(FPC_FLAGS) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
