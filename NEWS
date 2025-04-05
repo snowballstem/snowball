@@ -725,7 +725,7 @@ Compiler
 * Don't count `$x = x + 1` as initialising or using `x`, so it's now handled
   like `$x += 1` already is.
 
-* Comments are now only included in the generated code if command like option
+* Comments are now only included in the generated code if command line option
   -comments is specified.
 
   The comments in the generated code are useful if you're trying to debug the
