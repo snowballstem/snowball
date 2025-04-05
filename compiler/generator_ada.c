@@ -1329,7 +1329,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             }
             call_done = 1;
         } else {
-            writef(g, "~f~N", p);
+            write_failure(g);
         }
         writef(g, "~-~Mend if;~N", p);
     } else {
