@@ -31,10 +31,10 @@ jobs:
           CC: clang
         - name: "C"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -Werror'
         - name: "C (clang)"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -Werror'
           CC: clang
         - name: java
           JAVA: java
