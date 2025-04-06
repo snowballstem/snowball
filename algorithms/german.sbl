@@ -112,6 +112,9 @@ backwardmode (
                 'st'
                 (   st_ending hop 3 delete
                 )
+                'et' // E.g. vorbereitet
+                (   't' delete
+                )
             )
         )
         do (

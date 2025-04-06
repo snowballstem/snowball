@@ -28,9 +28,13 @@ Type
 
     Protected
         Function InGrouping(s : array of char; min, max : Integer) : Boolean;
+        Function GoInGrouping(s : array of char; min, max : Integer) : Boolean;
         Function InGroupingBk(s : array of char; min, max : Integer) : Boolean;
+        Function GoInGroupingBk(s : array of char; min, max : Integer) : Boolean;
         Function OutGrouping(s : array of char; min, max : Integer) : Boolean;
+        Function GoOutGrouping(s : array of char; min, max : Integer) : Boolean;
         Function OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
+        Function GoOutGroupingBk(s : array of char; min, max : Integer) : Boolean;
 
         Function EqS(s_size : Integer; s : AnsiString) : Boolean;
         Function EqSBk(s_size : Integer; s : AnsiString) : Boolean;
@@ -89,6 +93,23 @@ Begin
     Result := True;
 End;
 
+Function TSnowballProgram.GoInGrouping(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+    While (FCursor < FLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor + 1]);
+        If (ch > max) Or (ch < min) Then Exit;
+
+        ch := ch - min;
+        If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+
+        Inc(FCursor);
+    End;
+    Result := False;
+End;
+
 Function TSnowballProgram.InGroupingBk(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
@@ -103,6 +124,23 @@ Begin
 
     Dec(FCursor);
     Result := True;
+End;
+
+Function TSnowballProgram.GoInGroupingBk(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+    While (FCursor > FBkLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor]);
+        If (ch > max) Or (ch < min) Then Exit;
+
+        ch := ch - min;
+        If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+
+        Dec(FCursor);
+    End;
+    Result := False;
 End;
 
 Function TSnowballProgram.OutGrouping(s : array of char; min, max : Integer) : Boolean;
@@ -128,6 +166,29 @@ Begin
     End;
 End;
 
+Function TSnowballProgram.GoOutGrouping(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+
+    While (FCursor < FLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor + 1]);
+
+        If (ch <= max) And (ch >= min) Then
+        Begin
+            ch := ch - min;
+            If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) <> 0 Then
+            Begin
+                Exit;
+            End;
+        End;
+
+        Inc(FCursor);
+    End;
+    Result := False;
+End;
+
 Function TSnowballProgram.OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
@@ -149,6 +210,27 @@ Begin
         Dec(FCursor);
         Result := True;
     End;
+End;
+
+Function TSnowballProgram.GoOutGroupingBk(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+
+    While (FCursor > FBkLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor]);
+        If (ch <= max) And (ch >= min) Then
+        Begin
+            ch := ch - min;
+            If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) <> 0 Then
+            Begin
+                Exit;
+            End;
+        End;
+        Dec(FCursor);
+    End;
+    Result := False;
 End;
 
 Function TSnowballProgram.EqS(s_size : Integer; s : AnsiString) : Boolean;

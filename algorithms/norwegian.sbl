@@ -17,9 +17,13 @@ stringescapes {}
 
 stringdef ae   '{U+00E6}'
 stringdef ao   '{U+00E5}'
+stringdef e^   '{U+00EA}'  // e-circumflex
+stringdef o`   '{U+00F2}'  // o-grave
+stringdef o'   '{U+00F3}'  // o-acute
+stringdef o^   '{U+00F4}'  // o-circumflex
 stringdef o/   '{U+00F8}'
 
-define v 'aeiouy{ae}{ao}{o/}'
+define v 'ae{e^}io{o`}{o'}{o^}uy{ae}{ao}{o/}'
 
 define s_ending  'bcdfghjlmnoptvyz'
 
@@ -28,7 +32,7 @@ define mark_regions as (
     $p1 = limit
 
     test ( hop 3 setmark x )
-    goto v  gopast non-v  setmark p1
+    gopast v  gopast non-v  setmark p1
     try ( $p1 < x  $p1 = x )
 )
 

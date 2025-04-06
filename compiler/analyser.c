@@ -37,7 +37,6 @@ static struct node * C_style(struct analyser * a, const char * s, int token);
 
 
 static void print_node_(struct node * p, int n, const char * s) {
-
     printf("%*s%s", n * 2, s, name_of_token(p->type));
     if (p->name) {
         putchar(' ');
@@ -323,7 +322,6 @@ static symbol * new_literalstring(struct analyser * a) {
 }
 
 static int read_AE_test(struct analyser * a) {
-
     struct tokeniser * t = a->tokeniser;
     switch (read_token(t)) {
         case c_assign: return c_mathassign;
@@ -741,7 +739,6 @@ static int compare_node(const struct node *p, const struct node *q) {
 }
 
 static struct node * make_among(struct analyser * a, struct node * p, struct node * substring) {
-
     NEW(among, x);
     NEWVEC(amongvec, v, p->number);
     struct node * q = p->left;
@@ -829,7 +826,8 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->command_count = result - 1;
     {
         NEWVEC(node*, commands, x->command_count);
-        memset(commands, 0, x->command_count * sizeof(struct node*));
+        for (int i = 0; i != x->command_count; ++i)
+            commands[i] = NULL;
         for (w0 = v; w0 < w1; w0++) {
             if (w0->result > 0) {
                 /* result == -1 when there's no command. */
@@ -963,7 +961,6 @@ static struct node * read_among(struct analyser * a) {
 }
 
 static struct node * read_substring(struct analyser * a) {
-
     struct node * p = new_node(a, c_substring);
     if (a->substring != NULL) error2(a, e_substring_preceded_by_substring, a->substring->line_number);
     a->substring = p;
@@ -1041,10 +1038,45 @@ static struct node * read_C(struct analyser * a) {
         case c_fail:
         case c_test:
         case c_do:
-        case c_goto:
-        case c_gopast:
         case c_repeat:
             return C_style(a, "C", token);
+        case c_goto:
+        case c_gopast: {
+            struct node * subcommand = read_C(a);
+            if (subcommand->type == c_grouping || subcommand->type == c_non) {
+                /* We synthesise special command for "goto" or "gopast" when
+                 * used on a grouping or an inverted grouping - the movement of
+                 * c by the matching action is exactly what we want!
+                 *
+                 * Adding the tokens happens to give unique values (the code
+                 * would fail to compile if it didn't!)
+                 */
+                switch (token + subcommand->type) {
+                    case c_goto + c_grouping:
+                        subcommand->type = c_goto_grouping;
+                        break;
+                    case c_gopast + c_grouping:
+                        subcommand->type = c_gopast_grouping;
+                        break;
+                    case c_goto + c_non:
+                        subcommand->type = c_goto_non;
+                        break;
+                    case c_gopast + c_non:
+                        subcommand->type = c_gopast_non;
+                        break;
+                    default:
+                        fprintf(stderr, "Unexpected go/grouping combination: %s %s",
+                                name_of_token(token),
+                                name_of_token(subcommand->type));
+                        exit(1);
+                }
+                return subcommand;
+            }
+
+            struct node * p = new_node(a, token);
+            p->left = subcommand;
+            return p;
+        }
         case c_loop:
         case c_atleast:
             return C_style(a, "AC", token);
@@ -1124,13 +1156,12 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_dollar: {
-            struct tokeniser * t = a->tokeniser;
             read_token(t);
             if (t->token == c_bra) {
                 /* Handle newer $(AE REL_OP AE) syntax. */
                 struct node * n = read_AE(a, NULL, 0);
                 read_token(t);
-                int token = t->token;
+                token = t->token;
                 switch (token) {
                     case c_assign:
                         count_error(a);

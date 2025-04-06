@@ -35,3 +35,52 @@ stem), and over-stemming is more problematic than under-stemming so we tend not
 to stem in cases that are hard to resolve.  If you want to always reduce words
 to a root form and/or get a root form which is itself a word then Snowball's
 stemming algorithms likely aren't the right answer.
+
+Building Snowball
+=================
+
+GNU make is required to build Snowball.
+
+The build system is currently structured as two separate stages for many of the
+target languages.
+
+The first stage builds the Snowball compiler and runs it to create target
+language code (and it can also run tests on each stemmer).  The expectation is
+that you then create a "distribution" tarballs of this code with ``make dist``
+(or to create one for a specific target language, e.g.  ``make
+dist_libstemmer_c`` for C).  These tarballs are created in the ``dist/``
+subdirectory.
+
+To actually build the libstemmer library you then unpack and build the
+distribution tarball, e.g. for C::
+
+    tar xf dist/libstemmer_c-2.2.0.tar.gz
+    cd libstemmer_c-2.2.0
+    make
+
+Cross-compiling
+---------------
+
+If cross-compiling starting from the git repo, the Snowball compiler needs to
+be built with a native compiler then libstemmer with the cross-compiler.  For
+example::
+
+    make CC=cc dist_libstemmer_c
+    tar xf dist/libstemmer_c-2.2.0.tar.gz
+    cd libstemmer_c-2.2.0
+    make CC=riscv64-unknown-linux-gnu-gcc
+
+If you are cross-compiling to or from Microsoft Windows, you'll need to also
+work around an assumption in libstemmer's ``Makefile`` which sets ``EXEEXT``
+based on the OS you are building on::
+
+    ifeq ($(OS),Windows_NT)
+    EXEEXT=.exe
+    endif
+
+For example, if cross-compiling from Linux to Microsoft Windows, use something
+like this for the libstemmer build::
+
+    make CC=x86_64-w64-mingw32-gcc EXEEXT=.exe
+
+When going the other way, you'll need to use ``EXEEXT=``.

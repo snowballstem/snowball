@@ -160,7 +160,7 @@ backwardmode (
     define exception2 as (
 
         [substring] atlimit among(
-            'inning' 'outing' 'canning' 'herring' 'earring'
+            'inning' 'outing' 'canning' 'herring' 'earring' 'evening'
             'proceed' 'exceed' 'succeed'
 
             // ... extensions possible here ...
@@ -175,7 +175,6 @@ define exception1 as (
 
         /* special changes: */
 
-        'skis'      (<-'ski')
         'skies'     (<-'sky')
         'dying'     (<-'die')
         'lying'     (<-'lie')

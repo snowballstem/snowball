@@ -25,16 +25,16 @@ jobs:
       matrix:
         include:
         - name: "C distribution build"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wmissing-prototypes -Wmissing-declarations -Wshadow -Wdeclaration-after-statement -Werror'
         - name: "C distribution build (clang)"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wmissing-prototypes -Wmissing-declarations -Wshadow -Wdeclaration-after-statement -Werror'
           CC: clang
         - name: "C"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -Werror'
         - name: "C (clang)"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -Werror'
           CC: clang
         - name: java
           JAVA: java

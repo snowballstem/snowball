@@ -8,10 +8,6 @@ import (
 const MaxInt = math.MaxInt32
 const MinInt = math.MinInt32
 
-func splitAt(str string, mid int) (string, string) {
-	return str[:mid], str[mid:]
-}
-
 func min(a, b int) int {
 	if a < b {
 		return a

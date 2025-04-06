@@ -508,6 +508,12 @@ extern const char * name_of_token(int code) {
         case c_call:         return "call";
         case c_booltest:     return "Boolean test";
         case c_functionend:  return "Function end";
+        case c_goto_grouping:
+                             return "goto grouping";
+        case c_gopast_grouping:
+                             return "gopast grouping";
+        case c_goto_non:     return "goto non";
+        case c_gopast_non:   return "gopast non";
         case -2:             return "start of text";
         case -1:             return "end of text";
         default:             return "?";
