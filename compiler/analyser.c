@@ -1043,6 +1043,13 @@ static struct node * read_C(struct analyser * a) {
         case c_goto:
         case c_gopast: {
             struct node * subcommand = read_C(a);
+            // FIXME: javascript/base-stemmer-es6.mjs currently lacks the new
+            // runtime methods, which illustrates why we really want to avoid
+            // having to maintain two variants of essentially the same code
+            // like this.
+            //
+            // Just hack off the optimisation until this gets resolved.
+#if 0
             if (subcommand->type == c_grouping || subcommand->type == c_non) {
                 /* We synthesise special command for "goto" or "gopast" when
                  * used on a grouping or an inverted grouping - the movement of
@@ -1072,6 +1079,7 @@ static struct node * read_C(struct analyser * a) {
                 }
                 return subcommand;
             }
+#endif
 
             struct node * p = new_node(a, token);
             p->left = subcommand;
