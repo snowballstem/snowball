@@ -23,7 +23,7 @@ const stemming = async (lang, input, output, encoding) => {
         input: inputStream,
         terminal: false
     });
-    
+
     const out = fs.createWriteStream(output, { encoding });
 
     return new Promise((resolve, reject) => {
