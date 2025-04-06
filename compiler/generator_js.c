@@ -1286,8 +1286,7 @@ static void generate_class_begin(struct generator * g) {
              "~N"
              "const ~n = (() => {~+~N"
              "~Mconst base = new ~P();~N");
-    }
-    else if (g->options->js_version == 1) {
+    } else if (g->options->js_version == 1) {
         w(g, "// deno-lint-ignore-file~N"
              "import ~P from './base-stemmer.mjs'~N"
              "~N"
@@ -1307,21 +1306,21 @@ static void generate_class_begin(struct generator * g) {
 
 static void generate_class_end(struct generator * g) {
     w(g, "~N");
-    if(g->options->js_version == 2)
+    if (g->options->js_version == 2)
         w(g, "~Mreturn class {~+~N");
     w(g, "~M/**@return{string}*/~N");
-    if(g->options->js_version == 2)
+    if (g->options->js_version == 2)
         w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
     else
         w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
     w(g, "~Mbase.setCurrent(word);~N");
-    if(g->options->js_version == 2)
+    if (g->options->js_version == 2)
         w(g, "~Mstem();~N");
     else
         w(g, "~Mthis.stem();~N");
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
-    if(g->options->js_version == 2){
+    if (g->options->js_version == 2){
         w(g, "~-~M};~N");
         w(g, "~-})();~N");
     } else
