@@ -332,15 +332,10 @@ struct generator {
 #endif
     int margin;
 
-    /* if > 0, keep_count to restore in case of a failure;
-     * if < 0, the negated keep_count for the limit to restore in case of
-     * failure. */
-    int failure_keep_count;
-#if !defined(DISABLE_JAVA) && !defined(DISABLE_JS) && !defined(DISABLE_PYTHON) && !defined(DISABLE_CSHARP)
-    struct str * failure_str;  /* This is used by some generators instead of failure_keep_count */
-#endif
+    /* Target language code to execute in case of failure. */
+    struct str * failure_str;
 
-    int label_used;     /* Keep track of whether the failure label is used. */
+    int label_used;      /* Keep track of whether the failure label is used. */
     int failure_label;
     int debug_count;
     int copy_from_count; /* count of calls to copy_from() */
