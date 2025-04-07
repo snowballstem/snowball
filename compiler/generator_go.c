@@ -606,7 +606,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~Mfor _ = range make([]struct{},");
     generate_AE(g, p->AE);
-    writef(g, ") ~{", p);
+    writef(g, ") {~+", p);
 
     generate(g, p->left);
 
