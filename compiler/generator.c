@@ -1553,6 +1553,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     g->next_label = 0;
+    g->var_number = 0;
 
     g->S[0] = q->type == t_routine ? "static" : "extern";
     g->V[0] = q;
