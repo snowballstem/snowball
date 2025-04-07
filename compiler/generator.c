@@ -561,10 +561,9 @@ static int check_possible_signals(struct generator * g,
             int r = 1;
 
             if (x->substring == NULL) {
-                if (x->always_matches) {
-                    return 1;
+                if (!x->always_matches) {
+                    r = -1;
                 }
-                r = -1;
             }
 
             if (x->command_count > 0) {
