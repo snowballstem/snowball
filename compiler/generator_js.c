@@ -1281,56 +1281,71 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    if (g->options->js_type == JS_ES6) {
-        w(g, "import ~P from './base-stemmer-es6.mjs'~N"
-             "~N"
-             "const ~n = (() => {~+~N"
-             "~Mconst base = new ~P();~N");
-    } else if (g->options->js_type == JS_ESM) {
-        w(g, "// deno-lint-ignore-file~N"
-             "import ~P from './base-stemmer.mjs'~N"
-             "~N"
-             "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
-             "~N"
-             "/** @type {{ new(): Stemmer }} */~N"
-             "~C ~n = function() {~+~N"
-             "~M~D base = new ~P();~N");
-    } else {
-        w(g, "/**@constructor*/~N"
-             "~D ~n = function() {~+~N"
-             "~M~C ~P = require('./base-stemmer.js');~N"
-             "~M~D base = new ~P();~N");
+    switch (g->options->js_type) {
+        case JS_GLOBAL:
+            w(g, "/**@constructor*/~N"
+                 "~D ~n = function() {~+~N"
+                 "~M~C ~P = require('./base-stemmer.js');~N"
+                 "~M~D base = new ~P();~N");
+            break;
+        case JS_ESM:
+            w(g, "// deno-lint-ignore-file~N"
+                 "import ~P from './base-stemmer.mjs'~N"
+                 "~N"
+                 "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
+                 "~N"
+                 "/** @type {{ new(): Stemmer }} */~N"
+                 "~C ~n = function() {~+~N"
+                 "~M~D base = new ~P();~N");
+            break;
+        case JS_ES6:
+            w(g, "import ~P from './base-stemmer-es6.mjs'~N"
+                 "~N"
+                 "const ~n = (() => {~+~N"
+                 "~Mconst base = new ~P();~N");
+            break;
     }
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N");
-    if (g->options->js_type == JS_ES6)
-        w(g, "~Mreturn class {~+~N");
-    w(g, "~M/**@return{string}*/~N");
-    if (g->options->js_type == JS_ES6)
-        w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
-    else
-        w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
-    w(g, "~Mbase.setCurrent(word);~N");
-    if (g->options->js_type == JS_ES6)
-        w(g, "~Mstem();~N");
-    else
-        w(g, "~Mthis.stem();~N");
-    w(g, "~Mreturn base.getCurrent();~N");
-    w(g, "~-~M};~N");
-    if (g->options->js_type == JS_ES6){
-        w(g, "~-~M};~N");
-        w(g, "~-})();~N");
-    } else
-        w(g, "~-};~N");
-    if (g->options->js_type == JS_ES6 || g->options->js_type == JS_ESM) {
-        w(g, "~N"
-             "export default ~n~N");
-    } else {
-        w(g, "~N"
-             "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+    write_newline(g);
+    switch (g->options->js_type) {
+        case JS_GLOBAL:
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mthis.stem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-};~N");
+            w(g, "~N"
+                 "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+            break;
+        case JS_ESM:
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mthis.stem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-};~N");
+            w(g, "~N"
+                 "export default ~n~N");
+            break;
+        case JS_ES6:
+            w(g, "~Mreturn class {~+~N");
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mstem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-~M};~N");
+            w(g, "~-})();~N");
+            w(g, "~N"
+                 "export default ~n~N");
+            break;
     }
 }
 
