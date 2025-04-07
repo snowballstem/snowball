@@ -848,8 +848,8 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) {
-	w(g, "~MZ.C := C;~N");
-	g->temporary_used = true;
+        w(g, "~MZ.C := C;~N");
+        g->temporary_used = true;
     }
 }
 
@@ -866,8 +866,8 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) {
-	w(g, "~MZ.C := C;~N");
-	g->temporary_used = true;
+        w(g, "~MZ.C := C;~N");
+        g->temporary_used = true;
     }
 }
 
