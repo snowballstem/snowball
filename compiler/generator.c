@@ -1065,7 +1065,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    w(g, "~Mwhile(1) {~N~+");
+    w(g, "~Mwhile (1) {~N~+");
 
     struct str * savevar = NULL;
     if (style == 1 || repeat_restore(g, p->left)) {
@@ -1112,7 +1112,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-    writef(g, "~Mwhile(1) {~+~N", p);
+    writef(g, "~Mwhile (1) {~+~N", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
