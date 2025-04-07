@@ -229,7 +229,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             case 'C': { // Constant.
-                if (g->options->js_version >= 1) {
+                if (g->options->js_type != JS_GLOBAL) {
                     w(g, "const");
                 } else {
                     w(g, "/** @const */ var");
@@ -237,7 +237,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'D': { // Declare variable.
-                if (g->options->js_version >= 1) {
+                if (g->options->js_type != JS_GLOBAL) {
                     w(g, "let");
                 } else {
                     w(g, "var");
@@ -1077,7 +1077,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     g->V[0] = q;
-    if (g->options->js_version == 2 || q->type == t_routine) {
+    if (g->options->js_type == JS_ES6 || q->type == t_routine) {
         w(g, "~M/** @return {boolean} */~N"
              "~Mfunction ~W0() {~+~N");
     } else {
@@ -1281,12 +1281,12 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    if (g->options->js_version == 2) {
+    if (g->options->js_type == JS_ES6) {
         w(g, "import ~P from './base-stemmer-es6.mjs'~N"
              "~N"
              "const ~n = (() => {~+~N"
              "~Mconst base = new ~P();~N");
-    } else if (g->options->js_version == 1) {
+    } else if (g->options->js_type == JS_ESM) {
         w(g, "// deno-lint-ignore-file~N"
              "import ~P from './base-stemmer.mjs'~N"
              "~N"
@@ -1306,26 +1306,26 @@ static void generate_class_begin(struct generator * g) {
 
 static void generate_class_end(struct generator * g) {
     w(g, "~N");
-    if (g->options->js_version == 2)
+    if (g->options->js_type == JS_ES6)
         w(g, "~Mreturn class {~+~N");
     w(g, "~M/**@return{string}*/~N");
-    if (g->options->js_version == 2)
+    if (g->options->js_type == JS_ES6)
         w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
     else
         w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
     w(g, "~Mbase.setCurrent(word);~N");
-    if (g->options->js_version == 2)
+    if (g->options->js_type == JS_ES6)
         w(g, "~Mstem();~N");
     else
         w(g, "~Mthis.stem();~N");
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
-    if (g->options->js_version == 2){
+    if (g->options->js_type == JS_ES6){
         w(g, "~-~M};~N");
         w(g, "~-})();~N");
     } else
         w(g, "~-};~N");
-    if (g->options->js_version == 2 || g->options->js_version == 1) {
+    if (g->options->js_type == JS_ES6 || g->options->js_type == JS_ESM) {
         w(g, "~N"
              "export default ~n~N");
     } else {
