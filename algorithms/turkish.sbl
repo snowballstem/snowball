@@ -441,11 +441,20 @@ backwardmode (
 )
 
 define remove_proper_noun_suffix as (
+  // Remove any leading apostrophes (e.g. from tokenisation of single-quoted
+  // text).
+  do ([goto not '{'}'] delete)
+
   // https://en.wikipedia.org/wiki/Turkish_language says "In modern
   // Turkish orthography, an apostrophe is used to separate proper names
   // from any suffixes" with the example "Türkiye'dir ("it is Turkey")".
-  // Therefore we truncate at the first apostrophe.
-  do (goto '{'}' [ tolimit ] delete)
+  // Therefore we truncate at the first apostrophe, provided there are at least
+  // two characters before it (which avoids adversely affecting some foreign
+  // names and words such as "o'connor", "l'entrée").
+  do (
+    hop 2
+    goto '{'}' [ tolimit ] delete
+  )
 )
 
 // Test if there is more than one syllable.
