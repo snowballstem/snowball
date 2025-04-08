@@ -37,7 +37,7 @@ stringdef u`   '{U+00F9}'  // u-grave
 define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
 
 // Replace -oux with -ou if preceded by one of these letters.
-define oux_ending 'bhjlnpr'
+define oux_ending 'bhjlnp'
 
 // Single character elisions
 define elision_char 'cdjlmnst'
