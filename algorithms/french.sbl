@@ -14,7 +14,7 @@ externals ( stem )
 
 integers ( pV p1 p2 )
 
-groupings ( elision_char v keep_with_s )
+groupings ( elision_char v keep_with_s oux_ending )
 
 stringescapes {}
 
@@ -35,6 +35,9 @@ stringdef u^   '{U+00FB}'  // u-circumflex
 stringdef u`   '{U+00F9}'  // u-grave
 
 define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
+
+// Replace -oux with -ou if preceded by one of these letters.
+define oux_ending 'bhjlnpr'
 
 // Single character elisions
 define elision_char 'cdjlmnst'
@@ -159,6 +162,7 @@ backwardmode (
             )
             'eaux' (<- 'eau')
             'aux'  (R1 <- 'al')
+            'oux'  (oux_ending <- 'ou')
             'euse'
             'euses'((R2 delete) or (R1<-'eux'))
 
