@@ -1044,7 +1044,7 @@ static struct node * read_C(struct analyser * a) {
         case c_gopast: {
             struct node * subcommand = read_C(a);
             if (subcommand->type == c_grouping || subcommand->type == c_non) {
-                /* We synthesise special command for "goto" or "gopast" when
+                /* We synthesise special commands for "goto" or "gopast" when
                  * used on a grouping or an inverted grouping - the movement of
                  * c by the matching action is exactly what we want!
                  *
