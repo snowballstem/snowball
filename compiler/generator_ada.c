@@ -1658,8 +1658,6 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (i = 0; i < size; i++) map[i] = 0;
 
-    /* Using unicode would require revision here */
-
     for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
