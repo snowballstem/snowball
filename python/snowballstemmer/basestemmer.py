@@ -1,4 +1,4 @@
-class BaseStemmer(object):
+class BaseStemmer:
     def __init__(self):
         self.set_current("")
 
