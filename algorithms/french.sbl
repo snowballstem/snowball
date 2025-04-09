@@ -76,6 +76,8 @@ define mark_regions as (
             'par'  // paris, parie, pari
             'col'  // colis
             'tap'  // tapis
+                ()
+            'ni' (v) // niais/nierais/nié/niâmes/nièrent
             // extensions possible here
         )
         or
