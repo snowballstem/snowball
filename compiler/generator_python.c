@@ -55,10 +55,14 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "u\"");
     for (i = 0; i < SIZE(p); i++) {
         int ch = p[i];
-        if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\') write_string(g, "\\");
-            write_char(g, ch);
+        if (32 <= ch && ch < 0x590 && ch != 127) {
+            if (ch == '"' || ch == '\\') write_char(g, '\\');
+            // Python uses ENC_WIDECHARS so we need to convert.
+            write_wchar_as_utf8(g, ch);
         } else {
+            // Use escapes for anything over 0x590 as a crude way to avoid
+            // LTR characters affecting the rendering of source character
+            // order in confusing ways.
             write_string(g, "\\u");
             write_hex4(g, ch);
         }
@@ -1322,6 +1326,9 @@ static void generate_label_classes(struct generator * g)
 extern void generate_program_python(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
+
+    // Only needed for Python 2, which defaults to ASCII.
+    w(g, "#-*- coding: utf-8 -*-~N");
 
     write_start_comment(g, "# ", NULL);
     if (g->analyser->int_limits_used) {

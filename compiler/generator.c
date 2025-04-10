@@ -2117,6 +2117,10 @@ extern void write_string(struct generator * g, const char * s) {
     str_append_string(g->outbuf, s);
 }
 
+extern void write_wchar_as_utf8(struct generator * g, symbol ch) {
+    str_append_wchar_as_utf8(g->outbuf, ch);
+}
+
 extern void write_int(struct generator * g, int i) {
     str_append_int(g->outbuf, i);
 }

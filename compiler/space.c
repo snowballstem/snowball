@@ -268,6 +268,22 @@ extern void str_append_int(struct str * str, int i) {
     str_append_string(str, s);
 }
 
+/* Append wide character to a string as UTF-8. */
+extern void str_append_wchar_as_utf8(struct str * str, symbol ch) {
+    if (ch < 0x80) {
+        str_append_ch(str, ch);
+        return;
+    }
+    if (ch < 0x800) {
+        str_append_ch(str, (ch >> 6) | 0xC0);
+        str_append_ch(str, (ch & 0x3F) | 0x80);
+        return;
+    }
+    str_append_ch(str, (ch >> 12) | 0xE0);
+    str_append_ch(str, ((ch >> 6) & 0x3F) | 0x80);
+    str_append_ch(str, (ch & 0x3F) | 0x80);
+}
+
 /* Clear a string */
 extern void str_clear(struct str * str) {
     SIZE(str->data) = 0;
