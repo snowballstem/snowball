@@ -253,17 +253,19 @@ backwardmode (
 define Lose_prefix as (
     ['ge'] test hop 3 test (gopast ('ij' or v) repeat ('ij' or v) not atlimit)
     // Exceptions added:
-    not among (
+    among (
         // Avoid conflating `geeft` and `effen`/`effende`\`geeffende`.
-        'eft'
+        'eft' (false)
 
         // Avoid conflating `gevallen`/`geval` and `vallen`.
-        'val'
+        'val' (false)
+        'vali' (true)
 
         // Avoid conflating `gevaren`/`gevaar` (danger), `gevaarten` (huge
         // objects) and `varen` (to sail)
-        'var'
-        'vaa'
+        'vaa' 'vare' (false)
+
+        '' (true)
     )
     set GE_removed
     delete
