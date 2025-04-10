@@ -70,6 +70,22 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "\"");
 }
 
+static void write_literal_char(struct generator * g, symbol ch) {
+    write_string(g, "u\"");
+    if (32 <= ch && ch < 0x590 && ch != 127) {
+        if (ch == '"' || ch == '\\') write_char(g, '\\');
+        // Python uses ENC_WIDECHARS so we need to convert.
+        write_wchar_as_utf8(g, ch);
+    } else {
+        // Use escapes for anything over 0x590 as a crude way to avoid
+        // LTR characters affecting the rendering of source character
+        // order in confusing ways.
+        write_string(g, "\\u");
+        write_hex4(g, ch);
+    }
+    write_string(g, "\"");
+}
+
 static void write_margin(struct generator * g) {
     int i;
     for (i = 0; i < g->margin; i++) write_string(g, "    ");
@@ -524,13 +540,10 @@ static void generate_next(struct generator * g, struct node * p) {
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     g->V[0] = p->name;
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.go_~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.go_~S1_grouping~S0(~n.~W0)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
             w(g, "~Mself.cursor += 1~N");
@@ -969,13 +982,10 @@ static void generate_call(struct generator * g, struct node * p) {
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
     g->V[0] = p->name;
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.~S1_grouping~S0(~n.~W0)", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1256,27 +1266,17 @@ static void generate_amongs(struct generator * g) {
     }
 }
 
-static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
-    int range = q->largest_ch - q->smallest_ch + 1;
-    int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
-    symbol * map = create_b(size);
-    int i;
-    for (i = 0; i < size; i++) map[i] = 0;
-
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
 
-    w(g, "~M~W0 = [");
-    for (i = 0; i < size; i++) {
-        write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
+    w(g, "~M~W0 = {");
+    for (int i = 0; i < SIZE(b); i++) {
+        if (i > 0) w(g, ", ");
+        write_literal_char(g, b[i]);
     }
-    w(g, "]~N~N");
-    lose_b(map);
+    w(g, "}~N~N");
 }
 
 static void generate_groupings(struct generator * g) {

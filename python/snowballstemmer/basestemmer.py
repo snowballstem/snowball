@@ -27,95 +27,63 @@ class BaseStemmer(object):
         self.bra              = other.bra
         self.ket              = other.ket
 
-    def in_grouping(self, s, min, max):
+    def in_grouping(self, s):
         if self.cursor >= self.limit:
             return False
-        ch = ord(self.current[self.cursor])
-        if ch > max or ch < min:
-            return False
-        ch -= min
-        if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor] not in s:
             return False
         self.cursor += 1
         return True
 
-    def go_in_grouping(self, s, min, max):
+    def go_in_grouping(self, s):
         while self.cursor < self.limit:
-            ch = ord(self.current[self.cursor])
-            if ch > max or ch < min:
-                return True
-            ch -= min
-            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+            if self.current[self.cursor] not in s:
                 return True
             self.cursor += 1
         return False
 
-    def in_grouping_b(self, s, min, max):
+    def in_grouping_b(self, s):
         if self.cursor <= self.limit_backward:
             return False
-        ch = ord(self.current[self.cursor - 1])
-        if ch > max or ch < min:
-            return False
-        ch -= min
-        if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor - 1] not in s:
             return False
         self.cursor -= 1
         return True
 
-    def go_in_grouping_b(self, s, min, max):
+    def go_in_grouping_b(self, s):
         while self.cursor > self.limit_backward:
-            ch = ord(self.current[self.cursor - 1])
-            if ch > max or ch < min:
-                return True
-            ch -= min
-            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+            if self.current[self.cursor - 1] not in s:
                 return True
             self.cursor -= 1
         return False
 
-    def out_grouping(self, s, min, max):
+    def out_grouping(self, s):
         if self.cursor >= self.limit:
             return False
-        ch = ord(self.current[self.cursor])
-        if ch > max or ch < min:
-            self.cursor += 1
-            return True
-        ch -= min
-        if (s[ch >> 3] & (0X1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor] not in s:
             self.cursor += 1
             return True
         return False
 
-    def go_out_grouping(self, s, min, max):
+    def go_out_grouping(self, s):
         while self.cursor < self.limit:
-            ch = ord(self.current[self.cursor])
-            if ch <= max and ch >= min:
-                ch -= min
-                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
-                    return True
+            if self.current[self.cursor] in s:
+                return True
             self.cursor += 1
         return False
 
-    def out_grouping_b(self, s, min, max):
+    def out_grouping_b(self, s):
         if self.cursor <= self.limit_backward:
             return False
-        ch = ord(self.current[self.cursor - 1])
-        if ch > max or ch < min:
-            self.cursor -= 1
-            return True
-        ch -= min
-        if (s[ch >> 3] & (0X1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor - 1] not in s:
             self.cursor -= 1
             return True
         return False
 
-    def go_out_grouping_b(self, s, min, max):
+    def go_out_grouping_b(self, s):
         while self.cursor > self.limit_backward:
-            ch = ord(self.current[self.cursor - 1])
-            if ch <= max and ch >= min:
-                ch -= min
-                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
-                    return True
+            if self.current[self.cursor - 1] in s:
+                return True
             self.cursor -= 1
         return False
 
