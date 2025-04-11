@@ -1201,9 +1201,9 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->I[0] = x->number;
 
-    /* In forward mode with non-ASCII UTF-8 characters, the first character
+    /* In forward mode with non-ASCII UTF-8 characters, the first byte
      * of the string will often be the same, so instead look at the last
-     * common character position.
+     * common byte position.
      *
      * In backward mode, we can't match if there are fewer characters before
      * the current position than the minimum length.
