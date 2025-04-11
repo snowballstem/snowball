@@ -39,9 +39,8 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    int i;
     write_string(g, "\"");
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
             if (ch == '\"' || ch == '\\') write_string(g, "\\");
@@ -55,8 +54,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_margin(struct generator * g) {
-    int i;
-    for (i = 0; i < g->margin; i++) write_string(g, "    ");
+    for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 static void write_comment(struct generator * g, struct node * p) {
@@ -1158,9 +1156,8 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
-        int i;
         w(g, "~Mswitch (among_var) {~N~+");
-        for (i = 1; i <= x->command_count; i++) {
+        for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~Mcase ~I0:~N~+");
             generate(g, x->commands[i - 1]);
@@ -1323,31 +1320,26 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-
     w(g, "~M~C a_~I0 = [~N~+");
-    {
-        int i;
-        for (i = 0; i < x->literalstring_count; i++) {
-            g->I[0] = v->i;
-            g->I[1] = v->result;
-            g->L[0] = v->b;
-            g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~M[~L0, ~I0, ~I1");
-            if (v->function != NULL) {
-                w(g, ", ");
-                write_varname(g, v->function);
-            }
-            w(g, "]~S0~N");
-            v++;
+    for (int i = 0; i < x->literalstring_count; i++) {
+        g->I[0] = v[i].i;
+        g->I[1] = v[i].result;
+        g->L[0] = v[i].b;
+        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
+
+        w(g, "~M[~L0, ~I0, ~I1");
+        if (v[i].function != NULL) {
+            w(g, ", ");
+            write_varname(g, v[i].function);
         }
+        w(g, "]~S0~N");
     }
     w(g, "~-~M];~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x;
-    for (x = g->analyser->amongs; x; x = x->next) {
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
     }
 }
@@ -1359,15 +1351,14 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
     symbol * map = create_b(size);
-    int i;
-    for (i = 0; i < size; i++) map[i] = 0;
 
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
+    for (int i = 0; i < size; i++) map[i] = 0;
+
+    for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
-
     w(g, "~M~C /** Array<int> */ ~W0 = [");
-    for (i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
@@ -1377,8 +1368,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q;
-    for (q = g->analyser->groupings; q; q = q->next) {
+    for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
@@ -1387,8 +1377,7 @@ static void generate_groupings(struct generator * g) {
 static void generate_members(struct generator * g) {
     int wrote_members = false;
 
-    struct name * q;
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
@@ -1409,8 +1398,7 @@ static void generate_members(struct generator * g) {
 }
 
 static void generate_methods(struct generator * g) {
-    struct node * p;
-    for (p = g->analyser->program; p; p = p->right) {
+    for (struct node * p = g->analyser->program; p; p = p->right) {
         generate(g, p);
         g->unreachable = false;
     }

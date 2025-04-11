@@ -50,11 +50,10 @@ static void write_varref(struct generator * g, struct name * p) {  /* reference 
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    int i;
     // Ada supports UTF-8 literal strings, we only need to escape the quote and
     // special characters.
     write_char(g, '"');
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (ch == '"') {
             write_string(g, "\"\"");
@@ -72,8 +71,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_margin(struct generator * g) {
-    int i;
-    for (i = 0; i < g->margin; i++) write_string(g, "   ");
+    for (int i = 0; i < g->margin; i++) write_string(g, "   ");
 }
 
 static void write_relop(struct generator * g, int relop) {
@@ -1190,7 +1188,6 @@ static void generate_substring(struct generator * g, struct node * p) {
     int block = -1;
     unsigned int bitmap = 0;
     struct amongvec * among_cases = x->b;
-    int c;
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
@@ -1208,7 +1205,7 @@ static void generate_substring(struct generator * g, struct node * p) {
      * In backward mode, we can't match if there are fewer characters before
      * the current position than the minimum length.
      */
-    for (c = 0; c < x->literalstring_count; ++c) {
+    for (int c = 0; c < x->literalstring_count; ++c) {
         symbol ch;
         if (among_cases[c].size == 0) {
             empty_case = c;
@@ -1340,9 +1337,8 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
-        int i;
         w(g, "~Mcase A is~N~+");
-        for (i = 1; i <= x->command_count; i++) {
+        for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~Mwhen ~I0 =>~N");
             g->margin++;
@@ -1468,11 +1464,10 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 }
 
 static void generate_method_decls(struct generator * g, enum name_types type) {
-    struct name * q;
     struct among * a = g->analyser->amongs;
     int need_among_handler = 0;
 
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         if ((enum name_types)q->type == type) {
             generate_method_decl(g, q);
         }
@@ -1516,13 +1511,12 @@ static void generate_member_decls(struct generator * g) {
 }
 
 static int generate_among_string(struct generator * g, struct among * x, int count) {
-    int i;
     struct amongvec * v = x->b;
     int limit = count == 0 ? 38 : 80;
 
     g->I[0] = x->number;
 
-    for (i = 0; i < x->literalstring_count; i++, v++) {
+    for (int i = 0; i < x->literalstring_count; i++, v++) {
         /* Write among's string. */
         g->L[0] = v->b;
         g->I[1] = i;
@@ -1614,11 +1608,9 @@ static int generate_constructor(struct generator * g) {
 }
 
 static void generate_methods(struct generator * g) {
-    struct node * p = g->analyser->program;
-    while (p != NULL) {
+    for (struct node * p = g->analyser->program; p; p = p->right) {
         generate(g, p);
         g->unreachable = false;
-        p = p->right;
     }
 }
 
@@ -1653,24 +1645,22 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
     symbol * map = create_b(size);
-    int i;
     int need_comma = 0;
 
-    for (i = 0; i < size; i++) map[i] = 0;
+    for (int i = 0; i < size; i++) map[i] = 0;
 
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
+    for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
     g->I[0] = 8 * size - 1;
     w(g, "~N~M~W0 : constant Grouping_Array (0 .. ~I0) := (~N~+~M");
-    for (i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         unsigned char m = map[i];
-        int j;
         if (i != 0) {
             w(g, ",~N~M");
             need_comma = 0;
         }
-        for (j = 0; j < 8; j++) {
+        for (int j = 0; j < 8; j++) {
             if (need_comma)
                 w(g, ", ");
 
@@ -1688,8 +1678,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q;
-    for (q = g->analyser->groupings; q; q = q->next) {
+    for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }

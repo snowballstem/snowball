@@ -79,8 +79,7 @@ static void write_hexdigit(struct generator * g, int i) {
 }
 
 extern void write_hex4(struct generator * g, int ch) {
-    int i;
-    for (i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i);
+    for (int i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i);
 }
 
 static void write_hex(struct generator * g, int i) {
@@ -104,12 +103,9 @@ static void wlitch(struct generator * g, int ch) {
 
 static void wlitarray(struct generator * g, symbol * p) {  /* write literal array */
     write_string(g, "{ ");
-    {
-        int i;
-        for (i = 0; i < SIZE(p); i++) {
-            wlitch(g, p[i]);
-            if (i < SIZE(p) - 1) write_string(g, ", ");
-        }
+    for (int i = 0; i < SIZE(p); i++) {
+        wlitch(g, p[i]);
+        if (i < SIZE(p) - 1) write_string(g, ", ");
     }
     write_string(g, " }");
 }
@@ -130,8 +126,7 @@ static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal
 }
 
 static void write_margin(struct generator * g) {
-    int i;
-    for (i = 0; i < g->margin; i++) write_string(g, "    ");
+    for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 extern void write_c_relop(struct generator * g, int relop) {
@@ -569,8 +564,7 @@ static int check_possible_signals(struct generator * g,
             if (x->command_count > 0) {
                 int trues = (x->nocommand_count > 0);
                 int falses = false;
-                int i;
-                for (i = 1; i <= x->command_count; i++) {
+                for (int i = 1; i <= x->command_count; i++) {
                     int res = check_possible_signals(g, x->commands[i - 1],
                                                      call_depth);
                     if (res == 0) {
@@ -594,9 +588,8 @@ static int check_possible_signals(struct generator * g,
             return r;
         }
         case c_or: {
-            struct node * q;
             int r = 0;
-            for (q = p->left; q; q = q->right) {
+            for (struct node * q = p->left; q; q = q->right) {
                 // Just check this node - q->right is a separate clause of
                 // the OR.
                 int res = check_possible_signals(g, q, call_depth);
@@ -1587,7 +1580,6 @@ static void generate_substring(struct generator * g, struct node * p) {
     int block = -1;
     unsigned int bitmap = 0;
     struct amongvec * among_cases = x->b;
-    int c;
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
@@ -1604,7 +1596,7 @@ static void generate_substring(struct generator * g, struct node * p) {
      * In backward mode, we can't match if there are fewer characters before
      * the current position than the minimum length.
      */
-    for (c = 0; c < x->literalstring_count; ++c) {
+    for (int c = 0; c < x->literalstring_count; ++c) {
         symbol ch;
         if (among_cases[c].size == 0) {
             empty_case = c;
@@ -1716,9 +1708,8 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
-        int i;
         writef(g, "~Mswitch (among_var) {~N~+", p);
-        for (i = 1; i <= x->command_count; i++) {
+        for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~Mcase ~I0:~N~+");
             generate(g, x->commands[i - 1]);
@@ -1857,8 +1848,7 @@ static void generate_head(struct generator * g) {
 }
 
 static void generate_routine_headers(struct generator * g) {
-    struct name * q;
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_routine:
@@ -1924,8 +1914,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x;
-    for (x = g->analyser->amongs; x; x = x->next) {
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
     }
 }
@@ -1937,25 +1926,24 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
     symbol * map = create_b(size);
-    int i;
-    for (i = 0; i < size; i++) map[i] = 0;
 
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
+    for (int i = 0; i < size; i++) map[i] = 0;
+
+    for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
-
     w(g, "static const unsigned char ~V0[] = { ");
-    for (i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
     w(g, " };~N~N");
+
     lose_b(map);
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q;
-    for (q = g->analyser->groupings; q; q = q->next) {
+    for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
@@ -1984,7 +1972,6 @@ static void generate_create_and_close_templates(struct generator * g) {
 }
 
 static void generate_header_file(struct generator * g) {
-    struct name * q;
     const char * vp = g->options->variables_prefix;
     g->S[0] = vp;
 
@@ -1993,7 +1980,7 @@ static void generate_header_file(struct generator * g) {
          "#endif~N");            /* for C++ */
 
     generate_create_and_close_templates(g);
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_external:
@@ -2055,10 +2042,11 @@ extern void generate_program_c(struct generator * g) {
     g->declarations = g->outbuf;
     g->outbuf = str_new();
     g->literalstring_count = 0;
-    {
-        struct node * p = g->analyser->program;
-        while (p) { generate(g, p); p = p->right; }
+
+    for (struct node * p = g->analyser->program; p; p = p->right) {
+        generate(g, p);
     }
+
     generate_create(g);
     generate_close(g);
     output_str(g->options->output_src, g->declarations);
