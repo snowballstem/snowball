@@ -56,7 +56,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
         int ch = p[i];
         if (32 <= ch && ch < 0x590 && ch != 127) {
             if (ch == '"' || ch == '\\') write_char(g, '\\');
-            // Python uses ENC_WIDECHARS so we need to convert.
+            // Our Python generator uses ENC_WIDECHARS so we need to convert.
             write_wchar_as_utf8(g, ch);
         } else {
             // Use escapes for anything over 0x590 as a crude way to avoid
