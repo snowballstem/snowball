@@ -54,7 +54,7 @@ static void print_arglist(int exit_code) {
 #endif
 #ifndef DISABLE_JS
                "  -js[=TYPE]                       generate Javascript (TYPE values:\n"
-               "                                   esm global, default: global)\n"
+               "                                   es6 esm global, default: global)\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust\n"
@@ -119,7 +119,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     o->output_file = NULL;
     o->syntax_tree = false;
     o->comments = false;
-    o->js_esm = false;
+    o->js_type = JS_GLOBAL;
     o->externals_prefix = NULL;
     o->variables_prefix = NULL;
     o->runtime_path = NULL;
@@ -167,15 +167,17 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->js_esm = false;
+                o->js_type = JS_GLOBAL;
                 continue;
             }
             if (startswith(s, "-js=")) {
                 o->make_lang = LANG_JAVASCRIPT;
                 if (eq(s + 4, "global")) {
-                    o->js_esm = false;
+                    o->js_type = JS_GLOBAL;
                 } else if (eq(s + 4, "esm")) {
-                    o->js_esm = true;
+                    o->js_type = JS_ESM;
+                } else if (eq(s + 4, "es6")) {
+                    o->js_type = JS_ES6;
                 } else {
                     fprintf(stderr, "Unknown Javascript type '%s'\n", s + 4);
                 }
@@ -562,10 +564,16 @@ extern int main(int argc, char * argv[]) {
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
                     byte * s = add_sz_to_s(NULL, output_base);
-                    if (o->js_esm) {
-                        s = add_literal_to_s(s, ".mjs");
-                    } else {
-                        s = add_literal_to_s(s, ".js");
+                    switch (o->js_type) {
+                        case JS_GLOBAL:
+                            s = add_literal_to_s(s, ".js");
+                            break;
+                        case JS_ESM:
+                            s = add_literal_to_s(s, ".mjs");
+                            break;
+                        case JS_ES6:
+                            s = add_literal_to_s(s, "-es6.mjs");
+                            break;
                     }
                     o->output_src = get_output(s);
                     lose_s(s);
