@@ -1271,6 +1271,8 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     g->V[0] = q->name;
 
+    // We could use frozenset, but it seems slightly slower to construct which
+    // adds to startup time.
     w(g, "~M~W0 = {");
     for (int i = 0; i < SIZE(b); i++) {
         if (i > 0) w(g, ", ");
