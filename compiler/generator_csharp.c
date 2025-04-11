@@ -43,10 +43,14 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "\"");
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
-        if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\') write_string(g, "\\");
-            write_char(g, ch);
+        if (32 <= ch && ch < 0x590 && ch != 127) {
+            if (ch == '"' || ch == '\\') write_char(g, '\\');
+            // Our C# generator uses ENC_WIDECHARS so we need to convert.
+            write_wchar_as_utf8(g, ch);
         } else {
+            // Use escapes for anything over 0x590 as a crude way to avoid
+            // LTR characters affecting the rendering of source character
+            // order in confusing ways.
             write_string(g, "\\u");
             write_hex4(g, ch);
         }
