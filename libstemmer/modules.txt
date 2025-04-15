@@ -30,6 +30,7 @@ italian         UTF_8,ISO_8859_1        italian,it,ita
 lithuanian      UTF_8                   lithuanian,lt,lit
 nepali          UTF_8                   nepali,ne,nep
 norwegian       UTF_8,ISO_8859_1        norwegian,no,nor
+persian         UTF_8                   persian,fa,fas,per
 portuguese      UTF_8,ISO_8859_1        portuguese,pt,por
 romanian        UTF_8                   romanian,ro,rum,ron
 russian         UTF_8,KOI8_R            russian,ru,rus
