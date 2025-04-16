@@ -59,13 +59,8 @@ backwardmode (
             ( RV delete )
             'garri' 'garria' 'tza'
             (R2 delete)
-            'atseden'
-            (<- 'atseden')
-            'arabera'
-            (<- 'arabera')
-            'baditu'
-            (<- 'baditu')
-
+            'atseden' 'arabera' 'baditu'
+            ( )
         )
     )
 
@@ -111,14 +106,8 @@ backwardmode (
             (<- 'tra')
             'minutuko'
             (<- 'minutu')
-            'zehar'
-            (<- 'zehar')
-            'geldi'
-            (<- 'geldi')
-            'igaro'
-            (<- 'igaro')
-            'aurka'
-            (<- 'aurka')
+            'zehar' 'geldi' 'igaro' 'aurka'
+            ( )
         )
     )
 
