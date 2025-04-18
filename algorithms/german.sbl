@@ -14,7 +14,7 @@ externals ( stem )
 
 integers ( p1 p2 x )
 
-groupings ( v s_ending st_ending )
+groupings ( v et_ending s_ending st_ending )
 
 stringescapes {}
 
@@ -27,6 +27,7 @@ stringdef ss   '{U+00DF}'
 
 define v 'aeiouy{a"}{o"}{u"}'
 
+define et_ending 'dfgklmnrstUz{a"}'
 define s_ending  'bdfghklmnrt'
 define st_ending s_ending - 'r'
 
@@ -112,8 +113,15 @@ backwardmode (
                 'st'
                 (   st_ending hop 3 delete
                 )
-                'et' // E.g. vorbereitet
-                (   't' delete
+                'et'
+                (   test et_ending
+                    not among (
+                        'geordn' // Still conflate untergeordnet/untergeordnetere, etc.
+                        'plan' // Don't conflate Plan and Planet.
+                        'tick' // Don't conflate Tick and Ticket.
+                        'tr'   // Still conflate Vertreter/Vertretung, etc.
+                    )
+                    delete
                 )
             )
         )
