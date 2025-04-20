@@ -117,6 +117,7 @@ backwardmode (
                 (   test et_ending
                     not among (
                         'geordn' // Still conflate untergeordnet/untergeordnetere, etc.
+                        'intern' // Don't conflate Internet and internes.
                         'plan' // Don't conflate Plan and Planet.
                         'tick' // Don't conflate Tick and Ticket.
                         'tr'   // Still conflate Vertreter/Vertretung, etc.
