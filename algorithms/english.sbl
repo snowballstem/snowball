@@ -38,6 +38,7 @@ define mark_regions as (
             'gener'
             'commun'  //  added May 2005
             'arsen'   //  added Nov 2006 (arsenic/arsenal)
+            'past'    //  (past/paste)
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
@@ -51,6 +52,8 @@ backwardmode (
         ( non-v_WXY v non-v )
         or
         ( non-v v atlimit )
+        or
+        ( 'past' ) // pasted/pasting
     )
 
     define R1 as $p1 <= cursor
