@@ -324,4 +324,3 @@ define stem as (
             do (stemmed Step_6)
         )
 )
-

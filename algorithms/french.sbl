@@ -278,4 +278,3 @@ define stem as (
     )
     do postlude
 )
-
