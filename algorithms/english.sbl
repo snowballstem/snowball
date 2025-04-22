@@ -35,11 +35,11 @@ define mark_regions as (
     $p2 = limit
     do(
         among (
-            'gener'
-            'commun'  //  added May 2005
-            'arsen'   //  added Nov 2006 (arsenic/arsenal)
-            'past'    //  (past/paste)
-            'univers' //  (universe/university)
+            'gener'   // generate/general/generic/generous
+            'commun'  // communication/communism/community
+            'arsen'   // arsenic/arsenal
+            'past'    // past/paste
+            'univers' // universe/universal/university
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
@@ -141,7 +141,7 @@ backwardmode (
             'ful' 'ness'
                       (delete)
             'ative'
-                      (R2 delete)  // 'R2' added Dec 2001
+                      (R2 delete)
         )
     )
 
