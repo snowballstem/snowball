@@ -39,6 +39,7 @@ define mark_regions as (
             'commun'  //  added May 2005
             'arsen'   //  added Nov 2006 (arsenic/arsenal)
             'past'    //  (past/paste)
+            'univers' //  (universe/university)
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
