@@ -40,6 +40,7 @@ define mark_regions as (
             'arsen'   // arsenic/arsenal
             'past'    // past/paste
             'univers' // universe/universal/university
+            'later'   // lateral/later
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
