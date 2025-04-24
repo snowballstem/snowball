@@ -43,4 +43,4 @@ public class Among {
 
     // Make sure this is not accessible outside package for Java security reasons!
     final MethodHandle method; /* method to use if substring matches */
-};
+}
