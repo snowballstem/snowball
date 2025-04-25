@@ -602,10 +602,10 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    w(g, "~Mfor ~B0 in range (");
+    w(g, "~Mfor ~B0 in range(");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
-    writef(g, ", 0, -1):~N", p);
+    writef(g, "):~N", p);
     writef(g, "~{", p);
 
     generate(g, p->left);
