@@ -42,6 +42,7 @@ define mark_regions as (
             'univers' // universe/universal/university
             'later'   // lateral/later
             'emerg'   // emerge/emergency
+            'organ'   // organ/organic/organize
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
