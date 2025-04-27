@@ -310,7 +310,7 @@ struct analyser {
 };
 
 enum analyser_modes {
-    m_forward = 0, m_backward /*, m_integer */
+    m_forward = 0, m_backward
 };
 
 extern void print_program(struct analyser * a);

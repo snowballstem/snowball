@@ -79,7 +79,6 @@ static const char * name_of_mode(int n) {
     switch (n) {
         case m_backward: return "string backward";
         case m_forward:  return "string forward";
-    /*  case m_integer:  return "integer";  */
     }
     fprintf(stderr, "Invalid mode %d in name_of_mode()\n", n);
     exit(1);
