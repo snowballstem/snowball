@@ -1088,9 +1088,54 @@ static struct node * read_C(struct analyser * a) {
             p->left = subcommand;
             return p;
         }
-        case c_loop:
-        case c_atleast:
-            return C_style(a, "AC", token);
+        case c_loop: {
+            struct node * n = C_style(a, "AC", token);
+            // n->AE is NULL after a syntax error, e.g. `loop next`.
+            if (n->AE && n->AE->type == c_number) {
+                if (n->AE->number <= 0) {
+                    // `loop N C`, where N <= 0 is a no-op.
+                    if (n->AE->fixed_constant) {
+                        fprintf(stderr,
+                                "%s:%d: warning: loop %d C is a no-op\n",
+                                a->tokeniser->file,
+                                n->AE->line_number,
+                                n->AE->number);
+                    }
+                    n->AE = NULL;
+                    n->left = NULL;
+                    n->type = c_true;
+                } else if (n->AE->number == 1) {
+                    // `loop 1 C` -> `C`.
+                    if (n->AE->fixed_constant) {
+                        fprintf(stderr,
+                                "%s:%d: warning: loop 1 C is just C\n",
+                                a->tokeniser->file,
+                                n->AE->line_number);
+                    }
+                    n = n->left;
+                }
+            }
+            return n;
+        }
+        case c_atleast: {
+            struct node * n = C_style(a, "AC", token);
+            // n->AE is NULL after a syntax error, e.g. `loop next`.
+            if (n->AE && n->AE->type == c_number) {
+                if (n->AE->number <= 0) {
+                    // `atleast N C` where N <= 0 -> `repeat C`.
+                    if (n->AE->fixed_constant) {
+                        fprintf(stderr,
+                                "%s:%d: warning: atleast %d C is just repeat C\n",
+                                a->tokeniser->file,
+                                n->AE->line_number,
+                                n->AE->number);
+                    }
+                    n->AE = NULL;
+                    n->type = c_repeat;
+                }
+            }
+            return n;
+        }
         case c_setmark: {
             struct node * n = C_style(a, "i", token);
             if (n->name) n->name->initialised = true;
