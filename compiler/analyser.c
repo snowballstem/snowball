@@ -226,7 +226,7 @@ static struct name * find_name(struct analyser * a) {
 }
 
 static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
-    if (p->mode < 0) p->mode = mode; else
+    if (p->mode == m_unknown) p->mode = mode; else
     if (p->mode != mode) error2(a, e_misused, mode);
 }
 
@@ -284,7 +284,7 @@ handle_as_name:
                     NEW(name, p);
                     p->s = copy_s(t->s);
                     p->type = type;
-                    p->mode = -1; /* routines, externals */
+                    p->mode = m_unknown; /* used for routines, externals */
                     /* We defer assigning counts until after we've eliminated
                      * variables whose values are never used. */
                     p->count = -1;
@@ -1438,7 +1438,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     if (q) {
         check_name_type(a, q, 'R');
         if (q->definition != NULL) error(a, e_redefined);
-        if (q->mode < 0) q->mode = a->mode; else
+        if (q->mode == m_unknown) q->mode = a->mode; else
         if (q->mode != a->mode) error2(a, e_declared_as_different_mode, q->mode);
     }
     p->name = q;
