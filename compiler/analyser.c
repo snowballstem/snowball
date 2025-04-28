@@ -488,6 +488,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                             name_of_token(token));
                     exit(1);
             }
+            q->line_number = p->line_number;
         } else {
             // Check for specific constant or no-op cases.
             q = NULL;
@@ -518,28 +519,35 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     }
                     break;
                 case c_multiply:
-                    // 0 * r or p * 0 is 0
-                    if ((p->type == c_number && p->number == 0) ||
-                        (r->type == c_number && r->number == 0)) {
-                        q = new_node(a, c_number);
-                        q->number = 0;
+                    // 0 * r is 0
+                    if (p->type == c_number && p->number == 0) {
+                        q = p;
+                        break;
+                    }
+                    // p * 0 is 0
+                    if (r->type == c_number && r->number == 0) {
+                        q = r;
+                        q->line_number = p->line_number;
                         break;
                     }
                     // -1 * r is -r
                     if (p->type == c_number && p->number == -1) {
                         q = new_node(a, c_neg);
                         q->right = r;
+                        q->line_number = p->line_number;
                         break;
                     }
                     // p * -1 is -p
                     if (r->type == c_number && r->number == -1) {
                         q = new_node(a, c_neg);
                         q->right = p;
+                        q->line_number = p->line_number;
                         break;
                     }
                     // 1 * r is r
                     if (p->type == c_number && p->number == 1) {
                         q = r;
+                        q->line_number = p->line_number;
                         break;
                     }
                     // p * 1 is p
@@ -558,6 +566,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     if (r->type == c_number && r->number == -1) {
                         q = new_node(a, c_neg);
                         q->right = p;
+                        q->line_number = p->line_number;
                         break;
                     }
                     // p / 0 is an error!
