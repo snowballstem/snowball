@@ -417,6 +417,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
         case c_number:
             p = new_node(a, c_number);
             p->number = t->number;
+            p->fixed_constant = true;
             break;
         case c_lenof:
         case c_sizeof: {
@@ -447,6 +448,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             p->type = c_number;
             p->literalstring = NULL;
             p->number = result;
+            p->fixed_constant = (token == c_lenof);
             break;
         }
         default:
@@ -488,6 +490,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                             name_of_token(token));
                     exit(1);
             }
+            q->fixed_constant = p->fixed_constant && r->fixed_constant;
             q->line_number = p->line_number;
         } else {
             // Check for specific constant or no-op cases.
@@ -1105,10 +1108,12 @@ static struct node * read_C(struct analyser * a) {
                     n->AE = NULL;
                     n->type = c_next;
                 } else if (n->AE->number == 0) {
-                    fprintf(stderr,
-                            "%s:%d: warning: hop 0 is a no-op\n",
-                            a->tokeniser->file,
-                            n->AE->line_number);
+                    if (n->AE->fixed_constant) {
+                        fprintf(stderr,
+                                "%s:%d: warning: hop 0 is a no-op\n",
+                                a->tokeniser->file,
+                                n->AE->line_number);
+                    }
                     n->AE = NULL;
                     n->type = c_true;
                 } else if (n->AE->number < 0) {

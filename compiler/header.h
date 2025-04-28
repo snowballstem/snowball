@@ -259,6 +259,12 @@ struct node {
     struct node * right;
     byte type;
     byte mode;
+    // We want to distinguish constant AEs which have the same value everywhere
+    // (e.g. 42, 2+2, lenof '{U+0246}') from constant AEs which can have a
+    // different value depending on platform and/or target language and/or
+    // Unicode mode (e.g. maxint, sizeof '{U+0246}') - some warnings which
+    // depend on a constant AEs value should only fire for the first set.
+    byte fixed_constant;
     struct node * AE;
     struct name * name;
     symbol * literalstring;
