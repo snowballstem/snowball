@@ -605,12 +605,12 @@ static void generate_loop(struct generator * g, struct node * p) {
     if (p->AE->type == c_number && p->AE->number <= 4) {
         // Use a tuple instead of range() for small constant numbers of
         // iterations.
-        w(g, "~Mfor ~B0 in (");
+        w(g, "~Mfor ~B0 in ");
         for (int i = p->AE->number; i > 0; --i) {
             w(g, "0");
             if (i > 1) w(g, ", ");
         }
-        writef(g, "):~N", p);
+        writef(g, ":~N", p);
     } else {
         w(g, "~Mfor ~B0 in range(");
         generate_AE(g, p->AE);
