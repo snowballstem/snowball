@@ -105,9 +105,11 @@ static int read_literal_string(struct tokeniser * t, int c) {
     int ch;
     SIZE(t->b) = 0;
     while (true) {
-        if (c >= SIZE(p)) { error2(t, "'"); return c; }
+        if (c >= SIZE(p) || p[c] == '\n') {
+            error1(t, "string literal not terminated");
+            return c;
+        }
         ch = p[c];
-        if (ch == '\n') { error1(t, "string not terminated"); return c; }
         c++;
         if (ch == t->m_start) {
             /* Inside insert characters. */
@@ -115,13 +117,12 @@ static int read_literal_string(struct tokeniser * t, int c) {
             int newlines = false; /* no newlines as yet */
             int all_whitespace = true; /* no printing chars as yet */
             while (true) {
-                if (c >= SIZE(p)) { error2(t, "'"); return c; }
+                if (c >= SIZE(p) || (p[c] == '\n' && !all_whitespace)) {
+                    error1(t, "string literal not terminated");
+                    return c;
+                }
                 ch = p[c];
                 if (ch == '\n') {
-                    if (!all_whitespace) {
-                        error1(t, "string not terminated");
-                        return c;
-                    }
                     newlines = true;
                 }
                 c++;
