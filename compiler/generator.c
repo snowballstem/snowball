@@ -390,9 +390,11 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_number:
             write_int(g, p->number); break;
         case c_maxint:
-            write_string(g, "MAXINT"); break;
+            write_string(g, "INT_MAX");
+            break;
         case c_minint:
-            write_string(g, "MININT"); break;
+            write_string(g, "INT_MIN");
+            break;
         case c_neg:
             write_char(g, '-'); generate_AE(g, p->right); break;
         case c_multiply:
@@ -1402,6 +1404,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~Mstruct SN_env en~B0 = * z;~N", p);
+    // only copy start - we don't need to copy variables
     g->V[0] = p->name;
     /* Assume failure. */
     writef(g, "~Mint failure = 1;~N"
@@ -2034,6 +2037,9 @@ extern void generate_program_c(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
     write_start_comment(g, "/* ", " */");
+    if (g->analyser->int_limits_used) {
+        w(g, "#include <limits.h>~N");
+    }
     generate_head(g);
     generate_routine_headers(g);
     w(g, "#ifdef __cplusplus~N"
@@ -2057,6 +2063,7 @@ extern void generate_program_c(struct generator * g) {
 
     generate_create(g);
     generate_close(g);
+
     output_str(g->options->output_src, g->declarations);
     str_delete(g->declarations);
     output_str(g->options->output_src, g->outbuf);
