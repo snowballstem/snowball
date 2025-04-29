@@ -1189,10 +1189,17 @@ static struct node * read_C(struct analyser * a) {
             return new_node(a, token);
         case c_assignto:
         case c_sliceto: {
-            struct node *n;
             check_modifyable(a);
-            n = C_style(a, "s", token);
+            struct node *n = C_style(a, "s", token);
             if (n->name) n->name->initialised = true;
+            if (token == c_assignto) {
+                fprintf(stderr,
+                        "%s:%d: warning: Use of `=>` is not recommended, "
+                        "see https://snowballstem.org/compiler/snowman.html "
+                        "section 13.3 for details\n",
+                        a->tokeniser->file,
+                        n->line_number);
+            }
             return n;
         }
         case c_assign:
