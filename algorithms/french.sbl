@@ -139,8 +139,8 @@ backwardmode (
                         'eus'  ((R2 delete) or (R1<-'eux'))
                         'abl' 'iqU'
                                (R2 delete)
-                        'i{e`}r' 'I{e`}r'      //)
-                               (RV <-'i')      //)--new 2 Sept 02
+                        'i{e`}r' 'I{e`}r'
+                               (RV <-'i')
                     )
                 )
             )
