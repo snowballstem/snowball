@@ -1098,9 +1098,7 @@ static struct node * read_C(struct analyser * a) {
                     if (n->AE->fixed_constant) {
                         fprintf(stderr,
                                 "%s:%d: warning: loop %d C is a no-op\n",
-                                a->tokeniser->file,
-                                n->AE->line_number,
-                                n->AE->number);
+                                t->file, n->AE->line_number, n->AE->number);
                     }
                     n->AE = NULL;
                     n->left = NULL;
@@ -1110,8 +1108,7 @@ static struct node * read_C(struct analyser * a) {
                     if (n->AE->fixed_constant) {
                         fprintf(stderr,
                                 "%s:%d: warning: loop 1 C is just C\n",
-                                a->tokeniser->file,
-                                n->AE->line_number);
+                                t->file, n->AE->line_number);
                     }
                     n = n->left;
                 }
@@ -1127,9 +1124,7 @@ static struct node * read_C(struct analyser * a) {
                     if (n->AE->fixed_constant) {
                         fprintf(stderr,
                                 "%s:%d: warning: atleast %d C is just repeat C\n",
-                                a->tokeniser->file,
-                                n->AE->line_number,
-                                n->AE->number);
+                                t->file, n->AE->line_number, n->AE->number);
                     }
                     n->AE = NULL;
                     n->type = c_repeat;
@@ -1157,8 +1152,7 @@ static struct node * read_C(struct analyser * a) {
                     if (n->AE->fixed_constant) {
                         fprintf(stderr,
                                 "%s:%d: warning: hop 0 is a no-op\n",
-                                a->tokeniser->file,
-                                n->AE->line_number);
+                                t->file, n->AE->line_number);
                     }
                     n->AE = NULL;
                     n->type = c_true;
@@ -1167,9 +1161,7 @@ static struct node * read_C(struct analyser * a) {
                             "%s:%d: warning: hop %d now signals f (as was "
                             "always documented) rather than moving the cursor "
                             "in the opposite direction\n",
-                            a->tokeniser->file,
-                            n->AE->line_number,
-                            n->AE->number);
+                            t->file, n->AE->line_number, n->AE->number);
                     n->AE = NULL;
                     n->type = c_false;
                 }
@@ -1198,8 +1190,7 @@ static struct node * read_C(struct analyser * a) {
                         "%s:%d: warning: Use of `=>` is not recommended, "
                         "see https://snowballstem.org/compiler/snowman.html "
                         "section 13.3 for details\n",
-                        a->tokeniser->file,
-                        n->line_number);
+                        t->file, n->line_number);
             }
             return n;
         }
@@ -1457,7 +1448,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         }
         p->next = NULL;
         p->name = q;
-        p->line_number = a->tokeniser->line_number;
+        p->line_number = t->line_number;
         p->b = create_b(0);
         while (true) {
             switch (read_token(t)) {
