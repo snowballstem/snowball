@@ -1452,16 +1452,27 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         p->b = create_b(0);
         while (true) {
             switch (read_token(t)) {
-                case c_name:
-                    {
-                        struct name * r = find_name(a);
-                        if (r) {
-                            check_name_type(a, r, 'g');
-                            p->b = alter_grouping(p->b, r->grouping->b, style, false);
-                            r->used_in_definition = true;
-                        }
+                case c_name: {
+                    struct name * r = find_name(a);
+                    if (!r) break;
+
+                    check_name_type(a, r, 'g');
+                    if (r == q) {
+                        count_error(a);
+                        r->s[SIZE(r->s)] = 0;
+                        fprintf(stderr, "%s:%d: %s defined in terms of itself\n",
+                                t->file, t->line_number, r->s);
+                    } else if (!r->grouping) {
+                        count_error(a);
+                        r->s[SIZE(r->s)] = 0;
+                        fprintf(stderr, "%s:%d: %s undefined\n",
+                                t->file, t->line_number, r->s);
+                    } else {
+                        p->b = alter_grouping(p->b, r->grouping->b, style, false);
                     }
+                    r->used_in_definition = true;
                     break;
+                }
                 case c_literalstring:
                     p->b = alter_grouping(p->b, t->b, style, (a->encoding == ENC_UTF8));
                     break;
