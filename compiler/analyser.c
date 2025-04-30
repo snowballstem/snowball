@@ -86,6 +86,7 @@ static const char * name_of_mode(int n) {
 
 static const char * name_of_type(int n) {
     switch (n) {
+        case 'b': return "boolean";
         case 's': return "string";
         case 'i': return "integer";
         case 'r': return "routine";
