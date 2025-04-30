@@ -72,7 +72,7 @@ define mark_regions as (
     do (
         ( v v next )
         or
-        among ( // this exception list begun Nov 2006
+        among ( // Exception list:
             'par'    // paris, parie, pari
             'col'    // colis
             'tap'    // tapis
