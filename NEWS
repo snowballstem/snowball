@@ -1,6 +1,6 @@
-up to: 1c99a1886ac8e6454eeae12342d2c6ead3d270cc
+up to: 3863d4e7ae9ba630097eae67db330cca89ae6bbc
 
-Snowball 2.3.0 (2025-0?-??)
+Snowball 3.0.0 (2025-05-??)
 ===========================
 
 Ada
@@ -574,6 +574,31 @@ Compiler
   already emitting a suitable error but would then segfault.
 
 * Emit error for redefinition of a grouping.
+
+* Improve errors for `define` of an undeclared name.  We already peek at the
+  next token to decide whether to try to parse as a routine or grouping.
+  Previously we parsed as a routine if it was `as`, and a grouping otherwise,
+  but routine definitions are more common and a grouping can only start with
+  a literal string or a name, so now we assume a routine definition with a
+  missing `as` if the next token isn't valid for either.
+
+* Suppress duplicate (or even triplicate) "unexpected" errors for the same
+  token when the compiler tried to recover from the error by adjusting the
+  parse stare and marking the token to be reparsed, but the same token then
+  failed to parse in the new state.
+
+* Fix NULL pointer dereference if an undefined grouping is used in the
+  definition of another grouping.
+
+* Fix mangled error for `set` or `unset` on a non-boolean:
+
+  test.sbl:2: nameInvalid type 98 in name_of_type()
+
+* Emit warning if `=>` is used.  The documentation of how it works doesn't
+  match the implementation, and it seems it has only ever been used in the
+  Schinke stemmer implementation (which assumes the implemented behaviour).
+  We've updated the Schinke implementation to avoid it.  If you're using it
+  in your own Snowball code please let us know.
 
 * Improve errors for unterminated string literals.
 
