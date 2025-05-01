@@ -165,6 +165,7 @@ struct tokeniser {
     int token;
     int previous_token;
     byte token_held;
+    byte token_reported_as_unexpected;
     enc encoding;
 
     int omission;

@@ -118,6 +118,11 @@ static void count_error(struct analyser * a) {
 
 static void error2(struct analyser * a, error_code n, int x) {
     struct tokeniser * t = a->tokeniser;
+    if (n == e_unexpected_token && t->token_reported_as_unexpected) {
+        // Avoid duplicate errors if this token was already reported as
+        // unexpected and then held.
+        return;
+    }
     count_error(a);
     fprintf(stderr, "%s:%d: ", t->file, t->line_number);
     if ((int)n >= (int)e_redeclared) report_s(stderr, t->s);
@@ -128,6 +133,7 @@ static void error2(struct analyser * a, error_code n, int x) {
             fprintf(stderr, "in among(...), ");
             /* fall through */
         case e_unexpected_token:
+            t->token_reported_as_unexpected = true;
             fprintf(stderr, "unexpected %s", name_of_token(t->token));
             if (t->token == c_number) fprintf(stderr, " %d", t->number);
             if (t->token == c_name) {

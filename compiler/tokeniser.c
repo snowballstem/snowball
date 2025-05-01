@@ -359,6 +359,7 @@ extern int read_token(struct tokeniser * t) {
     int held = t->token_held;
     t->token_held = false;
     if (held) return t->token;
+    t->token_reported_as_unexpected = false;
     while (true) {
         int code = next_token(t);
         switch (code) {
@@ -540,6 +541,7 @@ extern struct tokeniser * create_tokeniser(byte * p, char * file) {
     t->get_depth = 0;
     t->error_count = 0;
     t->token_held = false;
+    t->token_reported_as_unexpected = false;
     t->token = -2;
     t->previous_token = -2;
     t->uplusmode = UPLUS_NONE;
