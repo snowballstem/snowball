@@ -205,11 +205,9 @@ static int check_token(struct analyser * a, int code) {
 static int get_token(struct analyser * a, int code) {
     struct tokeniser * t = a->tokeniser;
     read_token(t);
-    {
-        int x = check_token(a, code);
-        if (!x) t->token_held = true;
-        return x;
-    }
+    int x = check_token(a, code);
+    if (!x) hold_token(t);
+    return x;
 }
 
 static struct name * look_for_name(struct analyser * a) {
@@ -313,7 +311,7 @@ handle_as_name:
                 }
                 break;
             default:
-                if (!check_token(a, c_ket)) t->token_held = true;
+                if (!check_token(a, c_ket)) hold_token(t);
                 return;
         }
     }
@@ -341,7 +339,10 @@ static int read_AE_test(struct analyser * a) {
         case c_ge:
         case c_lt:
         case c_le: return t->token;
-        default: error(a, e_unexpected_token); t->token_held = true; return c_eq;
+        default:
+            error(a, e_unexpected_token);
+            hold_token(t);
+            return c_eq;
     }
 }
 
@@ -460,14 +461,14 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
         }
         default:
             error(a, e_unexpected_token);
-            t->token_held = true;
+            hold_token(t);
             return NULL;
     }
     while (true) {
         int token = read_token(t);
         int b = binding(token);
         if (binding(token) <= B) {
-            t->token_held = true;
+            hold_token(t);
             return p;
         }
         struct node * r = read_AE(a, assigned_to, b);
@@ -606,7 +607,7 @@ static struct node * read_C_connection(struct analyser * a, struct node * q, int
         q = read_C(a);
         p_end->right = q; p_end = q;
     } while (read_token(t) == op);
-    t->token_held = true;
+    hold_token(t);
     return p;
 }
 
@@ -618,13 +619,13 @@ static struct node * read_C_list(struct analyser * a) {
         int token = read_token(t);
         if (token == c_ket) return p;
         if (token < 0) { omission_error(a, c_ket); return p; }
-        t->token_held = true;
+        hold_token(t);
         {
             struct node * q = read_C(a);
             while (true) {
                 token = read_token(t);
                 if (token != c_and && token != c_or) {
-                    t->token_held = true;
+                    hold_token(t);
                     break;
                 }
                 q = read_C_connection(a, q, token);
@@ -950,8 +951,9 @@ static struct node * read_among(struct analyser * a) {
                     struct node * r = new_node(a, c_name);
                     name_to_node(a, r, 'r');
                     q->left = r;
+                } else {
+                    hold_token(t);
                 }
-                else t->token_held = true;
                 p->number++; break;
             case c_bra:
                 if (previous_token == c_bra) error(a, e_adjacent_bracketed_in_among);
@@ -1279,7 +1281,7 @@ static struct node * read_C(struct analyser * a) {
                     }
                     default:
                         error(a, e_unexpected_token);
-                        t->token_held = true;
+                        hold_token(t);
                         break;
                 }
                 return n;
@@ -1351,7 +1353,7 @@ static struct node * read_C(struct analyser * a) {
             }
 
             error(a, e_unexpected_token);
-            t->token_held = true;
+            hold_token(t);
             return new_node(a, c_dollar);
         }
         case c_name:
@@ -1503,7 +1505,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             p->smallest_ch = min;
             if (min == 1<<16) error(a, e_empty_grouping);
         }
-        t->token_held = true; return;
+        hold_token(t);
     }
 }
 
@@ -1547,12 +1549,11 @@ static void read_define(struct analyser * a) {
             /* No declaration, so sniff next token - if it is 'as' then parse
              * as a routine, otherwise as a grouping.
              */
-            if (read_token(a->tokeniser) == c_as) {
+            if (peek_token(a->tokeniser) == c_as) {
                 type = t_routine;
             } else {
                 type = t_grouping;
             }
-            a->tokeniser->token_held = true;
         }
 
         if (type == t_grouping) {

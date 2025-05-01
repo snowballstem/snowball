@@ -496,6 +496,12 @@ extern int read_token(struct tokeniser * t) {
     }
 }
 
+extern int peek_token(struct tokeniser * t) {
+    int token = read_token(t);
+    t->token_held = true;
+    return token;
+}
+
 extern const char * name_of_token(int code) {
     int i;
     for (i = 1; i < vocab->code; i++)
