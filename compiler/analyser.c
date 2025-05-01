@@ -1546,13 +1546,18 @@ static void read_define(struct analyser * a) {
         if (q) {
             type = q->type;
         } else {
-            /* No declaration, so sniff next token - if it is 'as' then parse
-             * as a routine, otherwise as a grouping.
+            /* No declaration so sniff next token - if it is a string or name
+             * we parse as a grouping, otherwise we parse as a routine.  This
+             * avoids an avalanche of further errors if `as` is missing from a
+             * routine definition.
              */
-            if (peek_token(a->tokeniser) == c_as) {
-                type = t_routine;
-            } else {
-                type = t_grouping;
+            switch (peek_token(a->tokeniser)) {
+                case c_literalstring:
+                case c_name:
+                    type = t_grouping;
+                    break;
+                default:
+                    type = t_routine;
             }
         }
 
