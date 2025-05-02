@@ -82,22 +82,35 @@ backwardmode (
     define Step_1b as (
         [substring] among (
             'eed' 'eedly'
-                (R1 <-'ee')
-            'ed' 'edly' 'ing' 'ingly'
-                (
-                test gopast v  delete
-                [] test (
-                    substring among(
-                        'at' 'bl' 'iz'
-                             (fail(<- 'e'))
-                        'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
-                        // ignoring double c, h, j, k, q, v, w, and x
-                             (not (aeo atlimit))
-                        ''   (fail(atmark p1  test shortv  <- 'e'))
-                    )
+                (do(R1 <-'ee'))
+            'ed' 'edly' 'ingly'
+                (false) // Handled below.
+            'ing'
+                ( // Handle exceptional cases here, rest handled below.
+                among (
+                    // dying->die, lying->die, tying->tie, vying->vie
+                    'y'
+                        (test(non-v atlimit) ] <-'ie')
+                    // Leave inning, outing, etc along.
+                    'inn' 'out' 'cann' 'herr' 'earr' 'even'
+                        (atlimit)
                 )
-                [next]  delete
             )
+            ''  ()
+        ) or (
+            // Handle 'ed' 'edly' 'ing' 'ingly'
+            test gopast v  delete
+            [] test (
+                substring among(
+                    'at' 'bl' 'iz'
+                         (fail(<- 'e'))
+                    'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
+                    // ignoring double c, h, j, k, q, v, w, and x
+                         (not (aeo atlimit))
+                    ''   (fail(atmark p1  test shortv  <- 'e'))
+                )
+            )
+            [next]  delete
         )
     )
 
@@ -168,7 +181,6 @@ backwardmode (
     define exception2 as (
 
         [substring] atlimit among(
-            'inning' 'outing' 'canning' 'herring' 'earring' 'evening'
             'proceed' 'exceed' 'succeed'
 
             // ... extensions possible here ...
@@ -184,9 +196,6 @@ define exception1 as (
         /* special changes: */
 
         'skies'     (<-'sky')
-        'dying'     (<-'die')
-        'lying'     (<-'lie')
-        'tying'     (<-'tie')
 
         /* special -LY cases */
 
