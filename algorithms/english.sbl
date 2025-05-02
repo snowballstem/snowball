@@ -8,7 +8,6 @@ routines (
     R1 R2
     Step_1a Step_1b Step_1c Step_2 Step_3 Step_4 Step_5
     exception1
-    exception2
 )
 
 externals ( stem )
@@ -82,7 +81,16 @@ backwardmode (
     define Step_1b as (
         [substring] among (
             'eed' 'eedly'
-                (do(R1 <-'ee'))
+                (
+                do (
+                    among (
+                        'proc' 'exc' 'succ'
+                            (atlimit)
+                    ) or (
+                        R1 <-'ee'
+                    )
+                )
+            )
             'ed' 'edly' 'ingly'
                 (false) // Handled below.
             'ing'
@@ -177,16 +185,6 @@ backwardmode (
             'l' (R2 'l' delete)
         )
     )
-
-    define exception2 as (
-
-        [substring] atlimit among(
-            'proceed' 'exceed' 'succeed'
-
-            // ... extensions possible here ...
-
-        )
-    )
 )
 
 define exception1 as (
@@ -232,17 +230,14 @@ define stem as (
 
             do Step_1a
 
-            exception2 or (
+            do Step_1b
+            do Step_1c
 
-                do Step_1b
-                do Step_1c
+            do Step_2
+            do Step_3
+            do Step_4
 
-                do Step_2
-                do Step_3
-                do Step_4
-
-                do Step_5
-            )
+            do Step_5
         )
         do postlude
     )
