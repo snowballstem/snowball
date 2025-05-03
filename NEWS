@@ -1,4 +1,4 @@
-up to: 3863d4e7ae9ba630097eae67db330cca89ae6bbc
+up to: 1a3e41130ee6321d3e649fabb26c8b60b354f8be
 
 Snowball 3.0.0 (2025-05-??)
 ===========================
@@ -172,6 +172,12 @@ Javascript
 
 * Other changes:
 
+  + The Javascript runner is now specified by make variable `JSRUN` instead
+    of `NODE` (since node is just one JS implementation).  The default value
+    is now `node` instead of `nodejs` (older Debian and Ubuntu packages used
+    `/usr/bin/nodejs` because `/usr/bin/node` was already in use by a
+    completely different package, but that has since changed).
+
   + Add start of ESM support.  See #183, reported by Lionel Rowe.
 
 Pascal
@@ -328,6 +334,12 @@ Behavioural changes to existing algorithms
 
 * English: Avoid conflating 'universe', 'universal' and 'university'.  Reported
   by Clem Wang on snowball-discuss.
+
+* English: Handle -eed and -ing exceptions in their respective rules.
+  This avoids the overhead of checking for them for the majority of
+  words which don't end -eed or -ing.  It also allows us to easily handle
+  vying->vie and hying->hie at basically no extra cost.  Reduces the time to
+  stem all words in our English word list by nearly 2%.
 
 * French: Remove elisions as first step.  See #187.  Originally reported by
   Paul Rudin and kelson42.
