@@ -101,6 +101,7 @@ backwardmode (
             'adora' 'ador' 'aci{o'}n'
             'adoras' 'adores' 'aciones'
             'ante' 'antes' 'ancia' 'ancias'
+            'acion' // Misspelling of '-ación'.
             (
                 R2 delete
                 try ( ['ic'] R2 delete )
