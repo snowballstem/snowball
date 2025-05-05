@@ -688,10 +688,10 @@ check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of $* stemmer for JS (ES6)"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(NODE) $(js_output_dir)/stemwords-es6.mjs -l $* -i tmp.in -o tmp.txt; \
+	  $(JSRUN) $(js_output_dir)/stemwords-es6.mjs -l $* -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  $(NODE) $(js_output_dir)/stemwords-es6.mjs -l $* -i $</voc.txt -o tmp.txt; \
+	  $(JSRUN) $(js_output_dir)/stemwords-es6.mjs -l $* -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
