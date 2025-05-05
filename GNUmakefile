@@ -35,7 +35,7 @@ python_sample_dir = sample
 js_output_dir = js_out
 js_runtime_dir = javascript
 js_sample_dir = sample
-NODE ?= nodejs
+JSRUN ?= node
 JSTYPE ?= global
 
 cargo ?= cargo
@@ -656,10 +656,10 @@ check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of $* stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(NODE) javascript/stemwords.js -l $* -i tmp.in -o tmp.txt; \
+	  $(JSRUN) javascript/stemwords.js -l $* -i tmp.in -o tmp.txt; \
 	  rm tmp.in; \
 	else \
-	  $(NODE) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
+	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \

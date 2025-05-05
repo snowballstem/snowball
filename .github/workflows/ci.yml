@@ -49,7 +49,7 @@ jobs:
           apt_packages: 'golang-1.22'
           GO: go
         - name: javascript_node
-          NODE: node
+          JSRUN: node
           apt_packages: 'nodejs'
         - name: rust
           RUST: rust
@@ -198,8 +198,8 @@ jobs:
       if: matrix.MCS
       run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
     - name: Test Javascript
-      if: matrix.NODE
-      run: $MAKE check_js NODE="${{ matrix.NODE }}"
+      if: matrix.JSRUN
+      run: $MAKE check_js JSRUN="${{ matrix.JSRUN }}"
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"
