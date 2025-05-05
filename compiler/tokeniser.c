@@ -105,9 +105,11 @@ static int read_literal_string(struct tokeniser * t, int c) {
     int ch;
     SIZE(t->b) = 0;
     while (true) {
-        if (c >= SIZE(p)) { error2(t, "'"); return c; }
+        if (c >= SIZE(p) || p[c] == '\n') {
+            error1(t, "string literal not terminated");
+            return c;
+        }
         ch = p[c];
-        if (ch == '\n') { error1(t, "string not terminated"); return c; }
         c++;
         if (ch == t->m_start) {
             /* Inside insert characters. */
@@ -115,13 +117,12 @@ static int read_literal_string(struct tokeniser * t, int c) {
             int newlines = false; /* no newlines as yet */
             int all_whitespace = true; /* no printing chars as yet */
             while (true) {
-                if (c >= SIZE(p)) { error2(t, "'"); return c; }
+                if (c >= SIZE(p) || (p[c] == '\n' && !all_whitespace)) {
+                    error1(t, "string literal not terminated");
+                    return c;
+                }
                 ch = p[c];
                 if (ch == '\n') {
-                    if (!all_whitespace) {
-                        error1(t, "string not terminated");
-                        return c;
-                    }
                     newlines = true;
                 }
                 c++;
@@ -358,6 +359,7 @@ extern int read_token(struct tokeniser * t) {
     int held = t->token_held;
     t->token_held = false;
     if (held) return t->token;
+    t->token_reported_as_unexpected = false;
     while (true) {
         int code = next_token(t);
         switch (code) {
@@ -494,6 +496,12 @@ extern int read_token(struct tokeniser * t) {
     }
 }
 
+extern int peek_token(struct tokeniser * t) {
+    int token = read_token(t);
+    t->token_held = true;
+    return token;
+}
+
 extern const char * name_of_token(int code) {
     int i;
     for (i = 1; i < vocab->code; i++)
@@ -539,6 +547,7 @@ extern struct tokeniser * create_tokeniser(byte * p, char * file) {
     t->get_depth = 0;
     t->error_count = 0;
     t->token_held = false;
+    t->token_reported_as_unexpected = false;
     t->token = -2;
     t->previous_token = -2;
     t->uplusmode = UPLUS_NONE;

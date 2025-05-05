@@ -1,4 +1,4 @@
-/* Estonian stemmer version 1.3
+/* Estonian stemmer
 
 Made by Linda Freienthal in January 2019.
 
@@ -58,7 +58,7 @@ backwardmode (
 
     )
 
-    // Signals t is a replacement was made; f otherwise.
+    // Signals t if a replacement was made; f otherwise.
     define verb as (
         setlimit tomark p1 for ([substring])
         among(
@@ -164,7 +164,7 @@ backwardmode (
         // mõtte(-le) -> mõte, hakka(-n) -> haka
         //
         // We only undouble if the vowel is in R1 to avoid modifying short
-        // non-words (mostly to avoid modifying acronyms/initialisms which such
+        // non-words (mostly to avoid modifying acronyms/initialisms such
         // as "PPE").
         V1 $(p1 <= cursor)
         [substring] among(

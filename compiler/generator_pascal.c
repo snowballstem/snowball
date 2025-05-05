@@ -54,10 +54,10 @@ static void write_varname(struct generator * g, struct name * p) {
          * program authors to avoid naming externals which only differ by
          * case.
          */
-        int i, len = SIZE(p->s);
+        int len = SIZE(p->s);
         int lower_pending = 0;
         write_char(g, "SBIrxg"[p->type]);
-        for (i = 0; i != len; ++i) {
+        for (int i = 0; i != len; ++i) {
             int ch = p->s[i];
             if (ch >= 'a' && ch <= 'z') {
                 ++lower_pending;
@@ -76,9 +76,8 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    int i;
     write_char(g, '\'');
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (ch == '\'') {
             write_string(g, "''");
@@ -95,8 +94,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_margin(struct generator * g) {
-    int i;
-    for (i = 0; i < g->margin; i++) write_string(g, "    ");
+    for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 static void write_relop(struct generator * g, int relop) {
@@ -1165,11 +1163,10 @@ static void generate_define(struct generator * g, struct node * p) {
     }
 
     if (g->next_label) {
-        int i, num = g->next_label;
-
         str_append_string(saved_output, "Label\n");
 
-        for (i = 0; i < num; ++i) {
+        int num = g->next_label;
+        for (int i = 0; i < num; ++i) {
             str_append_string(saved_output, "    lab");
             str_append_int(saved_output, i);
             str_append_string(saved_output, i == num - 1 ? ";\n" : ",\n");
@@ -1222,9 +1219,8 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
-        int i;
         w(g, "~MCase AmongVar Of~N~+");
-        for (i = 1; i <= x->command_count; i++) {
+        for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~M~I0:~N~{");
             generate(g, x->commands[i - 1]);
@@ -1363,12 +1359,10 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 }
 
 static void generate_method_decls(struct generator * g) {
-    struct name * q;
-
     w(g, "~Mpublic~N~+");
     w(g, "~MConstructor Create;~N");
 
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->type == t_external) {
             generate_method_decl(g, q);
         }
@@ -1376,7 +1370,7 @@ static void generate_method_decls(struct generator * g) {
     w(g, "~-");
 
     int first = true;
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->type == t_routine) {
             if (first) {
                 w(g, "~Mprivate~N~+");
@@ -1389,9 +1383,8 @@ static void generate_method_decls(struct generator * g) {
 }
 
 static void generate_member_decls(struct generator * g) {
-    struct name * q;
     int first = true;
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
@@ -1468,8 +1461,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x;
-    for (x = g->analyser->amongs; x; x = x->next) {
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
     }
 }
@@ -1496,17 +1488,15 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
     symbol * map = create_b(size);
-    int i;
-    for (i = 0; i < size; i++) map[i] = 0;
 
-    /* Using unicode would require revision here */
+    for (int i = 0; i < size; i++) map[i] = 0;
 
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
+    for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
     g->I[0] = size - 1;
     w(g, "~N~MConst~+~N~M~W0 : Array [0..~I0] Of Char = (~N~+");
-    for (i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         if (i != 0) w(g, ",~N");
         g->I[0] = map[i];
         w(g, "~MChr(~I0)");
@@ -1517,8 +1507,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q;
-    for (q = g->analyser->groupings; q; q = q->next) {
+    for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }

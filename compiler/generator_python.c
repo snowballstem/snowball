@@ -51,14 +51,17 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    int i;
     write_string(g, "u\"");
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
-        if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\') write_string(g, "\\");
-            write_char(g, ch);
+        if (32 <= ch && ch < 0x590 && ch != 127) {
+            if (ch == '"' || ch == '\\') write_char(g, '\\');
+            // Our Python generator uses ENC_WIDECHARS so we need to convert.
+            write_wchar_as_utf8(g, ch);
         } else {
+            // Use escapes for anything over 0x590 as a crude way to avoid
+            // LTR characters affecting the rendering of source character
+            // order in confusing ways.
             write_string(g, "\\u");
             write_hex4(g, ch);
         }
@@ -66,9 +69,24 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_string(g, "\"");
 }
 
+static void write_literal_char(struct generator * g, symbol ch) {
+    write_string(g, "u\"");
+    if (32 <= ch && ch < 0x590 && ch != 127) {
+        if (ch == '"' || ch == '\\') write_char(g, '\\');
+        // Python uses ENC_WIDECHARS so we need to convert.
+        write_wchar_as_utf8(g, ch);
+    } else {
+        // Use escapes for anything over 0x590 as a crude way to avoid
+        // LTR characters affecting the rendering of source character
+        // order in confusing ways.
+        write_string(g, "\\u");
+        write_hex4(g, ch);
+    }
+    write_string(g, "\"");
+}
+
 static void write_margin(struct generator * g) {
-    int i;
-    for (i = 0; i < g->margin; i++) write_string(g, "    ");
+    for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 static void write_comment(struct generator * g, struct node * p) {
@@ -520,13 +538,10 @@ static void generate_next(struct generator * g, struct node * p) {
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     g->V[0] = p->name;
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.go_~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.go_~S1_grouping~S0(~n.~W0)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
             w(g, "~Mself.cursor += 1~N");
@@ -587,10 +602,21 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    w(g, "~Mfor ~B0 in range (");
-    generate_AE(g, p->AE);
-    g->B[0] = str_data(loopvar);
-    writef(g, ", 0, -1):~N", p);
+    if (p->AE->type == c_number && p->AE->number <= 4) {
+        // Use a tuple instead of range() for small constant numbers of
+        // iterations.
+        w(g, "~Mfor ~B0 in ");
+        for (int i = p->AE->number; i > 0; --i) {
+            w(g, "0");
+            if (i > 1) w(g, ", ");
+        }
+        writef(g, ":~N", p);
+    } else {
+        w(g, "~Mfor ~B0 in range(");
+        generate_AE(g, p->AE);
+        g->B[0] = str_data(loopvar);
+        writef(g, "):~N", p);
+    }
     writef(g, "~{", p);
 
     generate(g, p->left);
@@ -965,13 +991,10 @@ static void generate_call(struct generator * g, struct node * p) {
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
     g->V[0] = p->name;
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "not self.~S1_grouping~S0(~n.~W0, ~I0, ~I1)", p);
+    write_failure_if(g, "not self.~S1_grouping~S0(~n.~W0)", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1070,8 +1093,7 @@ static void generate_among(struct generator * g, struct node * p) {
          * than O(1) dispatch of an integer and it was actually slower when we
          * tried generating it here).
          */
-        int i;
-        for (i = 1; i <= x->command_count; i++) {
+        for (int i = 1; i <= x->command_count; i++) {
             if (i == x->command_count && x->nocommand_count == 0) {
                 w(g, "~Melse:~N~+");
             } else {
@@ -1225,69 +1247,52 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
 
     w(g, "~Ma_~I0 = [~N~+");
-    {
-        int i;
-        for (i = 0; i < x->literalstring_count; i++) {
-            g->I[0] = v->i;
-            g->I[1] = v->result;
-            g->L[0] = v->b;
-            g->S[0] = i < x->literalstring_count - 1 ? "," : "";
+    for (int i = 0; i < x->literalstring_count; i++) {
+        g->I[0] = v[i].i;
+        g->I[1] = v[i].result;
+        g->L[0] = v[i].b;
+        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
-            w(g, "~MAmong(~L0, ~I0, ~I1");
-            if (v->function != NULL) {
-                w(g, ", ");
-                write_varname(g, v->function);
-            }
-            w(g, ")~S0~N");
-            v++;
+        w(g, "~MAmong(~L0, ~I0, ~I1");
+        if (v[i].function != NULL) {
+            w(g, ", ");
+            write_varname(g, v[i].function);
         }
+        w(g, ")~S0~N");
     }
     w(g, "~-~M]~N");
 }
 
 static void generate_amongs(struct generator * g) {
-    struct among * x;
-    for (x = g->analyser->amongs; x; x = x->next) {
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
     }
 }
 
-static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
-    int range = q->largest_ch - q->smallest_ch + 1;
-    int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
-    symbol * map = create_b(size);
-    int i;
-    for (i = 0; i < size; i++) map[i] = 0;
-
-    /* Using unicode would require revision here */
-
-    for (i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->V[0] = q->name;
 
-    w(g, "~M~W0 = [");
-    for (i = 0; i < size; i++) {
-        write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
+    // We could use frozenset, but it seems slightly slower to construct which
+    // adds to startup time.
+    w(g, "~M~W0 = {");
+    for (int i = 0; i < SIZE(b); i++) {
+        if (i > 0) w(g, ", ");
+        write_literal_char(g, b[i]);
     }
-    w(g, "]~N~N");
-    lose_b(map);
+    w(g, "}~N~N");
 }
 
 static void generate_groupings(struct generator * g) {
-    struct grouping * q;
-    for (q = g->analyser->groupings; q; q = q->next) {
+    for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
 }
 
 static void generate_members(struct generator * g) {
-    struct name * q;
-    for (q = g->analyser->names; q; q = q->next) {
+    for (struct name * q = g->analyser->names; q; q = q->next) {
         g->V[0] = q;
         switch (q->type) {
             case t_string:
@@ -1314,8 +1319,7 @@ static void generate_methods(struct generator * g) {
 
 static void generate_label_classes(struct generator * g)
 {
-    int i;
-    for (i = 0; i <= g->max_label; i++) {
+    for (int i = 0; i <= g->max_label; i++) {
         g->I[0] = i;
         w(g, "~N~Nclass lab~I0(BaseException): pass~N");
     }
@@ -1324,6 +1328,9 @@ static void generate_label_classes(struct generator * g)
 extern void generate_program_python(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
+
+    // Only needed for Python 2, which defaults to ASCII.
+    w(g, "#-*- coding: utf-8 -*-~N");
 
     write_start_comment(g, "# ", NULL);
     if (g->analyser->int_limits_used) {

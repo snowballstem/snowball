@@ -144,7 +144,11 @@ backwardmode (
             'rder'  (<-'r')
             'ing'
             'isme'
-            'erij'  (R1 delete lengthen_V)
+            'erij'  (// Exception added to avoid conflating
+                     // `schilderij` (painting) and `schild` (shield).
+                     ('ild' <- 'er')
+                     or
+                     (R1 delete lengthen_V))
             'arij'  (R1 C <-'aar')
             'fie'   (R2 delete attach 'f' lengthen_V)
             'gie'   (R2 delete attach 'g' lengthen_V)
@@ -178,7 +182,11 @@ backwardmode (
         (   [substring] among (
                 'iger'
                 'igst'
-                'ig'      (R1 C delete lengthen_V)
+                'ig'      (R1
+                           // Exception added to avoid conflating
+                           // `innig` (intimate) and `in` (in).
+                           not ('inn' atlimit)
+                           C delete lengthen_V)
             )
         )
     )
@@ -205,7 +213,10 @@ backwardmode (
             'kk'   (<-'k')
             'll'   (<-'l')
             'mm'   (<-'m')
-            'nn'   (<-'n')
+            'nn'   (// Exception added to avoid conflating
+                    // `innen` (to collect/cash) and `in` (in).
+                    not ('i' atlimit)
+                    <-'n')
             'pp'   (<-'p')
             'qq'   (<-'q')
             'rr'   (<-'r')
@@ -222,15 +233,40 @@ backwardmode (
 
     define Step_1c as
     (
-        [substring] among ( (R1 C)
-            'd' (not ('n' R1) delete)
-            't' (not ('h' R1) delete)
+        [substring] R1 C among (
+            'd' (not ('n' R1)
+                 // Exception added to avoid conflating
+                 // `geïnd` (collected/cashed) and `in` (in).
+                 // Instead we conflate `geïnd` with `innen`.
+                 ('in' atlimit <-'n') or
+                 delete)
+            't' (not ('h' R1)
+                 // Exception added to avoid conflating
+                 // `geënt` (grafted) and `en` (and).
+                 not ('en' atlimit)
+                 delete
+            )
         )
     )
 )
 
 define Lose_prefix as (
     ['ge'] test hop 3 test (gopast ('ij' or v) repeat ('ij' or v) not atlimit)
+    // Exceptions added:
+    among (
+        // Avoid conflating `geeft` and `effen`/`effende`\`geeffende`.
+        'eft' (false)
+
+        // Avoid conflating `gevallen`/`geval` and `vallen`.
+        'val' (false)
+        'vali' (true)
+
+        // Avoid conflating `gevaren`/`gevaar` (danger), `gevaarten` (huge
+        // objects) and `varen` (to sail)
+        'vaa' 'vare' (false)
+
+        '' (true)
+    )
     set GE_removed
     delete
     do ( [substring] among (
@@ -288,4 +324,3 @@ define stem as (
             do (stemmed Step_6)
         )
 )
-

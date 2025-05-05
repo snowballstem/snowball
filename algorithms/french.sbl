@@ -14,7 +14,7 @@ externals ( stem )
 
 integers ( pV p1 p2 )
 
-groupings ( elision_char v keep_with_s )
+groupings ( elision_char v keep_with_s oux_ending )
 
 stringescapes {}
 
@@ -35,6 +35,9 @@ stringdef u^   '{U+00FB}'  // u-circumflex
 stringdef u`   '{U+00F9}'  // u-grave
 
 define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
+
+// Replace -oux with -ou if preceded by one of these letters.
+define oux_ending 'bhjlnp'
 
 // Single character elisions
 define elision_char 'cdjlmnst'
@@ -69,10 +72,12 @@ define mark_regions as (
     do (
         ( v v next )
         or
-        among ( // this exception list begun Nov 2006
-            'par'  // paris, parie, pari
-            'col'  // colis
-            'tap'  // tapis
+        among ( // Exception list:
+            'par'    // paris, parie, pari
+            'col'    // colis
+            'tap'    // tapis
+                ()
+            'ni' (v) // niais/nierais/nié/niâmes/nièrent
             // extensions possible here
         )
         or
@@ -134,8 +139,8 @@ backwardmode (
                         'eus'  ((R2 delete) or (R1<-'eux'))
                         'abl' 'iqU'
                                (R2 delete)
-                        'i{e`}r' 'I{e`}r'      //)
-                               (RV <-'i')      //)--new 2 Sept 02
+                        'i{e`}r' 'I{e`}r'
+                               (RV <-'i')
                     )
                 )
             )
@@ -159,6 +164,7 @@ backwardmode (
             )
             'eaux' (<- 'eau')
             'aux'  (R1 <- 'al')
+            'oux'  (oux_ending <- 'ou')
             'euse'
             'euses'((R2 delete) or (R1<-'eux'))
 
@@ -187,8 +193,9 @@ backwardmode (
         )
     )
 
-    define verb_suffix as setlimit tomark pV for (
-        [substring] among (
+    define verb_suffix as (
+        setlimit tomark pV for ([substring])
+        among (
             'ions'
                 (R2 delete)
 
@@ -200,12 +207,22 @@ backwardmode (
 
                 (delete)
 
-            '{a^}mes' '{a^}t' '{a^}tes' 'a' 'ai' 'aIent' 'ais' 'ait' 'ant'
+            '{a^}mes' '{a^}t' '{a^}tes' 'a' 'ai' 'aIent' 'ait' 'ant'
             'ante' 'antes' 'ants' 'as' 'asse' 'assent' 'asses' 'assiez'
             'assions'
-                (delete
-                 try(['e'] delete)
-                )
+                ( try('e' RV]) delete )
+
+            'ais' 'aise' 'aises'
+                ( not among (
+                      'al'     // balais, calais, galais, malais, palais, valais
+                          (next atlimit)
+                      'auv'    // mauvais
+                      '{e'}pl' // déplais
+                          ()
+                  )
+                  delete )
+            'eais'
+                (delete)
         )
     )
 
@@ -261,4 +278,3 @@ define stem as (
     )
     do postlude
 )
-
