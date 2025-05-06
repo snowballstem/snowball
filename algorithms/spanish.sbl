@@ -112,6 +112,7 @@ backwardmode (
                 R2 <- 'log'
             )
             'uci{o'}n' 'uciones'
+            'ucion' // Misspelling of '-ución'.
             (
                 R2 <- 'u'
             )
