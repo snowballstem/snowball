@@ -83,6 +83,10 @@ stringdef ar_num8 '{U+0668}'
 stringdef ar_num9 '{U+0669}'
 
 // Other Characters
+// Note: U+200C (ZERO WIDTH NON-JOINER) is commonly referred to as "nim-faseleh" ("half-space") in Persian.
+// Although this name is not standard in English Unicode terminology, it reflects its widespread use
+// in Persian as a morpheme separator within words. This character is here to normalize
+// textual variations and ensure consistent stemming.
 stringdef half_space  '{U+200C}'
 stringdef zero_width  '{U+200B}'
 
