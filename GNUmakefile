@@ -332,7 +332,7 @@ $(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball$(EXEEXT)
 
 $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
-	./snowball $< -js="$(JSTYPE)" -o "$(js_output_dir)/$*-stemmer"
+	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)

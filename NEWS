@@ -178,8 +178,6 @@ Javascript
     `/usr/bin/nodejs` because `/usr/bin/node` was already in use by a
     completely different package, but that has since changed).
 
-  + Add start of ESM support.  See #183, reported by Lionel Rowe.
-
 Pascal
 ------
 

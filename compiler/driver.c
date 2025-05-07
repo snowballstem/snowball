@@ -28,10 +28,6 @@ static int eq(const char * s1, const char * s2) {
     return strcmp(s1, s2) == 0;
 }
 
-static int startswith(const char * s1, const char * s2) {
-    return strncmp(s1, s2, strlen(s2)) == 0;
-}
-
 static void print_arglist(int exit_code) {
     FILE * f = exit_code ? stderr : stdout;
     fprintf(f, "Usage: snowball SOURCE_FILE... [OPTIONS]\n\n"
@@ -53,8 +49,7 @@ static void print_arglist(int exit_code) {
                "  -py, -python\n"
 #endif
 #ifndef DISABLE_JS
-               "  -js[=TYPE]                       generate Javascript (TYPE values:\n"
-               "                                   esm global, default: global)\n"
+               "  -js                              generate Javascript\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust\n"
@@ -168,17 +163,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
                 o->js_esm = false;
-                continue;
-            }
-            if (startswith(s, "-js=")) {
-                o->make_lang = LANG_JAVASCRIPT;
-                if (eq(s + 4, "global")) {
-                    o->js_esm = false;
-                } else if (eq(s + 4, "esm")) {
-                    o->js_esm = true;
-                } else {
-                    fprintf(stderr, "Unknown Javascript type '%s'\n", s + 4);
-                }
                 continue;
             }
 #endif
