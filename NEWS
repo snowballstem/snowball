@@ -1,4 +1,4 @@
-up to: 1a3e41130ee6321d3e649fabb26c8b60b354f8be
+up to: cd61f01a4e04c7a79b91a3cc2a42b6ffa144a99b
 
 Snowball 3.0.0 (2025-05-??)
 ===========================
@@ -413,7 +413,11 @@ Behavioural changes to existing algorithms
   text was written using the visually similar "cedilla" diacritic on these
   letters instead ("ş" and "ţ").  Previously our stemmer only recognised the
   latter.  Now it maps the cedilla forms to "comma below" as a first step.
-  Patch from Rober Muir.
+  Patch from Robert Muir.
+
+* Spanish: Handle -acion like -ación and -ucion like -ución.  It's apparently
+  common to miss off accents in Spanish, and there are examples in our test
+  vocabulary that these change helps.  Proposed by Damian Janowski.
 
 * Swedish: Replace suffix "öst" with "ös" when preceded by any of 'iklnprtuv'
   rather than just 'l'.  The new rule only requires the "öst" to be in R1
@@ -459,6 +463,8 @@ Optimisations to existing algorithms
 
 * Lithuanian: Remove redundant R1 check.
 
+* Nepali: Eliminate redundant check_category_2 routine.
+
 * Tamil: Optimise by using `among` instead of long `or` chains.  The generated
   C version now takes 43% less time to processes the test vocabulary.
 
@@ -468,6 +474,8 @@ Optimisations to existing algorithms
 * Tamil: Clean up some uses of `test`.
 
 * Tamil: Make `fix_va_start` simpler and faster.
+
+* Tamil: Localise use of `found_a_match` flag.
 
 * Tamil: Eliminate pointless flag changes.
 
