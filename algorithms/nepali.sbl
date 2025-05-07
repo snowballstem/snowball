@@ -7,7 +7,6 @@
 
 routines (
   remove_category_1
-  check_category_2
   remove_category_2
   remove_category_3
 )
@@ -60,12 +59,6 @@ backwardmode (
     )
   )
 
-  define check_category_2 as(
-    [substring] among(
-      '{dsc}' '{dsa}' '{dvsai}'
-    )
-  )
-
   define remove_category_2 as (
     [substring] among(
     '{dsc}' '{dsa}' ('{dly}{dvsau}' or '{dlc}{dvsau}' or '{dln}{dvsau}' or '{dltha}{dvse}' delete)
@@ -85,8 +78,9 @@ backwardmode (
 define stem as (
   backwards (
     do remove_category_1
-      do (
-        repeat (do (check_category_2 and remove_category_2) remove_category_3)
-      )
+    repeat (
+      do remove_category_2
+      remove_category_3
+    )
   )
 )
