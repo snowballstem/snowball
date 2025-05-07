@@ -227,7 +227,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             case 'C': { // Constant.
-                if (g->options->js_esm) {
+                if (g->options->js_type != JS_GLOBAL) {
                     w(g, "const");
                 } else {
                     w(g, "/** @const */ var");
@@ -235,7 +235,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'D': { // Declare variable.
-                if (g->options->js_esm) {
+                if (g->options->js_type != JS_GLOBAL) {
                     w(g, "let");
                 } else {
                     w(g, "var");
@@ -1075,7 +1075,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     g->V[0] = q;
-    if (q->type == t_routine) {
+    if (g->options->js_type == JS_ES6 || q->type == t_routine) {
         w(g, "~M/** @return {boolean} */~N"
              "~Mfunction ~W0() {~+~N");
     } else {
@@ -1278,39 +1278,71 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    if (g->options->js_esm) {
-        w(g, "// deno-lint-ignore-file~N"
-             "import ~P from './base-stemmer.mjs'~N"
-             "~N"
-             "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
-             "~N"
-             "/** @type {{ new(): Stemmer }} */~N"
-             "~C ~n = function() {~+~N"
-             "~M~D base = new ~P();~N");
-    } else {
-        w(g, "/**@constructor*/~N"
-             "~D ~n = function() {~+~N"
-             "~M~C ~P = require('./base-stemmer.js');~N"
-             "~M~D base = new ~P();~N");
+    switch (g->options->js_type) {
+        case JS_GLOBAL:
+            w(g, "/**@constructor*/~N"
+                 "~D ~n = function() {~+~N"
+                 "~M~C ~P = require('./base-stemmer.js');~N"
+                 "~M~D base = new ~P();~N");
+            break;
+        case JS_ESM:
+            w(g, "// deno-lint-ignore-file~N"
+                 "import ~P from './base-stemmer.mjs'~N"
+                 "~N"
+                 "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
+                 "~N"
+                 "/** @type {{ new(): Stemmer }} */~N"
+                 "~C ~n = function() {~+~N"
+                 "~M~D base = new ~P();~N");
+            break;
+        case JS_ES6:
+            w(g, "import ~P from './base-stemmer-es6.mjs'~N"
+                 "~N"
+                 "const ~n = (() => {~+~N"
+                 "~Mconst base = new ~P();~N");
+            break;
     }
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N");
-    w(g, "~M/**@return{string}*/~N");
-    w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
-    w(g, "~Mbase.setCurrent(word);~N");
-    w(g, "~Mthis.stem();~N");
-    w(g, "~Mreturn base.getCurrent();~N");
-    w(g, "~-~M};~N");
-    w(g, "~-};~N");
-    if (g->options->js_esm) {
-        w(g, "~N"
-             "export default ~n~N");
-    } else {
-        w(g, "~N"
-             "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+    write_newline(g);
+    switch (g->options->js_type) {
+        case JS_GLOBAL:
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mthis.stem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-};~N");
+            w(g, "~N"
+                 "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+            break;
+        case JS_ESM:
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mthis.stem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-};~N");
+            w(g, "~N"
+                 "export default ~n~N");
+            break;
+        case JS_ES6:
+            w(g, "~Mreturn class {~+~N");
+            w(g, "~M/**@return{string}*/~N");
+            w(g, "~Mstatic stemWord(/**string*/word) {~+~N");
+            w(g, "~Mbase.setCurrent(word);~N");
+            w(g, "~Mstem();~N");
+            w(g, "~Mreturn base.getCurrent();~N");
+            w(g, "~-~M};~N");
+            w(g, "~-~M};~N");
+            w(g, "~-})();~N");
+            w(g, "~N"
+                 "export default ~n~N");
+            break;
     }
 }
 
