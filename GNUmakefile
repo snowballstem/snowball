@@ -2,7 +2,7 @@
 
 # After changing this, run `make update_version` to update various sources
 # which hard-code it.
-SNOWBALL_VERSION = 2.2.0
+SNOWBALL_VERSION = 3.0.0
 
 ifeq ($(OS),Windows_NT)
 EXEEXT = .exe

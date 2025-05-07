@@ -54,8 +54,8 @@ subdirectory.
 To actually build the libstemmer library you then unpack and build the
 distribution tarball, e.g. for C::
 
-    tar xf dist/libstemmer_c-2.2.0.tar.gz
-    cd libstemmer_c-2.2.0
+    tar xf dist/libstemmer_c-3.0.0.tar.gz
+    cd libstemmer_c-3.0.0
     make
 
 Cross-compiling
@@ -66,8 +66,8 @@ be built with a native compiler then libstemmer with the cross-compiler.  For
 example::
 
     make CC=cc dist_libstemmer_c
-    tar xf dist/libstemmer_c-2.2.0.tar.gz
-    cd libstemmer_c-2.2.0
+    tar xf dist/libstemmer_c-3.0.0.tar.gz
+    cd libstemmer_c-3.0.0
     make CC=riscv64-unknown-linux-gnu-gcc
 
 If you are cross-compiling to or from Microsoft Windows, you'll need to also

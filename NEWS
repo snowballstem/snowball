@@ -1,6 +1,4 @@
-up to: cd61f01a4e04c7a79b91a3cc2a42b6ffa144a99b
-
-Snowball 3.0.0 (2025-05-??)
+Snowball 3.0.0 (2025-05-08)
 ===========================
 
 Ada
@@ -78,7 +76,7 @@ C/C++
 
   + Store index delta for among substring_i field.  This makes trying
     substrings after a failed match slightly faster because we can just add
-    the offset to the pointer to the current elemtent which we already have.
+    the offset to the pointer we already have to the current element.
 
 * Code quality:
 
