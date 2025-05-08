@@ -21,7 +21,8 @@ for pyscript in os.listdir(python_out_folder):
 imports.sort()
 languages.sort()
 
-assert languages
+if len(languages) == 0:
+    raise AssertionError('languages list is empty!')
 
 src = '''__all__ = ('language', 'stemmer')
 
