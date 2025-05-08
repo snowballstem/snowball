@@ -1324,9 +1324,6 @@ extern void generate_program_python(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
-    // Only needed for Python 2, which defaults to ASCII.
-    w(g, "#-*- coding: utf-8 -*-~N");
-
     write_start_comment(g, "# ", NULL);
     if (g->analyser->int_limits_used) {
         /* sys.maxsize is used in the code generated for maxint and minint */
