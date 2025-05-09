@@ -1,3 +1,19 @@
+Snowball 3.0.1 (2025-05-09)
+===========================
+
+Python
+------
+
+* The __init__.py in 3.0.0 was incorrectly generated due to a missing
+  build dependency and the list of algorithms was empty.  First reported by
+  laymonage.  Thanks to Dmitry Shachnev, Henry Schreiner and Adam Turner for
+  diagnosing and fixing.  (#229, #230, #231)
+
+* Add trove classifiers for Armenian and Yiddish which have now been registered
+  with PyPI.  Thanks to Henry Schreiner and Dmitry Shachnev.  (#228)
+
+* Update documented details of Python 2 support in old versions.
+
 Snowball 3.0.0 (2025-05-08)
 ===========================
 
