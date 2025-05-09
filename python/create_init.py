@@ -40,7 +40,7 @@ except ImportError:
 
 def algorithms():
     if cext_available:
-        return Stemmer.language()
+        return Stemmer.algorithms()
     else:
         return list(_languages.keys())
 
