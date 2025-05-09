@@ -314,7 +314,7 @@ $(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
 	./snowball $< -py -o "$(python_output_dir)/$*_stemmer"
 
-$(python_output_dir)/__init__.py: $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
+$(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
 
 $(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball$(EXEEXT)
