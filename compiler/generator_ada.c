@@ -1155,6 +1155,16 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
     g->V[0] = q;
+
+#define FINAL_RETURN "\n      return;\n"
+#define FINAL_RETURN_LEN (sizeof(FINAL_RETURN) - 1)
+    if (memcmp(str_data(g->outbuf) + str_len(g->outbuf) - FINAL_RETURN_LEN,
+               FINAL_RETURN, FINAL_RETURN_LEN) == 0) {
+        // If generate_functionend() has just added a return we remove it again.
+        // This is really only a cosmetic improvement.
+        str_pop_n(g->outbuf, FINAL_RETURN_LEN - 1);
+    }
+
     w(g, "~-~Mend ~W0;~N");
 
     if (g->temporary_used) {
@@ -1178,7 +1188,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
 static void generate_functionend(struct generator * g, struct node * p) {
     (void)p;
-    w(g, "~MResult := True;~N");
+    w(g, "~MResult := True;~N~Mreturn;~N");
 }
 
 static void generate_substring(struct generator * g, struct node * p) {

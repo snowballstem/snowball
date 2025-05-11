@@ -328,6 +328,18 @@ extern void str_pop(const struct str *str) {
     if (SIZE(str->data)) --SIZE(str->data);
 }
 
+/* Remove the last n characters of the str.
+ *
+ * Or make the string empty if its length is less than n.
+ */
+extern void str_pop_n(const struct str *str, int n) {
+    if (SIZE(str->data) > n) {
+        SIZE(str->data) -= n;
+    } else {
+        SIZE(str->data) = 0;
+    }
+}
+
 extern int get_utf8(const symbol * p, int * slot) {
     int b0, b1;
     b0 = *p++;
