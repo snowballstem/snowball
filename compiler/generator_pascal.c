@@ -1063,12 +1063,12 @@ static void generate_call(struct generator * g, struct node * p) {
     if (g->failure_label == x_return) {
         if (p->right && p->right->type == c_functionend) {
             /* Tail call. */
-            writef(g, "~MResult = ~V0;~N", p);
+            writef(g, "~MResult := ~V0;~N", p);
             return;
         }
         if (signals == 0) {
             /* Always fails. */
-            writef(g, "~MBegin; Result = ~V0; Exit; End;~N", p);
+            writef(g, "~MBegin; Result := ~V0; Exit; End;~N", p);
             return;
         }
     }
