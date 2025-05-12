@@ -960,6 +960,10 @@ static void generate_call(struct generator * g, struct node * p) {
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
         /* Always fails or tail call. */
         writef(g, "~Mreturn ~V0();~N", p);
+        if (p->right && p->right->type == c_functionend) {
+            p->right = NULL;
+        }
+        g->unreachable = true;
         return;
     }
     if (signals == 1) {

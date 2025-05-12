@@ -1070,6 +1070,7 @@ static void generate_call(struct generator * g, struct node * p) {
         if (signals == 0) {
             /* Always fails. */
             writef(g, "~MBegin; Result := ~V0; Exit; End;~N", p);
+            g->unreachable = true;
             return;
         }
     }
