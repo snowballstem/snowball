@@ -792,7 +792,7 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M~V0 = base.assign_to();~N", p);
+    writef(g, "~M~V0 = base.current.slice(0, base.limit);~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
