@@ -1064,6 +1064,7 @@ static void generate_call(struct generator * g, struct node * p) {
         if (p->right && p->right->type == c_functionend) {
             /* Tail call. */
             writef(g, "~MResult := ~V0;~N", p);
+            p->right = NULL;
             return;
         }
         if (signals == 0) {
