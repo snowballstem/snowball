@@ -1142,6 +1142,11 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     } else if (x->always_matches) {
         writef(g, "~Mbase.find_among~S0(a_~I0);~N", p);
+    } else if (x->command_count == 0 &&
+               x->node->right && x->node->right->type == c_functionend) {
+        writef(g, "~Mreturn base.find_among~S0(a_~I0) != 0;~N", p);
+        x->node->right = NULL;
+        g->unreachable = true;
     } else {
         write_failure_if(g, "base.find_among~S0(a_~I0) == 0", p);
     }

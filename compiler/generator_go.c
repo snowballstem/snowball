@@ -1098,6 +1098,11 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     } else if (x->always_matches) {
         writef(g, "~Menv.FindAmong~S0(A_~I0, context)~N", p);
+    } else if (x->command_count == 0 &&
+               x->node->right && x->node->right->type == c_functionend) {
+        writef(g, "~Mreturn env.FindAmong~S0(A_~I0, context) != 0~N", p);
+        x->node->right = NULL;
+        g->unreachable = true;
     } else {
         write_failure_if(g, "env.FindAmong~S0(A_~I0, context) == 0", p);
     }

@@ -1698,6 +1698,10 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     } else if (x->always_matches) {
         writef(g, "~Mfind_among~S0(z, a_~I0, ~I1);~N", p);
+    } else if (x->command_count == 0 &&
+               x->node->right && x->node->right->type == c_functionend) {
+        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1) != 0;~N", p);
+        x->node->right = NULL;
     } else {
         writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1)) ~f~N", p);
     }
