@@ -1104,10 +1104,26 @@ static void generate_among(struct generator * g, struct node * p) {
     }
 }
 
-static void generate_booltest(struct generator * g, struct node * p) {
+static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
     g->V[0] = p->name;
-    write_failure_if(g, "!(~V0)", p);
+    if (g->failure_label == x_return) {
+        if (p->right && p->right->type == c_functionend) {
+            // Optimise at end of function.
+            if (inverted) {
+                writef(g, "~Mreturn !~V0;~N", p);
+            } else {
+                writef(g, "~Mreturn ~V0;~N", p);
+            }
+            p->right = NULL;
+            return;
+        }
+    }
+    if (inverted) {
+        write_failure_if(g, "~V0", p);
+    } else {
+        write_failure_if(g, "!~V0", p);
+    }
 }
 
 static void generate_false(struct generator * g, struct node * p) {
@@ -1189,7 +1205,8 @@ static void generate(struct generator * g, struct node * p) {
         case c_literalstring: generate_literalstring(g, p); break;
         case c_among:         generate_among(g, p); break;
         case c_substring:     generate_substring(g, p); break;
-        case c_booltest:      generate_booltest(g, p); break;
+        case c_booltest:      generate_booltest(g, p, false); break;
+        case c_not_booltest:  generate_booltest(g, p, true); break;
         case c_false:         generate_false(g, p); break;
         case c_true:          break;
         case c_debug:         generate_debug(g, p); break;

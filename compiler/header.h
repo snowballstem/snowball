@@ -131,6 +131,7 @@ enum token_codes {
     c_gopast_grouping,
     c_goto_non,
     c_gopast_non,
+    c_not_booltest,
 
     NUM_TOKEN_CODES
 };

@@ -522,6 +522,7 @@ extern const char * name_of_token(int code) {
                              return "gopast grouping";
         case c_goto_non:     return "goto non";
         case c_gopast_non:   return "gopast non";
+        case c_not_booltest: return "Inverted boolean test";
         case -2:             return "start of text";
         case -1:             return "end of text";
         default:             return "?";

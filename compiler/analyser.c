@@ -1053,7 +1053,19 @@ static struct node * read_C(struct analyser * a) {
                     return p;
                 }
             }
-        case c_not:
+        case c_not: {
+            struct node * subcommand = read_C(a);
+            if (subcommand->type == c_booltest) {
+                /* We synthesise a special command for "not" applied to testing
+                 * a boolean variable.
+                 */
+                subcommand->type = c_not_booltest;
+                return subcommand;
+            }
+            struct node * p = new_node(a, token);
+            p->left = subcommand;
+            return p;
+        }
         case c_try:
         case c_fail:
         case c_test:
