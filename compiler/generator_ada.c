@@ -897,12 +897,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->S[0] = q->mode == m_forward ? ">" : "<";
 
         w(g, "~Mif Z.C ~S0 "); generate_AE(g, q->AE); writef(g, " then~N~+", q);
-        w(g, "~MResult := False;~N");
-        w(g, "~Mreturn;~-~N");
-        w(g, "~Mend if;~N");
-        w(g, "~M~B0");
+        write_failure(g);
+        w(g, "~-~Mend if;~N");
         g->unreachable = false;
 
+        w(g, "~M~B0");
         if (p->mode == m_forward) {
             w(g, " := Z.L - Z.C; Z.L := ");
         } else {
