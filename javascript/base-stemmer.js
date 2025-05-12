@@ -414,7 +414,7 @@ const BaseStemmer = function() {
     };
 
     /**
-     * @param {number} c_bra
+     * @param {string} s
      * @return {boolean}
      */
     this.slice_from = function(s)
