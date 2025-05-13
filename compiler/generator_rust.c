@@ -1377,7 +1377,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
             write_varname(g, v[i].function);
             w(g, ")");
         } else {
-          w(g, "None");
+            w(g, "None");
         }
         w(g, ")~S0~N");
     }
