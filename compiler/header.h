@@ -359,7 +359,6 @@ struct generator {
     const char * S[10];  /* strings */
     byte * B[10];        /* byte blocks */
     int I[10];           /* integers */
-    symbol * L[5];       /* literals, used in formatted write */
 
     int line_count;      /* counts number of lines output */
     int line_labelled;   /* in ISO C, will need extra ';' if it is a block end */

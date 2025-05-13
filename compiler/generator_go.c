@@ -223,13 +223,9 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'W':
                 write_varname(g, p->name);
                 continue;
-            case 'L': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->L) / sizeof(g->L[0])))
-                    goto invalid_escape2;
-                write_literal_string(g, g->L[j]);
+            case 'L':
+                write_literal_string(g, p->literalstring);
                 continue;
-            }
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
@@ -985,11 +981,9 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
-    symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "B";
-    g->L[0] = b;
-    write_failure_if(g, "!env.EqS~S0(~L0)", p);
+    write_failure_if(g, "!env.EqS~S0(~L)", p);
 }
 
 static void generate_setup_context(struct generator * g) {
@@ -1254,15 +1248,16 @@ static void generate_among_table(struct generator * g, struct among * x) {
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
         g->I[1] = v[i].result;
-        g->L[0] = v[i].b;
         g->S[0] = ",";
 
-        w(g, "~M&snowballRuntime.Among{Str:~L0, A:~I0, B:~I1, ");
+        w(g, "~M&snowballRuntime.Among{Str:");
+        write_literal_string(g, v[i].b);
+        w(g, ", A:~I0, B:~I1, F:");
+
         if (v[i].function != NULL) {
-            w(g, "F:");
             write_varname(g, v[i].function);
         } else {
-            w(g, "F:nil");
+            w(g, "nil");
         }
         w(g, "}~S0~N");
     }

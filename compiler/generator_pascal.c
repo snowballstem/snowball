@@ -279,13 +279,12 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'W':
                 write_varname(g, p->name);
                 continue;
-            case 'L': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->L) / sizeof(g->L[0])))
-                    goto invalid_escape2;
-                write_literal_string(g, g->L[j]);
+            case 'L':
+                write_literal_string(g, p->literalstring);
                 continue;
-            }
+            case 's':
+                write_int(g, SIZE(p->literalstring));
+                continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
@@ -1089,11 +1088,9 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
-    symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "Bk";
-    g->L[0] = b;
-    write_failure_if(g, "Not (EqS~S0(~L0))", p);
+    write_failure_if(g, "Not (EqS~S0(~L))", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -1448,8 +1445,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
         g->I[1] = i;
 
         /* Write among's string. */
-        g->L[0] = v[i].b;
-        w(g, "~Ma_~I0[~I1].Str  := ~L0;~N");
+        w(g, "~Ma_~I0[~I1].Str  := ");
+        write_literal_string(g, v[i].b);
+        w(g, ";~N");
 
         /* Write among's index & result. */
         g->I[2] = v[i].i;

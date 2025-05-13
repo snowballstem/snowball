@@ -344,16 +344,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 write_varname(g, p->name);
                 continue;
             case 'L':
-            case 'A': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->L) / sizeof(g->L[0])))
-                    goto invalid_escape2;
-                if (ch == 'L')
-                    wlitref(g, g->L[j]);
-                else
-                    wlitarray(g, g->L[j]);
+                wlitref(g, p->literalstring);
                 continue;
-            }
+            case 's':
+                write_int(g, SIZE(p->literalstring));
+                continue;
             case 'a': write_data_address(g, p); continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
@@ -1518,10 +1513,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
         }
     } else {
         g->S[0] = p->mode == m_forward ? "" : "_b";
-        g->I[0] = SIZE(b);
-        g->L[0] = b;
-
-        writef(g, "~Mif (!(eq_s~S0(z, ~I0, ~L0))) ~f~N", p);
+        writef(g, "~Mif (!(eq_s~S0(z, ~s, ~L))) ~f~N", p);
     }
 }
 
@@ -1894,11 +1886,13 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     g->I[0] = x->number;
     for (int i = 0; i < x->literalstring_count; i++) {
-        g->I[1] = i;
-        g->I[2] = v[i].size;
-        g->L[0] = v[i].b;
-        if (v[i].size)
-            w(g, "static const symbol s_~I0_~I1[~I2] = ~A0;~N");
+        if (v[i].size) {
+            g->I[1] = i;
+            g->I[2] = v[i].size;
+            w(g, "static const symbol s_~I0_~I1[~I2] = ");
+            wlitarray(g, v[i].b);
+            w(g, ";~N");
+        }
     }
 
     g->I[1] = x->literalstring_count;

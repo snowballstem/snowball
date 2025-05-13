@@ -251,13 +251,9 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'W':
                 write_varname(g, p->name);
                 continue;
-            case 'L': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->L) / sizeof(g->L[0])))
-                    goto invalid_escape2;
-                write_literal_string(g, g->L[j]);
+            case 'L':
+                write_literal_string(g, p->literalstring);
                 continue;
-            }
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
@@ -1087,11 +1083,9 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
-    symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    g->L[0] = b;
-    writef(g, "~MC := Eq_S~S0 (Z, ~L0);~N", p);
+    writef(g, "~MC := Eq_S~S0 (Z, ~L);~N", p);
     write_failure_if(g, "C = 0", p);
     if (p->mode == m_forward) {
         writef(g, "~MZ.C := Z.C + C;~N", p);
@@ -1535,7 +1529,6 @@ static int generate_among_string(struct generator * g, struct among * x, int cou
 
     for (int i = 0; i < x->literalstring_count; i++, v++) {
         /* Write among's string. */
-        g->L[0] = v->b;
         g->I[1] = i;
         if (count + SIZE(v->b) > limit) {
             w(g, "~N~M& ");
@@ -1544,7 +1537,7 @@ static int generate_among_string(struct generator * g, struct among * x, int cou
         } else if (count > 0) {
             w(g, " & ");
         }
-        w(g, "~L0");
+        write_literal_string(g, v->b);
         count += SIZE(v->b) + 5;
     }
     return count;
