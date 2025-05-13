@@ -246,16 +246,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'V':
-            case 'W': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->V) / sizeof(g->V[0])))
-                    goto invalid_escape2;
-                if (ch == 'V')
-                    write_varref(g, g->V[j]);
-                else
-                    write_varname(g, g->V[j]);
+                write_varref(g, p->name);
                 continue;
-            }
+            case 'W':
+                write_varname(g, p->name);
+                continue;
             case 'L': {
                 int j = input[i++] - '0';
                 if (j < 0 || j > (int)(sizeof(g->L) / sizeof(g->L[0])))
@@ -339,12 +334,10 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "Z.Len");
             break;
         case c_lenof:
-            g->V[0] = p->name;
-            w(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V0))");
+            writef(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V))", p);
             break;
         case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "Ada.Strings.Unbounded.Length (~V0)");
+            writef(g, "Ada.Strings.Unbounded.Length (~V))", p);
             break;
         default:
             break;
@@ -513,14 +506,12 @@ static void generate_try(struct generator * g, struct node * p) {
 
 static void generate_set(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 := True;~N", p);
+    writef(g, "~M~V := True;~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 := False;~N", p);
+    writef(g, "~M~V := False;~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -565,8 +556,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        g->V[0] = p->left->name;
-        w(g, "~M~V0 (Z, Result);~N");
+        writef(g, "~M~V (Z, Result);~N", p->left);
     } else {
         g->failure_label = new_label(g);
         str_clear(g->failure_str);
@@ -600,14 +590,13 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->S[1] = complement ? "In" : "Out";
-    g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
     if (is_goto) {
-        writef(g, "~M~S1_Grouping~S0 (Z, ~V0, ~I0, ~I1, True, C);~N", p);
+        writef(g, "~M~S1_Grouping~S0 (Z, ~V, ~I0, ~I1, True, C);~N", p);
         write_failure_if(g, "C < 0", p);
     } else {
-        writef(g, "~M~S1_Grouping~S0 (Z, ~V0, ~I0, ~I1, True, C);~N", p);
+        writef(g, "~M~S1_Grouping~S0 (Z, ~V, ~I0, ~I1, True, C);~N", p);
         write_failure_if(g, "C < 0", p);
 
         if (p->mode == m_forward)
@@ -749,8 +738,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
 
 static void generate_setmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 := Z.C;~N", p);
+    writef(g, "~M~V := Z.C;~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
@@ -815,15 +803,13 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 := Assign_To (Z, ~V0);~N", p);
-    write_failure_if(g, "~V0 == 0", p);
+    writef(g, "~M~V := Assign_To (Z, ~V);~N", p);
+    write_failure_if(g, "~V == 0", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 := Ada.Strings.Unbounded.To_Unbounded_String (Slice_To (Z));~N", p);
+    writef(g, "~M~V := Ada.Strings.Unbounded.To_Unbounded_String (Slice_To (Z));~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -968,13 +954,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    g->V[0] = p->name;
 
     {
         struct str * saved_output = g->outbuf;
         str_clear(g->failure_str);
         g->outbuf = g->failure_str;
-        writef(g, "~V0 := FCurrent; "
+        writef(g, "~V := FCurrent; "
                   "FCurrent := ~B0_Current; "
                   "FCursor := ~B0_Cursor; "
                   "FLimit := ~B0_Limit; "
@@ -999,7 +984,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~M~B0_BkLimit := FBkLimit;~N"
               "~M~B0_Bra := FBra;~N"
               "~M~B0_Ket := FKet;~N"
-              "~MFCurrent := ~V0;~N"
+              "~MFCurrent := ~V;~N"
               "~MFCursor := 0;~N"
               "~MFLimit := Length(current);~N", p);
     generate(g, p->left);
@@ -1014,12 +999,11 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    w(g, "~M~V0 := ");
+    writef(g, "~M~V := ", p);
 
     if (s != NULL) {
         g->S[0] = s;
-        w(g, "~V0 ~S0 ");
+        writef(g, "~V ~S0 ", p);
     }
 
     generate_AE(g, p->AE);
@@ -1054,30 +1038,29 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
     write_comment(g, p);
-    g->V[0] = p->name;
     if (g->failure_label == x_return) {
         if (p->right && p->right->type == c_functionend) {
             /* Tail call. */
-            writef(g, "~M~V0 (Z, Result);~N~Mreturn;~N", p);
+            writef(g, "~M~V (Z, Result);~N~Mreturn;~N", p);
             p->right = NULL;
             return;
         }
         if (signals == 0) {
             /* Always fails. */
-            writef(g, "~M~V0 (Z, Result);~N", p);
+            writef(g, "~M~V (Z, Result);~N", p);
             w(g, "~Mreturn~N");
             return;
         }
     }
     if (signals == 1) {
         /* Always succeeds. */
-        writef(g, "~M~V0 (Z, Result);~N", p);
+        writef(g, "~M~V (Z, Result);~N", p);
     } else if (signals == 0) {
         /* Always fails. */
-        writef(g, "~M~V0 (Z, Result);~N", p);
+        writef(g, "~M~V (Z, Result);~N", p);
         write_failure(g);
     } else {
-        writef(g, "~M~V0 (Z, Result);~N", p);
+        writef(g, "~M~V (Z, Result);~N", p);
         write_failure_if(g, "not Result", p);
     }
 }
@@ -1088,10 +1071,9 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->S[1] = complement ? "Out_" : "In_";
-    g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    writef(g, "~M~S1Grouping~S0 (Z, ~V0, ~I0, ~I1, False, C);~N", p);
+    writef(g, "~M~S1Grouping~S0 (Z, ~V, ~I0, ~I1, False, C);~N", p);
     write_failure_if(g, "C /= 0", p);
     g->temporary_used = true;
 }
@@ -1099,8 +1081,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    g->V[0] = p->name;
-    writef(g, "~MC := Eq_S~S0 (Z, Ada.Strings.Unbounded.To_String (~V0));", p);
+    writef(g, "~MC := Eq_S~S0 (Z, Ada.Strings.Unbounded.To_String (~V));", p);
     write_failure_if(g, "C = 0", p);
     g->temporary_used = true;
 }
@@ -1128,8 +1109,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     /* Generate function header. */
-    g->V[0] = q;
-    w(g, "~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean) is~N");
+    writef(g, "~Mprocedure ~W (Z : in out Context_Type; Result : out Boolean) is~N", p);
 
     /* Save output. */
     struct str *saved_output = g->outbuf;
@@ -1154,7 +1134,6 @@ static void generate_define(struct generator * g, struct node * p) {
             generate(g, p->left->right);
         }
     }
-    g->V[0] = q;
 
 #define FINAL_RETURN "\n      return;\n"
 #define FINAL_RETURN_LEN (sizeof(FINAL_RETURN) - 1)
@@ -1165,7 +1144,7 @@ static void generate_define(struct generator * g, struct node * p) {
         str_pop_n(g->outbuf, FINAL_RETURN_LEN - 1);
     }
 
-    w(g, "~-~Mend ~W0;~N");
+    writef(g, "~-~Mend ~W;~N", p);
 
     if (g->temporary_used) {
         str_append_string(saved_output, "      C : Result_Index;\n");
@@ -1370,23 +1349,22 @@ static void generate_among(struct generator * g, struct node * p) {
 
 static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
-    g->V[0] = p->name;
     if (g->failure_label == x_return) {
         if (p->right && p->right->type == c_functionend) {
             // Optimise at end of function.
             if (inverted) {
-                writef(g, "~MResult := not ~V0;~N", p);
+                writef(g, "~MResult := not ~V;~N", p);
             } else {
-                writef(g, "~MResult := ~V0;~N", p);
+                writef(g, "~MResult := ~V;~N", p);
             }
             p->right = NULL;
             return;
         }
     }
     if (inverted) {
-        write_failure_if(g, "~V0", p);
+        write_failure_if(g, "~V", p);
     } else {
-        write_failure_if(g, "not ~V0", p);
+        write_failure_if(g, "not ~V", p);
     }
 }
 
@@ -1492,8 +1470,9 @@ static void generate_unit_start(struct generator * g) {
 }
 
 static void generate_method_decl(struct generator * g, struct name * q) {
-    g->V[0] = q;
-    w(g, "~Mprocedure ~W0 (Z : in out Context_Type; Result : out Boolean);~N");
+    w(g, "~Mprocedure ");
+    write_varref(g, q);
+    w(g, " (Z : in out Context_Type; Result : out Boolean);~N");
 }
 
 static void generate_method_decls(struct generator * g, enum name_types type) {
@@ -1522,16 +1501,21 @@ static void generate_member_decls(struct generator * g) {
         g->analyser->name_count[t_boolean] > 0) {
         w(g, " record~N~+");
         for (struct name * q = g->analyser->names; q; q = q->next) {
-            g->V[0] = q;
             switch (q->type) {
                 case t_string:
-                    w(g, "~M~W0 : Ada.Strings.Unbounded.Unbounded_String;~N");
+                    write_margin(g);
+                    write_varname(g, q);
+                    w(g, " : Ada.Strings.Unbounded.Unbounded_String;~N");
                     break;
                 case t_integer:
-                    w(g, "~M~W0 : Integer;~N");
+                    write_margin(g);
+                    write_varname(g, q);
+                    w(g, " : Integer;~N");
                     break;
                 case t_boolean:
-                    w(g, "~M~W0 : Boolean;~N");
+                    write_margin(g);
+                    write_varname(g, q);
+                    w(g, " : Boolean;~N");
                     break;
             }
         }
@@ -1659,9 +1643,9 @@ static int generate_operations_dispatcher(struct generator * g) {
             if (v[i].function != NULL) {
                 operation++;
                 g->I[2] = operation;
-                w(g, "when ~I2 =>~N~M");
-                g->V[0] = v[i].function;
-                w(g, "   ~W0 (Context_Type (Context), Result);~N~M");
+                w(g, "when ~I2 =>~N~M   ");
+                write_varname(g, v[i].function);
+                w(g, " (Context_Type (Context), Result);~N~M");
             }
         }
     }
@@ -1684,9 +1668,10 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    g->V[0] = q->name;
     g->I[0] = 8 * size - 1;
-    w(g, "~N~M~W0 : constant Grouping_Array (0 .. ~I0) := (~N~+~M");
+    w(g, "~N~M");
+    write_varname(g, q->name);
+    w(g, " : constant Grouping_Array (0 .. ~I0) := (~N~+~M");
     for (int i = 0; i < size; i++) {
         unsigned char m = map[i];
         if (i != 0) {

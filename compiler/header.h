@@ -359,7 +359,6 @@ struct generator {
     const char * S[10];  /* strings */
     byte * B[10];        /* byte blocks */
     int I[10];           /* integers */
-    struct name * V[5];  /* variables */
     symbol * L[5];       /* literals, used in formatted write */
 
     int line_count;      /* counts number of lines output */

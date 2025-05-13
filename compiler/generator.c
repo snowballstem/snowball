@@ -338,16 +338,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'V':
-            case 'W': {
-                int j = input[i++] - '0';
-                if (j < 0 || j > (int)(sizeof(g->V) / sizeof(g->V[0])))
-                    goto invalid_escape2;
-                if (ch == 'V')
-                    write_varref(g, g->V[j]);
-                else
-                    write_varname(g, g->V[j]);
+                write_varref(g, p->name);
                 continue;
-            }
+            case 'W':
+                write_varname(g, p->name);
+                continue;
             case 'L':
             case 'A': {
                 int j = input[i++] - '0';
@@ -423,14 +418,12 @@ static void generate_AE(struct generator * g, struct node * p) {
             break;
         case c_lenof:
             if (g->options->encoding == ENC_UTF8) {
-                g->V[0] = p->name;
-                w(g, "len_utf8(~V0)");
+                writef(g, "len_utf8(~V)", p);
                 break;
             }
             /* FALLTHRU */
         case c_sizeof:
-            g->V[0] = p->name;
-            w(g, "SIZE(~V0)");
+            writef(g, "SIZE(~V)", p);
             break;
     }
 }
@@ -942,14 +935,12 @@ static void generate_try(struct generator * g, struct node * p) {
 
 static void generate_set(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 = 1;~N", p);
+    writef(g, "~M~V = 1;~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 = 0;~N", p);
+    writef(g, "~M~V = 0;~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -995,8 +986,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        g->V[0] = p->left->name;
-        writef(g, "~{~Mint ret = ~V0(z);~N", p->left);
+        writef(g, "~{~Mint ret = ~V(z);~N", p->left);
         w(g, "~Mif (ret < 0) return ret;~N~}");
     } else {
         g->failure_label = new_label(g);
@@ -1038,14 +1028,13 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
-    g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
     if (is_goto) {
-        writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1) < 0) ~f~N", p);
+        writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V, ~I0, ~I1, 1) < 0) ~f~N", p);
     } else {
         writef(g, "~{"
-              "~Mint ret = ~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 1);~N"
+              "~Mint ret = ~S1_grouping~S0~S2(z, ~V, ~I0, ~I1, 1);~N"
               "~Mif (ret < 0) ~f~N", p);
         if (p->mode == m_forward)
             w(g, "~Mz->c += ret;~N");
@@ -1180,8 +1169,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
 
 static void generate_setmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 = z->c;~N", p);
+    writef(g, "~M~V = z->c;~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
@@ -1276,16 +1264,14 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 = assign_to(z, ~V0);~N"
-          "~Mif (~V0 == 0) return -1;~N", p);
+    writef(g, "~M~V = assign_to(z, ~V);~N"
+          "~Mif (~V == 0) return -1;~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    g->V[0] = p->name;
-    writef(g, "~M~V0 = slice_to(z, ~V0);~N"
-          "~Mif (~V0 == 0) return -1;~N", p);
+    writef(g, "~M~V = slice_to(z, ~V);~N"
+          "~Mif (~V == 0) return -1;~N", p);
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
@@ -1407,10 +1393,9 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->B[0] = str_data(savevar);
     writef(g, "~{~Mstruct SN_env en~B0 = * z;~N", p);
     // only copy start - we don't need to copy variables
-    g->V[0] = p->name;
     /* Assume failure. */
     writef(g, "~Mint failure = 1;~N"
-          "~Mz->p = ~V0;~N"
+          "~Mz->p = ~V;~N"
           "~Mz->lb = z->c = 0;~N"
           "~Mz->l = SIZE(z->p);~N", p);
     generate(g, p->left);
@@ -1418,7 +1403,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
     w(g, "~Mfailure = 0;~N");
     if (g->label_used)
         wsetl(g, g->failure_label);
-    g->V[0] = p->name; /* necessary */
 
     g->label_used = used;
     g->failure_label = a0;
@@ -1426,7 +1410,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     g->B[0] = str_data(savevar);
-    writef(g, "~M~V0 = z->p;~N"
+    writef(g, "~M~V = z->p;~N"
           "~M* z = en~B0;~N"
           "~Mif (failure) ~f~N~}", p);
     str_delete(savevar);
@@ -1434,9 +1418,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
     write_comment(g, p);
-    g->V[0] = p->name;
     g->S[0] = s;
-    w(g, "~M~V0 ~S0 "); generate_AE(g, p->AE); writef(g, ";~N", p);
+    writef(g, "~M~V ~S0 ", p); generate_AE(g, p->AE); writef(g, ";~N", p);
 }
 
 static void generate_integer_test(struct generator * g, struct node * p) {
@@ -1464,17 +1447,16 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
     write_comment(g, p);
-    g->V[0] = p->name;
     if (str_len(g->failure_str) == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
         /* Always fails or tail call. */
-        writef(g, "~Mreturn ~V0(z);~N", p);
+        writef(g, "~Mreturn ~V(z);~N", p);
         if (p->right && p->right->type == c_functionend) {
             p->right = NULL;
         }
         return;
     }
-    writef(g, "~{~Mint ret = ~V0(z);~N", p);
+    writef(g, "~{~Mint ret = ~V(z);~N", p);
     if (str_len(g->failure_str) == 0 && g->failure_label == x_return) {
         /* Combine the two tests in this special case for better optimisation
          * and clearer generated code. */
@@ -1502,17 +1484,15 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
     g->S[2] = g->options->encoding == ENC_UTF8 ? "_U" : "";
-    g->V[0] = p->name;
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V0, ~I0, ~I1, 0)) ~f~N", p);
+    writef(g, "~Mif (~S1_grouping~S0~S2(z, ~V, ~I0, ~I1, 0)) ~f~N", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->V[0] = p->name;
-    writef(g, "~Mif (!(eq_v~S0(z, ~V0))) ~f~N", p);
+    writef(g, "~Mif (!(eq_v~S0(z, ~V))) ~f~N", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1556,9 +1536,8 @@ static void generate_define(struct generator * g, struct node * p) {
     g->var_number = 0;
 
     g->S[0] = q->type == t_routine ? "static" : "extern";
-    g->V[0] = q;
 
-    w(g, "~S0 int ~V0(struct SN_env * z) {~N~+");
+    writef(g, "~S0 int ~V(struct SN_env * z) {~N~+", p);
     if (p->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
@@ -1733,23 +1712,22 @@ static void generate_among(struct generator * g, struct node * p) {
 
 static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
-    g->V[0] = p->name;
     if (g->failure_label == x_return) {
         if (p->right && p->right->type == c_functionend) {
             // Optimise at end of function.
             if (inverted) {
-                writef(g, "~Mreturn !~V0;~N", p);
+                writef(g, "~Mreturn !~V;~N", p);
             } else {
-                writef(g, "~Mreturn ~V0;~N", p);
+                writef(g, "~Mreturn ~V;~N", p);
             }
             p->right = NULL;
             return;
         }
     }
     if (inverted) {
-        writef(g, "~Mif (~V0) ~f~N", p);
+        writef(g, "~Mif (~V) ~f~N", p);
     } else {
-        writef(g, "~Mif (!~V0) ~f~N", p);
+        writef(g, "~Mif (!~V) ~f~N", p);
     }
 }
 
@@ -1886,21 +1864,24 @@ static void generate_head(struct generator * g) {
 
 static void generate_routine_headers(struct generator * g) {
     for (struct name * q = g->analyser->names; q; q = q->next) {
-        g->V[0] = q;
         switch (q->type) {
             case t_routine:
-                w(g, "static int ~W0(struct SN_env * z);~N");
+                w(g, "static int ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
                 break;
             case t_external:
                 w(g,
                   "#ifdef __cplusplus~N"
                   "extern \"C\" {~N"
                   "#endif~N"
-                  "extern int ~W0(struct SN_env * z);~N"
+                  "extern int ");
+                write_varname(g, q);
+                w(g,
+                  "(struct SN_env * z);~N"
                   "#ifdef __cplusplus~N"
                   "}~N"
-                  "#endif~N"
-                  );
+                  "#endif~N");
                 break;
         }
     }
@@ -1968,8 +1949,9 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    g->V[0] = q->name;
-    w(g, "static const unsigned char ~V0[] = { ");
+    w(g, "static const unsigned char ");
+    write_varname(g, q->name);
+    w(g, "[] = { ");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
@@ -2018,10 +2000,11 @@ static void generate_header_file(struct generator * g) {
 
     generate_create_and_close_templates(g);
     for (struct name * q = g->analyser->names; q; q = q->next) {
-        g->V[0] = q;
         switch (q->type) {
             case t_external:
-                w(g, "extern int ~W0(struct SN_env * z);~N");
+                w(g, "extern int ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
                 break;
             case t_string:
             case t_integer:
