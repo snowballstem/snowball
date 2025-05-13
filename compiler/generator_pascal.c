@@ -1085,16 +1085,15 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "Bk";
-    write_failure_if(g, "Not (EqV~S0(~V))", p);
+    write_failure_if(g, "Not (EqS~S0(~V))", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "Bk";
-    g->I[0] = SIZE(b);
     g->L[0] = b;
-    write_failure_if(g, "Not (EqS~S0(~I0, ~L0))", p);
+    write_failure_if(g, "Not (EqS~S0(~L0))", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {

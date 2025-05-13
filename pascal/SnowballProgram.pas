@@ -36,11 +36,8 @@ Type
         Function OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
         Function GoOutGroupingBk(s : array of char; min, max : Integer) : Boolean;
 
-        Function EqS(s_size : Integer; s : AnsiString) : Boolean;
-        Function EqSBk(s_size : Integer; s : AnsiString) : Boolean;
-
-        Function EqV(s : AnsiString) : Boolean;
-        Function EqVBk(s : AnsiString) : Boolean;
+        Function EqS(s : AnsiString) : Boolean;
+        Function EqSBk(s : AnsiString) : Boolean;
 
         Function FindAmong(v : array of TAmong; v_size : Integer) : Integer;
         Function FindAmongBk(v : array of TAmong; v_size : Integer) : Integer;
@@ -233,10 +230,11 @@ Begin
     Result := False;
 End;
 
-Function TSnowballProgram.EqS(s_size : Integer; s : AnsiString) : Boolean;
-Var I : Integer;
+Function TSnowballProgram.EqS(s : AnsiString) : Boolean;
+Var I, s_size : Integer;
 Begin
     Result := False;
+    s_size := Length(s);
 
     If (FLimit - FCursor) < s_size Then Exit;
 
@@ -248,10 +246,11 @@ Begin
     Result := True;
 End;
 
-Function TSnowballProgram.EqSBk(s_size : Integer; s : AnsiString) : Boolean;
-Var I : Integer;
+Function TSnowballProgram.EqSBk(s : AnsiString) : Boolean;
+Var I, s_size : Integer;
 Begin
     Result := False;
+    s_size := Length(s);
 
     if (FCursor - FBkLimit) < s_size Then Exit;
 
@@ -261,16 +260,6 @@ Begin
     FCursor := FCursor - s_size;
 
     Result := True;
-End;
-
-Function TSnowballProgram.EqV(s : AnsiString) : Boolean;
-Begin
-    Result := EqS(Length(s), s);
-End;
-
-Function TSnowballProgram.EqVBk(s : AnsiString) : Boolean;
-Begin
-    Result := EqSBk(Length(s), s);
 End;
 
 Function TSnowballProgram.FindAmong(v : array of TAmong; v_size : Integer) : Integer;
