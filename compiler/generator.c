@@ -423,217 +423,6 @@ static void generate_AE(struct generator * g, struct node * p) {
     }
 }
 
-// Return 0 for always f.
-// Return 1 for always t.
-// Return -1 for don't know (or can raise t or f).
-static int check_possible_signals_list(struct generator * g, struct node * p,
-                                       int type, int call_depth) {
-    int r = 1;
-    while (p) {
-        int res = check_possible_signals(g, p, call_depth);
-        if (res == 0) {
-            // If any command always signals f, then the list always signals f.
-            if (p->right) {
-                if (p->right->type != c_functionend) {
-                    fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is unreachable\n",
-                            g->analyser->tokeniser->file, p->line_number,
-                            (type == c_and ? "'and'" : "command list"));
-                }
-                p->right = NULL;
-            }
-            return res;
-        }
-        if (res < 0) r = res;
-        p = p->right;
-    }
-    return r;
-}
-
-// Return 0 for always f.
-// Return 1 for always t.
-// Return -1 for don't know (or can raise t or f).
-extern int check_possible_signals(struct generator * g,
-                                  struct node * p, int call_depth) {
-    switch (p->type) {
-        case c_fail:
-        case c_false:
-            /* Always gives signal f. */
-            return 0;
-        case c_assign:
-        case c_attach:
-        case c_debug:
-        case c_delete:
-        case c_do:
-        case c_insert:
-        case c_leftslice:
-        case c_repeat:
-        case c_rightslice:
-        case c_set:
-        case c_setmark:
-        case c_slicefrom:
-        case c_sliceto:
-        case c_tolimit:
-        case c_tomark:
-        case c_true:
-        case c_try:
-        case c_unset:
-        case c_mathassign:
-        case c_plusassign:
-        case c_minusassign:
-        case c_multiplyassign:
-        case c_divideassign:
-        case c_functionend:
-            /* Always gives signal t. */
-            return 1;
-        case c_not: {
-            int res = check_possible_signals(g, p->left, call_depth);
-            if (res >= 0)
-                res = !res;
-            if (res == 0 && p->right) {
-                if (p->right->type != c_functionend) {
-                    fprintf(stderr, "%s:%d: warning: 'not' always signals f so following commands are unreachable\n",
-                            g->analyser->tokeniser->file, p->line_number);
-                }
-                p->right = NULL;
-            }
-            return res;
-        }
-        case c_setlimit: {
-            /* If p->left signals f, setlimit does. */
-            int res = check_possible_signals(g, p->left, call_depth);
-            if (res == 0) {
-                return res;
-            }
-            /* Otherwise gives same signal as p->aux. */
-            int res2 = check_possible_signals(g, p->aux, call_depth);
-            if (res2 <= 0)
-                return res2;
-            return res;
-        }
-        case c_and:
-        case c_bra:
-            /* Gives same signal as list p->left. */
-            return check_possible_signals_list(g, p->left, p->type, call_depth);
-        case c_atleast:
-        case c_backwards:
-        case c_loop:
-        case c_reverse:
-        case c_test:
-            /* Give same signal as p->left. */
-            return check_possible_signals(g, p->left, call_depth);
-        case c_call:
-            if (call_depth >= 100) {
-                /* Recursive functions aren't typical in snowball programs,
-                 * so make the pessimistic assumption that both t and f are
-                 * possible if we hit a generous limit on recursion.  It's
-                 * not likely to make a difference to any real world
-                 * program, but means we won't recurse until we run out of
-                 * stack for pathological cases.
-                 */
-                return -1;
-            }
-            return check_possible_signals(g, p->name->definition,
-                                          call_depth + 1);
-        case c_gopast:
-        case c_goto:
-        case c_goto_grouping:
-        case c_gopast_grouping:
-        case c_goto_non:
-        case c_gopast_non:
-            /* FIXME: unless we can prove that c is either definitely atlimit
-             * or definitely not atlimit... */
-            return -1;
-        case c_atlimit:
-        case c_atmark:
-        case c_booltest:
-        case c_not_booltest:
-        case c_hop:
-        case c_literalstring:
-        case c_next:
-        case c_eq:
-        case c_ne:
-        case c_gt:
-        case c_ge:
-        case c_lt:
-        case c_le:
-        case c_grouping:
-        case c_non:
-        case c_name:
-            /* FIXME: unless we can prove... */
-            return -1;
-        case c_substring: {
-            struct among * x = p->among;
-            if (x->always_matches) {
-                return 1;
-            }
-            return -1;
-        }
-        case c_among: {
-            struct among * x = p->among;
-            int r = 1;
-
-            if (x->substring == NULL) {
-                if (!x->always_matches) {
-                    r = -1;
-                }
-            }
-
-            if (x->command_count > 0) {
-                int trues = (x->nocommand_count > 0);
-                int falses = false;
-                for (int i = 1; i <= x->command_count; i++) {
-                    int res = check_possible_signals(g, x->commands[i - 1],
-                                                     call_depth);
-                    if (res == 0) {
-                        falses = true;
-                    } else if (res > 0) {
-                        trues = true;
-                    } else {
-                        falses = trues = true;
-                    }
-                    if (falses && trues) break;
-                }
-                if (!trues) {
-                    // All commands in among always fail.
-                    return 0;
-                }
-                if (falses) {
-                    // Commands in among can succeed or fail.
-                    return -1;
-                }
-            }
-            return r;
-        }
-        case c_or: {
-            int r = 0;
-            for (struct node * q = p->left; q; q = q->right) {
-                // Just check this node - q->right is a separate clause of
-                // the OR.
-                int res = check_possible_signals(g, q, call_depth);
-                if (res > 0) {
-                    // If any clause of the OR always signals t, then the OR
-                    // always signals t.
-                    if (q->right) {
-                        if (q->right->type != c_functionend) {
-                            fprintf(stderr, "%s:%d: warning: command always signals t here so rest of 'or' is unreachable\n",
-                                    g->analyser->tokeniser->file,
-                                    q->line_number);
-                        }
-                        q->right = NULL;
-                    }
-                    return 1;
-                }
-                if (res < 0) {
-                    r = res;
-                }
-            }
-            return r;
-        }
-        default:
-            return -1;
-    }
-}
-
 /* K_needed() tests to see if we really need to keep c. Not true when the
    command does not touch the cursor. This and repeat_score() could be
    elaborated almost indefinitely.
@@ -1105,7 +894,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     g->label_used = 0;
     str_clear(g->failure_str);
 
-    int possible_signals = check_possible_signals(g, p->left, 0);
+    int possible_signals = p->left->possible_signals;
     if (possible_signals != -1) {
         fprintf(stderr, "%s:%d: warning: body of '%s' always signals '%c'\n",
                 g->analyser->tokeniser->file, p->line_number,
@@ -1440,7 +1229,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 }
 
 static void generate_call(struct generator * g, struct node * p) {
-    int signals = check_possible_signals(g, p->name->definition, 0);
+    int signals = p->name->definition->possible_signals;
     write_comment(g, p);
     if (str_len(g->failure_str) == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
@@ -1534,13 +1323,12 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;
-    int signals = check_possible_signals(g, p->left, 0);
 
     /* Generate function body. */
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
-        if (signals) {
+        if (p->left->possible_signals) {
             generate(g, p->left->right);
         }
     }

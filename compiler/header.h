@@ -274,6 +274,10 @@ struct node {
     // Unicode mode (e.g. maxint, sizeof '{U+0246}') - some warnings which
     // depend on a constant AEs value should only fire for the first set.
     byte fixed_constant;
+    // Return 0 for always f.
+    // Return 1 for always t.
+    // Return -1 for don't know (or can raise t or f).
+    signed char possible_signals;
     struct node * AE;
     struct name * name;
     symbol * literalstring;
@@ -423,9 +427,6 @@ extern void write_start_comment(struct generator * g,
 
 extern int K_needed(struct generator * g, struct node * p);
 extern int repeat_restore(struct generator * g, struct node * p);
-extern int check_possible_signals(struct generator * g,
-                                  struct node * p,
-                                  int call_depth);
 
 /* Generator for C code. */
 extern void generate_program_c(struct generator * g);

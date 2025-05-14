@@ -945,7 +945,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 }
 
 static void generate_call(struct generator * g, struct node * p) {
-    int signals = check_possible_signals(g, p->name->definition, 0);
+    int signals = p->name->definition->possible_signals;
     write_comment(g, p);
     if (g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
@@ -1008,7 +1008,7 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
-    int signals = check_possible_signals(g, p->left, 0);
+    int signals = p->left->possible_signals;
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
