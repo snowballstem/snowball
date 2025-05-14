@@ -1032,7 +1032,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 }
 
 static void generate_call(struct generator * g, struct node * p) {
-    int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
+    int signals = check_possible_signals(g, p->name->definition, 0);
     write_comment(g, p);
     if (g->failure_label == x_return) {
         if (p->right && p->right->type == c_functionend) {
@@ -1119,7 +1119,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     /* Generate function body. */
     w(g, "~{");
-    int signals = check_possible_signals_list(g, p->left, c_define, 0);
+    int signals = check_possible_signals(g, p->left, 0);
     g->temporary_used = false;
     generate(g, p->left);
     if (p->left->right) {

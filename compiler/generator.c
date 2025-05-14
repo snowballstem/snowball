@@ -426,7 +426,33 @@ static void generate_AE(struct generator * g, struct node * p) {
 // Return 0 for always f.
 // Return 1 for always t.
 // Return -1 for don't know (or can raise t or f).
-static int check_possible_signals(struct generator * g,
+static int check_possible_signals_list(struct generator * g, struct node * p,
+                                       int type, int call_depth) {
+    int r = 1;
+    while (p) {
+        int res = check_possible_signals(g, p, call_depth);
+        if (res == 0) {
+            // If any command always signals f, then the list always signals f.
+            if (p->right) {
+                if (p->right->type != c_functionend) {
+                    fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is unreachable\n",
+                            g->analyser->tokeniser->file, p->line_number,
+                            (type == c_and ? "'and'" : "command list"));
+                }
+                p->right = NULL;
+            }
+            return res;
+        }
+        if (res < 0) r = res;
+        p = p->right;
+    }
+    return r;
+}
+
+// Return 0 for always f.
+// Return 1 for always t.
+// Return -1 for don't know (or can raise t or f).
+extern int check_possible_signals(struct generator * g,
                                   struct node * p, int call_depth) {
     switch (p->type) {
         case c_fail:
@@ -506,8 +532,8 @@ static int check_possible_signals(struct generator * g,
                  */
                 return -1;
             }
-            return check_possible_signals_list(g, p->name->definition, c_define,
-                                               call_depth + 1);
+            return check_possible_signals(g, p->name->definition,
+                                          call_depth + 1);
         case c_gopast:
         case c_goto:
         case c_goto_grouping:
@@ -606,32 +632,6 @@ static int check_possible_signals(struct generator * g,
         default:
             return -1;
     }
-}
-
-// Return 0 for always f.
-// Return 1 for always t.
-// Return -1 for don't know (or can raise t or f).
-int check_possible_signals_list(struct generator * g, struct node * p,
-                                int type, int call_depth) {
-    int r = 1;
-    while (p) {
-        int res = check_possible_signals(g, p, call_depth);
-        if (res == 0) {
-            // If any command always signals f, then the list always signals f.
-            if (p->right) {
-                if (p->right->type != c_functionend) {
-                    fprintf(stderr, "%s:%d: warning: command always signals f here so rest of %s is unreachable\n",
-                            g->analyser->tokeniser->file, p->line_number,
-                            (type == c_and ? "'and'" : "command list"));
-                }
-                p->right = NULL;
-            }
-            return res;
-        }
-        if (res < 0) r = res;
-        p = p->right;
-    }
-    return r;
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
@@ -1105,7 +1105,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     g->label_used = 0;
     str_clear(g->failure_str);
 
-    int possible_signals = check_possible_signals_list(g, p->left, p->type, 0);
+    int possible_signals = check_possible_signals(g, p->left, 0);
     if (possible_signals != -1) {
         fprintf(stderr, "%s:%d: warning: body of '%s' always signals '%c'\n",
                 g->analyser->tokeniser->file, p->line_number,
@@ -1440,7 +1440,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 }
 
 static void generate_call(struct generator * g, struct node * p) {
-    int signals = check_possible_signals_list(g, p->name->definition, c_define, 0);
+    int signals = check_possible_signals(g, p->name->definition, 0);
     write_comment(g, p);
     if (str_len(g->failure_str) == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
@@ -1534,7 +1534,7 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;
-    int signals = check_possible_signals_list(g, p->left, c_define, 0);
+    int signals = check_possible_signals(g, p->left, 0);
 
     /* Generate function body. */
     generate(g, p->left);
