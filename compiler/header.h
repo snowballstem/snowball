@@ -209,7 +209,10 @@ struct name {
     byte initialised;           /* (For variables) is it ever initialised? */
     byte used_in_definition;    /* (grouping) used in grouping definition? */
     struct node * definition;   /* for routines, externals */
-    int count;                  /* 0, 1, 2 for each type */
+    // Initialised to -1; set to -2 if reachable from an external.
+    // Reachable names are then numbered 0, 1, 2, ... with separate numbering
+    // per type.
+    int count;
     struct grouping * grouping; /* for grouping names */
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
@@ -239,8 +242,9 @@ struct among {
     int command_count;        /* in this among (includes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* in this among */
-    int amongvar_needed;      /* do we need to set among_var? */
-    int always_matches;       /* will this among always match? */
+    byte amongvar_needed;     /* do we need to set among_var? */
+    byte always_matches;      /* will this among always match? */
+    byte used;                /* is this among in reachable code? */
     int shortest_size;        /* smallest non-zero string length in this among */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
@@ -310,7 +314,6 @@ struct analyser {
     int name_count[t_size];   /* name_count[i] counts the number of names of type i */
     struct among * amongs;
     struct among * amongs_end;
-    int among_count;
     int amongvar_needed;      /* used in reading routine definitions */
     int among_with_function_count; /* number of amongs with functions */
     struct grouping * groupings;

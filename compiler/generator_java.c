@@ -1202,7 +1202,7 @@ static void generate_class_begin(struct generator * g) {
     w(g, g->options->package);
     w(g, ";~N~N");
 
-    if (g->analyser->among_count > 0) {
+    if (g->analyser->amongs) {
         w(g, "import ");
         w(g, g->options->among_class);
         w(g, ";~N~N");
