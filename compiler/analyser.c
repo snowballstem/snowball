@@ -1545,8 +1545,12 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     if (p->left->type == c_bra) {
         /* Put the "functionend" node at the end of the command list. */
         struct node * e = p->left->left;
-        while (e->right) e = e->right;
-        e->right = new_node(a, c_functionend);
+        if (e) {
+            while (e->right) e = e->right;
+            e->right = new_node(a, c_functionend);
+        } else {
+            p->left = new_node(a, c_functionend);
+        }
     } else {
         /* Put the "functionend" node after the single command. */
         p->left->right = new_node(a, c_functionend);
