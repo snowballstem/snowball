@@ -988,17 +988,13 @@ static void generate_hop(struct generator * g, struct node * p) {
             //
             // No need to check for negative hop as that's converted to false by
             // the analyser.
-            //
-            // Note that if we signal f then z->c will be reset when this is
-            // handled - we rely on this here and unconditionally update z->c.
-            w(g, "z->c = z->c ~S0 ");
-            generate_AE(g, p->AE);
-            writef(g, ";~N", p);
+            g->I[0] = p->AE->number;
             if (p->mode == m_forward) {
-                writef(g, "~Mif (z->c > z->l) ~f~N", p);
+                writef(g, "~Mif (z->c ~S0 ~I0 > z->l) ~f~N", p);
             } else {
-                writef(g, "~Mif (z->c < z->lb) ~f~N", p);
+                writef(g, "~Mif (z->c ~S0 ~I0 < z->lb) ~f~N", p);
             }
+            writef(g, "~Mz->c = z->c ~S0 ~I0;~N", p);
         } else {
             w(g, "~{~Mint ret = z->c ~S0 ");
             generate_AE(g, p->AE);
