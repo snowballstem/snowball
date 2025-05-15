@@ -146,7 +146,9 @@ static void write_failure(struct generator * g) {
             break;
         default:
             g->I[0] = g->failure_label;
-            w(g, "~Mbreak lab~I0~N");
+            w(g, "~Mbreak lab");
+            write_int(g, g->failure_label);
+            write_newline(g);
             g->unreachable = true;
     }
 }
