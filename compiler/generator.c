@@ -537,10 +537,14 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
             case c_next:
             case c_grouping:
             case c_non:
+#if 0
+            // These could be here if the target-language helpers all preserved
+            // the cursor on failure:
             case c_goto_grouping:
             case c_gopast_grouping:
             case c_goto_non:
             case c_gopast_non:
+#endif
             case c_hop:
                 if (++score >= 2)
                     return score;
