@@ -698,10 +698,6 @@ static void generate_hop(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
-    w(g, "~Mc = self.cursor ~S0 ");
-    generate_AE(g, p->AE);
-    w(g, "~N");
-
     g->S[1] = p->mode == m_forward ? "> self.limit" : "< self.limit_backward";
     g->S[2] = p->mode == m_forward ? "<" : ">";
     if (p->AE->type == c_number) {
@@ -709,11 +705,16 @@ static void generate_hop(struct generator * g, struct node * p) {
         //
         // No need to check for negative hop as that's converted to false by
         // the analyser.
-        write_failure_if(g, "c ~S1", p);
+        g->I[0] = p->AE->number;
+        write_failure_if(g, "self.cursor ~S0 ~I0 ~S1", p);
+        w(g, "~Mself.cursor ~S0= ~I0~N");
     } else {
+        w(g, "~Mc = self.cursor ~S0 ");
+        generate_AE(g, p->AE);
+        w(g, "~N");
         write_failure_if(g, "c ~S1 or c ~S2 self.cursor", p);
+        writef(g, "~Mself.cursor = c~N", p);
     }
-    writef(g, "~Mself.cursor = c~N", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
