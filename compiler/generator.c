@@ -1135,9 +1135,9 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
-            w(g, "~Mint ~B0 = z->l - z->c; z->l = z->c;~N");
+            w(g, "~{~Mint ~B0 = z->l - z->c; z->l = z->c;~N");
         } else {
-            w(g, "~Mint ~B0 = z->lb; z->lb = z->c;~N");
+            w(g, "~{~Mint ~B0 = z->lb; z->lb = z->c;~N");
         }
         write_restorecursor(g, p, savevar);
 
