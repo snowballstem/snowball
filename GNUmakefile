@@ -564,6 +564,8 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 
 .PHONY: java check_java do_check_java
 
+.SUFFIXES: .class .java
+
 java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 
 .java.class:
@@ -797,5 +799,3 @@ ada/bin/generate:
 
 ada/bin/stemwords: $(ADA_SOURCES)
 	cd ada && $(gprbuild) -Pstemwords -p
-
-.SUFFIXES: .class .java
