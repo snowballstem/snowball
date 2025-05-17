@@ -1711,7 +1711,7 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
                 res = !res;
             if (res == 0 && p->right) {
                 if (p->right->type != c_functionend) {
-                    fprintf(stderr, "%s:%d: warning: 'not' always signals f so following commands are unreachable\n",
+                    fprintf(stderr, "%s:%d: warning: 'not' always signals f here so following commands are unreachable\n",
                             a->tokeniser->file, p->line_number);
                 }
                 p->right = NULL;
