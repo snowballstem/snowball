@@ -681,6 +681,21 @@ check_js_%: $(STEMMING_DATA)/%
 	fi
 	@rm tmp.txt
 
+	@echo "Checking output of $* stemmer for JS (ESM)"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(JSRUN) javascript/stemwords.js --esm -l $* -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(JSRUN) javascript/stemwords.js --esm -l $* -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(DIFF) -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
 ###############################################################################
 # Rust
 ###############################################################################
