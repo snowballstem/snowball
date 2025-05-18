@@ -465,5 +465,3 @@ const BaseStemmer = function() {
         return result;
     };
 };
-
-if (typeof module === 'object' && module.exports) module.exports = BaseStemmer;

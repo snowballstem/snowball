@@ -1308,8 +1308,7 @@ static void generate_class_end(struct generator * g) {
         w(g, "~N"
              "export default ~n~N");
     } else {
-        w(g, "~N"
-             "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+        w(g, "~N");
     }
 }
 
