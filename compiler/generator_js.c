@@ -218,19 +218,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             case 'C': { // Constant.
-                if (g->options->js_esm) {
-                    w(g, "const");
-                } else {
-                    w(g, "/** @const */ var");
-                }
+                w(g, "const");
                 continue;
             }
             case 'D': { // Declare variable.
-                if (g->options->js_esm) {
-                    w(g, "let");
-                } else {
-                    w(g, "var");
-                }
+                w(g, "let");
                 continue;
             }
             default:
@@ -1053,7 +1045,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    if (q->type == t_routine) {
+    if (g->options->js_esm || q->type == t_routine) {
         writef(g, "~M/** @return {boolean} */~N"
                   "~Mfunction ~W() {~+~N", p);
     } else {
@@ -1278,38 +1270,39 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_class_begin(struct generator * g) {
     if (g->options->js_esm) {
-        w(g, "// deno-lint-ignore-file~N"
-             "import ~P from './base-stemmer.mjs'~N"
+        w(g, "import { ~P } from './base-stemmer.js'~N"
+             "/** @constructor */~N"
              "~N"
-             "/** @typedef {{ stemWord(word: string): string }} Stemmer */~N"
-             "~N"
-             "/** @type {{ new(): Stemmer }} */~N"
-             "~C ~n = function() {~+~N"
-             "~M~D base = new ~P();~N");
+             "export const ~n = (() => {~+~N");
     } else {
-        w(g, "/**@constructor*/~N"
-             "~D ~n = function() {~+~N"
-             "~M~C ~P = require('./base-stemmer.js');~N"
-             "~M~D base = new ~P();~N");
+        w(g, "/** @constructor */~N"
+             "var ~n = function() {~+~N");
     }
+    w(g, "~M~C base = new ~P();~N");
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N");
-    w(g, "~M/**@return{string}*/~N");
-    w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
-    w(g, "~Mbase.setCurrent(word);~N");
-    w(g, "~Mthis.stem();~N");
-    w(g, "~Mreturn base.getCurrent();~N");
-    w(g, "~-~M};~N");
-    w(g, "~-};~N");
+    write_newline(g);
     if (g->options->js_esm) {
-        w(g, "~N"
-             "export default ~n~N");
+        // providing a name for the class is optional
+        w(g, "~Mreturn class ~n {~+~N");
+        w(g, "~M/** @return{string} */~N");
+        w(g, "~MstemWord(/** string */word) {~+~N");
+        w(g, "~Mbase.setCurrent(word);~N");
+        w(g, "~Mstem();~N");
+        w(g, "~Mreturn base.getCurrent();~N");
+        w(g, "~-~M};~N");
+        w(g, "~-~M};~N");
+        w(g, "~-})();~N");
     } else {
-        w(g, "~N"
-             "if (typeof module === 'object' && module.exports) module.exports = ~n;~N");
+        w(g, "~M/** @return{string} */~N");
+        w(g, "~Mthis['stemWord'] = function(/** string */word) {~+~N");
+        w(g, "~Mbase.setCurrent(word);~N");
+        w(g, "~Mthis.stem();~N");
+        w(g, "~Mreturn base.getCurrent();~N");
+        w(g, "~-~M};~N");
+        w(g, "~-};~N");
     }
 }
 
@@ -1389,7 +1382,7 @@ static void generate_members(struct generator * g) {
             case t_integer:
                 w(g, "~M~D /** number */ ");
                 write_varname(g, q);
-                w(g, ";~N");
+                w(g, " = 0;~N");
                 wrote_members = true;
                 break;
             case t_boolean:

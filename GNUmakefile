@@ -172,7 +172,9 @@ PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
-	$(js_output_dir)/base-stemmer.js
+	$(js_output_dir)/base-stemmer.js \
+	$(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.esm.js) \
+	$(js_output_dir)/base-stemmer.esm.js
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -332,11 +334,20 @@ $(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball$(EXEEXT)
 
 $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
-	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
+	./snowball $< -js=global -o "$(js_output_dir)/$*-stemmer"
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
+
+$(js_output_dir)/%-stemmer.esm.js: algorithms/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(js_output_dir)
+	./snowball $< -js=esm -o "$(js_output_dir)/$*-stemmer"
+
+$(js_output_dir)/base-stemmer.esm.js: $(js_runtime_dir)/base-stemmer.js
+	@mkdir -p $(js_output_dir)
+	cp $< $@
+	echo "\nexport { BaseStemmer };" >> $@
 
 $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)

@@ -49,7 +49,8 @@ static void print_arglist(int exit_code) {
                "  -py, -python\n"
 #endif
 #ifndef DISABLE_JS
-               "  -js                              generate Javascript\n"
+               "  -js[=TYPE]                       generate Javascript (TYPE values:\n"
+               "                                   esm global, default: global)\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust\n"
@@ -160,9 +161,13 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 continue;
             }
 #ifndef DISABLE_JS
-            if (eq(s, "-js")) {
+            if (eq(s, "-js") || eq(s, "-js=global")) {
                 o->make_lang = LANG_JAVASCRIPT;
                 o->js_esm = false;
+                continue;
+            } else if (eq(s, "-js=esm")) {
+                o->make_lang = LANG_JAVASCRIPT;
+                o->js_esm = true;
                 continue;
             }
 #endif
@@ -547,7 +552,7 @@ extern int main(int argc, char * argv[]) {
                 if (o->make_lang == LANG_JAVASCRIPT) {
                     byte * s = add_sz_to_s(NULL, output_base);
                     if (o->js_esm) {
-                        s = add_literal_to_s(s, ".mjs");
+                        s = add_literal_to_s(s, ".esm.js");
                     } else {
                         s = add_literal_to_s(s, ".js");
                     }
