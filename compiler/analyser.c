@@ -1385,7 +1385,7 @@ static struct node * read_C(struct analyser * a) {
                             }
                             if (p->type == c_mathassign && q) {
                                 /* $x = x + 1 doesn't initialise x. */
-                                if (ae_uses_name(p->AE, q)) {
+                                if (!ae_uses_name(p->AE, q)) {
                                     q->initialised = true;
                                 }
                             }
