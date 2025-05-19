@@ -81,30 +81,49 @@ else
 }
 
 // function stemming (lang : string, input : string, output : string, encoding : string, use_esm : Boolean) {
-function stemming (lang, input, output, encoding, use_esm) {
+function stemming(lang, input, output, encoding, use_esm) {
+    if (!use_esm) {
+        // Load BaseStemmer into the global scope
+        require('base-stemmer.js');
+        const bs = new BaseStemmer();
+    }
+    const Stemmer = create(lang, use_esm);
+
     const lines = readline.createInterface({
         input: fs.createReadStream(input, encoding),
         terminal: false
     });
-    var out = fs.createWriteStream(output, encoding);
-    var stemmer = create(lang);
+    const out = fs.createWriteStream(output, encoding);
     lines.on('line', (original) => {
-        out.write(stemmer.stemWord(original) + '\n');
+        out.write(Stemmer.stemWord(original) + '\n');
     });
 }
 
-function create (name, use_esm) {
-    let lc_name = name.toLowerCase();
-    if (!lc_name.match('\\W') && lc_name !== 'base') {
-        lc_name = `stemmer-${lc_name}`;
-        const filename = use_esm ? `${lc_name}.esm.js` : `${lc_name}.js`;
-        try {
-            const Stemmer = require(filename);
-            return new Stemmer();
-        } catch (error) {
-        }
+function create(name, use_esm) {
+    const lc_name = name.toLowerCase();
+    if (/\W/.test(lc_name) || lc_name === 'base') {
+        console.log('Unknown stemming language: ' + name + '\n');
+        usage();
+        process.exit(1);
+        return;
     }
-    console.log('Unknown stemming language: ' + name + '\n');
-    usage();
-    process.exit(1);
+    const stemmerClass = `${titleCase(lc_name)}Stemmer`;
+    const filename = use_esm ? `${lc_name}-stemmer.esm.js` : `${lc_name}-stemmer.js`;
+    try {
+        if (use_esm) {
+            // Load stemmer class from the module scope
+            const stemmerModule = require(filename);
+            return new stemmerModule[stemmerClass]();
+        } else {
+            // Load stemmer class into the global scope
+            require(filename);
+            return new globalThis[stemmerClass]();
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function titleCase(s) {
+    return s.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
 }
