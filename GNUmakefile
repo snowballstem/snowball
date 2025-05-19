@@ -523,40 +523,40 @@ check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with UTF-8"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|./stemwords$(EXEEXT) -c UTF_8 -l $* -o tmp.txt; \
+	  gzip -dc '$</voc.txt.gz'|./stemwords$(EXEEXT) -c UTF_8 -l $* -o 'tmp_$*.txt'; \
 	else \
-	  ./stemwords$(EXEEXT) -c UTF_8 -l $* -i $</voc.txt -o tmp.txt; \
+	  ./stemwords$(EXEEXT) -c UTF_8 -l $* -i $</voc.txt -o 'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with ISO_8859_1"
 	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
-	    ./stemwords -c ISO_8859_1 -l $* -o tmp.txt
+	    ./stemwords -c ISO_8859_1 -l $* -o 'tmp_$*.txt'
 	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</output.txt' |\
-	    $(DIFF) -u - tmp.txt
-	@rm tmp.txt
+	    $(DIFF) -u - 'tmp_$*.txt'
+	@rm 'tmp_$*.txt'
 
 check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with ISO_8859_2"
 	@$(ICONV) -f UTF-8 -t ISO-8859-2 '$</voc.txt' |\
-	    ./stemwords -c ISO_8859_2 -l $* -o tmp.txt
+	    ./stemwords -c ISO_8859_2 -l $* -o 'tmp_$*.txt'
 	@$(ICONV) -f UTF-8 -t ISO-8859-2 '$</output.txt' |\
-	    $(DIFF) -u - tmp.txt
-	@rm tmp.txt
+	    $(DIFF) -u - 'tmp_$*.txt'
+	@rm 'tmp_$*.txt'
 
 check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with KOI8R"
 	@$(ICONV) -f UTF-8 -t KOI8-R '$</voc.txt' |\
-	    ./stemwords -c KOI8_R -l $* -o tmp.txt
+	    ./stemwords -c KOI8_R -l $* -o 'tmp_$*.txt'
 	@$(ICONV) -f UTF-8 -t KOI8-R '$</output.txt' |\
-	    $(DIFF) -u - tmp.txt
-	@rm tmp.txt
+	    $(DIFF) -u - 'tmp_$*.txt'
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Java
@@ -580,16 +580,16 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Java"
 	@cd java && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(JAVA) org/tartarus/snowball/TestApp $* -o $(PWD)/tmp.txt; \
+	    $(JAVA) org/tartarus/snowball/TestApp $* -o $(PWD)/'tmp_$*.txt'; \
 	else \
-	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt -o $(PWD)/tmp.txt; \
+	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt -o $(PWD)/'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # C#
@@ -608,16 +608,16 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for C#"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(MONO) csharp_stemwords$(EXEEXT) -l $* -i /dev/stdin -o tmp.txt; \
+	    $(MONO) csharp_stemwords$(EXEEXT) -l $* -i /dev/stdin -o 'tmp_$*.txt'; \
 	else \
-	  $(MONO) csharp_stemwords$(EXEEXT) -l $* -i $</voc.txt -o tmp.txt; \
+	  $(MONO) csharp_stemwords$(EXEEXT) -l $* -i $</voc.txt -o 'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Pascal
@@ -635,10 +635,10 @@ do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
 check_pascal_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer with ISO_8859_1 for Pascal"
 	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
-	    ./pascal/stemwords -l $* > tmp.txt
+	    ./pascal/stemwords -l $* > 'tmp_$*.txt'
 	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</output.txt' |\
-	    $(DIFF) -u - tmp.txt
-	@rm tmp.txt
+	    $(DIFF) -u - 'tmp_$*.txt'
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Javascript
@@ -657,18 +657,18 @@ check_js_%: export NODE_PATH=$(js_output_dir)
 check_js_%: $(STEMMING_DATA)/%
 	@echo "Checking output of $* stemmer for JS"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(JSRUN) javascript/stemwords.js -l $* -i tmp.in -o tmp.txt; \
-	  rm tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > 'tmp_$*.in'; \
+	  $(JSRUN) javascript/stemwords.js -l $* -i 'tmp_$*.in' -o 'tmp_$*.txt'; \
+	  rm 'tmp_$*.in'; \
 	else \
-	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
+	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt -o 'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Rust
@@ -686,18 +686,18 @@ do_check_rust: $(libstemmer_algorithms:%=check_rust_%)
 check_rust_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Rust"
 	@cd rust && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(cargo) run $(cargoflags) -- -l $* -i tmp.in -o $(PWD)/tmp.txt; \
-	  rm tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > 'tmp_$*.in'; \
+	  $(cargo) run $(cargoflags) -- -l $* -i 'tmp_$*.in' -o $(PWD)/'tmp_$*.txt'; \
+	  rm 'tmp_$*.in'; \
 	else \
-	  $(cargo) run $(cargoflags) -- -l $* -i $</voc.txt -o $(PWD)/tmp.txt; \
+	  $(cargo) run $(cargoflags) -- -l $* -i $</voc.txt -o $(PWD)/'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Go
@@ -715,18 +715,18 @@ do_check_go: $(libstemmer_algorithms:%=check_go_%)
 check_go_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Go"
 	@cd go && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  $(go) run $(goflags) -l $* -i tmp.in -o $(PWD)/tmp.txt; \
-	  rm tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > 'tmp_$*.in'; \
+	  $(go) run $(goflags) -l $* -i 'tmp_$*.in' -o $(PWD)/'tmp_$*.txt'; \
+	  rm 'tmp_$*.in'; \
 	else \
-	  $(go) run $(goflags) -l $* -i $</voc.txt -o $(PWD)/tmp.txt; \
+	  $(go) run $(goflags) -l $* -i $</voc.txt -o $(PWD)/'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 ###############################################################################
 # Python
@@ -742,18 +742,18 @@ check_python: python
 check_python_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Python (THIN_FACTOR=$(THIN_FACTOR))"
 	@cd python_check && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) > tmp.in; \
-	  $(python) stemwords.py -c utf8 -l $* -i tmp.in -o $(PWD)/tmp.txt; \
-	  rm tmp.in; \
+	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) > 'tmp_$*.in'; \
+	  $(python) stemwords.py -c utf8 -l $* -i 'tmp_$*.in' -o $(PWD)/'tmp_$*.txt'; \
+	  rm 'tmp_$*.in'; \
 	else \
-	  $(python) stemwords.py -c utf8 -l $* -i $</voc.txt -o $(PWD)/tmp.txt; \
+	  $(python) stemwords.py -c utf8 -l $* -i $</voc.txt -o $(PWD)/'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz' $(THIN_TEST_DATA)|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz' $(THIN_TEST_DATA)|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	mkdir -p python_check
@@ -778,18 +778,18 @@ do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
 check_ada_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Ada"
 	@cd ada && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' > tmp.in; \
-	  ./bin/stemwords $* tmp.in $(PWD)/tmp.txt; \
-	  rm tmp.in; \
+	  gzip -dc '$</voc.txt.gz' > 'tmp_$*.in'; \
+	  ./bin/stemwords $* 'tmp_$*.in' $(PWD)/'tmp_$*.txt'; \
+	  rm 'tmp_$*.in'; \
 	else \
-	  ./bin/stemwords $* $</voc.txt $(PWD)/tmp.txt; \
+	  ./bin/stemwords $* $</voc.txt $(PWD)/'tmp_$*.txt'; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - 'tmp_$*.txt'; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  $(DIFF) -u $</output.txt 'tmp_$*.txt'; \
 	fi
-	@rm tmp.txt
+	@rm 'tmp_$*.txt'
 
 $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
 	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
