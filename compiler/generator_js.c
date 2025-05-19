@@ -218,11 +218,19 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             case 'C': { // Constant.
-                w(g, "const");
+                if (g->options->js_esm) {
+                    w(g, "const");
+                } else {
+                    w(g, "/** @const */ var");
+                }
                 continue;
             }
             case 'D': { // Declare variable.
-                w(g, "let");
+                if (g->options->js_esm) {
+                    w(g, "let");
+                } else {
+                    w(g, "var");
+                }
                 continue;
             }
             default:
