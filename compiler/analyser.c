@@ -1350,6 +1350,39 @@ static struct node * read_C(struct analyser * a) {
                              */
                             p->name = q;
                             p->AE = read_AE(a, q, 0);
+                            if (p->AE->type == c_number) {
+                                switch (p->type) {
+                                    case c_plusassign:
+                                    case c_minusassign:
+                                        if (p->AE->number == 0) {
+                                            // `$x+=0` and `$x-=0` are no-ops.
+                                            p->type = c_true;
+					    p->name = NULL;
+                                            p->AE = NULL;
+                                        }
+                                        break;
+                                    case c_multiplyassign:
+                                    case c_divideassign:
+                                        if (p->AE->number == 1) {
+                                            // `$x*=1` and `$x/=1` are no-ops.
+                                            p->type = c_true;
+					    p->name = NULL;
+                                            p->AE = NULL;
+                                        } else if (p->AE->number == 0) {
+                                            if (p->type == c_divide) {
+                                                fprintf(stderr, "%s:%d: Division by zero\n",
+                                                        t->file, t->line_number);
+                                                exit(1);
+                                            }
+                                            // `$x*=0` -> `$x=0`
+                                            p->type = c_mathassign;
+                                        } else if (p->AE->number == -1) {
+                                            // `$x/=-1` -> `$x*=-1`
+                                            p->type = c_multiplyassign;
+                                        }
+                                        break;
+                                }
+                            }
                             if (p->type == c_mathassign && q) {
                                 /* $x = x + 1 doesn't initialise x. */
                                 if (ae_uses_name(p->AE, q)) {
