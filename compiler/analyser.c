@@ -1298,109 +1298,107 @@ static struct node * read_C(struct analyser * a) {
                 return n;
             }
 
-            if (t->token == c_name) {
-                struct node * p;
-                struct name * q = find_name(a);
+            if (t->token != c_name) {
+                error(a, e_unexpected_token);
+                hold_token(t);
+                return new_node(a, c_dollar);
+            }
+
+            struct name * q = find_name(a);
+            if (q && q->type == t_string) {
+                /* Assume for now that $ on string both initialises and uses
+                 * the string variable.  FIXME: Can we do better?
+                 */
+                q->initialised = true;
+                q->value_used = true;
+                struct node * p = new_node(a, c_dollar);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
-                if (q && q->type == t_string) {
-                    /* Assume for now that $ on string both initialises and
-                     * uses the string variable.  FIXME: Can we do better?
-                     */
-                    q->initialised = true;
-                    q->value_used = true;
-                    a->mode = m_forward;
-                    a->modifyable = true;
-                    p = new_node(a, c_dollar);
-                    p->left = read_C(a);
-                    p->name = q;
-                } else {
-                    if (q && q->type != t_integer) {
-                        /* If $ is used on an unknown name or a name which
-                         * isn't a string or an integer then we assume the
-                         * unknown name is an integer as $ is used more often
-                         * on integers than strings, so hopefully this it less
-                         * likely to cause an error avalanche.
-                         *
-                         * For an unknown name, we'll already have reported an
-                         * error.
-                         */
-                        error(a, e_not_of_type_string_or_integer);
-                        q = NULL;
-                    }
-                    p = new_node(a, read_AE_test(a));
-                    switch (p->type) {
-                        case c_eq:
-                        case c_ne:
-                        case c_gt:
-                        case c_ge:
-                        case c_lt:
-                        case c_le:
-                            p->left = new_node(a, c_name);
-                            p->left->name = q;
-                            if (q) {
-                                q->value_used = true;
-                            }
-                            p->AE = read_AE(a, NULL, 0);
-                            break;
-                        default:
-                            /* +=, etc don't "initialise" as they only
-                             * amend an existing value.  Similarly, they
-                             * don't count as using the value.
-                             */
-                            p->name = q;
-                            p->AE = read_AE(a, q, 0);
-                            if (p->AE->type == c_number) {
-                                switch (p->type) {
-                                    case c_plusassign:
-                                    case c_minusassign:
-                                        if (p->AE->number == 0) {
-                                            // `$x+=0` and `$x-=0` are no-ops.
-                                            p->type = c_true;
-                                            p->name = NULL;
-                                            p->AE = NULL;
-                                        }
-                                        break;
-                                    case c_multiplyassign:
-                                    case c_divideassign:
-                                        if (p->AE->number == 1) {
-                                            // `$x*=1` and `$x/=1` are no-ops.
-                                            p->type = c_true;
-                                            p->name = NULL;
-                                            p->AE = NULL;
-                                        } else if (p->AE->number == 0) {
-                                            if (p->type == c_divide) {
-                                                fprintf(stderr, "%s:%d: Division by zero\n",
-                                                        t->file, t->line_number);
-                                                exit(1);
-                                            }
-                                            // `$x*=0` -> `$x=0`
-                                            p->type = c_mathassign;
-                                        } else if (p->AE->number == -1) {
-                                            // `$x/=-1` -> `$x*=-1`
-                                            p->type = c_multiplyassign;
-                                        }
-                                        break;
-                                }
-                            }
-                            if (p->type == c_mathassign && q) {
-                                /* $x = x + 1 doesn't initialise x. */
-                                if (!ae_uses_name(p->AE, q)) {
-                                    q->initialised = true;
-                                }
-                            }
-                            break;
-                    }
-                }
-                if (q) mark_used_in(a, q, p);
+                a->mode = m_forward;
+                a->modifyable = true;
+                p->left = read_C(a);
                 a->mode = mode;
                 a->modifyable = modifyable;
+                p->name = q;
+                mark_used_in(a, q, p);
                 return p;
             }
 
-            error(a, e_unexpected_token);
-            hold_token(t);
-            return new_node(a, c_dollar);
+            if (q && q->type != t_integer) {
+                /* If $ is used on an unknown name or a name which isn't a
+                 * string or an integer then we assume the unknown name is an
+                 * integer as $ is used more often on integers than strings, so
+                 * hopefully this it less likely to cause an error avalanche.
+                 *
+                 * For an unknown name, we'll already have reported an error.
+                 */
+                error(a, e_not_of_type_string_or_integer);
+                q = NULL;
+            }
+            struct node * p = new_node(a, read_AE_test(a));
+            switch (p->type) {
+                case c_eq:
+                case c_ne:
+                case c_gt:
+                case c_ge:
+                case c_lt:
+                case c_le:
+                    p->left = new_node(a, c_name);
+                    p->left->name = q;
+                    p->AE = read_AE(a, NULL, 0);
+                    if (q) {
+                        q->value_used = true;
+                        mark_used_in(a, q, p);
+                    }
+                    return p;
+            }
+
+            /* +=, etc don't "initialise" as they only amend an existing value.
+             * Similarly, they don't count as using the value.
+             */
+            p->name = q;
+            p->AE = read_AE(a, q, 0);
+            if (p->AE->type == c_number) {
+                switch (p->type) {
+                    case c_plusassign:
+                    case c_minusassign:
+                        if (p->AE->number == 0) {
+                            // `$x+=0` and `$x-=0` are no-ops.
+                            p->type = c_true;
+                            p->name = NULL;
+                            p->AE = NULL;
+                        }
+                        break;
+                    case c_multiplyassign:
+                    case c_divideassign:
+                        if (p->AE->number == 1) {
+                            // `$x*=1` and `$x/=1` are no-ops.
+                            p->type = c_true;
+                            p->name = NULL;
+                            p->AE = NULL;
+                        } else if (p->AE->number == 0) {
+                            if (p->type == c_divide) {
+                                fprintf(stderr, "%s:%d: Division by zero\n",
+                                        t->file, t->line_number);
+                                exit(1);
+                            }
+                            // `$x*=0` -> `$x=0`
+                            p->type = c_mathassign;
+                        } else if (p->AE->number == -1) {
+                            // `$x/=-1` -> `$x*=-1`
+                            p->type = c_multiplyassign;
+                        }
+                        break;
+                }
+            }
+            if (p->type == c_mathassign && q) {
+                /* $x = x + 1 doesn't initialise x. */
+                if (!ae_uses_name(p->AE, q)) {
+                    q->initialised = true;
+                }
+            }
+            if (q) mark_used_in(a, q, p);
+            return p;
         }
         case c_name:
             {
