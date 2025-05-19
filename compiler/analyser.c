@@ -1678,6 +1678,7 @@ static void remove_dead_assignments(struct node * p, struct name * q) {
                 /* c_true is a no-op. */
                 p->type = c_true;
                 p->AE = NULL;
+                p->name = NULL;
                 break;
             default:
                 /* There are no read accesses to this variable, so any
