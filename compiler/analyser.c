@@ -1352,7 +1352,9 @@ static struct node * read_C(struct analyser * a) {
                             p->AE = read_AE(a, q, 0);
                             if (p->type == c_mathassign && q) {
                                 /* $x = x + 1 doesn't initialise x. */
-                                q->initialised = !ae_uses_name(p->AE, q);
+                                if (ae_uses_name(p->AE, q)) {
+                                    q->initialised = true;
+                                }
                             }
                             break;
                     }
