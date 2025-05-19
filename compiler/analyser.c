@@ -1357,7 +1357,7 @@ static struct node * read_C(struct analyser * a) {
                                         if (p->AE->number == 0) {
                                             // `$x+=0` and `$x-=0` are no-ops.
                                             p->type = c_true;
-					    p->name = NULL;
+                                            p->name = NULL;
                                             p->AE = NULL;
                                         }
                                         break;
@@ -1366,7 +1366,7 @@ static struct node * read_C(struct analyser * a) {
                                         if (p->AE->number == 1) {
                                             // `$x*=1` and `$x/=1` are no-ops.
                                             p->type = c_true;
-					    p->name = NULL;
+                                            p->name = NULL;
                                             p->AE = NULL;
                                         } else if (p->AE->number == 0) {
                                             if (p->type == c_divide) {
