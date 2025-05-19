@@ -339,6 +339,7 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
+	echo "\nglobalThis.BaseStemmer = BaseStemmer;" >> $@
 
 $(js_output_dir)/%-stemmer.esm.js: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)

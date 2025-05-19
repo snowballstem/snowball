@@ -1053,7 +1053,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    if (g->options->js_esm || q->type == t_routine) {
+    if (q->type == t_routine) {
         writef(g, "~M/** @return {boolean} */~N"
                   "~Mfunction ~W() {~+~N", p);
     } else {
@@ -1278,39 +1278,29 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_class_begin(struct generator * g) {
     if (g->options->js_esm) {
-        w(g, "import { ~P } from './base-stemmer.js'~N"
-             "/** @constructor */~N"
-             "~N"
-             "export const ~n = (() => {~+~N");
-    } else {
-        w(g, "/** @constructor */~N"
-             "var ~n = function() {~+~N");
+        w(g, "import { ~P } from './base-stemmer.esm.js'~N");
+        write_newline(g);
     }
-    w(g, "~M~C base = new ~P();~N");
+    w(g, "/** @constructor */~N"
+         "~C ~n = function() {~+~N"
+         "~M~C base = new ~P();~N");
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
     write_newline(g);
+    w(g, "~M/**@return{string}*/~N");
+    w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+    w(g, "~Mbase.setCurrent(word);~N");
+    w(g, "~Mthis.stem();~N");
+    w(g, "~Mreturn base.getCurrent();~N");
+    w(g, "~-~M};~N");
+    w(g, "~-};~N");
+    write_newline(g);
     if (g->options->js_esm) {
-        // providing a name for the class is optional
-        w(g, "~Mreturn class ~n {~+~N");
-        w(g, "~M/** @return{string} */~N");
-        w(g, "~MstemWord(/** string */word) {~+~N");
-        w(g, "~Mbase.setCurrent(word);~N");
-        w(g, "~Mstem();~N");
-        w(g, "~Mreturn base.getCurrent();~N");
-        w(g, "~-~M};~N");
-        w(g, "~-~M};~N");
-        w(g, "~-})();~N");
+        w(g, "export { ~n };~N");
     } else {
-        w(g, "~M/** @return{string} */~N");
-        w(g, "~Mthis['stemWord'] = function(/** string */word) {~+~N");
-        w(g, "~Mbase.setCurrent(word);~N");
-        w(g, "~Mthis.stem();~N");
-        w(g, "~Mreturn base.getCurrent();~N");
-        w(g, "~-~M};~N");
-        w(g, "~-};~N");
+        w(g, "globalThis.~n = ~n;~N");
     }
 }
 
