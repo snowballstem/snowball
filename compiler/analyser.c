@@ -2071,12 +2071,20 @@ extern void read_program(struct analyser * a) {
                         q->s);
                 remove_unreachable_routine(a, q);
             }
-            // Avoid generating code for groupings only used in unreachable
-            // routines.
+            if (q->type != t_grouping) {
+                struct name * old = q;
+                q = q->next;
+                *ptr = q;
+                FREE(old);
+                continue;
+            }
+            // Don't free the struct name for a grouping as it will be
+            // referenced from a struct grouping.
+            //
+            // Instead we just flag it as not used and no code will be
+            // generated for it.  We leave it in a->names to avoid leaking
+            // it.
             q->used = false;
-            q = q->next;
-            *ptr = q;
-            continue;
         }
 
         ptr = &(q->next);
