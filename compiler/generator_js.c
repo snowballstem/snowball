@@ -958,6 +958,17 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
     write_comment(g, p);
+    if (p->AE->type == c_number && p->AE->number == 1) {
+        if (strcmp(s, "+=") == 0) {
+            // Optimise `+= 1` to increment.
+            writef(g, "~M++~V;~N", p);
+            return;
+        } else if (strcmp(s, "-=") == 0) {
+            // Optimise `-= 1` to decrement.
+            writef(g, "~M--~V;~N", p);
+            return;
+        }
+    }
     g->S[0] = s;
     writef(g, "~M~V ~S0 ", p);
     generate_AE(g, p->AE);
