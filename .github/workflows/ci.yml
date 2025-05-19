@@ -102,7 +102,7 @@ jobs:
 
     env:
       CC: ${{ matrix.CC || 'gcc' }}
-      MAKE: ${{ matrix.MAKE || 'make' }}
+      MAKE: ${{ matrix.MAKE || 'make' }} --output-sync --jobs=4
       STEMMING_DATA: 'snowball-data'
 
     steps:
