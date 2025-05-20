@@ -1243,7 +1243,7 @@ static struct node * read_C(struct analyser * a) {
                         count_error(a);
                         fprintf(stderr, "%s:%d: Expected relational operator (did you mean '=='?)\n",
                                 t->file, t->line_number);
-                        /* Assume it was == to try to avoid an error avalanche. */
+                        // Assume it was == to try to avoid an error avalanche.
                         token = c_eq;
                         /* FALLTHRU */
                     case c_eq:
