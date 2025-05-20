@@ -1367,6 +1367,12 @@ static struct node * read_C(struct analyser * a) {
                             p->type = c_true;
                             p->name = NULL;
                             p->AE = NULL;
+                        } else if (p->AE->number < 0) {
+                            // `$x+=-N` -> `$x-=N`, etc as
+                            // this may result in slightly
+                            // shorter target language code.
+                            p->type ^= (c_plusassign ^ c_minusassign);
+                            p->AE->number = -p->AE->number;
                         }
                         break;
                     case c_multiplyassign:
