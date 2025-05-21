@@ -908,12 +908,13 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     }
     if (starter) {
         starter->right = p;
+        p = new_node(a, c_bra);
         if (substring) {
-            p = starter;
+            p->left = starter;
         } else {
             substring = new_node(a, c_substring);
             substring->right = starter;
-            p = substring;
+            p->left = substring;
         }
     }
     x->substring = substring;
