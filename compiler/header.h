@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbool.h>  // bool
 
 #define SNOWBALL_VERSION "3.0.0"
 
