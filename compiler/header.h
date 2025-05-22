@@ -5,6 +5,9 @@
 typedef unsigned char byte;
 typedef unsigned short symbol;
 
+#define true 1
+#define false 0
+
 #define MALLOC check_malloc
 #define FREE check_free
 
