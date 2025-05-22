@@ -1391,7 +1391,7 @@ static void generate_members(struct generator * g) {
             case t_integer:
                 w(g, "~M~D /** number */ ");
                 write_varname(g, q);
-                w(g, ";~N");
+                w(g, " = 0;~N");
                 wrote_members = true;
                 break;
             case t_boolean:
