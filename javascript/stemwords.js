@@ -32,7 +32,7 @@ else
             process.argv.length = 0;
             break;
         case "-l":
-            if (process.argv.length == 0)
+            if (process.argv.length === 0)
             {
                 show_help = true;
                 break;
@@ -40,7 +40,7 @@ else
             language = process.argv.shift();
             break;
         case "-i":
-            if (process.argv.length == 0)
+            if (process.argv.length === 0)
             {
                 show_help = true;
                 break;
@@ -48,7 +48,7 @@ else
             input = process.argv.shift();
             break;
         case "-o":
-            if (process.argv.length == 0)
+            if (process.argv.length === 0)
             {
                 show_help = true;
                 break;
@@ -56,7 +56,7 @@ else
             output = process.argv.shift();
             break;
         case "-c":
-            if (process.argv.length == 0)
+            if (process.argv.length === 0)
             {
                 show_help = true;
                 break;
@@ -65,7 +65,7 @@ else
             break;
         }
     }
-    if (show_help || input == '' || output == '')
+    if (show_help || input === '' || output === '')
     {
         usage();
     }
@@ -90,7 +90,7 @@ function stemming (lang, input, output, encoding) {
 
 function create (name) {
     var lc_name = name.toLowerCase();
-    if (!lc_name.match('\\W') && lc_name != 'base') {
+    if (!lc_name.match('\\W') && lc_name !== 'base') {
         try {
             const Stemmer = require(lc_name + '-stemmer.js');
             return new Stemmer();
