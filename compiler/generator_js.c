@@ -1358,7 +1358,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~M~C /** Array<int> */ ");
+    w(g, "~M~C /** Array<number> */ ");
     write_varname(g, q->name);
     write_string(g, " = [");
     for (int i = 0; i < size; i++) {
