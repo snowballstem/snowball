@@ -1,0 +1,155 @@
+routines (
+  R1
+  palatalise_e
+  palatalise_ecaron_or_iacute
+  palatalise_i
+  mark_regions
+  possessive_suffix
+  case_suffix
+)
+
+externals ( stem )
+
+integers ( p1 x )
+
+groupings ( v v_or_syllabic_c )
+
+stringescapes {}
+
+stringdef a' '{U+00E1}'
+stringdef c^ '{U+010D}'
+stringdef d^ '{U+010F}'
+stringdef e' '{U+00E9}'
+stringdef e^ '{U+011B}'
+stringdef i' '{U+00ED}'
+stringdef n^ '{U+0148}'
+stringdef o' '{U+00F3}'
+stringdef r^ '{U+0159}'
+stringdef s^ '{U+0161}'
+stringdef t^ '{U+0165}'
+stringdef u' '{U+00FA}'
+stringdef u* '{U+016F}'
+stringdef y' '{U+00FD}'
+stringdef z^ '{U+017E}'
+
+define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
+
+// Some consonants in Czech can be syllabic - if these occur between two other
+// consonants then they act in a vowel-like way and it is helpful to include
+// them in the definition of R1.
+//
+// Some sources also list 'm' and 'n' as syllabic consonants for Czech but they
+// seem to be much rarer and including them makes no difference to the results
+// of stemming any words in our sample vocabulary list.
+define v_or_syllabic_c v + 'lr'
+
+define mark_regions as (
+
+    $p1 = limit
+    test(hop 3 setmark x)
+
+    do (
+        // A syllabic consonant must occur between two consonants, or be
+        // preceded by a consonant and at the end of the word.
+        //
+        // Instead of literally testing that, we handle the first character
+        // specially by only checking if it's a vowel; for subsequent
+        // characters we know that the character before is a consonant because
+        // otherwise we'd have stopped already.
+        //
+        // We also don't actually need to check the character after, since
+        // if it's a vowel then that vowel means we'd end up at the same
+        // position after `gopast non-v` anyway, and if it's the end of the
+        // word then there's no non-v after it.
+        (v or (next gopast v_or_syllabic_c)) gopast non-v
+        setmark p1
+        try($p1 < x  $p1 = x)  // at least 3
+    )
+)
+
+backwardmode (
+
+  define R1 as $p1 <= cursor
+
+  define palatalise_e as (
+    [substring] among (
+      'c' '{c^}' (<- 'k')
+      'z' '{z^}' (<- 'h')
+    )
+  )
+
+  define palatalise_ecaron_or_iacute as (
+    [substring] among (
+      '{c^}t' (<- 'ck')
+      '{s^}t' (<- 'sk')
+    )
+  )
+
+  define palatalise_i as (
+    [substring] among (
+      'c' '{c^}' (<- 'k')
+      'z' '{z^}' (<- 'h')
+      '{c^}t' (<- 'ck')
+      '{s^}t' (<- 'sk')
+    )
+  )
+
+  define possessive_suffix as (
+    [substring] R1 among (
+      'ov' '{u*}v'
+      (delete)
+      'in'
+      (
+        delete
+        try palatalise_i
+      )
+    )
+  )
+
+  define case_suffix as (
+    setlimit tomark p1 for ( [substring] ) among (
+      'atech'
+      'at{u*}m'
+      '{a'}ch' '{y'}ch' 'ov{e'}' '{y'}mi'
+      'ata' 'aty' 'ama' 'ami' 'ovi'
+      'at' '{a'}m' 'us' '{u*}m' '{y'}m' 'mi' 'ou'
+      '{e'}ho' '{e'}m' '{e'}mu'
+      'u' 'y' '{u*}' 'a' 'o' '{a'}' '{e'}' '{y'}'
+      (delete)
+      '{e^}' '{e^}tem' '{e^}mi' '{e^}te' '{e^}ti'
+      (
+        delete
+        try palatalise_ecaron_or_iacute
+      )
+      'e' 'ech' 'em' 'emi' 'ete' 'etem'
+      (
+        delete
+        try palatalise_e
+      )
+      'i'
+      (
+        delete
+        try palatalise_i
+      )
+      '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
+      (
+        delete
+        try palatalise_ecaron_or_iacute
+      )
+    )
+  )
+)
+
+define stem as (
+  do mark_regions
+  backwards (
+    do case_suffix
+    do possessive_suffix
+  )
+)
+
+// Ljiljana Dolamic and Jacques Savoy. 2009.
+// Indexing and stemming approaches for the Czech language.
+// Inf. Process. Manage. 45, 6 (November 2009), 714-720.
+// based on Java code by Ljiljana Dolamic:
+// http://members.unine.ch/jacques.savoy/clef/CzechStemmerLight.txt
