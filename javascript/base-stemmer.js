@@ -465,3 +465,5 @@ const BaseStemmer = function() {
         return result;
     };
 };
+
+export { BaseStemmer };

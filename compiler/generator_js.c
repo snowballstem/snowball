@@ -226,19 +226,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             case 'C': { // Constant.
-                if (g->options->js_esm) {
-                    w(g, "const");
-                } else {
-                    w(g, "/** @const */ var");
-                }
+                w(g, "const");
                 continue;
             }
             case 'D': { // Declare variable.
-                if (g->options->js_esm) {
-                    w(g, "let");
-                } else {
-                    w(g, "var");
-                }
+                w(g, "let");
                 continue;
             }
             default:
@@ -1279,18 +1271,16 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    if (g->options->js_esm) {
-        w(g, "import { ~P } from './base-stemmer.esm.js'~N");
-        write_newline(g);
-    }
-    w(g, "/** @constructor */~N"
+    w(g, "import { ~P } from './base-stemmer.js'~N"
+         "~N"
+         "/** @constructor */~N"
          "~C ~n = function() {~+~N"
          "~M~C base = new ~P();~N");
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
-    write_newline(g);
+    w(g, "~N");
     w(g, "~M/**@return{string}*/~N");
     w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
     w(g, "~Mbase.setCurrent(word);~N");
@@ -1298,12 +1288,8 @@ static void generate_class_end(struct generator * g) {
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
     w(g, "~-};~N");
-    write_newline(g);
-    if (g->options->js_esm) {
-        w(g, "export { ~n };~N");
-    } else {
-        w(g, "globalThis.~n = ~n;~N");
-    }
+    w(g, "~N");
+    w(g, "export { ~n };~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
