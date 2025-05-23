@@ -78,7 +78,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "base.limit - ";
-    writef(g, "~M~C /** number */ ~B0 = ~S1base.cursor;~N", p);
+    writef(g, "~Mconst /** number */ ~B0 = ~S1base.cursor;~N", p);
 }
 
 static void append_restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -225,14 +225,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
-            case 'C': { // Constant.
-                w(g, "const");
-                continue;
-            }
-            case 'D': { // Declare variable.
-                w(g, "let");
-                continue;
-            }
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
                        ch, input);
@@ -601,7 +593,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    w(g, "~Mfor (~D /** number */ ~B0 = ");
+    w(g, "~Mfor (let /** number */ ~B0 = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
     writef(g, "; ~B0 > 0; ~B0--)~N", p);
@@ -659,7 +651,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~{");
     g->B[0] = str_data(loopvar);
-    w(g, "~M~D ~B0 = ");
+    w(g, "~Mlet ~B0 = ");
     generate_AE(g, p->AE);
     w(g, ";~N");
     {
@@ -706,7 +698,7 @@ static void generate_hop(struct generator * g, struct node * p) {
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
     g->I[0] = c_count;
-    w(g, "~{~M~C /** number */ c~I0 = base.cursor ~S0 ");
+    w(g, "~{~Mconst /** number */ c~I0 = base.cursor ~S0 ");
     generate_AE(g, p->AE);
     w(g, ";~N");
 
@@ -795,7 +787,7 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~M~C /** number */ c~I0 = base.cursor;~N");
+        w(g, "~{~Mconst /** number */ c~I0 = base.cursor;~N");
     }
     writef(g, "~Mbase.insert(base.cursor, base.cursor, ", p);
     generate_address(g, p);
@@ -814,7 +806,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~M~C /** number */ c~I0 = base.cursor;~N");
+        w(g, "~{~Mconst /** number */ c~I0 = base.cursor;~N");
     }
     if (p->mode == m_forward) {
         writef(g, "~Mbase.insert(base.cursor, base.limit, ", p);
@@ -856,7 +848,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->unreachable = false;
 
         g->B[0] = str_data(varname);
-        w(g, "~M~C /** number */ ~B0 = ");
+        w(g, "~Mconst /** number */ ~B0 = ");
         if (p->mode == m_forward) {
             w(g, "base.limit - base.cursor;~N");
             w(g, "~Mbase.limit = ");
@@ -883,7 +875,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         if (!g->unreachable) {
             g->B[0] = str_data(varname);
-            w(g, "~M~C /** number */ ~B0 = ");
+            w(g, "~Mconst /** number */ ~B0 = ");
             if (p->mode == m_forward) {
                 w(g, "base.limit - base.cursor;~N");
                 w(g, "~Mbase.limit = base.cursor;~N");
@@ -926,7 +918,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
-              "~M~D /** !Object */ ~B0 = new ~P();~N", p);
+              "~Mlet /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(base);~N", p);
 
     ++g->copy_from_count;
@@ -1064,7 +1056,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->var_number = 0;
 
     if (p->amongvar_needed) {
-        w(g, "~M~D /** number */ among_var;~N");
+        w(g, "~Mlet /** number */ among_var;~N");
     }
     str_clear(g->failure_str);
     g->failure_label = x_return;
@@ -1274,8 +1266,8 @@ static void generate_class_begin(struct generator * g) {
     w(g, "import { ~P } from './base-stemmer.js'~N"
          "~N"
          "/** @constructor */~N"
-         "~C ~n = function() {~+~N"
-         "~M~C base = new ~P();~N");
+         "const ~n = function() {~+~N"
+         "~Mconst base = new ~P();~N");
     write_newline(g);
 }
 
@@ -1298,7 +1290,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    w(g, "~M~C a_~I0 = [~N~+");
+    w(g, "~Mconst a_~I0 = [~N~+");
 
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
@@ -1335,7 +1327,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~M~C /** Array<number> */ ");
+    w(g, "~Mconst /** Array<number> */ ");
     write_varname(g, q->name);
     write_string(g, " = [");
     for (int i = 0; i < size; i++) {
@@ -1360,19 +1352,19 @@ static void generate_members(struct generator * g) {
     for (struct name * q = g->analyser->names; q; q = q->next) {
         switch (q->type) {
             case t_string:
-                w(g, "~M~D /** string */ ");
+                w(g, "~Mlet /** string */ ");
                 write_varname(g, q);
                 w(g, " = '';~N");
                 wrote_members = true;
                 break;
             case t_integer:
-                w(g, "~M~D /** number */ ");
+                w(g, "~Mlet /** number */ ");
                 write_varname(g, q);
                 w(g, " = 0;~N");
                 wrote_members = true;
                 break;
             case t_boolean:
-                w(g, "~M~D /** boolean */ ");
+                w(g, "~Mlet /** boolean */ ");
                 write_varname(g, q);
                 w(g, " = false;~N");
                 wrote_members = true;
