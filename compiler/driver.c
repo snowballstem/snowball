@@ -33,32 +33,32 @@ static void print_arglist(int exit_code) {
     fprintf(f, "Usage: snowball SOURCE_FILE... [OPTIONS]\n\n"
                "Supported options:\n"
                "  -o, -output OUTPUT_BASE\n"
-               "  -s, -syntax\n"
-               "  -comments\n"
+               "  -s, -syntax                      show syntax tree and stop\n"
+               "  -comments                        generate comments\n"
 #ifndef DISABLE_JAVA
-               "  -j, -java\n"
+               "  -j, -java                        generate Java\n"
 #endif
 #ifndef DISABLE_CSHARP
-               "  -cs, -csharp\n"
+               "  -cs, -csharp                     generate C#\n"
 #endif
-               "  -c++\n"
+               "  -c++                             generate C++\n"
 #ifndef DISABLE_PASCAL
-               "  -pascal\n"
+               "  -pascal                          generate Pascal\n"
 #endif
 #ifndef DISABLE_PYTHON
-               "  -py, -python\n"
+               "  -py, -python                     generate Python\n"
 #endif
 #ifndef DISABLE_JS
                "  -js                              generate Javascript\n"
 #endif
 #ifndef DISABLE_RUST
-               "  -rust\n"
+               "  -rust                            generate Rust\n"
 #endif
 #ifndef DISABLE_GO
-               "  -go\n"
+               "  -go                              generate Go\n"
 #endif
 #ifndef DISABLE_ADA
-               "  -ada\n"
+               "  -ada                             generate Ada\n"
 #endif
                "  -w, -widechars\n"
                "  -u, -utf8\n"
