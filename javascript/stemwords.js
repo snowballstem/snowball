@@ -2,13 +2,17 @@ const fs = require('fs');
 const readline = require('readline');
 
 function usage() {
-    console.log("usage: stemwords.js [-l <language>] -i <input file> -o <output file> [-c <character encoding>] [-h]\n");
-    console.log("The input file consists of a list of words to be stemmed, one per");
-    console.log("line. Words should be in lower case.\n");
-    console.log("If -c is given, the argument is the character encoding of the input");
-    console.log("and output files.  If it is omitted, the UTF-8 encoding is used.\n");
-    console.log("The output file consists of the stemmed words, one per line.\n");
-    console.log("-h displays this help");
+    console.log(`usage: stemwords.js [-l <language>] -i <input file> -o <output file> [-c <character encoding>] [-h]
+
+The input file consists of a list of words to be stemmed, one per line.
+Words should be in lower case.
+
+If -c is given, the argument is the character encoding of the input and
+output files.  If it is omitted, the UTF-8 encoding is used.
+
+The output file consists of the stemmed words, one per line.
+
+-h displays this help`);
 }
 
 if (process.argv.length < 5)
