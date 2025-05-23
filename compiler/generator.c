@@ -1814,10 +1814,11 @@ static void generate_header_file(struct generator * g) {
                         count += g->analyser->name_count[t_integer];
                     }
                     g->I[0] = count;
-                    g->I[1] = "SIIrxg"[q->type];
                     w(g, "#define ~S0");
                     write_s(g, q->s);
-                    w(g, " (~c1[~I0])~N");
+                    w(g, " (");
+                    write_char(g, "SIIrxg"[q->type]);
+                    w(g, "[~I0])~N");
                 }
                 break;
         }
