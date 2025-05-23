@@ -381,6 +381,9 @@ static int read_options(struct options * o, int argc, char * argv[]) {
         if (o->externals_prefix) {
             fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
         }
+        if (o->variables_prefix) {
+            fprintf(stderr, "warning: -vp/-vprefix only meaningful for C and C++\n");
+        }
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
