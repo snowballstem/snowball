@@ -114,7 +114,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     o->output_file = NULL;
     o->syntax_tree = false;
     o->comments = false;
-    o->js_esm = false;
     o->externals_prefix = NULL;
     o->variables_prefix = NULL;
     o->runtime_path = NULL;
@@ -162,7 +161,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->js_esm = false;
                 continue;
             }
 #endif
@@ -546,11 +544,7 @@ extern int main(int argc, char * argv[]) {
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
                     byte * s = add_sz_to_s(NULL, output_base);
-                    if (o->js_esm) {
-                        s = add_literal_to_s(s, ".mjs");
-                    } else {
-                        s = add_literal_to_s(s, ".js");
-                    }
+                    s = add_literal_to_s(s, ".js");
                     o->output_src = get_output(s);
                     lose_s(s);
                     generate_program_js(g);

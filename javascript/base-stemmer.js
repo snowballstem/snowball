@@ -466,4 +466,4 @@ const BaseStemmer = function() {
     };
 };
 
-if (typeof module === 'object' && module.exports) module.exports = BaseStemmer;
+export { BaseStemmer };

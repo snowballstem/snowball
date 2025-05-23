@@ -81,23 +81,32 @@ function stemming (lang, input, output, encoding) {
         input: fs.createReadStream(input, encoding),
         terminal: false
     });
-    var out = fs.createWriteStream(output, encoding);
-    var stemmer = create(lang);
+    const out = fs.createWriteStream(output, encoding);
+    const stemmer = create(lang);
     lines.on('line', (original) => {
         out.write(stemmer.stemWord(original) + '\n');
     });
 }
 
 function create (name) {
-    var lc_name = name.toLowerCase();
-    if (!lc_name.match('\\W') && lc_name !== 'base') {
-        try {
-            const Stemmer = require(lc_name + '-stemmer.js');
-            return new Stemmer();
-        } catch (error) {
-        }
+    const lc_name = name.toLowerCase();
+    if (/\W/.test(lc_name) || lc_name === 'base') {
+        console.log('Unknown stemming language: ' + name + '\n');
+        usage();
+        process.exit(1);
+        return;
     }
-    console.log('Unknown stemming language: ' + name + '\n');
-    usage();
-    process.exit(1);
+    const stemmerName = `${titleCase(lc_name)}Stemmer`;
+    const filename = `${lc_name}-stemmer.js`;
+    try {
+        // Load stemmer class from the module scope
+        const stemmerModule = require(filename);
+        return new stemmerModule[stemmerName]();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function titleCase (s) {
+    return s.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
 }

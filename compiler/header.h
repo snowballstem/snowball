@@ -388,7 +388,6 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     byte comments;
-    byte js_esm;
     enc encoding;
     enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
