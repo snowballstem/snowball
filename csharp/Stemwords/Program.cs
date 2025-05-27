@@ -86,8 +86,6 @@ namespace Snowball
                 return;
             }
 
-            Console.WriteLine("Using " + stemmer.GetType());
-
             TextReader input = System.Console.In;
             if (inputName != null)
                 input = new StreamReader(inputName);
