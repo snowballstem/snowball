@@ -769,8 +769,6 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     int direction = substring != NULL ? substring->mode : p->mode;
     int backward = direction == m_backward;
 
-    if (a->amongs == NULL) a->amongs = x; else a->amongs_end->next = x;
-    a->amongs_end = x;
     x->next = NULL;
     x->node = p;
     x->b = v;
@@ -899,6 +897,83 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->literalstring_count = p->number;
     p->among = x;
 
+    if (starter) {
+        starter->right = p;
+        p = new_node(a, c_bra);
+        if (substring) {
+            p->left = starter;
+        } else {
+            substring = new_node(a, c_substring);
+            substring->right = starter;
+            p->left = substring;
+        }
+    }
+
+    if (x->literalstring_count == 1) {
+        // Eliminate single-case amongs.  Sometimes it's the natural way to
+        // express a single rule in Snowball code as it can show commonality
+        // with rulesets with multiple rules, but it's silly to actually
+        // generate as an among.
+        if (substring) {
+            substring->among = NULL;
+            substring->type = c_literalstring;
+            substring->literalstring = v[0].b;
+            if (v[0].action) {
+                // substring ... among ( S (C) )
+                //
+                // becomes:
+                //
+                // S ... (C)
+                p = v[0].action;
+            } else {
+                // substring ... among ( S )
+                //
+                // becomes:
+                //
+                // S ... true
+                p = new_node(a, c_true);
+            }
+        } else {
+            if (v[0].action) {
+                // among ( S (C) )
+                //
+                // becomes:
+                //
+                // (S C)
+                p = v[0].action;
+                assert(p->type == c_bra);
+                // Insert a c_literalstring node at the start of (C)
+                struct node * literalstring = new_node(a, c_literalstring);
+                literalstring->literalstring = v[0].b;
+                literalstring->right = p->left;
+                p->left = literalstring;
+            } else {
+                // among ( S )
+                //
+                // becomes:
+                //
+                // S
+                p->type = c_literalstring;
+                p->literalstring = v[0].b;
+                p->left = NULL;
+            }
+        }
+        if (v[0].function) {
+            // If there's an among function, convert the action to:
+            //
+            // FUNC and C
+            struct node * and_node = new_node(a, c_and);
+            and_node->left = new_node(a, c_call);
+            and_node->left->name = v[0].function;
+            and_node->left->right = p;
+            p = and_node;
+        }
+        FREE(x->commands);
+        FREE(x);
+        FREE(v);
+        return p;
+    }
+
     if (x->command_count > 1 ||
         (x->command_count == 1 && x->nocommand_count > 0)) {
         /* We need to set among_var rather than just checking if find_among*()
@@ -906,18 +981,12 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
          */
         x->amongvar_needed = a->amongvar_needed = true;
     }
-    if (starter) {
-        starter->right = p;
-        if (substring) {
-            p = starter;
-        } else {
-            substring = new_node(a, c_substring);
-            substring->right = starter;
-            p = substring;
-        }
-    }
+
     x->substring = substring;
     if (substring != NULL) substring->among = x;
+
+    if (a->amongs == NULL) a->amongs = x; else a->amongs_end->next = x;
+    a->amongs_end = x;
 
     return p;
 }
@@ -1243,7 +1312,7 @@ static struct node * read_C(struct analyser * a) {
                         count_error(a);
                         fprintf(stderr, "%s:%d: Expected relational operator (did you mean '=='?)\n",
                                 t->file, t->line_number);
-                        /* Assume it was == to try to avoid an error avalanche. */
+                        // Assume it was == to try to avoid an error avalanche.
                         token = c_eq;
                         /* FALLTHRU */
                     case c_eq:
@@ -1298,109 +1367,113 @@ static struct node * read_C(struct analyser * a) {
                 return n;
             }
 
-            if (t->token == c_name) {
-                struct node * p;
-                struct name * q = find_name(a);
+            if (t->token != c_name) {
+                error(a, e_unexpected_token);
+                hold_token(t);
+                return new_node(a, c_dollar);
+            }
+
+            struct name * q = find_name(a);
+            if (q && q->type == t_string) {
+                /* Assume for now that $ on string both initialises and uses
+                 * the string variable.  FIXME: Can we do better?
+                 */
+                q->initialised = true;
+                q->value_used = true;
+                struct node * p = new_node(a, c_dollar);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
-                if (q && q->type == t_string) {
-                    /* Assume for now that $ on string both initialises and
-                     * uses the string variable.  FIXME: Can we do better?
-                     */
-                    q->initialised = true;
-                    q->value_used = true;
-                    a->mode = m_forward;
-                    a->modifyable = true;
-                    p = new_node(a, c_dollar);
-                    p->left = read_C(a);
-                    p->name = q;
-                } else {
-                    if (q && q->type != t_integer) {
-                        /* If $ is used on an unknown name or a name which
-                         * isn't a string or an integer then we assume the
-                         * unknown name is an integer as $ is used more often
-                         * on integers than strings, so hopefully this it less
-                         * likely to cause an error avalanche.
-                         *
-                         * For an unknown name, we'll already have reported an
-                         * error.
-                         */
-                        error(a, e_not_of_type_string_or_integer);
-                        q = NULL;
-                    }
-                    p = new_node(a, read_AE_test(a));
-                    switch (p->type) {
-                        case c_eq:
-                        case c_ne:
-                        case c_gt:
-                        case c_ge:
-                        case c_lt:
-                        case c_le:
-                            p->left = new_node(a, c_name);
-                            p->left->name = q;
-                            if (q) {
-                                q->value_used = true;
-                            }
-                            p->AE = read_AE(a, NULL, 0);
-                            break;
-                        default:
-                            /* +=, etc don't "initialise" as they only
-                             * amend an existing value.  Similarly, they
-                             * don't count as using the value.
-                             */
-                            p->name = q;
-                            p->AE = read_AE(a, q, 0);
-                            if (p->AE->type == c_number) {
-                                switch (p->type) {
-                                    case c_plusassign:
-                                    case c_minusassign:
-                                        if (p->AE->number == 0) {
-                                            // `$x+=0` and `$x-=0` are no-ops.
-                                            p->type = c_true;
-                                            p->name = NULL;
-                                            p->AE = NULL;
-                                        }
-                                        break;
-                                    case c_multiplyassign:
-                                    case c_divideassign:
-                                        if (p->AE->number == 1) {
-                                            // `$x*=1` and `$x/=1` are no-ops.
-                                            p->type = c_true;
-                                            p->name = NULL;
-                                            p->AE = NULL;
-                                        } else if (p->AE->number == 0) {
-                                            if (p->type == c_divide) {
-                                                fprintf(stderr, "%s:%d: Division by zero\n",
-                                                        t->file, t->line_number);
-                                                exit(1);
-                                            }
-                                            // `$x*=0` -> `$x=0`
-                                            p->type = c_mathassign;
-                                        } else if (p->AE->number == -1) {
-                                            // `$x/=-1` -> `$x*=-1`
-                                            p->type = c_multiplyassign;
-                                        }
-                                        break;
-                                }
-                            }
-                            if (p->type == c_mathassign && q) {
-                                /* $x = x + 1 doesn't initialise x. */
-                                if (!ae_uses_name(p->AE, q)) {
-                                    q->initialised = true;
-                                }
-                            }
-                            break;
-                    }
-                }
-                if (q) mark_used_in(a, q, p);
+                a->mode = m_forward;
+                a->modifyable = true;
+                p->left = read_C(a);
                 a->mode = mode;
                 a->modifyable = modifyable;
+                p->name = q;
+                mark_used_in(a, q, p);
                 return p;
             }
 
-            error(a, e_unexpected_token);
-            hold_token(t);
-            return new_node(a, c_dollar);
+            if (q && q->type != t_integer) {
+                /* If $ is used on an unknown name or a name which isn't a
+                 * string or an integer then we assume the unknown name is an
+                 * integer as $ is used more often on integers than strings, so
+                 * hopefully this it less likely to cause an error avalanche.
+                 *
+                 * For an unknown name, we'll already have reported an error.
+                 */
+                error(a, e_not_of_type_string_or_integer);
+                q = NULL;
+            }
+            struct node * p = new_node(a, read_AE_test(a));
+            switch (p->type) {
+                case c_eq:
+                case c_ne:
+                case c_gt:
+                case c_ge:
+                case c_lt:
+                case c_le:
+                    p->left = new_node(a, c_name);
+                    p->left->name = q;
+                    p->AE = read_AE(a, NULL, 0);
+                    if (q) {
+                        q->value_used = true;
+                        mark_used_in(a, q, p);
+                    }
+                    return p;
+            }
+
+            /* +=, etc don't "initialise" as they only amend an existing value.
+             * Similarly, they don't count as using the value.
+             */
+            p->name = q;
+            p->AE = read_AE(a, q, 0);
+            if (p->AE->type == c_number) {
+                switch (p->type) {
+                    case c_plusassign:
+                    case c_minusassign:
+                        if (p->AE->number == 0) {
+                            // `$x+=0` and `$x-=0` are no-ops.
+                            p->type = c_true;
+                            p->name = NULL;
+                            p->AE = NULL;
+                        } else if (p->AE->number < 0) {
+                            // `$x+=-N` -> `$x-=N`, etc as
+                            // this may result in slightly
+                            // shorter target language code.
+                            p->type ^= (c_plusassign ^ c_minusassign);
+                            p->AE->number = -p->AE->number;
+                        }
+                        break;
+                    case c_multiplyassign:
+                    case c_divideassign:
+                        if (p->AE->number == 1) {
+                            // `$x*=1` and `$x/=1` are no-ops.
+                            p->type = c_true;
+                            p->name = NULL;
+                            p->AE = NULL;
+                        } else if (p->AE->number == 0) {
+                            if (p->type == c_divide) {
+                                fprintf(stderr, "%s:%d: Division by zero\n",
+                                        t->file, t->line_number);
+                                exit(1);
+                            }
+                            // `$x*=0` -> `$x=0`
+                            p->type = c_mathassign;
+                        } else if (p->AE->number == -1) {
+                            // `$x/=-1` -> `$x*=-1`
+                            p->type = c_multiplyassign;
+                        }
+                        break;
+                }
+            }
+            if (p->type == c_mathassign && q) {
+                /* $x = x + 1 doesn't initialise x. */
+                if (!ae_uses_name(p->AE, q)) {
+                    q->initialised = true;
+                }
+            }
+            if (q) mark_used_in(a, q, p);
+            return p;
         }
         case c_name:
             {

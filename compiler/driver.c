@@ -33,32 +33,32 @@ static void print_arglist(int exit_code) {
     fprintf(f, "Usage: snowball SOURCE_FILE... [OPTIONS]\n\n"
                "Supported options:\n"
                "  -o, -output OUTPUT_BASE\n"
-               "  -s, -syntax\n"
-               "  -comments\n"
+               "  -s, -syntax                      show syntax tree and stop\n"
+               "  -comments                        generate comments\n"
 #ifndef DISABLE_JAVA
-               "  -j, -java\n"
+               "  -j, -java                        generate Java\n"
 #endif
 #ifndef DISABLE_CSHARP
-               "  -cs, -csharp\n"
+               "  -cs, -csharp                     generate C#\n"
 #endif
-               "  -c++\n"
+               "  -c++                             generate C++\n"
 #ifndef DISABLE_PASCAL
-               "  -pascal\n"
+               "  -pascal                          generate Pascal\n"
 #endif
 #ifndef DISABLE_PYTHON
-               "  -py, -python\n"
+               "  -py, -python                     generate Python\n"
 #endif
 #ifndef DISABLE_JS
                "  -js                              generate Javascript\n"
 #endif
 #ifndef DISABLE_RUST
-               "  -rust\n"
+               "  -rust                            generate Rust\n"
 #endif
 #ifndef DISABLE_GO
-               "  -go\n"
+               "  -go                              generate Go\n"
 #endif
 #ifndef DISABLE_ADA
-               "  -ada\n"
+               "  -ada                             generate Ada\n"
 #endif
                "  -w, -widechars\n"
                "  -u, -utf8\n"
@@ -114,7 +114,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
     o->output_file = NULL;
     o->syntax_tree = false;
     o->comments = false;
-    o->js_esm = false;
     o->externals_prefix = NULL;
     o->variables_prefix = NULL;
     o->runtime_path = NULL;
@@ -162,7 +161,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JS
             if (eq(s, "-js")) {
                 o->make_lang = LANG_JAVASCRIPT;
-                o->js_esm = false;
                 continue;
             }
 #endif
@@ -383,6 +381,9 @@ static int read_options(struct options * o, int argc, char * argv[]) {
         if (o->externals_prefix) {
             fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
         }
+        if (o->variables_prefix) {
+            fprintf(stderr, "warning: -vp/-vprefix only meaningful for C and C++\n");
+        }
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
@@ -546,11 +547,7 @@ extern int main(int argc, char * argv[]) {
 #ifndef DISABLE_JS
                 if (o->make_lang == LANG_JAVASCRIPT) {
                     byte * s = add_sz_to_s(NULL, output_base);
-                    if (o->js_esm) {
-                        s = add_literal_to_s(s, ".mjs");
-                    } else {
-                        s = add_literal_to_s(s, ".js");
-                    }
+                    s = add_literal_to_s(s, ".js");
                     o->output_src = get_output(s);
                     lose_s(s);
                     generate_program_js(g);

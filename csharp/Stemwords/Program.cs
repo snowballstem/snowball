@@ -86,15 +86,21 @@ namespace Snowball
                 return;
             }
 
-            Console.WriteLine("Using " + stemmer.GetType());
-
-            TextWriter output = System.Console.Out;
-            if (outputName != null)
-                output = new StreamWriter(outputName);
-
             TextReader input = System.Console.In;
             if (inputName != null)
                 input = new StreamReader(inputName);
+
+            TextWriter output;
+            if (outputName != null) {
+                output = new StreamWriter(outputName);
+            } else {
+                // For some reason this is much faster than using
+                // System.Console.Out, at least with mono on Linux.
+                //
+                // `make check_sharp_tamil` takes 0.842s wallclock instead of
+                // 1.848s.
+                output = new StreamWriter(Console.OpenStandardOutput());
+            }
 
             while (true)
             {

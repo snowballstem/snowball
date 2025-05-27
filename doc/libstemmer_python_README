@@ -45,8 +45,8 @@ The ``snowballstemmer.stemmer`` function takes an algorithm name and returns a
 
    import snowballstemmer
 
-   stemmer = snowballstemmer.stemmer('english');
-   print(stemmer.stemWords("We are the world".split()));
+   stemmer = snowballstemmer.stemmer('english')
+   print(stemmer.stemWords("We are the world".split()))
 
 Generally you should create a stemmer object and reuse it rather than creating
 a fresh object for each word stemmed (since there's some cost to creating and
