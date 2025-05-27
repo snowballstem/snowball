@@ -349,7 +349,7 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
 
-$(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
+$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
