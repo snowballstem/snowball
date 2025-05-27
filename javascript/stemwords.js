@@ -2,10 +2,12 @@ const fs = require('fs');
 const readline = require('readline');
 
 function usage() {
-    console.log(`usage: stemwords.js [-l <language>] -i <input file> -o <output file> [-c <character encoding>] [-h]
+    console.log(`usage: stemwords.js [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-h]
 
 The input file consists of a list of words to be stemmed, one per line.
 Words should be in lower case.
+
+Language defaults to "English", input to stdin, and output to stdout.
 
 If -c is given, the argument is the character encoding of the input and
 output files.  If it is omitted, the UTF-8 encoding is used.
@@ -69,26 +71,39 @@ else
             break;
         }
     }
-    if (show_help || input === '' || output === '')
+    if (show_help)
     {
         usage();
     }
     else
     {
-        stemming(language, input, output, encoding);
+        const stemmer = create(language);
+        let istream, ostream;
+        if (input !== '') {
+           istream = fs.createReadStream(input, encoding);
+        } else {
+           istream = process.stdin;
+           istream.setEncoding(encoding);
+        }
+        if (output !== '') {
+            ostream = fs.createWriteStream(output, encoding);
+        } else {
+            ostream = process.stdout;
+            ostream.setEncoding(encoding);
+        }
+
+        stemming(stemmer, istream, ostream);
     }
 }
 
-// function stemming (lang : string, input : string, output : string, encoding : string) {
-function stemming (lang, input, output, encoding) {
+// function stemming (stemmer : Stemmer, input : Stream, output : Stream) {
+function stemming (stemmer, input, output) {
     const lines = readline.createInterface({
-        input: fs.createReadStream(input, encoding),
+        input: input,
         terminal: false
     });
-    const out = fs.createWriteStream(output, encoding);
-    const stemmer = create(lang);
     lines.on('line', (original) => {
-        out.write(stemmer.stemWord(original) + '\n');
+        output.write(stemmer.stemWord(original) + '\n');
     });
 }
 
