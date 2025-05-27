@@ -563,7 +563,7 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with KOI8R"
 	@$(ICONV) -f UTF-8 -t KOI8-R '$</voc.txt' |\
 	    ./stemwords -c KOI8_R -l $* |\
-	    $(ICONV) -f KOI8_R -t UTF-8 |\
+	    $(ICONV) -f KOI8-R -t UTF-8 |\
 	    $(DIFF) -u '$</output.txt' -
 
 ###############################################################################
