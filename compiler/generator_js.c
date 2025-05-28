@@ -1090,22 +1090,23 @@ static void generate_substring(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
+    g->S[1] = x->function_count > 0 ? ", this" : "";
     g->I[0] = x->number;
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = this.find_among~S0(this.#a_~I0);~N", p);
+        writef(g, "~Mamong_var = this.find_among~S0(this.#a_~I0~S1);~N", p);
         if (!x->always_matches) {
             write_failure_if(g, "among_var == 0", p);
         }
     } else if (x->always_matches) {
-        writef(g, "~Mthis.find_among~S0(this.#a_~I0);~N", p);
+        writef(g, "~Mthis.find_among~S0(this.#a_~I0~S1);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn this.find_among~S0(this.#a_~I0) != 0;~N", p);
+        writef(g, "~Mreturn this.find_among~S0(this.#a_~I0~S1) != 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "this.find_among~S0(this.#a_~I0) == 0", p);
+        write_failure_if(g, "this.find_among~S0(this.#a_~I0~S1) == 0", p);
     }
 }
 

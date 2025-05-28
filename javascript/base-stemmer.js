@@ -235,9 +235,10 @@ class BaseStemmer {
 
     /**
      * @param {Array<Array>} v
+     * @param {object} s
      * @return {number}
      */
-    find_among(v)
+    find_among(v, s=null)
     {
         /** @protected */
         let i = 0;
@@ -299,7 +300,7 @@ class BaseStemmer {
             {
                 this.cursor = c + w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
+                let res = w[3].call(s);
                 this.cursor = c + w[0].length;
                 if (res) return w[2];
             }
@@ -311,9 +312,10 @@ class BaseStemmer {
     // find_among_b is for backwards processing. Same comments apply
     /**
      * @param {Array<Array>} v
+     * @param {object} s
      * @return {number}
      */
-    find_among_b(v)
+    find_among_b(v, s=null)
     {
         /** @protected */
         let i = 0;
@@ -369,7 +371,7 @@ class BaseStemmer {
             {
                 this.cursor = c - w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
+                let res = w[3].call(s);
                 this.cursor = c - w[0].length;
                 if (res) return w[2];
             }
