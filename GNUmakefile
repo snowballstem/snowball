@@ -349,7 +349,19 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
 
+ifneq '$(filter grouped-target,$(.FEATURES))' ''
+# Grouped-targets were added in GNU make 4.3.
 $(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl snowball
+else
+# This will fail to recreate the .ads if it is deleted but the corresponding
+# .adb is still present and up-to-date.  That seems better than forcing a
+# serial build with .NOTPARALLEL which is seems can only be applied to an
+# entire makefile, not per-rule.
+$(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
+	@:
+
+$(ada_src_dir)/stemmer-%.adb: algorithms/%.sbl snowball
+endif
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
