@@ -35,6 +35,7 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
+    w(g, "this.#");
     write_varname(g, p);
 }
 
@@ -1039,12 +1040,8 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    if (q->type == t_routine) {
-        writef(g, "~M/** @return {boolean} */~N"
-                  "~Mfunction ~W() {~+~N", p);
-    } else {
-        writef(g, "~Mthis.~W = /** @return {boolean} */ function() {~+~N", p);
-    }
+    writef(g, "~M/** @return {boolean} */~N"
+              "~M#~W() {~+~N", p);
 
     /* Save output. */
     struct str * saved_output = g->outbuf;
@@ -1096,19 +1093,19 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = base.find_among~S0(a_~I0);~N", p);
+        writef(g, "~Mamong_var = base.find_among~S0(this.#a_~I0);~N", p);
         if (!x->always_matches) {
             write_failure_if(g, "among_var == 0", p);
         }
     } else if (x->always_matches) {
-        writef(g, "~Mbase.find_among~S0(a_~I0);~N", p);
+        writef(g, "~Mbase.find_among~S0(this.#a_~I0);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn base.find_among~S0(a_~I0) != 0;~N", p);
+        writef(g, "~Mreturn base.find_among~S0(this.#a_~I0) != 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "base.find_among~S0(a_~I0) == 0", p);
+        write_failure_if(g, "base.find_among~S0(this.#a_~I0) == 0", p);
     }
 }
 
@@ -1265,21 +1262,19 @@ static void generate(struct generator * g, struct node * p) {
 static void generate_class_begin(struct generator * g) {
     w(g, "import { ~P } from './base-stemmer.js'~N"
          "~N"
-         "/** @constructor */~N"
-         "const ~n = function() {~+~N"
-         "~Mconst base = new ~P();~N");
+         "class ~n extends ~P {~+~N");
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
     w(g, "~N");
     w(g, "~M/**@return{string}*/~N");
-    w(g, "~Mthis['stemWord'] = function(/**string*/word) {~+~N");
+    w(g, "~MstemWord(/**string*/word) {~+~N");
     w(g, "~Mbase.setCurrent(word);~N");
-    w(g, "~Mthis.stem();~N");
+    w(g, "~Mthis.#stem();~N");
     w(g, "~Mreturn base.getCurrent();~N");
     w(g, "~-~M};~N");
-    w(g, "~-};~N");
+    w(g, "~-}~N");
     w(g, "~N");
     w(g, "export { ~n };~N");
 }
@@ -1290,7 +1285,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    w(g, "~Mconst a_~I0 = [~N~+");
+    w(g, "~Mget #a_~I0() { return [~N~+");
 
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
@@ -1301,12 +1296,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
         write_literal_string(g, v[i].b);
         w(g, ", ~I0, ~I1");
         if (v[i].function != NULL) {
-            w(g, ", ");
+            w(g, ", this.#");
             write_varname(g, v[i].function);
         }
         w(g, "]~S0~N");
     }
-    w(g, "~-~M];~N~N");
+    w(g, "~-~M]; }~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -1327,14 +1322,15 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~Mconst /** Array<number> */ ");
+    w(g, "~M/** @return Array<number> */~N"
+         "~Mget #");
     write_varname(g, q->name);
-    write_string(g, " = [");
+    write_string(g, "() { return [");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, "];~N~N");
+    w(g, "]; }~N~N");
 
     lose_b(map);
 }
@@ -1352,21 +1348,21 @@ static void generate_members(struct generator * g) {
     for (struct name * q = g->analyser->names; q; q = q->next) {
         switch (q->type) {
             case t_string:
-                w(g, "~Mlet /** string */ ");
+                w(g, "~M#");
                 write_varname(g, q);
-                w(g, " = '';~N");
+                w(g, "/** string */ = '';~N");
                 wrote_members = true;
                 break;
             case t_integer:
-                w(g, "~Mlet /** number */ ");
+                w(g, "~M#");
                 write_varname(g, q);
-                w(g, " = 0;~N");
+                w(g, "/** number */ = 0;~N");
                 wrote_members = true;
                 break;
             case t_boolean:
-                w(g, "~Mlet /** boolean */ ");
+                w(g, "~M#");
                 write_varname(g, q);
-                w(g, " = false;~N");
+                w(g, "/** boolean */ = false;~N");
                 wrote_members = true;
                 break;
         }
