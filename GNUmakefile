@@ -609,11 +609,11 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	    $(JAVA) org/tartarus/snowball/TestApp $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	  rm $(PWD)/tmp.txt; \
 	else \
 	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # C#
@@ -634,11 +634,11 @@ check_csharp_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	    $(MONO) csharp_stemwords$(EXEEXT) -l $* -o tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
-	  rm tmp.txt; \
 	else \
 	  $(MONO) csharp_stemwords$(EXEEXT) -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # Pascal
@@ -680,11 +680,11 @@ check_js_%: $(STEMMING_DATA)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	      $(JSRUN) javascript/stemwords.js -l $* -o tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
-	  rm tmp.txt; \
 	else \
 	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # Rust
@@ -705,11 +705,11 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	      $(cargo) run $(cargoflags) -- -l $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	  rm $(PWD)/tmp.txt; \
 	else \
 	  $(cargo) run $(cargoflags) -- -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # Go
@@ -730,11 +730,11 @@ check_go_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	      $(go) run $(goflags) -l $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	  rm $(PWD)/tmp.txt; \
 	else \
 	  $(go) run $(goflags) -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # Python
@@ -753,11 +753,11 @@ check_python_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) |\
 	      $(python) stemwords.py -c utf8 -l $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz' $(THIN_TEST_DATA)|$(DIFF) -u - $(PWD)/tmp.txt; \
-	  rm $(PWD)/tmp.txt; \
 	else \
 	  $(python) stemwords.py -c utf8 -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	mkdir -p python_check
@@ -785,11 +785,11 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</voc.txt.gz' |\
 	  ./bin/stemwords $* /dev/stdin $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	  rm $(PWD)/tmp.txt;\
 	else \
 	  ./bin/stemwords $* $</voc.txt /dev/stdout |\
 	      $(DIFF) -u $</output.txt -; \
 	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
 	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
