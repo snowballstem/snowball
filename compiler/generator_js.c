@@ -1077,7 +1077,7 @@ static void generate_define(struct generator * g, struct node * p) {
             generate(g, p->left->right);
         }
     }
-    w(g, "~-~M};~N");
+    w(g, "~-~M}~N");
 
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
@@ -1282,7 +1282,7 @@ static void generate_class_end(struct generator * g) {
     w(g, "~Mthis.setCurrent(word);~N");
     w(g, "~Mthis.#stem();~N");
     w(g, "~Mreturn this.getCurrent();~N");
-    w(g, "~-~M};~N");
+    w(g, "~-~M}~N");
     w(g, "~-}~N");
     w(g, "~N");
     w(g, "export { ~n };~N");
