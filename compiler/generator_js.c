@@ -58,6 +58,15 @@ static void write_margin(struct generator * g) {
     for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
+static void write_relop(struct generator * g, int relop) {
+    // Relational operators are the same as C, save for (in-)equality.
+    switch (relop) {
+        case c_eq: write_string(g, " === "); break;
+        case c_ne: write_string(g, " !== "); break;
+        default: write_c_relop(g, relop);
+    }
+}
+
 static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
@@ -688,7 +697,7 @@ static void generate_tomark(struct generator * g, struct node * p) {
 
 static void generate_atmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif (this.cursor != "); generate_AE(g, p->AE); writef(g, ") ", p);
+    w(g, "~Mif (this.cursor !== "); generate_AE(g, p->AE); writef(g, ") ", p);
     write_failure_after_if(g);
     g->unreachable = false;
 }
@@ -768,7 +777,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~M~V = this.slice_to();~N"
-              "~Mif (~V == '') return false;~N", p);
+              "~Mif (~V === '') return false;~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -973,8 +982,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
         relop ^= 1;
     }
     generate_AE(g, p->left);
-    // Relational operators are the same as C.
-    write_c_relop(g, relop);
+    write_relop(g, relop);
     generate_AE(g, p->AE);
     if (optimise_to_return) {
         w(g, ";~N");
@@ -1096,17 +1104,17 @@ static void generate_substring(struct generator * g, struct node * p) {
     if (x->amongvar_needed) {
         writef(g, "~Mamong_var = this.find_among~S0(this.#a_~I0~S1);~N", p);
         if (!x->always_matches) {
-            write_failure_if(g, "among_var == 0", p);
+            write_failure_if(g, "among_var === 0", p);
         }
     } else if (x->always_matches) {
         writef(g, "~Mthis.find_among~S0(this.#a_~I0~S1);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn this.find_among~S0(this.#a_~I0~S1) != 0;~N", p);
+        writef(g, "~Mreturn this.find_among~S0(this.#a_~I0~S1) !== 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "this.find_among~S0(this.#a_~I0~S1) == 0", p);
+        write_failure_if(g, "this.find_among~S0(this.#a_~I0~S1) === 0", p);
     }
 }
 
