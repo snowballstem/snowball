@@ -8,6 +8,14 @@ ifeq ($(OS),Windows_NT)
 EXEEXT = .exe
 endif
 
+# make SAVETMP=1 to save stemwords output for UTF-8 C stemmers on failure.
+# Intended for use with snowball-data's stemmer-compare.
+ifneq '$(SAVETMP)' ''
+.NOTPARALLEL:
+TEE_TO_TMP_TXT:=tee tmp.txt|
+CLEAN_TMP_TXT:=rm -f tmp.txt
+endif
+
 c_src_dir = src_c
 
 JAVACFLAGS ?=
@@ -547,15 +555,14 @@ check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with UTF-8"
 	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz'|./stemwords$(EXEEXT) -c UTF_8 -l $* -o tmp.txt; \
-	else \
-	  ./stemwords$(EXEEXT) -c UTF_8 -l $* -i $</voc.txt -o tmp.txt; \
-	fi
-	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  $(DIFF) -u $</output.txt tmp.txt; \
+	  ./stemwords$(EXEEXT) -c UTF_8 -l $* -i $</voc.txt |\
+	  $(TEE_TO_TMP_TXT) \
+	  $(DIFF) -u $</output.txt -; \
 	fi
-	@rm tmp.txt
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+	@$(CLEAN_TMP_TXT)
 
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with ISO_8859_1"
