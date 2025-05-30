@@ -216,6 +216,7 @@ struct name {
     struct grouping * grouping; /* for grouping names */
     struct node * used;         /* First use, or NULL if not used */
     struct name * local_to;     /* Local to one routine/external */
+    int among_index;            /* for functions used in among */
     int declaration_line_number;/* Line number of declaration */
 };
 
@@ -231,6 +232,7 @@ struct amongvec {
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
     int line_number; /* for diagnostics and stable sorting */
+    int function_index; /* 1-based */
     struct name * function;
 };
 
@@ -241,7 +243,7 @@ struct among {
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among (includes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
-    int function_count;       /* in this among */
+    int function_count;       /* number of different functions in this among */
     byte amongvar_needed;     /* do we need to set among_var? */
     byte always_matches;      /* will this among always match? */
     byte used;                /* is this among in reachable code? */

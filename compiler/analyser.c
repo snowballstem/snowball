@@ -302,6 +302,7 @@ handle_as_name:
                     p->local_to = NULL;
                     p->grouping = NULL;
                     p->definition = NULL;
+                    p->among_index = 0;
                     p->declaration_line_number = t->line_number;
                     p->next = a->names;
                     a->names = p;
@@ -799,9 +800,13 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 w1->function = function;
                 function->used_in_among = true;
                 check_routine_mode(a, function, direction);
-                x->function_count++;
+                if (function->among_index == 0) {
+                    function->among_index = ++x->function_count;
+                }
+                w1->function_index = function->among_index;
             } else {
                 w1->function = NULL;
+                w1->function_index = 0;
                 if (w1->size == 0) {
                     // This among contains the empty string without a gating
                     // function so it will always match.
@@ -906,6 +911,14 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             substring = new_node(a, c_substring);
             substring->right = starter;
             p->left = substring;
+        }
+    }
+
+    // Clear any among_index values we set so we correctly handle a function
+    // used in more than one among.
+    for (int i = 0; i < x->literalstring_count; i++) {
+        if (v[i].function) {
+            v[i].function->among_index = 0;
         }
     }
 

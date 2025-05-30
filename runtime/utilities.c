@@ -235,7 +235,8 @@ extern int eq_v_b(struct SN_env * z, const symbol * p) {
     return eq_s_b(z, SIZE(p), p);
 }
 
-extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
+extern int find_among(struct SN_env * z, const struct among * v, int v_size,
+                      int (*call_among_func)(struct SN_env*)) {
 
     int i = 0;
     int j = v_size;
@@ -286,9 +287,10 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
     while (1) {
         if (common_i >= w->s_size) {
             z->c = c + w->s_size;
-            if (w->function == NULL) return w->result;
+            if (!w->function) return w->result;
+            z->af = w->function;
             {
-                int res = w->function(z);
+                int res = call_among_func(z);
                 z->c = c + w->s_size;
                 if (res) return w->result;
             }
@@ -300,7 +302,8 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
 
 /* find_among_b is for backwards processing. Same comments apply */
 
-extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
+extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
+                        int (*call_among_func)(struct SN_env*)) {
 
     int i = 0;
     int j = v_size;
@@ -341,9 +344,10 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
     while (1) {
         if (common_i >= w->s_size) {
             z->c = c - w->s_size;
-            if (w->function == NULL) return w->result;
+            if (!w->function) return w->result;
+            z->af = w->function;
             {
-                int res = w->function(z);
+                int res = call_among_func(z);
                 z->c = c - w->s_size;
                 if (res) return w->result;
             }

@@ -17,8 +17,8 @@ struct among
     int substring_i;
     /* Result of the lookup. */
     int result;
-    /* Optional condition routine, or NULL if none. */
-    int (* function)(struct SN_env *);
+    /* Optional condition routine index, or 0 if none. */
+    int function;
 };
 
 extern symbol * create_s(void);
@@ -43,8 +43,10 @@ extern int eq_s_b(struct SN_env * z, int s_size, const symbol * s);
 extern int eq_v(struct SN_env * z, const symbol * p);
 extern int eq_v_b(struct SN_env * z, const symbol * p);
 
-extern int find_among(struct SN_env * z, const struct among * v, int v_size);
-extern int find_among_b(struct SN_env * z, const struct among * v, int v_size);
+extern int find_among(struct SN_env * z, const struct among * v, int v_size,
+                      int (*)(struct SN_env *));
+extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
+                        int (*)(struct SN_env *));
 
 extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s, int * adjustment);
 extern int slice_from_s(struct SN_env * z, int s_size, const symbol * s);

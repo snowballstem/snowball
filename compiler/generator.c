@@ -323,6 +323,32 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 write_s(g, g->B[j]);
                 continue;
             }
+            case 'F': { // Among function dispatcher.
+                struct among * x = p->among;
+                if (x->function_count == 0) {
+                    write_char(g, '0');
+                    continue;
+                }
+
+                if (x->function_count == 1) {
+                    // Only one different function used in this among.
+                    struct amongvec * v = x->b;
+                    for (int j = 0; j < x->literalstring_count; j++) {
+                        if (v[j].function) {
+                            write_varref(g, v[j].function);
+                            goto continue_outer_loop;
+                        }
+                    }
+                    fprintf(stderr, "function_count == 1 but no among functions\n");
+                    exit(1);
+continue_outer_loop:
+                    continue;
+                }
+
+                w(g, "af_");
+                write_int(g, x->number);
+                continue;
+            }
             case 'I':
             case 'J':
             case 'c': {
@@ -1458,18 +1484,18 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1);~N", p);
+        writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1, ~F);~N", p);
         if (!x->always_matches) {
             writef(g, "~Mif (!among_var) ~f~N", p);
         }
     } else if (x->always_matches) {
-        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1);~N", p);
+        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1, ~F);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1) != 0;~N", p);
+        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1, ~F) != 0;~N", p);
         x->node->right = NULL;
     } else {
-        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1)) ~f~N", p);
+        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1, ~F)) ~f~N", p);
     }
 }
 
@@ -1698,6 +1724,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
         g->I[2] = v[i].size;
         g->I[3] = (v[i].i >= 0 ? v[i].i - i : 0);
         g->I[4] = v[i].result;
+        g->I[5] = v[i].function_index;
         g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         if (g->options->comments) {
@@ -1709,15 +1736,29 @@ static void generate_among_table(struct generator * g, struct among * x) {
         } else {
             w(g, "s_~I0_~I1,");
         }
-        w(g, " ~I3, ~I4, ");
-        if (v[i].function == NULL) {
-            write_char(g, '0');
-        } else {
-            write_varname(g, v[i].function);
-        }
-        w(g, "}~S0~N");
+        w(g, " ~I3, ~I4, ~I5}~S0~N");
     }
     w(g, "};~N~N");
+
+    if (x->function_count <= 1) return;
+
+    w(g, "~Mstatic int af_~I0(struct SN_env * z) {~N~+");
+    w(g, "~Mswitch (z->af) {~N~+");
+    for (int n = 1; n <= x->function_count; n++) {
+        w(g, "~Mcase ");
+        write_int(g, n);
+        w(g, ": return ");
+        for (int i = 0; i < x->literalstring_count; i++) {
+            if (v[i].function_index == n) {
+                write_varref(g, v[i].function);
+                w(g, "(z);~N");
+                break;
+            }
+        }
+    }
+    w(g, "~-~M}~N");
+    w(g, "~Mreturn -1;~N");
+    w(g, "~-~M}~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
