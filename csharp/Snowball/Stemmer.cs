@@ -115,6 +115,12 @@ namespace Snowball
     public abstract class Stemmer : Env
     {
         /// <summary>
+        ///   Among function being called.
+        /// </summary>
+        ///
+        protected int af;
+
+        /// <summary>
         ///   Initializes a new instance of the <see cref="Stemmer"/> class.
         /// </summary>
         ///
@@ -390,7 +396,7 @@ namespace Snowball
         ///   forward.
         /// </summary>
         ///
-        protected int find_among(Among[] v)
+        protected int find_among(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -465,10 +471,11 @@ namespace Snowball
                 {
                     cursor = c + w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Action == 0)
                         return w.Result;
 
-                    bool res = w.Action();
+                    af = w.Action;
+                    bool res = call_among_func();
                     cursor = c + w.SearchString.Length;
 
                     if (res)
@@ -488,7 +495,7 @@ namespace Snowball
         ///   backwards.
         /// </summary>
         ///
-        protected int find_among_b(Among[] v)
+        protected int find_among_b(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -558,10 +565,11 @@ namespace Snowball
                 {
                     cursor = c - w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Action == 0)
                         return w.Result;
 
-                    bool res = w.Action();
+                    af = w.Action;
+                    bool res = call_among_func();
                     cursor = c - w.SearchString.Length;
 
                     if (res)

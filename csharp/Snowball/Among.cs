@@ -59,20 +59,7 @@ namespace Snowball
         ///   Action to be invoked.
         /// </summary>
         ///
-        public Func<bool> Action { get; private set; }
-
-        /// <summary>
-        ///   Initializes a new instance of the <see cref="Among"/> class.
-        /// </summary>
-        ///
-        /// <param name="str">The search string.</param>
-        /// <param name="index">The index to the longest matching substring.</param>
-        /// <param name="result">The result of the lookup.</param>
-        ///
-        public Among(String str, int index, int result)
-            : this(str, index, result, null)
-        {
-        }
+        public int Action { get; private set; }
 
         /// <summary>
         ///   Initializes a new instance of the <see cref="Among"/> class.
@@ -83,7 +70,7 @@ namespace Snowball
         /// <param name="result">The result of the lookup.</param>
         /// <param name="action">The action to be performed, if any.</param>
         ///
-        public Among(String str, int index, int result, Func<bool> action)
+        public Among(String str, int index, int result, int action)
         {
             this.SearchString = str;
             this.MatchIndex = index;
