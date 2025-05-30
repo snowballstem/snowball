@@ -471,10 +471,10 @@ namespace Snowball
                 {
                     cursor = c + w.SearchString.Length;
 
-                    if (w.Action == 0)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    af = w.Action;
+                    af = w.Condition;
                     bool res = call_among_func();
                     cursor = c + w.SearchString.Length;
 
@@ -565,10 +565,10 @@ namespace Snowball
                 {
                     cursor = c - w.SearchString.Length;
 
-                    if (w.Action == 0)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    af = w.Action;
+                    af = w.Condition;
                     bool res = call_among_func();
                     cursor = c - w.SearchString.Length;
 
