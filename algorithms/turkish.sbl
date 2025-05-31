@@ -130,7 +130,7 @@ backwardmode (
   define mark_suffix_with_optional_n_consonant as (
     ('n' (test vowel))
     or
-    ((not(test 'n')) test(next vowel))
+    ((not 'n') test(next vowel))
   )
 
   // if the last consonant before suffix is vowel and s then advance and delete
@@ -140,7 +140,7 @@ backwardmode (
   define mark_suffix_with_optional_s_consonant as (
     ('s' (test vowel))
     or
-    ((not(test 's')) test(next vowel))
+    ((not 's') test(next vowel))
   )
 
   // if the last consonant before suffix is vowel and y then advance and delete
@@ -150,13 +150,13 @@ backwardmode (
   define mark_suffix_with_optional_y_consonant as (
     ('y' (test vowel))
     or
-    ((not(test 'y')) test(next vowel))
+    ((not 'y') test(next vowel))
   )
 
   define mark_suffix_with_optional_U_vowel as (
     (U (test non-vowel))
     or
-    ((not(test U)) test(next non-vowel))
+    ((not U) test(next non-vowel))
   )
 
   define mark_possessives as (
