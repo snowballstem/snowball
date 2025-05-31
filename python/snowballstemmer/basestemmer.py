@@ -88,20 +88,16 @@ class BaseStemmer:
         return False
 
     def eq_s(self, s):
-        if self.limit - self.cursor < len(s):
-            return False
-        if self.current[self.cursor:self.cursor + len(s)] != s:
-            return False
-        self.cursor += len(s)
-        return True
+        if self.current.startswith(s, self.cursor, self.limit):
+            self.cursor += len(s)
+            return True
+        return False
 
     def eq_s_b(self, s):
-        if self.cursor - self.limit_backward < len(s):
-            return False
-        if self.current[self.cursor - len(s):self.cursor] != s:
-            return False
-        self.cursor -= len(s)
-        return True
+        if self.current.endswith(s, self.limit_backward, self.cursor):
+            self.cursor -= len(s)
+            return True
+        return False
 
     def find_among(self, v):
         i = 0
