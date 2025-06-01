@@ -720,8 +720,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~Mif not self.slice_del():~N"
-              "~+~Mreturn False~N~-"
-              "~N", p);
+              "~+~Mreturn False~N~-", p);
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
