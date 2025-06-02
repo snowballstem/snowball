@@ -1,0 +1,26 @@
+Snowball stemming library for PHP
+=================================
+
+The PHP stemmer has been largely modified from the JavaScript library with 
+base-stemmer.php being translated from base-stemmer.js with virtually no 
+knowledge of the underlying algorithm.
+
+Likewise, the compiler code in generator_php.c was mostly copied from 
+generator_js.c
+
+
+How to use library
+------------------
+
+Then use it from PHP as follows:
+
+.. code-block:: php
+
+    require 'base-stemmer.php';
+    require 'english-stemmer.php';
+    $stemmer = new SnowballEnglishStemmer;
+    $word = 'Compiled';
+    $stem = $stemmer->stemWord($word);
+    printf("%s => %s\n", $word, $stem );
+
+	// prints "Compiled => Compil"
