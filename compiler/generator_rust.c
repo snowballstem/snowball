@@ -128,6 +128,7 @@ static void wsetlab_end(struct generator * g, int n) {
 static void wgotol(struct generator * g, int n) {
     g->I[0] = n;
     w(g, "~Mbreak 'lab~I0;~N");
+    g->unreachable = true;
 }
 
 static void write_failure(struct generator * g) {
@@ -353,7 +354,7 @@ static void generate_or(struct generator * g, struct node * p) {
             wgotol(g, out_lab);
             end_unreachable = false;
         }
-        w(g, "~-~M}~N");
+        wsetlab_end(g, label);
         g->unreachable = false;
         if (savevar) write_restorecursor(g, p, savevar);
         p = p->right;
@@ -410,7 +411,7 @@ static void generate_not(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     if (!g->unreachable) write_failure(g);
-    w(g, "~-~M}~N");
+    wsetlab_end(g, label);
 
     g->unreachable = false;
 
@@ -568,9 +569,10 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         if (style == 1) write_restorecursor(g, p, savevar);
         g->I[0] = golab;
         w(g, "~Mbreak 'golab~I0;~N");
+        g->unreachable = true;
     }
+    wsetlab_end(g, g->failure_label);
     g->unreachable = false;
-    w(g, "~-~M}~N");
     if (savevar) {
         write_restorecursor(g, p, savevar);
         str_delete(savevar);
