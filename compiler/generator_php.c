@@ -274,7 +274,7 @@ static void generate_AE(struct generator * g, struct node * p) {
              */
             write_string(g, "intdiv(");
             generate_AE(g, p->left);
-            write_string(g, " / ");
+            write_string(g, ",");
             generate_AE(g, p->right);
             write_char(g, ')');
             break;
