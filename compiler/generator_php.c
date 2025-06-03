@@ -940,9 +940,9 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~M$~B0 = clone $this~N", p);
 
     ++g->copy_from_count;
-    str_assign(g->failure_str, "clone ");
+    str_assign(g->failure_str, "$this->copyFrom(");
     str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ";");
+    str_append_string(g->failure_str, ");");
     writef(g, "~M$this->current = ~V;~N"
               "~M$this->cursor = 0;~N"
               "~M$this->limit_backward = 0;~N"

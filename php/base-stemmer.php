@@ -34,6 +34,16 @@ abstract class SnowballStemmer {
     }
 
 
+    protected function copyFrom( self $other ):void {
+        $this->current          = $other->current;
+        $this->cursor           = $other->cursor;
+        $this->limit            = $other->limit;
+        $this->limit_backward   = $other->limit_backward;
+        $this->bra              = $other->bra;
+        $this->ket              = $other->ket;
+    }
+
+
     /**
      * @param int[] $s
      */
