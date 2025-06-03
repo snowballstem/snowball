@@ -582,7 +582,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->I[1] = q->largest_ch;
     write_failure_if(g, "Not (Go~S1Grouping~S0(~V, ~I0, ~I1))", p);
     if (!is_goto) {
-        write_string(g, p->mode == m_forward ? "Inc(FCursor);" : "Dec(FCursor);");
+        w(g, p->mode == m_forward ? "~MInc(FCursor);~N" : "~MDec(FCursor);~N");
     }
 }
 
