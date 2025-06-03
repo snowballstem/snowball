@@ -145,11 +145,6 @@ static void wsetlab_end(struct generator * g, int n) {
     w(g, "~-~Mexcept lab~I0: pass~N");
 }
 
-static void wgotol(struct generator * g, int n) {
-    g->I[0] = n;
-    w(g, "~Mraise lab~I0()~N");
-}
-
 static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) {
         write_margin(g);
