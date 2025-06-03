@@ -149,14 +149,6 @@ static void wsetl(struct generator * g, int n) {
     g->line_labelled = g->line_count;
 }
 
-static void wgotol(struct generator * g, int n) {
-    write_margin(g);
-    write_string(g, "goto lab");
-    write_int(g, n);
-    write_string(g, ";");
-    write_newline(g);
-}
-
 static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) {
         write_margin(g);
@@ -377,15 +369,15 @@ static void generate_or(struct generator * g, struct node * p) {
     if (K_needed(g, p->left)) {
         savevar = vars_newname(g);
     }
-    int used = g->label_used;
 
+    int used = g->label_used;
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int out_lab = new_label(g);
     int end_unreachable = true;
 
     write_comment(g, p);
+    w(g, "~Mloop~N~+");
 
     if (savevar) write_savecursor(g, p, savevar);
 
@@ -403,7 +395,7 @@ static void generate_or(struct generator * g, struct node * p) {
         g->label_used = 0;
         generate(g, p);
         if (!g->unreachable) {
-            wgotol(g, out_lab);
+            w(g, "~Mexit;~N");
             end_unreachable = false;
         }
 
@@ -413,13 +405,15 @@ static void generate_or(struct generator * g, struct node * p) {
         if (savevar) write_restorecursor(g, p, savevar);
         p = p->right;
     }
+
     g->label_used = used;
     g->failure_label = a0;
     str_delete(g->failure_str);
     g->failure_str = a1;
 
     generate(g, p);
-    wsetl(g, out_lab);
+
+    w(g, "~Mexit;~N~-~Mend loop;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
