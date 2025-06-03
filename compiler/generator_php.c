@@ -229,14 +229,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
-            case 'C': { // Constant.
-                w(g, "/* TODO */ const"); // ??
-                continue;
-            }
-            case 'D': { // Declare variable.
-                w(g, "/* TODO ?*/" ); // ??
-                continue;
-            }
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
                        ch, input);
@@ -946,7 +938,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~{~C~N"
+    writef(g, "~{~N"
               "~M$~B0 = clone $this~N", p);
 
     ++g->copy_from_count;
