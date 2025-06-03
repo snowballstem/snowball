@@ -611,7 +611,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int a0 = g->failure_label;
 
     int end_unreachable = false;
-    int golab = new_label(g);
     w(g, "~Mloop~N~+");
 
     struct str * savevar = NULL;
@@ -632,7 +631,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     } else {
         /* include for goto; omit for gopast */
         if (style == 1) write_restorecursor(g, p, savevar);
-        g->I[0] = golab;
         w(g, "~Mexit;~N");
     }
     g->unreachable = false;
