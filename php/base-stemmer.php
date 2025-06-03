@@ -46,7 +46,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch -= $min;
-        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ){
+        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
             return false;
         }
         $this->cursor++;
@@ -64,7 +64,7 @@ abstract class SnowballStemmer {
                 return true;
             }
             $ch -= $min;
-            if( ($s[self::unsignedShiftRight($ch,3)] & (0x1 << ($ch & 0x7))) === 0 ){
+            if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
                 return true;
             }
             $this->cursor++;
@@ -86,7 +86,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch -= $min;
-        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ){
+        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
             return false;
         }
         $this->cursor--;
@@ -104,7 +104,7 @@ abstract class SnowballStemmer {
                 return true;
             }
             $ch -= $min;
-            if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0){
+            if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0){
                 return true;
             }
             $this->cursor--;
@@ -126,7 +126,7 @@ abstract class SnowballStemmer {
             return true;
         }
         $ch -= $min;
-        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0) {
+        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0) {
             $this->cursor++;
             return true;
         }
@@ -142,7 +142,7 @@ abstract class SnowballStemmer {
             $ch = $this->currentCharCodeAt($this->cursor);
             if ($ch <= $max && $ch >= $min) {
                 $ch -= $min;
-                if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) !== 0 ) {
+                if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) !== 0 ) {
                     return true;
                 }
             }
@@ -165,7 +165,7 @@ abstract class SnowballStemmer {
             return true;
         }
         $ch -= $min;
-        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ) {
+        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ) {
             $this->cursor--;
             return true;
         }
@@ -181,7 +181,7 @@ abstract class SnowballStemmer {
             $ch = $this->currentCharCodeAt($this->cursor - 1);
             if ($ch <= $max && $ch >= $min) {
                 $ch -= $min;
-                if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) !== 0) {
+                if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) !== 0) {
                     return true;
                 }
             }
@@ -233,7 +233,7 @@ abstract class SnowballStemmer {
         $first_key_inspected = false;
 
         while( true ){
-            $k = $i + self::unsignedShiftRight($j-$i,1);
+            $k = $i + ( ($j-$i) >> 1);
             $diff = 0;
             $common = min($common_i, $common_j); // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
@@ -314,7 +314,7 @@ abstract class SnowballStemmer {
         $first_key_inspected = false;
 
         while( true ) {
-            $k = $i + self::unsignedShiftRight($j-$i, 1);
+            $k = $i + ( ($j-$i) >> 1);
             $diff = 0;
             $common = min($common_i, $common_j);
             $w = $v[$k];
@@ -448,20 +448,6 @@ abstract class SnowballStemmer {
 
     // Everything above here was "translated" blindly from JavaScript.
     // Below are some utilities to ensure PHP behaviour matches JavaScript for string manipulation etc...
-
-
-    /**
-     * TODO emulate JavaScript ">>>" properly.
-     * PHP has no unsigned shift right operator.
-     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift
-     * @throws InvalidArgumentException
-     */
-    public static function unsignedShiftRight( int $x, int $y ):int {
-        if(  $x < 0 ){
-            throw new InvalidArgumentException('TODO handle right shift of unsigned integers?');
-        }
-        return $x >> $y;
-    }
 
 
     /**
