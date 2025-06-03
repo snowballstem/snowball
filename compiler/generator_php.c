@@ -270,9 +270,9 @@ static void generate_AE(struct generator * g, struct node * p) {
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_divide:
             /* Snowball specifies integer division with semantics matching C,
-             * so we need to use `Math.trunc(x/y)` here.
+             * so we need to use `intdiv($x/$y)` here.
              */
-            write_string(g, "$this->trunc_FIXME(");
+            write_string(g, "intdiv(");
             generate_AE(g, p->left);
             write_string(g, " / ");
             generate_AE(g, p->right);
