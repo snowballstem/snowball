@@ -733,10 +733,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif (!$this->slice_del())~N"
-              "~M{~N"
-              "~+~Mreturn false;~N~-"
-              "~M}~N", p);
+    writef(g, "~M$this->slice_del();~N", p);
 }
 
 
@@ -844,12 +841,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif (!$this->slice_from(");
+    w(g, "~M$this->slice_from(");
     generate_address(g, p);
-    writef(g, "))~N"
-              "~M{~N"
-              "~+~Mreturn false;~N~-"
-              "~M}~N", p);
+    writef(g, ");~N", p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {

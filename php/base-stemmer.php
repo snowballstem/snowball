@@ -383,27 +383,25 @@ abstract class SnowballStemmer {
     }
 
 
-    private function slice_check():bool {
-        return ! (
-            $this->bra < 0 ||
+    private function slice_check():void {
+        if( $this->bra < 0 ||
             $this->bra > $this->ket ||
             $this->ket > $this->limit ||
             $this->limit > $this->currentLength()
-        );
-    }
-
-
-    protected function slice_from( string $s ):bool {
-        if( $this->slice_check() ){
-            $this->replace_s($this->bra, $this->ket, $s );
-            return true;
+        ){
+            throw new LogicException('Faulty slice operation');
         }
-        return false;
     }
 
 
-    protected function slice_del():bool {
-        return $this->slice_from('');
+    protected function slice_from( string $s ):void {
+        $this->slice_check();
+        $this->replace_s($this->bra, $this->ket, $s );
+    }
+
+
+    protected function slice_del():void {
+        $this->slice_from('');
     }
 
 
@@ -415,11 +413,8 @@ abstract class SnowballStemmer {
 
 
     protected function slice_to():string {
-        $result = '';
-        if( $this->slice_check() ){
-            $result = $this->currentSlice($this->bra, $this->ket);
-        }
-        return $result;
+        $this->slice_check();
+        return $this->currentSlice($this->bra, $this->ket);
     }
 
 
