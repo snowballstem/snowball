@@ -35,6 +35,7 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
+    write_string(g,"$this->");
     write_varname(g, p);
 }
 
@@ -249,7 +250,6 @@ static void generate_AE(struct generator * g, struct node * p) {
     const char * s;
     switch (p->type) {
         case c_name:
-            write_string(g,"$this->");
             write_varref(g, p->name); break;
         case c_number:
             write_int(g, p->number); break;
@@ -456,12 +456,12 @@ static void generate_try(struct generator * g, struct node * p) {
 
 static void generate_set(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->~V = true;~N", p);
+    writef(g, "~M~V = true;~N", p);
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->~V = false;~N", p);
+    writef(g, "~M~V = false;~N", p);
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -506,7 +506,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        writef(g, "~M$this->~V();~N",p->left);
+        writef(g, "~M~V();~N",p->left);
     } else {
         g->failure_label = new_label(g);
         str_clear(g->failure_str);
@@ -537,7 +537,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->S[1] = complement ? "in" : "out";
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "!$this->go_~S1_grouping~S0($this->~V, ~I0, ~I1)", p);
+    write_failure_if(g, "!$this->go_~S1_grouping~S0(~V, ~I0, ~I1)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
             w(g, "~M$this->cursor++;~N");
@@ -682,7 +682,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
 
 static void generate_setmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->~V = $this->cursor;~N", p);
+    writef(g, "~M~V = $this->cursor;~N", p);
 }
 
 static void generate_tomark(struct generator * g, struct node * p) {
@@ -776,13 +776,13 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->~V = $this->assign_to();~N", p);
+    writef(g, "~M~V = $this->assign_to();~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->~V = $this->slice_to();~N"
-              "~Mif ( '' === $this->~V ){~N"
+    writef(g, "~M~V = $this->slice_to();~N"
+              "~Mif ( '' === ~V ){~N"
               "~+~Mreturn false;~N~-"
               "~M}~N", p);
 }
@@ -792,7 +792,6 @@ static void generate_address(struct generator * g, struct node * p) {
     if (b != NULL) {
         write_literal_string(g, b);
     } else {
-        write_string(g,"$this->");
         write_varref(g, p->name);
     }
 }
@@ -945,7 +944,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_assign(g->failure_str, "clone ");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ";");
-    writef(g, "~M$this->current = $this->~V;~N"
+    writef(g, "~M$this->current = ~V;~N"
               "~M$this->cursor = 0;~N"
               "~M$this->limit_backward = 0;~N"
               "~M$this->limit = $this->currentLength();~N", p);
@@ -963,7 +962,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
     write_comment(g, p);
     g->S[0] = s;
-    writef(g, "~M$this->~V ~S0 ",p); 
+    writef(g, "~M~V ~S0 ",p); 
     generate_AE(g, p->AE); 
     w(g, ";~N");
 }
@@ -1000,7 +999,7 @@ static void generate_call(struct generator * g, struct node * p) {
     if (g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
         /* Always fails or tail call. */
-        writef(g, "~Mreturn $this->~V();~N", p);
+        writef(g, "~Mreturn ~V();~N", p);
         if (p->right && p->right->type == c_functionend) {
             p->right = NULL;
         }
@@ -1009,13 +1008,13 @@ static void generate_call(struct generator * g, struct node * p) {
     }
     if (signals == 1) {
         /* Always succeeds. */
-        writef(g, "~M$this->~V();~N", p);
+        writef(g, "~M~V();~N", p);
     } else if (signals == 0) {
         /* Always fails. */
-        writef(g, "~M$this->~V();~N", p);
+        writef(g, "~M~V();~N", p);
         write_failure(g);
     } else {
-        write_failure_if(g, "!$this->~V()", p);
+        write_failure_if(g, "!~V()", p);
     }
 }
 
@@ -1027,13 +1026,13 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->S[1] = complement ? "out" : "in";
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "!($this->~S1_grouping~S0($this->~V, ~I0, ~I1))", p);
+    write_failure_if(g, "!($this->~S1_grouping~S0(~V, ~I0, ~I1))", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    write_failure_if(g, "!($this->eq_s~S0($this->~V))", p);
+    write_failure_if(g, "!($this->eq_s~S0(~V))", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1152,9 +1151,9 @@ static void generate_booltest(struct generator * g, struct node * p, int inverte
         if (p->right && p->right->type == c_functionend) {
             // Optimise at end of function.
             if (inverted) {
-                writef(g, "~Mreturn !$this->~V;~N", p);
+                writef(g, "~Mreturn !~V;~N", p);
             } else {
-                writef(g, "~Mreturn $this->~V;~N", p);
+                writef(g, "~Mreturn ~V;~N", p);
             }
             p->right = NULL;
             g->unreachable = true;
@@ -1162,9 +1161,9 @@ static void generate_booltest(struct generator * g, struct node * p, int inverte
         }
     }
     if (inverted) {
-        write_failure_if(g, "$this->~V", p);
+        write_failure_if(g, "~V", p);
     } else {
-        write_failure_if(g, "!$this->~V", p);
+        write_failure_if(g, "!~V", p);
     }
 }
 
