@@ -435,8 +435,8 @@ Begin
         i := w.Index;
         If i < 0 Then
         Begin
-                Result := 0;
-                Exit;
+            Result := 0;
+            Exit;
         End;
     End;
 End;
