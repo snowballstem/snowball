@@ -380,9 +380,8 @@ func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c + len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c + len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c + len(w.Str)
 					return w.B
 				}
 			} else {
@@ -449,9 +448,8 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c - len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c - len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c - len(w.Str)
 					return w.B
 				}
 			} else {

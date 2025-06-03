@@ -475,11 +475,10 @@ namespace Snowball
                         return w.Result;
 
                     af = w.Condition;
-                    bool res = call_among_func();
-                    cursor = c + w.SearchString.Length;
-
-                    if (res)
+                    if (call_among_func()) {
+                        cursor = c + w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;
@@ -569,11 +568,10 @@ namespace Snowball
                         return w.Result;
 
                     af = w.Condition;
-                    bool res = call_among_func();
-                    cursor = c - w.SearchString.Length;
-
-                    if (res)
+                    if (call_among_func()) {
+                        cursor = c - w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;

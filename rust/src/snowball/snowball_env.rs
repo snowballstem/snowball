@@ -407,9 +407,8 @@ impl<'a> SnowballEnv<'a> {
             if common_i >= w.0.len() as i32{
                 self.cursor = c + w.0.len() as i32;
                 if let Some(ref method) = w.3 {
-                    let res = method(self, context);
-                    self.cursor = c + w.0.len() as i32;
-                    if res {
+                    if method(self, context) {
+                        self.cursor = c + w.0.len() as i32;
                         return w.2;
                     }
                 } else {
@@ -481,9 +480,8 @@ impl<'a> SnowballEnv<'a> {
             if common_i >= w.0.len() as i32 {
                 self.cursor = c - w.0.len() as i32;
                 if let Some(ref method) = w.3 {
-                    let res = method(self, context);
-                    self.cursor = c - w.0.len() as i32;
-                    if res {
+                    if method(self, context) {
+                        self.cursor = c - w.0.len() as i32;
                         return w.2;
                     }
                 } else {

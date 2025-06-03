@@ -289,10 +289,9 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
             z->c = c + w->s_size;
             if (!w->function) return w->result;
             z->af = w->function;
-            {
-                int res = call_among_func(z);
+            if (call_among_func(z)) {
                 z->c = c + w->s_size;
-                if (res) return w->result;
+                return w->result;
             }
         }
         if (!w->substring_i) return 0;
@@ -346,10 +345,9 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
             z->c = c - w->s_size;
             if (!w->function) return w->result;
             z->af = w->function;
-            {
-                int res = call_among_func(z);
+            if (call_among_func(z)) {
                 z->c = c - w->s_size;
-                if (res) return w->result;
+                return w->result;
             }
         }
         if (!w->substring_i) return 0;

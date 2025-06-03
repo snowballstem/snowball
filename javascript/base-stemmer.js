@@ -299,9 +299,11 @@ class BaseStemmer {
             {
                 this.cursor = c + w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
-                this.cursor = c + w[0].length;
-                if (res) return w[2];
+                if (w[3](this))
+                {
+                    this.cursor = c + w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);
@@ -369,9 +371,11 @@ class BaseStemmer {
             {
                 this.cursor = c - w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
-                this.cursor = c - w[0].length;
-                if (res) return w[2];
+                if (w[3](this))
+                {
+                    this.cursor = c - w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);

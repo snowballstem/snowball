@@ -147,9 +147,8 @@ class BaseStemmer:
                 self.cursor = c + len(w.s)
                 if w.method is None:
                     return w.result
-                res = w.method(self)
-                self.cursor = c + len(w.s)
-                if res:
+                if w.method(self):
+                    self.cursor = c + len(w.s)
                     return w.result
             i = w.substring_i
             if i < 0:
@@ -204,9 +203,8 @@ class BaseStemmer:
                 self.cursor = c - len(w.s)
                 if w.method is None:
                     return w.result
-                res = w.method(self)
-                self.cursor = c - len(w.s)
-                if res:
+                if w.method(self):
+                    self.cursor = c - len(w.s)
                     return w.result
             i = w.substring_i
             if i < 0:
