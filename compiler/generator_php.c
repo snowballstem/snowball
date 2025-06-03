@@ -555,7 +555,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int end_unreachable = false;
     int golab = new_label(g);
     g->I[0] = golab;
-    write_comment(g, p);
     wsetlab_begin(g,golab);
     
     w(g, "~Mwhile(true){~N~+");
