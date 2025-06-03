@@ -245,10 +245,6 @@ static void wsetl(struct generator * g, int n) {
     g->margin++;
 }
 
-static void wgotol(struct generator * g, int n) {
-    wms(g, "goto lab"); write_int(g, n); write_char(g, ';'); write_newline(g);
-}
-
 static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) {
         write_string(g, "{ ");
@@ -641,22 +637,25 @@ static void generate_or(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int out_lab = new_label(g);
     write_comment(g, p);
+    w(g, "~Mdo {~N~+");
 
-    if (savevar) {
-        write_block_start(g);
-        write_savecursor(g, p, savevar);
-    }
+    if (savevar) write_savecursor(g, p, savevar);
 
     p = p->left;
     str_clear(g->failure_str);
 
+    if (p == NULL) {
+        /* p should never be NULL after an or: there should be at least two
+         * sub nodes. */
+        fprintf(stderr, "Error: \"or\" node without children nodes.");
+        exit(1);
+    }
     while (p->right != NULL) {
         g->failure_label = new_label(g);
         g->label_used = 0;
         generate(g, p);
-        wgotol(g, out_lab);
+        w(g, "~Mbreak;~N");
         if (g->label_used)
             wsetl(g, g->failure_label);
         if (savevar) write_restorecursor(g, p, savevar);
@@ -670,11 +669,10 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
+    w(g, "~-~M} while (0);~N");
     if (savevar) {
-        write_block_end(g);
         str_delete(savevar);
     }
-    wsetl(g, out_lab);
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
