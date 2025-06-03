@@ -324,12 +324,6 @@ abstract class SnowballStemmer {
                     $diff = -1;
                     break;
                 }
-                // NaN ??
-                //$offset = $c-1-$common;
-                //$codeA = $this->currentCharCodeAt($offset);
-                //$codeB = self::charCodeAt($w[0],$i2);
-                //printf("console.log( 'A: '+%s, String(%1\$s).charCodeAt(%d-1-%d), %d )\n", json_encode($this->current), $c, $common, $codeA );
-                //printf("console.log( 'B: '+%s, String(%1\$s).charCodeAt(%d), %d )\n", json_encode($w[0]), $i2, $codeB );
                 $diff = $this->currentCharCodeAt($c - 1 - $common) - self::charCodeAt($w[0],$i2);
                 if ($diff != 0){
                     break;
