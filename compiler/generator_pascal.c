@@ -175,15 +175,6 @@ static void wsetl(struct generator * g, int n) {
     w(g, ":~N");
 }
 
-static void wgotol(struct generator * g, int n) {
-    write_margin(g);
-    write_string(g, "goto lab");
-    write_int(g, n);
-    write_string(g, ";");
-    write_newline(g);
-    g->unreachable = true;
-}
-
 static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) {
         write_margin(g);
@@ -382,10 +373,10 @@ static void generate_or(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int out_lab = new_label(g);
     int end_unreachable = true;
 
     write_comment(g, p);
+    w(g, "~MRepeat~N~+");
 
     if (savevar) write_savecursor(g, p, savevar);
 
@@ -403,7 +394,7 @@ static void generate_or(struct generator * g, struct node * p) {
         g->label_used = 0;
         generate(g, p);
         if (!g->unreachable) {
-            wgotol(g, out_lab);
+            w(g, "~MBreak;~N");
             end_unreachable = false;
         }
 
@@ -421,7 +412,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    wsetl(g, out_lab);
+    w(g, "~MUntil True;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
