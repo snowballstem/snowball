@@ -241,7 +241,7 @@ struct among {
     struct amongvec * b;      /* pointer to the amongvec */
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
-    int command_count;        /* in this among (includes "no command" entries) */
+    int command_count;        /* in this among (excludes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* number of different functions in this among */
     byte amongvar_needed;     /* do we need to set among_var? */
