@@ -1046,6 +1046,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else if (x->always_matches) {
         writef(g, "~Mfind_among~S0(a_~I0);~N", p);
     } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
         writef(g, "~Mreturn find_among~S0(a_~I0) != 0;~N", p);
         x->node->right = NULL;
