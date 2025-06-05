@@ -1576,20 +1576,32 @@ static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
     return p;
 }
 
+static int compare_symbol(const void *pv, const void *qv) {
+    const symbol * p = (const symbol*)pv;
+    const symbol * q = (const symbol*)qv;
+    return *p - *q;
+}
+
 static int finalise_grouping(struct grouping * p) {
-    int max = 0;
-    int min = INT_MAX;
-    for (int i = 0; i < SIZE(p->b); i++) {
-        if (p->b[i] > max) max = p->b[i];
-        if (p->b[i] < min) min = p->b[i];
-    }
-    p->largest_ch = max;
-    if (min > max) {
+    if (SIZE(p->b) == 0) {
         // Empty grouping - leave things in a non-surprising state.
-        p->smallest_ch = 0;
+        p->smallest_ch = p->largest_ch = 0;
         return false;
     }
-    p->smallest_ch = min;
+
+    qsort(p->b, SIZE(p->b), sizeof(symbol), compare_symbol);
+    p->smallest_ch = p->b[0];
+    p->largest_ch = p->b[SIZE(p->b) - 1];
+
+    // Eliminate duplicates.
+    symbol ch = p->b[0];
+    int j = 1;
+    for (int i = 1; i < SIZE(p->b); i++) {
+        if (p->b[i] != ch) {
+            ch = p->b[j++] = p->b[i];
+        }
+    }
+    SIZE(p->b) = j;
     return true;
 }
 
