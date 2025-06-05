@@ -1123,7 +1123,8 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     }
 
-    if (block != -1 || n_cases <= 2) {
+    int pre_check = (block != -1 || n_cases <= 2);
+    if (pre_check) {
         char buf[64];
         g->I[2] = block;
         g->I[3] = bitmap;
@@ -1182,7 +1183,27 @@ static void generate_substring(struct generator * g, struct node * p) {
         if (!x->always_matches) {
             write_failure_if(g, "among_var == 0", p);
         }
-    } else if (x->always_matches) {
+        if (block_opened) write_block_end(g);
+        return;
+    }
+
+    if (pre_check && !x->function_count) {
+        // If all cases are one symbol long (so one byte of UTF-8, one
+        // character long in fixed-width encodings) then we don't need to call
+        // the helper and can just inc/dec the cursor by 1.
+        if (x->longest_size == 1 && !x->always_matches) {
+            if (p->mode == m_forward) {
+                w(g, "~Menv.cursor += 1;~N");
+            } else {
+                w(g, "~Menv.cursor -= 1;~N");
+            }
+            // Suppress generating table for this among.
+            x->used = false;
+            return;
+        }
+    }
+
+    if (x->always_matches) {
         writef(g, "~Menv.find_among~S0(A_~I0, context);~N", p);
     } else if (x->command_count == 0 &&
                g->failure_label == x_return &&
@@ -1193,7 +1214,6 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else {
         write_failure_if(g, "env.find_among~S0(A_~I0, context) == 0", p);
     }
-    if (block_opened) write_block_end(g);
 }
 
 static void generate_among(struct generator * g, struct node * p) {
@@ -1366,7 +1386,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
 
-    w(g, "~Mstatic A_~I0: &'static [Among<Context>; ~I1] = &[~N~+");
+    w(g, "~N~Mstatic A_~I0: &'static [Among<Context>; ~I1] = &[~N~+");
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
         g->I[1] = v[i].result;
@@ -1384,13 +1404,16 @@ static void generate_among_table(struct generator * g, struct among * x) {
         }
         w(g, ")~S0~N");
     }
-    w(g, "~-~M];~N~N");
+    w(g, "~-~M];~N");
 }
 
 static void generate_amongs(struct generator * g) {
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
     for (struct among * x = g->analyser->amongs; x; x = x->next) {
-        generate_among_table(g, x);
+        if (x->used) generate_among_table(g, x);
     }
+    g->outbuf = s;
 }
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
@@ -1406,23 +1429,26 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     g->I[0] = size;
-    w(g, "~Mstatic ");
+    w(g, "~N~Mstatic ");
     write_varname(g, q->name);
     w(g, ": &'static [u8; ~I0] = &[");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, "];~N~N");
+    w(g, "];~N");
 
     lose_b(map);
 }
 
 static void generate_groupings(struct generator * g) {
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
+    g->outbuf = s;
 }
 
 static void generate_members(struct generator * g) {
@@ -1469,13 +1495,20 @@ extern void generate_program_rust(struct generator * g) {
     }
     generate_class_begin(g);
 
+    generate_members(g);
+
+    g->declarations = g->outbuf;
+    g->outbuf = str_new();
+
+    generate_methods(g);
+
     generate_amongs(g);
     generate_groupings(g);
 
-    generate_members(g);
-    generate_methods(g);
-
+    output_str(g->options->output_src, g->declarations);
+    str_delete(g->declarations);
     output_str(g->options->output_src, g->outbuf);
-    str_delete(g->failure_str);
     str_delete(g->outbuf);
+
+    str_delete(g->failure_str);
 }

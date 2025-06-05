@@ -780,6 +780,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->always_matches = false;
     x->used = false;
     x->shortest_size = INT_MAX;
+    x->longest_size = 0;
 
     if (q->type == c_bra) {
         starter = q;
@@ -875,7 +876,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         int size = w0->size;
         struct amongvec * w;
 
-        if (size && size < x->shortest_size) x->shortest_size = size;
+        if (size) {
+            if (size < x->shortest_size) x->shortest_size = size;
+            if (size > x->longest_size) x->longest_size = size;
+        }
 
         for (w = w0 - 1; w >= v; w--) {
             if (w->size < size && memcmp(w->b, b, w->size * sizeof(symbol)) == 0) {

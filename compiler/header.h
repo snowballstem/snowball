@@ -248,6 +248,7 @@ struct among {
     byte always_matches;      /* will this among always match? */
     byte used;                /* is this among in reachable code? */
     int shortest_size;        /* smallest non-zero string length in this among */
+    int longest_size;         /* longest string length in this among */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
     struct node * node;       /* pointer to the node for this among */

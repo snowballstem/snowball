@@ -1167,8 +1167,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     int n_cases = 0;
     symbol cases[2];
     int shortest_size = x->shortest_size;
-    int call_done = 0;
-    int need_among_handler = (x->function_count > 0);
+    int block_opened = 0;
 
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->I[0] = x->number;
@@ -1215,7 +1214,8 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     }
 
-    if (block != -1 || n_cases <= 2) {
+    int pre_check = (block != -1 || n_cases <= 2);
+    if (pre_check) {
         char buf[64];
         char buf2[128];
         char buf3[64];
@@ -1268,41 +1268,57 @@ static void generate_substring(struct generator * g, struct node * p) {
              */
             g->I[4] = among_cases[empty_case].result;
             writef(g, "~MA := ~I4;~-~N~Melse~+~N", p);
-            if (need_among_handler) {
-                writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
-            } else {
-                writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
-            }
-            if (!x->always_matches) {
-                write_failure_if(g, "A = 0", p);
-            }
-            call_done = 1;
+            block_opened = 1;
         } else {
-            write_failure(g);
+            writef(g, "~f", p);
+            writef(g, "~-~Mend if;~N", p);
         }
-        writef(g, "~-~Mend if;~N", p);
     } else {
 #ifdef OPTIMISATION_WARNINGS
         printf("Couldn't shortcut among %d\n", x->number);
 #endif
     }
 
-    if (!call_done) {
-        if (need_among_handler) {
-            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, Among_Handler'Access, A);~N", p);
-        } else {
-            writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, null, A);~N", p);
-        }
+    g->S[1] = (x->function_count > 0) ? "Among_Handler'Access" : "null";
+
+    if (x->amongvar_needed) {
+        writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, ~S1, A);~N", p);
         if (!x->always_matches) {
-            if (x->command_count == 0 &&
-                g->failure_label == x_return &&
-                x->node->right && x->node->right->type == c_functionend) {
-                writef(g, "~MResult := A /= 0;~N", p);
-                x->node->right = NULL;
-            } else {
-                write_failure_if(g, "A = 0", p);
-            }
+            write_failure_if(g, "A = 0", p);
         }
+        if (block_opened) writef(g, "~-~Mend if;~N", p);
+        return;
+    }
+
+    if (pre_check && !x->function_count) {
+        // If all cases are one symbol long (so one byte of UTF-8, one
+        // character long in fixed-width encodings) then we don't need to call
+        // the helper and can just inc/dec the cursor by 1.
+        if (x->longest_size == 1 && !x->always_matches) {
+            if (p->mode == m_forward) {
+                w(g, "~MZ.C := Z.C + 1;~N");
+            } else {
+                w(g, "~MZ.C := Z.C - 1;~N");
+            }
+            // Suppress generating table for this among.
+            x->used = false;
+            return;
+        }
+    }
+
+    writef(g, "~MFind_Among~S0 (Z, A_~I0, Among_String, ~S1, A);~N", p);
+    if (x->always_matches) {
+        // The result in `A` can't be zero.
+    } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
+               x->node->right && x->node->right->type == c_functionend) {
+        if (g->failure_label != x_return) {
+            printf("failure_label is %d\n", g->failure_label);
+        }
+        writef(g, "~MResult := A /= 0;~N", p);
+        x->node->right = NULL;
+    } else {
+        write_failure_if(g, "A = 0", p);
     }
 }
 
@@ -1544,7 +1560,7 @@ static int generate_among_table(struct generator * g, struct among * x, int star
     g->I[0] = x->number;
 
     g->I[1] = x->literalstring_count - 1;
-    w(g, "~MA_~I0 : constant Among_Array_Type (0 .. ~I1) := ~+(~N");
+    w(g, "~N~MA_~I0 : constant Among_Array_Type (0 .. ~I1) := ~+(~N");
 
     v = x->b;
     for (int i = 0; i < x->literalstring_count; i++) {
@@ -1578,47 +1594,37 @@ static int generate_among_table(struct generator * g, struct among * x, int star
             w(g, ",~N");
         }
     }
-    w(g, ");~-~N~N");
+    w(g, ");~-~N");
     return start_pos;
 }
 
-static int generate_amongs(struct generator * g) {
-    struct among * a = g->analyser->amongs;
-    if (!a) return 0;
-    int count;
-    int start_pos;
+static void generate_amongs(struct generator * g) {
+    if (!g->analyser->amongs) return;
 
-    w(g, "~MAmong_String : constant String := ~+");
-    count = 0;
-    while (a != NULL) {
-        count = generate_among_string(g, a, count);
-        a = a->next;
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
+
+    w(g, "~N~MAmong_String : constant String := ~+");
+    int count = 0;
+    for (struct among * x = g->analyser->amongs; x != NULL; x = x->next) {
+        if (x->used) {
+            count = generate_among_string(g, x, count);
+        }
     }
-    w(g, ";~N~-~N");
+    w(g, ";~N~-");
 
     int operation = 0;
-    start_pos = 1;
-    a = g->analyser->amongs;
-    while (a != NULL) {
-        start_pos = generate_among_table(g, a, start_pos, &operation);
-        a = a->next;
+    int start_pos = 1;
+    for (struct among * x = g->analyser->amongs; x != NULL; x = x->next) {
+        if (x->used) {
+            start_pos = generate_among_table(g, x, start_pos, &operation);
+        }
     }
-    return operation;
-}
+    g->outbuf = s;
 
-static int generate_constructor(struct generator * g) {
-    return generate_amongs(g);
-}
+    if (operation == 0) return;
 
-static void generate_methods(struct generator * g) {
-    for (struct node * p = g->analyser->program; p; p = p->right) {
-        generate(g, p);
-        g->unreachable = false;
-    }
-}
-
-static int generate_operations_dispatcher(struct generator * g) {
-    int operation = 0;
+    operation = 0;
 
     w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean) is~N");
     w(g, "~Mbegin~+~N~M");
@@ -1638,7 +1644,13 @@ static int generate_operations_dispatcher(struct generator * g) {
     w(g, "when others =>~N~M");
     w(g, "   Result := False;~-~N~Mend case;~-~N~M");
     w(g, "end Among_Handler;~N~-");
-    return operation;
+}
+
+static void generate_methods(struct generator * g) {
+    for (struct node * p = g->analyser->program; p; p = p->right) {
+        generate(g, p);
+        g->unreachable = false;
+    }
 }
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
@@ -1682,10 +1694,13 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 }
 
 static void generate_groupings(struct generator * g) {
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
+    g->outbuf = s;
 }
 
 extern void generate_program_ada(struct generator * g) {
@@ -1707,20 +1722,22 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "~N");
 
     generate_method_decls(g, t_routine);
-    generate_groupings(g);
 
-    int operations = generate_constructor(g);
+    g->declarations = g->outbuf;
+    g->outbuf = str_new();
+
     generate_methods(g);
-    if (operations > 0) {
-        generate_operations_dispatcher(g);
-    }
+
+    generate_amongs(g);
+    generate_groupings(g);
 
     w(g, "end Stemmer.");
     w(g, g->options->package);
     w(g, ";~N");
 
+    output_str(g->options->output_src, g->declarations);
+    str_delete(g->declarations);
     output_str(g->options->output_src, g->outbuf);
-
     str_clear(g->outbuf);
 
     g->margin = 0;
