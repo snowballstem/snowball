@@ -1576,6 +1576,23 @@ static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
     return p;
 }
 
+static int finalise_grouping(struct grouping * p) {
+    int max = 0;
+    int min = INT_MAX;
+    for (int i = 0; i < SIZE(p->b); i++) {
+        if (p->b[i] > max) max = p->b[i];
+        if (p->b[i] < min) min = p->b[i];
+    }
+    p->largest_ch = max;
+    if (min > max) {
+        // Empty grouping - leave things in a non-surprising state.
+        p->smallest_ch = 0;
+        return false;
+    }
+    p->smallest_ch = min;
+    return true;
+}
+
 static void read_define_grouping(struct analyser * a, struct name * q) {
     struct tokeniser * t = a->tokeniser;
     int style = c_plus;
@@ -1629,18 +1646,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             }
         }
     label0:
-        {
-            int i;
-            int max = 0;
-            int min = 1<<16;
-            for (i = 0; i < SIZE(p->b); i++) {
-                if (p->b[i] > max) max = p->b[i];
-                if (p->b[i] < min) min = p->b[i];
-            }
-            p->largest_ch = max;
-            p->smallest_ch = min;
-            if (min == 1<<16) error(a, e_empty_grouping);
-        }
+        if (!finalise_grouping(p)) error(a, e_empty_grouping);
         hold_token(t);
     }
 }
