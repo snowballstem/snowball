@@ -233,10 +233,10 @@ class BaseStemmer:
         '''
         @type s string
         '''
-        assert(self.bra >= 0)
-        assert(self.bra <= self.ket)
-        assert(self.ket <= self.limit)
-        assert(self.limit <= len(self.current))
+        assert self.bra >= 0
+        assert self.bra <= self.ket
+        assert self.ket <= self.limit
+        assert self.limit <= len(self.current)
         self.replace_s(self.bra, self.ket, s)
 
     def slice_del(self):
@@ -258,10 +258,10 @@ class BaseStemmer:
         '''
         Return the slice as a string.
         '''
-        assert(self.bra >= 0)
-        assert(self.bra <= self.ket)
-        assert(self.ket <= self.limit)
-        assert(self.limit <= len(self.current))
+        assert self.bra >= 0
+        assert self.bra <= self.ket
+        assert self.ket <= self.limit
+        assert self.limit <= len(self.current)
         return self.current[self.bra:self.ket]
 
     def assign_to(self):
