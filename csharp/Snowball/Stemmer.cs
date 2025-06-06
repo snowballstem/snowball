@@ -30,6 +30,7 @@
 namespace Snowball
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
 
@@ -603,10 +604,10 @@ namespace Snowball
         /// </summary>
         protected void slice_check()
         {
-            if (bra < 0 || bra > ket || ket > limit || limit > current.Length)
-            {
-                System.Diagnostics.Trace.WriteLine("faulty slice operation");
-            }
+            Debug.Assert(bra >= 0);
+            Debug.Assert(bra <= ket);
+            Debug.Assert(ket <= limit);
+            Debug.Assert(limit <= current.Length);
         }
 
         /// <summary>
