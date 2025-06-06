@@ -406,39 +406,28 @@ class BaseStemmer {
      */
     #slice_check()
     {
-        if (this.bra < 0 ||
-            this.bra > this.ket ||
-            this.ket > this.limit ||
-            this.limit > this.current.length)
-        {
-            return false;
-        }
-        return true;
+        console.assert(this.bra >= 0);
+        console.assert(this.bra <= this.ket);
+        console.assert(this.ket <= this.limit);
+        console.assert(this.limit <= this.current.length);
     }
 
     /**
      * @param {string} s
-     * @return {boolean}
      */
     slice_from(s)
     {
         /** @protected */
-        let result = false;
-        if (this.#slice_check())
-        {
-            this.#replace_s(this.bra, this.ket, s);
-            result = true;
-        }
-        return result;
+        this.#slice_check();
+        this.#replace_s(this.bra, this.ket, s);
     }
 
     /**
-     * @return {boolean}
      */
     slice_del()
     {
         /** @protected */
-        return this.slice_from("");
+        this.slice_from("");
     }
 
     /**
@@ -460,12 +449,8 @@ class BaseStemmer {
     slice_to()
     {
         /** @protected */
-        let result = '';
-        if (this.#slice_check())
-        {
-            result = this.current.slice(this.bra, this.ket);
-        }
-        return result;
+        this.#slice_check();
+        return this.current.slice(this.bra, this.ket);
     }
 }
 
