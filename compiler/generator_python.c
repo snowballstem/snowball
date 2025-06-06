@@ -1291,10 +1291,26 @@ static void generate_amongs(struct generator * g) {
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
     symbol * b = q->b;
 
-    // We could use frozenset, but it seems slightly slower to construct which
-    // adds to startup time.
     write_margin(g);
     write_varname(g, q->name);
+    if (SIZE(b) <= 3) {
+        // The `s in g` test used in base-stemmer.py works whether g is a
+        // set or a string.
+        //
+        // The generated code for the string is smaller, faster to construct,
+        // and (for a small grouping) seems to be if anything fractionally
+        // faster to test.
+        //
+        // FIXME: The threshold seems about right for Python 3.13 but we should
+        // recheck periodically.
+        write_string(g, " = ");
+        write_literal_string(g, b);
+        w(g, "~N");
+        return;
+    }
+
+    // We could use frozenset, but it seems slightly slower to construct which
+    // adds to startup time.
     write_string(g, " = {");
     for (int i = 0; i < SIZE(b); i++) {
         if (i > 0) w(g, ", ");
