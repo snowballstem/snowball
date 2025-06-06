@@ -718,9 +718,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif !env.SliceDel() {~N"
-              "~+~Mreturn false~N~-"
-              "~M}~N", p);
+    writef(g, "~Menv.SliceDel()~N", p);
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
@@ -755,9 +753,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = env.SliceTo()~N"
-              "~Mif ~V == \"\" {~N"
-              "~+~Mreturn false~N~-~M}~N", p);
+    writef(g, "~M~V = env.SliceTo()~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -805,10 +801,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif !env.SliceFrom(");
+    w(g, "~Menv.SliceFrom(");
     generate_address(g, p);
-    writef(g, ") {~N"
-              "~+~Mreturn false~N~-~M}~N", p);
+    writef(g, ")~N", p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {

@@ -92,10 +92,9 @@ func (env *Env) EqSB(s string) bool {
 	}
 }
 
-func (env *Env) SliceFrom(s string) bool {
+func (env *Env) SliceFrom(s string) {
 	bra, ket := env.Bra, env.Ket
 	env.ReplaceS(bra, ket, s)
-	return true
 }
 
 func (env *Env) NextChar() {
@@ -310,8 +309,8 @@ func (env *Env) GoOutGroupingB(chars []byte, min, max int32) bool {
 	return false
 }
 
-func (env *Env) SliceDel() bool {
-	return env.SliceFrom("")
+func (env *Env) SliceDel() {
+	env.SliceFrom("")
 }
 
 func (env *Env) Insert(bra, ket int, s string) {
