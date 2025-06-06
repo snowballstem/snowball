@@ -93,10 +93,9 @@ impl<'a> SnowballEnv<'a> {
     }
 
     /// Replace string between `bra` and `ket` with s
-    pub fn slice_from(&mut self, s: &str) -> bool {
+    pub fn slice_from(&mut self, s: &str) {
         let (bra, ket) = (self.bra, self.ket);
         self.replace_s(bra, ket, s);
-        true
     }
 
     /// Move cursor to next character
@@ -331,7 +330,7 @@ impl<'a> SnowballEnv<'a> {
 
 
     /// Helper function that removes the string slice between `bra` and `ket`
-    pub fn slice_del(&mut self) -> bool {
+    pub fn slice_del(&mut self) {
         self.slice_from("")
     }
 
