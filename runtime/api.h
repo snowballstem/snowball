@@ -14,6 +14,7 @@ typedef unsigned char symbol;
 struct SN_env {
     symbol * p;
     int c; int l; int lb; int bra; int ket;
+    int af;
     symbol * * S;
     int * I;
 };

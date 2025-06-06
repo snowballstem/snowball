@@ -302,6 +302,7 @@ handle_as_name:
                     p->local_to = NULL;
                     p->grouping = NULL;
                     p->definition = NULL;
+                    p->among_index = 0;
                     p->declaration_line_number = t->line_number;
                     p->next = a->names;
                     a->names = p;
@@ -779,6 +780,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->always_matches = false;
     x->used = false;
     x->shortest_size = INT_MAX;
+    x->longest_size = 0;
 
     if (q->type == c_bra) {
         starter = q;
@@ -799,9 +801,13 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 w1->function = function;
                 function->used_in_among = true;
                 check_routine_mode(a, function, direction);
-                x->function_count++;
+                if (function->among_index == 0) {
+                    function->among_index = ++x->function_count;
+                }
+                w1->function_index = function->among_index;
             } else {
                 w1->function = NULL;
+                w1->function_index = 0;
                 if (w1->size == 0) {
                     // This among contains the empty string without a gating
                     // function so it will always match.
@@ -870,7 +876,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         int size = w0->size;
         struct amongvec * w;
 
-        if (size && size < x->shortest_size) x->shortest_size = size;
+        if (size) {
+            if (size < x->shortest_size) x->shortest_size = size;
+            if (size > x->longest_size) x->longest_size = size;
+        }
 
         for (w = w0 - 1; w >= v; w--) {
             if (w->size < size && memcmp(w->b, b, w->size * sizeof(symbol)) == 0) {
@@ -906,6 +915,14 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             substring = new_node(a, c_substring);
             substring->right = starter;
             p->left = substring;
+        }
+    }
+
+    // Clear any among_index values we set so we correctly handle a function
+    // used in more than one among.
+    for (int i = 0; i < x->literalstring_count; i++) {
+        if (v[i].function) {
+            v[i].function->among_index = 0;
         }
     }
 
@@ -1559,6 +1576,35 @@ static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
     return p;
 }
 
+static int compare_symbol(const void *pv, const void *qv) {
+    const symbol * p = (const symbol*)pv;
+    const symbol * q = (const symbol*)qv;
+    return *p - *q;
+}
+
+static int finalise_grouping(struct grouping * p) {
+    if (SIZE(p->b) == 0) {
+        // Empty grouping - leave things in a non-surprising state.
+        p->smallest_ch = p->largest_ch = 0;
+        return false;
+    }
+
+    qsort(p->b, SIZE(p->b), sizeof(symbol), compare_symbol);
+    p->smallest_ch = p->b[0];
+    p->largest_ch = p->b[SIZE(p->b) - 1];
+
+    // Eliminate duplicates.
+    symbol ch = p->b[0];
+    int j = 1;
+    for (int i = 1; i < SIZE(p->b); i++) {
+        if (p->b[i] != ch) {
+            ch = p->b[j++] = p->b[i];
+        }
+    }
+    SIZE(p->b) = j;
+    return true;
+}
+
 static void read_define_grouping(struct analyser * a, struct name * q) {
     struct tokeniser * t = a->tokeniser;
     int style = c_plus;
@@ -1612,18 +1658,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             }
         }
     label0:
-        {
-            int i;
-            int max = 0;
-            int min = 1<<16;
-            for (i = 0; i < SIZE(p->b); i++) {
-                if (p->b[i] > max) max = p->b[i];
-                if (p->b[i] < min) min = p->b[i];
-            }
-            p->largest_ch = max;
-            p->smallest_ch = min;
-            if (min == 1<<16) error(a, e_empty_grouping);
-        }
+        if (!finalise_grouping(p)) error(a, e_empty_grouping);
         hold_token(t);
     }
 }

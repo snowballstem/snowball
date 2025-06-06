@@ -245,10 +245,6 @@ static void wsetl(struct generator * g, int n) {
     g->margin++;
 }
 
-static void wgotol(struct generator * g, int n) {
-    wms(g, "goto lab"); write_int(g, n); write_char(g, ';'); write_newline(g);
-}
-
 static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) {
         write_string(g, "{ ");
@@ -321,6 +317,32 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 if (j < 0 || j > (int)(sizeof(g->B) / sizeof(g->B[0])))
                     goto invalid_escape2;
                 write_s(g, g->B[j]);
+                continue;
+            }
+            case 'F': { // Among function dispatcher.
+                struct among * x = p->among;
+                if (x->function_count == 0) {
+                    write_char(g, '0');
+                    continue;
+                }
+
+                if (x->function_count == 1) {
+                    // Only one different function used in this among.
+                    struct amongvec * v = x->b;
+                    for (int j = 0; j < x->literalstring_count; j++) {
+                        if (v[j].function) {
+                            write_varref(g, v[j].function);
+                            goto continue_outer_loop;
+                        }
+                    }
+                    fprintf(stderr, "function_count == 1 but no among functions\n");
+                    exit(1);
+continue_outer_loop:
+                    continue;
+                }
+
+                w(g, "af_");
+                write_int(g, x->number);
                 continue;
             }
             case 'I':
@@ -615,22 +637,25 @@ static void generate_or(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int out_lab = new_label(g);
     write_comment(g, p);
+    w(g, "~Mdo {~N~+");
 
-    if (savevar) {
-        write_block_start(g);
-        write_savecursor(g, p, savevar);
-    }
+    if (savevar) write_savecursor(g, p, savevar);
 
     p = p->left;
     str_clear(g->failure_str);
 
+    if (p == NULL) {
+        /* p should never be NULL after an or: there should be at least two
+         * sub nodes. */
+        fprintf(stderr, "Error: \"or\" node without children nodes.");
+        exit(1);
+    }
     while (p->right != NULL) {
         g->failure_label = new_label(g);
         g->label_used = 0;
         generate(g, p);
-        wgotol(g, out_lab);
+        w(g, "~Mbreak;~N");
         if (g->label_used)
             wsetl(g, g->failure_label);
         if (savevar) write_restorecursor(g, p, savevar);
@@ -644,11 +669,10 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
+    w(g, "~-~M} while (0);~N");
     if (savevar) {
-        write_block_end(g);
         str_delete(savevar);
     }
-    wsetl(g, out_lab);
 }
 
 static void generate_backwards(struct generator * g, struct node * p) {
@@ -1405,7 +1429,8 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     }
 
-    if (block != -1 || n_cases <= 2) {
+    int pre_check = (block != -1 || n_cases <= 2);
+    if (pre_check) {
         char buf[64];
         g->I[2] = block;
         g->I[3] = bitmap;
@@ -1458,18 +1483,36 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1);~N", p);
+        writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1, ~F);~N", p);
         if (!x->always_matches) {
             writef(g, "~Mif (!among_var) ~f~N", p);
         }
-    } else if (x->always_matches) {
-        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1);~N", p);
+        return;
+    }
+
+    if (pre_check && !x->function_count) {
+        // If all cases are one symbol long (so one byte of UTF-8, one
+        // character long in fixed-width encodings) then we don't need to call
+        // the helper and can just inc/dec the cursor by 1.
+        if (x->longest_size == 1 && !x->always_matches) {
+            write_margin(g);
+            winc(g, p);
+            write_newline(g);
+            // Suppress generating table for this among.
+            x->used = false;
+            return;
+        }
+    }
+
+    if (x->always_matches) {
+        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1, ~F);~N", p);
     } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1) != 0;~N", p);
+        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1, ~F) != 0;~N", p);
         x->node->right = NULL;
     } else {
-        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1)) ~f~N", p);
+        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1, ~F)) ~f~N", p);
     }
 }
 
@@ -1675,6 +1718,7 @@ static void generate_routine_headers(struct generator * g) {
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
+    write_newline(g);
     write_comment(g, x->node);
 
     struct amongvec * v = x->b;
@@ -1698,6 +1742,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
         g->I[2] = v[i].size;
         g->I[3] = (v[i].i >= 0 ? v[i].i - i : 0);
         g->I[4] = v[i].result;
+        g->I[5] = v[i].function_index;
         g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         if (g->options->comments) {
@@ -1709,21 +1754,38 @@ static void generate_among_table(struct generator * g, struct among * x) {
         } else {
             w(g, "s_~I0_~I1,");
         }
-        w(g, " ~I3, ~I4, ");
-        if (v[i].function == NULL) {
-            write_char(g, '0');
-        } else {
-            write_varname(g, v[i].function);
-        }
-        w(g, "}~S0~N");
+        w(g, " ~I3, ~I4, ~I5}~S0~N");
     }
-    w(g, "};~N~N");
+    w(g, "};~N");
+
+    if (x->function_count <= 1) return;
+
+    w(g, "~N~Mstatic int af_~I0(struct SN_env * z) {~N~+");
+    w(g, "~Mswitch (z->af) {~N~+");
+    for (int n = 1; n <= x->function_count; n++) {
+        w(g, "~Mcase ");
+        write_int(g, n);
+        w(g, ": return ");
+        for (int i = 0; i < x->literalstring_count; i++) {
+            if (v[i].function_index == n) {
+                write_varref(g, v[i].function);
+                w(g, "(z);~N");
+                break;
+            }
+        }
+    }
+    w(g, "~-~M}~N");
+    w(g, "~Mreturn -1;~N");
+    w(g, "~-~M}~N");
 }
 
 static void generate_amongs(struct generator * g) {
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
     for (struct among * x = g->analyser->amongs; x; x = x->next) {
-        generate_among_table(g, x);
+        if (x->used) generate_among_table(g, x);
     }
+    g->outbuf = s;
 }
 
 static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
@@ -1738,23 +1800,26 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "static const unsigned char ");
+    w(g, "~Nstatic const unsigned char ");
     write_varname(g, q->name);
     w(g, "[] = { ");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, " };~N~N");
+    w(g, " };~N");
 
     lose_b(map);
 }
 
 static void generate_groupings(struct generator * g) {
+    struct str * s = g->outbuf;
+    g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
         if (q->name->used)
             generate_grouping_table(g, q);
     }
+    g->outbuf = s;
 }
 
 static void generate_create(struct generator * g) {
@@ -1849,9 +1914,7 @@ extern void generate_program_c(struct generator * g) {
     w(g, "~N"
          "#ifdef __cplusplus~N"
          "}~N"
-         "#endif~N");
-    generate_amongs(g);
-    generate_groupings(g);
+         "#endif~N~N");
     g->declarations = g->outbuf;
     g->outbuf = str_new();
     g->literalstring_count = 0;
@@ -1859,6 +1922,9 @@ extern void generate_program_c(struct generator * g) {
     for (struct node * p = g->analyser->program; p; p = p->right) {
         generate(g, p);
     }
+
+    generate_amongs(g);
+    generate_groupings(g);
 
     generate_create(g);
     generate_close(g);

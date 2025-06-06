@@ -7,7 +7,6 @@ routines (
     initial_apostrophe
     long_word
     merged_numeral
-    not_after_letter
     pronoun
     standard_suffix
     ujn_suffix
@@ -124,19 +123,19 @@ backwardmode (
         loop 2 gopast vowel or (gopast '-' next) or gopast digit
     )
 
-    define not_after_letter as ('-' or digit)
-
     define standard_suffix as (
-        [substring try '-']
+        [
         among(
             'a' 'aj' 'ajn' 'an'
             'e' 'en'
             'i' 'as' 'is' 'os' 'u' 'us'
             'o' 'oj' 'ojn' 'on'
-            'j' not_after_letter
-            'jn' not_after_letter
-            'n' not_after_letter
+                ()
+            'j' 'jn' 'n'
+                (test ('-' or digit))
         )
+        try '-'
+        ]
         delete
     )
 )

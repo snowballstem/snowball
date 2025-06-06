@@ -92,10 +92,9 @@ func (env *Env) EqSB(s string) bool {
 	}
 }
 
-func (env *Env) SliceFrom(s string) bool {
+func (env *Env) SliceFrom(s string) {
 	bra, ket := env.Bra, env.Ket
 	env.ReplaceS(bra, ket, s)
-	return true
 }
 
 func (env *Env) NextChar() {
@@ -310,8 +309,8 @@ func (env *Env) GoOutGroupingB(chars []byte, min, max int32) bool {
 	return false
 }
 
-func (env *Env) SliceDel() bool {
-	return env.SliceFrom("")
+func (env *Env) SliceDel() {
+	env.SliceFrom("")
 }
 
 func (env *Env) Insert(bra, ket int, s string) {
@@ -380,9 +379,8 @@ func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c + len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c + len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c + len(w.Str)
 					return w.B
 				}
 			} else {
@@ -449,9 +447,8 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c - len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c - len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c - len(w.Str)
 					return w.B
 				}
 			} else {

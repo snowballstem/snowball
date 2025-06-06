@@ -177,8 +177,8 @@ package body Stemmer with SPARK_Mode is
                   return;
                end if;
                Execute (Context, W.Operation, Status);
-               Context.C := C + Len;
                if Status then
+                  Context.C := C + Len;
                   Result := W.Result;
                   return;
                end if;
@@ -250,8 +250,8 @@ package body Stemmer with SPARK_Mode is
                   return;
                end if;
                Execute (Context, W.Operation, Status);
-               Context.C := C - Len;
                if Status then
+                  Context.C := C - Len;
                   Result := W.Result;
                   return;
                end if;

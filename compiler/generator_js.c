@@ -125,6 +125,7 @@ static void wgotol(struct generator * g, int n) {
     write_int(g, n);
     write_string(g, ";");
     write_newline(g);
+    g->unreachable = true;
 }
 
 static void write_failure_(struct generator * g, byte after_if) {
@@ -730,7 +731,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif (!this.slice_del()) return false;~N", p);
+    writef(g, "~Mthis.slice_del();~N", p);
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
@@ -776,8 +777,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = this.slice_to();~N"
-              "~Mif (~V === '') return false;~N", p);
+    writef(g, "~M~V = this.slice_to();~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -833,9 +833,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif (!this.slice_from(");
+    w(g, "~Mthis.slice_from(");
     generate_address(g, p);
-    writef(g, ")) return false;~N", p);
+    writef(g, ");~N", p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
@@ -1109,6 +1109,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else if (x->always_matches) {
         writef(g, "~Mthis.find_among~S0(this.#a_~I0~S1);~N", p);
     } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
         writef(g, "~Mreturn this.find_among~S0(this.#a_~I0~S1) !== 0;~N", p);
         x->node->right = NULL;

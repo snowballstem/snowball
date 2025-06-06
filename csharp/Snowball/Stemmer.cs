@@ -30,6 +30,7 @@
 namespace Snowball
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
 
@@ -114,6 +115,12 @@ namespace Snowball
     ///
     public abstract class Stemmer : Env
     {
+        /// <summary>
+        ///   Among function being called.
+        /// </summary>
+        ///
+        protected int af;
+
         /// <summary>
         ///   Initializes a new instance of the <see cref="Stemmer"/> class.
         /// </summary>
@@ -390,7 +397,7 @@ namespace Snowball
         ///   forward.
         /// </summary>
         ///
-        protected int find_among(Among[] v)
+        protected int find_among(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -465,14 +472,14 @@ namespace Snowball
                 {
                     cursor = c + w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    bool res = w.Action();
-                    cursor = c + w.SearchString.Length;
-
-                    if (res)
+                    af = w.Condition;
+                    if (call_among_func()) {
+                        cursor = c + w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;
@@ -488,7 +495,7 @@ namespace Snowball
         ///   backwards.
         /// </summary>
         ///
-        protected int find_among_b(Among[] v)
+        protected int find_among_b(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -558,14 +565,14 @@ namespace Snowball
                 {
                     cursor = c - w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    bool res = w.Action();
-                    cursor = c - w.SearchString.Length;
-
-                    if (res)
+                    af = w.Condition;
+                    if (call_among_func()) {
+                        cursor = c - w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;
@@ -597,10 +604,10 @@ namespace Snowball
         /// </summary>
         protected void slice_check()
         {
-            if (bra < 0 || bra > ket || ket > limit || limit > current.Length)
-            {
-                System.Diagnostics.Trace.WriteLine("faulty slice operation");
-            }
+            Debug.Assert(bra >= 0);
+            Debug.Assert(bra <= ket);
+            Debug.Assert(ket <= limit);
+            Debug.Assert(limit <= current.Length);
         }
 
         /// <summary>
