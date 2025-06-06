@@ -744,8 +744,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif not self.slice_del():~N"
-              "~+~Mreturn False~N~-", p);
+    writef(g, "~Mself.slice_del()~N", p);
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
@@ -780,9 +779,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = self.slice_to()~N"
-              "~Mif ~V == '':~N"
-              "~+~Mreturn False~N~-", p);
+    writef(g, "~M~V = self.slice_to()~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -822,10 +819,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif not self.slice_from(");
+    w(g, "~Mself.slice_from(");
     generate_address(g, p);
-    writef(g, "):~N"
-              "~+~Mreturn False~N~-", p);
+    writef(g, ")~N", p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
