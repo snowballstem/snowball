@@ -35,7 +35,9 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-    w(g, "this.#");
+    if (p->type != t_grouping) {
+        w(g, "this.#");
+    }
     write_varname(g, p);
 }
 
@@ -214,6 +216,33 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 if (j < 0 || j > (int)(sizeof(g->B) / sizeof(g->B[0])))
                     goto invalid_escape2;
                 write_s(g, g->B[j]);
+                continue;
+            }
+            case 'F': { // Among function dispatcher.
+                struct among * x = p->among;
+                if (x->function_count == 0) {
+                    continue;
+                }
+
+                w(g, ", ");
+
+                if (x->function_count == 1) {
+                    // Only one different function used in this among.
+                    struct amongvec * v = x->b;
+                    for (int j = 0; j < x->literalstring_count; j++) {
+                        if (v[j].function) {
+                            write_varref(g, v[j].function);
+                            goto continue_outer_loop;
+                        }
+                    }
+                    fprintf(stderr, "function_count == 1 but no among functions\n");
+                    exit(1);
+continue_outer_loop:
+                    continue;
+                }
+
+                w(g, "this.#af_");
+                write_int(g, x->number);
                 continue;
             }
             case 'I': {
@@ -1098,24 +1127,23 @@ static void generate_substring(struct generator * g, struct node * p) {
     struct among * x = p->among;
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    g->S[1] = x->function_count > 0 ? ", this" : "";
     g->I[0] = x->number;
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = this.find_among~S0(this.#a_~I0~S1);~N", p);
+        writef(g, "~Mamong_var = this.find_among~S0(a_~I0~F);~N", p);
         if (!x->always_matches) {
             write_failure_if(g, "among_var === 0", p);
         }
     } else if (x->always_matches) {
-        writef(g, "~Mthis.find_among~S0(this.#a_~I0~S1);~N", p);
+        writef(g, "~Mthis.find_among~S0(a_~I0~F);~N", p);
     } else if (x->command_count == 0 &&
                g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn this.find_among~S0(this.#a_~I0~S1) !== 0;~N", p);
+        writef(g, "~Mreturn this.find_among~S0(a_~I0~F) !== 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "this.find_among~S0(this.#a_~I0~S1) === 0", p);
+        write_failure_if(g, "this.find_among~S0(a_~I0~F) === 0", p);
     }
 }
 
@@ -1295,7 +1323,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    w(g, "~Mget #a_~I0() { return [~N~+");
+    w(g, "~Mconst a_~I0 = [~N~+");
 
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
@@ -1306,17 +1334,51 @@ static void generate_among_table(struct generator * g, struct among * x) {
         write_literal_string(g, v[i].b);
         w(g, ", ~I0, ~I1");
         if (v[i].function != NULL) {
-            w(g, ", this.#");
-            write_varname(g, v[i].function);
+            w(g, ", ");
+            write_int(g, v[i].function_index);
         }
         w(g, "]~S0~N");
     }
-    w(g, "~-~M]; }~N~N");
+    w(g, "~-~M];~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
     for (struct among * x = g->analyser->amongs; x; x = x->next) {
         generate_among_table(g, x);
+    }
+}
+
+static void generate_among_dispatcher(struct generator * g, struct among * x) {
+    if (x->function_count <= 1) return;
+
+    struct amongvec * v = x->b;
+
+    write_comment(g, x->node);
+
+    g->I[0] = x->number;
+    w(g, "~N~M/** @return {boolean} */~N");
+    w(g, "~M#af_~I0() {~N~+");
+    w(g, "~Mswitch (this.af) {~N~+");
+    for (int n = 1; n <= x->function_count; n++) {
+        w(g, "~Mcase ");
+        write_int(g, n);
+        w(g, ": return ");
+        for (int i = 0; i < x->literalstring_count; i++) {
+            if (v[i].function_index == n) {
+                write_varref(g, v[i].function);
+                w(g, "();~N");
+                break;
+            }
+        }
+    }
+    w(g, "~-~M}~N");
+    w(g, "~Mreturn false;~N");
+    w(g, "~-~M}~N");
+}
+
+static void generate_among_dispatchers(struct generator * g) {
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
+        generate_among_dispatcher(g, x);
     }
 }
 
@@ -1332,15 +1394,14 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~M/** @return Array<number> */~N"
-         "~Mget #");
+    w(g, "~Mconst ");
     write_varname(g, q->name);
-    write_string(g, "() { return [");
+    write_string(g, "/** Array<number> */ = [");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
     }
-    w(g, "]; }~N~N");
+    w(g, "];~N~N");
 
     lose_b(map);
 }
@@ -1393,12 +1454,15 @@ extern void generate_program_js(struct generator * g) {
 
     write_start_comment(g, "// ", NULL);
 
-    generate_class_begin(g);
-
     generate_amongs(g);
     generate_groupings(g);
 
+    generate_class_begin(g);
+
     generate_members(g);
+
+    generate_among_dispatchers(g);
+
     generate_methods(g);
 
     generate_class_end(g);
