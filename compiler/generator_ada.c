@@ -1643,7 +1643,7 @@ static void generate_amongs(struct generator * g) {
     }
     w(g, "when others =>~N~M");
     w(g, "   Result := False;~-~N~Mend case;~-~N~M");
-    w(g, "end Among_Handler;~N~-");
+    w(g, "end Among_Handler;~N");
 }
 
 static void generate_methods(struct generator * g) {
