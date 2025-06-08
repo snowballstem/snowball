@@ -603,22 +603,19 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 }
 
 static void generate_loop(struct generator * g, struct node * p) {
-    struct str * loopvar = vars_newname(g);
     write_comment(g, p);
-    g->B[0] = str_data(loopvar);
     if (p->AE->type == c_number && p->AE->number <= 4) {
         // Use a tuple instead of range() for small constant numbers of
         // iterations.
-        w(g, "~Mfor ~B0 in ");
+        w(g, "~Mfor _ in ");
         for (int i = p->AE->number; i > 0; --i) {
             w(g, "0");
             if (i > 1) w(g, ", ");
         }
         writef(g, ":~N", p);
     } else {
-        w(g, "~Mfor ~B0 in range(");
+        w(g, "~Mfor _ in range(");
         generate_AE(g, p->AE);
-        g->B[0] = str_data(loopvar);
         writef(g, "):~N", p);
     }
     writef(g, "~{", p);
@@ -626,7 +623,6 @@ static void generate_loop(struct generator * g, struct node * p) {
     generate(g, p->left);
 
     w(g, "~}");
-    str_delete(loopvar);
     g->unreachable = false;
 }
 
