@@ -363,8 +363,8 @@ static void generate_or(struct generator * g, struct node * p) {
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
     }
+    int label = new_label(g);
     while (p->right != NULL) {
-        int label = new_label(g);
         g->failure_label = label;
         wsetlab_begin(g);
         generate(g, p);
