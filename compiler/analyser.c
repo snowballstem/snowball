@@ -1526,7 +1526,7 @@ static struct node * read_C(struct analyser * a) {
                 struct node * p = new_node(a, token);
                 read_token(t);
                 if (t->token == c_minus) read_token(t);
-                if (!check_token(a, c_name)) { omission_error(a, c_name); return p; }
+                if (!check_token(a, c_name)) { return p; }
                 name_to_node(a, p, 'g');
                 return p;
             }
