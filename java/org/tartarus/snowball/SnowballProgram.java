@@ -354,8 +354,6 @@ public class SnowballProgram implements Serializable {
             if (common_i >= w.s.length) {
                 cursor = c - w.s.length;
                 if (w.method == null) return w.result;
-
-                boolean res = false;
                 try {
                     if ((boolean) w.method.invokeExact(this)) {
                         cursor = c - w.s.length;
