@@ -57,8 +57,7 @@ extern symbol * create_b(int n) {
 }
 
 extern void report_b(FILE * out, const symbol * p) {
-    int i;
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         if (p[i] > 255) {
             printf("In report_b, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
             exit(1);
@@ -122,15 +121,12 @@ extern void check_free(void * p) {
 extern char * b_to_sz(const symbol * p) {
     int n = SIZE(p);
     char * s = (char *)xmalloc(n + 1);
-    {
-        int i;
-        for (i = 0; i < n; i++) {
-            if (p[i] > 255) {
-                printf("In b_to_s, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
-                exit(1);
-            }
-            s[i] = (char)p[i];
+    for (int i = 0; i < n; i++) {
+        if (p[i] > 255) {
+            printf("In b_to_s, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
+            exit(1);
         }
+        s[i] = (char)p[i];
     }
     s[n] = 0;
     return s;
@@ -140,13 +136,10 @@ extern char * b_to_sz(const symbol * p) {
    block is created. */
 
 extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
-    int k;
     if (p == NULL) p = create_b(1);
-    k = SIZE(p);
-    {
-        int x = k + 1 - CAPACITY(p);
-        if (x > 0) p = increase_capacity_b(p, x);
-    }
+    int k = SIZE(p);
+    int x = k + 1 - CAPACITY(p);
+    if (x > 0) p = increase_capacity_b(p, x);
     p[k] = ch;
     SIZE(p)++;
     return p;
@@ -184,13 +177,10 @@ extern byte * copy_s(const byte * p) {
    block is created. */
 
 extern byte * add_s_to_s(byte * p, const char * s, int n) {
-    int k;
     if (p == NULL) p = create_s(n);
-    k = SIZE(p);
-    {
-        int x = k + n - CAPACITY(p);
-        if (x > 0) p = increase_capacity_s(p, x);
-    }
+    int k = SIZE(p);
+    int x = k + n - CAPACITY(p);
+    if (x > 0) p = increase_capacity_s(p, x);
     memcpy(p + k, s, n);
     SIZE(p) += n;
     return p;
@@ -207,13 +197,10 @@ extern byte * add_sz_to_s(byte * p, const char * s) {
    block is created. */
 
 extern byte * add_char_to_s(byte * p, char ch) {
-    int k;
     if (p == NULL) p = create_s(1);
-    k = SIZE(p);
-    {
-        int x = k + 1 - CAPACITY(p);
-        if (x > 0) p = increase_capacity_s(p, x);
-    }
+    int k = SIZE(p);
+    int x = k + 1 - CAPACITY(p);
+    if (x > 0) p = increase_capacity_s(p, x);
     p[k] = ch;
     SIZE(p)++;
     return p;
@@ -341,12 +328,11 @@ extern void str_pop_n(const struct str *str, int n) {
 }
 
 extern int get_utf8(const symbol * p, int * slot) {
-    int b0, b1;
-    b0 = *p++;
+    int b0 = *p++;
     if (b0 < 0xC0) {   /* 1100 0000 */
         * slot = b0; return 1;
     }
-    b1 = *p++;
+    int b1 = *p++;
     if (b0 < 0xE0) {   /* 1110 0000 */
         * slot = (b0 & 0x1F) << 6 | (b1 & 0x3F); return 2;
     }

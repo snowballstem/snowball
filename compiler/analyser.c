@@ -212,8 +212,7 @@ static int get_token(struct analyser * a, int code) {
 
 static struct name * look_for_name(struct analyser * a) {
     const byte * q = a->tokeniser->s;
-    struct name * p;
-    for (p = a->names; p; p = p->next) {
+    for (struct name * p = a->names; p; p = p->next) {
         byte * b = p->s;
         int n = SIZE(b);
         if (n == SIZE(q) && memcmp(q, b, n) == 0) {
@@ -440,15 +439,12 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             /* Replace lenof or sizeof on a literal string with a numeric
              * constant.
              */
-            int result;
+            int result = 0;
             if (token == c_lenof && t->encoding == ENC_UTF8) {
                 // UTF-8.
-                int i = 0;
                 symbol * b = p->literalstring;
-                result = 0;
-                while (i < SIZE(b)) {
-                    int dummy;
-                    i += get_utf8(b + i, &dummy);
+                int dummy;
+                for (int i = 0; i < SIZE(b); i += get_utf8(b + i, &dummy)) {
                     ++result;
                 }
             } else {
@@ -621,26 +617,24 @@ static struct node * read_C_list(struct analyser * a) {
         if (token == c_ket) return p;
         if (token < 0) { omission_error(a, c_ket); return p; }
         hold_token(t);
-        {
-            struct node * q = read_C(a);
-            while (true) {
-                token = read_token(t);
-                if (token != c_and && token != c_or) {
-                    hold_token(t);
-                    break;
-                }
-                q = read_C_connection(a, q, token);
+
+        struct node * q = read_C(a);
+        while (true) {
+            token = read_token(t);
+            if (token != c_and && token != c_or) {
+                hold_token(t);
+                break;
             }
-            if (p_end == NULL) p->left = q; else p_end->right = q;
-            p_end = q;
+            q = read_C_connection(a, q, token);
         }
+        if (p_end == NULL) p->left = q; else p_end->right = q;
+        p_end = q;
     }
 }
 
 static struct node * C_style(struct analyser * a, const char * s, int token) {
-    int i;
     struct node * p = new_node(a, token);
-    for (i = 0; s[i] != 0; i++) switch (s[i]) {
+    for (int i = 0; s[i] != 0; i++) switch (s[i]) {
         case 'C':
             p->left = read_C(a); continue;
         case 'D':
@@ -686,8 +680,7 @@ static int compare_amongvec(const void *pv, const void *qv) {
     symbol * b_p = p->b; int p_size = p->size;
     symbol * b_q = q->b; int q_size = q->size;
     int smaller_size = p_size < q_size ? p_size : q_size;
-    int i;
-    for (i = 0; i < smaller_size; i++)
+    for (int i = 0; i < smaller_size; i++)
         if (b_p[i] != b_q[i]) return b_p[i] - b_q[i];
     if (p_size - q_size)
         return p_size - q_size;
@@ -736,22 +729,20 @@ static int compare_node(const struct node *p, const struct node *q) {
 
     PTR_NULL_CHECK(p->name, q->name);
     if (p->name) {
-        int r;
         if (SIZE(p->name->s) != SIZE(q->name->s)) {
             return SIZE(p->name->s) - SIZE(q->name->s);
         }
-        r = memcmp(p->name->s, q->name->s, SIZE(p->name->s));
+        int r = memcmp(p->name->s, q->name->s, SIZE(p->name->s));
         if (r != 0) return r;
     }
 
     PTR_NULL_CHECK(p->literalstring, q->literalstring);
     if (p->literalstring) {
-        int r;
         if (SIZE(p->literalstring) != SIZE(q->literalstring)) {
             return SIZE(p->literalstring) - SIZE(q->literalstring);
         }
-        r = memcmp(p->literalstring, q->literalstring,
-                   SIZE(p->literalstring) * sizeof(symbol));
+        int r = memcmp(p->literalstring, q->literalstring,
+                       SIZE(p->literalstring) * sizeof(symbol));
         if (r != 0) return r;
     }
 
@@ -1120,10 +1111,9 @@ static struct node * read_C(struct analyser * a) {
             {
                 int mode = a->mode;
                 if (a->mode == m_backward) error(a, e_already_backwards); else a->mode = m_backward;
-                {   struct node * p = C_style(a, "C", token);
-                    a->mode = mode;
-                    return p;
-                }
+                struct node * p = C_style(a, "C", token);
+                a->mode = mode;
+                return p;
             }
         case c_reverse:
             {
@@ -1131,12 +1121,10 @@ static struct node * read_C(struct analyser * a) {
                 int modifyable = a->modifyable;
                 a->modifyable = false;
                 a->mode = mode == m_forward ? m_backward : m_forward;
-                {
-                    struct node * p = C_style(a, "C", token);
-                    a->mode = mode;
-                    a->modifyable = modifyable;
-                    return p;
-                }
+                struct node * p = C_style(a, "C", token);
+                a->mode = mode;
+                a->modifyable = modifyable;
+                return p;
             }
         case c_not: {
             struct node * subcommand = read_C(a);
@@ -1303,9 +1291,8 @@ static struct node * read_C(struct analyser * a) {
         case c_insert:
         case c_attach:
         case c_slicefrom: {
-            struct node *n;
             check_modifyable(a);
-            n = C_style(a, "S", token);
+            struct node * n = C_style(a, "S", token);
             if (n->name) n->name->value_used = true;
             return n;
         }
@@ -1526,7 +1513,9 @@ static struct node * read_C(struct analyser * a) {
                 struct node * p = new_node(a, token);
                 read_token(t);
                 if (t->token == c_minus) read_token(t);
-                if (!check_token(a, c_name)) { return p; }
+                if (!check_token(a, c_name)) {
+                    return p;
+                }
                 name_to_node(a, p, 'g');
                 return p;
             }
@@ -1552,19 +1541,18 @@ static int next_symbol(symbol * p, symbol * W, int utf8) {
 
 static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
     int j = 0;
-    symbol W;
-    int width;
     if (style == c_plus) {
         while (j < SIZE(q)) {
-            width = next_symbol(q + j, &W, utf8);
+            symbol W;
+            int width = next_symbol(q + j, &W, utf8);
             p = add_symbol_to_b(p, W);
             j += width;
         }
     } else {
         while (j < SIZE(q)) {
-            int i;
-            width = next_symbol(q + j, &W, utf8);
-            for (i = 0; i < SIZE(p); i++) {
+            symbol W;
+            int width = next_symbol(q + j, &W, utf8);
+            for (int i = 0; i < SIZE(p); i++) {
                 if (p[i] == W) {
                     memmove(p + i, p + i + 1, (SIZE(p) - i - 1) * sizeof(symbol));
                     SIZE(p)--;
@@ -2070,18 +2058,14 @@ static void visit_routine(struct analyser * a, struct name * n) {
 
 extern void read_program(struct analyser * a) {
     read_program_(a, -1);
-    {
-        struct name * q = a->names;
-        while (q) {
-            switch (q->type) {
-                case t_external: case t_routine:
-                    if (q->used && q->definition == NULL) error4(a, q);
-                    break;
-                case t_grouping:
-                    if (q->used && q->grouping == NULL) error4(a, q);
-                    break;
-            }
-            q = q->next;
+    for (struct name * q = a->names; q; q = q->next) {
+        switch (q->type) {
+            case t_external: case t_routine:
+                if (q->used && q->definition == NULL) error4(a, q);
+                break;
+            case t_grouping:
+                if (q->used && q->grouping == NULL) error4(a, q);
+                break;
         }
     }
 
@@ -2240,7 +2224,7 @@ extern struct analyser * create_analyser(struct tokeniser * t) {
     a->groupings = NULL;
     a->mode = m_forward;
     a->modifyable = true;
-    { int i; for (i = 0; i < t_size; i++) a->name_count[i] = 0; }
+    for (int i = 0; i < t_size; i++) a->name_count[i] = 0;
     a->substring = NULL;
     a->int_limits_used = false;
     return a;
