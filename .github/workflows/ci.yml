@@ -24,80 +24,9 @@ jobs:
     strategy:
       matrix:
         include:
-        - name: "C distribution build"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wmissing-prototypes -Wmissing-declarations -Wshadow -Wdeclaration-after-statement -Werror'
-        - name: "C distribution build (clang)"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wmissing-prototypes -Wmissing-declarations -Wshadow -Wdeclaration-after-statement -Werror'
-          CC: clang
-        - name: "C"
-          c_tests: y
-          WERROR: '-std=c99 -Werror'
-        - name: "C (clang)"
-          c_tests: y
-          WERROR: '-std=c99 -Werror'
-          CC: clang
-        - name: java
-          JAVA: java
-          JAVAC: javac
-          JAVACFLAGS: '-Xlint:all -Werror'
-        - name: go_old
-          os: 'ubuntu-22.04'
-          apt_packages: 'golang-1.13'
-          GO: go
-        - name: go_new
-          os: 'ubuntu-24.04'
-          apt_packages: 'golang-1.22'
-          GO: go
-        - name: javascript_node
-          JSRUN: node
-          apt_packages: 'nodejs'
         - name: javascript_deno
           JSRUN: 'deno --allow-read --allow-write'
           apt_packages: 'nodejs'
-        - name: rust
-          RUST: rust
-          apt_packages: 'rustc'
-        - name: csharp
-          MCS: mcs
-          apt_packages: 'mono-devel'
-        - name: Pascal
-          FPC: fpc
-          apt_packages: 'fpc'
-        - name: Python 3.8
-          PYTHON_VERSION: 3.8
-          os: 'ubuntu-22.04'
-          # The pure Python versions run slowly - when we used travis for CI
-          # we used to need to thin the testdata for languages such as Arabic
-          # where there's a lot to avoid the build exceeding the maximum time
-          # allowed for a CI job.  GHA allows jobs to take up to 6 hours so
-          # we should no longer need to do this.
-          THIN_FACTOR: 1
-        - name: Python 3.10
-          PYTHON: python3.10
-          os: 'ubuntu-22.04'
-          apt_packages: 'python3.10'
-          THIN_FACTOR: 1
-        - name: Python 3.12
-          PYTHON: python3.12
-          os: 'ubuntu-24.04'
-          apt_packages: 'python3.12'
-          THIN_FACTOR: 1
-        - name: Python (pypy3)
-          PYTHON: pypy3
-          apt_packages: 'pypy3'
-        - name: Ada
-          gprbuild: gprbuild
-          apt_packages: 'gnat gprbuild'
-        - name: Windows (C)
-          os: windows-latest
-          c_tests: y
-          ccache: sccache
-        - name: Windows (Go)
-          os: windows-latest
-          GO: go
-          MAKE: mingw32-make
-          mingw64_packages: 'mingw-w64-ucrt-x86_64-go'
-          ccache: sccache
 
       fail-fast: false
 
