@@ -1,5 +1,5 @@
-const fs = require('fs');
-const readline = require('readline');
+import fs from 'node:fs';
+import readline from 'node:readline';
 
 function usage() {
     console.log(`usage: stemwords.js [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-h]
@@ -28,46 +28,47 @@ else
     var encoding = 'utf8';
     var language = 'English';
     var show_help = false;
-    while (process.argv.length > 0)
+    let argv = process.argv.slice(0);
+    while (argv.length > 0)
     {
-        var arg = process.argv.shift();
+        var arg = argv.shift();
         switch (arg)
         {
         case "-h":
             show_help = true;
-            process.argv.length = 0;
+            argv.length = 0;
             break;
         case "-l":
-            if (process.argv.length === 0)
+            if (argv.length === 0)
             {
                 show_help = true;
                 break;
             }
-            language = process.argv.shift();
+            language = argv.shift();
             break;
         case "-i":
-            if (process.argv.length === 0)
+            if (argv.length === 0)
             {
                 show_help = true;
                 break;
             }
-            input = process.argv.shift();
+            input = argv.shift();
             break;
         case "-o":
-            if (process.argv.length === 0)
+            if (argv.length === 0)
             {
                 show_help = true;
                 break;
             }
-            output = process.argv.shift();
+            output = argv.shift();
             break;
         case "-c":
-            if (process.argv.length === 0)
+            if (argv.length === 0)
             {
                 show_help = true;
                 break;
             }
-            encoding = process.argv.shift();
+            encoding = argv.shift();
             break;
         }
     }
@@ -77,19 +78,19 @@ else
     }
     else
     {
-        const stemmer = create(language);
+        const stemmer = await create(language);
         let istream, ostream;
         if (input !== '') {
            istream = fs.createReadStream(input, encoding);
         } else {
            istream = process.stdin;
-           istream.setEncoding(encoding);
+           if (istream.setEncoding) istream.setEncoding(encoding);
         }
         if (output !== '') {
             ostream = fs.createWriteStream(output, encoding);
         } else {
             ostream = process.stdout;
-            ostream.setEncoding(encoding);
+            if (ostream.setEncoding) ostream.setEncoding(encoding);
         }
 
         stemming(stemmer, istream, ostream);
@@ -107,7 +108,7 @@ function stemming (stemmer, input, output) {
     });
 }
 
-function create (name) {
+async function create (name) {
     const lc_name = name.toLowerCase();
     if (/\W/.test(lc_name) || lc_name === 'base') {
         console.log('Unknown stemming language: ' + name + '\n');
@@ -116,10 +117,10 @@ function create (name) {
         return;
     }
     const stemmerName = `${titleCase(lc_name)}Stemmer`;
-    const filename = `${lc_name}-stemmer.js`;
+    const filename = `../js_out/${lc_name}-stemmer.js`;
     try {
         // Load stemmer class from the module scope
-        const stemmerModule = require(filename);
+        const stemmerModule = await import(filename);
         return new stemmerModule[stemmerName]();
     } catch (error) {
         console.error(error);

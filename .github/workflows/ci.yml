@@ -52,7 +52,7 @@ jobs:
           JSRUN: node
           apt_packages: 'nodejs'
         - name: javascript_deno
-          JSRUN: deno
+          JSRUN: 'deno --allow-read --allow-write'
           apt_packages: 'nodejs'
         - name: rust
           RUST: rust
@@ -167,7 +167,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ${{ matrix.apt_packages }}
     - uses: denoland/setup-deno@v2
-      if: ${{ matrix.JSRUN == 'deno' }}
+      if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       with:
         deno-version: vx.x.x
     - name: Install mingw64 packages
