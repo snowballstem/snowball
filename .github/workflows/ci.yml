@@ -51,6 +51,9 @@ jobs:
         - name: javascript_node
           JSRUN: node
           apt_packages: 'nodejs'
+        - name: javascript_deno
+          JSRUN: deno
+          apt_packages: 'nodejs'
         - name: rust
           RUST: rust
           apt_packages: 'rustc'
@@ -163,6 +166,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ${{ matrix.apt_packages }}
+    - uses: denoland/setup-deno@v2
+      if: ${{ matrix.JSRUN == 'deno' }}
+      with:
+        deno-version: vx.x.x
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
       uses: msys2/setup-msys2@v2
