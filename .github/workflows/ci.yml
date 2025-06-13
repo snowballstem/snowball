@@ -207,6 +207,11 @@ jobs:
     - name: Test Javascript
       if: matrix.JSRUN
       run: $MAKE check_js JSRUN="${{ matrix.JSRUN }}"
+    - name: Lint and check Javascript code
+      if: ${{ startsWith(matrix.JSRUN, 'deno') }}
+      run: |
+        deno lint javascript/*.js js_out/*.js
+        deno check javascript/*.js js_out/*.js
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"
