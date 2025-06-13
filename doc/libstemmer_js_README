@@ -30,9 +30,9 @@ with node:
 
 .. code-block:: javascript
 
-    var EnglishStemmer = require('english-stemmer.js');
+    let EnglishStemmer = require('english-stemmer.js');
 
-    var stemmer = new EnglishStemmer();
+    let stemmer = new EnglishStemmer();
     console.log(stemmer.stemWord("testing"));
 
 You'll need to bundle ``base-stemmer.js`` and whichever languages you want
