@@ -139,9 +139,8 @@ jobs:
     - name: Lint and check Javascript code
       if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       run: |
-        deno lint javascript/*.js js_out/*.js || true
-        deno check javascript/*.js js_out/*.js || true
         deno lint --rules-include=no-inferrable-types javascript/*.js js_out/*.js || true
+        deno check javascript/*.js js_out/*.js || true
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"
