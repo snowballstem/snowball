@@ -162,7 +162,10 @@ extern void lose_s(byte * p) {
 }
 
 extern byte * increase_capacity_s(byte * p, int n) {
-    byte * q = create_s(CAPACITY(p) + n + EXTENDER);
+    int new_size = CAPACITY(p) + n + EXTENDER;
+    // Switch to exponential growth for large strings.
+    if (new_size > 512) new_size *= 2;
+    byte * q = create_s(new_size);
     memmove(q, p, CAPACITY(p));
     SIZE(q) = SIZE(p);
     lose_s(p);
