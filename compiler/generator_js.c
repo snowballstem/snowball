@@ -114,6 +114,8 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
+    // This label may end up unused, but we can't easily tell at this point.
+    w(g, "~M// deno-lint-ignore no-unused-labels~N");
     w(g, "~Mlab~I0: {~N~+");
 }
 
@@ -588,6 +590,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int end_unreachable = false;
     int golab = new_label(g);
     g->I[0] = golab;
+    // This label may end up unused, but we can't easily tell at this point.
+    w(g, "~M// deno-lint-ignore no-unused-labels~N");
     w(g, "~Mgolab~I0: while(true)~N");
     w(g, "~{");
 
@@ -1090,6 +1094,10 @@ static void generate_define(struct generator * g, struct node * p) {
     g->var_number = 0;
 
     if (p->amongvar_needed) {
+        // among_var is only assigned to, but the initialisation can be
+        // generated in a nested block so it seems hard to declare it as
+        // const and still have it visible when we want to use it.
+        w(g, "~M// deno-lint-ignore prefer-const~N");
         w(g, "~Mlet /** number */ among_var;~N");
     }
     str_clear(g->failure_str);
@@ -1453,6 +1461,9 @@ extern void generate_program_js(struct generator * g) {
     g->failure_str = str_new();
 
     write_start_comment(g, "// ", NULL);
+
+    // We generate deno-lint-ignore which may not all be used.
+    w(g, "// deno-lint-ignore-file ban-unused-ignore~N~N");
 
     generate_amongs(g);
     generate_groupings(g);
