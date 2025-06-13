@@ -24,15 +24,15 @@ if (process.argv.length < 5)
 }
 else
 {
-    var input = '';
-    var output = '';
-    var encoding = 'utf8';
-    var language = 'English';
-    var show_help = false;
+    let input = '';
+    let output = '';
+    let encoding = 'utf8';
+    let language = 'English';
+    let show_help = false;
     let argv = process.argv.slice(0);
     while (argv.length > 0)
     {
-        var arg = argv.shift();
+        let arg = argv.shift();
         switch (arg)
         {
         case "-h":
