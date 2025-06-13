@@ -1163,10 +1163,10 @@ static void generate_among(struct generator * g, struct node * p) {
         w(g, "~Mswitch (among_var) {~N~+");
         for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
-            w(g, "~Mcase ~I0:~N~+");
+            w(g, "~Mcase ~I0: {~N~+");
             generate(g, x->commands[i - 1]);
             if (!g->unreachable) w(g, "~Mbreak;~N");
-            w(g, "~-");
+            w(g, "~-~M}~N");
             g->unreachable = false;
         }
         write_block_end(g);
