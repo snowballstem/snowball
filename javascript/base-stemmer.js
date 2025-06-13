@@ -245,8 +245,8 @@ class BaseStemmer {
         let i = 0;
         let j = v.length;
 
-        let c = this.cursor;
-        let l = this.limit;
+        const c = this.cursor;
+        const l = this.limit;
 
         let common_i = 0;
         let common_j = 0;
@@ -255,11 +255,11 @@ class BaseStemmer {
 
         while (true)
         {
-            let k = i + ((j - i) >>> 1);
+            const k = i + ((j - i) >>> 1);
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j; // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
-            let w = v[k];
+            const w = v[k];
             let i2;
             for (i2 = common; i2 < w[0].length; i2++)
             {
@@ -296,7 +296,7 @@ class BaseStemmer {
             }
         }
         do {
-            let w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c + w[0].length;
@@ -324,8 +324,8 @@ class BaseStemmer {
         let i = 0;
         let j = v.length
 
-        let c = this.cursor;
-        let lb = this.limit_backward;
+        const c = this.cursor;
+        const lb = this.limit_backward;
 
         let common_i = 0;
         let common_j = 0;
@@ -334,10 +334,10 @@ class BaseStemmer {
 
         while (true)
         {
-            let k = i + ((j - i) >> 1);
+            const k = i + ((j - i) >> 1);
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j;
-            let w = v[k];
+            const w = v[k];
             let i2;
             for (i2 = w[0].length - 1 - common; i2 >= 0; i2--)
             {
@@ -369,7 +369,7 @@ class BaseStemmer {
             }
         }
         do {
-            let w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c - w[0].length;
@@ -397,7 +397,7 @@ class BaseStemmer {
      */
     #replace_s(c_bra, c_ket, s)
     {
-        let adjustment = s.length - (c_ket - c_bra);
+        const adjustment = s.length - (c_ket - c_bra);
         this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
         this.limit += adjustment;
         if (this.cursor >= c_ket) this.cursor += adjustment;
@@ -442,7 +442,7 @@ class BaseStemmer {
     insert(c_bra, c_ket, s)
     {
         /** @protected */
-        let adjustment = this.#replace_s(c_bra, c_ket, s);
+        const adjustment = this.#replace_s(c_bra, c_ket, s);
         if (c_bra <= this.bra) this.bra += adjustment;
         if (c_bra <= this.ket) this.ket += adjustment;
     }

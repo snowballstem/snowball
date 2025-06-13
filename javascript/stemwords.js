@@ -29,10 +29,11 @@ else
     let encoding = 'utf8';
     let language = 'English';
     let show_help = false;
-    let argv = process.argv.slice(0);
+    // deno doesn't allow modifying process.argv so make a copy.
+    const argv = process.argv.slice(0);
     while (argv.length > 0)
     {
-        let arg = argv.shift();
+        const arg = argv.shift();
         switch (arg)
         {
         case "-h":
