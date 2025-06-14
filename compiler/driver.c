@@ -132,7 +132,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
     while (i < argc) {
         char * s = argv[i++];
-        if (s[0] != '-') {
+        if (s[0] != '-' || s[1] == '\0') {
             /* Non-option argument - shuffle down. */
             argv[new_argc++] = s;
             continue;

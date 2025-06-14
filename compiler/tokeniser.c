@@ -23,21 +23,35 @@ static int hex_to_num(int ch);
 static int smaller(int a, int b) { return a < b ? a : b; }
 
 extern byte * get_input(const char * filename) {
-    FILE * input = fopen(filename, "r");
+    FILE * input = strcmp(filename, "-") == 0 ? stdin : fopen(filename, "r");
     if (input == NULL) { return NULL; }
-    {
-        byte * u = create_s(INITIAL_INPUT_BUFFER_SIZE);
-        int size = 0;
-        while (true) {
-            int ch = getc(input);
-            if (ch == EOF) break;
-            if (size >= CAPACITY(u)) u = increase_capacity_s(u, size);
-            u[size++] = ch;
+    byte * u = NULL;
+    int size = fseek(input, 0, SEEK_END) == 0 ? ftell(input) : -1;
+    if (size >= 0 && fseek(input, 0, SEEK_SET) == 0) {
+        u = create_s(size);
+        if (fread(u, 1, size, input) != (size_t)size) {
+            fprintf(stderr, "%s: Read error\n", filename);
+            exit(1);
         }
-        fclose(input);
-        SIZE(u) = size;
-        return u;
+    } else {
+        // Unseekable stream, e.g. piped stdin.
+        size = 0;
+        u = create_s(INITIAL_INPUT_BUFFER_SIZE);
+        while (true) {
+            int s = CAPACITY(u) - size;
+            int r = fread(u + size, 1, s, input);
+            if (r < 0) {
+                fprintf(stderr, "%s: Read error\n", filename);
+                exit(1);
+            }
+            size += r;
+            if (r < s) break;
+            u = increase_capacity_s(u, size);
+        }
     }
+    if (input != stdin) fclose(input);
+    SIZE(u) = size;
+    return u;
 }
 
 static void error(struct tokeniser * t, const char * s1, byte * p, int n, const char * s2) {
