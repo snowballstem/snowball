@@ -687,66 +687,37 @@ static int compare_amongvec(const void *pv, const void *qv) {
     return p->line_number - q->line_number;
 }
 
-#define PTR_NULL_CHECK(P, Q) do {\
-        if ((Q) == NULL) {\
-            if ((P) != NULL) return 1;\
-        } else {\
-            if ((P) == NULL) return -1;\
-        }\
-    } while (0)
+#define nodes_equivalent(P, Q) \
+    ((P) == (Q) || ((P) && (Q) && nodes_equivalent_((P), (Q))))
 
-static int compare_node(const struct node *p, const struct node *q) {
-    PTR_NULL_CHECK(p, q);
-    if (q == NULL) {
-        /* p must be NULL too. */
-        return 0;
-    }
+static int nodes_equivalent_(const struct node *p, const struct node *q) {
+    if (p == q) return true;
+    if (p == NULL || q == NULL) return false;
 
-    if (p->type != q->type) return p->type > q->type ? 1 : -1;
-    if (p->mode != q->mode) return p->mode > q->mode ? 1 : -1;
+    if (p->type != q->type) return false;
+    if (p->mode != q->mode) return false;
     if (p->type == c_number) {
         if (p->number != q->number)
-            return p->number > q->number ? 1 : -1;
+            return false;
     }
 
-    PTR_NULL_CHECK(p->left, q->left);
-    if (p->left) {
-        int r = compare_node(p->left, q->left);
-        if (r != 0) return r;
-    }
+    if (!nodes_equivalent(p->left, q->left)) return false;
+    if (!nodes_equivalent(p->AE, q->AE)) return false;
+    if (!nodes_equivalent(p->aux, q->aux)) return false;
 
-    PTR_NULL_CHECK(p->AE, q->AE);
-    if (p->AE) {
-        int r = compare_node(p->AE, q->AE);
-        if (r != 0) return r;
-    }
+    if (p->name != q->name) return false;
 
-    PTR_NULL_CHECK(p->aux, q->aux);
-    if (p->aux) {
-        int r = compare_node(p->aux, q->aux);
-        if (r != 0) return r;
-    }
-
-    PTR_NULL_CHECK(p->name, q->name);
-    if (p->name) {
-        if (SIZE(p->name->s) != SIZE(q->name->s)) {
-            return SIZE(p->name->s) - SIZE(q->name->s);
+    if (p->literalstring != q->literalstring) {
+        if (!p->literalstring ||
+            !q->literalstring ||
+            SIZE(p->literalstring) != SIZE(q->literalstring) ||
+            memcmp(p->literalstring, q->literalstring,
+                   SIZE(p->literalstring) * sizeof(symbol)) != 0) {
+            return false;
         }
-        int r = memcmp(p->name->s, q->name->s, SIZE(p->name->s));
-        if (r != 0) return r;
     }
 
-    PTR_NULL_CHECK(p->literalstring, q->literalstring);
-    if (p->literalstring) {
-        if (SIZE(p->literalstring) != SIZE(q->literalstring)) {
-            return SIZE(p->literalstring) - SIZE(q->literalstring);
-        }
-        int r = memcmp(p->literalstring, q->literalstring,
-                       SIZE(p->literalstring) * sizeof(symbol));
-        if (r != 0) return r;
-    }
-
-    return compare_node(p->right, q->right);
+    return nodes_equivalent(p->right, q->right);
 }
 
 static struct node * make_among(struct analyser * a, struct node * p, struct node * substring) {
@@ -816,7 +787,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             int among_result = -1;
             struct amongvec * w;
             for (w = v; w < w0; ++w) {
-                if (w->action && compare_node(w->action->left, q->left) == 0) {
+                if (w->action && nodes_equivalent(w->action->left, q->left)) {
                     if (w->result <= 0) {
                         printf("Among code %d isn't positive\n", w->result);
                         exit(1);
