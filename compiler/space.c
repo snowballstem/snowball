@@ -1,4 +1,5 @@
 
+#include <limits.h>
 #include <stdio.h>    /* for printf */
 #include <stdlib.h>   /* malloc, free */
 #include <string.h>   /* memmove */
@@ -172,6 +173,12 @@ extern byte * increase_capacity_s(byte * p, int n) {
     return q;
 }
 
+extern byte * ensure_capacity_s(byte * p, int n) {
+    int x = SIZE(p) + n - CAPACITY(p);
+    if (x > 0) p = increase_capacity_s(p, x);
+    return p;
+}
+
 extern byte * copy_s(const byte * p) {
     return add_s_to_s(NULL, (const char*)p, SIZE(p));
 }
@@ -180,12 +187,14 @@ extern byte * copy_s(const byte * p) {
    block is created. */
 
 extern byte * add_s_to_s(byte * p, const char * s, int n) {
-    if (p == NULL) p = create_s(n);
+    if (p == NULL) {
+        p = create_s(n);
+    } else {
+        p = ensure_capacity_s(p, n);
+    }
     int k = SIZE(p);
-    int x = k + n - CAPACITY(p);
-    if (x > 0) p = increase_capacity_s(p, x);
     memcpy(p + k, s, n);
-    SIZE(p) += n;
+    SIZE(p) = k + n;
     return p;
 }
 
@@ -200,12 +209,12 @@ extern byte * add_sz_to_s(byte * p, const char * s) {
    block is created. */
 
 extern byte * add_char_to_s(byte * p, char ch) {
-    if (p == NULL) p = create_s(1);
-    int k = SIZE(p);
-    int x = k + 1 - CAPACITY(p);
-    if (x > 0) p = increase_capacity_s(p, x);
-    p[k] = ch;
-    SIZE(p)++;
+    if (p == NULL) {
+        p = create_s(1);
+    } else {
+        p = ensure_capacity_s(p, 1);
+    }
+    p[SIZE(p)++] = ch;
     return p;
 }
 
@@ -253,9 +262,23 @@ extern void str_append_string(struct str * str, const char * s) {
 
 /* Append an integer to a str. */
 extern void str_append_int(struct str * str, int i) {
-    char s[30];
-    sprintf(s, "%d", i);
-    str_append_string(str, s);
+    // Most calls are for integers 0 to 9 (~72%).
+    if (i >= 0 && i <= 9) {
+        str_append_ch(str, '0' + i);
+        return;
+    }
+
+    // Ensure there's enough space then snprintf() directly onto the end.
+    int max_size = (CHAR_BIT * sizeof(int) + 5) / 3;
+    str->data = ensure_capacity_s(str->data, max_size);
+    int r = snprintf((char*)str->data + SIZE(str->data), max_size, "%d", i);
+    // Some pre-C99 snprintf implementations return -1 if the buffer is too
+    // small so cast to unsigned for a simpler test.
+    if ((unsigned)r >= (unsigned)max_size) {
+        fprintf(stderr, "str_append_int(%d) would truncate output\n", i);
+        exit(1);
+    }
+    SIZE(str->data) += r;
 }
 
 /* Append wide character to a string as UTF-8. */

@@ -32,6 +32,7 @@ extern byte * create_s(int n);
 extern void report_s(FILE * out, const byte * p);
 extern void lose_s(byte * p);
 extern byte * increase_capacity_s(byte * p, int n);
+extern byte * ensure_capacity_s(byte * p, int n);
 extern byte * copy_s(const byte * p);
 extern byte * add_s_to_s(byte * p, const char * s, int n);
 extern byte * add_sz_to_s(byte * p, const char * s);
