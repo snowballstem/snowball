@@ -140,7 +140,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
         {
             if (eq(s, "-o") || eq(s, "-output")) {
-               check_lim(i, argc);
+                check_lim(i, argc);
                 o->output_file = argv[i++];
                 continue;
             }
