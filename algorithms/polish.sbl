@@ -1,0 +1,240 @@
+/* Based on the Polish stemming algorithm developed by Błażej Kubiński,
+ * which can be found at https://github.com/Tutanchamon/pl_stemmer.
+ *
+ * The first Snowball implementation was written by Tomasz Łysiak, rewritten
+ * and modified by Dmitry Shachnev.
+ */
+
+stringescapes {}
+
+stringdef ak '{U+0105}' // ą a + ogonek
+stringdef ek '{U+0119}' // ę e + ogonek
+stringdef l/ '{U+0142}' // ł l + stroke
+stringdef s' '{U+015b}' // ś s + acute (kreska)
+stringdef c' '{U+0107}' // ć c + acute (kreska)
+stringdef o' '{U+00f3}' // ó o + acute (kreska)
+
+
+externals (stem)
+
+
+routines (
+  mark_regions
+  remove_nouns
+  remove_diminutive
+  remove_superlative_ends
+  remove_adjective_ends
+  remove_verbs_ends
+  remove_adverbs_ends
+  remove_plural_forms
+  remove_general_ends
+)
+
+integers ( pV p1 )
+
+groupings ( v )
+
+define v 'a{ak}e{ek}io{o'}uy'
+
+
+define mark_regions as (
+  $pV = limit
+  $p1 = limit
+
+  do (
+    gopast v     setmark pV
+    gopast non-v setmark p1
+  )
+)
+
+backwardmode (
+  define remove_nouns as (
+    setlimit tomark p1 for ([substring]) among (
+      'ach'  // plural locative
+      'ami'  // plural instrumental
+      'nia'  // genitive of words ending with -nie, e.g. czytanie - czytania
+      'niu'  // dative/locative of words ending with -nie, e.g. czytanie - czytaniu
+      'cia'  // genitive of words ending with -cie, e.g. ukrycie - ukrycia
+      'ciu'  // dative/locative of words ending with -cie, e.g. ukrycie - ukryciu
+      'ce'   // dative/locative of words ending with -ka, e.g. muzyka - muzyce
+      // Verbal nouns, e.g. czytanie, narodzenie.
+      'anie' 'enie'  // nominative
+      'aniu' 'eniu'  // dative/locative
+      // Borrowed words that match English -ation, e.g. fortyfikacja (fortification).
+      'acja'     // nominative
+      'acji'     // genitive/dative/locative
+      'acj{ak}'  // accusative
+        (delete)
+      // Borrowed words that match English -tics, e.g. lingwistyka (linguistics).
+      'tyka'
+        (<- 'ty')
+      // Borrowed words that match English -tion, e.g. intencja (intention).
+      'cja'     // nominative
+      'cji'     // genitive/dative/locative
+      'cj{ak}'  // accusative
+        (<- 'c')
+    )
+  )
+
+  define remove_diminutive as (
+    setlimit tomark p1 for ([substring]) among (
+      'eczek' 'eczka' 'eczkowi' 'eczkiem' 'eczku'      // e.g. człowieczek (diminutive of człowiek)
+      'eczki' 'eczk{o'}w' 'eczkom' 'eczkami' 'eczkach' // plural
+      'iczek' 'iczka' 'iczkowi' 'iczkiem' 'iczku'      // e.g. czajniczek (diminutive of czajnik)
+      'iczki' 'iczk{o'}w' 'iczkom' 'iczkami' 'iczkach' // plural
+      'iszek' 'iszka' 'iszkowi' 'iszkiem' 'iszku'      // e.g. braciszek (diminutive of brat)
+      'iszki' 'iszk{o'}w' 'iszkom' 'iszkami' 'iszkach' // plural
+      'aszek' 'aszka' 'aszkowi' 'aszkiem' 'aszku'      // e.g. młodzieniaszek (diminutive of młodzieniec)
+      'aszki' 'aszk{o'}w' 'aszkom' 'aszkami' 'aszkach' // plural
+      'uszek' 'uszka' 'uszkowi' 'uszkiem' 'uszku'      // e.g. kwiatuszek (diminutive of kwiat)
+      'uszki' 'uszk{o'}w' 'uszkom' 'uszkami' 'uszkach' // plural
+      'ek'     // e.g. ogródek (diminutive of ogród)
+      'ak'     // e.g. gęsiak (diminutive of gęś)
+        (delete)
+    )
+  )
+
+  define remove_adjective_ends as (
+    setlimit tomark p1 for ([substring]) among (
+      // declension of words with -ow- d-suffix, e.g. bobrowy
+      'owy' 'owego' 'owemu' 'owym'  // masculine
+      'owa' 'owej' 'ow{ak}'         // feminine
+      'owe'                         // neuter
+      'owi' 'owych' 'owymi'         // plural
+      // general adjective endings
+      'ych'  // genitive/accusative/locative plural
+      'ego'  // genitive/accusative singular (masculine)
+      'emu'  // dative singular (masculine/neuter)
+      'ej'   // genitive/dative/locative singular (feminine)
+        (delete)
+    )
+  )
+
+  define remove_verbs_ends as (
+    do (
+      setlimit tomark p1 for ([substring]) among (
+        // conditionals:
+        'bym'        // 1st person singular, e.g. czytał(a)bym
+        'by{s'}'     // 2nd person singular, e.g. czytał(a)byś
+        'by{s'}my'   // 1st person plural, e.g. czytalibyśmy
+        'by{s'}cie'  // 2nd person plural, e.g. czytalibyście
+        'by'         // 3rd person singular/plural, e.g. czytał(a)by, czytaliby
+          (delete)
+      )
+    )
+    setlimit tomark pV for ([substring]) among (
+      'asz'  'esz'   // present 2nd person singular, e.g. czytasz, piszesz
+      'amy'  'emy'   // present 1st person plural, e.g. czytamy, piszemy
+      'acie' 'ecie'  // present 2nd person plural, e.g. czytacie, piszecie
+      'cie'          // imperative 2nd person plural, e.g. czytajcie, chodźcie
+      'e{s'}{c'}'    // infinitive, e.g. przynieść
+      'a{s'}{c'}'    // infinitive, e.g. popaść
+      'a{c'}'        // infinitive, e.g. czytać
+      'e{c'}'        // infinitive, e.g. chcieć
+      'i{c'}'        // infinitive, e.g. wozić
+      '{ak}{c'}'     // infinitive, e.g. marznąć
+      'a{l/}em'       'i{l/}em' 'em'  // past 1st person singular masculine, e.g. czytałem, chodziłem, marzłem
+      'a{l/}am'       'i{l/}am' 'am'  // past 1st person singular feminine, e.g. czytałam, chodziłam, marzłam
+      'a{l/}e{s'}'    'i{l/}e{s'}'    // past 2nd person singular masculine, e.g. czytałeś, chodziłeś
+      'a{l/}a{s'}'    'i{l/}a{s'}'    // past 2nd person singular feminine, e.g. czytałaś, chodziłaś
+      'a{l/}'         'i{l/}'         // past 3rd person singular masculine, e.g. czytał, chodził
+      'a{l/}a'        'i{l/}a'        // past 3rd person singular feminine, e.g. czytała, chodziła
+      'a{l/}o'        'i{l/}o'        // past 3rd person singular neuter, e.g. czytało, chodziło
+      'ali{s'}my'     'ili{s'}my'     // past 1st person plural virile, e.g. czytaliśmy, chodziliśmy
+      'a{l/}y{s'}my'  'i{l/}y{s'}my'  // past 1st person plural nonvirile, e.g. czytałyśmy, chodziłyśmy
+      'ali{s'}cie'    'ili{s'}cie'    // past 2nd person plural virile, e.g. czytaliście, chodziliście
+      'a{l/}y{s'}cie' 'i{l/}y{s'}cie' // past 2nd person plural nonvirile, e.g. czytałyście, chodziłyście
+      'ali'           'ili'           // past 3rd person plural virile, e.g. czytali, chodzili
+      'a{l/}y'        'i{l/}y'        // past 3rd person plural nonvirile, e.g. czytały, chodziły
+      '{ak}c'      // contemporary adverbial participle (transgressive), e.g. czytając
+      // different forms of active adjectival participle, e.g. czytający (one who is reading)
+      '{ak}cy'     // nominative singular (masculine)
+      '{ak}cego'   // genitive singular (masculine/neuter)
+      '{ak}cemu'   // dative singular (masculine)
+      '{ak}cym'    // instrumental/locative singular (masculine)
+      '{ak}ca'     // nominative singular (feminine)
+      '{ak}cej'    // genitive/dative/locative singular (feminine)
+      '{ak}c{ak}'  // accusative singular (feminine)
+      '{ak}ce'     // nominative/accusative singular (neuter)
+      '{ak}cych'   // genitive plural
+      '{ak}cymi'   // instrumental plural
+        (delete)
+      'aj'     // imperative, e.g. czytaj
+         (<- 'a')
+    )
+  )
+
+  define remove_adverbs_ends as (
+    setlimit tomark p1 for ([substring]) among (
+      'nie'  // e.g. dokładnie
+        (<- 'n')
+      'wie'  // e.g. możliwie
+        (<- 'w')
+      'rze'  // e.g. dobrze
+        (<- 'r')
+    )
+  )
+
+  define remove_plural_forms as (
+    setlimit tomark p1 for ([substring]) among (
+      '{o'}w'  // genitive plural, e.g. włos - włosów
+      'om'     // dative plural, e.g. włos - włosom
+      'ami'    // instrumental plural, e.g. włos - włosami
+        (delete)
+    )
+  )
+
+  define remove_general_ends as (
+    setlimit tomark p1 for ([substring]) among (
+      // These vowel endings can appear in different contexts
+      'ia'    // e.g. słonia (genitive singular of słoń)
+      'ie'    // e.g. słonie (nominative plural of słoń)
+      'u'     // e.g. stołu (genitive singular of stół)
+      '{ak}'  // e.g. książką (noun, instrumental) or piszą (verb, present 3rd person plural)
+      '{ek}'  // e.g. książkę (noun, accusative) or piszę (verb, present 1st person singular)
+      'i'     // e.g. książki (nominative plural of książka)
+      'a'     // e.g. kobieta (nominative singular)
+      'y'     // e.g. kobiety (nominative plural of kobieta)
+      '{l/}'  // e.g. napadł (past 3rd person singular masculine of napaść)
+        (delete)
+    )
+  )
+)
+
+define remove_superlative_ends as (
+  test (
+    ['naj'] (
+      backwards (
+        [substring] among (
+          'sze'    // adverb, e.g. w najlepsze
+          'szy'    // nominative singular (masculine), e.g. najlepszy
+          'sza'    // nominative singular (feminine), e.g. najlepsza
+          'sz{ak}' // accusative singular (feminine), e.g. najlepszą
+          'szych'  // genitive plural, e.g. najlepszych
+          'szego'  // genitive/accusative singular (masculine), e.g. najlepszego
+          'szemu'  // dative singular (masculine/neuter), e.g. najlepszemu
+          'szym'   // instrumental/locative singular (masculine/neuter), e.g. najlepszym
+          'szej'   // genitive/dative/locative singular (feminine), e.g. najlepszej
+            (delete)
+        )
+      )
+    )
+  )
+  [tomark sizeof 'naj'] delete
+)
+
+define stem as (
+  do mark_regions
+  backwards (
+    do remove_nouns
+    do remove_diminutive
+  )
+  remove_superlative_ends or (backwards do remove_adjective_ends)
+  backwards (
+    do remove_verbs_ends
+    do remove_adverbs_ends
+    do remove_plural_forms
+    do remove_general_ends
+  )
+)
+
