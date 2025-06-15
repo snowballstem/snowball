@@ -1402,9 +1402,9 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~Mconst ");
+    w(g, "~Mconst /** Array<number> */ ");
     write_varname(g, q->name);
-    write_string(g, "/** Array<number> */ = [");
+    write_string(g, " = [");
     for (int i = 0; i < size; i++) {
         write_int(g, map[i]);
         if (i < size - 1) w(g, ", ");
