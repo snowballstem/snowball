@@ -826,8 +826,10 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) {
         w(g, "~{~Mconst /** number */ c = this.cursor;~N");
+        writef(g, "~Mthis.insert(c, c, ", p);
+    } else {
+        writef(g, "~Mthis.insert(this.cursor, this.cursor, ", p);
     }
-    writef(g, "~Mthis.insert(this.cursor, this.cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) w(g, "~Mthis.cursor = c;~N~}");
@@ -840,11 +842,17 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (keep_c) {
         w(g, "~{~Mconst /** number */ c = base.cursor;~N");
-    }
-    if (p->mode == m_forward) {
-        writef(g, "~Mthis.insert(this.cursor, this.limit, ", p);
+        if (p->mode == m_forward) {
+            writef(g, "~Mthis.insert(c, this.limit, ", p);
+        } else {
+            writef(g, "~Mthis.insert(this.limit_backward, c, ", p);
+        }
     } else {
-        writef(g, "~Mthis.insert(this.limit_backward, this.cursor, ", p);
+        if (p->mode == m_forward) {
+            writef(g, "~Mthis.insert(this.cursor, this.limit, ", p);
+        } else {
+            writef(g, "~Mthis.insert(this.limit_backward, this.cursor, ", p);
+        }
     }
     generate_address(g, p);
     writef(g, ");~N", p);
