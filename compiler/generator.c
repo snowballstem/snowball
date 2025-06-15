@@ -295,8 +295,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
         ch = input[i++];
         switch (ch) {
             case '~': write_char(g, '~'); continue;
-            case 'i': winc(g, p); continue;
-            case 'l': write_check_limit(g, p); continue;
             case 'f': write_failure(g); continue;
             case 'M': write_margin(g); continue;
             case 'N': write_newline(g); continue;
@@ -835,9 +833,14 @@ static void generate_next(struct generator * g, struct node * p) {
               "~Mif (ret < 0) ~f~N"
               "~Mz->c = ret;~N"
               "~}", p);
-    } else
-        writef(g, "~M~l~N"
-              "~M~i~N", p);
+    } else {
+        write_margin(g);
+        write_check_limit(g, p);
+        write_newline(g);
+        write_margin(g);
+        winc(g, p);
+        write_newline(g);
+    }
 }
 
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
