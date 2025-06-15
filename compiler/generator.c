@@ -104,8 +104,8 @@ static void wlitch(struct generator * g, int ch) {
 static void wlitarray(struct generator * g, symbol * p) {  /* write literal array */
     write_string(g, "{ ");
     for (int i = 0; i < SIZE(p); i++) {
+        if (i) write_string(g, ", ");
         wlitch(g, p[i]);
-        if (i < SIZE(p) - 1) write_string(g, ", ");
     }
     write_string(g, " }");
 }
@@ -1738,12 +1738,12 @@ static void generate_among_table(struct generator * g, struct among * x) {
     w(g, "~Mstatic const struct among a_~I0[~I1] = {~N");
 
     for (int i = 0; i < x->literalstring_count; i++) {
+        if (i) w(g, ",~N");
         g->I[1] = i;
         g->I[2] = v[i].size;
         g->I[3] = (v[i].i >= 0 ? v[i].i - i : 0);
         g->I[4] = v[i].result;
         g->I[5] = v[i].function_index;
-        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         if (g->options->comments) {
             w(g, "/*~J1 */ ");
@@ -1754,9 +1754,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
         } else {
             w(g, "s_~I0_~I1,");
         }
-        w(g, " ~I3, ~I4, ~I5}~S0~N");
+        w(g, " ~I3, ~I4, ~I5}");
     }
-    w(g, "};~N");
+    w(g, "~N};~N");
 
     if (x->function_count <= 1) return;
 
@@ -1804,8 +1804,8 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     write_varname(g, q->name);
     w(g, "[] = { ");
     for (int i = 0; i < size; i++) {
+        if (i) w(g, ", ");
         write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
     }
     w(g, " };~N");
 

@@ -1265,9 +1265,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     w(g, "~Mprivate final static Among[] a_~I0 = {~N~+");
     for (int i = 0; i < x->literalstring_count; i++) {
+        if (i) w(g, ",~N");
         g->I[0] = v[i].i;
         g->I[1] = v[i].result;
-        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         w(g, "~Mnew Among(");
         write_literal_string(g, v[i].b);
@@ -1277,9 +1277,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
             write_varname(g, v[i].function);
             w(g, "\", methodObject");
         }
-        w(g, ")~S0~N");
+        w(g, ")");
     }
-    w(g, "~-~M};~N~N");
+    w(g, "~N~-~M};~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -1304,8 +1304,8 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     write_varname(g, q->name);
     write_string(g, " = {");
     for (int i = 0; i < size; i++) {
+        if (i) w(g, ", ");
         write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
     }
     w(g, " };~N~N");
 

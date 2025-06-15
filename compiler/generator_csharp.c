@@ -1269,16 +1269,16 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     w(g, "~Mprivate static readonly Among[] a_~I0 = new[] ~N~M{~N~+");
     for (int i = 0; i < x->literalstring_count; i++) {
+        if (i) w(g, ",~N");
         g->I[3] = v[i].i;
         g->I[4] = v[i].result;
         g->I[5] = v[i].function_index;
-        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         w(g, "~Mnew Among(");
         write_literal_string(g, v[i].b);
-        w(g, ", ~I3, ~I4, ~I5)~S0~N");
+        w(g, ", ~I3, ~I4, ~I5)");
     }
-    w(g, "~-~M};~N");
+    w(g, "~N~-~M};~N");
 
     if (x->function_count <= 1) return;
 
