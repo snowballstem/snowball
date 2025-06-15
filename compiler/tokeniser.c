@@ -23,13 +23,13 @@ static int hex_to_num(int ch);
 static int smaller(int a, int b) { return a < b ? a : b; }
 
 extern byte * get_input(const char * filename) {
-    FILE * input = strcmp(filename, "-") == 0 ? stdin : fopen(filename, "r");
+    FILE * input = strcmp(filename, "-") == 0 ? stdin : fopen(filename, "rb");
     if (input == NULL) { return NULL; }
     byte * u = NULL;
     int size = fseek(input, 0, SEEK_END) == 0 ? ftell(input) : -1;
     if (size >= 0 && fseek(input, 0, SEEK_SET) == 0) {
         u = create_s(size);
-        if (fread(u, 1, size, input) != (size_t)size) {
+        if (fread(u, size, 1, input) != 1) {
             fprintf(stderr, "%s: Read error\n", filename);
             exit(1);
         }
