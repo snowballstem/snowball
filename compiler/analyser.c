@@ -35,7 +35,7 @@ static void read_program_(struct analyser * a, int terminator);
 static struct node * read_C(struct analyser * a);
 static struct node * new_string_command(struct analyser * a, int token);
 
-static void print_node_(struct node * p, int n, const char * s) {
+static void print_node_(const struct node * p, int n, const char * s) {
     printf("%*s%s", n * 2, s, name_of_token(p->type));
     if (p->name) {
         putchar(' ');
