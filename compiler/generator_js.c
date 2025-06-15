@@ -737,16 +737,13 @@ static void generate_atmark(struct generator * g, struct node * p) {
 }
 
 static void generate_hop(struct generator * g, struct node * p) {
-    int c_count = ++g->keep_count;
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
-    g->I[0] = c_count;
-    w(g, "~{~Mconst /** number */ c~I0 = this.cursor ~S0 ");
+    w(g, "~{~Mconst /** number */ c = this.cursor ~S0 ");
     generate_AE(g, p->AE);
     w(g, ";~N");
 
-    g->I[0] = c_count;
     g->S[1] = p->mode == m_forward ? "> this.limit" : "< this.limit_backward";
     g->S[2] = p->mode == m_forward ? "<" : ">";
     if (p->AE->type == c_number) {
@@ -754,11 +751,11 @@ static void generate_hop(struct generator * g, struct node * p) {
         //
         // No need to check for negative hop as that's converted to false by
         // the analyser.
-        write_failure_if(g, "c~I0 ~S1", p);
+        write_failure_if(g, "c ~S1", p);
     } else {
-        write_failure_if(g, "c~I0 ~S1 || c~I0 ~S2 this.cursor", p);
+        write_failure_if(g, "c ~S1 || c ~S2 this.cursor", p);
     }
-    writef(g, "~Mthis.cursor = c~I0;~N", p);
+    writef(g, "~Mthis.cursor = c;~N", p);
     writef(g, "~}", p);
 }
 
@@ -823,33 +820,26 @@ static void generate_address(struct generator * g, struct node * p) {
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
-    int c_count;
+
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) {
-        c_count = ++g->keep_count;
-        g->I[0] = c_count;
-        w(g, "~{~Mconst /** number */ c~I0 = this.cursor;~N");
+        w(g, "~{~Mconst /** number */ c = this.cursor;~N");
     }
     writef(g, "~Mthis.insert(this.cursor, this.cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) {
-        g->I[0] = c_count;
-        w(g, "~Mthis.cursor = c~I0;~N~}");
-    }
+    if (keep_c) w(g, "~Mthis.cursor = c;~N~}");
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-    int c_count;
+
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
     if (keep_c) {
-        c_count = ++g->keep_count;
-        g->I[0] = c_count;
-        w(g, "~{~Mconst /** number */ c~I0 = this.cursor;~N");
+        w(g, "~{~Mconst /** number */ c = base.cursor;~N");
     }
     if (p->mode == m_forward) {
         writef(g, "~Mthis.insert(this.cursor, this.limit, ", p);
@@ -858,10 +848,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) {
-        g->I[0] = c_count;
-        w(g, "~Mthis.cursor = c~I0;~N~}");
-    }
+    if (keep_c) w(g, "~Mthis.cursor = c;~N~}");
 }
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
