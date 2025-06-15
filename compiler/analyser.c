@@ -33,8 +33,7 @@ typedef enum {
 
 static void read_program_(struct analyser * a, int terminator);
 static struct node * read_C(struct analyser * a);
-static struct node * C_style(struct analyser * a, const char * s, int token);
-
+static struct node * new_string_command(struct analyser * a, int token);
 
 static void print_node_(struct node * p, int n, const char * s) {
     printf("%*s%s", n * 2, s, name_of_token(p->type));
@@ -430,7 +429,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
         case c_lenof:
         case c_sizeof: {
             int token = t->token;
-            p = C_style(a, "S", token);
+            p = new_string_command(a, token);
             if (!p->literalstring) {
                 if (p->name) p->name->value_used = true;
                 break;
@@ -632,30 +631,15 @@ static struct node * read_C_list(struct analyser * a) {
     }
 }
 
-static struct node * C_style(struct analyser * a, const char * s, int token) {
+static struct node * new_string_command(struct analyser * a, int token) {
     struct node * p = new_node(a, token);
-    for (int i = 0; s[i] != 0; i++) switch (s[i]) {
-        case 'C':
-            p->left = read_C(a); continue;
-        case 'D':
-            p->aux = read_C(a); continue;
-        case 'A':
-            p->AE = read_AE(a, NULL, 0); continue;
-        case 'f':
-            get_token(a, c_for); continue;
-        case 'S':
-            {
-                int str_token = read_token(a->tokeniser);
-                if (str_token == c_name) name_to_node(a, p, 's'); else
-                if (str_token == c_literalstring) p->literalstring = new_literalstring(a);
-                else error(a, e_string_omitted);
-            }
-            continue;
-        case 'b':
-        case 's':
-        case 'i':
-            if (get_token(a, c_name)) name_to_node(a, p, s[i]);
-            continue;
+    int str_token = read_token(a->tokeniser);
+    if (str_token == c_literalstring) {
+        p->literalstring = new_literalstring(a);
+    } else if (str_token == c_name) {
+        name_to_node(a, p, 's');
+    } else {
+        error(a, e_string_omitted);
     }
     return p;
 }
@@ -1078,25 +1062,25 @@ static struct node * read_C(struct analyser * a) {
             }
             return p;
         }
-        case c_backwards:
-            {
-                int mode = a->mode;
-                if (a->mode == m_backward) error(a, e_already_backwards); else a->mode = m_backward;
-                struct node * p = C_style(a, "C", token);
-                a->mode = mode;
-                return p;
-            }
-        case c_reverse:
-            {
-                int mode = a->mode;
-                int modifyable = a->modifyable;
-                a->modifyable = false;
-                a->mode = mode == m_forward ? m_backward : m_forward;
-                struct node * p = C_style(a, "C", token);
-                a->mode = mode;
-                a->modifyable = modifyable;
-                return p;
-            }
+        case c_backwards: {
+            int mode = a->mode;
+            if (a->mode == m_backward) error(a, e_already_backwards); else a->mode = m_backward;
+            struct node * p = new_node(a, token);
+            p->left = read_C(a);
+            a->mode = mode;
+            return p;
+        }
+        case c_reverse: {
+            int mode = a->mode;
+            int modifyable = a->modifyable;
+            a->modifyable = false;
+            a->mode = mode == m_forward ? m_backward : m_forward;
+            struct node * p = new_node(a, token);
+            p->left = read_C(a);
+            a->mode = mode;
+            a->modifyable = modifyable;
+            return p;
+        }
         case c_not: {
             struct node * subcommand = read_C(a);
             if (subcommand->type == c_booltest) {
@@ -1114,8 +1098,11 @@ static struct node * read_C(struct analyser * a) {
         case c_fail:
         case c_test:
         case c_do:
-        case c_repeat:
-            return C_style(a, "C", token);
+        case c_repeat: {
+            struct node * p = new_node(a, token);
+            p->left = read_C(a);
+            return p;
+        }
         case c_goto:
         case c_gopast: {
             struct node * subcommand = read_C(a);
@@ -1153,59 +1140,66 @@ static struct node * read_C(struct analyser * a) {
             p->left = subcommand;
             return p;
         }
-        case c_loop: {
-            struct node * n = C_style(a, "AC", token);
-            // n->AE is NULL after a syntax error, e.g. `loop next`.
-            if (n->AE && n->AE->type == c_number) {
-                if (n->AE->number <= 0) {
-                    // `loop N C`, where N <= 0 is a no-op.
-                    if (n->AE->fixed_constant) {
-                        fprintf(stderr,
-                                "%s:%d: warning: loop %d C is a no-op\n",
-                                t->file, n->AE->line_number, n->AE->number);
-                    }
-                    n->AE = NULL;
-                    n->left = NULL;
-                    n->type = c_true;
-                } else if (n->AE->number == 1) {
-                    // `loop 1 C` -> `C`.
-                    if (n->AE->fixed_constant) {
-                        fprintf(stderr,
-                                "%s:%d: warning: loop 1 C is just C\n",
-                                t->file, n->AE->line_number);
-                    }
-                    n = n->left;
-                }
-            }
-            return n;
-        }
+        case c_loop:
         case c_atleast: {
-            struct node * n = C_style(a, "AC", token);
+            struct node * n = new_node(a, token);
+            n->AE = read_AE(a, NULL, 0);
+            n->left = read_C(a);
+
             // n->AE is NULL after a syntax error, e.g. `loop next`.
             if (n->AE && n->AE->type == c_number) {
                 if (n->AE->number <= 0) {
-                    // `atleast N C` where N <= 0 -> `repeat C`.
-                    if (n->AE->fixed_constant) {
-                        fprintf(stderr,
-                                "%s:%d: warning: atleast %d C is just repeat C\n",
-                                t->file, n->AE->line_number, n->AE->number);
+                    if (token == c_loop) {
+                        // `loop N C`, where N <= 0 is a no-op.
+                        if (n->AE->fixed_constant) {
+                            fprintf(stderr,
+                                    "%s:%d: warning: loop %d C is a no-op\n",
+                                    t->file, n->AE->line_number, n->AE->number);
+                        }
+                        n->AE = NULL;
+                        n->left = NULL;
+                        n->type = c_true;
+                    } else {
+                        // `atleast N C` where N <= 0 -> `repeat C`.
+                        if (n->AE->fixed_constant) {
+                            fprintf(stderr,
+                                    "%s:%d: warning: atleast %d C is just repeat C\n",
+                                    t->file, n->AE->line_number, n->AE->number);
+                        }
+                        n->AE = NULL;
+                        n->type = c_repeat;
                     }
-                    n->AE = NULL;
-                    n->type = c_repeat;
+                } else if (n->AE->number == 1) {
+                    if (token == c_loop) {
+                        // `loop 1 C` -> `C`.
+                        if (n->AE->fixed_constant) {
+                            fprintf(stderr,
+                                    "%s:%d: warning: loop 1 C is just C\n",
+                                    t->file, n->AE->line_number);
+                        }
+                        n = n->left;
+                    }
                 }
             }
             return n;
         }
         case c_setmark: {
-            struct node * n = C_style(a, "i", token);
-            if (n->name) n->name->initialised = true;
+            struct node * n = new_node(a, token);
+            if (get_token(a, c_name)) {
+                name_to_node(a, n, 'i');
+                if (n->name) n->name->initialised = true;
+            }
             return n;
         }
         case c_tomark:
-        case c_atmark:
-            return C_style(a, "A", token);
+        case c_atmark: {
+            struct node * n = new_node(a, token);
+            n->AE = read_AE(a, NULL, 0);
+            return n;
+        }
         case c_hop: {
-            struct node * n = C_style(a, "A", token);
+            struct node * n = new_node(a, token);
+            n->AE = read_AE(a, NULL, 0);
             // n->AE is NULL after a syntax error, e.g. `hop hop`.
             if (n->AE && n->AE->type == c_number) {
                 if (n->AE->number == 1) {
@@ -1247,8 +1241,11 @@ static struct node * read_C(struct analyser * a) {
         case c_assignto:
         case c_sliceto: {
             check_modifyable(a);
-            struct node *n = C_style(a, "s", token);
-            if (n->name) n->name->initialised = true;
+            struct node * n = new_node(a, token);
+            if (get_token(a, c_name)) {
+                name_to_node(a, n, 's');
+                if (n->name) n->name->initialised = true;
+            }
             if (token == c_assignto) {
                 fprintf(stderr,
                         "%s:%d: warning: Use of `=>` is not recommended, "
@@ -1263,16 +1260,24 @@ static struct node * read_C(struct analyser * a) {
         case c_attach:
         case c_slicefrom: {
             check_modifyable(a);
-            struct node * n = C_style(a, "S", token);
+            struct node * n = new_string_command(a, token);
             if (n->name) n->name->value_used = true;
             return n;
         }
-        case c_setlimit:
-            return C_style(a, "CfD", token);
+        case c_setlimit: {
+            struct node * n = new_node(a, token);
+            n->left = read_C(a);
+            get_token(a, c_for);
+            n->aux = read_C(a);
+            return n;
+        }
         case c_set:
         case c_unset: {
-            struct node * n = C_style(a, "b", token);
-            if (n->name) n->name->initialised = true;
+            struct node * n = new_node(a, token);
+            if (get_token(a, c_name)) {
+                name_to_node(a, n, 'b');
+                if (n->name) n->name->initialised = true;
+            }
             return n;
         }
         case c_dollar: {
