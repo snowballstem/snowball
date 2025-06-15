@@ -1034,7 +1034,7 @@ static void generate_define(struct generator * g, struct node * p) {
         writef(g, "~Mfunc ~W(env *snowballRuntime.Env) bool {~+~N", p);
         generate_setup_context(g);
     }
-    if (p->amongvar_needed) w(g, "~Mvar among_var int32~N");
+    if (q->amongvar_needed) w(g, "~Mvar among_var int32~N");
 
     /* Save output. */
     struct str * saved_output = g->outbuf;

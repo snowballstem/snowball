@@ -1350,7 +1350,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->S[0] = q->type == t_routine ? "static" : "extern";
 
     writef(g, "~S0 int ~V(struct SN_env * z) {~N~+", p);
-    if (p->amongvar_needed) w(g, "~Mint among_var;~N");
+    if (q->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;

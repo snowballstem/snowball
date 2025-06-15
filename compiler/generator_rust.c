@@ -1025,7 +1025,7 @@ static void generate_define(struct generator * g, struct node * p) {
         writef(g, "~Mpub fn ~W(env: &mut SnowballEnv) -> bool {~+~N", p);
         generate_setup_context(g);
     }
-    if (p->amongvar_needed) w(g, "~Mlet mut among_var;~N");
+    if (q->amongvar_needed) w(g, "~Mlet mut among_var;~N");
 
     /* Save output. */
     struct str * saved_output = g->outbuf;

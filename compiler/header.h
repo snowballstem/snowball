@@ -209,6 +209,7 @@ struct name {
     byte value_used;            /* (For variables) is its value ever used? */
     byte initialised;           /* (For variables) is it ever initialised? */
     byte used_in_definition;    /* (grouping) used in grouping definition? */
+    byte amongvar_needed;       /* for routines, externals */
     struct node * definition;   /* for routines, externals */
     // Initialised to -1; set to -2 if reachable from an external.
     // Reachable names are then numbered 0, 1, 2, ... with separate numbering
@@ -287,7 +288,6 @@ struct node {
     symbol * literalstring;
     int number;
     int line_number;
-    int amongvar_needed;   /* used in routine definitions */
 };
 
 enum name_types {

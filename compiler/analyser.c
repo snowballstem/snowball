@@ -1661,7 +1661,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
         error2(a, e_unresolved_substring, a->substring->line_number);
         a->substring = NULL;
     }
-    p->amongvar_needed = a->amongvar_needed;
+    if (q) q->amongvar_needed = a->amongvar_needed;
 }
 
 static void read_define(struct analyser * a) {
