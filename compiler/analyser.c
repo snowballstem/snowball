@@ -1712,7 +1712,8 @@ static void read_backwardmode(struct analyser * a) {
 static void read_program_(struct analyser * a, int terminator) {
     struct tokeniser * t = a->tokeniser;
     while (true) {
-        switch (read_token(t)) {
+        int token = read_token(t);
+        switch (token) {
             case c_strings:     read_names(a, t_string); break;
             case c_booleans:    read_names(a, t_boolean); break;
             case c_integers:    read_names(a, t_integer); break;
@@ -1721,13 +1722,10 @@ static void read_program_(struct analyser * a, int terminator) {
             case c_groupings:   read_names(a, t_grouping); break;
             case c_define:      read_define(a); break;
             case c_backwardmode:read_backwardmode(a); break;
-            case c_ket:
-                if (terminator == c_ket) return;
-                /* fall through */
             default:
+                if (token == terminator) return;
                 error(a, e_unexpected_token); break;
             case -1:
-                if (terminator >= 0) omission_error(a, c_ket);
                 return;
         }
     }
