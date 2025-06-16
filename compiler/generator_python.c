@@ -143,6 +143,8 @@ static void wsetlab_begin(struct generator * g) {
 static void wsetlab_end(struct generator * g, int n) {
     g->I[0] = n;
     w(g, "~-~Mexcept lab~I0: pass~N");
+    // We can safely reuse this later in this function.
+    g->next_label = n;
 }
 
 static void write_failure(struct generator * g) {
@@ -363,8 +365,8 @@ static void generate_or(struct generator * g, struct node * p) {
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
     }
-    int label = new_label(g);
     while (p->right != NULL) {
+        int label = new_label(g);
         g->failure_label = label;
         wsetlab_begin(g);
         generate(g, p);
