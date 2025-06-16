@@ -1342,6 +1342,8 @@ static struct node * read_C(struct analyser * a) {
                     default:
                         error(a, e_unexpected_token);
                         hold_token(t);
+                        (void)read_AE(a, NULL, 0);
+                        get_token(a, c_ket);
                         break;
                 }
                 return n;
@@ -1407,7 +1409,7 @@ static struct node * read_C(struct analyser * a) {
              */
             p->name = q;
             p->AE = read_AE(a, q, 0);
-            if (p->AE->type == c_number) {
+            if (p->AE && p->AE->type == c_number) {
                 switch (p->type) {
                     case c_plusassign:
                     case c_minusassign:
