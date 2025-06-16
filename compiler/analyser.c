@@ -640,6 +640,7 @@ static struct node * new_string_command(struct analyser * a, int token) {
         name_to_node(a, p, 's');
     } else {
         error(a, e_string_omitted);
+        hold_token(a->tokeniser);
     }
     return p;
 }
