@@ -1490,6 +1490,7 @@ static struct node * read_C(struct analyser * a) {
                 read_token(t);
                 if (t->token == c_minus) read_token(t);
                 if (!check_token(a, c_name)) {
+                    hold_token(t);
                     return p;
                 }
                 name_to_node(a, p, 'g');
