@@ -25,7 +25,7 @@ routines (
   normalize_consonant
 )
 
-integers ( p0 p1 )
+integers ( p1 )
 
 groupings ( v )
 
@@ -33,12 +33,7 @@ define v 'a{ak}e{ek}io{o'}uy'
 
 
 define mark_regions as (
-  $p0 = limit
   $p1 = limit
-
-  // Make sure we don't produce too short outputs.
-  test (hop 2 setmark p0)
-
   gopast v
   gopast non-v  setmark p1
 )
@@ -47,7 +42,7 @@ backwardmode (
   define adjectival as (
     // This function handles adjectives (including comparative/superlative forms)
     // as well as participles.
-    setlimit tomark p0 for ([substring]) among (
+    [substring] among (
       'y'          // singular masculine nominative (nowy)
       'ego' 'iego' // singular masculine genitive (nowego, polskiego)
       'emu' 'iemu' // singular masculine dative (nowemu, polskiemu)
@@ -58,7 +53,7 @@ backwardmode (
         (
           delete
           try (
-            setlimit tomark p0 for ([substring]) among (
+            [substring] among (
               'aj{ak}c'  // participle suffix (czytający)
               '{ak}c'    // participle suffix (lecący)
               'iejsz'    // comparative suffix (piękniejszy)
@@ -96,7 +91,7 @@ backwardmode (
           (delete)
       )
     )
-    setlimit tomark p0 for ([substring]) among (
+    [substring] among (
       'asz'  'esz'  'isz'  // present 2nd person singular (czytasz, piszesz, nosisz)
       'amy'  'emy'  'imy'  // present 1st person plural (czytamy, piszemy, nosimy)
       'acie' 'ecie' 'icie' // present 2nd person plural (czytacie, piszecie, nosicie)
@@ -151,7 +146,7 @@ backwardmode (
   define verb2 as (
     // -szą can be also part of comparative forms like piękniejszą,
     // so we need to process it after we are done with adjectival forms.
-    setlimit tomark p0 for ([substring]) among (
+    [substring] among (
       'sz{ek}' // present 1st person singular (noszę)
       'sz{ak}' // present 3rd person plural (noszą)
         (<- 's')
@@ -178,7 +173,8 @@ backwardmode (
 
   define normalize_consonant as (
     // Remove kreska mark, because most of oblique cases do not have it.
-    [substring] among (
+    // Don't mutate single character inputs.
+    [substring] not atlimit among (
       '{c'}' (<- 'c') // e.g. miłość → miłośc
       '{n'}' (<- 'n') // e.g. słoń → słon
       '{s'}' (<- 's') // e.g. gęś → gęs
@@ -189,12 +185,18 @@ backwardmode (
 
 define stem as (
   do mark_regions
-  backwards (
-    verb
-    or short_verb
-    or adjectival
-    or noun
-    or normalize_consonant
-    or verb2
+  // Make sure we don't produce too short outputs.  The "backwards" will
+  // set the backwards limit to the current cursor position.
+  (
+    hop 2
+    backwards (
+      verb
+      or short_verb
+      or adjectival
+      or noun
+      or verb2
+    )
+  ) or (
+    backwards normalize_consonant
   )
 )
