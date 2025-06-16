@@ -193,6 +193,7 @@ define exception1 as (
 
         /* special changes: */
 
+        'skis'      (<-'ski')
         'skies'     (<-'sky')
 
         /* special -LY cases */
