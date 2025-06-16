@@ -10,7 +10,7 @@
 #define EXTENDER 40
 
 
-/*  This modules provides a simple mechanism for arbitrary length writable
+/*  This module provides a simple mechanism for arbitrary length writable
     strings, called 'blocks'. They are 'symbol *' items rather than 'char *'
     items however.
 
