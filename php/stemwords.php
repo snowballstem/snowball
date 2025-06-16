@@ -25,11 +25,14 @@ $stemmer = new $class;
 fwrite(STDERR,"Waiting for stdin...\n");
 $in = fopen('php://stdin', 'r');
 fwrite(STDERR,"Stemming $lang...\n");
+$bench = microtime(true);
+$count = 0;
 while( $word = fgets($in) ) {
     $word = rtrim($word, "\n");
     $stem = $stemmer->stemWord($word);
     //fwrite(STDERR,"$word => $stem\n");
+    $count++;
     echo $stem,"\n";
 }
-fwrite(STDERR,"Done\n");
+fwrite(STDERR, sprintf("Done: %u words in %.2f seconds\n", $count, microtime(true)-$bench) );
 fclose($in);
