@@ -146,7 +146,6 @@ static void wsetl(struct generator * g, int n) {
     write_int(g, n);
     write_string(g, ">>");
     write_newline(g);
-    g->line_labelled = g->line_count;
 }
 
 static void write_failure(struct generator * g) {
