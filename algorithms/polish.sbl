@@ -17,10 +17,7 @@ externals (stem)
 
 routines (
   mark_regions
-  adjectival
-  verb
-  short_verb
-  verb2
+  verb_or_adjective
   noun
   normalize_consonant
 )
@@ -39,47 +36,7 @@ define mark_regions as (
 )
 
 backwardmode (
-  define adjectival as (
-    // This function handles adjectives (including comparative/superlative forms)
-    // as well as participles.
-    [substring] among (
-      'y'          // singular masculine nominative (nowy)
-      'ego' 'iego' // singular masculine genitive (nowego, polskiego)
-      'emu' 'iemu' // singular masculine dative (nowemu, polskiemu)
-      'ym'  'im'   // singular masculine instrumental (nowym, polskim)
-      'ej'  'iej'  // singular feminine genitive (nowej, polskiej)
-      'ych' 'ich'  // plural genitive (nowych, polskich)
-      'ymi' 'imi'  // plural instrumental (nowymi, polskimi)
-        (
-          delete
-          try (
-            [substring] among (
-              'aj{ak}c'  // participle suffix (czytający)
-              '{ak}c'    // participle suffix (lecący)
-              'iejsz'    // comparative suffix (piękniejszy)
-              'sz'       // comparative suffix (lepszy)
-                (delete)
-              'sz{ak}c'  // participle suffix (noszący)
-                (<- 's')
-            )
-          )
-        )
-      // We cannot remove endings like -ą and -e unconditionally, because these
-      // letters appear in too many contexts. But we can safely remove them if we
-      // know that our word is a participle or a comparative/superlative form.
-      'aj{ak}ca'    '{ak}ca'    'iejsza'    'sza'    // singular feminine nominative (czytająca, lecąca, piękniejsza, lepsza)
-      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}' 'sz{ak}' // singular feminine accusative (czytającą, lecącą, piękniejszą, lepszą)
-      'aj{ak}ce'    '{ak}ce'    'iejsze'    'sze'    // singular neuter nominative (czytające, lecące, piękniejsze, lepsze)
-        (delete)
-      // Handle participles like nosząca, prosząca.
-      'sz{ak}ca'
-      'sz{ak}c{ak}'
-      'sz{ak}ce'
-        (<- 's')
-    )
-  )
-
-  define verb as (
+  define verb_or_adjective as (
     do (
       setlimit tomark p1 for ([substring]) among (
         // conditionals:
@@ -120,6 +77,13 @@ backwardmode (
       'ajcie'  // imperative 2nd person plural (czytajcie)
       'cie'    // imperative 2nd person plural (chodźcie)
         (delete)
+      'sz{ek}' // present 1st person singular (noszę)
+// Also an adjectival form below (singular feminine accusative).
+// Currently noszą -> no.  FIXME When to apply each rule?
+//      'sz{ak}' // present 3rd person plural (noszą)
+        (<- 's')
+      '{ek}'   // present 1st person singular (lecę)
+        (delete)
 
       // There are short verbs whose root consists of only one consonant, e.g. być, żyć.
       // Stemming them to one letter would merge them with these letters used in other
@@ -132,25 +96,50 @@ backwardmode (
       'li{s'}cie'
       '{l/}y{s'}cie'
         (<- '{l/}')
-    )
-  )
 
-  define verb2 as (
-    // -szą can be also part of comparative forms like piękniejszą,
-    // so we need to process it after we are done with adjectival forms.
-    [substring] among (
-      'sz{ek}' // present 1st person singular (noszę)
-      'sz{ak}' // present 3rd person plural (noszą)
-        (<- 's')
-      '{ek}'   // present 1st person singular (lecę)
+      // Adjectives (including comparative/superlative forms)
+      // as well as participles.
+      'y'          // singular masculine nominative (nowy)
+      'ego' 'iego' // singular masculine genitive (nowego, polskiego)
+      'emu' 'iemu' // singular masculine dative (nowemu, polskiemu)
+      'ym'  'im'   // singular masculine instrumental (nowym, polskim)
+      'ej'  'iej'  // singular feminine genitive (nowej, polskiej)
+      'ych' 'ich'  // plural genitive (nowych, polskich)
+      'ymi' 'imi'  // plural instrumental (nowymi, polskimi)
+        (
+          delete
+          try (
+            [substring] among (
+              'aj{ak}c'  // participle suffix (czytający)
+              '{ak}c'    // participle suffix (lecący)
+              'iejsz'    // comparative suffix (piękniejszy)
+              'sz'       // comparative suffix (lepszy)
+                (delete)
+              'sz{ak}c'  // participle suffix (noszący)
+                (<- 's')
+            )
+          )
+        )
+      // We cannot remove endings like -ą and -e unconditionally, because these
+      // letters appear in too many contexts. But we can safely remove them if we
+      // know that our word is a participle or a comparative/superlative form.
+      'aj{ak}ca'    '{ak}ca'    'iejsza'    'sza'    // singular feminine nominative (czytająca, lecąca, piękniejsza, lepsza)
+      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}' 'sz{ak}' // singular feminine accusative (czytającą, lecącą, piękniejszą, lepszą)
+      'aj{ak}ce'    '{ak}ce'    'iejsze'    'sze'    // singular neuter nominative (czytające, lecące, piękniejsze, lepsze)
         (delete)
+      // Handle participles like nosząca, prosząca.
+      'sz{ak}ca'
+      'sz{ak}c{ak}'
+      'sz{ak}ce'
+        (<- 's')
     )
   )
 
   define noun as (
     setlimit tomark p1 for ([substring]) among (
       'a' 'o'                   // singular nominative (książka, lato)
-      'i' 'y' 'u' 'ia'          // singular genitive (książki, kobiety, stołu, słonia)
+      // 'y' removed as an adjectival ending.
+      'i' /*'y'*/ 'u' 'ia'          // singular genitive (książki, kobiety, stołu, słonia)
       'owi' 'iowi'              // singular dative (stołowi, słoniowi)
       '{ak}' 'i{ak}' 'em' 'iem' // singular instrumental (książką, możliwością, stołem, słoniem)
       'e' 'iu'                  // singular locative (stole, słoniu)
@@ -182,10 +171,8 @@ define stem as (
   (
     hop 2
     backwards (
-      verb
-      or adjectival
+      verb_or_adjective
       or noun
-      or verb2
     )
   ) or (
     backwards normalize_consonant
