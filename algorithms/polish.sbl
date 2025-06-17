@@ -17,9 +17,10 @@ externals (stem)
 
 routines (
   mark_regions
-  verb_or_adjective
+  remove_endings
   noun
   normalize_consonant
+  R1
 )
 
 integers ( p1 )
@@ -36,7 +37,9 @@ define mark_regions as (
 )
 
 backwardmode (
-  define verb_or_adjective as (
+  define R1 as ($p1 <= cursor)
+
+  define remove_endings as (
     do (
       setlimit tomark p1 for ([substring]) among (
         // conditionals:
@@ -132,22 +135,19 @@ backwardmode (
       'sz{ak}c{ak}'
       'sz{ak}ce'
         (<- 's')
-    )
-  )
 
-  define noun as (
-    setlimit tomark p1 for ([substring]) among (
-      'a' 'o'                   // singular nominative (książka, lato)
+      // Noun forms.
+      'a' R1 'o' R1                  // singular nominative (książka, lato)
       // 'y' removed as an adjectival ending.
-      'i' /*'y'*/ 'u' 'ia'          // singular genitive (książki, kobiety, stołu, słonia)
-      'owi' 'iowi'              // singular dative (stołowi, słoniowi)
-      '{ak}' 'i{ak}' 'em' 'iem' // singular instrumental (książką, możliwością, stołem, słoniem)
-      'e' 'iu'                  // singular locative (stole, słoniu)
-      'ie'                      // plural nominative (słonie)
-      '{o'}w'                   // plural genitive (stołów)
-      'om'  'iom'               // plural dative (książkom, słoniom)
-      'ami' 'iami'              // plural instrumental (książkami, słoniami)
-      'ach' 'iach'              // plural locative (książkach, słoniach)
+      'i' R1 /*'y'*/ 'u' R1 'ia' R1          // singular genitive (książki, kobiety, stołu, słonia)
+      'owi' R1 'iowi' R1              // singular dative (stołowi, słoniowi)
+      '{ak}' R1 'i{ak}' R1 'em' R1 'iem' R1 // singular instrumental (książką, możliwością, stołem, słoniem)
+      'e' R1 'iu' R1                  // singular locative (stole, słoniu)
+      'ie' R1                      // plural nominative (słonie)
+      '{o'}w' R1                   // plural genitive (stołów)
+      'om' R1  'iom' R1               // plural dative (książkom, słoniom)
+      'ami' R1 'iami' R1              // plural instrumental (książkami, słoniami)
+      'ach' R1 'iach' R1              // plural locative (książkach, słoniach)
         (delete)
     )
   )
@@ -170,10 +170,7 @@ define stem as (
   // set the backwards limit to the current cursor position.
   (
     hop 2
-    backwards (
-      verb_or_adjective
-      or noun
-    )
+    backwards remove_endings
   ) or (
     backwards normalize_consonant
   )
