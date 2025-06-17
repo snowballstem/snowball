@@ -118,16 +118,13 @@ backwardmode (
       'a{l/}y'        'ia{l/}y'        'i{l/}y'        // past 3rd person plural nonvirile (czytały, leciały, chodziły)
       'aj'     // imperative 2nd person singular (czytaj)
       'ajcie'  // imperative 2nd person plural (czytajcie)
+      'cie'    // imperative 2nd person plural (chodźcie)
         (delete)
-    )
-  )
 
-  define short_verb as (
-    // There are short verbs whose root consists of only one consonant, e.g. być, żyć.
-    // Stemming them to one letter would merge them with these letters used in other
-    // contexts, which is undesirable. But let's at least merge all past tense forms
-    // together, e.g. byłem, byłam, byłyśmy, etc. to był.
-    ([substring]) among (
+      // There are short verbs whose root consists of only one consonant, e.g. być, żyć.
+      // Stemming them to one letter would merge them with these letters used in other
+      // contexts, which is undesirable. But let's at least merge all past tense forms
+      // together, e.g. byłem, byłam, byłyśmy, etc. to był.
       '{l/}e{s'}'
       '{l/}a{s'}'
       'li{s'}my'
@@ -135,11 +132,6 @@ backwardmode (
       'li{s'}cie'
       '{l/}y{s'}cie'
         (<- '{l/}')
-      // Handle the imperative 2nd person plural form (chodźcie) here as well.
-      // We cannot do that earlier, because that would also affect the 2nd person
-      // plural past tense forms.
-      'cie'
-        (delete)
     )
   )
 
@@ -191,7 +183,6 @@ define stem as (
     hop 2
     backwards (
       verb
-      or short_verb
       or adjectival
       or noun
       or verb2
