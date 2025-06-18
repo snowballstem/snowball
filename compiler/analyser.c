@@ -5,30 +5,6 @@
 #include <string.h>  /* memmove */
 #include "header.h"
 
-typedef enum {
-    e_token_omitted = 0,
-    e_unexpected_token = 1,
-    e_string_omitted = 2,
-    e_unexpected_token_in_among = 3,
-    /* For codes above here, report "after " t->previous_token after the error. */
-    e_unresolved_substring = 14,
-    e_not_allowed_inside_reverse = 15,
-    e_empty_grouping = 16,
-    e_already_backwards = 17,
-    e_empty_among = 18,
-    e_adjacent_bracketed_in_among = 19,
-    e_substring_preceded_by_substring = 20,
-    /* For codes below here, tokeniser->s is printed before the error. */
-    e_redeclared = 30,
-    e_undeclared = 31,
-    e_declared_as_different_mode = 32,
-    e_not_of_type_x = 33,
-    e_not_of_type_string_or_integer = 34,
-    e_misplaced = 35,
-    e_redefined = 36,
-    e_misused = 37
-} error_code;
-
 /* recursive usage: */
 
 static void read_program_(struct analyser * a, int terminator);
@@ -83,20 +59,7 @@ static const char * name_of_mode(int n) {
     exit(1);
 }
 
-static const char * name_of_type(int n) {
-    switch (n) {
-        case 'b': return "boolean";
-        case 's': return "string";
-        case 'i': return "integer";
-        case 'r': return "routine";
-        case 'R': return "routine or grouping";
-        case 'g': return "grouping";
-    }
-    fprintf(stderr, "Invalid type %d in name_of_type()\n", n);
-    exit(1);
-}
-
-static const char * name_of_name_type(int code) {
+static const char * name_of_type(int code) {
     switch (code) {
         case t_string: return "string";
         case t_boolean: return "boolean";
@@ -105,7 +68,7 @@ static const char * name_of_name_type(int code) {
         case t_external: return "external";
         case t_grouping: return "grouping";
     }
-    fprintf(stderr, "Invalid type code %d in name_of_name_type()\n", code);
+    fprintf(stderr, "Invalid type code %d in name_of_type()\n", code);
     exit(1);
 }
 
@@ -115,84 +78,51 @@ static void count_error(struct analyser * a) {
     t->error_count++;
 }
 
-static void error2(struct analyser * a, error_code n, int x) {
+static void report_error_location(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
-    if (n == e_unexpected_token && t->token_reported_as_unexpected) {
+    count_error(a);
+    fprintf(stderr, "%s:%d: ", t->file, t->line_number);
+}
+
+static void report_error_after(struct analyser * a) {
+    struct tokeniser * t = a->tokeniser;
+    if (t->previous_token > 0)
+        fprintf(stderr, " after %s", name_of_token(t->previous_token));
+}
+
+static void omission_error(struct analyser * a, int n) {
+    report_error_location(a);
+    fprintf(stderr, "%s omitted", name_of_token(n));
+    report_error_after(a);
+    putc('\n', stderr);
+}
+
+static void unexpected_token_error(struct analyser * a,
+                                   const char * context) {
+    struct tokeniser * t = a->tokeniser;
+    if (t->token_reported_as_unexpected) {
         // Avoid duplicate errors if this token was already reported as
         // unexpected and then held.
         return;
     }
-    count_error(a);
-    fprintf(stderr, "%s:%d: ", t->file, t->line_number);
-    if ((int)n >= (int)e_redeclared) report_s(stderr, t->s);
-    switch (n) {
-        case e_token_omitted:
-            fprintf(stderr, "%s omitted", name_of_token(t->omission)); break;
-        case e_unexpected_token_in_among:
-            fprintf(stderr, "in among(...), ");
-            /* fall through */
-        case e_unexpected_token:
-            t->token_reported_as_unexpected = true;
-            fprintf(stderr, "unexpected %s", name_of_token(t->token));
-            if (t->token == c_number) fprintf(stderr, " %d", t->number);
-            if (t->token == c_name) {
-                t->s[SIZE(t->s)] = 0;
-                fprintf(stderr, " %s", t->s);
-            }
-            break;
-        case e_string_omitted:
-            fprintf(stderr, "string omitted"); break;
-
-        case e_unresolved_substring:
-            fprintf(stderr, "unresolved substring on line %d", x); break;
-        case e_not_allowed_inside_reverse:
-            fprintf(stderr, "%s not allowed inside reverse(...)", name_of_token(t->token)); break;
-        case e_empty_grouping:
-            fprintf(stderr, "empty grouping"); break;
-        case e_already_backwards:
-            fprintf(stderr, "backwards used when already in this mode"); break;
-        case e_empty_among:
-            fprintf(stderr, "empty among(...)"); break;
-        case e_adjacent_bracketed_in_among:
-            fprintf(stderr, "two adjacent bracketed expressions in among(...)"); break;
-        case e_substring_preceded_by_substring:
-            fprintf(stderr, "substring preceded by another substring on line %d", x); break;
-
-        case e_redeclared:
-            fprintf(stderr, " re-declared"); break;
-        case e_undeclared:
-            fprintf(stderr, " undeclared"); break;
-        case e_declared_as_different_mode:
-            fprintf(stderr, " declared as %s mode; used as %s mode",
-                            name_of_mode(a->mode), name_of_mode(x)); break;
-        case e_not_of_type_x:
-            fprintf(stderr, " not of type %s", name_of_type(x)); break;
-        case e_not_of_type_string_or_integer:
-            fprintf(stderr, " not of type string or integer"); break;
-        case e_misplaced:
-            fprintf(stderr, " misplaced"); break;
-        case e_redefined:
-            fprintf(stderr, " redefined"); break;
-        case e_misused:
-            fprintf(stderr, " mis-used as %s mode",
-                            name_of_mode(x)); break;
+    report_error_location(a);
+    t->token_reported_as_unexpected = true;
+    fprintf(stderr, "unexpected %s", name_of_token(t->token));
+    if (t->token == c_number) fprintf(stderr, " %d", t->number);
+    if (t->token == c_name) {
+        fprintf(stderr, " %.*s", SIZE(t->s), t->s);
     }
-    if ((int)n < (int)e_unresolved_substring && t->previous_token > 0)
-        fprintf(stderr, " after %s", name_of_token(t->previous_token));
-    fprintf(stderr, "\n");
+    if (context) {
+        fprintf(stderr, " in %s", context);
+    }
+    report_error_after(a);
+    putc('\n', stderr);
 }
 
-static void error(struct analyser * a, error_code n) { error2(a, n, 0); }
-
-static void error4(struct analyser * a, struct name * q) {
+static void substring_without_among_error(struct analyser * a) {
     count_error(a);
-    q->s[SIZE(q->s)] = 0;
-    fprintf(stderr, "%s:%d: %s undefined\n", a->tokeniser->file, q->used->line_number, q->s);
-}
-
-static void omission_error(struct analyser * a, int n) {
-    a->tokeniser->omission = n;
-    error(a, e_token_omitted);
+    fprintf(stderr, "%s:%d: 'substring' with no matching 'among'\n",
+            a->tokeniser->file, a->substring->line_number);
 }
 
 static int check_token(struct analyser * a, int code) {
@@ -224,37 +154,32 @@ static struct name * look_for_name(struct analyser * a) {
 
 static struct name * find_name(struct analyser * a) {
     struct name * p = look_for_name(a);
-    if (p == NULL) error(a, e_undeclared);
+    if (p == NULL) {
+        report_error_location(a);
+        fprintf(stderr, "'%s' undeclared\n", a->tokeniser->s);
+    }
     return p;
 }
 
 static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
-    if (p->mode == m_unknown) p->mode = mode; else
-    if (p->mode != mode) error2(a, e_misused, mode);
+    if (p->mode == m_unknown) {
+        p->mode = mode;
+    } else if (p->mode != mode) {
+        report_error_location(a);
+        fprintf(stderr, "%s '%.*s' mis-used in %s mode\n",
+                name_of_type(p->type),
+                SIZE(p->s), p->s,
+                name_of_mode(mode));
+    }
 }
 
 static void check_name_type(struct analyser * a, struct name * p, int type) {
-    switch (type) {
-        case 's':
-            if (p->type == t_string) return;
-            break;
-        case 'i':
-            if (p->type == t_integer) return;
-            break;
-        case 'b':
-            if (p->type == t_boolean) return;
-            break;
-        case 'R':
-            if (p->type == t_grouping) return;
-            /* FALLTHRU */
-        case 'r':
-            if (p->type == t_routine || p->type == t_external) return;
-            break;
-        case 'g':
-            if (p->type == t_grouping) return;
-            break;
-    }
-    error2(a, e_not_of_type_x, type);
+    if (p->type == type) return;
+    if (type == t_routine && p->type == t_external) return;
+    report_error_location(a);
+    fprintf(stderr, "'%.*s' not of type %s\n",
+            SIZE(p->s), p->s,
+            name_of_type(type));
 }
 
 static void read_names(struct analyser * a, int type) {
@@ -283,7 +208,10 @@ static void read_names(struct analyser * a, int type) {
             }
             case c_name:
 handle_as_name:
-                if (look_for_name(a) != NULL) error(a, e_redeclared); else {
+                if (look_for_name(a) != NULL) {
+                    report_error_location(a);
+                    fprintf(stderr, "'%s' re-declared\n", t->s);
+                } else {
                     NEW(name, p);
                     p->s = copy_s(t->s);
                     p->type = type;
@@ -340,7 +268,7 @@ static int read_AE_test(struct analyser * a) {
         case c_lt:
         case c_le: return t->token;
         default:
-            error(a, e_unexpected_token);
+            unexpected_token_error(a, "integer test expression");
             hold_token(t);
             return c_eq;
     }
@@ -406,7 +334,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             break;
         case c_name:
             p = new_node(a, c_name);
-            name_to_node(a, p, 'i');
+            name_to_node(a, p, t_integer);
             if (p->name) {
                 // $x = x + 1 shouldn't count as a use of x.
                 p->name->value_used = (p->name != assigned_to);
@@ -457,7 +385,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             break;
         }
         default:
-            error(a, e_unexpected_token);
+            unexpected_token_error(a, "integer expression");
             hold_token(t);
             return NULL;
     }
@@ -638,9 +566,12 @@ static struct node * new_string_command(struct analyser * a, int token) {
     if (str_token == c_literalstring) {
         p->literalstring = new_literalstring(a);
     } else if (str_token == c_name) {
-        name_to_node(a, p, 's');
+        name_to_node(a, p, t_string);
     } else {
-        error(a, e_string_omitted);
+        report_error_location(a);
+        fprintf(stderr, "string omitted");
+        report_error_after(a);
+        putc('\n', stderr);
         hold_token(a->tokeniser);
     }
     return p;
@@ -983,14 +914,17 @@ static struct node * read_among(struct analyser * a) {
                 q = read_literalstring(a);
                 if (read_token(t) == c_name) {
                     struct node * r = new_node(a, c_name);
-                    name_to_node(a, r, 'r');
+                    name_to_node(a, r, t_routine);
                     q->left = r;
                 } else {
                     hold_token(t);
                 }
                 p->number++; break;
             case c_bra:
-                if (previous_token == c_bra) error(a, e_adjacent_bracketed_in_among);
+                if (previous_token == c_bra) {
+                    report_error_location(a);
+                    fprintf(stderr, "two adjacent bracketed expressions in among(...)\n");
+                }
                 q = read_C_list(a);
                 if (is_just_true(q->left)) {
                     /* Convert anything equivalent to () to () so we handle it
@@ -1000,11 +934,14 @@ static struct node * read_among(struct analyser * a) {
                 }
                 break;
             default:
-                error(a, e_unexpected_token_in_among);
+                unexpected_token_error(a, "among(...)");
                 previous_token = token;
                 continue;
             case c_ket:
-                if (p->number == 0) error(a, e_empty_among);
+                if (p->number == 0) {
+                    report_error_location(a);
+                    fprintf(stderr, "empty among(...)\n");
+                }
                 if (t->error_count == 0) p = make_among(a, p, substring);
                 return p;
         }
@@ -1016,13 +953,20 @@ static struct node * read_among(struct analyser * a) {
 
 static struct node * read_substring(struct analyser * a) {
     struct node * p = new_node(a, c_substring);
-    if (a->substring != NULL) error2(a, e_substring_preceded_by_substring, a->substring->line_number);
+    if (a->substring != NULL) {
+        substring_without_among_error(a);
+    }
     a->substring = p;
     return p;
 }
 
 static void check_modifyable(struct analyser * a) {
-    if (!a->modifyable) error(a, e_not_allowed_inside_reverse);
+    if (!a->modifyable) {
+        struct tokeniser * t = a->tokeniser;
+        report_error_location(a);
+        fprintf(stderr, "%s not allowed inside reverse(...)\n",
+                name_of_token(t->token));
+    }
 }
 
 static int ae_uses_name(struct node * p, struct name * q) {
@@ -1067,7 +1011,11 @@ static struct node * read_C(struct analyser * a) {
         }
         case c_backwards: {
             int mode = a->mode;
-            if (a->mode == m_backward) error(a, e_already_backwards); else a->mode = m_backward;
+            if (a->mode == m_backward) {
+                report_error_location(a);
+                fprintf(stderr, "'backwards' used when already in this mode\n");
+            }
+            a->mode = m_backward;
             struct node * p = new_node(a, token);
             p->left = read_C(a);
             a->mode = mode;
@@ -1189,7 +1137,7 @@ static struct node * read_C(struct analyser * a) {
         case c_setmark: {
             struct node * n = new_node(a, token);
             if (get_token(a, c_name)) {
-                name_to_node(a, n, 'i');
+                name_to_node(a, n, t_integer);
                 if (n->name) n->name->initialised = true;
             }
             return n;
@@ -1246,7 +1194,7 @@ static struct node * read_C(struct analyser * a) {
             check_modifyable(a);
             struct node * n = new_node(a, token);
             if (get_token(a, c_name)) {
-                name_to_node(a, n, 's');
+                name_to_node(a, n, t_string);
                 if (n->name) n->name->initialised = true;
             }
             if (token == c_assignto) {
@@ -1278,7 +1226,7 @@ static struct node * read_C(struct analyser * a) {
         case c_unset: {
             struct node * n = new_node(a, token);
             if (get_token(a, c_name)) {
-                name_to_node(a, n, 'b');
+                name_to_node(a, n, t_boolean);
                 if (n->name) n->name->initialised = true;
             }
             return n;
@@ -1343,7 +1291,7 @@ static struct node * read_C(struct analyser * a) {
                         break;
                     }
                     default:
-                        error(a, e_unexpected_token);
+                        unexpected_token_error(a, "integer test expression");
                         hold_token(t);
                         (void)read_AE(a, NULL, 0);
                         get_token(a, c_ket);
@@ -1353,7 +1301,7 @@ static struct node * read_C(struct analyser * a) {
             }
 
             if (t->token != c_name) {
-                error(a, e_unexpected_token);
+                unexpected_token_error(a, "integer test expression");
                 hold_token(t);
                 return new_node(a, c_dollar);
             }
@@ -1386,7 +1334,9 @@ static struct node * read_C(struct analyser * a) {
                  *
                  * For an unknown name, we'll already have reported an error.
                  */
-                error(a, e_not_of_type_string_or_integer);
+                report_error_location(a);
+                fprintf(stderr, "'%.*s' not of type integer or string\n",
+                        SIZE(q->s), q->s);
                 q = NULL;
             }
             struct node * p = new_node(a, read_AE_test(a));
@@ -1472,7 +1422,9 @@ static struct node * read_C(struct analyser * a) {
                             q->value_used = true;
                             break;
                         case t_integer:
-                            error(a, e_misplaced); /* integer name misplaced */
+                            report_error_location(a);
+                            fprintf(stderr, "integer name '%s' misplaced\n",
+                                    t->s);
                             break;
                         case t_string:
                             q->value_used = true;
@@ -1498,14 +1450,16 @@ static struct node * read_C(struct analyser * a) {
                     hold_token(t);
                     return p;
                 }
-                name_to_node(a, p, 'g');
+                name_to_node(a, p, t_grouping);
                 return p;
             }
         case c_literalstring:
             return read_literalstring(a);
         case c_among: return read_among(a);
         case c_substring: return read_substring(a);
-        default: error(a, e_unexpected_token); return NULL;
+        default:
+            unexpected_token_error(a, 0);
+            return NULL;
     }
 }
 
@@ -1584,7 +1538,8 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         a->groupings_end = p;
         if (q) {
             if (q->grouping != NULL) {
-                error(a, e_redefined);
+                report_error_location(a);
+                fprintf(stderr, "'%s' redefined\n", t->s);
                 FREE(q->grouping);
             }
             q->grouping = p;
@@ -1599,17 +1554,15 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     struct name * r = find_name(a);
                     if (!r) break;
 
-                    check_name_type(a, r, 'g');
+                    check_name_type(a, r, t_grouping);
                     if (r == q) {
                         count_error(a);
-                        r->s[SIZE(r->s)] = 0;
-                        fprintf(stderr, "%s:%d: %s defined in terms of itself\n",
-                                t->file, t->line_number, r->s);
+                        fprintf(stderr, "%s:%d: %.*s defined in terms of itself\n",
+                                t->file, t->line_number, SIZE(r->s), r->s);
                     } else if (!r->grouping) {
                         count_error(a);
-                        r->s[SIZE(r->s)] = 0;
-                        fprintf(stderr, "%s:%d: %s undefined\n",
-                                t->file, t->line_number, r->s);
+                        fprintf(stderr, "%s:%d: %.*s undefined\n",
+                                t->file, t->line_number, SIZE(r->s), r->s);
                     } else {
                         p->b = alter_grouping(p->b, r->grouping->b, style, false);
                     }
@@ -1620,9 +1573,10 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     p->b = alter_grouping(p->b, t->b, style, (a->encoding == ENC_UTF8));
                     break;
                 default:
-                    error(a, e_unexpected_token);
-                    (void)finalise_grouping(p);
+                    unexpected_token_error(a, "grouping definition");
                     hold_token(t);
+                    // Don't report an error for an empty grouping as well.
+                    (void)finalise_grouping(p);
                     return;
             }
             switch (read_token(t)) {
@@ -1632,7 +1586,10 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             }
         }
     label0:
-        if (!finalise_grouping(p)) error(a, e_empty_grouping);
+        if (!finalise_grouping(p)) {
+            report_error_location(a);
+            fprintf(stderr, "empty grouping\n");
+        }
         hold_token(t);
     }
 }
@@ -1641,10 +1598,24 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     struct node * p = new_node(a, c_define);
     a->current_routine = q;
     if (q) {
-        check_name_type(a, q, 'R');
-        if (q->definition != NULL) error(a, e_redefined);
-        if (q->mode == m_unknown) q->mode = a->mode; else
-        if (q->mode != a->mode) error2(a, e_declared_as_different_mode, q->mode);
+        int type = q->type;
+        if (type != t_grouping && type != t_routine && type != t_external) {
+            report_error_location(a);
+            fprintf(stderr, "'%.*s' not of type grouping, routine or external\n",
+                    SIZE(q->s), q->s);
+        }
+        if (q->definition != NULL) {
+            report_error_location(a);
+            fprintf(stderr, "'%.*s' redefined\n", SIZE(q->s), q->s);
+        }
+        if (q->mode == m_unknown) {
+            q->mode = a->mode;
+        } else if (q->mode != a->mode) {
+            report_error_location(a);
+            fprintf(stderr, "'%.*s' declared as %s mode; used as %s mode",
+                    SIZE(q->s), q->s,
+                    name_of_mode(a->mode), name_of_mode(q->mode));
+        }
     }
     p->name = q;
     if (a->program == NULL) a->program = p; else a->program_end->right = p;
@@ -1673,7 +1644,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     }
 
     if (a->substring != NULL) {
-        error2(a, e_unresolved_substring, a->substring->line_number);
+        substring_without_among_error(a);
         a->substring = NULL;
     }
     a->current_routine = NULL;
@@ -1734,7 +1705,8 @@ static void read_program_(struct analyser * a, int terminator) {
             case c_backwardmode:read_backwardmode(a); break;
             default:
                 if (token == terminator) return;
-                error(a, e_unexpected_token); break;
+                unexpected_token_error(a, 0);
+                return;
             case -1:
                 return;
         }
@@ -2043,13 +2015,25 @@ static void visit_routine(struct analyser * a, struct name * n) {
 extern void read_program(struct analyser * a) {
     read_program_(a, -1);
     for (struct name * q = a->names; q; q = q->next) {
+        // Declaring but not defining is only an error if used.  We'll issue
+        // a warning later on if there are no errors.
+        if (!q->used) continue;
+
+        int error = false;
         switch (q->type) {
             case t_external: case t_routine:
-                if (q->used && q->definition == NULL) error4(a, q);
+                error = (q->definition == NULL);
                 break;
             case t_grouping:
-                if (q->used && q->grouping == NULL) error4(a, q);
+                error = (q->grouping == NULL);
                 break;
+        }
+        if (error) {
+            count_error(a);
+            fprintf(stderr, "%s:%d: %s '%.*s' declared but not defined\n",
+                    a->tokeniser->file, q->used->line_number,
+                    name_of_type(q->type),
+                    SIZE(q->s), q->s);
         }
     }
 
@@ -2067,12 +2051,11 @@ extern void read_program(struct analyser * a) {
     struct name ** ptr = &(a->names);
     while (q) {
         if (!q->referenced) {
-            q->s[SIZE(q->s)] = 0;
-            fprintf(stderr, "%s:%d: warning: %s '%s' ",
+            fprintf(stderr, "%s:%d: warning: %s '%.*s' ",
                     a->tokeniser->file,
                     q->declaration_line_number,
-                    name_of_name_type(q->type),
-                    q->s);
+                    name_of_type(q->type),
+                    SIZE(q->s), q->s);
             if (q->type == t_routine ||
                 q->type == t_external ||
                 q->type == t_grouping) {
@@ -2096,12 +2079,11 @@ extern void read_program(struct analyser * a) {
                 } else {
                     line_num = q->grouping->line_number;
                 }
-                q->s[SIZE(q->s)] = 0;
-                fprintf(stderr, "%s:%d: warning: %s '%s' defined but not used\n",
+                fprintf(stderr, "%s:%d: warning: %s '%.*s' defined but not used\n",
                         a->tokeniser->file,
                         line_num,
-                        name_of_name_type(q->type),
-                        q->s);
+                        name_of_type(q->type),
+                        SIZE(q->s), q->s);
                 q = q->next;
                 *ptr = q;
                 continue;
@@ -2110,19 +2092,17 @@ extern void read_program(struct analyser * a) {
 
         if (q->type < t_routine) {
             if (!q->initialised) {
-                q->s[SIZE(q->s)] = 0;
-                fprintf(stderr, "%s:%d: warning: %s '%s' is never initialised\n",
+                fprintf(stderr, "%s:%d: warning: %s '%.*s' is never initialised\n",
                         a->tokeniser->file,
                         q->declaration_line_number,
-                        name_of_name_type(q->type),
-                        q->s);
+                        name_of_type(q->type),
+                        SIZE(q->s), q->s);
             } else if (!q->value_used) {
-                q->s[SIZE(q->s)] = 0;
-                fprintf(stderr, "%s:%d: warning: %s '%s' is set but never used\n",
+                fprintf(stderr, "%s:%d: warning: %s '%.*s' is set but never used\n",
                         a->tokeniser->file,
                         q->declaration_line_number,
-                        name_of_name_type(q->type),
-                        q->s);
+                        name_of_type(q->type),
+                        SIZE(q->s), q->s);
                 remove_dead_assignments(a->program, q);
                 q = q->next;
                 *ptr = q;
@@ -2139,12 +2119,11 @@ extern void read_program(struct analyser * a) {
             // routine which is not reachable (or will have been warned about as
             // unused by the check above).
             if (q->type == t_routine) {
-                q->s[SIZE(q->s)] = 0;
-                fprintf(stderr, "%s:%d: warning: %s '%s' not reachable from any externals\n",
+                fprintf(stderr, "%s:%d: warning: %s '%.*s' not reachable from any externals\n",
                         a->tokeniser->file,
                         q->declaration_line_number,
-                        name_of_name_type(q->type),
-                        q->s);
+                        name_of_type(q->type),
+                        SIZE(q->s), q->s);
                 remove_unreachable_routine(a, q);
             }
             if (q->type != t_grouping) {

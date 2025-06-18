@@ -175,7 +175,6 @@ struct tokeniser {
     byte token_reported_as_unexpected;
     enc encoding;
 
-    int omission;
     struct include * includes;
 
     /* Mode in which U+ has been used:
