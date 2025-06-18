@@ -1619,7 +1619,11 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                 case c_literalstring:
                     p->b = alter_grouping(p->b, t->b, style, (a->encoding == ENC_UTF8));
                     break;
-                default: error(a, e_unexpected_token); return;
+                default:
+                    error(a, e_unexpected_token);
+                    (void)finalise_grouping(p);
+                    hold_token(t);
+                    return;
             }
             switch (read_token(t)) {
                 case c_plus:
