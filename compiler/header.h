@@ -326,11 +326,11 @@ struct analyser {
     int name_count[t_size];   /* name_count[i] counts the number of names of type i */
     struct among * amongs;
     struct among * amongs_end;
-    int amongvar_needed;      /* used in reading routine definitions */
     int among_with_function_count; /* number of amongs with functions */
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
+    struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
 };
