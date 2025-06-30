@@ -81,10 +81,11 @@ backwardmode (
       'cie'    // imperative 2nd person plural (chodźcie)
         (delete)
       'sz{ek}' // present 1st person singular (noszę)
-// Also an adjectival form below (singular feminine accusative).
-// Currently noszą -> no.  FIXME When to apply each rule?
-//      'sz{ak}' // present 3rd person plural (noszą)
         (<- 's')
+      'sz{ak}' // present 3rd person plural (noszą)
+        // Also an adjectival form (singular feminine accusative), e.g. lepszą.
+        // This heuristic does the right thing in common cases.
+        (R1 and delete or <-'s')
       '{ek}'   // present 1st person singular (lecę)
         (delete)
 
@@ -127,7 +128,7 @@ backwardmode (
       // letters appear in too many contexts. But we can safely remove them if we
       // know that our word is a participle or a comparative/superlative form.
       'aj{ak}ca'    '{ak}ca'    'iejsza'    'sza'    // singular feminine nominative (czytająca, lecąca, piękniejsza, lepsza)
-      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}' 'sz{ak}' // singular feminine accusative (czytającą, lecącą, piękniejszą, lepszą)
+      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}'          // singular feminine accusative (czytającą, lecącą, piękniejszą); -szą is handled separately
       'aj{ak}ce'    '{ak}ce'    'iejsze'    'sze'    // singular neuter nominative (czytające, lecące, piękniejsze, lepsze)
         (delete)
       // Handle participles like nosząca, prosząca.
