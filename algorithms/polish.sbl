@@ -40,6 +40,7 @@ backwardmode (
   define R1 as ($p1 <= cursor)
 
   define remove_endings as (
+    // Verbs.
     do (
       setlimit tomark p1 for ([substring]) among (
         // conditionals:
@@ -79,6 +80,7 @@ backwardmode (
       'aj'     // imperative 2nd person singular (czytaj)
       'ajcie'  // imperative 2nd person plural (czytajcie)
       'cie'    // imperative 2nd person plural (chodźcie)
+      '{ek}'   // present 1st person singular (lecę)
         (delete)
       'sz{ek}' // present 1st person singular (noszę)
         (<- 's')
@@ -86,8 +88,6 @@ backwardmode (
         // Also an adjectival form (singular feminine accusative), e.g. lepszą.
         // This heuristic does the right thing in common cases.
         (R1 and delete or <-'s')
-      '{ek}'   // present 1st person singular (lecę)
-        (delete)
 
       // There are short verbs whose root consists of only one consonant, e.g. być, żyć.
       // Stemming them to one letter would merge them with these letters used in other
@@ -127,9 +127,9 @@ backwardmode (
       // We cannot remove endings like -ą and -e unconditionally, because these
       // letters appear in too many contexts. But we can safely remove them if we
       // know that our word is a participle or a comparative/superlative form.
-      'aj{ak}ca'    '{ak}ca'    'iejsza'    'sza'    // singular feminine nominative (czytająca, lecąca, piękniejsza, lepsza)
-      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}'          // singular feminine accusative (czytającą, lecącą, piękniejszą); -szą is handled separately
-      'aj{ak}ce'    '{ak}ce'    'iejsze'    'sze'    // singular neuter nominative (czytające, lecące, piękniejsze, lepsze)
+      'aj{ak}ca'    '{ak}ca'    'iejsza'    'sza'  // singular feminine nominative (czytająca, lecąca, piękniejsza, lepsza)
+      'aj{ak}c{ak}' '{ak}c{ak}' 'iejsz{ak}'        // singular feminine accusative (czytającą, lecącą, piękniejszą); -szą is handled separately
+      'aj{ak}ce'    '{ak}ce'    'iejsze'    'sze'  // singular neuter nominative (czytające, lecące, piękniejsze, lepsze)
         (delete)
       // Handle participles like nosząca, prosząca.
       'sz{ak}ca'
@@ -137,18 +137,17 @@ backwardmode (
       'sz{ak}ce'
         (<- 's')
 
-      // Noun forms.
-      'a' R1 'o' R1                  // singular nominative (książka, lato)
-      // 'y' removed as an adjectival ending.
-      'i' R1 /*'y'*/ 'u' R1 'ia' R1          // singular genitive (książki, kobiety, stołu, słonia)
-      'owi' R1 'iowi' R1              // singular dative (stołowi, słoniowi)
-      '{ak}' R1 'i{ak}' R1 'em' R1 'iem' R1 // singular instrumental (książką, możliwością, stołem, słoniem)
-      'e' R1 'iu' R1                  // singular locative (stole, słoniu)
-      'ie' R1                      // plural nominative (słonie)
-      '{o'}w' R1                   // plural genitive (stołów)
-      'om' R1  'iom' R1               // plural dative (książkom, słoniom)
-      'ami' R1 'iami' R1              // plural instrumental (książkami, słoniami)
-      'ach' R1 'iach' R1              // plural locative (książkach, słoniach)
+      // Noun forms (excluding endings that were already handled above).
+      'a' R1  'o' R1                            // singular nominative (książka, lato)
+      'i' R1  'u' R1  'ia' R1                   // singular genitive (książki, stołu, słonia)
+      'owi' R1  'iowi' R1                       // singular dative (stołowi, słoniowi)
+      '{ak}' R1  'i{ak}' R1  'em' R1  'iem' R1  // singular instrumental (książką, możliwością, stołem, słoniem)
+      'e' R1  'iu' R1                           // singular locative (stole, słoniu)
+      'ie' R1                                   // plural nominative (słonie)
+      '{o'}w' R1                                // plural genitive (stołów)
+      'om' R1   'iom' R1                        // plural dative (książkom, słoniom)
+      'ami' R1  'iami' R1                       // plural instrumental (książkami, słoniami)
+      'ach' R1  'iach' R1                       // plural locative (książkach, słoniach)
         (delete)
     )
   )
