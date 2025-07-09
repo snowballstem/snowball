@@ -363,11 +363,12 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
 }
 
 extern int read_token(struct tokeniser * t) {
-    byte * p = t->p;
-    int held = t->token_held;
-    t->token_held = false;
-    if (held) return t->token;
+    if (t->token_held) {
+        t->token_held = false;
+        return t->token;
+    }
     t->token_reported_as_unexpected = false;
+    byte * p = t->p;
     while (true) {
         int code = next_token(t);
         switch (code) {
