@@ -129,11 +129,11 @@ jobs:
         # snowball-data repo's default branch.  If there is such a branch but
         # the merge fails, we treat that as a fatal error.
         UPSTREAM_REPO_URL=https://github.com/snowballstem/snowball-data.git
+        GH_BRANCH=${GITHUB_REF_NAME}
+        GH_REPO_OWNER=${GITHUB_REPOSITORY_OWNER}
+        GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
         if [ -n "$GITHUB_HEAD_REF" ] ; then
           # Pull-request.
-          GH_BRANCH=${GITHUB_HEAD_REF}
-          GH_REPO_OWNER=${GITHUB_ACTOR}
-          GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
           git clone "$UPSTREAM_REPO_URL"
           cd snowball-data
           git remote add pr "$GH_REPO_URL"
@@ -147,9 +147,6 @@ jobs:
           fi
         else
           # Push.
-          GH_BRANCH=${GITHUB_REF_NAME}
-          GH_REPO_OWNER=${GITHUB_REPOSITORY_OWNER}
-          GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
           echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
           if ! git clone -b "$GH_BRANCH" "$GH_REPO_URL" ; then
             echo "Falling back to $UPSTREAM_REPO_URL"
