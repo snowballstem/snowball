@@ -18,7 +18,6 @@ externals (stem)
 routines (
   mark_regions
   remove_endings
-  noun
   normalize_consonant
   R1
 )
