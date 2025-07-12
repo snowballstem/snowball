@@ -249,19 +249,16 @@ abstract class SnowballStemmer {
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
             $w = $v[$k];
             $w0length = strlen($w[0]);
-            for( $i2 = $common; $i2 < $w0length; ){
+            for( $i2 = $common; $i2 < $w0length; $i2++){
                 if ( $c + $common === $l){
                     $diff = -1;
                     break;
                 }
-                $ch = $this->currentCharCodeAt($c+$common);
-                $diff = $ch - self::charCodeAt($w[0],$i2);
+                $diff = ord(substr($this->current, $c+$common, 1)) - ord(substr($w[0],$i2,1));
                 if ($diff !== 0){
                     break;
                 }
-                $uw = self::utf8_width($ch);
-                $common += $uw;
-                $i2 += $uw;
+                $common++;
             }
             if ($diff < 0){
                 $j = $k;
@@ -332,19 +329,16 @@ abstract class SnowballStemmer {
             $common = min($common_i, $common_j);
             $w = $v[$k];
             $w0length = strlen($w[0]);
-            for ( $i2 = $w0length - $common; $i2 > 0; ){
-                if ($c - $common <= $lb){
+            for ( $i2 = $w0length - 1 - $common; $i2 >= 0; $i2--){
+                if ($c - $common == $lb){
                     $diff = -1;
                     break;
                 }
-                $ch = $this->currentCharCodeBefore($c - $common);
-                $diff = $ch - self::charCodeBefore($w[0],$i2);
+                $diff = ord(substr($this->current, $c - 1 - $common, 1)) - ord(substr($w[0],$i2,1));
                 if ($diff != 0){
                     break;
                 }
-                $uw = self::utf8_width($ch);
-                $common += $uw;
-                $i2 -= $uw;
+                $common++;
             }
             if ($diff < 0) {
                 $j = $k;
