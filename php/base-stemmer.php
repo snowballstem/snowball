@@ -333,7 +333,7 @@ abstract class SnowballStemmer {
             $w = $v[$k];
             $w0length = strlen($w[0]);
             for ( $i2 = $w0length - $common; $i2 > 0; ){
-                if ($c - $common == $lb){
+                if ($c - $common <= $lb){
                     $diff = -1;
                     break;
                 }
