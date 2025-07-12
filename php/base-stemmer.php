@@ -55,8 +55,8 @@ abstract class SnowballStemmer {
         if ($ch > $max || $ch < $min){
             return false;
         }
-        $ch -= $min;
-        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
+        $o = $ch - $min;
+        if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
             return false;
         }
         $this->cursor++;
@@ -73,8 +73,8 @@ abstract class SnowballStemmer {
             if( $ch > $max || $ch < $min ){
                 return true;
             }
-            $ch -= $min;
-            if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
+            $o = $ch - $min;
+            if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
                 return true;
             }
             $this->cursor++;
@@ -95,8 +95,8 @@ abstract class SnowballStemmer {
         if ($ch > $max || $ch < $min){
             return false;
         }
-        $ch -= $min;
-        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ){
+        $o = $ch - $min;
+        if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
             return false;
         }
         $this->cursor--;
@@ -113,8 +113,8 @@ abstract class SnowballStemmer {
             if ($ch > $max || $ch < $min){ 
                 return true;
             }
-            $ch -= $min;
-            if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0){
+            $o = $ch - $min;
+            if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0){
                 return true;
             }
             $this->cursor--;
@@ -135,8 +135,8 @@ abstract class SnowballStemmer {
             $this->cursor++;
             return true;
         }
-        $ch -= $min;
-        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0) {
+        $o = $ch - $min;
+        if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
             $this->cursor++;
             return true;
         }
@@ -151,8 +151,8 @@ abstract class SnowballStemmer {
         while ( $this->cursor < $this->limit) {
             $ch = $this->currentCharCodeAt($this->cursor);
             if ($ch <= $max && $ch >= $min) {
-                $ch -= $min;
-                if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) !== 0 ) {
+                $o = $ch - $min;
+                if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) !== 0 ) {
                     return true;
                 }
             }
@@ -174,8 +174,8 @@ abstract class SnowballStemmer {
             $this->cursor--;
             return true;
         }
-        $ch -= $min;
-        if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) === 0 ) {
+        $o = $ch - $min;
+        if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ) {
             $this->cursor--;
             return true;
         }
@@ -190,8 +190,8 @@ abstract class SnowballStemmer {
         while ( $this->cursor > $this->limit_backward) {
             $ch = $this->currentCharCodeAt($this->cursor - 1);
             if ($ch <= $max && $ch >= $min) {
-                $ch -= $min;
-                if( ($s[$ch >> 3] & (0x1 << ($ch & 0x7))) !== 0) {
+                $o = $ch - $min;
+                if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) !== 0) {
                     return true;
                 }
             }
