@@ -22,7 +22,7 @@ abstract class SnowballStemmer {
     protected function setCurrent( string $value ):void {
         $this->current = $value;
         $this->cursor = 0;
-        $this->limit = $this->currentLength();
+        $this->limit = strlen($value);
         $this->limit_backward = 0;
         $this->bra = $this->cursor;
         $this->ket = $this->limit;
@@ -59,7 +59,7 @@ abstract class SnowballStemmer {
         if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
             return false;
         }
-        $this->cursor++;
+        $this->cursor += self::utf8_width($ch);
         return true;
     }
 
@@ -77,7 +77,7 @@ abstract class SnowballStemmer {
             if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
                 return true;
             }
-            $this->cursor++;
+            $this->cursor += self::utf8_width($ch);
         }
         return false;
     }
@@ -91,7 +91,7 @@ abstract class SnowballStemmer {
         if( $this->cursor <= $this->limit_backward ){
             return false;
         }
-        $ch = $this->currentCharCodeAt($this->cursor - 1);
+        $ch = $this->currentCharCodeBefore($this->cursor);
         if ($ch > $max || $ch < $min){
             return false;
         }
@@ -99,7 +99,7 @@ abstract class SnowballStemmer {
         if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ){
             return false;
         }
-        $this->cursor--;
+        $this->cursor -= self::utf8_width($ch);
         return true;
     }
 
@@ -109,7 +109,7 @@ abstract class SnowballStemmer {
      */
     protected function go_in_grouping_b( array $s, int $min, int $max ):bool {
         while ( $this->cursor > $this->limit_backward) {
-            $ch = $this->currentCharCodeAt($this->cursor - 1);
+            $ch = $this->currentCharCodeBefore($this->cursor);
             if ($ch > $max || $ch < $min){ 
                 return true;
             }
@@ -117,7 +117,7 @@ abstract class SnowballStemmer {
             if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0){
                 return true;
             }
-            $this->cursor--;
+            $this->cursor -= self::utf8_width($ch);
         }
         return false;
     }
@@ -132,12 +132,12 @@ abstract class SnowballStemmer {
         }
         $ch = $this->currentCharCodeAt($this->cursor);
         if ($ch > $max || $ch < $min) {
-            $this->cursor++;
+            $this->cursor += self::utf8_width($ch);
             return true;
         }
         $o = $ch - $min;
         if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
-            $this->cursor++;
+            $this->cursor += self::utf8_width($ch);
             return true;
         }
         return false;
@@ -156,7 +156,7 @@ abstract class SnowballStemmer {
                     return true;
                 }
             }
-            $this->cursor++;
+            $this->cursor += self::utf8_width($ch);
         }
         return false;
     }
@@ -169,14 +169,14 @@ abstract class SnowballStemmer {
         if ($this->cursor <= $this->limit_backward){
             return false;
         }
-        $ch = $this->currentCharCodeAt($this->cursor - 1);
+        $ch = $this->currentCharCodeBefore($this->cursor);
         if ($ch > $max || $ch < $min) {
-            $this->cursor--;
+            $this->cursor -= self::utf8_width($ch);
             return true;
         }
         $o = $ch - $min;
         if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0 ) {
-            $this->cursor--;
+            $this->cursor -= self::utf8_width($ch);
             return true;
         }
         return false;
@@ -188,14 +188,14 @@ abstract class SnowballStemmer {
      */
     protected function go_out_grouping_b ( array $s, int $min, int $max ):bool {
         while ( $this->cursor > $this->limit_backward) {
-            $ch = $this->currentCharCodeAt($this->cursor - 1);
+            $ch = $this->currentCharCodeBefore($this->cursor);
             if ($ch <= $max && $ch >= $min) {
                 $o = $ch - $min;
                 if( ($s[$o >> 3] & (0x1 << ($o & 0x7))) !== 0) {
                     return true;
                 }
             }
-            $this->cursor--;
+            $this->cursor -= self::utf8_width($ch);
         }
         return false;
     }
@@ -206,7 +206,7 @@ abstract class SnowballStemmer {
         if ($this->limit - $this->cursor < $slength ){
             return false;
         }
-        if ( $this->currentSlice($this->cursor, $this->cursor + $slength) !== $s) {
+        if (substr_compare($this->current, $s, $this->cursor, $slength) != 0) {
             return false;
         }
         $this->cursor += $slength;
@@ -219,7 +219,7 @@ abstract class SnowballStemmer {
         if ($this->cursor - $this->limit_backward < $slength){
             return false;
         }
-        if ($this->currentSlice($this->cursor - $slength, $this->cursor) !== $s){
+        if (substr_compare($this->current, $s, $this->cursor - $slength, $slength) != 0) {
             return false;
         }
         $this->cursor -= $slength;
@@ -249,16 +249,19 @@ abstract class SnowballStemmer {
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
             $w = $v[$k];
             $w0length = strlen($w[0]);
-            for( $i2 = $common; $i2 < $w0length; $i2++ ){
+            for( $i2 = $common; $i2 < $w0length; ){
                 if ( $c + $common === $l){
                     $diff = -1;
                     break;
                 }
-                $diff = $this->currentCharCodeAt($c+$common) - self::charCodeAt($w[0],$i2);
+                $ch = $this->currentCharCodeAt($c+$common);
+                $diff = $ch - self::charCodeAt($w[0],$i2);
                 if ($diff !== 0){
                     break;
                 }
-                $common++;
+                $uw = self::utf8_width($ch);
+                $common += $uw;
+                $i2 += $uw;
             }
             if ($diff < 0){
                 $j = $k;
@@ -329,16 +332,19 @@ abstract class SnowballStemmer {
             $common = min($common_i, $common_j);
             $w = $v[$k];
             $w0length = strlen($w[0]);
-            for ( $i2 = $w0length - 1 - $common; $i2 >= 0; $i2-- ){
+            for ( $i2 = $w0length - $common; $i2 > 0; ){
                 if ($c - $common == $lb){
                     $diff = -1;
                     break;
                 }
-                $diff = $this->currentCharCodeAt($c - 1 - $common) - self::charCodeAt($w[0],$i2);
+                $ch = $this->currentCharCodeBefore($c - $common);
+                $diff = $ch - self::charCodeBefore($w[0],$i2);
                 if ($diff != 0){
                     break;
                 }
-                $common++;
+                $uw = self::utf8_width($ch);
+                $common += $uw;
+                $i2 -= $uw;
             }
             if ($diff < 0) {
                 $j = $k;
@@ -381,7 +387,7 @@ abstract class SnowballStemmer {
     private function replace_s( int $c_bra, int $c_ket, string $s ):int {
         $slength = strlen($s);
         $adjustment = $slength - ($c_ket - $c_bra);
-        $this->current = $this->currentSlice(0,$c_bra) . $s . $this->currentSlice($c_ket);
+        $this->current = substr_replace($this->current, $s, $c_bra, $c_ket - $c_bra);
         $this->limit += $adjustment;
         if ( $this->cursor >= $c_ket){
             $this->cursor += $adjustment;
@@ -397,7 +403,7 @@ abstract class SnowballStemmer {
         if( $this->bra < 0 ||
             $this->bra > $this->ket ||
             $this->ket > $this->limit ||
-            $this->limit > $this->currentLength()
+            $this->limit > strlen($this->current)
         ){
             throw new LogicException('Faulty slice operation');
         }
@@ -424,33 +430,27 @@ abstract class SnowballStemmer {
 
     protected function slice_to():string {
         $this->slice_check();
-        return $this->currentSlice($this->bra, $this->ket);
+        return substr($this->current, $this->bra, $this->ket - $this->bra);
     }
 
 
     protected function assign_to():string {
-        return $this->currentSlice(0, $this->limit );
+        return substr($this->current, 0, $this->limit);
     }
     
     
     
-    // -- Getters named similarly to JavaScript method. e.g. $this->current.length => $this->currentLength()
+    // Getters named similarly to JavaScript method.
 
     
     private function currentCharCodeAt( int $offset ):int {
         return self::charCodeAt( $this->current, $offset );
     }
     
-    protected function currentLength():int {
-        return strlen( $this->current );
+    private function currentCharCodeBefore( int $offset ):int {
+        return self::charCodeBefore( $this->current, $offset );
     }
     
-
-    private function currentSlice( int $start, ?int $end = null ):string {
-        return self::strSlice($this->current, $start, $end );
-    }
-
-
     // Everything above here was "translated" blindly from JavaScript.
     // Below are some utilities to ensure PHP behaviour matches JavaScript for string manipulation etc...
 
@@ -459,34 +459,26 @@ abstract class SnowballStemmer {
      * As per String.prototype.charCodeAt
      * @throws RangeException
      */
-    public static function charCodeAt( string $s, int $offset ):int {
-        $c = substr($s,$offset,1);
-        if( '' === $c ){
-            throw new RangeException('Bad character offset');
-        }
-        return ord($c);
+    private static function charCodeAt( string $s, int $offset ):int {
+        $s = substr($s, $offset, 4);
+        $c = ord($s);
+        return $c < 0x80 ? $c : mb_ord($s, 'UTF-8');
     }
 
-
-    /**
-     * As per String.prototype.slice
-     */
-    public static function strSlice( string $s, int $start, ?int $end = null ):string {
-        if( is_null($end) ){
-            return substr($s,$start);
-        }
-        if( $start < 0 ){
-            $start = max(0, strlen($s)+$start );
-        }
-        if( $end < 0 ){
-            $end = max(0, strlen($s)+$end );
-        }
-        if( $end < $start ){
-            return '';
-        }
-        return substr( $s, $start, $end-$start);
+    private static function charCodeBefore( string $s, int $offset ):int {
+        $c = ord(substr($s, $offset - 1));
+        if ($c < 0x80) return $c;
+        $o = $offset - 1;
+        while (--$o && ord(substr($s, $o)) < 0xc0) { }
+        return mb_ord(substr($s, $o, $offset - $o), 'UTF-8');
     }
-    
+
+    private static function utf8_width(int $ch):int {
+        if ($ch < 0x80) return 1;
+        if ($ch < 0x800) return 2;
+        if ($ch < 0x10000) return 3;
+        return 4;
+    }
 
     /**
      * Public entry point for stemming a word
