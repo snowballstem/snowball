@@ -118,7 +118,7 @@ static void wsetlab_begin(struct generator * g, int n) {
     w(g, "~M// begin lab~I0 block:~N");
 }
 
-static void wsetlab_end(struct generator * g, int n ) {
+static void wsetlab_end(struct generator * g, int n) {
     g->I[0] = n;
     w(g, "~Mlab~I0:~N");
 }
@@ -365,7 +365,7 @@ static void generate_or(struct generator * g, struct node * p) {
             wgotol(g, out_lab);
             end_unreachable = false;
         }
-        wsetlab_end(g,g->failure_label);
+        wsetlab_end(g, g->failure_label);
         g->unreachable = false;
         if (savevar) write_restorecursor(g, p, savevar);
         p = p->right;
@@ -376,7 +376,7 @@ static void generate_or(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     generate(g, p);
-    wsetlab_end(g,out_lab);
+    wsetlab_end(g, out_lab);
     if (!end_unreachable) {
         g->unreachable = false;
     }
@@ -423,7 +423,7 @@ static void generate_not(struct generator * g, struct node * p) {
 
     if (!g->unreachable) write_failure(g);
 
-    wsetlab_end(g,label);
+    wsetlab_end(g, label);
     g->unreachable = false;
 
     if (savevar) {
@@ -560,8 +560,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     int end_unreachable = false;
     int golab = new_label(g);
     g->I[0] = golab;
-    wsetlab_begin(g,golab);
-    
+    wsetlab_begin(g, golab);
+
     w(g, "~Mwhile(true){~N~+");
 
     struct str * savevar = NULL;
@@ -586,7 +586,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         w(g, "~Mgoto lab~I0;~N");
     }
     g->unreachable = false;
-    wsetlab_end(g,g->failure_label);
+    wsetlab_end(g, g->failure_label);
     if (savevar) {
         write_restorecursor(g, p, savevar);
         str_delete(savevar);
@@ -599,7 +599,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     write_check_limit(g, p);
     write_inc_cursor(g, p);
     write_block_end(g);
-    wsetlab_end(g,golab);
+    wsetlab_end(g, golab);
     g->unreachable = end_unreachable;
 }
 
@@ -643,7 +643,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
         w(g, "~Mcontinue;~N");
     }
 
-    wsetlab_end(g,g->failure_label);
+    wsetlab_end(g, g->failure_label);
     g->unreachable = false;
 
     if (savevar) {
@@ -740,7 +740,6 @@ static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~M$this->slice_del();~N", p);
 }
-
 
 static void generate_tolimit(struct generator * g, struct node * p) {
     write_comment(g, p);
@@ -842,7 +841,6 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
 }
 
-
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~M$this->slice_from(");
@@ -862,7 +860,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
          * pattern, and by special-casing we can avoid having to save and
          * restore c.
          */
-        struct node * q = p->left;        
+        struct node * q = p->left;
         write_comment(g, q);
         g->S[0] = q->mode == m_forward ? ">" : "<";
         w(g, "~Mif ($this->cursor ~S0 "); generate_AE(g, q->AE); w(g, ")~N");
@@ -966,8 +964,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
 static void generate_integer_assign(struct generator * g, struct node * p, const char * s) {
     write_comment(g, p);
     g->S[0] = s;
-    writef(g, "~M~V ~S0 ",p); 
-    generate_AE(g, p->AE); 
+    writef(g, "~M~V ~S0 ", p);
+    generate_AE(g, p->AE);
     w(g, ";~N");
 }
 
@@ -1053,9 +1051,9 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     if (q->type == t_routine) {
-        writef(g, "~N~Mprotected function ~W():bool {~+~N",p);
+        writef(g, "~N~Mprotected function ~W():bool {~+~N", p);
     } else {
-        writef(g, "~N~Mpublic function ~W():bool {~+~N",p);
+        writef(g, "~N~Mpublic function ~W():bool {~+~N", p);
     }
     /* Save output. */
     struct str * saved_output = g->outbuf;
@@ -1239,7 +1237,7 @@ static void generate(struct generator * g, struct node * p) {
             /* Snowball specifies integer division with semantics matching C,
              * so we need to use `Math.trunc(x/y)` here.
              */
-            writef(g, "~M~V = $this->trunc_FIXME(~V / ",p);
+            writef(g, "~M~V = $this->trunc_FIXME(~V / ", p);
             generate_AE(g, p->AE);
             w(g, ");~N");
             break;
