@@ -369,7 +369,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 o->parent_class_name = DEFAULT_JS_BASE_CLASS;
             break;
         case LANG_PHP:
-            o->encoding = ENC_WIDECHARS;
+            o->encoding = ENC_UTF8;
             if (!o->parent_class_name)
                 o->parent_class_name = DEFAULT_PHP_BASE_CLASS;
             break;
