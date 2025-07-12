@@ -282,14 +282,17 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "$this->cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "$this->limit" : "$this->limit_backward"); break;
-        // This is modelled on JavaScript, so will treat string length as Uniode characters, not bytes.
         case c_lenof:
+            writef(g, "mb_strlen($~V,'UTF-8')", p);
+            break;
         case c_sizeof:
-            writef(g, "strlen($~V)",p);
+            writef(g, "strlen($~V)", p);
             break;
         case c_len:
+            w(g, "mb_strlen($this->current,'UTF-8')");
+            break;
         case c_size:
-            w(g, "$this->currentLength()");
+            w(g, "strlen($this->current)");
             break;
     }
 }
