@@ -107,7 +107,7 @@ static void write_restorecursor(struct generator * g, struct node * p, struct st
 
 static void write_inc_cursor(struct generator * g, struct node * p) {
     write_margin(g);
-    write_string(g, p->mode == m_forward ? "$this->cursor++;" : "$this->cursor--;");
+    write_string(g, p->mode == m_forward ? "$this->inc_cursor();" : "$this->dec_cursor();");
     write_newline(g);
 }
 
@@ -543,9 +543,9 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     write_failure_if(g, "!$this->go_~S1_grouping~S0(~V, ~I0, ~I1)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
-            w(g, "~M$this->cursor++;~N");
+            w(g, "~M$this->inc_cursor();~N");
         else
-            w(g, "~M$this->cursor--;~N");
+            w(g, "~M$this->dec_cursor();~N");
     }
 }
 

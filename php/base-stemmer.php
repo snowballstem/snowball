@@ -480,6 +480,14 @@ abstract class SnowballStemmer {
         return 4;
     }
 
+    public function inc_cursor():void {
+	do { ++$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+    }
+
+    public function dec_cursor():void {
+	do { --$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+    }
+
     /**
      * Public entry point for stemming a word
      */
