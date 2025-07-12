@@ -711,29 +711,19 @@ static void generate_atmark(struct generator * g, struct node * p) {
 }
 
 static void generate_hop(struct generator * g, struct node * p) {
-    int c_count = ++g->keep_count;
     write_comment(g, p);
-    g->S[0] = p->mode == m_forward ? "+" : "-";
-
-    g->I[0] = c_count;
-    w(g, "~{~M$c~I0 = $this->cursor ~S0 ");
+    // Generate the AE to a temporary block so we can substitute it in
+    // write_failure_if().
+    struct str * ae = str_new();
+    struct str * s = g->outbuf;
+    g->outbuf = ae;
     generate_AE(g, p->AE);
-    w(g, ";~N");
-
-    g->I[0] = c_count;
-    g->S[1] = p->mode == m_forward ? "> $this->limit" : "< $this->limit_backward";
-    g->S[2] = p->mode == m_forward ? "<" : ">";
-    if (p->AE->type == c_number) {
-        // Constant distance hop.
-        //
-        // No need to check for negative hop as that's converted to false by
-        // the analyser.
-        write_failure_if(g, "$c~I0 ~S1", p);
-    } else {
-        write_failure_if(g, "$c~I0 ~S1 || $c~I0 ~S2 $this->cursor", p);
-    }
-    writef(g, "~M$this->cursor = $c~I0;~N", p);
-    writef(g, "~}", p);
+    g->outbuf = s;
+    g->B[0] = str_data(ae);
+    g->S[0] = p->mode == m_forward ? "" : "_back";
+    g->S[1] = p->AE->type == c_number ? "" : "_checked";
+    write_failure_if(g, "!$this->hop~S0~S1(~B0)", p);
+    str_delete(ae);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {

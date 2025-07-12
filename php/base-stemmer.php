@@ -475,11 +475,49 @@ abstract class SnowballStemmer {
     }
 
     public function inc_cursor():void {
-	do { ++$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+        do { ++$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
     }
 
     public function dec_cursor():void {
-	do { --$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+        do { --$this->cursor; } while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+    }
+
+    public function hop(int $delta):bool {
+        $res = $this->cursor;
+        while ($delta > 0) {
+            $delta--;
+            if ($res >= $this->limit) {
+                return false;
+            }
+            do {
+                $res++;
+            } while ($res < $this->limit && (ord(substr($this->current, $res, 1)) & 0xc0) == 0x80);
+        }
+        $this->cursor = $res;
+        return true;
+    }
+
+    public function hop_checked(int $delta):bool {
+        return $delta >= 0 && $this->hop($delta);
+    }
+
+    public function hop_back(int $delta):bool {
+        $res = $this->cursor;
+        while ($delta > 0) {
+            $delta--;
+            if ($res <= $this->limit_backward) {
+                return false;
+            }
+            do {
+                $res--;
+            } while ($res > $this->limit_backward && (ord(substr($this->current, $res, 1)) & 0xc0) == 0x80);
+        }
+        $this->cursor = $res;
+        return true;
+    }
+
+    public function hop_back_checked(int $delta):bool {
+        return $delta >= 0 && $this->hop_back($delta);
     }
 
     /**
