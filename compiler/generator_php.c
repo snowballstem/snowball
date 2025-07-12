@@ -1235,9 +1235,9 @@ static void generate(struct generator * g, struct node * p) {
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
         case c_divideassign:
             /* Snowball specifies integer division with semantics matching C,
-             * so we need to use `Math.trunc(x/y)` here.
+             * so we need to use `intdiv($x,$y)` here.
              */
-            writef(g, "~M~V = $this->trunc_FIXME(~V / ", p);
+            writef(g, "~M~V = intdiv(~V,", p);
             generate_AE(g, p->AE);
             w(g, ");~N");
             break;
