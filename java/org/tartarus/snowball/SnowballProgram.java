@@ -290,16 +290,16 @@ public class SnowballProgram implements Serializable {
             if (common_i >= w.s.length) {
                 cursor = c + w.s.length;
                 if (w.method == null) return w.result;
-                boolean res = false;
                 try {
-                    res = (boolean) w.method.invokeExact(this);
+                    if ((boolean) w.method.invokeExact(this)) {
+                        cursor = c + w.s.length;
+                        return w.result;
+                    }
                 } catch (Error | RuntimeException e) {
                     throw e;
                 } catch (Throwable e) {
                     throw new UndeclaredThrowableException(e);
                 }
-                cursor = c + w.s.length;
-                if (res) return w.result;
             }
             i = w.substring_i;
             if (i < 0) return 0;
@@ -354,17 +354,16 @@ public class SnowballProgram implements Serializable {
             if (common_i >= w.s.length) {
                 cursor = c - w.s.length;
                 if (w.method == null) return w.result;
-
-                boolean res = false;
                 try {
-                    res = (boolean) w.method.invokeExact(this);
+                    if ((boolean) w.method.invokeExact(this)) {
+                        cursor = c - w.s.length;
+                        return w.result;
+                    }
                 } catch (Error | RuntimeException e) {
                     throw e;
                 } catch (Throwable e) {
                     throw new UndeclaredThrowableException(e);
                 }
-                cursor = c - w.s.length;
-                if (res) return w.result;
             }
             i = w.substring_i;
             if (i < 0) return 0;

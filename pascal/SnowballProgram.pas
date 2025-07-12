@@ -264,7 +264,7 @@ End;
 
 Function TSnowballProgram.FindAmong(v : array of TAmong; v_size : Integer) : Integer;
 Var i, i2, j, c, l, common_i, common_j, k, diff, common : Integer;
-    first_key_inspected, res : Boolean;
+    first_key_inspected : Boolean;
     w : TAmong;
 Begin
     i := 0;
@@ -336,10 +336,9 @@ Begin
                 Exit;
             End;
 
-            res := w.Method;
-
-            FCursor := c + Length(w.Str);
-            if (res) Then Begin
+            if w.Method Then
+            Begin
+                FCursor := c + Length(w.Str);
                 Result := w.Result;
                 Exit;
             End;
@@ -356,7 +355,7 @@ End;
 
 Function TSnowballProgram.FindAmongBk(v : array of TAmong; v_size : Integer) : Integer;
 Var i, j, c, lb, common_i, common_j, k, diff, common, i2 : Integer;
-    first_key_inspected, res : Boolean;
+    first_key_inspected : Boolean;
     w : TAmong;
 Begin
     i := 0;
@@ -422,11 +421,9 @@ Begin
                 Exit;
             End;
 
-            res := w.Method;
-
-            FCursor := c - Length(w.Str);
-            If Res Then
+            if w.Method Then
             Begin
+                FCursor := c - Length(w.Str);
                 Result := w.Result;
                 Exit;
             End;
@@ -435,8 +432,8 @@ Begin
         i := w.Index;
         If i < 0 Then
         Begin
-                Result := 0;
-                Exit;
+            Result := 0;
+            Exit;
         End;
     End;
 End;

@@ -1,4 +1,5 @@
 
+#include <limits.h>
 #include <stdio.h>    /* for printf */
 #include <stdlib.h>   /* malloc, free */
 #include <string.h>   /* memmove */
@@ -9,7 +10,7 @@
 #define EXTENDER 40
 
 
-/*  This modules provides a simple mechanism for arbitrary length writable
+/*  This module provides a simple mechanism for arbitrary length writable
     strings, called 'blocks'. They are 'symbol *' items rather than 'char *'
     items however.
 
@@ -57,8 +58,7 @@ extern symbol * create_b(int n) {
 }
 
 extern void report_b(FILE * out, const symbol * p) {
-    int i;
-    for (i = 0; i < SIZE(p); i++) {
+    for (int i = 0; i < SIZE(p); i++) {
         if (p[i] > 255) {
             printf("In report_b, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
             exit(1);
@@ -122,15 +122,12 @@ extern void check_free(void * p) {
 extern char * b_to_sz(const symbol * p) {
     int n = SIZE(p);
     char * s = (char *)xmalloc(n + 1);
-    {
-        int i;
-        for (i = 0; i < n; i++) {
-            if (p[i] > 255) {
-                printf("In b_to_s, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
-                exit(1);
-            }
-            s[i] = (char)p[i];
+    for (int i = 0; i < n; i++) {
+        if (p[i] > 255) {
+            printf("In b_to_s, can't convert p[%d] to char because it's 0x%02x\n", i, (int)p[i]);
+            exit(1);
         }
+        s[i] = (char)p[i];
     }
     s[n] = 0;
     return s;
@@ -140,13 +137,10 @@ extern char * b_to_sz(const symbol * p) {
    block is created. */
 
 extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
-    int k;
     if (p == NULL) p = create_b(1);
-    k = SIZE(p);
-    {
-        int x = k + 1 - CAPACITY(p);
-        if (x > 0) p = increase_capacity_b(p, x);
-    }
+    int k = SIZE(p);
+    int x = k + 1 - CAPACITY(p);
+    if (x > 0) p = increase_capacity_b(p, x);
     p[k] = ch;
     SIZE(p)++;
     return p;
@@ -169,11 +163,20 @@ extern void lose_s(byte * p) {
 }
 
 extern byte * increase_capacity_s(byte * p, int n) {
-    byte * q = create_s(CAPACITY(p) + n + EXTENDER);
+    int new_size = CAPACITY(p) + n + EXTENDER;
+    // Switch to exponential growth for large strings.
+    if (new_size > 512) new_size *= 2;
+    byte * q = create_s(new_size);
     memmove(q, p, CAPACITY(p));
     SIZE(q) = SIZE(p);
     lose_s(p);
     return q;
+}
+
+extern byte * ensure_capacity_s(byte * p, int n) {
+    int x = SIZE(p) + n - CAPACITY(p);
+    if (x > 0) p = increase_capacity_s(p, x);
+    return p;
 }
 
 extern byte * copy_s(const byte * p) {
@@ -184,15 +187,14 @@ extern byte * copy_s(const byte * p) {
    block is created. */
 
 extern byte * add_s_to_s(byte * p, const char * s, int n) {
-    int k;
-    if (p == NULL) p = create_s(n);
-    k = SIZE(p);
-    {
-        int x = k + n - CAPACITY(p);
-        if (x > 0) p = increase_capacity_s(p, x);
+    if (p == NULL) {
+        p = create_s(n);
+    } else {
+        p = ensure_capacity_s(p, n);
     }
+    int k = SIZE(p);
     memcpy(p + k, s, n);
-    SIZE(p) += n;
+    SIZE(p) = k + n;
     return p;
 }
 
@@ -207,15 +209,12 @@ extern byte * add_sz_to_s(byte * p, const char * s) {
    block is created. */
 
 extern byte * add_char_to_s(byte * p, char ch) {
-    int k;
-    if (p == NULL) p = create_s(1);
-    k = SIZE(p);
-    {
-        int x = k + 1 - CAPACITY(p);
-        if (x > 0) p = increase_capacity_s(p, x);
+    if (p == NULL) {
+        p = create_s(1);
+    } else {
+        p = ensure_capacity_s(p, 1);
     }
-    p[k] = ch;
-    SIZE(p)++;
+    p[SIZE(p)++] = ch;
     return p;
 }
 
@@ -263,9 +262,23 @@ extern void str_append_string(struct str * str, const char * s) {
 
 /* Append an integer to a str. */
 extern void str_append_int(struct str * str, int i) {
-    char s[30];
-    sprintf(s, "%d", i);
-    str_append_string(str, s);
+    // Most calls are for integers 0 to 9 (~72%).
+    if (i >= 0 && i <= 9) {
+        str_append_ch(str, '0' + i);
+        return;
+    }
+
+    // Ensure there's enough space then snprintf() directly onto the end.
+    int max_size = (CHAR_BIT * sizeof(int) + 5) / 3;
+    str->data = ensure_capacity_s(str->data, max_size);
+    int r = snprintf((char*)str->data + SIZE(str->data), max_size, "%d", i);
+    // Some pre-C99 snprintf implementations return -1 if the buffer is too
+    // small so cast to unsigned for a simpler test.
+    if ((unsigned)r >= (unsigned)max_size) {
+        fprintf(stderr, "str_append_int(%d) would truncate output\n", i);
+        exit(1);
+    }
+    SIZE(str->data) += r;
 }
 
 /* Append wide character to a string as UTF-8. */
@@ -341,12 +354,11 @@ extern void str_pop_n(const struct str *str, int n) {
 }
 
 extern int get_utf8(const symbol * p, int * slot) {
-    int b0, b1;
-    b0 = *p++;
+    int b0 = *p++;
     if (b0 < 0xC0) {   /* 1100 0000 */
         * slot = b0; return 1;
     }
-    b1 = *p++;
+    int b1 = *p++;
     if (b0 < 0xE0) {   /* 1110 0000 */
         * slot = (b0 & 0x1F) << 6 | (b1 & 0x3F); return 2;
     }

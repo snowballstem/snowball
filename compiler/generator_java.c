@@ -117,6 +117,7 @@ static void wgotol(struct generator * g, int n) {
     write_int(g, n);
     write_string(g, ";");
     write_newline(g);
+    g->unreachable = true;
 }
 
 static void write_failure(struct generator * g) {
@@ -1003,7 +1004,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (p->amongvar_needed) w(g, "~Mint among_var;~N");
+    if (q->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
@@ -1045,6 +1046,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else if (x->always_matches) {
         writef(g, "~Mfind_among~S0(a_~I0);~N", p);
     } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
         writef(g, "~Mreturn find_among~S0(a_~I0) != 0;~N", p);
         x->node->right = NULL;
@@ -1263,9 +1265,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     w(g, "~Mprivate final static Among[] a_~I0 = {~N~+");
     for (int i = 0; i < x->literalstring_count; i++) {
+        if (i) w(g, ",~N");
         g->I[0] = v[i].i;
         g->I[1] = v[i].result;
-        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         w(g, "~Mnew Among(");
         write_literal_string(g, v[i].b);
@@ -1275,9 +1277,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
             write_varname(g, v[i].function);
             w(g, "\", methodObject");
         }
-        w(g, ")~S0~N");
+        w(g, ")");
     }
-    w(g, "~-~M};~N~N");
+    w(g, "~N~-~M};~N~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -1302,8 +1304,8 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     write_varname(g, q->name);
     write_string(g, " = {");
     for (int i = 0; i < size; i++) {
+        if (i) w(g, ", ");
         write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
     }
     w(g, " };~N~N");
 
