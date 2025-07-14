@@ -1023,7 +1023,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (p->amongvar_needed) w(g, "~Mint among_var;~N");
+    if (q->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;
@@ -1065,6 +1065,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else if (x->always_matches) {
         writef(g, "~Mfind_among~S0(a_~I0, ~F);~N", p);
     } else if (x->command_count == 0 &&
+               g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
         writef(g, "~Mreturn find_among~S0(a_~I0, ~F) != 0;~N", p);
         x->node->right = NULL;
@@ -1268,16 +1269,16 @@ static void generate_among_table(struct generator * g, struct among * x) {
     g->I[0] = x->number;
     w(g, "~Mprivate static readonly Among[] a_~I0 = new[] ~N~M{~N~+");
     for (int i = 0; i < x->literalstring_count; i++) {
+        if (i) w(g, ",~N");
         g->I[3] = v[i].i;
         g->I[4] = v[i].result;
         g->I[5] = v[i].function_index;
-        g->S[0] = i < x->literalstring_count - 1 ? "," : "";
 
         w(g, "~Mnew Among(");
         write_literal_string(g, v[i].b);
-        w(g, ", ~I3, ~I4, ~I5)~S0~N");
+        w(g, ", ~I3, ~I4, ~I5)");
     }
-    w(g, "~-~M};~N");
+    w(g, "~N~-~M};~N");
 
     if (x->function_count <= 1) return;
 

@@ -32,6 +32,7 @@ extern byte * create_s(int n);
 extern void report_s(FILE * out, const byte * p);
 extern void lose_s(byte * p);
 extern byte * increase_capacity_s(byte * p, int n);
+extern byte * ensure_capacity_s(byte * p, int n);
 extern byte * copy_s(const byte * p);
 extern byte * add_s_to_s(byte * p, const char * s, int n);
 extern byte * add_sz_to_s(byte * p, const char * s);
@@ -159,9 +160,13 @@ struct tokeniser {
     // Used for c_name names.
     byte * s;
     int number;
+    // String escape start character or -1.
     int m_start;
+    // String escape end character.
     int m_end;
+    // Link list of stringdefs.
     struct m_pair * m_pairs;
+    // Nesting depth of get directives.
     int get_depth;
     int error_count;
     int token;
@@ -170,7 +175,6 @@ struct tokeniser {
     byte token_reported_as_unexpected;
     enc encoding;
 
-    int omission;
     struct include * includes;
 
     /* Mode in which U+ has been used:
@@ -208,6 +212,7 @@ struct name {
     byte value_used;            /* (For variables) is its value ever used? */
     byte initialised;           /* (For variables) is it ever initialised? */
     byte used_in_definition;    /* (grouping) used in grouping definition? */
+    byte amongvar_needed;       /* for routines, externals */
     struct node * definition;   /* for routines, externals */
     // Initialised to -1; set to -2 if reachable from an external.
     // Reachable names are then numbered 0, 1, 2, ... with separate numbering
@@ -241,13 +246,14 @@ struct among {
     struct amongvec * b;      /* pointer to the amongvec */
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
-    int command_count;        /* in this among (includes "no command" entries) */
+    int command_count;        /* in this among (excludes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* number of different functions in this among */
     byte amongvar_needed;     /* do we need to set among_var? */
     byte always_matches;      /* will this among always match? */
     byte used;                /* is this among in reachable code? */
     int shortest_size;        /* smallest non-zero string length in this among */
+    int longest_size;         /* longest string length in this among */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
     struct node * node;       /* pointer to the node for this among */
@@ -285,7 +291,6 @@ struct node {
     symbol * literalstring;
     int number;
     int line_number;
-    int amongvar_needed;   /* used in routine definitions */
 };
 
 enum name_types {
@@ -320,11 +325,11 @@ struct analyser {
     int name_count[t_size];   /* name_count[i] counts the number of names of type i */
     struct among * amongs;
     struct among * amongs_end;
-    int amongvar_needed;      /* used in reading routine definitions */
     int among_with_function_count; /* number of amongs with functions */
     struct grouping * groupings;
     struct grouping * groupings_end;
     struct node * substring;  /* pending 'substring' in current routine definition */
+    struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
 };

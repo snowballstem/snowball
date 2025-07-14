@@ -9,6 +9,7 @@ class BaseStemmer {
         this.limit_backward = 0;
         this.bra = 0;
         this.ket = 0;
+        this.af = 0;
     }
 
     /**
@@ -234,17 +235,18 @@ class BaseStemmer {
     }
 
     /**
-     * @param {Array<Array>} v
+     * @param {Array<Array<string|number>>} v
+     * @param {?function(): boolean} call_among_func
      * @return {number}
      */
-    find_among(v)
+    find_among(v, call_among_func)
     {
         /** @protected */
         let i = 0;
         let j = v.length;
 
-        let c = this.cursor;
-        let l = this.limit;
+        const c = this.cursor;
+        const l = this.limit;
 
         let common_i = 0;
         let common_j = 0;
@@ -253,11 +255,11 @@ class BaseStemmer {
 
         while (true)
         {
-            let k = i + ((j - i) >>> 1);
+            const k = i + ((j - i) >>> 1);
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j; // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
-            let w = v[k];
+            const w = v[k];
             let i2;
             for (i2 = common; i2 < w[0].length; i2++)
             {
@@ -294,14 +296,17 @@ class BaseStemmer {
             }
         }
         do {
-            let w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c + w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
-                this.cursor = c + w[0].length;
-                if (res) return w[2];
+                this.af = w[3];
+                if (call_among_func.call(this))
+                {
+                    this.cursor = c + w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);
@@ -310,17 +315,17 @@ class BaseStemmer {
 
     // find_among_b is for backwards processing. Same comments apply
     /**
-     * @param {Array<Array>} v
-     * @return {number}
+     * @param {Array<Array<string|number>>} v
+     * @param {?function(): boolean} call_among_func
      */
-    find_among_b(v)
+    find_among_b(v, call_among_func)
     {
         /** @protected */
         let i = 0;
         let j = v.length
 
-        let c = this.cursor;
-        let lb = this.limit_backward;
+        const c = this.cursor;
+        const lb = this.limit_backward;
 
         let common_i = 0;
         let common_j = 0;
@@ -329,10 +334,10 @@ class BaseStemmer {
 
         while (true)
         {
-            let k = i + ((j - i) >> 1);
+            const k = i + ((j - i) >> 1);
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j;
-            let w = v[k];
+            const w = v[k];
             let i2;
             for (i2 = w[0].length - 1 - common; i2 >= 0; i2--)
             {
@@ -364,14 +369,17 @@ class BaseStemmer {
             }
         }
         do {
-            let w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c - w[0].length;
                 if (w.length < 4) return w[2];
-                let res = w[3](this);
-                this.cursor = c - w[0].length;
-                if (res) return w[2];
+                this.af = w[3];
+                if (call_among_func.call(this))
+                {
+                    this.cursor = c - w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);
@@ -389,7 +397,7 @@ class BaseStemmer {
      */
     #replace_s(c_bra, c_ket, s)
     {
-        let adjustment = s.length - (c_ket - c_bra);
+        const adjustment = s.length - (c_ket - c_bra);
         this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
         this.limit += adjustment;
         if (this.cursor >= c_ket) this.cursor += adjustment;
@@ -398,43 +406,31 @@ class BaseStemmer {
     }
 
     /**
-     * @return {boolean}
      */
     #slice_check()
     {
-        if (this.bra < 0 ||
-            this.bra > this.ket ||
-            this.ket > this.limit ||
-            this.limit > this.current.length)
-        {
-            return false;
-        }
-        return true;
+        console.assert(this.bra >= 0);
+        console.assert(this.bra <= this.ket);
+        console.assert(this.ket <= this.limit);
+        console.assert(this.limit <= this.current.length);
     }
 
     /**
      * @param {string} s
-     * @return {boolean}
      */
     slice_from(s)
     {
         /** @protected */
-        let result = false;
-        if (this.#slice_check())
-        {
-            this.#replace_s(this.bra, this.ket, s);
-            result = true;
-        }
-        return result;
+        this.#slice_check();
+        this.#replace_s(this.bra, this.ket, s);
     }
 
     /**
-     * @return {boolean}
      */
     slice_del()
     {
         /** @protected */
-        return this.slice_from("");
+        this.slice_from("");
     }
 
     /**
@@ -445,7 +441,7 @@ class BaseStemmer {
     insert(c_bra, c_ket, s)
     {
         /** @protected */
-        let adjustment = this.#replace_s(c_bra, c_ket, s);
+        const adjustment = this.#replace_s(c_bra, c_ket, s);
         if (c_bra <= this.bra) this.bra += adjustment;
         if (c_bra <= this.ket) this.ket += adjustment;
     }
@@ -456,12 +452,8 @@ class BaseStemmer {
     slice_to()
     {
         /** @protected */
-        let result = '';
-        if (this.#slice_check())
-        {
-            result = this.current.slice(this.bra, this.ket);
-        }
-        return result;
+        this.#slice_check();
+        return this.current.slice(this.bra, this.ket);
     }
 }
 
