@@ -158,8 +158,8 @@ backwardmode (
 
     define Step_3 as (
         [substring] R1 among (
-            'tional'  (<- 'tion')
-            'ational' (<- 'ate')
+            'tional'  (<-'tion')
+            'ational' (<-'ate')
             'alize'   (<-'al')
             'icate' 'iciti' 'ical'
                       (<-'ic')
