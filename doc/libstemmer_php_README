@@ -22,8 +22,8 @@ Then use it from PHP as follows:
     require 'base-stemmer.php';
     require 'english-stemmer.php';
     $stemmer = new SnowballEnglishStemmer;
-    $word = 'Compiled';
+    $word = 'compiled';
     $stem = $stemmer->stemWord($word);
     printf("%s => %s\n", $word, $stem );
 
-	// prints "Compiled => Compil"
+	// prints "compiled => compil"
