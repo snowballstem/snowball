@@ -9,7 +9,7 @@ Likewise, the compiler code in generator_php.c was mostly copied from
 generator_js.c
 
 The generated code is compatible with PHP versions from 7.4 to 8.4.
-Required extensions are `mbstring` and `intl`.
+The `mbstring` extension is required.
 
 
 How to use library
