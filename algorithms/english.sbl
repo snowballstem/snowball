@@ -99,7 +99,7 @@ backwardmode (
                     // dying->die, lying->die, tying->tie, vying->vie
                     'y'
                         (test(non-v atlimit) ] <-'ie')
-                    // Leave inning, outing, etc along.
+                    // Leave inning, outing, etc alone.
                     'inn' 'out' 'cann' 'herr' 'earr' 'even'
                         (atlimit)
                 )
@@ -158,8 +158,8 @@ backwardmode (
 
     define Step_3 as (
         [substring] R1 among (
-            'tional'  (<- 'tion')
-            'ational' (<- 'ate')
+            'tional'  (<-'tion')
+            'ational' (<-'ate')
             'alize'   (<-'al')
             'icate' 'iciti' 'ical'
                       (<-'ic')
