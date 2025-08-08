@@ -1,291 +1,411 @@
 /*
- * Persian Stemming Algorithm
- * Initiator: https://saeiddrv.com
+* -----------------------------------------------------------------------------
+* Persian Stemmer (HPS-like)
+* -----------------------------------------------------------------------------
+* Based on the paper:
+*   "HPS: A Hierarchical Persian Stemming Method"
+*   Ayshe Rashidi, Mina Zolfy Lighvan (2014)
+* -----------------------------------------------------------------------------
+* Differences from original HPS:
+* 1) No POS-tagger stage:
+*      - HPS uses a POS tagger to route tokens to Noun, Adjective, or Verb
+*        suffix rules directly.
+*      - Here we fall back to the fixed order: Noun → Adjective → Verb
+*        when POS is unknown.
+*      Reason: Implementation is tagger-agnostic and lightweight.
+* 2) Lexical "-AN" guard:
+*      - Added `Protect_Lexical_AN` to avoid stripping true lexical endings
+*        like "...stan", "...ran", and known stems (Iran, Tehran, Ensan).
+*      Reason: reduces over-stemming where HPS relied on explicit hash lists.
+* -----------------------------------------------------------------------------
+* PIPELINE (HPS-like, POS-tagger free):
+*   1) Normalize characters : unify Arabic variants; delete ZWNJ/ZWJ/spaces
+*   2) Strip start-anchored prefixes (repeatable)
+*   3) Iteratively peel one suffix layer per pass, in fixed order:
+*        Noun → Adjective → Verb
+*      If a noun rule fires, the pass is frozen (no adj/verb in that pass).
+* -----------------------------------------------------------------------------
+* Implemented by: https://saeiddrv.com
+* -----------------------------------------------------------------------------
 */
 
 stringescapes { }
 
-// Basic Persian Letters
-stringdef aa      '{U+0622}'
-stringdef alef    '{U+0627}'
-stringdef be      '{U+0628}'
-stringdef pe      '{U+067E}'
-stringdef te      '{U+062A}'
-stringdef se      '{U+062B}'
-stringdef jim     '{U+062C}'
-stringdef che     '{U+0686}'
-stringdef he      '{U+062D}'
-stringdef khe     '{U+062E}'
-stringdef dal     '{U+062F}'
-stringdef zal     '{U+0630}'
-stringdef re      '{U+0631}'
-stringdef ze      '{U+0632}'
-stringdef zhe     '{U+0698}'
-stringdef sin     '{U+0633}'
-stringdef shin    '{U+0634}'
-stringdef sad     '{U+0635}'
-stringdef zad     '{U+0636}'
-stringdef ta      '{U+0637}'
-stringdef za      '{U+0638}'
-stringdef ain     '{U+0639}'
-stringdef ghain   '{U+063A}'
-stringdef fe      '{U+0641}'
-stringdef ghaf    '{U+0642}'
-stringdef kaf     '{U+06A9}'
-stringdef gaf     '{U+06AF}'
-stringdef lam     '{U+0644}'
-stringdef mim     '{U+0645}'
-stringdef nun     '{U+0646}'
-stringdef vav     '{U+0648}'
-stringdef heh     '{U+0647}'
-stringdef heh_du  '{U+06BE}'
-stringdef ye      '{U+06CC}'
+// ============================================================================
+//  Alphabet & special symbols
+// ============================================================================
+stringdef alef       '{U+0627}'
+stringdef aa         '{U+0622}'
+stringdef be         '{U+0628}'
+stringdef pe         '{U+067E}'
+stringdef te         '{U+062A}'
+stringdef se         '{U+062B}'
+stringdef jim        '{U+062C}'
+stringdef che        '{U+0686}'
+stringdef heh_jimi   '{U+062D}'
+stringdef khe        '{U+062E}'
+stringdef dal        '{U+062F}'
+stringdef zal        '{U+0630}'
+stringdef re         '{U+0631}'
+stringdef ze         '{U+0632}'
+stringdef zhe        '{U+0698}'
+stringdef sin        '{U+0633}'
+stringdef shin       '{U+0634}'
+stringdef sad        '{U+0635}'
+stringdef zad        '{U+0636}'
+stringdef ta         '{U+0637}'
+stringdef za         '{U+0638}'
+stringdef ain        '{U+0639}'
+stringdef ghain      '{U+063A}'
+stringdef fe         '{U+0641}'
+stringdef ghaf       '{U+0642}'
+stringdef kaf        '{U+06A9}'
+stringdef gaf        '{U+06AF}'
+stringdef lam        '{U+0644}'
+stringdef mim        '{U+0645}'
+stringdef nun        '{U+0646}'
+stringdef vav        '{U+0648}'
+stringdef heh        '{U+0647}'
+stringdef ye         '{U+06CC}'
 
-// Diacritics
-stringdef farha    '{U+064E}'
-stringdef damma    '{U+064F}'
-stringdef kasra    '{U+0650}'
-stringdef tashdid  '{U+0651}'
-stringdef sukun    '{U+0652}'
-stringdef hamza    '{U+0654}'
-
-// Arabic variants
-stringdef ar_heh                     '{U+06C1}'
-stringdef ar_kaf                     '{U+0643}'
-stringdef ar_ye                      '{U+064A}'
-stringdef ar_ye_with_hamza_above     '{U+0626}'
-stringdef ar_he_with_hamza_above     '{U+06C0}'
-stringdef ar_he_marbuta              '{U+0629}'
-stringdef ar_alef_with_hamza_below   '{U+0625}'
-stringdef ar_alef_with_hamza_above   '{U+0623}'
-stringdef ar_vav_with_hamza_above    '{U+0624}'
-
-// Persian and Arabic numbers
-stringdef num0 '{U+06F0}'
-stringdef num1 '{U+06F1}'
-stringdef num2 '{U+06F2}'
-stringdef num3 '{U+06F3}'
-stringdef num4 '{U+06F4}'
-stringdef num5 '{U+06F5}'
-stringdef num6 '{U+06F6}'
-stringdef num7 '{U+06F7}'
-stringdef num8 '{U+06F8}'
-stringdef num9 '{U+06F9}'
-stringdef ar_num0 '{U+0660}'
-stringdef ar_num1 '{U+0661}'
-stringdef ar_num2 '{U+0662}'
-stringdef ar_num3 '{U+0663}'
-stringdef ar_num4 '{U+0664}'
-stringdef ar_num5 '{U+0665}'
-stringdef ar_num6 '{U+0666}'
-stringdef ar_num7 '{U+0667}'
-stringdef ar_num8 '{U+0668}'
-stringdef ar_num9 '{U+0669}'
-
-// Other Characters
+stringdef space             '{U+0020}'
+stringdef zero_width_joiner '{U+200D}'
+stringdef half_space        '{U+200C}' // zero-width non-joiner (ZWNJ)
 // Note: U+200C (ZERO WIDTH NON-JOINER) is commonly referred to as "nim-faseleh" ("half-space") in Persian.
 // Although this name is not standard in English Unicode terminology, it reflects its widespread use
 // in Persian as a morpheme separator within words. This character is here to normalize
-// textual variations and ensure consistent stemming.
-stringdef half_space  '{U+200C}'
-stringdef zero_width  '{U+200B}'
 
+// Arabic variants to normalize → Persian forms
+stringdef ar_kaf                   '{U+0643}'
+stringdef ar_ye                    '{U+064A}'
+stringdef ar_ye_with_hamza_above   '{U+0626}'
+stringdef ar_heh                   '{U+06C1}'
+stringdef ar_he_marbuta            '{U+0629}'
+stringdef ar_alef_with_hamza_above '{U+0623}'
+stringdef ar_alef_with_hamza_below '{U+0625}'
+stringdef ar_vav_with_hamza_above  '{U+0624}'
+
+// ============================================================================
+//  Declarations (routines, flags, and marks)
+// ============================================================================
 routines (
-    Exceptions
+  Normalize_Characters  // Forward: Unicode/script normalization
+  Strip_Prefix_At_Start // Forward: anchored prefix peeling (one per call)
+  Protect_Lexical_AN    // Probe: flag lexical -AN endings (per pass)
 
-    Remove_Half_Spaces
-    Remove_Diacritics
-
-    Normalize_Arabic_Characters
-    Normalize_Numbers
-    Normalize_Nouns
-
-    Remove_Prefix_Verbs
-    Remove_Suffix_Verbs
-    Remove_Prefix_Nouns
-    Remove_Suffix_Nouns
-    Remove_Suffix_Adjectives
+  // Noun tier (HPS categories)
+  AN_LexHash N_Hash V_Hash
+  Noun_Possessive  Noun_Plural  Noun_Other  Stem_Noun
+  Adjective_Superlative_Comparative  Adjective_Derivational
+  Adjective_Relative Stem_Adjective
+  Participle_Clitic_Tails
+  Verb_Person_Endings  Verb_Tense_Mood_Markers  Stem_Verb
 )
 
 externals ( stem )
 
-define Remove_Half_Spaces as (
-    repeat (
-        (
-            [substring] among (
-                '{half_space}' '{zero_width}' (delete)
-                '' (next)
-            )
-        )
-    )
-)
+// Loop/guard flags and marks:
+//  - 'changed'           : set true whenever a rule modifies the buffer in this pass.
+//  - 'protect_lex_an'    : true when final -AN is lexical (not plural) in this pass.
+//  - 'freeze_pass'       : true when a noun rule requests skipping adj/verb tiers
+//                          in the current pass (e.g., after -gah / -dan stripping).
+//  - 'saw_present_prefix': true when a present-tense prefix (mi-/nemi-) is stripped;
+//                          used to enable verb person-ending rules in this pass.
+//  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
+//                          also enables verb person-ending rules in this pass.
+//  - 'start_mark'        : index of token start for anchored prefix matching.
+//  - 'temp_mark'         : temporary cursor save/restore during probes or rewrites.
+booleans ( changed protect_lex_an freeze_pass saw_present_prefix saw_inf_or_part )
+integers ( start_mark temp_mark )
 
-define Remove_Diacritics as (
-    repeat (
-        (
-            [substring] among (
-                '{farha}' '{damma}' '{kasra}' '{tashdid}' '{sukun}' '{hamza}' (delete)
-                '' (next)
-            )
-        )
-    )
-)
-
-define Normalize_Arabic_Characters as (
-    repeat (
-        (
-            [substring] among (
-                '{ar_kaf}' ( <- '{kaf}')
-                '{ar_ye}' '{ar_ye_with_hamza_above}' '{ye}{ye}' ( <- '{ye}')
-                '{ar_heh}' '{ar_he_marbuta}' '{ar_he_with_hamza_above}' ( <- '{heh}')
-                '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}' '{alef}{alef}' ( <- '{alef}')
-                '{ar_vav_with_hamza_above}' ( <- '{vav}')
-
-                '' (next)
-            )
-        )
-    )
-)
-
-define Normalize_Numbers as (
-    repeat (
-        (
-            [substring] among (
-                '{ar_num0}' ( <- '{num0}' )
-                '{ar_num1}' ( <- '{num1}' )
-                '{ar_num2}' ( <- '{num2}' )
-                '{ar_num3}' ( <- '{num3}' )
-                '{ar_num4}' ( <- '{num4}' )
-                '{ar_num5}' ( <- '{num5}' )
-                '{ar_num6}' ( <- '{num6}' )
-                '{ar_num7}' ( <- '{num7}' )
-                '{ar_num8}' ( <- '{num8}' )
-                '{ar_num9}' ( <- '{num9}' )
-                '' (next)
-            )
-        )
-    )
-)
-
-define Normalize_Nouns as (
-    backwards (
-        [substring] among (
-            '{alef}{sin}{te}' '{shin}{dal}{heh}' ( $(len > 4) <- '' )     // ast, shodeh -> ''
-            '{heh}{alef}{nun}' ( $(len > 4) <- '{heh}' )                  // haan -> heh (giyahan -> giyah)
-            '{gaf}{alef}{nun}' ( $(len > 4) <- '{heh}')                   // gaan -> heh (setaregan -> setareh)
-        )
-    )
-)
-
-define Remove_Prefix_Verbs as (
+// ============================================================================
+//  PHASE 1 — NORMALIZATION (forward)
+//  - Unify Arabic forms to Persian letters for stable downstream matching.
+//  - Delete ZWNJ (U+200C), ZWJ (U+200D), and ASCII spaces so the token is solid.
+// ============================================================================
+define Normalize_Characters as (
+  repeat (
     [substring] among (
-        '{mim}{ye}' ($(len > 4) delete)          // mii (present continuous)
-        '{nun}{mim}{ye}' ($(len > 5) delete)     // nemii (negative present continuous)
+      '{ar_kaf}'                                                 (<- '{kaf}')
+      '{ar_ye}' '{ar_ye_with_hamza_above}'                       (<- '{ye}')
+      '{ar_heh}' '{ar_he_marbuta}'                               (<- '{heh}')
+      '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}'  (<- '{alef}')
+      '{ar_vav_with_hamza_above}'                                (<- '{vav}')
+      '{half_space}'                                             ( delete )
+      '{zero_width_joiner}'                                      ( delete )
+      '{space}'                                                  ( delete )
+      ''                                                         ( next )
     )
+  )
 )
 
-define Remove_Prefix_Nouns as (
+// ============================================================================
+//  PHASE 2 — PREFIX STRIPPING (forward, anchored)
+//  - HPS: remove known prefixes before suffix processing.
+//  - Sets `saw_present_prefix` when matching {mi}/{nemi} to enable person endings later.
+// ============================================================================
+define Strip_Prefix_At_Start as (
+  setmark temp_mark
+  tomark start_mark
+  [substring] among (
+    // with optional space variants to handle ZWNJ → space
+    '{nun}{mim}{ye}'         ($(len > 4) delete set changed set saw_present_prefix) // NEMI
+    '{mim}{ye}'              ($(len > 3) delete set changed set saw_present_prefix) // MI
+    '{nun}{alef}'            ($(len > 3) delete set changed) // NA
+    '{be}{ye}'               ($(len > 3) delete set changed) // BI
+  )
+  tomark temp_mark
+)
+
+// ============================================================================
+//  PROBE — PROTECT LEXICAL "-AN" (not plural)
+//  - HPS strips -AN as a plural; however, many stems end in orthographic "AN":
+//      ...stan / ...san / ...ran (place names/lexical stems), and frequent
+//      stems such as Iran/Tehran/Ensan/Ostan.
+//  - We set 'protect_lex_an' per pass if a trailing pattern indicates lexical AN.
+//  - This is a probe only: it NEVER edits the buffer; it only sets a flag.
+//  - We always restore the cursor with 'temp_mark' after probing.
+// ============================================================================
+
+define Protect_Lexical_AN as (
+  unset protect_lex_an
+  setmark temp_mark
+  backwards (
+    do AN_LexHash or
     [substring] among (
-        // '{be}{ye}' ($(len > 3) delete)         // bii (Makes some conflicts with other nouns)
-        '{be}{heh}' ($(len > 3) delete)        // beh
-        '{pe}{ye}{shin}' ($(len > 4) delete)   // pish
-        '{pe}{sin}' ($(len > 3) delete)        // pas
-        '{ze}{ye}{re}' ($(len > 4) delete)     // ziir
-        '{heh}{mim}' ($(len > 3) delete)       // ham
-        '{nun}{alef}' ($(len > 3) delete)      // naa
+      '{sin}{te}{alef}{nun}'  ( set protect_lex_an )  // …stan
+      '{sin}{alef}{nun}'      ( set protect_lex_an )  // …san
+      '{re}{alef}{nun}'       ( set protect_lex_an )  // …ran
     )
+  )
+  tomark temp_mark
 )
 
-define Remove_Suffix_Nouns as (
-    backwards (
-        [substring] among (
-            '{heh}{alef}' '{heh_du}{alef}' ($(len > 3) delete)             // haa (plural)
-            '{heh}{alef}{ye}' '{heh_du}{alef}{ye}' ($(len > 4) delete)     // haaye (plural)
+// ============================================================================
+//  PHASE 3 — SUFFIX STRIPPING (backward)
+//  - All routines in backward mode start matching from the end of the token.
+//  - IMPORTANT: no successful "no-op" arms; every success must modify the text.
+//    This ensures 'repeat' loops terminate.
+//  - Length guards $(len > N) reduce over-stemming risk on short words.
+// ============================================================================
+backwardmode (
 
-            '{alef}{te}' ($(len > 3) delete)              // aat (Arabic plural)
-            '{ye}{te}' ($(len > 3) delete)                // yat
-
-            // '{alef}{nun}'  ($(len > 3) delete)         // aan (plural) - Make some conflict with some nouns such as (Tehran)
-        )
+  // --- Lexical "-AN" hash list (exact matches).
+  //     Small curated set of stems ending in orthographic -AN that are not plural.
+  //     Used by `Protect_Lexical_AN` to prevent stripping on place names / lexical nouns.
+  define AN_LexHash as (
+    [substring] among (
+      '{aa}{lam}{mim}{alef}{nun}'         ( set protect_lex_an ) // alman
+      '{aa}{sin}{alef}{nun}'              ( set protect_lex_an ) // asan
+      '{alef}{ye}{mim}{alef}{nun}'        ( set protect_lex_an ) // eiman
+      '{dal}{re}{mim}{alef}{nun}'         ( set protect_lex_an ) // darman
+      '{pe}{ye}{mim}{alef}{nun}'          ( set protect_lex_an ) // payman
+      '{re}{mim}{alef}{nun}'              ( set protect_lex_an ) // roman
+      '{alef}{ye}{re}{alef}{nun}'         ( set protect_lex_an ) // iran
+      '{te}{heh}{re}{alef}{nun}'          ( set protect_lex_an ) // tehran
+      '{alef}{nun}{sin}{alef}{nun}'       ( set protect_lex_an ) // ensan
     )
+  )
+
+  // --- Noun irregular rewrites (small hash table).
+  //     Only include entries that actually change the buffer.
+  define N_Hash as (
+    [substring] among (
+      '{alef}{khe}{be}{alef}{re}'      (<- '{khe}{be}{re}' set changed)
+      '{khe}{vav}{alef}{sin}'          (<- '{khe}{alef}{sin}{heh}' set changed)
+      '{alef}{sin}{alef}{te}{ye}{dal}' (<- '{alef}{sin}{te}{alef}{dal}' set changed)
+    )
+  )
+
+  // --- Verb irregular rewrites (compact).
+  define V_Hash as (
+    [substring] among (
+      '{alef}{sin}{te}' (<- '{heh}{sin}{te}' set changed)
+    )
+  )
+
+  // --- Noun possessive suffixes (long + short clitics)
+  define Noun_Possessive as (
+    [substring] among (
+      '{alef}{mim}'      ($(len > 4) delete set changed) // -AM
+      '{alef}{te}'       ($(len > 4) delete set changed) // -AT
+      '{alef}{shin}'     ($(len > 4) delete set changed) // -ASH
+      '{mim}{alef}{nun}' ($(len > 5) delete set changed) // -MAN
+      '{te}{alef}{nun}'  ($(len > 5) delete set changed) // -TAN
+      '{shin}{alef}{nun}'($(len > 5) delete set changed) // -SHAN
+
+      // short clitics
+      '{mim}'             ($(len > 3) delete set changed) // -M
+      '{te}'              ($(len > 3) delete set changed) // -T
+      '{shin}'            ($(len > 3) delete set changed) // -SH
+    )
+  )
+
+  // --- Noun plurals.
+  //     -YAN and -GAN are productive; -AN is guarded by 'protect_lex_an' probe.
+  define Noun_Plural as (
+    [substring] among (
+      '{ye}{alef}{nun}'     ($(len > 5) delete set changed)                 // -YAN
+      '{gaf}{alef}{nun}'    ($(len > 5) delete set changed)                 // -GAN
+      '{heh}{alef}{ye}{ye}' ($(len > 6) delete set changed)                 // -HAYI
+      '{heh}{alef}{ye}'     ($(len > 5) delete set changed)                 // -HAY
+      '{alef}{nun}{ye}'     ($(len > 5) delete set changed)                 // -ANI
+      '{heh}{alef}'         ($(len > 4) delete set changed)                 // -HA
+      '{alef}{nun}'         ( not protect_lex_an $(len > 4) delete set changed ) // -AN (only if not lexical)
+      '{ye}{nun}'           ($(len > 4) delete set changed)                 // -IN
+      '{alef}{te}'          ($(len > 4) delete set changed)                 // -AT
+    )
+  )
+
+  // --- Other derivational noun endings (conservative set).
+  //     Order: longer patterns before shorter (e.g., -YAT before -Y).
+  define Noun_Other as (
+    [substring] among (
+      '{gaf}{alef}{heh}'  ($(len > 5) delete set changed set freeze_pass ) // -GAH
+      '{be}{alef}{nun}'   ($(len > 5) delete set changed) // -BAN
+      '{dal}{alef}{nun}'  ($(len > 5) delete set changed set freeze_pass ) // -DAN
+      '{gaf}{ye}'         ($(len > 4) delete set changed) // -GI (abstract noun)
+      '{ye}{te}'          ($(len > 4) delete set changed) // -YAT
+      '{ye}{ye}'          ($(len > 4) delete set changed) // -YY (double Y)
+    )
+  )
+
+  // --- Composite noun step (OR chain).
+  //     Any noun success sets `freeze_pass` so adj/verb do not run this pass.
+  define Stem_Noun as (
+    ( N_Hash set freeze_pass )
+    or ( Noun_Other set freeze_pass )
+    or ( Noun_Plural set freeze_pass )
+    or ( Noun_Possessive set freeze_pass )
+  )
+
+  // --- Adjective: comparative/superlative (HPS).
+  define Adjective_Superlative_Comparative as (
+    [substring] among (
+      '{te}{re}{ye}{nun}' ($(len > 6) delete set changed) // -TARIN
+      '{te}{re}'          ($(len > 5) delete set changed) // -TAR
+    )
+  )
+
+  // --- Adjective derivational endings (HPS list + common variants).
+  define Adjective_Derivational as (
+    [substring] among (
+      '{alef}{nun}{heh}'  ($(len > 5) delete set changed) // -ANE
+      '{mim}{nun}{dal}'   ($(len > 5) delete set changed) // -MAND
+      '{vav}{alef}{re}'   ($(len > 5) delete set changed) // -VAR
+      '{nun}{alef}{kaf}'  ($(len > 5) delete set changed) // -NAK
+      '{gaf}{alef}{re}'   ($(len > 5) delete set changed) // -GAR
+      '{ye}{nun}'         ($(len > 4) delete set changed) // -IN
+    )
+  )
+
+  // --- Adjective: relative -Y and final -H cleanups.
+  define Adjective_Relative as (
+    [substring] among (
+      '{ye}{ye}'  ($(len > 4) delete set changed) // -YY
+    )
+  )
+
+  // --- Composite adjective step (OR chain).
+  define Stem_Adjective as (
+    Adjective_Superlative_Comparative or
+    Adjective_Derivational or
+    Adjective_Relative
+  )
+
+  // --- Participle + person/aux clitic tails
+  define Participle_Clitic_Tails as (
+  [substring] among (
+      '{alef}{ye}{dal}'  ($(len > 5) delete set changed)
+      '{alef}{ye}{mim}'  ($(len > 5) delete set changed)
+      '{alef}{nun}{dal}' ($(len > 5) delete set changed)
+      '{alef}{sin}{te}'  ($(len > 5) delete set changed)
+      '{alef}{sin}'      ($(len > 4) delete set changed)
+      '{alef}{ye}'       ($(len > 4) delete set changed)
+      '{ye}{dal}'        ($(len > 4) delete set changed)
+      '{ye}{mim}'        ($(len > 4) delete set changed)
+      '{mim}'            ($(len > 3) delete set changed)
+      '{dal}'            ($(len > 3) delete set changed)
+    )
+  )
+
+  // --- Verb: person/number endings
+  define Verb_Person_Endings as (
+    // 1) Specific past-3sg stem fixes for
+    [substring] among (
+      '{re}{fe}{te}{mim}'                 (<- '{re}{fe}{te}' set changed)
+      '{re}{fe}{te}{ye}'                  (<- '{re}{fe}{te}' set changed)
+      '{re}{fe}{te}{ye}{mim}'             (<- '{re}{fe}{te}' set changed)
+      '{re}{fe}{te}{ye}{dal}'             (<- '{re}{fe}{te}' set changed)
+      '{re}{fe}{te}{alef}{nun}{dal}'      (<- '{re}{fe}{te}' set changed)
+    )
+    or
+    // 2) Generic person endings — only if we saw a verb cue this pass
+    ( (saw_present_prefix or saw_inf_or_part) and
+      [substring] among (
+        '{alef}{nun}{dal}' ($(len > 5) delete set changed) // -AND
+        '{ye}{dal}'        ($(len > 4) delete set changed) // -ID
+        '{ye}{mim}'        ($(len > 4) delete set changed) // -IM
+        '{alef}{mim}'      ($(len > 4) delete set changed) // -AM
+        '{dal}'            ($(len > 3) delete set changed) // -D
+        '{mim}'            ($(len > 3) delete set changed) // -M
+      )
+    )
+  )
+
+  // --- Verb: mood/tense markers (HPS).
+  define Verb_Tense_Mood_Markers as (
+    [substring] among (
+      '{heh}'       ($(len > 3) delete set changed set saw_inf_or_part) // participle -H
+      '{alef}{nun}' ($(len > 4) delete set changed set saw_inf_or_part) // infinitive -N / -AN
+    )
+  )
+
+  // --- Composite verb step (OR chain).
+  define Stem_Verb as (
+    Participle_Clitic_Tails or
+    V_Hash or
+    Verb_Person_Endings or
+    Verb_Tense_Mood_Markers
+  )
 )
 
-define Remove_Suffix_Verbs as (
-    backwards (
-        [substring] among (
-            '{ye}{mim}' ($(len > 3) delete)
-            // '{nun}{dal}' ($(len > 3) delete) (Makes some conflicts with nouns, payvand)
-            '{mim}' ($(len > 3) delete)
-            '{ye}{dal}' ($(len > 3) delete)
-            '{alef}{ye}{dal}' ($(len > 3) delete)
-            '{alef}{nun}{dal}' ($(len > 3) delete)
-        )
-    )
-)
-
-define Remove_Suffix_Adjectives as (
-    backwards (
-        [substring] among (
-            '{te}{re}' (delete)           // tar (comparative)
-            '{te}{re}{ye}{nun}' (delete)  // tarin (superlative)
-            '{mim}{nun}{dal}' (delete)    // mand
-            '{nun}{alef}{kaf}' (delete)   // naak
-            '{gaf}{ye}' (delete)          // gii
-            '{alef}{nun}{heh}' (delete)   // aaneh
-        )
-    )
-)
-
-define Exceptions as (
-    [substring] atlimit among (
-        '{sin}{ye}'
-        '{dal}{re}'
-        '{alef}{ye}{nun}'
-        '{alef}{ye}'
-        '{be}{re}'
-        '{nun}{alef}{mim}'
-        '{pe}{sin}'
-        '{alef}{sin}{te}{alef}{nun}'
-        '{be}{re}{alef}{ye}'
-        '{pe}{ye}{vav}{nun}{dal}'
-        '{mim}{ye}{lam}{alef}{dal}{ye}'
-        '{mim}{lam}{ye}'
-        '{che}{nun}{dal}'
-        '{be}{re}{khe}{ye}'
-        '{heh}{mim}{ye}{nun}'
-        '{heh}{mim}{alef}{nun}'
-        '{heh}{mim}{heh}'
-        '{mim}{te}{re}'
-        '{te}{ye}{mim}'
-        '{sin}{lam}{alef}{mim}'
-        '{alef}{sin}{lam}{alef}{mim}'
-        '{ye}{ain}{nun}{ye}'
-        '{aa}{lam}{be}{vav}{mim}'
-        '{heh}{sin}{te}{mim}'
-        '{nun}{ye}{sin}{te}{mim}'
-        '{be}{vav}{dal}{mim}'
-        '{be}{alef}{ye}{dal}'
-        '{ain}{nun}{vav}{alef}{nun}'
-        '{be}{ye}{re}{vav}{nun}'
-    )
-)
-
+// ============================================================================
+//  MAIN (HPS pipeline)
+//  - 1) Normalize script/spacing.
+//  - 2) Strip all leading prefixes (one per call; repeat while changed).
+//  - 3) In each pass: try Noun; if Noun changed, `freeze_pass` short-circuits
+//       Adjective/Verb for this pass. Otherwise try Adjective, then Verb.
+//  Invariants:
+//    - After each outer iteration, either the buffer is shorter or unchanged.
+//    - 'changed' controls loop termination (no infinite loop).
+// ============================================================================
 define stem as (
-    do Remove_Half_Spaces             // Remove all half-space characters first
-    do Remove_Diacritics              // Remove diacritics
-    
-    do Normalize_Arabic_Characters    // Normalize Arabic/Persian variants
-    do Normalize_Numbers              // Convert Persian/Arabic numbers
-    do Normalize_Nouns                // Normalize nouns
+  // 1) Normalize script/spacing
+  do Normalize_Characters
 
-    ( Exceptions )                    // If word is in Exceptions, stop processing
-    or (
-        do Remove_Suffix_Nouns        // Remove noun suffixes
-        do Remove_Prefix_Nouns        // Remove noun prefixes
+  // 2) Anchor start for prefix stripping
+  setmark start_mark
 
-        do Remove_Prefix_Verbs        // Remove verb prefixes
-        do Remove_Suffix_Verbs        // Remove verb suffixes
+  // 3) Peel prefixes (forward, anchored)
+  repeat (
+    unset changed
+    Strip_Prefix_At_Start
+    changed
+  )
 
-        do Remove_Suffix_Adjectives   // Remove adjective suffixes
+  // 4) Peel suffixes (backward), one layer per pass
+  repeat (
+    unset changed
+    unset saw_inf_or_part
+    do Protect_Lexical_AN
+    backwards (
+      // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
+       unset freeze_pass
+      ( do Stem_Noun and ( freeze_pass or ( do Stem_Adjective or do Stem_Verb ) ) )
+      or
+      ( do Stem_Adjective or do Stem_Verb )
     )
+    changed
+  )
 )
