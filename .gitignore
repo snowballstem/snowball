@@ -16,6 +16,7 @@
 /stemwords
 /dist
 /java/org/tartarus/snowball/ext/
+/dart/lib/ext/
 /js_out
 /python_check
 /python_out

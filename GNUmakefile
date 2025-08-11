@@ -24,6 +24,14 @@ JAVA ?= java -ea
 java_src_main_dir = java/org/tartarus/snowball
 java_src_dir = $(java_src_main_dir)/ext
 
+DART ?= dart run --enable-asserts
+dart_src_main_dir = dart/lib
+dart_src_dir = $(dart_src_main_dir)/ext
+dart_runtime_dir = dart/lib/src
+dart_gen_dir = dart/lib/gen
+dart_example_dir = dart/example
+dart_package_dir = dart
+
 MONO ?= mono
 MCS ?= mcs
 csharp_src_main_dir = csharp/Snowball
@@ -104,6 +112,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/driver.c \
 		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
+		   compiler/generator_dart.c \
 		   compiler/generator_js.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
@@ -124,6 +133,17 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
+
+DARTRUNTIME_SOURCES = dart/lib/src/snowball.dart \
+		      dart/lib/src/algorithms.dart
+
+DART_PACKAGE_SOURCES = dart/lib/snowball.dart
+
+DART_TEST_SOURCES = dart/example/test_app.dart
+
+DART_PACKAGE_FILES = dart/pubspec.yaml \
+		     dart/analysis_options.yaml \
+		     dart/.gitignore
 
 CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 			 csharp/Snowball/Stemmer.cs \
@@ -175,6 +195,8 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+DART_SOURCES = $(libstemmer_algorithms:%=$(dart_src_dir)/%_stemmer.dart) \
+	$(dart_runtime_dir)/algorithms.dart
 CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
@@ -218,6 +240,7 @@ clean:
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
+	      $(DART_SOURCES) \
 	      $(CSHARP_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
@@ -234,21 +257,23 @@ clean:
 	-rmdir $(js_output_dir)
 
 update_version:
-	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/' \
+	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/;' \
+		-e 's/\d+\.\d+\.\d+(.*?SNOWBALL_VERSION)/$(SNOWBALL_VERSION)$$1/;' \
 		compiler/header.h \
 		csharp/Snowball/AssemblyInfo.cs \
+		dart/pubspec.yaml \
 		python/setup.py
 
-everything: all java csharp pascal js rust go python ada
+everything: all java dart csharp pascal js rust go python ada
 
 baseline-create: everything
 	rm -rf *.baseline
-	for d in src_c java csharp pascal js_out rust go python_out ada ; do cp -a $$d $$d.baseline ; done
+	for d in src_c java dart csharp pascal js_out rust go python_out ada ; do cp -a $$d $$d.baseline ; done
 	rm -rf *.baseline/*.o ada.baseline/obj pascal.baseline/*.ppu
 	find java.baseline -name '*.class' -delete
 
 baseline-diff:
-	@for d in src_c java csharp pascal js_out rust go python_out ada ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
+	@for d in src_c java dart csharp pascal js_out rust go python_out ada ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
 
 .PHONY: all clean update_version everything baseline-create baseline-diff
 
@@ -289,6 +314,9 @@ tests/%.o: tests/%.c
 stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
+dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
+	dart/generate_algorithms.pl $(libstemmer_algorithms) > $@
+
 csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
@@ -320,6 +348,10 @@ $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 $(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
 	./snowball $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+
+$(dart_src_dir)/%_stemmer.dart: algorithms/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(dart_src_dir)
+	./snowball $< -d -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
 
 $(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
@@ -373,10 +405,10 @@ endif
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
-.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_dart dist_libstemmer_js dist_libstemmer_python
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_dart dist_libstemmer_js dist_libstemmer_python
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -473,6 +505,38 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	 echo "README" >> MANIFEST && \
 	 ls $(java_src_dir)/*.java >> MANIFEST && \
 	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+	rm -rf $${dest}
+
+# Make a distribution of all the sources required to compile the Dart library.
+dist_libstemmer_dart: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+	    $(COMMON_FILES) \
+            $(LIBSTEMMER_EXTRA) \
+	    $(DART_SOURCES)
+	destname=libstemmer_dart-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(dart_package_dir) && \
+	mkdir -p $${dest}/$(dart_src_dir) && \
+	mkdir -p $${dest}/$(dart_runtime_dir) && \
+	mkdir -p $${dest}/$(dart_src_main_dir) && \
+	mkdir -p $${dest}/$(dart_example_dir) && \
+	cp -a doc/libstemmer_dart_README $${dest}/$(dart_package_dir)/README.md && \
+	cp -a $(DART_SOURCES) $${dest}/$(dart_src_dir) && \
+	cp -a $(DARTRUNTIME_SOURCES) $${dest}/$(dart_runtime_dir) && \
+	cp -a $(DART_PACKAGE_SOURCES) $${dest}/$(dart_src_main_dir) && \
+	cp -a $(DART_TEST_SOURCES) $${dest}/$(dart_example_dir) && \
+	cp -a $(DART_PACKAGE_FILES) $${dest}/$(dart_package_dir) && \
+	cp -a $(COMMON_FILES) $${dest}/$(dart_package_dir) && \
+	mv $${dest}/$(dart_package_dir)/COPYING $${dest}/$(dart_package_dir)/LICENSE && \
+	mv $${dest}/$(dart_package_dir)/NEWS $${dest}/$(dart_package_dir)/CHANGELOG.md && \
+	(cd $${dest} && \
+	 echo "$${dart_src_main_dir}/README.md" >> MANIFEST && \
+	 ls $(dart_src_dir)/*.dart >> MANIFEST && \
+	 ls $(dart_src_main_dir)/*.dart >> MANIFEST && \
+	 ls $(dart_runtime_dir)/*.dart >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
@@ -611,6 +675,33 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
 	else \
 	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt |\
+	      $(DIFF) -u $</output.txt - ;\
+	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+
+###############################################################################
+# Dart
+###############################################################################
+
+.PHONY: dart check_dart do_check_dart
+
+.SUFFIXES: .dart
+
+dart: $(DART_SOURCES)
+
+check_dart: dart
+	$(MAKE) do_check_dart
+
+do_check_dart: $(libstemmer_algorithms:%=check_dart_%)
+
+check_dart_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for Dart"
+	@cd dart && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	    $(DART) example/test_app.dart $* -o $(PWD)/tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
+	else \
+	  $(DART) example/test_app.dart $* $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
