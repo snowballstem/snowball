@@ -54,7 +54,7 @@ static void print_arglist(int exit_code) {
                "  -js                              generate Javascript\n"
 #endif
 #ifndef DISABLE_PHP
-               "  -php\n"
+               "  -php                             generate PHP\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust                            generate Rust\n"
