@@ -1,8 +1,4 @@
 <?php
-/*
- * For testing vocab files from snowball-data
- * run `make check_php`
- */
 
 $lang = $argv[1] ?? 'english';
 $parent = realpath(__DIR__.'/..');
@@ -21,18 +17,8 @@ if( ! class_exists($class) ){
 }
 $stemmer = new $class;
 
-
-fwrite(STDERR,"Waiting for stdin...\n");
-$in = fopen('php://stdin', 'r');
-fwrite(STDERR,"Stemming $lang...\n");
-$bench = microtime(true);
-$count = 0;
-while( $word = fgets($in) ) {
-    $word = rtrim($word, "\n");
+while( $word = fgets(STDIN) ) {
+    $word = strtolower(rtrim($word, "\n"));
     $stem = $stemmer->stemWord($word);
-    //fwrite(STDERR,"$word => $stem\n");
-    $count++;
-    echo $stem,"\n";
+    echo $stem, "\n";
 }
-fwrite(STDERR, sprintf("Done: %u words in %.2f seconds\n", $count, microtime(true)-$bench) );
-fclose($in);
