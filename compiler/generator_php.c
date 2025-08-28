@@ -115,7 +115,6 @@ static void write_inc_cursor(struct generator * g, struct node * p) {
 
 static void wsetlab_begin(struct generator * g, int n) {
     g->I[0] = n;
-    w(g, "~M// begin lab~I0 block:~N");
 }
 
 static void wsetlab_end(struct generator * g, int n) {
