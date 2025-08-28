@@ -1050,9 +1050,6 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    /*if (p->amongvar_needed) {
-        w(g, "~M$among_var = 0;~N");
-    }*/
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
