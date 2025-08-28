@@ -1026,12 +1026,13 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
+    write_newline(g);
     write_comment(g, p);
 
     if (q->type == t_routine) {
-        writef(g, "~N~Mprotected function ~W(): bool~N", p);
+        writef(g, "~Mprotected function ~W(): bool~N", p);
     } else {
-        writef(g, "~N~Mpublic function ~W(): bool~N", p);
+        writef(g, "~Mpublic function ~W(): bool~N", p);
     }
     write_block_start(g);
 
