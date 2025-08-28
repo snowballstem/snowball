@@ -154,12 +154,11 @@ static void write_failure(struct generator * g) {
 }
 
 static void write_failure_if(struct generator * g, const char * s, struct node * p) {
-    writef(g, "~Mif (", p);
+    w(g, "~Mif (");
     writef(g, s, p);
-    writef(g, ")~N", p);
-    write_block_start(g);
+    w(g, ") {~+~N");
     write_failure(g);
-    write_block_end(g);
+    w(g, "~-~M}~N");
     g->unreachable = false;
 }
 
@@ -285,13 +284,13 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "$this->limit" : "$this->limit_backward"); break;
         case c_lenof:
-            writef(g, "mb_strlen($~V,'UTF-8')", p);
+            writef(g, "mb_strlen($~V, 'UTF-8')", p);
             break;
         case c_sizeof:
             writef(g, "strlen($~V)", p);
             break;
         case c_len:
-            w(g, "mb_strlen($this->current,'UTF-8')");
+            w(g, "mb_strlen($this->current, 'UTF-8')");
             break;
         case c_size:
             w(g, "strlen($this->current)");
@@ -562,7 +561,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->I[0] = golab;
     wsetlab_begin(g, golab);
 
-    w(g, "~Mwhile(true){~N~+");
+    w(g, "~Mwhile (true) {~N~+");
 
     struct str * savevar = NULL;
     if (style == 1 || repeat_restore(g, p->left)) {
@@ -610,8 +609,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     w(g, "~Mfor (~B0 = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
-    writef(g, "; ~B0 > 0; ~B0--)~N", p);
-    writef(g, "~{", p);
+    writef(g, "; ~B0 > 0; ~B0--) {~+~N", p);
 
     generate(g, p->left);
 
@@ -621,7 +619,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-    writef(g, "~Mwhile(true)~N~{", p);
+    writef(g, "~Mwhile (true) {~+~N", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
@@ -693,20 +691,18 @@ static void generate_tomark(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? ">" : "<";
 
-    w(g, "~Mif ($this->cursor ~S0 "); generate_AE(g, p->AE); w(g, ")~N");
-    write_block_start(g);
+    w(g, "~Mif ($this->cursor ~S0 "); generate_AE(g, p->AE); w(g, ") {~+~N");
     write_failure(g);
-    write_block_end(g);
+    w(g, "~-~M}~N");
     g->unreachable = false;
     w(g, "~M$this->cursor = "); generate_AE(g, p->AE); writef(g, ";~N", p);
 }
 
 static void generate_atmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif ($this->cursor != "); generate_AE(g, p->AE); writef(g, ")~N", p);
-    write_block_start(g);
+    w(g, "~Mif ($this->cursor != "); generate_AE(g, p->AE); writef(g, ") {~+~N", p);
     write_failure(g);
-    write_block_end(g);
+    w(g, "~-~M}~N");
     g->unreachable = false;
 }
 
@@ -775,7 +771,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
     writef(g, "~M~V = $this->slice_to();~N"
-              "~Mif ( '' === ~V ){~N"
+              "~Mif ('' === ~V){~N"
               "~+~Mreturn false;~N~-"
               "~M}~N", p);
 }
@@ -853,10 +849,9 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         struct node * q = p->left;
         write_comment(g, q);
         g->S[0] = q->mode == m_forward ? ">" : "<";
-        w(g, "~Mif ($this->cursor ~S0 "); generate_AE(g, q->AE); w(g, ")~N");
-        write_block_start(g);
+        w(g, "~Mif ($this->cursor ~S0 "); generate_AE(g, q->AE); w(g, ") {~+~N");
         write_failure(g);
-        write_block_end(g);
+        w(g, "~-~M}~N");
         g->unreachable = false;
 
         g->B[0] = str_data(varname);
@@ -977,10 +972,9 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     if (optimise_to_return) {
         w(g, ";~N");
     } else {
-        w(g, ")~N");
-        write_block_start(g);
+        w(g, ") {~+~N");
         write_failure(g);
-        write_block_end(g);
+        w(g, "~-~M}~N");
         g->unreachable = false;
     }
 }
@@ -1041,10 +1035,12 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     if (q->type == t_routine) {
-        writef(g, "~N~Mprotected function ~W():bool {~+~N", p);
+        writef(g, "~N~Mprotected function ~W(): bool~N", p);
     } else {
-        writef(g, "~N~Mpublic function ~W():bool {~+~N", p);
+        writef(g, "~N~Mpublic function ~W(): bool~N", p);
     }
+    write_block_start(g);
+
     /* Save output. */
     struct str * saved_output = g->outbuf;
     struct str * saved_declarations = g->declarations;
@@ -1071,7 +1067,7 @@ static void generate_define(struct generator * g, struct node * p) {
             generate(g, p->left->right);
         }
     }
-    w(g, "~-~M}~N");
+    write_block_end(g);
 
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
@@ -1262,11 +1258,12 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    w(g, "class Snowball~n extends SnowballStemmer {~N~N~+");
+    w(g, "class Snowball~n extends SnowballStemmer~N");
+    write_block_start(g);
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~-}~N");
+    write_block_end(g);
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {
