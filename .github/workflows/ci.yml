@@ -63,6 +63,9 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
+        - name: PHP
+          PHP: php
+          apt_packages: 'php'
         - name: Python 3.8
           PYTHON_VERSION: 3.8
           os: 'ubuntu-22.04'
@@ -224,6 +227,9 @@ jobs:
     - name: Test Pascal
       if: matrix.FPC
       run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
+    - name: Test PHP
+      if: matrix.PHP
+      run: $MAKE check_php PHP="${{ matrix.PHP }}"
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
