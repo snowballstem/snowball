@@ -404,7 +404,6 @@ static void generate_not(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (savevar) {
-        write_block_start(g);
         write_savecursor(g, p, savevar);
     }
 
@@ -427,7 +426,6 @@ static void generate_not(struct generator * g, struct node * p) {
 
     if (savevar) {
         write_restorecursor(g, p, savevar);
-        write_block_end(g);
         str_delete(savevar);
     }
 }
@@ -661,7 +659,6 @@ static void generate_atleast(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
 
     write_comment(g, p);
-    w(g, "~{");
     g->B[0] = str_data(loopvar);
     w(g, "~M~B0 = ");
     generate_AE(g, p->AE);
@@ -678,7 +675,6 @@ static void generate_atleast(struct generator * g, struct node * p) {
     }
     g->B[0] = str_data(loopvar);
     write_failure_if(g, "~B0 > 0", p);
-    w(g, "~}");
     str_delete(loopvar);
 }
 
@@ -793,14 +789,14 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~M$c~I0 = $this->cursor;~N");
+        w(g, "~M$c~I0 = $this->cursor;~N");
     }
     writef(g, "~M$this->insert($this->cursor, $this->cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) {
         g->I[0] = c_count;
-        w(g, "~M$this->cursor = $c~I0;~N~}");
+        w(g, "~M$this->cursor = $c~I0;~N");
     }
 }
 
@@ -812,7 +808,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     if (keep_c) {
         c_count = ++g->keep_count;
         g->I[0] = c_count;
-        w(g, "~{~M$c~I0 = $this->cursor;~N");
+        w(g, "~M$c~I0 = $this->cursor;~N");
     }
     if (p->mode == m_forward) {
         writef(g, "~M$this->insert($this->cursor, $this->limit, ", p);
@@ -823,7 +819,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     writef(g, ");~N", p);
     if (keep_c) {
         g->I[0] = c_count;
-        w(g, "~M$this->cursor = $c~I0;~N~}");
+        w(g, "~M$this->cursor = $c~I0;~N");
     }
 }
 
@@ -924,8 +920,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~{~N"
-              "~M$~B0 = clone $this~N", p);
+    writef(g, "~M$~B0 = clone $this~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "$this->copyFrom(");
@@ -942,7 +937,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
         write_str(g, g->failure_str);
         write_newline(g);
     }
-    w(g, "~}");
     str_delete(savevar);
 }
 
