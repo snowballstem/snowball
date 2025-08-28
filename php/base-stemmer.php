@@ -296,7 +296,7 @@ abstract class SnowballStemmer {
                 if (count($w) < 4) {
                     return $w[2];
                 }
-                $res = call_user_func([ $this, $w[3] ]);
+                $res = $this->{$w[3]}();
                 $this->cursor = $c + $w0length;
                 if ($res) {
                     return $w[2];
@@ -363,7 +363,7 @@ abstract class SnowballStemmer {
                 if (count($w) < 4) {
                     return $w[2];
                 }
-                $res = call_user_func([ $this, $w[3] ]);
+                $res = $this->{$w[3]}();
                 $this->cursor = $c - $w0length;
                 if ($res) {
                     return $w[2];
