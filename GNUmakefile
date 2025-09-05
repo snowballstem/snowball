@@ -134,8 +134,8 @@ JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
 
-DARTRUNTIME_SOURCES = dart/lib/src/snowball.dart \
-		      dart/lib/src/algorithms.dart
+DART_RUNTIME_SOURCES = dart/lib/src/snowball.dart \
+		       dart/lib/src/algorithms.dart
 
 DART_PACKAGE_SOURCES = dart/lib/snowball.dart
 
@@ -525,7 +525,7 @@ dist_libstemmer_dart: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/$(dart_example_dir) && \
 	cp -a doc/libstemmer_dart_README $${dest}/$(dart_package_dir)/README.md && \
 	cp -a $(DART_SOURCES) $${dest}/$(dart_src_dir) && \
-	cp -a $(DARTRUNTIME_SOURCES) $${dest}/$(dart_runtime_dir) && \
+	cp -a $(DART_RUNTIME_SOURCES) $${dest}/$(dart_runtime_dir) && \
 	cp -a $(DART_PACKAGE_SOURCES) $${dest}/$(dart_src_main_dir) && \
 	cp -a $(DART_TEST_SOURCES) $${dest}/$(dart_example_dir) && \
 	cp -a $(DART_PACKAGE_FILES) $${dest}/$(dart_package_dir) && \
