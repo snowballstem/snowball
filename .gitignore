@@ -17,6 +17,7 @@
 /dist
 /java/org/tartarus/snowball/ext/
 /dart/lib/ext/
+/dart/lib/src/algorithms.dart
 /js_out
 /python_check
 /python_out
