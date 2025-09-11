@@ -131,6 +131,21 @@ static int check_token(struct analyser * a, int code) {
     return true;
 }
 
+static void hold_token_if_toplevel(struct tokeniser * t) {
+    // Hold token if it starts a top-level construct.
+    switch (t->token) {
+        case c_backwardmode:
+        case c_booleans:
+        case c_define:
+        case c_externals:
+        case c_groupings:
+        case c_integers:
+        case c_routines:
+        case c_strings:
+            hold_token(t);
+    }
+}
+
 static int get_token(struct analyser * a, int code) {
     struct tokeniser * t = a->tokeniser;
     read_token(t);
@@ -1574,7 +1589,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     break;
                 default:
                     unexpected_token_error(a, "grouping definition");
-                    hold_token(t);
+                    hold_token_if_toplevel(t);
                     // Don't report an error for an empty grouping as well.
                     (void)finalise_grouping(p);
                     return;
