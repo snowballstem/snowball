@@ -220,6 +220,7 @@ C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
+DART_BUILD_ARTIFACTS = dart/.dart_tool dart/pubspec.lock dart/.dart_deps
 
 CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 CPPFLAGS=
@@ -252,6 +253,7 @@ clean:
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
 	rm -rf ada/obj dist
+	rm -rf $(DART_BUILD_ARTIFACTS)
 	-rmdir $(c_src_dir)
 	-rmdir $(python_output_dir)
 	-rmdir $(js_output_dir)
@@ -687,7 +689,12 @@ check_java_%: $(STEMMING_DATA_ABS)/%
 
 .SUFFIXES: .dart
 
-dart: $(DART_SOURCES)
+dart: $(DART_SOURCES) dart/.dart_deps
+
+dart/.dart_deps: dart/pubspec.yaml
+	@echo "Fetching Dart package dependencies..."
+	@cd dart && dart pub get
+	@touch $@
 
 check_dart: dart
 	$(MAKE) do_check_dart
