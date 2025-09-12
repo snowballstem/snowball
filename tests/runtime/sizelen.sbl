@@ -1,0 +1,56 @@
+// Test len/lenof/size/sizeof.
+
+externals (stem)
+
+integers (expected_size)
+
+strings (s)
+
+stringescapes {}
+
+define stem as (
+  = ''
+  $(len == 0) or fail='len empty incorrect'
+  $(size == 0) or fail='size empty incorrect'
+  = 'test'
+  $(len == 4) or fail='len incorrect'
+  $(size == 4) or fail='size incorrect'
+
+  $(lenof '' == 0) or fail='lenof empty literal incorrect'
+  $(sizeof '' == 0) or fail='sizeof empty literal incorrect'
+  $(lenof 'test' == 4) or fail='lenof literal incorrect'
+  $(sizeof 'test' == 4) or fail='sizeof literal incorrect'
+
+  $s = ''
+  $(lenof s == 0) or fail='lenof empty string variable incorrect'
+  $(sizeof s == 0) or fail='sizeof empty string variable incorrect'
+  $s = 'test'
+  $(lenof s == 4) or fail='lenof string variable incorrect'
+  $(sizeof s == 4) or fail='sizeof string variable incorrect'
+
+  // Probe if character representation is UTF-8.
+  (
+    // UTF-8.
+    $(sizeof '{U+00A0}' == 2)  $expected_size = 8
+  ) or (
+    $(sizeof '{U+00A0}' == 1)  $expected_size = 7
+  ) or fail='sizeof U+00A0 unexpected'
+
+  = '{U+00E9}preuve'
+  $(len == 7) or fail='Unicode len incorrect'
+
+  $(lenof '{U+00E9}preuve' == 7) or fail='Unicode lenof literal incorrect'
+
+  $s = '{U+00E9}preuve'
+  $(lenof s == 7) or fail='Unicode lenof string variable incorrect'
+
+  = '{U+00E9}preuve'
+  $(size == expected_size) or fail='Unicode size incorrect'
+
+  $(sizeof '{U+00E9}preuve' == expected_size) or fail='Unicode sizeof literal incorrect'
+
+  $s = '{U+00E9}preuve'
+  $(sizeof s == expected_size) or fail='Unicode sizeof string variable incorrect'
+
+  ='ok'
+)
