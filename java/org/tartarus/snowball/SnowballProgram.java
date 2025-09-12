@@ -77,7 +77,7 @@ public class SnowballProgram implements Serializable {
     }
 
     // current string
-    private char[] current;
+    protected char[] current;
 
     protected int cursor;
     protected int length;
