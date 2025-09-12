@@ -841,7 +841,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (keep_c) {
-        w(g, "~{~Mconst /** number */ c = base.cursor;~N");
+        w(g, "~{~Mconst /** number */ c = this.cursor;~N");
         if (p->mode == m_forward) {
             writef(g, "~Mthis.insert(c, this.limit, ", p);
         } else {
@@ -957,7 +957,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
               "~Mlet /** !Object */ ~B0 = new ~P();~N", p);
-    writef(g, "~M~B0.copy_from(base);~N", p);
+    writef(g, "~M~B0.copy_from(this);~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "this.copy_from(");
