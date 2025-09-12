@@ -38,6 +38,7 @@ The output file consists of the stemmed words, one per line.
         case "-h":
             usage();
             process.exit(0);
+            break;
         case "-l":
             if (argv.length === 0)
             {
