@@ -171,7 +171,8 @@ static struct name * find_name(struct analyser * a) {
     struct name * p = look_for_name(a);
     if (p == NULL) {
         report_error_location(a);
-        fprintf(stderr, "'%s' undeclared\n", a->tokeniser->s);
+        byte * s = a->tokeniser->s;
+        fprintf(stderr, "'%.*s' undeclared\n", SIZE(s), s);
     }
     return p;
 }
@@ -225,7 +226,7 @@ static void read_names(struct analyser * a, int type) {
 handle_as_name:
                 if (look_for_name(a) != NULL) {
                     report_error_location(a);
-                    fprintf(stderr, "'%s' re-declared\n", t->s);
+                    fprintf(stderr, "'%.*s' re-declared\n", SIZE(t->s), t->s);
                 } else {
                     NEW(name, p);
                     p->s = copy_s(t->s);
@@ -1438,8 +1439,8 @@ static struct node * read_C(struct analyser * a) {
                             break;
                         case t_integer:
                             report_error_location(a);
-                            fprintf(stderr, "integer name '%s' misplaced\n",
-                                    t->s);
+                            fprintf(stderr, "integer name '%.*s' misplaced\n",
+                                    SIZE(t->s), t->s);
                             break;
                         case t_string:
                             q->value_used = true;
@@ -1554,7 +1555,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         if (q) {
             if (q->grouping != NULL) {
                 report_error_location(a);
-                fprintf(stderr, "'%s' redefined\n", t->s);
+                fprintf(stderr, "'%.*s' redefined\n", SIZE(t->s), t->s);
                 FREE(q->grouping);
             }
             q->grouping = p;

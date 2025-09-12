@@ -1,0 +1,9 @@
+syntax/undeclared.sbl:3: 'rb' re-declared
+syntax/undeclared.sbl:4: 'rg' re-declared
+syntax/undeclared.sbl:5: 'ri' re-declared
+syntax/undeclared.sbl:6: 'rs' re-declared
+syntax/undeclared.sbl:10: 'rg' redefined
+syntax/undeclared.sbl:14: 'xb' undeclared
+syntax/undeclared.sbl:16: 'xi' undeclared
+syntax/undeclared.sbl:17: integer name 'ri' misplaced
+syntax/undeclared.sbl:19: 'xs' undeclared
