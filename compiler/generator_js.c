@@ -1459,7 +1459,8 @@ extern void generate_program_js(struct generator * g) {
 
     // We generate deno-lint-ignore which may not all be used.
     // Expressions in conditionals may be constant.
-    w(g, "// deno-lint-ignore-file ban-unused-ignore no-constant-condition~N~N");
+    // Empty blocks may be generated in some cases.
+    w(g, "// deno-lint-ignore-file ban-unused-ignore no-constant-condition no-empty~N~N");
 
     generate_amongs(g);
     generate_groupings(g);
