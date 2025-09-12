@@ -190,36 +190,39 @@ jobs:
         $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}"
     - name: Hackily hook up runtime testing
       run: |
-        cp tests/runtime/intlimits.sbl algorithms/english.sbl
-        echo 'ok' > snowball-data/english/voc.txt
-        echo 'ok' > snowball-data/english/output.txt
+        for v in snowball-data/*/{voc,output}.txt ; do echo ok > "$v" ; done
+        set x tests/runtime/*.sbl
+        shift
+        for f in algorithms/*.sbl ; do
+          if [ -n "$1" ] ; then
+            mv "$1" "$f"
+            shift
+          else
+            echo 'externals(stem)define stem as()' > "$f"
+          fi
+        done
+        # This hack only allows as many tests/runtime/*.sbl as we have
+        # algorithms/*.sbl.
+        [ -z "$1" ] || { echo "Excess runtime tests: $*"; exit 1; }
     - name: Test C
       if: matrix.c_tests
-      run: $MAKE check_utf8_english CC="$CC"
+      run: $MAKE check CC="$CC"
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
       if: matrix.PYTHON_VERSION
     - name: Test Python
       if: matrix.PYTHON || matrix.PYTHON_VERSION
-      run: |
-        $MAKE python
-        $MAKE check_python_english python="${{ matrix.PYTHON || 'python' }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
+      run: $MAKE check_python python="${{ matrix.PYTHON || 'python' }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
     - name: Test Java
       if: matrix.JAVA && matrix.JAVAC
-      run: |
-        $MAKE java
-        $MAKE check_java_english JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}" JAVACFLAGS="${{ matrix.JAVACFLAGS }}"
+      run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}" JAVACFLAGS="${{ matrix.JAVACFLAGS }}"
     - name: Test C#
       if: matrix.MCS
-      run: |
-        $MAKE csharp
-        $MAKE check_csharp_english MCS="${{ matrix.MCS }}"
+      run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
     - name: Test Javascript
       if: matrix.JSRUN
-      run: |
-        $MAKE js
-        $MAKE check_js_english JSRUN="${{ matrix.JSRUN }}"
+      run: $MAKE check_js JSRUN="${{ matrix.JSRUN }}"
     - name: Lint and check Javascript code
       if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       run: |
@@ -228,22 +231,15 @@ jobs:
         deno check javascript/*.js js_out/*.js || true
     - name: Test Rust
       if: matrix.RUST
-      run: |
-        $MAKE rust
-        $MAKE check_rust_english RUST="${{ matrix.RUST }}"
+      run: $MAKE check_rust RUST="${{ matrix.RUST }}"
     - name: Test Go
       if: matrix.GO
       run: |
         go mod init github.com/snowballstem/snowball
-        $MAKE go
-        $MAKE check_go_english GO="${{ matrix.GO }}"
+        $MAKE check_go GO="${{ matrix.GO }}"
     - name: Test Pascal
       if: matrix.FPC
-      run: |
-        $MAKE pascal
-        $MAKE check_pascal_english FPC="${{ matrix.FPC }}"
+      run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
     - name: Test Ada
       if: matrix.gprbuild
-      run: |
-        $MAKE ada
-        $MAKE check_ada_english gprbuild="${{ matrix.gprbuild }}"
+      run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
