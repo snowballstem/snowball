@@ -177,10 +177,7 @@ jobs:
         msystem: ucrt64
         install: base-devel ${{ matrix.mingw64_packages }}
     - name: Build
-      run: |
-        $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
-        echo '#!/bin/sh' > stemtest
-        chmod 755 stemtest
+      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
