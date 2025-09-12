@@ -536,9 +536,12 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 # C
 ###############################################################################
 
-.PHONY: check check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+.PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
+check_compilertest: tests/compilertest
+	cd tests && ./compilertest
 
 check_stemtest: stemtest$(EXEEXT)
 	./stemtest

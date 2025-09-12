@@ -1,0 +1,3 @@
+syntax/bad-grouping-definition.sbl:3: unexpected define in grouping definition after name
+syntax/bad-grouping-definition.sbl:4: unexpected define in grouping definition after -
+syntax/bad-grouping-definition.sbl:5: unexpected externals in grouping definition after name

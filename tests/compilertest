@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+SNOWBALL='../snowball -o tmp'
+set x syntax/*.sbl
+shift
+echo "1..$#"
+r=0
+for t ; do
+  b=`echo "$t"|sed 's/\.sbl$//'`
+  f=
+  if $SNOWBALL -syntax "$t" 2> tmp.stderr > tmp.syntax ; then
+    f="snowball compiler did not fail"
+  else
+    if [ -f "$b.stderr" ] ; then
+      if ! diff "$b.stderr" tmp.stderr ; then
+	f="stderr output not as expected"
+      fi
+    fi
+    if [ -z "$f" ] && [ -f "$b.syntax" ] ; then
+      if ! diff "$b.syntax" tmp.syntax ; then
+	f="syntax tree not as expected"
+      fi
+    fi
+  fi
+  if [ -z "$f" ] ; then
+    echo "ok - $b"
+  else
+    echo "not ok - $b: $f"
+    r=1
+  fi
+done
+exit $r

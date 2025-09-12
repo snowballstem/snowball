@@ -1,0 +1,5 @@
+externals (stem)
+define stem as (
+  <-
+  hop 2
+)
