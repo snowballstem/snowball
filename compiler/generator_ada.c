@@ -412,7 +412,10 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~Mexit;~N~-~Mend loop;~N");
+    if (!g->unreachable) {
+        w(g, "~Mexit;~N");
+    }
+    w(g, "~-~Mend loop;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
