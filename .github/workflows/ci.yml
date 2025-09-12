@@ -177,7 +177,10 @@ jobs:
         msystem: ucrt64
         install: base-devel ${{ matrix.mingw64_packages }}
     - name: Build
-      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
+      run: |
+        $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
+        echo '#!/bin/sh' > stemtest
+        chmod 755 stemtest
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
@@ -191,6 +194,7 @@ jobs:
     - name: Hackily hook up runtime testing
       run: |
         for v in snowball-data/*/{voc,output}.txt ; do echo ok > "$v" ; done
+        for v in snowball-data/*/{voc,output}.txt.gz ; do rm "$v"; echo ok > `echo "$v"|sed 's/\.gz$//'` ; done
         set x tests/runtime/*.sbl
         shift
         for f in algorithms/*.sbl ; do
