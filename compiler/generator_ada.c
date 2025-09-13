@@ -324,7 +324,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             writef(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V))", p);
             break;
         case c_sizeof:
-            writef(g, "Ada.Strings.Unbounded.Length (~V))", p);
+            writef(g, "Ada.Strings.Unbounded.Length (~V)", p);
             break;
         default:
             break;
