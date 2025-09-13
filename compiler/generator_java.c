@@ -886,9 +886,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
     str_assign(g->failure_str, "copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
-    writef(g, "~Mcurrent = ~V;~N"
-              "~Mcursor = 0;~N"
-              "~Mlimit = current.length();~N", p);
+    /* TODO: not optimal */
+    writef(g, "~MsetCurrent(~V.toString());~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
