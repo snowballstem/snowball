@@ -9,6 +9,8 @@
 #define DEFAULT_JAVA_AMONG_CLASS "org.tartarus.snowball.Among"
 #define DEFAULT_JAVA_STRING_CLASS "java.lang.StringBuilder"
 
+#define DEFAULT_DART_BASE_CLASS "SnowballProgram"
+
 #define DEFAULT_GO_PACKAGE "snowball"
 #define DEFAULT_GO_SNOWBALL_RUNTIME "github.com/snowballstem/snowball/go"
 
@@ -37,6 +39,9 @@ static void print_arglist(int exit_code) {
                "  -comments                        generate comments\n"
 #ifndef DISABLE_JAVA
                "  -j, -java                        generate Java\n"
+#endif
+#ifndef DISABLE_DART
+               "  -d, -dart                        generate Dart\n"
 #endif
 #ifndef DISABLE_CSHARP
                "  -cs, -csharp                     generate C#\n"
@@ -179,6 +184,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 #ifndef DISABLE_JAVA
             if (eq(s, "-j") || eq(s, "-java")) {
                 o->make_lang = LANG_JAVA;
+                continue;
+            }
+#endif
+#ifndef DISABLE_DART
+            if (eq(s, "-d") || eq(s, "-dart")) {
+                o->make_lang = LANG_DART;
                 continue;
             }
 #endif
@@ -352,6 +363,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             if (!o->package)
                 o->package = DEFAULT_JAVA_PACKAGE;
             break;
+        case LANG_DART:
+            o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_DART_BASE_CLASS;
+            break;
         case LANG_JAVASCRIPT:
             o->encoding = ENC_WIDECHARS;
             if (!o->parent_class_name)
@@ -521,6 +537,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(s);
                     lose_s(s);
                     generate_program_java(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_DART
+                if (o->make_lang == LANG_DART) {
+                    byte * s = add_sz_to_s(NULL, output_base);
+                    s = add_literal_to_s(s, ".dart");
+                    o->output_src = get_output(s);
+                    lose_s(s);
+                    generate_program_dart(g);
                     fclose(o->output_src);
                 }
 #endif
