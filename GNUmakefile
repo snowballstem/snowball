@@ -363,7 +363,7 @@ $(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl sn
 else
 # This will fail to recreate the .ads if it is deleted but the corresponding
 # .adb is still present and up-to-date.  That seems better than forcing a
-# serial build with .NOTPARALLEL which is seems can only be applied to an
+# serial build with .NOTPARALLEL which it seems can only be applied to an
 # entire makefile, not per-rule.
 $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 	@:
