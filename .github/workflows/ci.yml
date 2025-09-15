@@ -106,7 +106,10 @@ jobs:
     env:
       CC: ${{ matrix.CC || 'gcc' }}
       MAKE: ${{ matrix.MAKE || 'make' }} --output-sync --jobs=4
-      STEMMING_DATA: 'snowball-data'
+      STEMMING_DATA: 'tmp_runtime_tests_snowball_data'
+      ALGORITHMS: 'tests/runtime'
+      MODULES: 'tmp_runtime_tests_snowball_data/modules.txt'
+      other_algorithms: ''
 
     steps:
     - name: Checkout
@@ -190,21 +193,7 @@ jobs:
         $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}"
     - name: Hackily hook up runtime testing
       run: |
-        for v in snowball-data/*/{voc,output}.txt ; do echo ok > "$v" ; done
-        for v in snowball-data/*/{voc,output}.txt.gz ; do rm "$v"; echo ok > `echo "$v"|sed 's/\.gz$//'` ; done
-        set x tests/runtime/*.sbl
-        shift
-        for f in algorithms/*.sbl ; do
-          if [ -n "$1" ] ; then
-            mv "$1" "$f"
-            shift
-          else
-            echo 'externals(stem)define stem as()' > "$f"
-          fi
-        done
-        # This hack only allows as many tests/runtime/*.sbl as we have
-        # algorithms/*.sbl.
-        [ -z "$1" ] || { echo "Excess runtime tests: $*"; exit 1; }
+        make setup_runtime_tests
     - name: Test C
       if: matrix.c_tests
       run: $MAKE check CC="$CC"
