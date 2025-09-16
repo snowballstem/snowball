@@ -18,6 +18,7 @@ procedure Stemwords is
    function Get_Language (Name : in String;
                           Error: out Boolean) return Language_Type is
    begin
+      Error := False;
       return Language_Type'Value ("L_" & Name);
 
    exception
