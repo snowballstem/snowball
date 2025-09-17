@@ -492,7 +492,7 @@ extern int len_utf8(const symbol * p) {
     return len;
 }
 
-#if 0
+#if 1
 extern void debug(struct SN_env * z, int number, int line_count) {
     int i;
     int limit = SIZE(z->p);
@@ -510,6 +510,6 @@ extern void debug(struct SN_env * z, int number, int line_count) {
             printf("%c", ch);
         }
     }
-    printf("'\n");
+    printf("' bra=%d ket=%d\n", z->bra, z->ket);
 }
 #endif

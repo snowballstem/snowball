@@ -51,50 +51,38 @@ package body Stemmer with SPARK_Mode is
    end Get_Result;
 
    function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Char_Index is
+                  S       : in String;
+                  Len     : in Char_Index) return Char_Index is
    begin
-      if Context.L - Context.C < S'Length then
+      if Context.L - Context.C < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 .. Context.C + S'Length) /= S then
+      if Context.P (Context.C + 1 .. Context.C + Len) /= S then
          return 0;
       end if;
-      return S'Length;
+      return Len;
    end Eq_S;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Char_Index is
+                           S       : in String;
+                           Len     : in Char_Index) return Char_Index is
    begin
-      if Context.C - Context.Lb < S'Length then
+      if Context.C - Context.Lb < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 - S'Length .. Context.C) /= S then
+      if Context.P (Context.C + 1 - Len .. Context.C) /= S then
          return 0;
       end if;
-      return S'Length;
+      return Len;
    end Eq_S_Backward;
 
-   function Length_Utf8 (Context : in Context_Type'Class) return Natural is
+   function Length_Utf8 (S   : in String;
+                         Len : in Char_Index) return Natural is
       Count : Natural := 0;
       Pos   : Positive := 1;
       Val   : Byte;
    begin
-      while Pos <= Context.Len loop
-         Val := Character'Pos (Context.P (Pos));
-         Pos := Pos + 1;
-         if Val >= 16#C0# or Val < 16#80# then
-            Count := Count + 1;
-         end if;
-      end loop;
-      return Count;
-   end Length_Utf8;
-
-   function Length_Utf8 (S : in String) return Natural is
-      Count : Natural := 0;
-      Pos   : Positive := 1;
-      Val   : Byte;
-   begin
-      while Pos <= S'Length loop
+      while Pos <= Len loop
          Val := Character'Pos (S (Pos));
          Pos := Pos + 1;
          if Val >= 16#C0# or Val < 16#80# then
@@ -621,10 +609,10 @@ package body Stemmer with SPARK_Mode is
       Result : Integer;
    begin
       Replace (Context, C_Bra, C_Ket, S, Result);
-      if C_Bra <= Context.Bra then
+      if C_Bra < Context.Bra then
          Context.Bra := Context.Bra + Result;
       end if;
-      if C_Bra <= Context.Ket then
+      if C_Ket < Context.Ket then
          Context.Ket := Context.Ket + Result;
       end if;
    end Insert;

@@ -83,16 +83,18 @@ private
    type Among_Array_Type is array (Natural range <>) of Among_Type;
 
    function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Char_Index with
+                  S       : in String;
+                  Len     : in Char_Index) return Char_Index with
      Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S'Result = 0 or Eq_S'Result = S'Length;
+     Pre => Len > 0,
+     Post => Eq_S'Result = 0 or Eq_S'Result = Len;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Char_Index with
+                           S       : in String;
+                           Len     : in Char_Index) return Char_Index with
      Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = S'Length;
+     Pre => Len > 0,
+     Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = Len;
 
    procedure Find_Among (Context : in out Context_Type'Class;
                          Amongs  : in Among_Array_Type;
@@ -138,9 +140,8 @@ private
                                 Value   : out Utf8_Type;
                                 Count   : out Natural);
 
-   function Length_Utf8 (Context : in Context_Type'Class) return Natural;
-
-   function Length_Utf8 (S : in String) return Natural;
+   function Length_Utf8 (S   : in String;
+                         Len : in Char_Index) return Natural;
 
    function Check_Among (Context : in Context_Type'Class;
                          Pos     : in Char_Index;
