@@ -1693,8 +1693,7 @@ static void generate_groupings(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
     g->outbuf = s;
 }

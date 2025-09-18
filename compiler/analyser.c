@@ -1556,7 +1556,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             if (q->grouping != NULL) {
                 report_error_location(a);
                 fprintf(stderr, "'%.*s' redefined\n", SIZE(t->s), t->s);
-                FREE(q->grouping);
+                q->grouping->name = NULL;
             }
             q->grouping = p;
         }
@@ -2059,13 +2059,18 @@ extern void read_program(struct analyser * a) {
 
     for (struct name * n = a->names; n; n = n->next) {
         if (n->type == t_external) {
+            if (!n->used) {
+                // Externals can be called from outside of Snowball, so if they
+                // aren't already marked as used we set the `used` field to
+                // point to the definition so we can just check this field
+                // later.
+                n->used = n->definition;
+            }
             visit_routine(a, n);
         }
     }
 
-    struct name * q = a->names;
-    struct name ** ptr = &(a->names);
-    while (q) {
+    for (struct name * q = a->names; q; q = q->next) {
         if (!q->referenced) {
             fprintf(stderr, "%s:%d: warning: %s '%.*s' ",
                     a->tokeniser->file,
@@ -2079,8 +2084,7 @@ extern void read_program(struct analyser * a) {
             } else {
                 fprintf(stderr, "defined but not used\n");
             }
-            q = q->next;
-            *ptr = q;
+            q->used = NULL;
             continue;
         }
 
@@ -2100,8 +2104,6 @@ extern void read_program(struct analyser * a) {
                         line_num,
                         name_of_type(q->type),
                         SIZE(q->s), q->s);
-                q = q->next;
-                *ptr = q;
                 continue;
             }
         }
@@ -2120,8 +2122,7 @@ extern void read_program(struct analyser * a) {
                         name_of_type(q->type),
                         SIZE(q->s), q->s);
                 remove_dead_assignments(a->program, q);
-                q = q->next;
-                *ptr = q;
+                q->used = NULL;
                 continue;
             }
         }
@@ -2142,33 +2143,51 @@ extern void read_program(struct analyser * a) {
                         SIZE(q->s), q->s);
                 remove_unreachable_routine(a, q);
             }
-            if (q->type != t_grouping) {
-                struct name * old = q;
-                q = q->next;
-                *ptr = q;
-                FREE(old);
-                continue;
-            }
-            // Don't free the struct name for a grouping as it will be
-            // referenced from a struct grouping.
-            //
-            // Instead we just flag it as not used and no code will be
-            // generated for it.  We leave it in a->names to avoid leaking
-            // it.
-            q->used = false;
+            q->used = NULL;
         }
-
-        ptr = &(q->next);
-        q = q->next;
     }
 
-    /* Now we've eliminated variables whose values are never used and
-     * names which are unreachable we can number the names, which is
-     * used by some generators.
+    /* We've now identified variables whose values are never used and
+     * names which are unreachable, and cleared "used" for them, so go
+     * through and unlink the unused ones and number the others.  The
+     * numbers are used by the C generator.
      */
     int * name_count = a->name_count;
-    for (struct name * n = a->names; n; n = n->next) {
+    struct name * n = a->names;
+    struct name ** n_ptr = &(a->names);
+    while (n) {
+        if (!n->used) {
+            if (n->grouping) {
+                // Clear the name field then loop through and remove from
+                // the groupings list just below.
+                n->grouping->name = NULL;
+            }
+            struct name * n_next = n->next;
+            lose_s(n->s);
+            FREE(n);
+            n = n_next;
+            *n_ptr = n;
+            continue;
+        }
         n->count = name_count[n->type]++;
+        n_ptr = &(n->next);
+        n = n->next;
+    }
+
+    // Remove groupings which aren't used.
+    struct grouping * g = a->groupings;
+    struct grouping ** g_ptr = &(a->groupings);
+    while (g) {
+        if (!g->name) {
+            struct grouping * g_next = g->next;
+            lose_b(g->b);
+            FREE(g);
+            g = g_next;
+            *g_ptr = g;
+            continue;
+        }
+        g_ptr = &(g->next);
+        g = g->next;
     }
 
     // Remove amongs which are in unreachable routines from the list
