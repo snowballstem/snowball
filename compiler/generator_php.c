@@ -283,10 +283,10 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "$this->limit" : "$this->limit_backward"); break;
         case c_lenof:
-            writef(g, "mb_strlen($~V, 'UTF-8')", p);
+            writef(g, "mb_strlen(~V, 'UTF-8')", p);
             break;
         case c_sizeof:
-            writef(g, "strlen($~V)", p);
+            writef(g, "strlen(~V)", p);
             break;
         case c_len:
             w(g, "mb_strlen($this->current, 'UTF-8')");
@@ -919,7 +919,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~M$~B0 = clone $this~N", p);
+    writef(g, "~M~B0 = clone $this;~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "$this->copyFrom(");
@@ -931,7 +931,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~M$this->limit = $this->currentLength();~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
-        writef(g, "~M$~V = $this->current;~N", p);
+        writef(g, "~M~V = $this->current;~N", p);
         write_margin(g);
         write_str(g, g->failure_str);
         write_newline(g);
