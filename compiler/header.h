@@ -257,6 +257,7 @@ struct among {
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
     struct node * node;       /* pointer to the node for this among */
+    struct name * in_routine; /* pointer to name for routine this among is in */
 };
 
 struct grouping {

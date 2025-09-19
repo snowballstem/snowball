@@ -244,7 +244,7 @@ handle_as_name:
                     p->local_to = NULL;
                     p->grouping = NULL;
                     p->definition = NULL;
-                    p->used_in_among = 0
+                    p->used_in_among = 0;
                     p->among_index = 0;
                     p->declaration_line_number = t->line_number;
                     p->next = a->names;
@@ -676,6 +676,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->used = false;
     x->shortest_size = INT_MAX;
     x->longest_size = 0;
+    x->in_routine = a->current_routine;
 
     if (q->type == c_bra) {
         starter = q;
@@ -686,7 +687,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         if (q->type == c_literalstring) {
             symbol * b = q->literalstring;
             w1->b = b;           /* pointer to case string */
-            w1->action = NULL;   /* action gets filled in below */
+            w1->action = NULL;   /* action gets filled in later */
             w1->line_number = q->line_number;
             w1->size = SIZE(b);  /* number of characters in string */
             w1->i = -1;          /* index of longest substring */
@@ -718,6 +719,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
              * the same action code if we find one.
              */
             int among_result = -1;
+            struct node * action = q;
             struct amongvec * w;
             for (w = v; w < w0; ++w) {
                 if (w->action && nodes_equivalent(w->action->left, q->left)) {
@@ -725,6 +727,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                         printf("Among code %d isn't positive\n", w->result);
                         exit(1);
                     }
+                    action = w->action;
                     among_result = w->result;
                     break;
                 }
@@ -734,7 +737,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             }
 
             while (w0 != w1) {
-                w0->action = q;
+                w0->action = action;
                 w0->result = among_result;
                 w0++;
             }
@@ -885,15 +888,6 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         FREE(x);
         FREE(v);
         return p;
-    }
-
-    if (x->command_count > 1 ||
-        (x->command_count == 1 && x->nocommand_count > 0)) {
-        /* We need to set among_var rather than just checking if find_among*()
-         * returns zero or not.
-         */
-        x->amongvar_needed = true;
-        if (a->current_routine) a->current_routine->amongvar_needed = true;
     }
 
     x->substring = substring;
@@ -2205,6 +2199,58 @@ extern void read_program(struct analyser * a) {
 
             x->number = among_count++;
             if (x->function_count > 0) ++a->among_with_function_count;
+
+            for (int i = 1; i <= x->command_count; i++) {
+                int merge_with = 0;
+                struct node * command = x->commands[i - 1];
+                assert(command->type == c_bra);
+                if (!command->left || is_just_true(command->left)) {
+                    // Optimisation has turned this action into a no-op.
+                    command->left = NULL;
+                    merge_with = -1;
+                } else {
+                    for (int k = 1; k < i; ++k) {
+                        if (nodes_equivalent(command->left, x->commands[k - 1]->left)) {
+                            // Optimisation has made this action equivalent
+                            // to an earlier one.
+                            merge_with = k;
+                            break;
+                        }
+                    }
+                }
+                if (!merge_with) continue;
+
+                // Update references to this command index to be `merge_with`
+                // and subtract one from references to command indexes after
+                // this one.
+                for (int j = 0; j < x->literalstring_count; ++j) {
+                    int diff = (x->b[j].result - i);
+                    if (diff == 0) {
+                        x->b[j].result = merge_with;
+                        if (merge_with == 0) {
+                            assert(x->b[j].action->type == c_bra);
+                            x->b[j].action->left = NULL;
+                        }
+                    } else if (diff > 0) {
+                        --x->b[j].result;
+                    }
+                }
+                memmove(x->commands + (i - 1), x->commands + i,
+                        sizeof(x->commands[0]) * (x->command_count - i));
+                --x->command_count;
+                ++x->nocommand_count;
+                --i;
+            }
+
+            if (x->command_count > 1 ||
+                (x->command_count == 1 && x->nocommand_count > 0)) {
+                /* We need to set among_var rather than just checking if
+                 * find_among*() returns zero or not.
+                 */
+                x->amongvar_needed = true;
+                if (x->in_routine)
+                    x->in_routine->amongvar_needed = true;
+            }
 
             a_ptr = &(x->next);
         }
