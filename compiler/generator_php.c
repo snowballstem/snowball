@@ -928,7 +928,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~M$this->current = ~V;~N"
               "~M$this->cursor = 0;~N"
               "~M$this->limit_backward = 0;~N"
-              "~M$this->limit = $this->currentLength();~N", p);
+              "~M$this->limit = strlen($this->current);~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         writef(g, "~M~V = $this->current;~N", p);
