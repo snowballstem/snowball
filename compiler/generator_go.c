@@ -1021,7 +1021,6 @@ static void generate_setup_context(struct generator * g) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
