@@ -382,7 +382,7 @@ $(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl sn
 else
 # This will fail to recreate the .ads if it is deleted but the corresponding
 # .adb is still present and up-to-date.  That seems better than forcing a
-# serial build with .NOTPARALLEL which is seems can only be applied to an
+# serial build with .NOTPARALLEL which it seems can only be applied to an
 # entire makefile, not per-rule.
 $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 	@:
@@ -571,9 +571,12 @@ dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
 # C
 ###############################################################################
 
-.PHONY: check check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+.PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
+check_compilertest: tests/compilertest
+	cd tests && ./compilertest
 
 check_stemtest: stemtest$(EXEEXT)
 	./stemtest
@@ -858,5 +861,5 @@ $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/g
 ada/bin/generate:
 	cd ada && $(gprbuild) -Pgenerate -p
 
-ada/bin/stemwords: $(ADA_SOURCES)
+ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemwords.adb
 	cd ada && $(gprbuild) -Pstemwords -p

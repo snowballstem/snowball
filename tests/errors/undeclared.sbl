@@ -1,0 +1,20 @@
+// Regression test for bug reporting names.
+externals (stem)
+booleans (rb longbool rb)
+groupings (rg longgroup rg)
+integers (ri longint ri)
+strings (rs longstring rs)
+
+define rg 'rg'
+define longgroup 'aeiou'
+define rg 'xy'
+
+define stem as (
+  set longbool
+  set xb
+  $longint = 1
+  $xi = 1
+  ri
+  $longstring = ''
+  $(sizeof xs > 0)
+)

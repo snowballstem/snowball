@@ -324,7 +324,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             writef(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V))", p);
             break;
         case c_sizeof:
-            writef(g, "Ada.Strings.Unbounded.Length (~V))", p);
+            writef(g, "Ada.Strings.Unbounded.Length (~V)", p);
             break;
         default:
             break;
@@ -412,7 +412,10 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~Mexit;~N~-~Mend loop;~N");
+    if (!g->unreachable) {
+        w(g, "~Mexit;~N");
+    }
+    w(g, "~-~Mend loop;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
@@ -1690,8 +1693,7 @@ static void generate_groupings(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
     g->outbuf = s;
 }

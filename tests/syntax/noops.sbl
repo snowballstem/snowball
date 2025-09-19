@@ -1,0 +1,32 @@
+// Test no-op commands which should get canonicalised.
+externals (stem)
+integers (x y)
+booleans (b)
+strings (s)
+define stem as (
+  $x = 0
+  [substring] among (
+    'a' ()
+    'b' (true)
+    'c' ('')
+    'd' (loop 0 next)
+    'e' (loop -1 next)
+    'f' (hop 0)
+    'g' ($x += 0)
+    'h' ($x -= 0)
+    'i' ($x *= 1)
+    'j' ($x /= 1)
+
+    // Values set are unused.
+    'k' ($y = 1)
+    'l' ($y += 1)
+    'm' ($y -= 1)
+    'n' ($y *= 2)
+    'o' ($y /= 2)
+    'p' (setmark y)
+    'q' (set b)
+    'r' (unset b)
+    's' (-> s)
+  )
+)
+

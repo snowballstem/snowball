@@ -1,0 +1,13 @@
+externals (stem)
+integers (i)
+groupings (g)
+define g +
+define stem as (
+  $
+  next
+  $(i 0)
+  $i = hop 2
+  $(i = )
+  backwardmode (next)
+)
+next

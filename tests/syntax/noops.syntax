@@ -1,0 +1,46 @@
+define stem
+  (
+    true
+    [
+    substring
+    ]
+    among
+      literal 'a'
+      (
+      literal 'b'
+      (
+      literal 'c'
+      (
+      literal 'd'
+      (
+      literal 'e'
+      (
+      literal 'f'
+      (
+      literal 'g'
+      (
+      literal 'h'
+      (
+      literal 'i'
+      (
+      literal 'j'
+      (
+      literal 'k'
+      (
+      literal 'l'
+      (
+      literal 'm'
+      (
+      literal 'n'
+      (
+      literal 'o'
+      (
+      literal 'p'
+      (
+      literal 'q'
+      (
+      literal 'r'
+      (
+      literal 's'
+      (
+    Function end
