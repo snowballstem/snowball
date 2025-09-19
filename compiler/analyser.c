@@ -236,7 +236,6 @@ handle_as_name:
                      * variables whose values are never used. */
                     p->count = -1;
                     p->referenced = false;
-                    p->used_in_among = false;
                     p->used = NULL;
                     p->value_used = false;
                     p->initialised = false;
@@ -245,6 +244,7 @@ handle_as_name:
                     p->local_to = NULL;
                     p->grouping = NULL;
                     p->definition = NULL;
+                    p->used_in_among = 0
                     p->among_index = 0;
                     p->declaration_line_number = t->line_number;
                     p->next = a->names;
@@ -694,7 +694,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             if (q->left) {
                 struct name * function = q->left->name;
                 w1->function = function;
-                function->used_in_among = true;
+                ++function->used_in_among;
                 check_routine_mode(a, function, direction);
                 if (function->among_index == 0) {
                     function->among_index = ++x->function_count;
@@ -879,6 +879,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             and_node->left->name = v[0].function;
             and_node->left->right = p;
             p = and_node;
+            --v[0].function->used_in_among;
         }
         FREE(x->commands);
         FREE(x);
