@@ -2165,6 +2165,8 @@ extern void read_program(struct analyser * a) {
                 // Clear the name field then loop through and remove from
                 // the groupings list just below.
                 n->grouping->name = NULL;
+            } else if (n->definition) {
+                remove_unreachable_routine(a, n);
             }
             struct name * n_next = n->next;
             lose_s(n->s);
