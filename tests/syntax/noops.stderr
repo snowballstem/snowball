@@ -1,3 +1,4 @@
+syntax/noops.sbl:11: warning: empty literal string is a no-op
 syntax/noops.sbl:12: warning: loop 0 C is a no-op
 syntax/noops.sbl:13: warning: loop -1 C is a no-op
 syntax/noops.sbl:14: warning: hop 0 is a no-op

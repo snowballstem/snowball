@@ -8,7 +8,7 @@ define stem as (
   [substring] among (
     'a' ()
     'b' (true)
-    'c' (/*''*/)
+    'c' ('')
     'd' (loop 0 next)
     'e' (loop -1 next)
     'f' (hop 0)

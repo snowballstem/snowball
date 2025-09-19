@@ -1464,8 +1464,17 @@ static struct node * read_C(struct analyser * a) {
                 name_to_node(a, p, t_grouping);
                 return p;
             }
-        case c_literalstring:
-            return read_literalstring(a);
+        case c_literalstring: {
+            struct node * p = read_literalstring(a);
+            if (SIZE(p->literalstring) == 0) {
+                fprintf(stderr,
+                        "%s:%d: warning: empty literal string is a no-op\n",
+                        t->file, p->line_number);
+                p->type = c_true;
+                p->literalstring = NULL;
+            }
+            return p;
+        }
         case c_among: return read_among(a);
         case c_substring: return read_substring(a);
         default:
