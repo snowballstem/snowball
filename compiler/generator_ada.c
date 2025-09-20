@@ -799,7 +799,8 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V := Slice_To (Z);~N", p);
+    writef(g, "~MZ.L~W := Z.Ket - Z.Bra;~N", p);
+    writef(g, "~M~V (1 .. Z.L~W) := Z.P (Z.Bra + 1 .. Z.Ket);~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -1075,8 +1076,13 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    writef(g, "~MC := Eq_S~S0 (Z, ~V, Z.L~W);", p);
+    writef(g, "~MC := Eq_S~S0 (Z, ~V, Z.L~W);~N", p);
     write_failure_if(g, "C = 0", p);
+    if (p->mode == m_forward) {
+        writef(g, "~MZ.C := Z.C + C;~N", p);
+    } else {
+        writef(g, "~MZ.C := Z.C - C;~N", p);
+    }
     g->temporary_used = true;
 }
 

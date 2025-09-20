@@ -194,8 +194,6 @@ private
      Pre => Context.Ket >= Context.Bra
      and Context.Len - (Context.Ket - Context.Bra) + Text'Length < Context.P'Length;
 
-   function Slice_To (Context : in Context_Type'Class) return String;
-
    procedure Insert (Context : in out Context_Type'Class;
                      C_Bra   : in Char_Index;
                      C_Ket   : in Char_Index;

@@ -57,7 +57,7 @@ package body Stemmer with SPARK_Mode is
       if Context.L - Context.C < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 .. Context.C + Len) /= S then
+      if Context.P (Context.C + 1 .. Context.C + Len) /= S (1 .. Len) then
          return 0;
       end if;
       return Len;
@@ -70,7 +70,7 @@ package body Stemmer with SPARK_Mode is
       if Context.C - Context.Lb < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 - Len .. Context.C) /= S then
+      if Context.P (Context.C + 1 - Len .. Context.C) /= S (1 .. Len) then
          return 0;
       end if;
       return Len;
@@ -596,11 +596,6 @@ package body Stemmer with SPARK_Mode is
    begin
       Replace (Context, Context.Bra, Context.Ket, Text, Result);
    end Slice_From;
-
-   function Slice_To (Context : in Context_Type'Class) return String is
-   begin
-      return Context.P (Context.Bra + 1 .. Context.Ket);
-   end Slice_To;
 
    procedure Insert (Context : in out Context_Type'Class;
                      C_Bra   : in Char_Index;
