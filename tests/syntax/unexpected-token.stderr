@@ -1,8 +1,0 @@
-syntax/unexpected-token.sbl:4: unexpected + in grouping definition after name
-syntax/unexpected-token.sbl:7: unexpected next in integer test expression after $
-syntax/unexpected-token.sbl:8: unexpected number 0 in integer test expression after name
-syntax/unexpected-token.sbl:9: unexpected hop in integer expression after =
-syntax/unexpected-token.sbl:10: Expected relational operator (did you mean '=='?)
-syntax/unexpected-token.sbl:10: unexpected ) in integer expression after =
-syntax/unexpected-token.sbl:11: unexpected backwardmode after )
-syntax/unexpected-token.sbl:13: unexpected next after )

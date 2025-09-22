@@ -1021,7 +1021,6 @@ static void generate_setup_context(struct generator * g) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -1304,8 +1303,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
 static void generate_groupings(struct generator * g) {
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
 }
 

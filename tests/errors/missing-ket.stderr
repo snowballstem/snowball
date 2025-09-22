@@ -1,0 +1,6 @@
+errors/missing-ket.sbl:2: ) omitted after name
+errors/missing-ket.sbl:3: ) omitted after name
+errors/missing-ket.sbl:4: name omitted after -
+errors/missing-ket.sbl:6: ) omitted after number
+errors/missing-ket.sbl:7: ) omitted after number
+errors/missing-ket.sbl:8: ) omitted after delete
