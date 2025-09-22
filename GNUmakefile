@@ -828,6 +828,7 @@ ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/sr
 .PHONY: setup_runtime_tests clean_runtime_tests
 
 RUNTIME_DATA_DIR = tmp_runtime_tests_snowball_data
+
 setup_runtime_tests: clean_runtime_tests
 	mkdir $(RUNTIME_DATA_DIR)
 	r=$$PWD/$(RUNTIME_DATA_DIR) ;\
@@ -838,6 +839,7 @@ setup_runtime_tests: clean_runtime_tests
 	  echo ok > $$r/$$d/output.txt ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
+	$(MAKE) algorithms.mk
 
 clean_runtime_tests:
 	rm -rf $(RUNTIME_DATA_DIR)
