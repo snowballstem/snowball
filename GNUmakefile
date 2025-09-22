@@ -800,5 +800,5 @@ $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/g
 ada/bin/generate:
 	cd ada && $(gprbuild) -Pgenerate -p
 
-ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemwords.adb
+ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
 	cd ada && $(gprbuild) -Pstemwords -p
