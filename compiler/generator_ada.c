@@ -807,8 +807,12 @@ static void generate_address(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     if (b != NULL) {
         write_literal_string(g, b);
+        write_string(g, ", ");
+        write_int(g, SIZE(b));
     } else {
         write_varref(g, p->name);
+        write_string(g, ", Z.L");
+        write_varname(g, p->name);
     }
 }
 

@@ -57,7 +57,7 @@ package body Stemmer with SPARK_Mode is
       if Context.L - Context.C < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 .. Context.C + Len) /= S (1 .. Len) then
+      if Context.P (Context.C + 1 .. Context.C + Len) /= S (S'First .. Len) then
          return 0;
       end if;
       return Len;
@@ -70,7 +70,7 @@ package body Stemmer with SPARK_Mode is
       if Context.C - Context.Lb < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 - Len .. Context.C) /= S (1 .. Len) then
+      if Context.P (Context.C + 1 - Len .. Context.C) /= S (S'First .. Len) then
          return 0;
       end if;
       return Len;
@@ -561,49 +561,48 @@ package body Stemmer with SPARK_Mode is
                       C_Bra      : in Char_Index;
                       C_Ket      : in Char_Index;
                       S          : in String;
+                      Len        : in Char_Index;
                       Adjustment : out Integer) is
    begin
-      Adjustment := S'Length - (C_Ket - C_Bra);
-      if Adjustment > 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
+      Adjustment := Len - (C_Ket - C_Bra);
+      if Adjustment /= 0 then
+         Context.P (C_Ket + Adjustment + 1 .. Context.Len + Adjustment + 1)
            := Context.P (C_Ket + 1 .. Context.Len + 1);
+         Context.Len := Context.Len + Adjustment;
+         Context.L := Context.L + Adjustment;
+         if Context.C >= C_Ket then
+            Context.C := Context.C + Adjustment;
+         elsif Context.C > C_Bra then
+            Context.C := C_Bra;
+         end if;
       end if;
-      if S'Length > 0 then
-         Context.P (C_Bra + 1 .. C_Bra + S'Length) := S;
-      end if;
-      if Adjustment < 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.Len + 1);
-      end if;
-      Context.Len := Context.Len + Adjustment;
-      Context.L := Context.L + Adjustment;
-      if Context.C >= C_Ket then
-         Context.C := Context.C + Adjustment;
-      elsif Context.C > C_Bra then
-         Context.C := C_Bra;
+      if Len > 0 then
+         Context.P (C_Bra + 1 .. C_Bra + Len) := S (S'First .. Len);
       end if;
    end Replace;
 
    procedure Slice_Del (Context : in out Context_Type'Class) is
       Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, "", Result);
+      Replace (Context, Context.Bra, Context.Ket, "", 0, Result);
    end Slice_Del;
 
    procedure Slice_From (Context : in out Context_Type'Class;
-                         Text    : in String) is
+                         Text    : in String;
+                         Len     : in Char_Index) is
       Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, Text, Result);
+      Replace (Context, Context.Bra, Context.Ket, Text, Len, Result);
    end Slice_From;
 
    procedure Insert (Context : in out Context_Type'Class;
                      C_Bra   : in Char_Index;
                      C_Ket   : in Char_Index;
-                     S       : in String) is
+                     S       : in String;
+                     Len     : in Char_Index) is
       Result : Integer;
    begin
-      Replace (Context, C_Bra, C_Ket, S, Result);
+      Replace (Context, C_Bra, C_Ket, S, Len, Result);
       if C_Bra < Context.Bra then
          Context.Bra := Context.Bra + Result;
       end if;
