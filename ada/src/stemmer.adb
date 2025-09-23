@@ -51,50 +51,38 @@ package body Stemmer with SPARK_Mode is
    end Get_Result;
 
    function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Char_Index is
+                  S       : in String;
+                  Len     : in Char_Index) return Char_Index is
    begin
-      if Context.L - Context.C < S'Length then
+      if Context.L - Context.C < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 .. Context.C + S'Length) /= S then
+      if Context.P (Context.C + 1 .. Context.C + Len) /= S (S'First .. Len) then
          return 0;
       end if;
-      return S'Length;
+      return Len;
    end Eq_S;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Char_Index is
+                           S       : in String;
+                           Len     : in Char_Index) return Char_Index is
    begin
-      if Context.C - Context.Lb < S'Length then
+      if Context.C - Context.Lb < Len then
          return 0;
       end if;
-      if Context.P (Context.C + 1 - S'Length .. Context.C) /= S then
+      if Context.P (Context.C + 1 - Len .. Context.C) /= S (S'First .. Len) then
          return 0;
       end if;
-      return S'Length;
+      return Len;
    end Eq_S_Backward;
 
-   function Length_Utf8 (Context : in Context_Type'Class) return Natural is
+   function Length_Utf8 (S   : in String;
+                         Len : in Char_Index) return Natural is
       Count : Natural := 0;
       Pos   : Positive := 1;
       Val   : Byte;
    begin
-      while Pos <= Context.Len loop
-         Val := Character'Pos (Context.P (Pos));
-         Pos := Pos + 1;
-         if Val >= 16#C0# or Val < 16#80# then
-            Count := Count + 1;
-         end if;
-      end loop;
-      return Count;
-   end Length_Utf8;
-
-   function Length_Utf8 (S : in String) return Natural is
-      Count : Natural := 0;
-      Pos   : Positive := 1;
-      Val   : Byte;
-   begin
-      while Pos <= S'Length loop
+      while Pos <= Len loop
          Val := Character'Pos (S (Pos));
          Pos := Pos + 1;
          if Val >= 16#C0# or Val < 16#80# then
@@ -573,54 +561,48 @@ package body Stemmer with SPARK_Mode is
                       C_Bra      : in Char_Index;
                       C_Ket      : in Char_Index;
                       S          : in String;
+                      Len        : in Char_Index;
                       Adjustment : out Integer) is
    begin
-      Adjustment := S'Length - (C_Ket - C_Bra);
-      if Adjustment > 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
+      Adjustment := Len - (C_Ket - C_Bra);
+      if Adjustment /= 0 then
+         Context.P (C_Ket + Adjustment + 1 .. Context.Len + Adjustment + 1)
            := Context.P (C_Ket + 1 .. Context.Len + 1);
+         Context.Len := Context.Len + Adjustment;
+         Context.L := Context.L + Adjustment;
+         if Context.C >= C_Ket then
+            Context.C := Context.C + Adjustment;
+         elsif Context.C > C_Bra then
+            Context.C := C_Bra;
+         end if;
       end if;
-      if S'Length > 0 then
-         Context.P (C_Bra + 1 .. C_Bra + S'Length) := S;
-      end if;
-      if Adjustment < 0 then
-         Context.P (C_Bra + S'Length + 1 .. Context.Len + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.Len + 1);
-      end if;
-      Context.Len := Context.Len + Adjustment;
-      Context.L := Context.L + Adjustment;
-      if Context.C >= C_Ket then
-         Context.C := Context.C + Adjustment;
-      elsif Context.C > C_Bra then
-         Context.C := C_Bra;
+      if Len > 0 then
+         Context.P (C_Bra + 1 .. C_Bra + Len) := S (S'First .. Len);
       end if;
    end Replace;
 
    procedure Slice_Del (Context : in out Context_Type'Class) is
       Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, "", Result);
+      Replace (Context, Context.Bra, Context.Ket, "", 0, Result);
    end Slice_Del;
 
    procedure Slice_From (Context : in out Context_Type'Class;
-                         Text    : in String) is
+                         Text    : in String;
+                         Len     : in Char_Index) is
       Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, Text, Result);
+      Replace (Context, Context.Bra, Context.Ket, Text, Len, Result);
    end Slice_From;
-
-   function Slice_To (Context : in Context_Type'Class) return String is
-   begin
-      return Context.P (Context.Bra + 1 .. Context.Ket);
-   end Slice_To;
 
    procedure Insert (Context : in out Context_Type'Class;
                      C_Bra   : in Char_Index;
                      C_Ket   : in Char_Index;
-                     S       : in String) is
+                     S       : in String;
+                     Len     : in Char_Index) is
       Result : Integer;
    begin
-      Replace (Context, C_Bra, C_Ket, S, Result);
+      Replace (Context, C_Bra, C_Ket, S, Len, Result);
       if C_Bra <= Context.Bra then
          Context.Bra := Context.Bra + Result;
       end if;
