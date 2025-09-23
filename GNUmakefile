@@ -208,7 +208,7 @@ INCLUDES=-Iinclude
 
 all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
-algorithms.mk: libstemmer/mkalgorithms.pl $(MODULES)
+algorithms.mk: GNUmakefile libstemmer/mkalgorithms.pl $(MODULES)
 	libstemmer/mkalgorithms.pl algorithms.mk $(MODULES)
 
 clean:
@@ -839,7 +839,8 @@ setup_runtime_tests: clean_runtime_tests
 	  echo ok > $$r/$$d/output.txt ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
-	$(MAKE) algorithms.mk
+	rm -f algorithms.mk
+	$(MAKE) algorithms.mk STEMMING_DATA=tmp_runtime_tests_snowball_data ALGORITHMS=tests/runtime MODULES=tmp_runtime_tests_snowball_data/modules.txt other_algorithms=
 
 clean_runtime_tests:
 	rm -rf $(RUNTIME_DATA_DIR)
