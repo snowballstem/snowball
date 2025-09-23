@@ -751,7 +751,7 @@ check_python: python
 	$(MAKE) $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Python (THIN_FACTOR=$(THIN_FACTOR))"
+	@echo "Checking output of $* stemmer for Python$(if $(THIN_FACTOR), (THIN_FACTOR=$(THIN_FACTOR)))"
 	@cd python_check && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) |\
 	      $(python) stemwords.py -c utf8 -l $* -o $(PWD)/tmp.txt; \
