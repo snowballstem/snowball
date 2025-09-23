@@ -106,10 +106,7 @@ jobs:
     env:
       CC: ${{ matrix.CC || 'gcc' }}
       MAKE: ${{ matrix.MAKE || 'make' }} --output-sync --jobs=4
-      STEMMING_DATA: 'tmp_runtime_tests_snowball_data'
-      ALGORITHMS: 'tests/runtime'
-      MODULES: 'tmp_runtime_tests_snowball_data/modules.txt'
-      other_algorithms: ''
+      STEMMING_DATA: 'snowball-data'
 
     steps:
     - name: Checkout
@@ -160,9 +157,8 @@ jobs:
             git clone "$UPSTREAM_REPO_URL"
           fi
         fi
-    - name: Hackily hook up runtime testing
+    - name: Hook up runtime testing
       run: |
-        unset MODULES
         make setup_runtime_tests
     - name: Install CCache
       uses: hendrikmuhs/ccache-action@v1

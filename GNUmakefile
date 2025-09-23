@@ -91,6 +91,7 @@ tarball_ext = .tar.gz
 
 ALGORITHMS ?= algorithms
 MODULES ?= libstemmer/modules.txt
+
 # algorithms.mk is generated from the file $(MODULES) and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
