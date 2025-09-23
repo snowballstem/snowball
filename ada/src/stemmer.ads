@@ -86,14 +86,12 @@ private
                   S       : in String;
                   Len     : in Char_Index) return Char_Index with
      Global => null,
-     Pre => Len > 0,
      Post => Eq_S'Result = 0 or Eq_S'Result = Len;
 
    function Eq_S_Backward (Context : in Context_Type'Class;
                            S       : in String;
                            Len     : in Char_Index) return Char_Index with
      Global => null,
-     Pre => Len > 0,
      Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = Len;
 
    procedure Find_Among (Context : in out Context_Type'Class;
