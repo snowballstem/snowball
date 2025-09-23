@@ -16,6 +16,9 @@ TEE_TO_TMP_TXT:=tee tmp.txt|
 CLEAN_TMP_TXT:=rm -f tmp.txt
 endif
 
+# Use to hook up runtime tests (see `setup_runtime_tests` target below).
+-include overrides.mk
+
 c_src_dir = src_c
 
 JAVACFLAGS ?=
@@ -814,12 +817,8 @@ ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/sr
 #
 # make clean setup_runtime_tests
 #
-# Then run them like so:
-#
-# make STEMMING_DATA=tmp_runtime_tests_snowball_data ALGORITHMS=tests/runtime MODULES=tmp_runtime_tests_snowball_data/modules.txt other_algorithms= check
-#
-# This will run the runtime tests with the C stemmers - to run for another
-# language use e.g `check_python` instead of `check`.
+# Then targets like `check_utf8`, `check_python`, etc will run the runtime
+# tests for a particular target language.
 #
 # Once you're done, switch the tree back to the normal state:
 #
@@ -827,7 +826,7 @@ ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/sr
 
 .PHONY: setup_runtime_tests clean_runtime_tests
 
-RUNTIME_DATA_DIR = tmp_runtime_tests_snowball_data
+RUNTIME_DATA_DIR := tmp_runtime_tests_snowball_data
 
 setup_runtime_tests: clean_runtime_tests
 	mkdir $(RUNTIME_DATA_DIR)
@@ -839,8 +838,9 @@ setup_runtime_tests: clean_runtime_tests
 	  echo ok > $$r/$$d/output.txt ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
+	printf '%s:=%s\n' STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime  MODULES $(RUNTIME_DATA_DIR)/modules.txt other_algorithms > overrides.mk
 	rm -f algorithms.mk
-	$(MAKE) algorithms.mk STEMMING_DATA=tmp_runtime_tests_snowball_data ALGORITHMS=tests/runtime MODULES=tmp_runtime_tests_snowball_data/modules.txt other_algorithms=
+	$(MAKE) algorithms.mk
 
 clean_runtime_tests:
-	rm -rf $(RUNTIME_DATA_DIR)
+	rm -rf $(RUNTIME_DATA_DIR) overrides.mk
