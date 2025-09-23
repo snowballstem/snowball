@@ -1080,28 +1080,14 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    writef(g, "~MC := Eq_S~S0 (Z, ~V, Z.L~W);~N", p);
-    write_failure_if(g, "C = 0", p);
-    if (p->mode == m_forward) {
-        writef(g, "~MZ.C := Z.C + C;~N", p);
-    } else {
-        writef(g, "~MZ.C := Z.C - C;~N", p);
-    }
-    g->temporary_used = true;
+    write_failure_if(g, "not Eq_S~S0 (Z, ~V, Z.L~W)", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
     g->I[0] = SIZE(p->literalstring);
-    writef(g, "~MC := Eq_S~S0 (Z, ~L, ~I0);~N", p);
-    write_failure_if(g, "C = 0", p);
-    if (p->mode == m_forward) {
-        writef(g, "~MZ.C := Z.C + C;~N", p);
-    } else {
-        writef(g, "~MZ.C := Z.C - C;~N", p);
-    }
-    g->temporary_used = true;
+    write_failure_if(g, "not Eq_S~S0 (Z, ~L, ~I0)", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
