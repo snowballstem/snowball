@@ -1198,7 +1198,9 @@ static struct node * read_C(struct analyser * a) {
         case c_rightslice:
         case c_true:
         case c_false:
+            return new_node(a, token);
         case c_debug:
+            a->debug_used = true;
             return new_node(a, token);
         case c_assignto:
         case c_sliceto: {
@@ -2284,6 +2286,7 @@ extern struct analyser * create_analyser(struct tokeniser * t) {
     a->substring = NULL;
     a->current_routine = NULL;
     a->int_limits_used = false;
+    a->debug_used = false;
     return a;
 }
 
