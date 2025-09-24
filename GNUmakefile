@@ -86,6 +86,8 @@ endif
 
 tarball_ext = .tar.gz
 
+ALGORITHMS ?= algorithms
+
 # algorithms.mk is generated from libstemmer/modules.txt and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
@@ -164,7 +166,7 @@ PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 COMMON_FILES = COPYING \
 	       NEWS
 
-ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%.sbl)
+ALL_ALGORITHM_FILES = $(all_algorithms:%=$(ALGORITHMS)/%.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
 		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c) \
@@ -299,45 +301,45 @@ pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
 pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
 	$(FPC) $(FPC_FLAGS) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
 
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
 
-$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball charsets/KOI8-R.sbl $< -o "$(c_src_dir)/stem_KOI8_R_$*" -eprefix $*_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball $< -o "$(c_src_dir)/stem_ISO_8859_1_$*" -eprefix $*_ISO_8859_1_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball charsets/ISO-8859-2.sbl $< -o "$(c_src_dir)/stem_ISO_8859_2_$*" -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-$(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball$(EXEEXT)
+$(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
 	./snowball $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
 
-$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball$(EXEEXT)
+$(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
 	./snowball $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
 
-$(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball$(EXEEXT)
+$(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(pascal_src_dir)
 	./snowball $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
 
-$(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball$(EXEEXT)
+$(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
 	./snowball $< -py -o "$(python_output_dir)/$*_stemmer"
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
 
-$(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball$(EXEEXT)
+$(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(rust_src_dir)
 	./snowball $< -rust -o "$(rust_src_dir)/$*_stemmer"
 
@@ -345,12 +347,12 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
-$(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball$(EXEEXT)
+$(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
 	./snowball $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
-$(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
+$(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
 	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
 
@@ -360,7 +362,7 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 
 ifneq '$(filter grouped-target,$(.FEATURES))' ''
 # Grouped-targets were added in GNU make 4.3.
-$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl snowball
+$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
 else
 # This will fail to recreate the .ads if it is deleted but the corresponding
 # .adb is still present and up-to-date.  That seems better than forcing a
@@ -369,7 +371,7 @@ else
 $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 	@:
 
-$(ada_src_dir)/stemmer-%.adb: algorithms/%.sbl snowball
+$(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
 endif
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
