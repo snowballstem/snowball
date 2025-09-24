@@ -370,7 +370,7 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
 
-$(php_output_dir)/%-stemmer.php: algorithms/%.sbl snowball$(EXEEXT)
+$(php_output_dir)/%-stemmer.php: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(php_output_dir)
 	./snowball $< -php -o "$(php_output_dir)/$*-stemmer"
 
