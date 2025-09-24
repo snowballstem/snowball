@@ -302,11 +302,11 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, "cursor"); break;
         case c_limit:
             w(g, p->mode == m_forward ? "limit" : "limit_backward"); break;
-        case c_lenof:
+        case c_lenof: /* Same as sizeof() for Dart. */
         case c_sizeof:
             writef(g, "~V.length", p);
             break;
-        case c_len: /* Same as size() for Java. */
+        case c_len: /* Same as size() for Dart. */
         case c_size:
             w(g, "current.length");
             break;
