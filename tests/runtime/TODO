@@ -2,13 +2,13 @@
 Not exercised by current algorithms
 ===================================
 
-minint
+DONE minint
 
-maxint
+DONE maxint
 
-size
+DONE size
 
-lenof
+DONE lenof
 
 $stringvar
 
@@ -20,11 +20,11 @@ external calling external
 
 AE: *
 
-AE: /
+DONE AE: /
 
 AE: *=
 
-AE: /=
+DONE AE: /=
 
 AE: unary - (?)
 
