@@ -121,6 +121,7 @@ RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
 JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
+		      java/org/tartarus/snowball/CharArraySequence.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java

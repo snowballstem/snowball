@@ -1961,6 +1961,8 @@ extern struct generator * create_generator(struct analyser * a, struct options *
 #ifndef DISABLE_PYTHON
     g->max_label = 0;
 #endif
+    g->java_import_arrays = false;
+    g->java_import_chararraysequence = false;
     return g;
 }
 

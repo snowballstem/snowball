@@ -77,7 +77,7 @@ public class SnowballProgram implements Serializable {
     }
 
     // current string
-    private char[] current;
+    protected char[] current;
 
     protected int cursor;
     protected int length;
@@ -424,21 +424,6 @@ public class SnowballProgram implements Serializable {
         int adjustment = replace_s(c_bra, c_ket, s);
         if (c_bra <= bra) bra += adjustment;
         if (c_bra <= ket) ket += adjustment;
-    }
-
-    /* Copy the slice into the supplied StringBuilder */
-    protected void slice_to(StringBuilder s)
-    {
-        slice_check();
-        int len = ket - bra;
-        s.setLength(0);
-        s.append(current, bra, len);
-    }
-
-    protected void assign_to(StringBuilder s)
-    {
-        s.setLength(0);
-        s.append(current, 0, limit);
     }
 
 /*
