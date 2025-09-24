@@ -744,7 +744,7 @@ static void generate_hop(struct generator * g, struct node * p) {
     g->S[2] = p->mode == m_forward ? "<" : ">";
     if (p->AE->type == c_number) {
         // Constant distance hop.
-        // 
+        //
         // No need to check for negative hop as that's converted to false by
         // the analyser.
         write_failure_if(g, "c ~S1", p);
