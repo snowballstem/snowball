@@ -333,6 +333,7 @@ struct analyser {
     struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
+    byte debug_used;          /* is the '?' command used? */
 };
 
 enum analyser_modes {
@@ -381,6 +382,8 @@ struct generator {
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
     int temporary_used;  /* track if temporary variable used (Ada and Pascal) */
+    char java_import_arrays; /* need `import java.util.Arrays;` */
+    char java_import_chararraysequence; /* need `import org.tartarus.snowball.CharArraySequence;` */
 };
 
 /* Special values for failure_label in struct generator. */

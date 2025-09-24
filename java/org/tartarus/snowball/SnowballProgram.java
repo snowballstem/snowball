@@ -426,21 +426,6 @@ public class SnowballProgram implements Serializable {
         if (c_bra <= ket) ket += adjustment;
     }
 
-    /* Copy the slice into the supplied StringBuilder */
-    protected void slice_to(StringBuilder s)
-    {
-        slice_check();
-        int len = ket - bra;
-        s.setLength(0);
-        s.append(current, bra, len);
-    }
-
-    protected void assign_to(StringBuilder s)
-    {
-        s.setLength(0);
-        s.append(current, 0, limit);
-    }
-
 /*
 extern void debug(struct SN_env * z, int number, int line_count)
 {   int i;
