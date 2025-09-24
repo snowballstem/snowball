@@ -8,8 +8,10 @@ define stem as (
   $(minint < 0) or fail='minint should be negative'
   $(maxint > 0) or fail='maxint should be positive'
 
-  $(minint < -32768) or fail='minint should be <= -32768'
-  $(maxint > 32767) or fail='maxint should be > 32767'
+  $(minint <= -32767) or fail='minint should be <= -32767'
+  $(maxint >= 32767) or fail='maxint should be >= 32767'
+
+  $(minint + maxint == 0) or $(minint + maxint == -1) or fail='minint+maxint should be 0 or -1'
 
   $x = minint
   $(x == minint) or fail='minint cannot be stored in a variable'
