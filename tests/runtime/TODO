@@ -18,15 +18,15 @@ reverse
 
 external calling external
 
-AE: *
+DONE AE: *
 
 DONE AE: /
 
-AE: *=
+DONE AE: *=
 
 DONE AE: /=
 
-AE: unary - (?)
+DONE AE: unary - (?)
 
 i_test_op: ==
 
@@ -47,3 +47,105 @@ Lightly exercised
 =================
 
 -> stringvar
+
+======
+Others
+======
+
+grouping definitions with + and -
+
+AE: cursor
+
+AE: limit
+
+AE: limit
+
+i_test_op: != > >= < <=
+
+itest: $(...) and $x ...
+
+$s more thoroughly
+
+C or C
+
+C and C
+
+not C
+
+test C
+
+try C
+
+do C
+
+fail C
+
+goto C
+
+gopast C
+
+repeat C
+
+loop AE C
+
+atleast AE C
+
+S
+
+=S
+
+insert S / <+ S
+
+attach S
+
+<-S
+
+delete
+
+hop AE
+
+next
+
+[ ]
+
+=>s_name
+
+->s_name
+
+setmark i_name
+
+tomark AE
+
+atmark AE
+
+tolimit
+
+atlimit
+
+setlimit C for C
+
+backwards C
+
+reverse C
+
+substring ... among ( )
+
+set b_name
+
+unset b_name
+
+b_name
+
+r_name
+
+g_name
+
+non-g_name
+
+non g_name
+
+true
+
+false
+
+?
