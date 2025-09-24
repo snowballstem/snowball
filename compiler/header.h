@@ -333,6 +333,7 @@ struct analyser {
     struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
+    byte debug_used;          /* is the '?' command used? */
 };
 
 enum analyser_modes {

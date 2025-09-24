@@ -82,17 +82,15 @@ private
 
    type Among_Array_Type is array (Natural range <>) of Among_Type;
 
-   function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Char_Index with
-     Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S'Result = 0 or Eq_S'Result = S'Length;
+   function Eq_S (Context : in out Context_Type'Class;
+                  S       : in String;
+                  Len     : in Char_Index) return Boolean with
+     Global => null;
 
-   function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Char_Index with
-     Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = S'Length;
+   function Eq_S_Backward (Context : in out Context_Type'Class;
+                           S       : in String;
+                           Len     : in Char_Index) return Boolean with
+     Global => null;
 
    procedure Find_Among (Context : in out Context_Type'Class;
                          Amongs  : in Among_Array_Type;
@@ -138,9 +136,8 @@ private
                                 Value   : out Utf8_Type;
                                 Count   : out Natural);
 
-   function Length_Utf8 (Context : in Context_Type'Class) return Natural;
-
-   function Length_Utf8 (S : in String) return Natural;
+   function Length_Utf8 (S   : in String;
+                         Len : in Char_Index) return Natural;
 
    function Check_Among (Context : in Context_Type'Class;
                          Pos     : in Char_Index;
@@ -179,29 +176,30 @@ private
                       C_Bra      : in Char_Index;
                       C_Ket      : in Char_Index;
                       S          : in String;
+                      Len        : in Char_Index;
                       Adjustment : out Integer) with
      Global => null,
-     Pre => C_Ket >= C_Bra;
+     Pre => C_Bra <= C_Ket and C_Ket <= Context.Len
+     and Context.Len + Len - (C_Ket - C_Bra) < Context.P'Length;
 
    procedure Slice_Del (Context : in out Context_Type'Class) with
      Global => null,
-     Pre => Context.Ket >= Context.Bra;
+     Pre => Context.Bra <= Context.Ket and Context.Ket <= Context.Len;
 
    procedure Slice_From (Context : in out Context_Type'Class;
-                         Text    : in String) with
+                         Text    : in String;
+                         Len     : in Char_Index) with
      Global => null,
-     Pre => Context.Ket >= Context.Bra
-     and Context.Len - (Context.Ket - Context.Bra) + Text'Length < Context.P'Length;
-
-   function Slice_To (Context : in Context_Type'Class) return String;
+     Pre => Context.Bra <= Context.Ket and Context.Ket <= Context.Len;
 
    procedure Insert (Context : in out Context_Type'Class;
                      C_Bra   : in Char_Index;
                      C_Ket   : in Char_Index;
-                     S       : in String) with
+                     S       : in String;
+                     Len     : in Char_Index) with
      Global => null,
-     Pre => C_Ket >= C_Bra
-     and Context.Len - (C_Ket - C_Bra) + S'Length < Context.P'Length;
+     Pre => C_Bra <= C_Ket and C_Ket <= Context.Len
+     and Context.Len + Len - (C_Ket - C_Bra) < Context.P'Length;
 
    --  The context indexes follow the C paradigm: they start at 0 for the first character.
    --  This is necessary because several algorithms rely on this when they compare the
