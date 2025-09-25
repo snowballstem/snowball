@@ -563,8 +563,8 @@ package body Stemmer with SPARK_Mode is
                       C_Bra      : in Char_Index;
                       C_Ket      : in Char_Index;
                       S          : in String;
-                      Len        : in Char_Index;
-                      Adjustment : out Integer) is
+                      Len        : in Char_Index) is
+      Adjustment : Integer;
    begin
       Adjustment := Len - (C_Ket - C_Bra);
       if Adjustment /= 0 then
@@ -584,32 +584,29 @@ package body Stemmer with SPARK_Mode is
    end Replace;
 
    procedure Slice_Del (Context : in out Context_Type'Class) is
-      Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, "", 0, Result);
+      Replace (Context, Context.Bra, Context.Ket, "", 0);
    end Slice_Del;
 
    procedure Slice_From (Context : in out Context_Type'Class;
                          Text    : in String;
                          Len     : in Char_Index) is
-      Result : Integer;
    begin
-      Replace (Context, Context.Bra, Context.Ket, Text, Len, Result);
+      Replace (Context, Context.Bra, Context.Ket, Text, Len);
    end Slice_From;
 
    procedure Insert (Context : in out Context_Type'Class;
-                     C_Bra   : in Char_Index;
-                     C_Ket   : in Char_Index;
                      S       : in String;
                      Len     : in Char_Index) is
-      Result : Integer;
+      C : Char_Index;
    begin
-      Replace (Context, C_Bra, C_Ket, S, Len, Result);
-      if C_Bra <= Context.Bra then
-         Context.Bra := Context.Bra + Result;
+      C := Context.C;
+      Replace (Context, Context.C, Context.C, S, Len);
+      if C <= Context.Bra then
+         Context.Bra := Context.Bra + Len;
       end if;
-      if C_Bra <= Context.Ket then
-         Context.Ket := Context.Ket + Result;
+      if C <= Context.Ket then
+         Context.Ket := Context.Ket + Len;
       end if;
    end Insert;
 

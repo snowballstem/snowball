@@ -821,7 +821,7 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) w(g, "~MC := Z.C;~N");
-    writef(g, "~MInsert (Z, Z.C, Z.C, ", p);
+    writef(g, "~MInsert (Z, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) {
@@ -836,9 +836,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (keep_c) writef(g, "~MC := Z.C;~N", p);
     if (p->mode == m_forward) {
-        writef(g, "~MInsert (Z, Z.C, Z.L, ", p);
+        writef(g, "~MReplace (Z, Z.C, Z.L, ", p);
     } else {
-        writef(g, "~MInsert (Z, Z.Lb, Z.C, ", p);
+        writef(g, "~MReplace (Z, Z.Lb, Z.C, ", p);
     }
     generate_address(g, p);
     writef(g, ");~N", p);
