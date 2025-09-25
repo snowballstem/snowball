@@ -1193,7 +1193,9 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     write_str(g, g->failure_str);
     w(g, "~N"
       "~}");
-    write_block_end(g);
+    if (p->left && p->left->type == c_tomark) {
+        write_block_end(g);
+    }
     str_delete(varname);
 }
 
