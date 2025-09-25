@@ -6,7 +6,8 @@ strings (s)
 define stem as (
   $x = 0
   [substring] among (
-    'a' ()
+    '0' ()
+    'a' (())
     'b' (true)
     'c' ('')
     'd' (loop 0 next)
