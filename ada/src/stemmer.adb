@@ -605,10 +605,10 @@ package body Stemmer with SPARK_Mode is
       Result : Integer;
    begin
       Replace (Context, C_Bra, C_Ket, S, Len, Result);
-      if C_Bra <= Context.Bra then
+      if C_Bra < Context.Bra then
          Context.Bra := Context.Bra + Result;
       end if;
-      if C_Bra <= Context.Ket then
+      if C_Ket < Context.Ket then
          Context.Ket := Context.Ket + Result;
       end if;
    end Insert;
