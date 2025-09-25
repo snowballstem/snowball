@@ -16,6 +16,9 @@ TEE_TO_TMP_TXT:=tee tmp.txt|
 CLEAN_TMP_TXT:=rm -f tmp.txt
 endif
 
+# Use to hook up runtime tests (see `setup_runtime_tests` target below).
+-include overrides.mk
+
 c_src_dir = src_c
 
 JAVACFLAGS ?=
@@ -87,15 +90,16 @@ endif
 tarball_ext = .tar.gz
 
 ALGORITHMS ?= algorithms
+MODULES ?= libstemmer/modules.txt
 
-# algorithms.mk is generated from libstemmer/modules.txt and defines:
+# algorithms.mk is generated from the file $(MODULES) and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
 # * ISO_8859_2_algorithms
 # * KOI8_R_algorithms
 include algorithms.mk
 
-other_algorithms = lovins
+other_algorithms ?= lovins
 
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
@@ -156,7 +160,7 @@ PYTHON_PACKAGE_FILES = python/MANIFEST.in \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
+LIBSTEMMER_EXTRA = $(MODULES) libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 STEMTEST_SOURCES = tests/stemtest.c
@@ -209,8 +213,8 @@ INCLUDES=-Iinclude
 
 all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
-algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
-	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
+algorithms.mk: GNUmakefile libstemmer/mkalgorithms.pl $(MODULES)
+	libstemmer/mkalgorithms.pl algorithms.mk $(MODULES)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
@@ -269,11 +273,11 @@ libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
 libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
 	sed 's/@MODULES_H@/modules_utf8.h/' $^ >$@
 
-libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
+libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl $(MODULES)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc.mak
 
-libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc_utf8.mak utf8
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl $(MODULES)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
@@ -295,7 +299,7 @@ stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
 csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
-pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
+pascal/stemwords.dpr: pascal/stemwords-template.dpr $(MODULES)
 	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
 
 pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
@@ -343,7 +347,7 @@ $(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(rust_src_dir)
 	./snowball $< -rust -o "$(rust_src_dir)/$*_stemmer"
 
-$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/modules.txt
+$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
@@ -508,7 +512,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
-	cp libstemmer/modules.txt $${dest} && \
+	cp $(MODULES) $${dest} && \
 	cp doc/libstemmer_python_README $${dest}/README.rst && \
 	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
@@ -541,7 +545,7 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 
 .PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_compilertest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_compilertest: tests/compilertest
 	cd tests && ./compilertest
@@ -805,3 +809,40 @@ ada/bin/generate:
 
 ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
 	cd ada && $(gprbuild) -Pstemwords -p
+
+###############################################################################
+# Runtime tests
+###############################################################################
+
+# Runtime test integration is currently a bit clunky, and you need to switch
+# your tree to a different state to run runtime tests.
+#
+# make clean setup_runtime_tests
+#
+# Then targets like `check_utf8`, `check_python`, etc will run the runtime
+# tests for a particular target language.
+#
+# Once you're done, switch the tree back to the normal state:
+#
+# make clean clean_runtime_tests
+
+.PHONY: setup_runtime_tests clean_runtime_tests
+
+RUNTIME_DATA_DIR := tmp_runtime_tests_snowball_data
+
+setup_runtime_tests: clean_runtime_tests
+	mkdir $(RUNTIME_DATA_DIR)
+	r=$$PWD/$(RUNTIME_DATA_DIR) ;\
+	cd tests/runtime && for t in *.sbl ; do \
+	  d=`echo "$$t"|sed 's/\.sbl$$//'` ;\
+	  mkdir $$r/$$d ;\
+	  echo ok > $$r/$$d/voc.txt ;\
+	  echo ok > $$r/$$d/output.txt ;\
+	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
+	done
+	printf '%s:=%s\n' STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime  MODULES $(RUNTIME_DATA_DIR)/modules.txt THIN_FACTOR '' other_algorithms > overrides.mk
+	rm -f algorithms.mk
+	$(MAKE) algorithms.mk
+
+clean_runtime_tests:
+	rm -rf $(RUNTIME_DATA_DIR) overrides.mk

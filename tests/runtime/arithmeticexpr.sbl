@@ -1,0 +1,61 @@
+// Test operators in arithmetic expressions (AEs).
+externals (stem)
+integers (x y)
+define stem as (
+  $x = 3 * 2
+  $x *= 5
+  $(x * 7 == 210) or fail='multiplication gave wrong answer'
+
+  $x = 1 + 2
+  $x += 4
+  $(x + 8 == 15) or fail='addition gave wrong answer'
+
+  $x = 1 - 2
+  $x -= 4
+  $(8 - x == 13) or fail='subtraction gave wrong answer'
+
+  $(-x == 5) or fail='negation gave wrong answer'
+
+  // Test division truncates towards zero.
+
+  $x = 7
+  $x /= 4
+  $(x == 1) or fail='/= should truncate towards zero (+/+)'
+
+  $y = 7
+  $x = y / 4
+  $(x == 1) or fail='/ should truncate towards zero (+/+)'
+
+  $(7 / 4 * 4 == 4) or fail='should use integer / (+/+)'
+
+  $x = -7
+  $x /= -4
+  $(x == 1) or fail='/= should truncate towards zero (-/-)'
+
+  $y = -7
+  $x = y / -4
+  $(x == 1) or fail='/ should truncate towards zero (-/-)'
+
+  $(-7 / -4 * 4 == 4) or fail='should use integer / (-/-)'
+
+  $x = -7
+  $x /= 4
+  $(x == -1) or fail='/= should truncate towards zero (-/+)'
+
+  $y = -7
+  $x = y / 4
+  $(x == -1) or fail='/ should truncate towards zero (-/+)'
+
+  $(-7 / 4 * 4 == -4) or fail='should use integer / (-/+)'
+
+  $x = 7
+  $x /= -4
+  $(x == -1) or fail='/= should truncate towards zero (+/-)'
+
+  $y = 7
+  $x = y / -4
+  $(x == -1) or fail='/ should truncate towards zero (+/-)'
+
+  $(7 / -4 * 4 == -4) or fail='should use integer / (+/-)'
+)
+

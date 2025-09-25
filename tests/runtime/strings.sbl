@@ -1,0 +1,44 @@
+// Test strings
+
+externals (stem)
+
+strings (s)
+
+stringescapes {}
+
+define stem as (
+  '' or fail='failed to match empty string'
+  test 'o' or fail='failed to match 1-char string'
+  test ('o' $(cursor == 1)) or fail='failed to update cursor after 1-char string match'
+  test 'ok' or fail='failed to match string'
+  test ('ok' $(cursor == 2)) or fail='failed to update cursor after string match'
+  test ('ok' $(cursor == 2) atlimit) or fail='atlimit failed after string match'
+  not 'x' or fail='incorrectly matched single character string'
+  not 'ko' or fail='incorrectly matched string'
+
+  $s=''
+  s or fail='failed to match empty string var'
+  $s='o'
+  test s or fail='failed to match 1-char string var'
+  test (s $(cursor == 1)) or fail='failed to update cursor after 1-char string var match'
+  $s='ok'
+  test s or fail='failed to match string var'
+  test (s $(cursor == 2)) or fail='failed to update cursor after string var match'
+  test (s $(cursor == 2) atlimit) or fail='atlimit failed after string var match'
+  $s='x' not s or fail='incorrectly matched single character string var'
+  $s='ko' not s or fail='incorrectly matched string var'
+
+  ='abcde'
+  test ( $(len == 5) $(cursor == 0) 'abcde' atlimit ) or fail='string assignment wrong'
+
+  setlimit hop 4 for test (next ='nkl')
+  test ( $(len == 5) $(cursor == 0) 'ankle' atlimit ) or fail='string assignment does not replace c:l (same len)'
+
+  setlimit hop 4 for test (next ='x')
+  test ( $(len == 3) $(cursor == 0) 'axe' atlimit ) or fail='string assignment does not replace c:l (shorter)'
+
+  setlimit hop 2 for test (next ='ustralopithecin')
+  test ( $(len == 17) $(cursor == 0) 'australopithecine' atlimit ) or fail='string assignment does not replace c:l (longer)'
+
+  ='ok'
+)

@@ -15,6 +15,10 @@ on:
     paths-ignore:
       - '*.rst'
       - NEWS
+  workflow_call:
+    inputs:
+      runtime-tests: # We reuse this workflow from runtime-tests.yml.
+        type: boolean
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -115,6 +119,7 @@ jobs:
         show-progress: false
 
     - name: Checkout data
+      if: ${{ ! inputs.runtime-tests }}
       run: |
         # Try to check out a branch of the same name from the snowball-data
         # repo sibling of this snowball repo, so that PRs requiring changes to
@@ -156,6 +161,10 @@ jobs:
             git clone "$UPSTREAM_REPO_URL"
           fi
         fi
+    - name: Hook up runtime testing
+      if: ${{ inputs.runtime-tests }}
+      run: |
+        make setup_runtime_tests
     - name: Install CCache
       uses: hendrikmuhs/ccache-action@v1
       with:
