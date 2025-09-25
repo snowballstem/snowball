@@ -1124,6 +1124,7 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * varname = vars_newname(g);
     write_comment(g, p);
+    int extra_block = false;
     if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
@@ -1164,6 +1165,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         }
     } else {
         write_block_start(g);
+        extra_block = true;
         struct str * savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
         generate(g, p->left);
@@ -1193,7 +1195,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     write_str(g, g->failure_str);
     w(g, "~N"
       "~}");
-    if (p->left && p->left->type == c_tomark) {
+    if (extra_block) {
         write_block_end(g);
     }
     str_delete(varname);
