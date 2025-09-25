@@ -1163,6 +1163,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append_ch(g->failure_str, ';');
         }
     } else {
+        write_block_start(g);
         struct str * savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
         generate(g, p->left);
@@ -1192,6 +1193,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     write_str(g, g->failure_str);
     w(g, "~N"
       "~}");
+    write_block_end(g);
     str_delete(varname);
 }
 
