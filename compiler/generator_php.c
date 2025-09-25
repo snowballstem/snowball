@@ -229,7 +229,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
             case 'n': write_string(g, g->options->name); continue;
-            case 'P': write_string(g, g->options->parent_class_name); continue;
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
                        ch, input);

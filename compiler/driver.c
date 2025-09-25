@@ -22,8 +22,6 @@
 
 #define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
-#define DEFAULT_PHP_BASE_CLASS "SnowballStemmer"
-
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
 static int eq(const char * s1, const char * s2) {
@@ -370,8 +368,6 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             break;
         case LANG_PHP:
             o->encoding = ENC_UTF8;
-            if (!o->parent_class_name)
-                o->parent_class_name = DEFAULT_PHP_BASE_CLASS;
             break;
         case LANG_PYTHON:
             o->encoding = ENC_WIDECHARS;
