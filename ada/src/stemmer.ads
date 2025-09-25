@@ -176,8 +176,7 @@ private
                       C_Bra      : in Char_Index;
                       C_Ket      : in Char_Index;
                       S          : in String;
-                      Len        : in Char_Index;
-                      Adjustment : out Integer) with
+                      Len        : in Char_Index) with
      Global => null,
      Pre => C_Bra <= C_Ket and C_Ket <= Context.Len
      and Context.Len + Len - (C_Ket - C_Bra) < Context.P'Length;
@@ -193,13 +192,11 @@ private
      Pre => Context.Bra <= Context.Ket and Context.Ket <= Context.Len;
 
    procedure Insert (Context : in out Context_Type'Class;
-                     C_Bra   : in Char_Index;
-                     C_Ket   : in Char_Index;
                      S       : in String;
                      Len     : in Char_Index) with
      Global => null,
-     Pre => C_Bra <= C_Ket and C_Ket <= Context.Len
-     and Context.Len + Len - (C_Ket - C_Bra) < Context.P'Length;
+     Pre => Context.C <= Context.Len
+     and Context.Len + Len < Context.P'Length;
 
    --  The context indexes follow the C paradigm: they start at 0 for the first character.
    --  This is necessary because several algorithms rely on this when they compare the
