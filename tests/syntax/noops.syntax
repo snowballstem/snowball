@@ -5,6 +5,8 @@ define stem
     substring
     ]
     among
+      literal '0'
+      (
       literal 'a'
       (
       literal 'b'
