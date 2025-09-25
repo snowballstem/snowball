@@ -12,7 +12,7 @@ DONE lenof
 
 $stringvar
 
-= 'foo'
+DONE = 'foo'
 
 reverse
 
@@ -130,11 +130,11 @@ reverse C
 
 substring ... among ( )
 
-set b_name
+DONE set b_name
 
-unset b_name
+DONE unset b_name
 
-b_name
+DONE b_name
 
 r_name
 
@@ -144,8 +144,8 @@ non-g_name
 
 non g_name
 
-true
+DONE true
 
-false
+DONE false
 
 ?
