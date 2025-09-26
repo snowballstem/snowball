@@ -113,7 +113,7 @@ extern void * check_malloc(size_t n) {
 }
 
 extern void check_free(void * p) {
-    space_count--;
+    if (p) space_count--;
     free(p);
 }
 
