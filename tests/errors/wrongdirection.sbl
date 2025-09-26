@@ -1,0 +1,14 @@
+externals ( stem )
+routines ( remove_suffix )
+
+backwardmode (
+  define remove_suffix as (
+    [substring] among (
+      'al' 'ance' 'ence' 'er' 'ic' (delete)
+    )
+  )
+)
+
+define stem as (
+  remove_suffix
+)
