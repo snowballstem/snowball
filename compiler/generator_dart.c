@@ -1037,7 +1037,9 @@ static void generate_define(struct generator * g, struct node * p) {
     write_comment(g, p);
 
     if (q->type != t_routine) {
-        w(g, "~M@override~N");
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            w(g, "~M@override~N");
+        }
     }
     writef(g, "~Mbool ~V() {~+~N", p);
 
