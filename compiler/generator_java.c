@@ -1013,7 +1013,9 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine) {
         g->S[0] = "private";
     } else {
-        w(g, "~M@Override~N");
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            w(g, "~M@Override~N");
+        }
         g->S[0] = "public";
     }
     writef(g, "~M~S0 boolean ~V() {~+~N", p);

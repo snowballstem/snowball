@@ -1479,21 +1479,10 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 }
 
 static void generate_method_decls(struct generator * g, enum name_types type) {
-    struct among * a = g->analyser->amongs;
-    int need_among_handler = 0;
-
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if ((enum name_types)q->type == type) {
             generate_method_decl(g, q);
         }
-    }
-
-    while (a != NULL && need_among_handler == 0) {
-        need_among_handler = (a->function_count > 0);
-        a = a->next;
-    }
-    if (need_among_handler) {
-        w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
     }
 }
 
@@ -1720,6 +1709,17 @@ extern void generate_program_ada(struct generator * g) {
 
     generate_method_decls(g, t_routine);
 
+    int need_among_handler = false;
+    for (struct among * a = g->analyser->amongs; a; a = a->next) {
+        if (a->function_count > 0) {
+            need_among_handler = true;
+            break;
+        }
+    }
+    if (need_among_handler) {
+        w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
+    }
+
     g->declarations = g->outbuf;
     g->outbuf = str_new();
 
@@ -1743,7 +1743,8 @@ extern void generate_program_ada(struct generator * g) {
     w(g, g->options->package);
     w(g, " with SPARK_Mode is~N~+");
     w(g, "   type Context_Type is new Stemmer.Context_Type with private;~N");
-    w(g, "   procedure Stem (Z : in out Context_Type; Result : out Boolean);~N");
+    generate_method_decls(g, t_external);
+
     w(g, "private~N");
     generate_member_decls(g);
     w(g, "end Stemmer.");

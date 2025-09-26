@@ -1011,7 +1011,11 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine) {
         g->S[0] = "private";
     } else {
-        g->S[0] = "protected override";
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            g->S[0] = "protected override";
+        } else {
+            g->S[0] = "protected";
+        }
     }
     writef(g, "~M~S0 bool ~V()~N~M{~+~N", p);
 
