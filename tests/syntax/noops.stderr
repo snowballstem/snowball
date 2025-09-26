@@ -2,6 +2,10 @@ syntax/noops.sbl:12: warning: empty literal string is a no-op
 syntax/noops.sbl:13: warning: loop 0 C is a no-op
 syntax/noops.sbl:14: warning: loop -1 C is a no-op
 syntax/noops.sbl:15: warning: hop 0 is a no-op
+syntax/noops.sbl:44: warning: empty literal string is a no-op
+syntax/noops.sbl:45: warning: loop 0 C is a no-op
+syntax/noops.sbl:46: warning: loop -1 C is a no-op
+syntax/noops.sbl:47: warning: hop 0 is a no-op
 syntax/noops.sbl:5: warning: string 's' is set but never used
 syntax/noops.sbl:4: warning: boolean 'b' is set but never used
 syntax/noops.sbl:3: warning: integer 'y' is set but never used

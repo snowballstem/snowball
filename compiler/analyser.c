@@ -1057,12 +1057,20 @@ static struct node * read_C(struct analyser * a) {
             return p;
         }
         case c_try:
-        case c_fail:
         case c_test:
         case c_do:
         case c_repeat: {
             struct node * p = new_node(a, token);
             p->left = read_C(a);
+            return p;
+        }
+        case c_fail: {
+            struct node * p = new_node(a, token);
+            p->left = read_C(a);
+            if (!p->left || is_just_true(p->left)) {
+                p->type = c_false;
+                p->left = NULL;
+            }
             return p;
         }
         case c_goto:
