@@ -1,0 +1,35 @@
+// Test integer tests.
+externals (stem)
+integers (x y)
+define stem as (
+  $x = len
+
+  $x == 2 or fail='== failed (old style)'
+  $(x == 2) or fail='== failed'
+  $(2 == x) or fail='== failed (reversed)'
+
+  $x != 3 or fail='!= failed (old style)'
+  $(x != 3) or fail='!= failed'
+  $(3 != x) or fail='!= failed (reversed)'
+
+  $x >= 2 or fail='>= failed (old style)'
+  $(x >= 2) or fail='>= failed'
+  $(x >= 1) or fail='>= failed (nonequal)'
+  $(2 >= x) or fail='>= failed (reversed)'
+  $(3 >= x) or fail='>= failed (nonequal, reversed)'
+
+  $x <= 2 or fail='<= failed (old style)'
+  $(x <= 2) or fail='<= failed'
+  $(x <= 3) or fail='<= failed (nonequal)'
+  $(2 <= x) or fail='<= failed (reversed)'
+  $(1 <= x) or fail='<= failed (nonequal, reversed)'
+
+  $x > 1 or fail='> failed (old style)'
+  $(x > 1) or fail='> failed'
+  $(3 > x) or fail='> failed (nonequal, reversed)'
+
+  $x < 3 or fail='< failed (old style)'
+  $(x < 3) or fail='< failed'
+  $(1 < x) or fail='< failed (reversed)'
+)
+
