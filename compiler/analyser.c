@@ -1644,7 +1644,7 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     a->program_end = p;
     get_token(a, c_as);
     p->left = read_C(a);
-    if (q) q->definition = p->left;
+    if (q) q->definition = p;
     /* We should get a node with a NULL right pointer from read_C() for the
      * routine's code.  We synthesise a "functionend" node there so
      * optimisations such as dead code elimination and tail call optimisation
@@ -2026,12 +2026,13 @@ static void visit_routine(struct analyser * a, struct name * n) {
     // Recursive functions are valid in the Snowball language, but aren't
     // actually used in typical snowball programs so we take a simple
     // approach and handle them by setting pessimistic assumptions here which
-    // will be used if a function calls itself (directly or indirectly).  These
-    // will get overwritten by visit_node() for non-recursive cases.
-
+    // will be used if a function calls itself (directly or indirectly).
     p->possible_signals = -1; // Assume it could signal t or f.
 
-    visit_node(a, p);
+    visit_node(a, p->left);
+
+    // Update with calculated value.
+    p->possible_signals = p->left->possible_signals;
 }
 
 extern void read_program(struct analyser * a) {

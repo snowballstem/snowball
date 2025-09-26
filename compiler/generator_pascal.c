@@ -1350,7 +1350,9 @@ static void generate_method_decl(struct generator * g, struct name * q) {
     write_varname(g, q);
     w(g, " : Boolean;");
     if (q->type == t_external) {
-        w(g, " Override;");
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            w(g, " Override;");
+        }
     }
     w(g, "~N");
 }
