@@ -1,7 +1,14 @@
-// Test operators in arithmetic expressions (AEs).
+// Test arithmetic expressions (AEs).
 externals (stem)
+routines (operators pseudovars)
 integers (x y)
+
 define stem as (
+  operators
+  pseudovars
+)
+
+define operators as (
   $x = 3 * 2
   $x *= 5
   $(x * 7 == 210) or fail='multiplication gave wrong answer'
@@ -59,3 +66,17 @@ define stem as (
   $(7 / -4 * 4 == -4) or fail='should use integer / (+/-)'
 )
 
+define pseudovars as (
+  $(cursor == 0) or fail='cursor should be 0'
+  $(limit == 2) or fail='limit should be 2'
+  test (next $(cursor == 1)) or fail='cursor should be 1'
+  test (hop 2 $(cursor == 2)) or fail='cursor should be 2'
+  setlimit next for $(limit == 1) or fail='limit should be 1'
+  test (reverse $(cursor == 0)) or fail='cursor should be 0 (reverse)'
+  test (reverse $(limit == 0)) or fail='limit should be 0 (reverse)'
+  test (next reverse $(limit == 0)) or fail='limit should be 0 (reverse)'
+  test (next reverse $(cursor == 1)) or fail='cursor should be 1 (reverse)'
+  test (backwards $(cursor == 2)) or fail='cursor should be 2 (backwards)'
+  test (backwards $(limit == 0)) or fail='limit should be 0 (backwards)'
+  test (next backwards $(limit == 1)) or fail='limit should be 1 (backwards)'
+)
