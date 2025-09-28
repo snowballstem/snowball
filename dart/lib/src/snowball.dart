@@ -29,6 +29,17 @@ class SnowballProgram {
   int ket = 0;
   int af = 0;
 
+  SnowballProgram();
+
+  SnowballProgram.from(SnowballProgram other)
+    : current = other.current,
+      cursor = other.cursor,
+      limit = other.limit,
+      limit_backward = other.limit_backward,
+      bra = other.bra,
+      ket = other.ket,
+      af = other.af;
+
   void init(String s) {
     current = s;
     cursor = 0;

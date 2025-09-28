@@ -928,7 +928,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
-              "~Mfinal SnowballProgram ~B0 = SnowballProgram(this);~N", p);
+              "~Mfinal SnowballProgram ~B0 = SnowballProgram.from(this);~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "copy_from(");
