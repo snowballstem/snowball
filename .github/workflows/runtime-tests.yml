@@ -1,0 +1,26 @@
+name: Runtime tests
+
+# Use bash by default on all platforms.
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    paths-ignore:
+      - '*.rst'
+      - NEWS
+  pull_request:
+    branches: master
+    paths-ignore:
+      - '*.rst'
+      - NEWS
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+    with:
+      runtime-tests: true

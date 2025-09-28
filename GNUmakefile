@@ -16,6 +16,9 @@ TEE_TO_TMP_TXT:=tee tmp.txt|
 CLEAN_TMP_TXT:=rm -f tmp.txt
 endif
 
+# Use to hook up runtime tests (see `setup_runtime_tests` target below).
+-include overrides.mk
+
 c_src_dir = src_c
 
 JAVACFLAGS ?=
@@ -94,14 +97,17 @@ endif
 
 tarball_ext = .tar.gz
 
-# algorithms.mk is generated from libstemmer/modules.txt and defines:
+ALGORITHMS ?= algorithms
+MODULES ?= libstemmer/modules.txt
+
+# algorithms.mk is generated from the file $(MODULES) and defines:
 # * libstemmer_algorithms
 # * ISO_8859_1_algorithms
 # * ISO_8859_2_algorithms
 # * KOI8_R_algorithms
 include algorithms.mk
 
-other_algorithms = lovins
+other_algorithms ?= lovins
 
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
@@ -130,6 +136,7 @@ RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
 JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
+		      java/org/tartarus/snowball/CharArraySequence.java \
 		      java/org/tartarus/snowball/SnowballProgram.java \
 		      java/org/tartarus/snowball/SnowballStemmer.java \
 		      java/org/tartarus/snowball/TestApp.java
@@ -173,7 +180,7 @@ PYTHON_PACKAGE_FILES = python/MANIFEST.in \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = libstemmer/modules.txt libstemmer/libstemmer_c.in
+LIBSTEMMER_EXTRA = $(MODULES) libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 STEMTEST_SOURCES = tests/stemtest.c
@@ -183,7 +190,7 @@ PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 COMMON_FILES = COPYING \
 	       NEWS
 
-ALL_ALGORITHM_FILES = $(all_algorithms:%=algorithms/%.sbl)
+ALL_ALGORITHM_FILES = $(all_algorithms:%=$(ALGORITHMS)/%.sbl)
 C_LIB_SOURCES = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c) \
 		$(KOI8_R_algorithms:%=$(c_src_dir)/stem_KOI8_R_%.c) \
 		$(ISO_8859_1_algorithms:%=$(c_src_dir)/stem_ISO_8859_1_%.c) \
@@ -229,8 +236,8 @@ INCLUDES=-Iinclude
 
 all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
 
-algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
-	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
+algorithms.mk: GNUmakefile libstemmer/mkalgorithms.pl $(MODULES)
+	libstemmer/mkalgorithms.pl algorithms.mk $(MODULES)
 
 clean:
 	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
@@ -293,11 +300,11 @@ libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
 libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
 	sed 's/@MODULES_H@/modules_utf8.h/' $^ >$@
 
-libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc.mak
+libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl $(MODULES)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc.mak
 
-libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl libstemmer/modules.txt
-	libstemmer/mkmodules.pl $@ $(c_src_dir) libstemmer/modules.txt libstemmer/mkinc_utf8.mak utf8
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl $(MODULES)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
@@ -322,68 +329,68 @@ dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
 csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
-pascal/stemwords.dpr: pascal/stemwords-template.dpr libstemmer/modules.txt
+pascal/stemwords.dpr: pascal/stemwords-template.dpr $(MODULES)
 	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
 
 pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
 	$(FPC) $(FPC_FLAGS) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
 
-$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
 
-$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball charsets/KOI8-R.sbl $< -o "$(c_src_dir)/stem_KOI8_R_$*" -eprefix $*_KOI8_R_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball $< -o "$(c_src_dir)/stem_ISO_8859_1_$*" -eprefix $*_ISO_8859_1_ -r ../runtime
 
-$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: algorithms/%.sbl snowball$(EXEEXT)
+$(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	./snowball charsets/ISO-8859-2.sbl $< -o "$(c_src_dir)/stem_ISO_8859_2_$*" -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-$(java_src_dir)/%Stemmer.java: algorithms/%.sbl snowball$(EXEEXT)
+$(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
 	./snowball $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
 
-$(dart_src_dir)/%_stemmer.dart: algorithms/%.sbl snowball$(EXEEXT)
+$(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(dart_src_dir)
 	./snowball $< -d -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
 
-$(csharp_src_dir)/%Stemmer.generated.cs: algorithms/%.sbl snowball$(EXEEXT)
+$(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
 	./snowball $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
 
-$(pascal_src_dir)/%Stemmer.pas: algorithms/%.sbl snowball$(EXEEXT)
+$(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(pascal_src_dir)
 	./snowball $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
 
-$(python_output_dir)/%_stemmer.py: algorithms/%.sbl snowball$(EXEEXT)
+$(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
 	./snowball $< -py -o "$(python_output_dir)/$*_stemmer"
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
 
-$(rust_src_dir)/%_stemmer.rs: algorithms/%.sbl snowball$(EXEEXT)
+$(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(rust_src_dir)
 	./snowball $< -rust -o "$(rust_src_dir)/$*_stemmer"
 
-$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go libstemmer/modules.txt
+$(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 	@echo "Generating algorithms.go"
 	@cd go/stemwords && go generate
 
-$(go_src_dir)/%_stemmer.go: algorithms/%.sbl snowball$(EXEEXT)
+$(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
 	./snowball $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
-$(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
+$(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
 	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
 
@@ -393,16 +400,16 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 
 ifneq '$(filter grouped-target,$(.FEATURES))' ''
 # Grouped-targets were added in GNU make 4.3.
-$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: algorithms/%.sbl snowball
+$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
 else
 # This will fail to recreate the .ads if it is deleted but the corresponding
 # .adb is still present and up-to-date.  That seems better than forcing a
-# serial build with .NOTPARALLEL which is seems can only be applied to an
+# serial build with .NOTPARALLEL which it seems can only be applied to an
 # entire makefile, not per-rule.
 $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 	@:
 
-$(ada_src_dir)/stemmer-%.adb: algorithms/%.sbl snowball
+$(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
 endif
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
@@ -571,7 +578,7 @@ dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
 	mkdir -p $${dest} && \
 	mkdir -p $${dest}/src/$(python_runtime_dir) && \
 	mkdir -p $${dest}/src/$(python_sample_dir) && \
-	cp libstemmer/modules.txt $${dest} && \
+	cp $(MODULES) $${dest} && \
 	cp doc/libstemmer_python_README $${dest}/README.rst && \
 	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
 	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
@@ -602,9 +609,12 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 # C
 ###############################################################################
 
-.PHONY: check check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+.PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+check: check_compilertest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+
+check_compilertest: tests/compilertest
+	cd tests && ./compilertest
 
 check_stemtest: stemtest$(EXEEXT)
 	./stemtest
@@ -846,7 +856,7 @@ check_python: python
 	$(MAKE) $(libstemmer_algorithms:%=check_python_%)
 
 check_python_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Python (THIN_FACTOR=$(THIN_FACTOR))"
+	@echo "Checking output of $* stemmer for Python$(if $(THIN_FACTOR), (THIN_FACTOR=$(THIN_FACTOR)))"
 	@cd python_check && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' $(THIN_TEST_DATA) |\
 	      $(python) stemwords.py -c utf8 -l $* -o $(PWD)/tmp.txt; \
@@ -895,5 +905,42 @@ $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/g
 ada/bin/generate:
 	cd ada && $(gprbuild) -Pgenerate -p
 
-ada/bin/stemwords: $(ADA_SOURCES)
+ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
 	cd ada && $(gprbuild) -Pstemwords -p
+
+###############################################################################
+# Runtime tests
+###############################################################################
+
+# Runtime test integration is currently a bit clunky, and you need to switch
+# your tree to a different state to run runtime tests.
+#
+# make clean setup_runtime_tests
+#
+# Then targets like `check_utf8`, `check_python`, etc will run the runtime
+# tests for a particular target language.
+#
+# Once you're done, switch the tree back to the normal state:
+#
+# make clean clean_runtime_tests
+
+.PHONY: setup_runtime_tests clean_runtime_tests
+
+RUNTIME_DATA_DIR := tmp_runtime_tests_snowball_data
+
+setup_runtime_tests: clean_runtime_tests
+	mkdir $(RUNTIME_DATA_DIR)
+	r=$$PWD/$(RUNTIME_DATA_DIR) ;\
+	cd tests/runtime && for t in *.sbl ; do \
+	  d=`echo "$$t"|sed 's/\.sbl$$//'` ;\
+	  mkdir $$r/$$d ;\
+	  echo ok > $$r/$$d/voc.txt ;\
+	  echo ok > $$r/$$d/output.txt ;\
+	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
+	done
+	printf '%s:=%s\n' STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime  MODULES $(RUNTIME_DATA_DIR)/modules.txt THIN_FACTOR '' other_algorithms > overrides.mk
+	rm -f algorithms.mk
+	$(MAKE) algorithms.mk
+
+clean_runtime_tests:
+	rm -rf $(RUNTIME_DATA_DIR) overrides.mk

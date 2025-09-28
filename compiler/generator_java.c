@@ -265,7 +265,7 @@ static void generate_AE(struct generator * g, struct node * p) {
             w(g, p->mode == m_forward ? "limit" : "limit_backward"); break;
         case c_lenof: /* Same as sizeof() for Java. */
         case c_sizeof:
-            writef(g, "~V.length()", p);
+            writef(g, "L~V", p);
             break;
         case c_len: /* Same as size() for Java. */
         case c_size:
@@ -739,12 +739,25 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Massign_to(~V);~N", p);
+    writef(g, "~Mif (~V.length < limit) {~N~+", p);
+    writef(g, "~M~V = Arrays.copyOf(current, limit);~N~-", p);
+    writef(g, "~M} else {~N~+", p);
+    writef(g, "~MSystem.arraycopy(current, 0, ~V, 0, limit);~N~-", p);
+    writef(g, "~M}~N", p);
+    writef(g, "~ML~V = limit;~N", p);
+    g->java_import_arrays = true;
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mslice_to(~V);~N", p);
+    writef(g, "~Mslice_check();~N", p);
+    writef(g, "~Mif (~V.length < ket - bra) {~N~+", p);
+    writef(g, "~M~V = Arrays.copyOfRange(current, bra, ket);~N~-", p);
+    writef(g, "~M} else {~N~+", p);
+    writef(g, "~MSystem.arraycopy(current, bra, ~V, 0, ket - bra);~N~-", p);
+    writef(g, "~M}~N", p);
+    writef(g, "~ML~V = ket - bra;~N", p);
+    g->java_import_arrays = true;
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -752,7 +765,12 @@ static void generate_address(struct generator * g, struct node * p) {
     if (b != NULL) {
         write_literal_string(g, b);
     } else {
+        write_string(g, "new CharArraySequence(");
         write_varref(g, p->name);
+        write_string(g, ", L");
+        write_varref(g, p->name);
+        write_string(g, ")");
+        g->java_import_chararraysequence = true;
     }
 }
 
@@ -883,12 +901,15 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~MSnowballProgram ~B0 = new SnowballProgram(this);~N", p);
 
     ++g->copy_from_count;
-    str_assign(g->failure_str, "copy_from(");
+    str_append_string(g->failure_str, "LS_");
+    str_append_s(g->failure_str, p->name->s);
+    str_append_string(g->failure_str, " = length; copy_from(");
     str_append(g->failure_str, savevar);
     str_append_string(g->failure_str, ");");
     writef(g, "~Mcurrent = ~V;~N"
               "~Mcursor = 0;~N"
-              "~Mlimit = current.length();~N", p);
+              "~Mlength = L~V;~N"
+              "~Mlimit = length;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
@@ -973,7 +994,8 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    write_failure_if(g, "!(eq_s~S0(~V))", p);
+    write_failure_if(g, "!(eq_s~S0(new CharArraySequence(~V, L~V)))", p);
+    g->java_import_chararraysequence = true;
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -984,7 +1006,6 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -992,7 +1013,9 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine) {
         g->S[0] = "private";
     } else {
-        w(g, "~M@Override~N");
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            w(g, "~M@Override~N");
+        }
         g->S[0] = "public";
     }
     writef(g, "~M~S0 boolean ~V() {~+~N", p);
@@ -1204,10 +1227,18 @@ static void generate_class_begin(struct generator * g) {
     w(g, g->options->package);
     w(g, ";~N~N");
 
+    if (g->java_import_arrays) {
+        w(g, "import java.util.Arrays;~N~N");
+    }
+
     if (g->analyser->amongs) {
         w(g, "import ");
         w(g, g->options->among_class);
         w(g, ";~N~N");
+    }
+
+    if (g->java_import_chararraysequence) {
+        w(g, "import org.tartarus.snowball.CharArraySequence;~N~N");
     }
 
     if (g->copy_from_count > 0) {
@@ -1314,8 +1345,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
 static void generate_groupings(struct generator * g) {
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
 }
 
@@ -1325,13 +1355,12 @@ static void generate_members(struct generator * g) {
     for (struct name * q = g->analyser->names; q; q = q->next) {
         switch (q->type) {
             case t_string:
-                w(g, "~Mprivate ");
-                write_string(g, g->options->string_class);
-                write_char(g, ' ');
+                w(g, "~Mprivate char[] ");
                 write_varname(g, q);
-                write_string(g, " = new ");
-                write_string(g, g->options->string_class);
-                w(g, "();~N");
+                w(g, " = new char[8];~N");
+                w(g, "~Mprivate int L");
+                write_varname(g, q);
+                w(g, " = 0;~N");
                 wrote_members = true;
                 break;
             case t_integer:

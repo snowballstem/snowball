@@ -1,0 +1,4 @@
+errors/bad-dollar.sbl:10: unexpected = in integer test expression after $
+errors/bad-dollar.sbl:11: 'stem' not of type integer or string
+errors/bad-dollar.sbl:12: 'b' not of type integer or string
+errors/bad-dollar.sbl:13: 'g' not of type integer or string

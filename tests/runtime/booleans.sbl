@@ -1,0 +1,19 @@
+// Test strings
+
+externals (stem)
+
+booleans (b)
+
+stringescapes {}
+
+define stem as (
+  true or fail='true failed'
+  not false or fail='false did not fail'
+
+  set b
+  b or fail='set b did not set b'
+  unset b
+  not b or fail='unset b did not unset b'
+  set b
+  b or fail='set b did not set b (2)'
+)

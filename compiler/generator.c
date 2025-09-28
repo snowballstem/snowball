@@ -487,7 +487,7 @@ static int K_needed_(struct node * p, int call_depth) {
                  * recurse until we run out of stack for pathological cases.
                  */
                 if (call_depth >= 100) return true;
-                if (K_needed_(p->name->definition, call_depth + 1))
+                if (K_needed_(p->name->definition->left, call_depth + 1))
                     return true;
                 break;
 
@@ -548,7 +548,7 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
                 if (call_depth >= 100) {
                     return 2;
                 }
-                score += repeat_score(g, p->name->definition, call_depth + 1);
+                score += repeat_score(g, p->name->definition->left, call_depth + 1);
                 if (score >= 2)
                     return score;
                 break;
@@ -667,7 +667,11 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~-~M} while (0);~N");
+    write_block_end(g);
+    if (str_back(g->outbuf) == '\n') {
+        str_pop(g->outbuf);
+    }
+    w(g, " while (0);~N");
     if (savevar) {
         str_delete(savevar);
     }
@@ -1124,6 +1128,7 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * varname = vars_newname(g);
     write_comment(g, p);
+    int extra_block = false;
     if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
@@ -1163,6 +1168,8 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             str_append_ch(g->failure_str, ';');
         }
     } else {
+        write_block_start(g);
+        extra_block = true;
         struct str * savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
         generate(g, p->left);
@@ -1192,6 +1199,9 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     write_str(g, g->failure_str);
     w(g, "~N"
       "~}");
+    if (extra_block) {
+        write_block_end(g);
+    }
     str_delete(varname);
 }
 
@@ -1342,7 +1352,6 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -1686,6 +1695,12 @@ void write_start_comment(struct generator * g,
 }
 
 static void generate_head(struct generator * g) {
+    if (g->analyser->int_limits_used) {
+        w(g, "#include <limits.h>~N");
+    }
+    if (g->analyser->debug_used) {
+        w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
+    }
     w(g, "#include \"");
     if (g->options->runtime_path) {
         write_string(g, g->options->runtime_path);
@@ -1819,8 +1834,7 @@ static void generate_groupings(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
     g->outbuf = s;
 }
@@ -1904,9 +1918,6 @@ extern void generate_program_c(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
     write_start_comment(g, "/* ", " */");
-    if (g->analyser->int_limits_used) {
-        w(g, "#include <limits.h>~N");
-    }
     generate_head(g);
     generate_routine_headers(g);
     w(g, "#ifdef __cplusplus~N"
@@ -1960,6 +1971,8 @@ extern struct generator * create_generator(struct analyser * a, struct options *
 #ifndef DISABLE_PYTHON
     g->max_label = 0;
 #endif
+    g->java_import_arrays = false;
+    g->java_import_chararraysequence = false;
     return g;
 }
 

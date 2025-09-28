@@ -18,32 +18,31 @@ The output file consists of the stemmed words, one per line.
 -h displays this help`);
 }
 
-if (process.argv.length < 5)
-{
-    usage();
-}
-else
 {
     let input = '';
     let output = '';
     let encoding = 'utf8';
     let language = 'English';
-    let show_help = false;
-    // deno doesn't allow modifying process.argv so make a copy.
-    const argv = process.argv.slice(0);
+    let usage_error = false;
+    // Skip the first two entries of argv which are the interpreter
+    // and the script name.
+    //
+    // deno doesn't allow modifying process.argv so we need to make
+    // a copy here.
+    const argv = process.argv.slice(2);
     while (argv.length > 0)
     {
         const arg = argv.shift();
         switch (arg)
         {
         case "-h":
-            show_help = true;
-            argv.length = 0;
+            usage();
+            process.exit(0);
             break;
         case "-l":
             if (argv.length === 0)
             {
-                show_help = true;
+                usage_error = true;
                 break;
             }
             language = argv.shift();
@@ -51,7 +50,7 @@ else
         case "-i":
             if (argv.length === 0)
             {
-                show_help = true;
+                usage_error = true;
                 break;
             }
             input = argv.shift();
@@ -59,7 +58,7 @@ else
         case "-o":
             if (argv.length === 0)
             {
-                show_help = true;
+                usage_error = true;
                 break;
             }
             output = argv.shift();
@@ -67,36 +66,39 @@ else
         case "-c":
             if (argv.length === 0)
             {
-                show_help = true;
+                usage_error = true;
                 break;
             }
             encoding = argv.shift();
             break;
-        }
-    }
-    if (show_help)
-    {
-        usage();
-    }
-    else
-    {
-        const stemmer = await create(language);
-        let istream, ostream;
-        if (input !== '') {
-           istream = fs.createReadStream(input, encoding);
-        } else {
-           istream = process.stdin;
-           if (istream.setEncoding) istream.setEncoding(encoding);
-        }
-        if (output !== '') {
-            ostream = fs.createWriteStream(output, encoding);
-        } else {
-            ostream = process.stdout;
-            if (ostream.setEncoding) ostream.setEncoding(encoding);
+        default:
+            console.log('Unknown command line option: ' + arg + '\n');
+            usage_error = true;
         }
 
-        stemming(stemmer, istream, ostream);
+        if (usage_error)
+        {
+            usage();
+            process.exit(1);
+        }
     }
+
+    const stemmer = await create(language);
+    let istream, ostream;
+    if (input !== '') {
+       istream = fs.createReadStream(input, encoding);
+    } else {
+       istream = process.stdin;
+       if (istream.setEncoding) istream.setEncoding(encoding);
+    }
+    if (output !== '') {
+        ostream = fs.createWriteStream(output, encoding);
+    } else {
+        ostream = process.stdout;
+        if (ostream.setEncoding) ostream.setEncoding(encoding);
+    }
+
+    stemming(stemmer, istream, ostream);
 }
 
 // function stemming (stemmer : Stemmer, input : Stream, output : Stream) {

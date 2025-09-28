@@ -1,0 +1,6 @@
+groupings (g1 g2 g3)
+define g1
+define g2 'abc' -
+define g3
+externals (stem)
+define stem as ()

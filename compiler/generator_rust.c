@@ -26,16 +26,8 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    switch (p->type) {
-        case t_external:
-            break;
-        default: {
-            int ch = "SbirxG"[p->type];
-            write_char(g, ch);
-            write_char(g, '_');
-            break;
-        }
-    }
+    write_char(g, "SbirrG"[p->type]);
+    write_char(g, '_');
     write_s(g, p->s);
 }
 
@@ -214,6 +206,11 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 if (j < 0 || j > (int)(sizeof(g->I) / sizeof(g->I[0])))
                     goto invalid_escape2;
                 write_int(g, g->I[j]);
+                continue;
+            }
+            case 'E': {
+                // Write an external name.
+                write_s(g, p->name->s);
                 continue;
             }
             case 'V':
@@ -1014,7 +1011,6 @@ static void generate_setup_context(struct generator * g) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -1022,8 +1018,16 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_routine) {
         writef(g, "~Mfn ~W(env: &mut SnowballEnv, context: &mut Context) -> bool {~+~N", p);
     } else {
-        writef(g, "~Mpub fn ~W(env: &mut SnowballEnv) -> bool {~+~N", p);
+        writef(g, "~Mpub fn ~E(env: &mut SnowballEnv) -> bool {~+~N", p);
         generate_setup_context(g);
+        if (q->used != q->definition) {
+            // This external needs to be callable as a routine, so generate
+            // the actual code like a routine with an external which just
+            // forwards to that.
+            writef(g, "~Mreturn ~W(env, context);~N", p);
+            w(g, "~-~M}~N");
+            writef(g, "~Mfn ~W(env: &mut SnowballEnv, context: &mut Context) -> bool {~+~N", p);
+        }
     }
     if (q->amongvar_needed) w(g, "~Mlet mut among_var;~N");
 
@@ -1439,8 +1443,7 @@ static void generate_groupings(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
     g->outbuf = s;
 }

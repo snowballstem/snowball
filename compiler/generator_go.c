@@ -27,21 +27,8 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    switch (p->type) {
-        case t_external: {
-            char save_initial = p->s[0];
-            p->s[0] = toupper(save_initial);
-            str_append_s(g->outbuf, p->s);
-            p->s[0] = save_initial;
-            return;
-        }
-        default: {
-            int ch = "SbirxG"[p->type];
-            write_char(g, ch);
-            write_char(g, '_');
-            break;
-        }
-    }
+    write_char(g, "SbirrG"[p->type]);
+    write_char(g, '_');
     write_s(g, p->s);
 }
 
@@ -220,6 +207,14 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 if (j < 0 || j > (int)(sizeof(g->I) / sizeof(g->I[0])))
                     goto invalid_escape2;
                 write_int(g, g->I[j]);
+                continue;
+            }
+            case 'E': {
+                // Write an external name.
+                char save_initial = p->name->s[0];
+                p->name->s[0] = toupper(save_initial);
+                write_s(g, p->name->s);
+                p->name->s[0] = save_initial;
                 continue;
             }
             case 'V':
@@ -1021,7 +1016,6 @@ static void generate_setup_context(struct generator * g) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -1031,8 +1025,18 @@ static void generate_define(struct generator * g, struct node * p) {
         w(g, "~Mcontext := ctx.(*Context)~N");
         w(g, "~M_ = context~N");
     } else {
-        writef(g, "~Mfunc ~W(env *snowballRuntime.Env) bool {~+~N", p);
+        writef(g, "~Mfunc ~E(env *snowballRuntime.Env) bool {~+~N", p);
         generate_setup_context(g);
+        if (q->used != q->definition) {
+            // This external needs to be callable as a routine, so generate
+            // the actual code like a routine with an external which just
+            // forwards to that.
+            writef(g, "~Mreturn ~W(env, context)~N", p);
+            w(g, "~-~M}~N");
+            writef(g, "~Mfunc ~W(env *snowballRuntime.Env, ctx interface{}) bool {~+~N", p);
+            w(g, "~Mcontext := ctx.(*Context)~N");
+            w(g, "~M_ = context~N");
+        }
     }
     if (q->amongvar_needed) w(g, "~Mvar among_var int32~N");
 
@@ -1304,8 +1308,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
 static void generate_groupings(struct generator * g) {
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
 }
 
@@ -1345,10 +1348,6 @@ extern void generate_program_go(struct generator * g) {
     g->failure_str = str_new();
 
     write_start_comment(g, "//! ", NULL);
-    if (g->analyser->int_limits_used) {
-        /* std::usize is used in the code generated for usize::MAX and usize::MIN */
-        w(g, "use std::usize;~N~N");
-    }
     generate_class_begin(g);
 
     generate_amongs(g);

@@ -1,0 +1,14 @@
+strings ( x )
+
+externals ( stem )
+
+booleans ( b )
+
+groupings ( g )
+
+define stem as (
+    $ = 'xxx'
+    $stem = 1
+    $b = 1
+    $g = 1
+)

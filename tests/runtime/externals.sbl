@@ -1,0 +1,22 @@
+// Test calling externals within the program.
+
+externals (stem e1 e2)
+
+define stem as (
+  not e2 or fail='failed to call external e2'
+
+  test e1 or fail='external as among function failed'
+  $(len == 4) or fail='external as among function result wrong'
+  not e1 or fail='external as among function did not fail'
+
+  ='ok'
+)
+
+define e1 as (
+  [substring] among (
+    'ok' e2 ( <-'oops' )
+    'no' ( <-'nope' )
+  )
+)
+
+define e2 as atlimit

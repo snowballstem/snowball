@@ -1,0 +1,25 @@
+// Test minint and maxint work as expected.
+
+externals (stem)
+
+integers (x y)
+
+define stem as (
+  $(minint < 0) or fail='minint should be negative'
+  $(maxint > 0) or fail='maxint should be positive'
+
+  $(minint <= -32767) or fail='minint should be <= -32767'
+  $(maxint >= 32767) or fail='maxint should be >= 32767'
+
+  $(minint + maxint == 0) or $(minint + maxint == -1) or fail='minint+maxint should be 0 or -1'
+
+  $x = minint
+  $(x == minint) or fail='minint cannot be stored in a variable'
+  $y = x + 1
+  $(y - x == 1) or fail='Adding one to minint does not work'
+
+  $x = maxint
+  $(x == maxint) or fail='maxint cannot be stored in a variable'
+  $y = x - 1
+  $(x - y == 1) or fail='Subtracting one from maxint does not work'
+)

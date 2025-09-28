@@ -841,7 +841,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     if (keep_c) {
-        w(g, "~{~Mconst /** number */ c = base.cursor;~N");
+        w(g, "~{~Mconst /** number */ c = this.cursor;~N");
         if (p->mode == m_forward) {
             writef(g, "~Mthis.insert(c, this.limit, ", p);
         } else {
@@ -956,8 +956,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
-              "~Mlet /** !Object */ ~B0 = new ~P();~N", p);
-    writef(g, "~M~B0.copy_from(base);~N", p);
+              "~Mconst /** !Object */ ~B0 = new ~P();~N", p);
+    writef(g, "~M~B0.copy_from(this);~N", p);
 
     ++g->copy_from_count;
     str_assign(g->failure_str, "this.copy_from(");
@@ -1071,7 +1071,6 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 
 static void generate_define(struct generator * g, struct node * p) {
     struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
 
     write_newline(g);
     write_comment(g, p);
@@ -1411,8 +1410,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
 static void generate_groupings(struct generator * g) {
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
 }
 
@@ -1458,7 +1456,9 @@ extern void generate_program_js(struct generator * g) {
     write_start_comment(g, "// ", NULL);
 
     // We generate deno-lint-ignore which may not all be used.
-    w(g, "// deno-lint-ignore-file ban-unused-ignore~N~N");
+    // Expressions in conditionals may be constant.
+    // Empty blocks may be generated in some cases.
+    w(g, "// deno-lint-ignore-file ban-unused-ignore no-constant-condition no-empty~N~N");
 
     generate_amongs(g);
     generate_groupings(g);

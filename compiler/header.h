@@ -208,12 +208,12 @@ struct name {
     byte type;                  /* t_string etc */
     byte mode;                  /* for routines, externals (m_forward, etc) */
     byte referenced;
-    byte used_in_among;         /* Function used in among? */
     byte value_used;            /* (For variables) is its value ever used? */
     byte initialised;           /* (For variables) is it ever initialised? */
     byte used_in_definition;    /* (grouping) used in grouping definition? */
     byte amongvar_needed;       /* for routines, externals */
-    struct node * definition;   /* for routines, externals */
+    struct node * definition;   /* (routines/externals) c_define node */
+    int used_in_among;          /* (routines/externals) Count of uses in amongs */
     // Initialised to -1; set to -2 if reachable from an external.
     // Reachable names are then numbered 0, 1, 2, ... with separate numbering
     // per type.
@@ -257,6 +257,7 @@ struct among {
     struct node * substring;  /* i.e. substring ... among ( ... ) */
     struct node ** commands;  /* array with command_count entries */
     struct node * node;       /* pointer to the node for this among */
+    struct name * in_routine; /* pointer to name for routine this among is in */
 };
 
 struct grouping {
@@ -332,6 +333,7 @@ struct analyser {
     struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
     byte int_limits_used;     /* are maxint or minint used? */
+    byte debug_used;          /* is the '?' command used? */
 };
 
 enum analyser_modes {
@@ -380,6 +382,8 @@ struct generator {
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
     int temporary_used;  /* track if temporary variable used (Ada and Pascal) */
+    char java_import_arrays; /* need `import java.util.Arrays;` */
+    char java_import_chararraysequence; /* need `import org.tartarus.snowball.CharArraySequence;` */
 };
 
 /* Special values for failure_label in struct generator. */

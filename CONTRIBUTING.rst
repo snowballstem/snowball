@@ -223,6 +223,13 @@ Key problems to solve
   backends with special handling here which may be useful to look at
   include Javascript, Pascal and Python.
 
+* Although all the stemmers we currently ship define a single Snowball
+  `external` named `stem`, this should not be assumed.  Also externals
+  should be callable from Snowball code as well as externally (see
+  the Go and Rust generators for examples of how to handle this - if
+  an external is called from Snowball code then it is generated as a
+  routine, with a shim external which just tail calls to this routine).
+
 Don't hardcode algorithm names
 ------------------------------
 

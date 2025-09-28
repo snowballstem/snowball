@@ -315,16 +315,16 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "Z.L" : "Z.Lb"); break;
         case c_len:
-            w(g, "Length_Utf8 (Z)");
+            w(g, "Length_Utf8 (Z.P, Z.Len)");
             break;
         case c_size:
             w(g, "Z.Len");
             break;
         case c_lenof:
-            writef(g, "Length_Utf8 (Ada.Strings.Unbounded.To_String (~V))", p);
+            writef(g, "Length_Utf8 (~V, Z.L~W)", p);
             break;
         case c_sizeof:
-            writef(g, "Ada.Strings.Unbounded.Length (~V))", p);
+            writef(g, "Z.L~W", p);
             break;
         default:
             break;
@@ -412,7 +412,10 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~Mexit;~N~-~Mend loop;~N");
+    if (!g->unreachable) {
+        w(g, "~Mexit;~N");
+    }
+    w(g, "~-~Mend loop;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
@@ -796,17 +799,20 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V := Ada.Strings.Unbounded.To_Unbounded_String (Slice_To (Z));~N", p);
+    writef(g, "~MZ.L~W := Z.Ket - Z.Bra;~N", p);
+    writef(g, "~M~V (1 .. Z.L~W) := Z.P (Z.Bra + 1 .. Z.Ket);~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
     symbol * b = p->literalstring;
     if (b != NULL) {
         write_literal_string(g, b);
+        write_string(g, ", ");
+        write_int(g, SIZE(b));
     } else {
-        w(g, "Ada.Strings.Unbounded.To_String (");
         write_varref(g, p->name);
-        w(g, ")");
+        write_string(g, ", Z.L");
+        write_varname(g, p->name);
     }
 }
 
@@ -815,7 +821,7 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) w(g, "~MC := Z.C;~N");
-    writef(g, "~MInsert (Z, Z.C, Z.C, ", p);
+    writef(g, "~MInsert (Z, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
     if (keep_c) {
@@ -830,9 +836,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (keep_c) writef(g, "~MC := Z.C;~N", p);
     if (p->mode == m_forward) {
-        writef(g, "~MInsert (Z, Z.C, Z.L, ", p);
+        writef(g, "~MReplace (Z, Z.C, Z.L, ", p);
     } else {
-        writef(g, "~MInsert (Z, Z.Lb, Z.C, ", p);
+        writef(g, "~MReplace (Z, Z.Lb, Z.C, ", p);
     }
     generate_address(g, p);
     writef(g, ");~N", p);
@@ -946,34 +952,40 @@ static void generate_dollar(struct generator * g, struct node * p) {
         struct str * saved_output = g->outbuf;
         str_clear(g->failure_str);
         g->outbuf = g->failure_str;
-        writef(g, "~V := FCurrent; "
-                  "FCurrent := ~B0_Current; "
-                  "FCursor := ~B0_Cursor; "
-                  "FLimit := ~B0_Limit; "
-                  "FBkLimit := ~B0_BkLimit; "
-                  "FBra := ~B0_Bra; "
-                  "FKet := ~B0_Ket;", p);
+        writef(g, "~V := Z.P; "
+                  "Z.L~W := Z.Len; "
+                  "Z.C := ~B0_C; "
+                  "Z.Len := ~B0_Len; "
+                  "Z.L := ~B0_L; "
+                  "Z.Lb := ~B0_Lb; "
+                  "Z.Bra := ~B0_Bra; "
+                  "Z.Ket := ~B0_Ket; "
+                  "Z.P := ~B0_P;", p);
         g->failure_str = g->outbuf;
         g->outbuf = saved_output;
     }
 
-    write_declare(g, "~B0_Current : AnsiString", p);
-    write_declare(g, "~B0_Cursor : Integer", p);
-    write_declare(g, "~B0_Limit : Integer", p);
-    write_declare(g, "~B0_BkLimit : Integer", p);
-    write_declare(g, "~B0_Bra : Integer", p);
-    write_declare(g, "~B0_Ket : Integer", p);
+    write_declare(g, "~B0_C : Char_Index", p);
+    write_declare(g, "~B0_Len : Char_Index", p);
+    write_declare(g, "~B0_L : Char_Index", p);
+    write_declare(g, "~B0_Lb : Char_Index", p);
+    write_declare(g, "~B0_Bra : Char_Index", p);
+    write_declare(g, "~B0_Ket : Char_Index", p);
+    write_declare(g, "~B0_P : String (1 .. WORD_MAX_LENGTH)", p);
     writef(g, "~{"
-              "~M~B0_Current := FCurrent;~N"
-              "{ ~M~B0_Current := Copy(FCurrent, 1, FLimit); }~N"
-              "~M~B0_Cursor := FCursor;~N"
-              "~M~B0_Limit := FLimit;~N"
-              "~M~B0_BkLimit := FBkLimit;~N"
-              "~M~B0_Bra := FBra;~N"
-              "~M~B0_Ket := FKet;~N"
-              "~MFCurrent := ~V;~N"
-              "~MFCursor := 0;~N"
-              "~MFLimit := Length(current);~N", p);
+              "~M~B0_C := Z.C;~N"
+              "~M~B0_Len := Z.Len;~N"
+              "~M~B0_L := Z.L;~N"
+              "~M~B0_Lb := Z.Lb;~N"
+              "~M~B0_Bra := Z.Bra;~N"
+              "~M~B0_Ket := Z.Ket;~N"
+              "~M~B0_P := Z.P;~N"
+              "~MZ.P := ~V;~N"
+              "~MZ.Len := Z.L~W;~N"
+              "~MZ.C := 0;~N"
+              "~MZ.Bra := 0;~N"
+              "~MZ.Ket := 0;~N"
+              "~MZ.L := Z.Len;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
         write_margin(g);
@@ -1068,28 +1080,17 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    writef(g, "~MC := Eq_S~S0 (Z, Ada.Strings.Unbounded.To_String (~V));", p);
-    write_failure_if(g, "C = 0", p);
-    g->temporary_used = true;
+    write_failure_if(g, "not Eq_S~S0 (Z, ~V, Z.L~W)", p);
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_Backward";
-    writef(g, "~MC := Eq_S~S0 (Z, ~L);~N", p);
-    write_failure_if(g, "C = 0", p);
-    if (p->mode == m_forward) {
-        writef(g, "~MZ.C := Z.C + C;~N", p);
-    } else {
-        writef(g, "~MZ.C := Z.C - C;~N", p);
-    }
-    g->temporary_used = true;
+    g->I[0] = SIZE(p->literalstring);
+    write_failure_if(g, "not Eq_S~S0 (Z, ~L, ~I0)", p);
 }
 
 static void generate_define(struct generator * g, struct node * p) {
-    struct name * q = p->name;
-    if (q->type == t_routine && !q->used) return;
-
     write_newline(g);
     write_comment(g, p);
 
@@ -1478,21 +1479,10 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 }
 
 static void generate_method_decls(struct generator * g, enum name_types type) {
-    struct among * a = g->analyser->amongs;
-    int need_among_handler = 0;
-
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if ((enum name_types)q->type == type) {
             generate_method_decl(g, q);
         }
-    }
-
-    while (a != NULL && need_among_handler == 0) {
-        need_among_handler = (a->function_count > 0);
-        a = a->next;
-    }
-    if (need_among_handler) {
-        w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
     }
 }
 
@@ -1507,7 +1497,11 @@ static void generate_member_decls(struct generator * g) {
                 case t_string:
                     write_margin(g);
                     write_varname(g, q);
-                    w(g, " : Ada.Strings.Unbounded.Unbounded_String;~N");
+                    w(g, " : String (1 .. WORD_MAX_LENGTH);~N");
+                    write_margin(g);
+                    write_char(g, 'L');
+                    write_varname(g, q);
+                    w(g, " : Char_Index := 0;~N");
                     break;
                 case t_integer:
                     write_margin(g);
@@ -1690,8 +1684,7 @@ static void generate_groupings(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
     for (struct grouping * q = g->analyser->groupings; q; q = q->next) {
-        if (q->name->used)
-            generate_grouping_table(g, q);
+        generate_grouping_table(g, q);
     }
     g->outbuf = s;
 }
@@ -1716,6 +1709,17 @@ extern void generate_program_ada(struct generator * g) {
 
     generate_method_decls(g, t_routine);
 
+    int need_among_handler = false;
+    for (struct among * a = g->analyser->amongs; a; a = a->next) {
+        if (a->function_count > 0) {
+            need_among_handler = true;
+            break;
+        }
+    }
+    if (need_among_handler) {
+        w(g, "~N~Mprocedure Among_Handler (Context : in out Stemmer.Context_Type'Class; Operation : in Operation_Index; Result : out Boolean);~N");
+    }
+
     g->declarations = g->outbuf;
     g->outbuf = str_new();
 
@@ -1735,14 +1739,12 @@ extern void generate_program_ada(struct generator * g) {
 
     g->margin = 0;
     write_start_comment(g, "--  ", NULL);
-    if (g->analyser->name_count[t_string]) {
-        w(g, "private with Ada.Strings.Unbounded;~N");
-    }
     w(g, "package Stemmer.");
     w(g, g->options->package);
     w(g, " with SPARK_Mode is~N~+");
     w(g, "   type Context_Type is new Stemmer.Context_Type with private;~N");
-    w(g, "   procedure Stem (Z : in out Context_Type; Result : out Boolean);~N");
+    generate_method_decls(g, t_external);
+
     w(g, "private~N");
     generate_member_decls(g);
     w(g, "end Stemmer.");
