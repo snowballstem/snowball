@@ -586,6 +586,7 @@ package body Stemmer with SPARK_Mode is
    procedure Slice_Del (Context : in out Context_Type'Class) is
    begin
       Replace (Context, Context.Bra, Context.Ket, "", 0);
+      Context.Ket := Context.Bra;
    end Slice_Del;
 
    procedure Slice_From (Context : in out Context_Type'Class;
@@ -593,6 +594,7 @@ package body Stemmer with SPARK_Mode is
                          Len     : in Char_Index) is
    begin
       Replace (Context, Context.Bra, Context.Ket, Text, Len);
+      Context.Ket := Context.Bra + Len;
    end Slice_From;
 
    procedure Insert (Context : in out Context_Type'Class;

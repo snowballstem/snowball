@@ -667,7 +667,11 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~-~M} while (0);~N");
+    write_block_end(g);
+    if (str_back(g->outbuf) == '\n') {
+        str_pop(g->outbuf);
+    }
+    w(g, " while (0);~N");
     if (savevar) {
         str_delete(savevar);
     }

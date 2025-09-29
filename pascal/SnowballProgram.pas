@@ -488,6 +488,7 @@ Procedure TSnowballProgram.SliceFrom(s : AnsiString);
 Begin
     SliceCheck();
     ReplaceS(FBra, FKet, s);
+    FKet := FBra + Length(s);
 End;
 
 Function TSnowballProgram.AssignTo() : AnsiString;

@@ -95,6 +95,7 @@ func (env *Env) EqSB(s string) bool {
 func (env *Env) SliceFrom(s string) {
 	bra, ket := env.Bra, env.Ket
 	env.ReplaceS(bra, ket, s)
+	env.Ket = bra + len(s)
 }
 
 func (env *Env) NextChar() {

@@ -417,7 +417,9 @@ static int slice_check(struct SN_env * z) {
 
 extern int slice_from_s(struct SN_env * z, int s_size, const symbol * s) {
     if (slice_check(z)) return -1;
-    return replace_s(z, z->bra, z->ket, s_size, s, NULL);
+    if (replace_s(z, z->bra, z->ket, s_size, s, NULL) < 0) return -1;
+    z->ket = z->bra + s_size;
+    return 0;
 }
 
 extern int slice_from_v(struct SN_env * z, const symbol * p) {

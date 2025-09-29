@@ -96,6 +96,7 @@ impl<'a> SnowballEnv<'a> {
     pub fn slice_from(&mut self, s: &str) {
         let (bra, ket) = (self.bra, self.ket);
         self.replace_s(bra, ket, s);
+        self.ket = bra + s.len() as i32;
     }
 
     /// Move cursor to next character

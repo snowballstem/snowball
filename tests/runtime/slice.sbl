@@ -1,0 +1,23 @@
+// Test slice-related operations.
+
+externals (stem)
+
+strings (s)
+
+stringescapes {}
+
+define stem as (
+  test ([ tolimit ] <-'abcd') $(size == 4) or fail='<- replacement did not work as expected'
+  test ([ tolimit ] <-'ok') $(size == 2) or fail='<- replacement did not work as expected (2)'
+
+  test ([ tolimit ] <-'abcd' $(cursor == 4)) or fail='<- replacement did not adjust cursor as expected'
+  test ([ tolimit ] <-'ok' $(cursor == 2)) or fail='<- replacement did not adjust cursor as expected (2)'
+
+  test ([ tolimit ]) <-'abcd' $(cursor == 0) or fail='<- replacement did not adjust cursor as expected (3)'
+  test ([ tolimit ]) <-'ok' $(cursor == 0) or fail='<- replacement did not adjust cursor as expected (4)'
+
+  test ([ next ] delete <-'boo') test ('book' atlimit) or fail='delete did not adjust slice as expected'
+  test ([ next ] <-'ch' <-'outl') test ('outlook' atlimit) or fail='<- did not adjust slice as expected'
+
+  ='ok'
+)

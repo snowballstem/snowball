@@ -619,6 +619,7 @@ namespace Snowball
         {
             slice_check();
             replace_s(bra, ket, s);
+            ket = bra + s.Length;
         }
 
         /// <summary>
