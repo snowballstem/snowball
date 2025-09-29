@@ -70,6 +70,10 @@ jobs:
         - name: PHP
           PHP: php
           apt_packages: 'php'
+        - name: PHP_8.1
+          os: 'ubuntu-22.04'
+          PHP: php
+          apt_packages: 'php'
         - name: Python 3.8
           PYTHON_VERSION: 3.8
           os: 'ubuntu-22.04'
