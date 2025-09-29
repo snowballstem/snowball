@@ -931,17 +931,15 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~Mfinal SnowballProgram ~B0 = SnowballProgram.from(this);~N", p);
 
     ++g->copy_from_count;
-    str_assign(g->failure_str, "copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
+
     writef(g, "~Mcurrent = ~V;~N"
               "~Mcursor = 0;~N"
               "~Mlimit = current.length;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+        g->B[0] = str_data(savevar);
+        writef(g, "~M~V = current;~N"
+                  "~Mcopy_from(~B0);~N", p);
     }
     w(g, "~}");
     str_delete(savevar);
