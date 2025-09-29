@@ -311,6 +311,7 @@ class SnowballProgram {
   void slice_from(String s) {
     slice_check();
     replace_s(bra, ket, s);
+    ket = bra + s.length;
   }
 
   void slice_del() {
