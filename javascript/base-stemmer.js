@@ -210,7 +210,7 @@ class BaseStemmer {
     {
         /** @protected */
         if (this.limit - this.cursor < s.length) return false;
-        if (this.current.slice(this.cursor, this.cursor + s.length) !== s)
+        if (!this.current.startsWith(s, this.cursor))
         {
             return false;
         }
@@ -226,7 +226,7 @@ class BaseStemmer {
     {
         /** @protected */
         if (this.cursor - this.limit_backward < s.length) return false;
-        if (this.current.slice(this.cursor - s.length, this.cursor) !== s)
+        if (!this.current.endsWith(s, this.cursor))
         {
             return false;
         }
