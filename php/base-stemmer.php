@@ -407,6 +407,7 @@ abstract class SnowballStemmer {
     protected function slice_from(string $s): void {
         $this->slice_check();
         $this->replace_s($this->bra, $this->ket, $s);
+        $this->ket = $this->bra + strlen($s);
     }
 
 
