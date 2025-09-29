@@ -69,19 +69,19 @@ jobs:
           apt_packages: 'fpc'
         - name: PHP
           PHP: php
-          apt_packages: 'php'
+          apt_packages: 'php php-mbstring'
         - name: PHP_8.1
           os: 'ubuntu-22.04'
           PHP: php
-          apt_packages: 'php'
+          apt_packages: 'php php-mbstring'
         - name: PHP_8.0
           os: 'ubuntu-22.04'
           PHP: php
-          apt_packages: 'php8.0-cli'
+          apt_packages: 'php8.0-cli php8.0-mbstring'
         - name: PHP_7.4
           os: 'ubuntu-22.04'
           PHP: php
-          apt_packages: 'php7.4-cli'
+          apt_packages: 'php7.4-cli php7.4-mbstring'
         - name: Python 3.8
           PYTHON_VERSION: 3.8
           os: 'ubuntu-22.04'
