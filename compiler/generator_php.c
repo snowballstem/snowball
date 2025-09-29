@@ -1265,7 +1265,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    w(g, "~Mprivate const array A_~I0 = [~N~+");
+    w(g, "~Mprivate const A_~I0 = [~N~+");
 
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
@@ -1303,7 +1303,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~Mprivate const array ");
+    w(g, "~Mprivate const ");
     write_varname(g, q->name);
     write_string(g, " = [");
     for (int i = 0; i < size; i++) {
