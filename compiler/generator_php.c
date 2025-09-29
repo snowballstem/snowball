@@ -1291,28 +1291,18 @@ static void generate_amongs(struct generator * g) {
     }
 }
 
-static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
-
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
-    int range = q->largest_ch - q->smallest_ch + 1;
-    int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
-    symbol * map = create_b(size);
-
-    for (int i = 0; i < size; i++) map[i] = 0;
-
-    for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
     w(g, "~Mprivate const ");
     write_varname(g, q->name);
     write_string(g, " = [");
-    for (int i = 0; i < size; i++) {
-        write_int(g, map[i]);
-        if (i < size - 1) w(g, ", ");
+    for (int i = 0; i < SIZE(b); i++) {
+        if (i > 0) w(g, ", ");
+        write_int(g, b[i]);
+        w(g, "=>true");
     }
     w(g, "];~N~N");
-
-    lose_b(map);
 }
 
 static void generate_groupings(struct generator * g) {

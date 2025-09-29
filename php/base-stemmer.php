@@ -52,11 +52,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch = $this->currentCharCodeAt($this->cursor);
-        if ($ch > $max || $ch < $min) {
-            return false;
-        }
-        $o = $ch - $min;
-        if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+        if (!array_key_exists($ch, $s)) {
             return false;
         }
         $this->cursor += self::utf8_width($ch);
@@ -70,11 +66,7 @@ abstract class SnowballStemmer {
     protected function go_in_grouping(array $s, int $min, int $max): bool {
         while ( $this->cursor < $this->limit) {
             $ch = $this->currentCharCodeAt($this->cursor);
-            if ($ch > $max || $ch < $min) {
-                return true;
-            }
-            $o = $ch - $min;
-            if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+            if (!array_key_exists($ch, $s)) {
                 return true;
             }
             $this->cursor += self::utf8_width($ch);
@@ -92,11 +84,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch = $this->currentCharCodeBefore($this->cursor);
-        if ($ch > $max || $ch < $min) {
-            return false;
-        }
-        $o = $ch - $min;
-        if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+        if (!array_key_exists($ch, $s)) {
             return false;
         }
         $this->cursor -= self::utf8_width($ch);
@@ -110,11 +98,7 @@ abstract class SnowballStemmer {
     protected function go_in_grouping_b(array $s, int $min, int $max): bool {
         while ( $this->cursor > $this->limit_backward) {
             $ch = $this->currentCharCodeBefore($this->cursor);
-            if ($ch > $max || $ch < $min) {
-                return true;
-            }
-            $o = $ch - $min;
-            if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+            if (!array_key_exists($ch, $s)) {
                 return true;
             }
             $this->cursor -= self::utf8_width($ch);
@@ -131,12 +115,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch = $this->currentCharCodeAt($this->cursor);
-        if ($ch > $max || $ch < $min) {
-            $this->cursor += self::utf8_width($ch);
-            return true;
-        }
-        $o = $ch - $min;
-        if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+        if (!array_key_exists($ch, $s)) {
             $this->cursor += self::utf8_width($ch);
             return true;
         }
@@ -150,11 +129,8 @@ abstract class SnowballStemmer {
     protected function go_out_grouping ( array $s, int $min, int $max): bool {
         while ( $this->cursor < $this->limit) {
             $ch = $this->currentCharCodeAt($this->cursor);
-            if ($ch <= $max && $ch >= $min) {
-                $o = $ch - $min;
-                if (($s[$o >> 3] & (0x1 << ($o & 0x7))) !== 0) {
-                    return true;
-                }
+            if (array_key_exists($ch, $s)) {
+                return true;
             }
             $this->cursor += self::utf8_width($ch);
         }
@@ -170,12 +146,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch = $this->currentCharCodeBefore($this->cursor);
-        if ($ch > $max || $ch < $min) {
-            $this->cursor -= self::utf8_width($ch);
-            return true;
-        }
-        $o = $ch - $min;
-        if (($s[$o >> 3] & (0x1 << ($o & 0x7))) === 0) {
+        if (!array_key_exists($ch, $s)) {
             $this->cursor -= self::utf8_width($ch);
             return true;
         }
@@ -189,11 +160,8 @@ abstract class SnowballStemmer {
     protected function go_out_grouping_b ( array $s, int $min, int $max): bool {
         while ( $this->cursor > $this->limit_backward) {
             $ch = $this->currentCharCodeBefore($this->cursor);
-            if ($ch <= $max && $ch >= $min) {
-                $o = $ch - $min;
-                if (($s[$o >> 3] & (0x1 << ($o & 0x7))) !== 0) {
-                    return true;
-                }
+            if (array_key_exists($ch, $s)) {
+                return true;
             }
             $this->cursor -= self::utf8_width($ch);
         }
