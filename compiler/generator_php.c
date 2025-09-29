@@ -26,7 +26,7 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    int ch = "SBIrxg"[p->type];
+    int ch = "SBIrxG"[p->type];
     if (p->type != t_external) {
         write_char(g, ch);
         write_char(g, '_');
@@ -35,7 +35,11 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-    write_string(g,"$this->");
+    if (p->type == t_grouping) {
+        write_string(g,"self::");
+    } else {
+        write_string(g,"$this->");
+    }
     write_varname(g, p);
 }
 
@@ -1080,19 +1084,19 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->amongvar_needed) {
-        writef(g, "~M$among_var = $this->find_among~S0($this->a_~I0);~N", p);
+        writef(g, "~M$among_var = $this->find_among~S0(self::A_~I0);~N", p);
         if (!x->always_matches) {
             write_failure_if(g, "0 === $among_var", p);
         }
     } else if (x->always_matches) {
-        writef(g, "~M$this->find_among~S0($this->a_~I0);~N", p);
+        writef(g, "~M$this->find_among~S0(self::A_~I0);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn $this->find_among~S0($this->a_~I0) != 0;~N", p);
+        writef(g, "~Mreturn $this->find_among~S0(self::A_~I0) != 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "$this->find_among~S0($this->a_~I0) === 0", p);
+        write_failure_if(g, "$this->find_among~S0(self::A_~I0) === 0", p);
     }
 }
 
@@ -1261,7 +1265,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     struct amongvec * v = x->b;
 
     g->I[0] = x->number;
-    w(g, "~Mprivate array $a_~I0 = [~N~+");
+    w(g, "~Mprivate const array A_~I0 = [~N~+");
 
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[0] = v[i].i;
@@ -1299,7 +1303,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~Mprivate array $");
+    w(g, "~Mprivate const array ");
     write_varname(g, q->name);
     write_string(g, " = [");
     for (int i = 0; i < size; i++) {
