@@ -64,7 +64,7 @@ abstract class SnowballStemmer {
      * @param int[] $s
      */
     protected function go_in_grouping(array $s, int $min, int $max): bool {
-        while ( $this->cursor < $this->limit) {
+        while ($this->cursor < $this->limit) {
             $ch = $this->currentCharCodeAt($this->cursor);
             if (!array_key_exists($ch, $s)) {
                 return true;
@@ -96,7 +96,7 @@ abstract class SnowballStemmer {
      * @param int[] $s
      */
     protected function go_in_grouping_b(array $s, int $min, int $max): bool {
-        while ( $this->cursor > $this->limit_backward) {
+        while ($this->cursor > $this->limit_backward) {
             $ch = $this->currentCharCodeBefore($this->cursor);
             if (!array_key_exists($ch, $s)) {
                 return true;
@@ -126,8 +126,8 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_out_grouping ( array $s, int $min, int $max): bool {
-        while ( $this->cursor < $this->limit) {
+    protected function go_out_grouping(array $s, int $min, int $max): bool {
+        while ($this->cursor < $this->limit) {
             $ch = $this->currentCharCodeAt($this->cursor);
             if (array_key_exists($ch, $s)) {
                 return true;
@@ -157,8 +157,8 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_out_grouping_b ( array $s, int $min, int $max): bool {
-        while ( $this->cursor > $this->limit_backward) {
+    protected function go_out_grouping_b(array $s, int $min, int $max): bool {
+        while ($this->cursor > $this->limit_backward) {
             $ch = $this->currentCharCodeBefore($this->cursor);
             if (array_key_exists($ch, $s)) {
                 return true;
@@ -211,7 +211,7 @@ abstract class SnowballStemmer {
         $first_key_inspected = false;
 
         while (true) {
-            $k = $i + ( ($j-$i) >> 1);
+            $k = $i + (($j-$i) >> 1);
             $diff = 0;
             $common = min($common_i, $common_j); // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
