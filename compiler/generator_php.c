@@ -61,6 +61,19 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_char(g, '"');
 }
 
+static void write_literal_char(struct generator * g, int ch) {
+    write_char(g, '"');
+    if (32 <= ch && ch < 127) {
+        if (ch == '\"' || ch == '\\') write_string(g, "\\");
+        write_char(g, ch);
+    } else {
+        write_string(g, "\\u{");
+        write_hex4(g, ch);
+        write_string(g, "}");
+    }
+    write_char(g, '"');
+}
+
 static void write_margin(struct generator * g) {
     for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
@@ -540,9 +553,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "!$this->go_~S1_grouping~S0(~V, ~I0, ~I1)", p);
+    write_failure_if(g, "!$this->go_~S1_grouping~S0(~V)", p);
     if (!is_goto) {
         if (p->mode == m_forward)
             w(g, "~M$this->inc_cursor();~N");
@@ -1013,9 +1024,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
-    g->I[0] = q->smallest_ch;
-    g->I[1] = q->largest_ch;
-    write_failure_if(g, "!($this->~S1_grouping~S0(~V, ~I0, ~I1))", p);
+    write_failure_if(g, "!($this->~S1_grouping~S0(~V))", p);
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
@@ -1307,7 +1316,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     write_string(g, " = [");
     for (int i = 0; i < SIZE(b); i++) {
         if (i > 0) w(g, ", ");
-        write_int(g, b[i]);
+        write_literal_char(g, b[i]);
         w(g, "=>true");
     }
     w(g, "];~N~N");

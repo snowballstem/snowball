@@ -25,15 +25,15 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function in_grouping(array $s, int $min, int $max): bool {
+    protected function in_grouping(array $s): bool {
         if ($this->cursor >= $this->limit) {
             return false;
         }
-        $ch = $this->charCodeAt();
+        $ch = $this->charAt();
         if (!array_key_exists($ch, $s)) {
             return false;
         }
-        $this->cursor += self::utf8_width($ch);
+        $this->cursor += strlen($ch);
         return true;
     }
 
@@ -41,13 +41,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_in_grouping(array $s, int $min, int $max): bool {
+    protected function go_in_grouping(array $s): bool {
         while ($this->cursor < $this->limit) {
-            $ch = $this->charCodeAt();
+            $ch = $this->charAt();
             if (!array_key_exists($ch, $s)) {
                 return true;
             }
-            $this->cursor += self::utf8_width($ch);
+            $this->cursor += strlen($ch);
         }
         return false;
     }
@@ -57,15 +57,15 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function in_grouping_b(array $s, int $min, int $max): bool {
+    protected function in_grouping_b(array $s): bool {
         if ($this->cursor <= $this->limit_backward) {
             return false;
         }
-        $ch = $this->charCodeBefore();
+        $ch = $this->charBefore();
         if (!array_key_exists($ch, $s)) {
             return false;
         }
-        $this->cursor -= self::utf8_width($ch);
+        $this->cursor -= strlen($ch);
         return true;
     }
 
@@ -73,13 +73,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_in_grouping_b(array $s, int $min, int $max): bool {
+    protected function go_in_grouping_b(array $s): bool {
         while ($this->cursor > $this->limit_backward) {
-            $ch = $this->charCodeBefore();
+            $ch = $this->charBefore();
             if (!array_key_exists($ch, $s)) {
                 return true;
             }
-            $this->cursor -= self::utf8_width($ch);
+            $this->cursor -= strlen($ch);
         }
         return false;
     }
@@ -88,13 +88,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function out_grouping(array $s, int $min, int $max): bool {
+    protected function out_grouping(array $s): bool {
         if ($this->cursor >= $this->limit) {
             return false;
         }
-        $ch = $this->charCodeAt();
+        $ch = $this->charAt();
         if (!array_key_exists($ch, $s)) {
-            $this->cursor += self::utf8_width($ch);
+            $this->cursor += strlen($ch);
             return true;
         }
         return false;
@@ -104,13 +104,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_out_grouping(array $s, int $min, int $max): bool {
+    protected function go_out_grouping(array $s): bool {
         while ($this->cursor < $this->limit) {
-            $ch = $this->charCodeAt();
+            $ch = $this->charAt();
             if (array_key_exists($ch, $s)) {
                 return true;
             }
-            $this->cursor += self::utf8_width($ch);
+            $this->cursor += strlen($ch);
         }
         return false;
     }
@@ -119,13 +119,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function out_grouping_b(array $s, int $min, int $max): bool {
+    protected function out_grouping_b(array $s): bool {
         if ($this->cursor <= $this->limit_backward) {
             return false;
         }
-        $ch = $this->charCodeBefore();
+        $ch = $this->charBefore();
         if (!array_key_exists($ch, $s)) {
-            $this->cursor -= self::utf8_width($ch);
+            $this->cursor -= strlen($ch);
             return true;
         }
         return false;
@@ -135,13 +135,13 @@ abstract class SnowballStemmer {
     /**
      * @param int[] $s
      */
-    protected function go_out_grouping_b(array $s, int $min, int $max): bool {
+    protected function go_out_grouping_b(array $s): bool {
         while ($this->cursor > $this->limit_backward) {
-            $ch = $this->charCodeBefore();
+            $ch = $this->charBefore();
             if (array_key_exists($ch, $s)) {
                 return true;
             }
-            $this->cursor -= self::utf8_width($ch);
+            $this->cursor -= strlen($ch);
         }
         return false;
     }
@@ -374,25 +374,21 @@ abstract class SnowballStemmer {
         return substr($this->current, $this->bra, $this->ket - $this->bra);
     }
 
-    private function charCodeAt(): int {
-        $s = substr($this->current, $this->cursor, 4);
+    private function charAt(): string {
+        $s = $this->current[$this->cursor];
         $c = ord($s);
-        return $c < 0x80 ? $c : mb_ord($s, 'UTF-8');
+        if ($c < 0xc0) return $s;
+        if ($c < 0xe0) return substr($this->current, $this->cursor, 2);
+        if ($c < 0xf0) return substr($this->current, $this->cursor, 3);
+        return substr($this->current, $this->cursor, 4);
     }
 
-    private function charCodeBefore(): int {
-        $c = ord(substr($this->current, $this->cursor - 1));
-        if ($c < 0x80) return $c;
+    private function charBefore(): string {
+        $s = $this->current[$this->cursor - 1];
+        if (ord($s) < 0x80) return $s;
         $o = $this->cursor - 1;
-        while (--$o && ord(substr($this->current, $o)) < 0xc0) { }
-        return mb_ord(substr($this->current, $o, $this->cursor - $o), 'UTF-8');
-    }
-
-    private static function utf8_width(int $ch): int {
-        if ($ch < 0x80) return 1;
-        if ($ch < 0x800) return 2;
-        if ($ch < 0x10000) return 3;
-        return 4;
+        while (--$o && ord($this->current[$o]) < 0xc0) { }
+        return substr($this->current, $o, $this->cursor - $o);
     }
 
     protected function inc_cursor(): void {
