@@ -40,7 +40,7 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    write_string(g, "\"");
+    write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
@@ -51,7 +51,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_hex4(g, ch);
         }
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
@@ -536,7 +536,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     int golab = new_label(g);
     g->I[0] = golab;
-    w(g, "~Mgolab~I0: while(true)~N");
+    w(g, "~Mgolab~I0: while (true)~N");
     w(g, "~{");
 
     struct str * savevar = NULL;
@@ -595,7 +595,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-    writef(g, "~Mwhile(true)~N~{", p);
+    writef(g, "~Mwhile (true)~N~{", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {

@@ -70,7 +70,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_literal_char(struct generator * g, symbol ch) {
-    write_string(g, "\"");
+    write_char(g, '"');
     if (32 <= ch && ch < 0x590 && ch != 127) {
         if (ch == '"' || ch == '\\') write_char(g, '\\');
         // Python uses ENC_WIDECHARS so we need to convert.
@@ -82,7 +82,7 @@ static void write_literal_char(struct generator * g, symbol ch) {
         write_string(g, "\\u");
         write_hex4(g, ch);
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {

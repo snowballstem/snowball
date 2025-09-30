@@ -38,7 +38,7 @@ static void write_varref(struct generator * g, struct name * p) {
 
 static void write_literal_string(struct generator * g, symbol * p) {
     int i = 0;
-    write_string(g, "\"");
+    write_char(g, '"');
     while (i < SIZE(p)) {
         int ch;
         i += get_utf8(p + i, &ch);
@@ -54,7 +54,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_string(g, "}");
         }
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
