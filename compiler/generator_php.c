@@ -768,10 +768,7 @@ static void generate_assignto(struct generator * g, struct node * p) {
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = $this->slice_to();~N"
-              "~Mif ('' === ~V){~N"
-              "~+~Mreturn false;~N~-"
-              "~M}~N", p);
+    writef(g, "~M~V = $this->slice_to();~N", p);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
