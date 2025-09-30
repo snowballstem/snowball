@@ -592,7 +592,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->I[0] = golab;
     // This label may end up unused, but we can't easily tell at this point.
     w(g, "~M// deno-lint-ignore no-unused-labels~N");
-    w(g, "~Mgolab~I0: while(true)~N");
+    w(g, "~Mgolab~I0: while (true)~N");
     w(g, "~{");
 
     struct str * savevar = NULL;
@@ -651,7 +651,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-    writef(g, "~Mwhile(true) {~N~+", p);
+    writef(g, "~Mwhile (true) {~N~+", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
