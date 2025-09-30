@@ -1,11 +1,4 @@
 <?php
-/**
- * Manually converted from JavaScript:
- * https://github.com/snowballstem/snowball/blob/master/javascript/base-stemmer.js
- * 
- * Build a stemmer from Snowball, as follows:
- * ~$ ./snowball algorithms/english.sbl -php -o php/english-stemmer
- */
 abstract class SnowballStemmer {
 
     protected string $current = '';
@@ -19,21 +12,6 @@ abstract class SnowballStemmer {
     abstract public function stem(): bool;
 
     
-    protected function setCurrent(string $value): void {
-        $this->current = $value;
-        $this->cursor = 0;
-        $this->limit = strlen($value);
-        $this->limit_backward = 0;
-        $this->bra = $this->cursor;
-        $this->ket = $this->limit;
-    }
-
-
-    protected function getCurrent(): string {
-        return $this->current;
-    }
-
-
     protected function copyFrom(self $other): void {
         $this->current          = $other->current;
         $this->cursor           = $other->cursor;
@@ -51,7 +29,7 @@ abstract class SnowballStemmer {
         if ($this->cursor >= $this->limit) {
             return false;
         }
-        $ch = $this->currentCharCodeAt($this->cursor);
+        $ch = $this->charCodeAt();
         if (!array_key_exists($ch, $s)) {
             return false;
         }
@@ -65,7 +43,7 @@ abstract class SnowballStemmer {
      */
     protected function go_in_grouping(array $s, int $min, int $max): bool {
         while ($this->cursor < $this->limit) {
-            $ch = $this->currentCharCodeAt($this->cursor);
+            $ch = $this->charCodeAt();
             if (!array_key_exists($ch, $s)) {
                 return true;
             }
@@ -83,7 +61,7 @@ abstract class SnowballStemmer {
         if ($this->cursor <= $this->limit_backward) {
             return false;
         }
-        $ch = $this->currentCharCodeBefore($this->cursor);
+        $ch = $this->charCodeBefore();
         if (!array_key_exists($ch, $s)) {
             return false;
         }
@@ -97,7 +75,7 @@ abstract class SnowballStemmer {
      */
     protected function go_in_grouping_b(array $s, int $min, int $max): bool {
         while ($this->cursor > $this->limit_backward) {
-            $ch = $this->currentCharCodeBefore($this->cursor);
+            $ch = $this->charCodeBefore();
             if (!array_key_exists($ch, $s)) {
                 return true;
             }
@@ -114,7 +92,7 @@ abstract class SnowballStemmer {
         if ($this->cursor >= $this->limit) {
             return false;
         }
-        $ch = $this->currentCharCodeAt($this->cursor);
+        $ch = $this->charCodeAt();
         if (!array_key_exists($ch, $s)) {
             $this->cursor += self::utf8_width($ch);
             return true;
@@ -128,7 +106,7 @@ abstract class SnowballStemmer {
      */
     protected function go_out_grouping(array $s, int $min, int $max): bool {
         while ($this->cursor < $this->limit) {
-            $ch = $this->currentCharCodeAt($this->cursor);
+            $ch = $this->charCodeAt();
             if (array_key_exists($ch, $s)) {
                 return true;
             }
@@ -145,7 +123,7 @@ abstract class SnowballStemmer {
         if ($this->cursor <= $this->limit_backward) {
             return false;
         }
-        $ch = $this->currentCharCodeBefore($this->cursor);
+        $ch = $this->charCodeBefore();
         if (!array_key_exists($ch, $s)) {
             $this->cursor -= self::utf8_width($ch);
             return true;
@@ -159,7 +137,7 @@ abstract class SnowballStemmer {
      */
     protected function go_out_grouping_b(array $s, int $min, int $max): bool {
         while ($this->cursor > $this->limit_backward) {
-            $ch = $this->currentCharCodeBefore($this->cursor);
+            $ch = $this->charCodeBefore();
             if (array_key_exists($ch, $s)) {
                 return true;
             }
@@ -222,7 +200,7 @@ abstract class SnowballStemmer {
                     $diff = -1;
                     break;
                 }
-                $diff = ord(substr($this->current, $c+$common, 1)) - ord(substr($w[0], $i2, 1));
+                $diff = strcmp($this->current[$c+$common], $w[0][$i2]);
                 if ($diff !== 0) {
                     break;
                 }
@@ -302,7 +280,7 @@ abstract class SnowballStemmer {
                     $diff = -1;
                     break;
                 }
-                $diff = ord(substr($this->current, $c - 1 - $common, 1)) - ord(substr($w[0], $i2, 1));
+                $diff = strcmp($this->current[$c - 1 - $common], $w[0][$i2]);
                 if ($diff != 0) {
                     break;
                 }
@@ -396,39 +374,18 @@ abstract class SnowballStemmer {
         return substr($this->current, $this->bra, $this->ket - $this->bra);
     }
 
-
-    
-    // Getters named similarly to JavaScript method.
-
-    
-    private function currentCharCodeAt(int $offset): int {
-        return self::charCodeAt($this->current, $offset);
-    }
-    
-    private function currentCharCodeBefore(int $offset): int {
-        return self::charCodeBefore($this->current, $offset);
-    }
-    
-    // Everything above here was "translated" blindly from JavaScript.
-    // Below are some utilities to ensure PHP behaviour matches JavaScript for string manipulation etc...
-
-
-    /**
-     * As per String.prototype.charCodeAt
-     * @throws RangeException
-     */
-    private static function charCodeAt(string $s, int $offset): int {
-        $s = substr($s, $offset, 4);
+    private function charCodeAt(): int {
+        $s = substr($this->current, $this->cursor, 4);
         $c = ord($s);
         return $c < 0x80 ? $c : mb_ord($s, 'UTF-8');
     }
 
-    private static function charCodeBefore(string $s, int $offset): int {
-        $c = ord(substr($s, $offset - 1));
+    private function charCodeBefore(): int {
+        $c = ord(substr($this->current, $this->cursor - 1));
         if ($c < 0x80) return $c;
-        $o = $offset - 1;
-        while (--$o && ord(substr($s, $o)) < 0xc0) { }
-        return mb_ord(substr($s, $o, $offset - $o), 'UTF-8');
+        $o = $this->cursor - 1;
+        while (--$o && ord(substr($this->current, $o)) < 0xc0) { }
+        return mb_ord(substr($this->current, $o, $this->cursor - $o), 'UTF-8');
     }
 
     private static function utf8_width(int $ch): int {
@@ -438,15 +395,15 @@ abstract class SnowballStemmer {
         return 4;
     }
 
-    public function inc_cursor(): void {
-        do ++$this->cursor; while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+    protected function inc_cursor(): void {
+        do ++$this->cursor; while ($this->cursor < $this->limit && (ord($this->current[$this->cursor]) & 0xc0) == 0x80);
     }
 
-    public function dec_cursor(): void {
-        do --$this->cursor; while ((ord(substr($this->current, $this->cursor, 1)) & 0xc0) == 0x80);
+    protected function dec_cursor(): void {
+        do --$this->cursor; while ($this->cursor > $this->limit_backward && (ord($this->current[$this->cursor]) & 0xc0) == 0x80);
     }
 
-    public function hop(int $delta): bool {
+    protected function hop(int $delta): bool {
         $res = $this->cursor;
         while ($delta > 0) {
             $delta--;
@@ -455,17 +412,17 @@ abstract class SnowballStemmer {
             }
             do {
                 $res++;
-            } while ($res < $this->limit && (ord(substr($this->current, $res, 1)) & 0xc0) == 0x80);
+            } while ($res < $this->limit && (ord($this->current[$res]) & 0xc0) == 0x80);
         }
         $this->cursor = $res;
         return true;
     }
 
-    public function hop_checked(int $delta): bool {
+    protected function hop_checked(int $delta): bool {
         return $delta >= 0 && $this->hop($delta);
     }
 
-    public function hop_back(int $delta): bool {
+    protected function hop_back(int $delta): bool {
         $res = $this->cursor;
         while ($delta > 0) {
             $delta--;
@@ -474,13 +431,13 @@ abstract class SnowballStemmer {
             }
             do {
                 $res--;
-            } while ($res > $this->limit_backward && (ord(substr($this->current, $res, 1)) & 0xc0) == 0x80);
+            } while ($res > $this->limit_backward && (ord($this->current[$res]) & 0xc0) == 0x80);
         }
         $this->cursor = $res;
         return true;
     }
 
-    public function hop_back_checked(int $delta): bool {
+    protected function hop_back_checked(int $delta): bool {
         return $delta >= 0 && $this->hop_back($delta);
     }
 
@@ -488,8 +445,13 @@ abstract class SnowballStemmer {
      * Public entry point for stemming a word
      */
     public function stemWord(string $word): string {
-        $this->setCurrent($word);
+        $this->current = $word;
+        $this->cursor = 0;
+        $this->limit = strlen($word);
+        $this->limit_backward = 0;
+        $this->bra = $this->cursor;
+        $this->ket = $this->limit;
         $this->stem();
-        return $this->getCurrent();
+        return $this->current;
     }
 }
