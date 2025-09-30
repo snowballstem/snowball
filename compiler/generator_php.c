@@ -782,33 +782,26 @@ static void generate_address(struct generator * g, struct node * p) {
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
-    int c_count;
+
     int keep_c = style == c_attach;
     write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) {
-        c_count = ++g->keep_count;
-        g->I[0] = c_count;
-        w(g, "~M$c~I0 = $this->cursor;~N");
+        w(g, "~M$c = $this->cursor;~N");
     }
     writef(g, "~M$this->insert($this->cursor, $this->cursor, ", p);
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) {
-        g->I[0] = c_count;
-        w(g, "~M$this->cursor = $c~I0;~N");
-    }
+    if (keep_c) w(g, "~M$this->cursor = $c;~N");
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-    int c_count;
+
     int keep_c = p->mode == m_forward; /* like 'attach' */
 
     write_comment(g, p);
     if (keep_c) {
-        c_count = ++g->keep_count;
-        g->I[0] = c_count;
-        w(g, "~M$c~I0 = $this->cursor;~N");
+        w(g, "~M$c = $this->cursor;~N");
     }
     if (p->mode == m_forward) {
         writef(g, "~M$this->insert($this->cursor, $this->limit, ", p);
@@ -817,10 +810,7 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
     generate_address(g, p);
     writef(g, ");~N", p);
-    if (keep_c) {
-        g->I[0] = c_count;
-        w(g, "~M$this->cursor = $c~I0;~N");
-    }
+    if (keep_c) w(g, "~M$this->cursor = $c;~N");
 }
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
