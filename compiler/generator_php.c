@@ -36,9 +36,9 @@ static void write_varname(struct generator * g, struct name * p) {
 
 static void write_varref(struct generator * g, struct name * p) {
     if (p->type == t_grouping) {
-        write_string(g,"self::");
+        write_string(g, "self::");
     } else {
-        write_string(g,"$this->");
+        write_string(g, "$this->");
     }
     write_varname(g, p);
 }
@@ -149,7 +149,7 @@ static void write_failure(struct generator * g) {
             break;
         default:
             write_string(g, "goto lab");
-            write_int(g, g->failure_label );
+            write_int(g, g->failure_label);
             write_string(g, ";");
             g->unreachable = true;
     }
@@ -450,7 +450,7 @@ static void generate_try(struct generator * g, struct node * p) {
 
     wsetlab_begin(g, g->failure_label);
     generate(g, p->left);
-    wsetlab_end(g,g->failure_label);
+    wsetlab_end(g, g->failure_label);
     g->unreachable = false;
 
     if (savevar) {
@@ -510,14 +510,14 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        writef(g, "~M~V();~N",p->left);
+        writef(g, "~M~V();~N", p->left);
     } else {
         g->failure_label = new_label(g);
         str_clear(g->failure_str);
 
         wsetlab_begin(g, g->failure_label);
         generate(g, p->left);
-        wsetlab_end(g,g->failure_label);
+        wsetlab_end(g, g->failure_label);
         g->unreachable = false;
     }
 
