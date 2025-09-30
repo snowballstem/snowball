@@ -42,7 +42,7 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    write_string(g, "\"");
+    write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
@@ -53,7 +53,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_hex4(g, ch);
         }
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
