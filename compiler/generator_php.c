@@ -764,7 +764,7 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = $this->assign_to();~N", p);
+    writef(g, "~M~V = substr($this->current, 0, $this->limit);~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {

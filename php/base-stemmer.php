@@ -397,11 +397,6 @@ abstract class SnowballStemmer {
     }
 
 
-    protected function assign_to(): string {
-        return substr($this->current, 0, $this->limit);
-    }
-    
-    
     
     // Getters named similarly to JavaScript method.
 
