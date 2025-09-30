@@ -699,7 +699,7 @@ static void generate_tomark(struct generator * g, struct node * p) {
 
 static void generate_atmark(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~Mif ($this->cursor != "); generate_AE(g, p->AE); writef(g, ") {~+~N", p);
+    w(g, "~Mif ($this->cursor !== "); generate_AE(g, p->AE); writef(g, ") {~+~N", p);
     write_failure(g);
     w(g, "~-~M}~N");
     g->unreachable = false;
@@ -1089,7 +1089,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else if (x->command_count == 0 &&
                g->failure_label == x_return &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn $this->find_among~S0(self::A_~I0) != 0;~N", p);
+        writef(g, "~Mreturn $this->find_among~S0(self::A_~I0) !== 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
