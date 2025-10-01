@@ -890,17 +890,26 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
+
+    {
+        struct str * saved_output = g->outbuf;
+        str_clear(g->failure_str);
+        g->outbuf = g->failure_str;
+        /* Update string variable; restore env. */
+        writef(g, "~V = env.current.clone().into_owned(); *env = ~B0;", p);
+        g->failure_str = g->outbuf;
+        g->outbuf = saved_output;
+    }
+
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Menv.set_current_s(~V.clone());~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len() as i32;~N", p);
     generate(g, p->left);
     if (!g->unreachable) {
-        g->B[0] = str_data(savevar);
-        /* Update string variable. */
-        writef(g, "~M~V = env.current.clone().into_owned();~N", p);
-        /* Reset env */
-        w(g, "~M*env = ~B0;~N");
+        write_margin(g);
+        write_str(g, g->failure_str);
+        write_newline(g);
     }
     str_delete(savevar);
 }
