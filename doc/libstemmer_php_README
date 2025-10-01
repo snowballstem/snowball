@@ -4,8 +4,11 @@ Snowball stemming library for PHP
 This is an automatically-generated pure PHP implementation of the Snowball
 stemming algorithms.
 
-The generated code is compatible with PHP 7.4 and later.  The `mbstring`
+The generated code is compatible with PHP 8.3 and later.  The `mbstring`
 extension is required.
+
+It would be possible to extend support to older PHP (back to 7.4) if there's
+demand for it.  Please contact us if this would be useful to you.
 
 This library is intended for situations where the convenience of a pure PHP
 implementation is more important than performance.  If performance
