@@ -10,7 +10,7 @@ how the project grows by gathering contributions over time.
 
 The Snowball compiler translates a Snowball program into source code in another
 language - currently Ada, ISO C, C#, Go, Java, Javascript, Object Pascal,
-Python and Rust are supported.
+PHP, Python and Rust are supported.
 
 This repository contains the source code for the snowball compiler and the
 stemming algorithms.  The snowball compiler is written in ISO C - you'll need
