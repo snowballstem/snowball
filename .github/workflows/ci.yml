@@ -74,24 +74,6 @@ jobs:
           PHP: php
           apt_extra_repo: ppa:ondrej/php
           apt_packages: 'php8.3-cli php8.3-mbstring'
-        - name: PHP 8.2
-          PHP: php
-          apt_extra_repo: ppa:ondrej/php
-          apt_packages: 'php8.2-cli php8.2-mbstring'
-        - name: PHP 8.1
-          os: 'ubuntu-22.04'
-          PHP: php
-          apt_packages: 'php php-mbstring'
-        - name: PHP 8.0
-          os: 'ubuntu-22.04'
-          PHP: php
-          apt_extra_repo: ppa:ondrej/php
-          apt_packages: 'php8.0-cli php8.0-mbstring'
-        - name: PHP 7.4
-          os: 'ubuntu-22.04'
-          PHP: php
-          apt_packages: 'php7.4-cli php7.4-mbstring'
-          apt_extra_repo: ppa:ondrej/php
         - name: Python 3.8
           PYTHON_VERSION: 3.8
           os: 'ubuntu-22.04'
