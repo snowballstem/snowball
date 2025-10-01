@@ -49,6 +49,10 @@ js_sample_dir = sample
 JSRUN ?= node
 JSTYPE ?= global
 
+php_output_dir = php_out
+php_runtime_dir = php
+PHP ?= php
+
 cargo ?= cargo
 cargoflags ?= --release
 rust_src_main_dir = rust/src
@@ -112,6 +116,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_java.c \
 		   compiler/generator_js.c \
 		   compiler/generator_pascal.c \
+		   compiler/generator_php.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
 		   compiler/generator_go.c \
@@ -145,6 +150,8 @@ JS_SAMPLE_SOURCES = javascript/stemwords.js
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
 PASCAL_STEMWORDS_SOURCES = pascal/stemwords.dpr
+
+PHP_RUNTIME_SOURCES = php/base-stemmer.php
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -188,6 +195,8 @@ PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
 	$(js_output_dir)/base-stemmer.js
+PHP_SOURCES = $(libstemmer_algorithms:%=$(php_output_dir)/%-stemmer.php) \
+	$(php_output_dir)/base-stemmer.php
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -229,6 +238,7 @@ clean:
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
+	      $(PHP_SOURCES) \
 	      $(RUST_SOURCES) \
 	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
@@ -238,6 +248,7 @@ clean:
 	rm -rf ada/obj dist
 	-rmdir $(c_src_dir)
 	-rmdir $(python_output_dir)
+	-rmdir $(php_output_dir)
 	-rmdir $(js_output_dir)
 
 update_version:
@@ -364,6 +375,14 @@ $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
 
+$(php_output_dir)/%-stemmer.php: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(php_output_dir)
+	./snowball $< -php -o "$(php_output_dir)/$*-stemmer"
+
+$(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
+	@mkdir -p $(php_output_dir)
+	cp $< $@
+
 ifneq '$(filter grouped-target,$(.FEATURES))' ''
 # Grouped-targets were added in GNU make 4.3.
 $(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
@@ -380,10 +399,10 @@ endif
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
-.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -536,6 +555,22 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
 	 ls README.rst $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+	rm -rf $${dest}
+
+dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
+	destname=libstemmer_php-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(php_runtime_dir) && \
+	cp -a doc/libstemmer_php_README $${dest}/README.rst && \
+	cp -a $(COMMON_FILES) $${dest} && \
+	cp -a $(PHP_RUNTIME_SOURCES) $${dest}/$(php_runtime_dir) && \
+	cp -a $(PHP_SOURCES) $${dest}/$(php_runtime_dir) && \
+	(cd $${dest} && \
+	 ls README.rst $(COMMON_FILES) $(php_runtime_dir)/*.php > MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
@@ -692,6 +727,32 @@ check_js_%: $(STEMMING_DATA)/%
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
 	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt |\
+	      $(DIFF) -u $</output.txt - ;\
+	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+
+###############################################################################
+# PHP
+###############################################################################
+
+.PHONY: php check_php do_check_php
+
+php: $(PHP_SOURCES)
+
+check_php: php
+	$(MAKE) do_check_php
+
+do_check_php: $(libstemmer_algorithms:%=check_php_%)
+
+check_php_%: export PHP_PATH=$(php_output_dir)
+check_php_%: $(STEMMING_DATA)/%
+	@echo "Checking output of $* stemmer for PHP"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	      $(PHP) php/stemwords.php $* > tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(PHP) php/stemwords.php $* < $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
