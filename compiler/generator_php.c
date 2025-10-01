@@ -61,7 +61,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
     write_char(g, '"');
 }
 
-static void write_literal_char(struct generator * g, int ch) {
+static void write_literal_char(struct generator * g, symbol ch) {
     write_char(g, '"');
     if (32 <= ch && ch < 127) {
         if (ch == '\"' || ch == '\\') write_string(g, "\\");
