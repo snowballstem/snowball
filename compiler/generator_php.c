@@ -550,7 +550,6 @@ static void generate_next(struct generator * g, struct node * p) {
 static void generate_GO_grouping(struct generator * g, struct node * p, int is_goto, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "in" : "out";
     write_failure_if(g, "!$this->go_~S1_grouping~S0(~V)", p);
@@ -1021,7 +1020,6 @@ static void generate_call(struct generator * g, struct node * p) {
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
     write_comment(g, p);
 
-    struct grouping * q = p->name->grouping;
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
     write_failure_if(g, "!($this->~S1_grouping~S0(~V))", p);
