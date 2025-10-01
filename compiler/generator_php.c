@@ -287,11 +287,11 @@ static void generate_AE(struct generator * g, struct node * p) {
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_divide:
             /* Snowball specifies integer division with semantics matching C,
-             * so we need to use `intdiv($x,$y)` here.
+             * so we need to use `intdiv($x, $y)` here.
              */
             write_string(g, "intdiv(");
             generate_AE(g, p->left);
-            write_string(g, ",");
+            write_string(g, ", ");
             generate_AE(g, p->right);
             write_char(g, ')');
             break;
@@ -403,7 +403,8 @@ static void generate_or(struct generator * g, struct node * p) {
 
 static void generate_backwards(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M$this->limit_backward = $this->cursor; $this->cursor = $this->limit;~N", p);
+    writef(g, "~M$this->limit_backward = $this->cursor;~N"
+              "~M$this->cursor = $this->limit;~N", p);
     generate(g, p->left);
     w(g, "~M$this->cursor = $this->limit_backward;~N");
 }
