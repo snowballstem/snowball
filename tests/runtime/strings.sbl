@@ -41,5 +41,9 @@ define stem as (
   // Test string literals are properly escaped for various target languages.
   $s='$xxx \x42 \u0042 \u{0042} {$xxx}' $(lenof s == 32) or fail='bad target language string literal escaping'
 
+  // Test ASCII control characters in string literals
+  stringescapes {}
+  $s='{U+000A}{U+001F}{U+007F}{U+0000}x' $(lenof s == 5) or fail='ASCII control characters not handled'
+
   ='ok'
 )
