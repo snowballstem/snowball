@@ -58,8 +58,9 @@ static void write_literal_string(struct generator * g, symbol * p) {
         if (ch == '"') {
             write_string(g, "\"\"");
         } else if (ch < 32 || ch == 127) {
-            printf("In write_literal_string, can't handle non-graphic character 0x%02x currently\n", (int)p[i]);
-            exit(1);
+            write_string(g, "\" & Character'Val(");
+            write_int(g, (int)p[i]);
+            write_string(g, ") & \"");
         } else if (ch <= 255) {
             write_char(g, ch);
         } else {
