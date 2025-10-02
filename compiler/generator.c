@@ -270,6 +270,8 @@ void write_comment_content(struct generator * g, struct node * p,
         case c_literalstring:
             write_comment_literalstring(g, p->literalstring, end);
             break;
+        case c_call:
+        case c_grouping:
         case c_name:
             write_s(g, p->name->s);
             break;
