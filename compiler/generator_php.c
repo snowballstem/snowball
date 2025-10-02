@@ -50,7 +50,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
         int ch;
         i += get_utf8(p + i, &ch);
         if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\') write_string(g, "\\");
+            if (ch == '\"' || ch == '\\' || ch == '$') write_string(g, "\\");
             write_char(g, ch);
         } else {
             write_string(g, "\\u{");
