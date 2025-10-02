@@ -183,6 +183,51 @@ next_outer: ;
     write_char(g, '\'');
 }
 
+static void write_comment_AE(struct generator * g, struct node * p) {
+    switch (p->type) {
+        case c_name:
+            write_s(g, p->name->s);
+            break;
+        case c_number:
+            write_int(g, p->number);
+            break;
+        case c_cursor:
+        case c_len:
+        case c_lenof:
+        case c_limit:
+        case c_maxint:
+        case c_minint:
+        case c_size:
+        case c_sizeof:
+            write_string(g, name_of_token(p->type));
+            if (p->name) {
+                write_char(g, ' ');
+                write_s(g, p->name->s);
+            }
+            break;
+        case c_neg:
+            write_char(g, '-');
+            write_comment_AE(g, p->right);
+            break;
+        case c_multiply:
+        case c_plus:
+        case c_minus:
+        case c_divide:
+            write_char(g, '(');
+            write_comment_AE(g, p->left);
+            write_char(g, ' ');
+            write_string(g, name_of_token(p->type));
+            write_char(g, ' ');
+            write_comment_AE(g, p->right);
+            write_char(g, ')');
+            break;
+        default:
+            fprintf(stderr, "Unexpected type #%d in write_comment_AE\n", p->type);
+            exit(1);
+    }
+
+}
+
 void write_comment_content(struct generator * g, struct node * p,
                            const char * end) {
     switch (p->type) {
@@ -197,7 +242,8 @@ void write_comment_content(struct generator * g, struct node * p,
                 write_char(g, ' ');
             }
             write_string(g, name_of_token(p->type));
-            write_string(g, " <integer expression>");
+            write_char(g, ' ');
+            write_comment_AE(g, p->AE);
             break;
         case c_eq:
         case c_ne:
@@ -205,9 +251,13 @@ void write_comment_content(struct generator * g, struct node * p,
         case c_ge:
         case c_lt:
         case c_le:
-            write_string(g, "$(<integer expression> ");
+            write_string(g, "$(");
+            write_comment_AE(g, p->left);
+            write_char(g, ' ');
             write_string(g, name_of_token(p->type));
-            write_string(g, " <integer expression>)");
+            write_char(g, ' ');
+            write_comment_AE(g, p->AE);
+            write_char(g, ')');
             break;
         case c_define:
             if (p->mode == m_forward) {
