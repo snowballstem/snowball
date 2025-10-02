@@ -429,7 +429,8 @@ extern void write_s(struct generator * g, const byte * b);
 extern void write_str(struct generator * g, struct str * str);
 extern void write_c_relop(struct generator * g, int relop);
 
-extern void write_comment_content(struct generator * g, struct node * p);
+extern void write_comment_content(struct generator * g, struct node * p,
+                                  const char * end);
 extern void write_generated_comment_content(struct generator * g);
 extern void write_start_comment(struct generator * g,
                                 const char * comment_start,

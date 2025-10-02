@@ -143,7 +143,48 @@ extern void write_c_relop(struct generator * g, int relop) {
     }
 }
 
-void write_comment_content(struct generator * g, struct node * p) {
+static void write_comment_literalstring(struct generator * g, const symbol *s,
+                                        const char * end) {
+    if (end) {
+        // Check if the literal string contains the target language end comment
+        // string.  Don't try to be clever here as real-world literal strings
+        // are unlikely to contain even partial matches.
+        int end_len = strlen(end);
+        if (end_len <= SIZE(s)) {
+            for (int i = 0; i <= SIZE(s) - end_len; ++i) {
+                for (int j = 0; j < end_len; ++j) {
+                    if (s[i + j] != end[j]) goto next_outer;
+                }
+                write_string(g, "<literal string>");
+                return;
+next_outer: ;
+            }
+        }
+    }
+    write_char(g, '\'');
+    for (int i = 0; i < SIZE(s); ++i) {
+        symbol c = s[i];
+        if (c == '\'' || c == '{') {
+            write_char(g, '{');
+            write_char(g, c);
+            write_char(g, '}');
+        } else if (c < 32 || c == 127) {
+            write_string(g, "{U+");
+            write_hex(g, c);
+            write_char(g, '}');
+        } else {
+            if (g->options->encoding == ENC_WIDECHARS) {
+                write_wchar_as_utf8(g, s[i]);
+            } else {
+                write_char(g, s[i]);
+            }
+        }
+    }
+    write_char(g, '\'');
+}
+
+void write_comment_content(struct generator * g, struct node * p,
+                           const char * end) {
     switch (p->type) {
         case c_mathassign:
         case c_plusassign:
@@ -170,16 +211,26 @@ void write_comment_content(struct generator * g, struct node * p) {
             break;
         case c_define:
             if (p->mode == m_forward) {
-                write_string(g, "forwardmode ");
+                write_string(g, "forwardmode define ");
             } else {
-                write_string(g, "backwardmode ");
+                write_string(g, "backwardmode define ");
             }
-            /* FALLTHRU */
+            write_s(g, p->name->s);
+            break;
+        case c_literalstring:
+            write_comment_literalstring(g, p->literalstring, end);
+            break;
+        case c_name:
+            write_s(g, p->name->s);
+            break;
         default:
             write_string(g, name_of_token(p->type));
             if (p->name) {
                 write_char(g, ' ');
                 write_s(g, p->name->s);
+            } else if (p->literalstring) {
+                write_char(g, ' ');
+                write_comment_literalstring(g, p->literalstring, end);
             }
     }
     write_string(g, ", line ");
@@ -190,7 +241,7 @@ static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "/* ");
-    write_comment_content(g, p);
+    write_comment_content(g, p, "*/");
     write_string(g, " */");
     write_newline(g);
 }

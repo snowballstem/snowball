@@ -45,5 +45,8 @@ define stem as (
   stringescapes {}
   $s='{U+000A}{U+001F}{U+007F}{U+0000}x' $(lenof s == 5) or fail='ASCII control characters not handled'
 
+  // Test that using a C close-comment sequence doesn't trip anything up.
+  not '*/' or fail='C close comment sequence mishandled'
+
   ='ok'
 )

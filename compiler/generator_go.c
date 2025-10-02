@@ -66,7 +66,7 @@ static void write_comment(struct generator * g, struct node * p) {
     /* FIXME could use Go //line syntax if we had original filename */
     write_margin(g);
     write_string(g, "// ");
-    write_comment_content(g, p);
+    write_comment_content(g, p, NULL);
     write_newline(g);
 }
 

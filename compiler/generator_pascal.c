@@ -127,9 +127,8 @@ static void write_declare(struct generator * g,
 static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
-    write_string(g, "{ ");
-    write_comment_content(g, p);
-    write_string(g, " }");
+    write_string(g, "// ");
+    write_comment_content(g, p, NULL);
     write_newline(g);
 }
 
@@ -1329,7 +1328,7 @@ static void generate(struct generator * g, struct node * p) {
 
 /* Class declaration generation. */
 static void generate_unit_start(struct generator * g) {
-    write_start_comment(g, "{ ", " }");
+    write_start_comment(g, "// ", NULL);
     w(g, "Unit ~n;~N~N{$HINTS OFF}~N~NInterface~N~NUses " BASE_UNIT ";~N");
 }
 
