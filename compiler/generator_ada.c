@@ -1015,7 +1015,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
         w(g, "~M~f~N");
     } else if (p->left->possible_signals == -1) {
         write_failure_if(g, "~B0_F", p);
-
     }
     w(g, "~}");
 
