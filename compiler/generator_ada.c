@@ -1517,8 +1517,7 @@ static void generate_member_decls(struct generator * g) {
             }
         }
 
-        w(g, "~-");
-        w(g, "~-   end record;~N");
+        w(g, "~-~Mend record;~N");
     } else {
         w(g, " null record;~N");
     }
