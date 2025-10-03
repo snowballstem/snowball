@@ -888,29 +888,49 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-
-    {
-        struct str * saved_output = g->outbuf;
-        str_clear(g->failure_str);
-        g->outbuf = g->failure_str;
-        /* Update string variable; restore env. */
-        writef(g, "~V = env.current.clone().into_owned(); *env = ~B0;", p);
-        g->failure_str = g->outbuf;
-        g->outbuf = saved_output;
-    }
-
     writef(g, "~Mlet ~B0 = env.clone();~N"
               "~Menv.set_current_s(~V.clone());~N"
               "~Menv.cursor = 0;~N"
               "~Menv.limit = env.current.len() as i32;~N", p);
-    generate(g, p->left);
-    if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~Mlet mut ~B0_f = true;~N");
     }
+
+    wsetlab_begin(g, g->failure_label);
+
+    generate(g, p->left);
+
+    if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = false;~N");
+    }
+
+    wsetlab_end(g, g->failure_label);
+
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    /* Update string variable; restore env. */
+    writef(g, "~M~V = env.current.clone().into_owned();~N"
+              "~M*env = ~B0;~N", p);
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        write_failure(g);
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
+    }
+
     str_delete(savevar);
 }
 
