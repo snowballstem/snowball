@@ -901,28 +901,53 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
               "~MSnowballProgram ~B0 = new SnowballProgram(this);~N", p);
 
-    ++g->copy_from_count;
-    str_append_string(g->failure_str, "LS_");
-    str_append_s(g->failure_str, p->name->s);
-    str_append_string(g->failure_str, " = length; copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
     writef(g, "~Mcurrent = ~V;~N"
               "~Mcursor = 0;~N"
               "~Mlength = L~V;~N"
               "~Mlimit = length;~N", p);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~Mboolean ~B0_f = true;~N");
+    }
+
+    wsetlab_begin(g, g->failure_label);
+
     generate(g, p->left);
-    if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+
+    if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = false;~N");
+    }
+
+    wsetlab_end(g);
+
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~ML~W = length;~N"
+              "~Mcopy_from(~B0);~N", p);
+    ++g->copy_from_count;
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        write_failure(g);
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
     }
     w(g, "~}");
+
     str_delete(savevar);
 }
 
