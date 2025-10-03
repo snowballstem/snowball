@@ -930,8 +930,6 @@ static void generate_dollar(struct generator * g, struct node * p) {
     writef(g, "~{~N"
               "~Mfinal SnowballProgram ~B0 = SnowballProgram.from(this);~N", p);
 
-    ++g->copy_from_count;
-
     writef(g, "~Mcurrent = ~V;~N"
               "~Mcursor = 0;~N"
               "~Mlimit = current.length;~N", p);
@@ -1259,8 +1257,8 @@ static void generate_class_begin(struct generator * g) {
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N}");
-    w(g, "~N");
+    w(g, "~-~M~N");
+    w(g, "}~N");
 }
 
 static void generate_equals(struct generator * g) {
@@ -1389,7 +1387,8 @@ extern void generate_program_dart(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
 
-    w(g, "~+");
+    write_start_comment(g, "// ", NULL);
+    generate_class_begin(g);
 
     generate_amongs(g);
     generate_groupings(g);
@@ -1399,24 +1398,6 @@ extern void generate_program_dart(struct generator * g) {
     generate_equals(g);
 
     generate_class_end(g);
-
-    w(g, "~-");
-
-    {
-        /* We need to call generate_class_begin() after we've generated the
-         * methods so we know if copy_from_count > 0.
-         */
-        struct str * body = g->outbuf;
-
-        g->outbuf = str_new();
-
-        write_start_comment(g, "// ", NULL);
-        generate_class_begin(g);
-
-        str_append(g->outbuf, body);
-
-        str_delete(body);
-    }
 
     output_str(g->options->output_src, g->outbuf);
     str_delete(g->failure_str);
