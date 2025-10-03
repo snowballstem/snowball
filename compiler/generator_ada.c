@@ -946,25 +946,15 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int used = g->label_used;
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    g->label_used = 0;
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-
-    {
-        struct str * saved_output = g->outbuf;
-        str_clear(g->failure_str);
-        g->outbuf = g->failure_str;
-        writef(g, "~V := Z.P; "
-                  "Z.L~W := Z.Len; "
-                  "Z.C := ~B0_C; "
-                  "Z.Len := ~B0_Len; "
-                  "Z.L := ~B0_L; "
-                  "Z.Lb := ~B0_Lb; "
-                  "Z.Bra := ~B0_Bra; "
-                  "Z.Ket := ~B0_Ket; "
-                  "Z.P := ~B0_P;", p);
-        g->failure_str = g->outbuf;
-        g->outbuf = saved_output;
-    }
 
     write_declare(g, "~B0_C : Char_Index", p);
     write_declare(g, "~B0_Len : Char_Index", p);
@@ -987,13 +977,48 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~MZ.Bra := 0;~N"
               "~MZ.Ket := 0;~N"
               "~MZ.L := Z.Len;~N", p);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        write_declare(g, "~B0_F : Boolean", p);
+        w(g, "~M~B0_F := True;~N");
+    }
+
     generate(g, p->left);
-    if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+
+    if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_F := False;~N");
+    }
+
+    if (g->label_used)
+        wsetl(g, g->failure_label);
+
+    g->label_used = used;
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~M~V := Z.P;~N"
+              "~MZ.L~W := Z.Len;~N"
+              "~MZ.C := ~B0_C;~N"
+              "~MZ.Len := ~B0_Len;~N"
+              "~MZ.L := ~B0_L;~N"
+              "~MZ.Lb := ~B0_Lb;~N"
+              "~MZ.Bra := ~B0_Bra;~N"
+              "~MZ.Ket := ~B0_Ket;~N"
+              "~MZ.P := ~B0_P;~N", p);
+
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        w(g, "~M~f~N");
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_F", p);
+
     }
     w(g, "~}");
+
     str_delete(savevar);
 }
 
