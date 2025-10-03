@@ -1334,6 +1334,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     generate(g, p->left);
     if (p->left->possible_signals == -1) {
         /* Mark success. */
+        g->B[0] = str_data(savevar);
         w(g, "~M~B0_f = 0;~N");
     }
     if (g->label_used)
