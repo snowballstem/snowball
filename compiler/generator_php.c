@@ -934,25 +934,53 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int used = g->label_used;
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    g->label_used = 0;
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~M~B0 = clone $this;~N", p);
 
-    ++g->copy_from_count;
-    str_assign(g->failure_str, "$this->copyFrom(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
     writef(g, "~M$this->current = ~V;~N"
               "~M$this->cursor = 0;~N"
               "~M$this->limit_backward = 0;~N"
               "~M$this->limit = strlen($this->current);~N", p);
-    generate(g, p->left);
-    if (!g->unreachable) {
-        writef(g, "~M~V = $this->current;~N", p);
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~M~B0_f = true;~N");
     }
+
+    generate(g, p->left);
+
+    if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = false;~N");
+    }
+
+    if (g->label_used)
+        wsetl(g, g->failure_label);
+
+    g->label_used = used;
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~M~V = $this->current;~N"
+              "~M$this->copyFrom(~B0);~N", p);
+
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        w(g, "~M~f~N");
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
+    }
+
     str_delete(savevar);
 }
 
