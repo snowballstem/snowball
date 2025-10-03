@@ -953,28 +953,54 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
               "~Mconst /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(this);~N", p);
 
-    ++g->copy_from_count;
-    str_assign(g->failure_str, "this.copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
     writef(g, "~Mthis.current = ~V;~N"
               "~Mthis.cursor = 0;~N"
               "~Mthis.limit_backward = 0;~N"
               "~Mthis.limit = this.current.length;~N", p);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~Mlet /**boolean*/ ~B0_f = true;~N");
+    }
+
+    wsetlab_begin(g, g->failure_label);
+
     generate(g, p->left);
-    if (!g->unreachable) {
-        writef(g, "~M~V = this.current;~N", p);
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+
+    if (p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = false;~N");
+    }
+
+    wsetlab_end(g);
+
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~M~V = this.current;~N"
+              "~Mthis.copy_from(~B0);~N", p);
+    ++g->copy_from_count;
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        write_failure(g);
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
     }
     w(g, "~}");
+
     str_delete(savevar);
 }
 
