@@ -1874,6 +1874,7 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         }
         case c_atleast:
         case c_backwards:
+        case c_dollar:
         case c_loop:
         case c_reverse:
         case c_test:
