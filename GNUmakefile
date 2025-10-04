@@ -8,13 +8,18 @@ ifeq ($(OS),Windows_NT)
 EXEEXT = .exe
 endif
 
-# make SAVETMP=1 to save stemwords output for UTF-8 C stemmers on failure.
+# `make SAVETMP=1` to save stemwords output for UTF-8 C stemmers on failure.
 # Intended for use with snowball-data's stemmer-compare.
 ifneq '$(SAVETMP)' ''
 .NOTPARALLEL:
 TEE_TO_TMP_TXT:=tee tmp.txt|
 CLEAN_TMP_TXT:=rm -f tmp.txt
 endif
+
+# `make SNOWBALL_FLAGS=-comments` to generate target language code with
+# comments indicating the corresponding lines in the .sbl source.
+SNOWBALL_FLAGS ?=
+SNOWBALL_COMPILE := ./snowball $(SNOWBALL_FLAGS)
 
 # Use to hook up runtime tests (see `setup_runtime_tests` target below).
 -include overrides.mk
@@ -56,6 +61,10 @@ js_runtime_dir = javascript
 js_sample_dir = sample
 JSRUN ?= node
 JSTYPE ?= global
+
+php_output_dir = php_out
+php_runtime_dir = php
+PHP ?= php
 
 cargo ?= cargo
 cargoflags ?= --release
@@ -121,6 +130,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_dart.c \
 		   compiler/generator_js.c \
 		   compiler/generator_pascal.c \
+		   compiler/generator_php.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
 		   compiler/generator_go.c \
@@ -166,6 +176,8 @@ PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
 PASCAL_STEMWORDS_SOURCES = pascal/stemwords.dpr
 
+PHP_RUNTIME_SOURCES = php/base-stemmer.php
+
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
 
@@ -210,6 +222,8 @@ PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
 	$(js_output_dir)/base-stemmer.js
+PHP_SOURCES = $(libstemmer_algorithms:%=$(php_output_dir)/%-stemmer.php) \
+	$(php_output_dir)/base-stemmer.php
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -253,6 +267,7 @@ clean:
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
+	      $(PHP_SOURCES) \
 	      $(RUST_SOURCES) \
 	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
@@ -263,6 +278,7 @@ clean:
 	rm -rf $(DART_BUILD_ARTIFACTS)
 	-rmdir $(c_src_dir)
 	-rmdir $(python_output_dir)
+	-rmdir $(php_output_dir)
 	-rmdir $(js_output_dir)
 
 update_version:
@@ -337,26 +353,26 @@ pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	./snowball $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
+	$(SNOWBALL_COMPILE) $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
 
 $(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	./snowball charsets/KOI8-R.sbl $< -o "$(c_src_dir)/stem_KOI8_R_$*" -eprefix $*_KOI8_R_ -r ../runtime
+	$(SNOWBALL_COMPILE) charsets/KOI8-R.sbl $< -o "$(c_src_dir)/stem_KOI8_R_$*" -eprefix $*_KOI8_R_ -r ../runtime
 
 $(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	./snowball $< -o "$(c_src_dir)/stem_ISO_8859_1_$*" -eprefix $*_ISO_8859_1_ -r ../runtime
+	$(SNOWBALL_COMPILE) $< -o "$(c_src_dir)/stem_ISO_8859_1_$*" -eprefix $*_ISO_8859_1_ -r ../runtime
 
 $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	./snowball charsets/ISO-8859-2.sbl $< -o "$(c_src_dir)/stem_ISO_8859_2_$*" -eprefix $*_ISO_8859_2_ -r ../runtime
+	$(SNOWBALL_COMPILE) charsets/ISO-8859-2.sbl $< -o "$(c_src_dir)/stem_ISO_8859_2_$*" -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
 $(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
-	./snowball $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+	$(SNOWBALL_COMPILE) $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
 
 $(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(dart_src_dir)
@@ -364,22 +380,22 @@ $(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 
 $(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
-	./snowball $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
+	$(SNOWBALL_COMPILE) $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
 
 $(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(pascal_src_dir)
-	./snowball $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
+	$(SNOWBALL_COMPILE) $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
 
 $(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
-	./snowball $< -py -o "$(python_output_dir)/$*_stemmer"
+	$(SNOWBALL_COMPILE) $< -py -o "$(python_output_dir)/$*_stemmer"
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
 
 $(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(rust_src_dir)
-	./snowball $< -rust -o "$(rust_src_dir)/$*_stemmer"
+	$(SNOWBALL_COMPILE) $< -rust -o "$(rust_src_dir)/$*_stemmer"
 
 $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 	@echo "Generating algorithms.go"
@@ -387,15 +403,23 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 
 $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
-	./snowball $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
+	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
 $(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
-	./snowball $< -js -o "$(js_output_dir)/$*-stemmer"
+	$(SNOWBALL_COMPILE) $< -js -o "$(js_output_dir)/$*-stemmer"
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
+	cp $< $@
+
+$(php_output_dir)/%-stemmer.php: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(php_output_dir)
+	$(SNOWBALL_COMPILE) $< -php -o "$(php_output_dir)/$*-stemmer"
+
+$(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
+	@mkdir -p $(php_output_dir)
 	cp $< $@
 
 ifneq '$(filter grouped-target,$(.FEATURES))' ''
@@ -412,12 +436,12 @@ $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 $(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
 endif
 	@mkdir -p $(ada_src_dir)
-	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
+	$(SNOWBALL_COMPILE) $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
-.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_dart dist_libstemmer_js dist_libstemmer_python
+.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_dart dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_dart dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_dart dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -602,6 +626,22 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	cp -a $(JS_SOURCES) $${dest}/$(js_runtime_dir) && \
 	(cd $${dest} && \
 	 ls README.rst $(COMMON_FILES) $(js_runtime_dir)/*.js $(js_sample_dir)/*.js > MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+	rm -rf $${dest}
+
+dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
+	destname=libstemmer_php-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(php_runtime_dir) && \
+	cp -a doc/libstemmer_php_README $${dest}/README.rst && \
+	cp -a $(COMMON_FILES) $${dest} && \
+	cp -a $(PHP_RUNTIME_SOURCES) $${dest}/$(php_runtime_dir) && \
+	cp -a $(PHP_SOURCES) $${dest}/$(php_runtime_dir) && \
+	(cd $${dest} && \
+	 ls README.rst $(COMMON_FILES) $(php_runtime_dir)/*.php > MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
@@ -790,6 +830,32 @@ check_js_%: $(STEMMING_DATA)/%
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
 	  $(JSRUN) javascript/stemwords.js -l $* -i $</voc.txt |\
+	      $(DIFF) -u $</output.txt - ;\
+	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+
+###############################################################################
+# PHP
+###############################################################################
+
+.PHONY: php check_php do_check_php
+
+php: $(PHP_SOURCES)
+
+check_php: php
+	$(MAKE) do_check_php
+
+do_check_php: $(libstemmer_algorithms:%=check_php_%)
+
+check_php_%: export PHP_PATH=$(php_output_dir)
+check_php_%: $(STEMMING_DATA)/%
+	@echo "Checking output of $* stemmer for PHP"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	      $(PHP) php/stemwords.php $* > tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(PHP) php/stemwords.php $* < $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi

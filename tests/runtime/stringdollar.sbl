@@ -1,0 +1,39 @@
+// Test string-$.
+
+externals (stem)
+
+strings (s s2)
+
+stringescapes {}
+
+define stem as (
+  $s=''
+  $(lenof s == 0) or fail='setting s empty failed'
+
+  $s='xyz'
+  $(lenof s == 3) or fail='setting s failed'
+  test ('ok' atlimit) or fail='setting s changed current string'
+
+  test (next $s hop 2 $(cursor == 1)) or fail='cursor not restored after string-$'
+  test (next $s hop 2 $(limit == 2)) or fail='limit not restored after string-$'
+
+  test (next $s $(cursor == 0)) or fail='cursor not zeroed inside string-$'
+  test (next $s $(limit == 3)) or fail='limit not reset inside string-$'
+
+  // Test things are reset on failure (regression test for Dart, Go, Rust).
+  (not $s fail ='news' test ('ok' atlimit)) or fail='current string not restored after failing string-$'
+  test (next not $s fail (='news' next) $(cursor == 1)) or fail='cursor not restored after failing string-$'
+  (not $s fail (='news' next) $(limit == 2)) or fail='limit not restored after failing string-$'
+
+  // Test things are reset on failure with nested use (regression test for
+  // everything, though for C the only problem was -Wshadow warnings).
+  (not $s2 $s fail ='news' test ('ok' atlimit)) or fail='current string not restored after failing string-$'
+  test (next not $s2 $s fail (='news' next) $(cursor == 1)) or fail='cursor not restored after failing string-$'
+  (not $s2 $s fail (='news' next) $(limit == 2)) or fail='limit not restored after failing string-$'
+  (not $s2 $s (='news' $(cursor == 99)) test ('ok' atlimit)) or fail='current string not restored after failing string-$'
+  test (next not $s2 $s (='news' next $(cursor == 99)) $(cursor == 1)) or fail='cursor not restored after failing string-$'
+  (not $s2 $s (='news' next $(cursor == 99)) $(limit == 2)) or fail='limit not restored after failing string-$'
+
+  // Test successful nested use.
+  $s2 (='x' $s='y') or fail='nested string-$ failed'
+)

@@ -412,6 +412,7 @@ public class SnowballProgram implements Serializable {
     {
         slice_check();
         replace_s(bra, ket, s);
+        ket = bra + s.length();
     }
 
     protected void slice_del()

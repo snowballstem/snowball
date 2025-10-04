@@ -238,6 +238,7 @@ class BaseStemmer:
         assert self.ket <= self.limit
         assert self.limit <= len(self.current)
         self.replace_s(self.bra, self.ket, s)
+        self.ket = self.bra + len(s)
 
     def slice_del(self):
         return self.slice_from("")

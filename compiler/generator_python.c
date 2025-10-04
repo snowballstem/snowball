@@ -70,7 +70,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 }
 
 static void write_literal_char(struct generator * g, symbol ch) {
-    write_string(g, "\"");
+    write_char(g, '"');
     if (32 <= ch && ch < 0x590 && ch != 127) {
         if (ch == '"' || ch == '\\') write_char(g, '\\');
         // Python uses ENC_WIDECHARS so we need to convert.
@@ -82,7 +82,7 @@ static void write_literal_char(struct generator * g, symbol ch) {
         write_string(g, "\\u");
         write_hex4(g, ch);
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
@@ -93,7 +93,7 @@ static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "# ");
-    write_comment_content(g, p);
+    write_comment_content(g, p, NULL);
     write_newline(g);
 }
 
@@ -903,31 +903,52 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 /* dollar sets snowball up to operate on a string variable as if it were the
  * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
+    write_comment(g, p);
+
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    write_comment(g, p);
     writef(g, "~M~B0 = BaseStemmer()~N"
               "~M~B0.copy_from(self)~N", p);
-
-    {
-        struct str * saved_output = g->outbuf;
-        str_clear(g->failure_str);
-        g->outbuf = g->failure_str;
-        writef(g, "~V = self.current; ", p);
-        writef(g, "super().copy_from(~B0)", p);
-        g->failure_str = g->outbuf;
-        g->outbuf = saved_output;
-    }
 
     writef(g, "~Mself.current = ~V~N"
               "~Mself.cursor = 0~N"
               "~Mself.limit = len(self.current)~N", p);
-    generate(g, p->left);
-    if (!g->unreachable) {
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~M~B0_f = True~N");
     }
+
+    wsetlab_begin(g);
+
+    generate(g, p->left);
+
+    if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = False~N");
+    }
+
+    wsetlab_end(g, g->failure_label);
+
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~M~V = self.current~N"
+              "~Msuper().copy_from(~B0)~N", p);
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        write_failure(g);
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
+    }
+
     str_delete(savevar);
 }
 

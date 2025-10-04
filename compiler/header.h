@@ -400,7 +400,7 @@ struct options {
     byte syntax_tree;
     byte comments;
     enc encoding;
-    enum { LANG_JAVA, LANG_DART, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_DART, LANG_PASCAL, LANG_PHP, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -429,7 +429,8 @@ extern void write_s(struct generator * g, const byte * b);
 extern void write_str(struct generator * g, struct str * str);
 extern void write_c_relop(struct generator * g, int relop);
 
-extern void write_comment_content(struct generator * g, struct node * p);
+extern void write_comment_content(struct generator * g, struct node * p,
+                                  const char * end);
 extern void write_generated_comment_content(struct generator * g);
 extern void write_start_comment(struct generator * g,
                                 const char * comment_start,
@@ -458,6 +459,10 @@ extern void generate_program_csharp(struct generator * g);
 
 #ifndef DISABLE_PASCAL
 extern void generate_program_pascal(struct generator * g);
+#endif
+
+#ifndef DISABLE_PHP
+extern void generate_program_php(struct generator * g);
 #endif
 
 #ifndef DISABLE_PYTHON

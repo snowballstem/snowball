@@ -42,7 +42,7 @@ static void write_varref(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    write_string(g, "\"");
+    write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
@@ -53,7 +53,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_hex4(g, ch);
         }
     }
-    write_string(g, "\"");
+    write_char(g, '"');
 }
 
 static void write_margin(struct generator * g) {
@@ -73,7 +73,7 @@ static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
     write_string(g, "// ");
-    write_comment_content(g, p);
+    write_comment_content(g, p, NULL);
     write_newline(g);
 }
 
@@ -592,7 +592,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->I[0] = golab;
     // This label may end up unused, but we can't easily tell at this point.
     w(g, "~M// deno-lint-ignore no-unused-labels~N");
-    w(g, "~Mgolab~I0: while(true)~N");
+    w(g, "~Mgolab~I0: while (true)~N");
     w(g, "~{");
 
     struct str * savevar = NULL;
@@ -651,7 +651,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
-    writef(g, "~Mwhile(true) {~N~+", p);
+    writef(g, "~Mwhile (true) {~N~+", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
@@ -953,28 +953,54 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
+    int a0 = g->failure_label;
+    struct str * a1 = str_copy(g->failure_str);
+    g->failure_label = new_label(g);
+    str_clear(g->failure_str);
+
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
               "~Mconst /** !Object */ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(this);~N", p);
 
-    ++g->copy_from_count;
-    str_assign(g->failure_str, "this.copy_from(");
-    str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
     writef(g, "~Mthis.current = ~V;~N"
               "~Mthis.cursor = 0;~N"
               "~Mthis.limit_backward = 0;~N"
               "~Mthis.limit = this.current.length;~N", p);
+    if (p->left->possible_signals == -1) {
+        /* Assume failure. */
+        w(g, "~Mlet /**boolean*/ ~B0_f = true;~N");
+    }
+
+    wsetlab_begin(g, g->failure_label);
+
     generate(g, p->left);
-    if (!g->unreachable) {
-        writef(g, "~M~V = this.current;~N", p);
-        write_margin(g);
-        write_str(g, g->failure_str);
-        write_newline(g);
+
+    if (p->left->possible_signals == -1) {
+        /* Mark success. */
+        g->B[0] = str_data(savevar);
+        w(g, "~M~B0_f = false;~N");
+    }
+
+    wsetlab_end(g);
+
+    g->failure_label = a0;
+    str_delete(g->failure_str);
+    g->failure_str = a1;
+
+    g->B[0] = str_data(savevar);
+    writef(g, "~M~V = this.current;~N"
+              "~Mthis.copy_from(~B0);~N", p);
+    ++g->copy_from_count;
+    if (p->left->possible_signals == 0) {
+        // p->left always signals f.
+        write_failure(g);
+    } else if (p->left->possible_signals == -1) {
+        write_failure_if(g, "~B0_f", p);
     }
     w(g, "~}");
+
     str_delete(savevar);
 }
 

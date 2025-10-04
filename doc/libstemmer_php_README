@@ -1,0 +1,32 @@
+Snowball stemming library for PHP
+=================================
+
+This is an automatically-generated pure PHP implementation of the Snowball
+stemming algorithms.
+
+The generated code is compatible with PHP 8.3 and later.  The `mbstring`
+extension is required.
+
+It would be possible to extend support to older PHP (back to 7.4) if there's
+demand for it.  Please contact us if this would be useful to you.
+
+This library is intended for situations where the convenience of a pure PHP
+implementation is more important than performance.  If performance
+matters we recommend using the C implementation via bindings instead,
+(for example, using https://github.com/amaccis/php-stemmer).
+
+How to use library
+------------------
+
+You can stem a word from PHP as follows:
+
+.. code-block:: php
+
+    require 'base-stemmer.php';
+    require 'english-stemmer.php';
+    $stemmer = new SnowballEnglishStemmer;
+    $word = 'compiled';
+    $stem = $stemmer->stemWord($word);
+    printf("%s => %s\n", $word, $stem );
+
+	// prints "compiled => compil"

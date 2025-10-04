@@ -19,6 +19,7 @@
 /dart/lib/ext/
 /dart/lib/src/algorithms.dart
 /js_out
+/php_out
 /python_check
 /python_out
 *.generated.cs

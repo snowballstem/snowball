@@ -4,8 +4,6 @@ externals (stem)
 
 strings (s)
 
-stringescapes {}
-
 define stem as (
   '' or fail='failed to match empty string'
   test 'o' or fail='failed to match 1-char string'
@@ -39,6 +37,16 @@ define stem as (
 
   setlimit hop 2 for test (next ='ustralopithecin')
   test ( $(len == 17) $(cursor == 0) 'australopithecine' atlimit ) or fail='string assignment does not replace c:l (longer)'
+
+  // Test string literals are properly escaped for various target languages.
+  $s='$xxx \x42 \u0042 \u{0042} {$xxx}' $(lenof s == 32) or fail='bad target language string literal escaping'
+
+  // Test ASCII control characters in string literals
+  stringescapes {}
+  $s='{U+000A}{U+001F}{U+007F}{U+0000}x' $(lenof s == 5) or fail='ASCII control characters not handled'
+
+  // Test that using a C close-comment sequence doesn't trip anything up.
+  not '*/' or fail='C close comment sequence mishandled'
 
   ='ok'
 )

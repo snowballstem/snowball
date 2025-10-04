@@ -71,6 +71,13 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
+        - name: PHP 8.4
+          PHP: php
+          apt_packages: 'php php-mbstring'
+        - name: PHP 8.3
+          PHP: php
+          apt_extra_repo: ppa:ondrej/php
+          apt_packages: 'php8.3-cli php8.3-mbstring'
         - name: Python 3.8
           PYTHON_VERSION: 3.8
           os: 'ubuntu-22.04'
@@ -174,6 +181,12 @@ jobs:
       with:
         key: ${{ matrix.name }}
         variant: ${{ matrix.ccache || 'ccache' }}
+    - name: Enable extra Ubuntu package repo
+      if: matrix.apt_extra_repo
+      run: |
+        sudo apt-get -qq remove "php*-cli" "php*-dev"
+        sudo add-apt-repository -y ${{ matrix.apt_extra_repo }}
+        sudo apt-get update
     - name: Install Ubuntu packages
       if: matrix.apt_packages
       run: |
@@ -245,6 +258,9 @@ jobs:
     - name: Test Pascal
       if: matrix.FPC
       run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
+    - name: Test PHP
+      if: matrix.PHP
+      run: $MAKE check_php PHP="${{ matrix.PHP }}"
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
