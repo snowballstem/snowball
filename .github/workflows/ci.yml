@@ -44,6 +44,10 @@ jobs:
           JAVA: java
           JAVAC: javac
           JAVACFLAGS: '-Xlint:all -Werror'
+        - name: dart
+          DART: dart
+          os: 'ubuntu-24.04'
+          dart_sdk: stable
         - name: go_old
           os: 'ubuntu-22.04'
           apt_packages: 'golang-1.13'
@@ -192,6 +196,11 @@ jobs:
       if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       with:
         deno-version: vx.x.x
+    - name: Install Dart SDK
+      if: matrix.dart_sdk
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ matrix.dart_sdk }}
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
       uses: msys2/setup-msys2@v2
@@ -223,6 +232,9 @@ jobs:
     - name: Test Java
       if: matrix.JAVA && matrix.JAVAC
       run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}" JAVACFLAGS="${{ matrix.JAVACFLAGS }}"
+    - name: Test Dart
+      if: matrix.DART
+      run: $MAKE check_dart DART="${{ matrix.DART }}"
     - name: Test C#
       if: matrix.MCS
       run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
