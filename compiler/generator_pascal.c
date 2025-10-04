@@ -444,10 +444,9 @@ static void generate_not(struct generator * g, struct node * p) {
         write_savecursor(g, p, savevar);
     }
 
-    g->failure_label = new_label(g);
+    int label = new_label(g);
+    g->failure_label = label;
     str_clear(g->failure_str);
-
-    int l = g->failure_label;
 
     generate(g, p->left);
 
@@ -458,7 +457,7 @@ static void generate_not(struct generator * g, struct node * p) {
     if (!g->unreachable) write_failure(g);
 
     if (g->label_used)
-        wsetl(g, l);
+        wsetl(g, label);
 
     g->unreachable = false;
 
@@ -628,6 +627,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         write_restorecursor(g, p, savevar);
         str_delete(savevar);
     }
+
     g->label_used = used;
     g->failure_label = a0;
     str_delete(g->failure_str);
@@ -670,6 +670,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     }
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     str_clear(g->failure_str);
     generate(g, p->left);
 
