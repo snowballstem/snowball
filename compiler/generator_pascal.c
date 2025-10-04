@@ -656,7 +656,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
     int replab = new_label(g);
     g->I[0] = replab;
-    writef(g, "lab~I0:~N~MWhile True Do~N~{", p);
+    writef(g, "lab~I0:~N~{", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
@@ -687,7 +687,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
         str_delete(savevar);
     }
 
-    w(g, "~MBreak;~N~}");
+    w(g, "~}");
 }
 
 static void generate_repeat(struct generator * g, struct node * p) {
