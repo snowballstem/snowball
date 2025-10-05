@@ -282,8 +282,7 @@ clean:
 	-rmdir $(js_output_dir)
 
 update_version:
-	perl -pi -e 's/(SNOWBALL_VERSION.*?)\d+\.\d+\.\d+/$${1}$(SNOWBALL_VERSION)/;' \
-		-e 's/\d+\.\d+\.\d+(.*?SNOWBALL_VERSION)/$(SNOWBALL_VERSION)$$1/;' \
+	perl -pi -e '/SNOWBALL_VERSION/ && s/\d+\.\d+\.\d+/$(SNOWBALL_VERSION)/' \
 		compiler/header.h \
 		csharp/Snowball/AssemblyInfo.cs \
 		dart/pubspec.yaml \
