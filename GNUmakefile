@@ -136,11 +136,11 @@ RUNTIME_SOURCES  = runtime/api.c \
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
-JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
-		      java/org/tartarus/snowball/CharArraySequence.java \
-		      java/org/tartarus/snowball/SnowballProgram.java \
-		      java/org/tartarus/snowball/SnowballStemmer.java \
-		      java/org/tartarus/snowball/TestApp.java
+JAVA_RUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
+		       java/org/tartarus/snowball/CharArraySequence.java \
+		       java/org/tartarus/snowball/SnowballProgram.java \
+		       java/org/tartarus/snowball/SnowballStemmer.java \
+		       java/org/tartarus/snowball/TestApp.java
 
 CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
 			 csharp/Snowball/Stemmer.cs \
@@ -218,7 +218,7 @@ STEMTEST_OBJECTS=$(STEMTEST_SOURCES:.c=.o)
 C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
-JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
+JAVA_RUNTIME_CLASSES=$(JAVA_RUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 CPPFLAGS=
@@ -498,7 +498,7 @@ dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	mkdir -p $${dest}/$(java_src_dir) && \
 	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
 	mkdir -p $${dest}/$(java_src_main_dir) && \
-	cp -a $(JAVARUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
+	cp -a $(JAVA_RUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
 	cp -a $(COMMON_FILES) $${dest} && \
 	(cd $${dest} && \
 	 echo "README" >> MANIFEST && \
