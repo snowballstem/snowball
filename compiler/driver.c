@@ -41,7 +41,7 @@ static void print_arglist(int exit_code) {
                "  -j, -java                        generate Java\n"
 #endif
 #ifndef DISABLE_DART
-               "  -d, -dart                        generate Dart\n"
+               "  -dart                            generate Dart\n"
 #endif
 #ifndef DISABLE_CSHARP
                "  -cs, -csharp                     generate C#\n"
@@ -197,7 +197,7 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             }
 #endif
 #ifndef DISABLE_DART
-            if (eq(s, "-d") || eq(s, "-dart")) {
+            if (eq(s, "-dart")) {
                 o->make_lang = LANG_DART;
                 continue;
             }
