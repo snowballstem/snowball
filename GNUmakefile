@@ -422,7 +422,7 @@ csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES)
 
 $(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
-	$(SNOWBALL_COMPILE) $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
+	$(SNOWBALL_COMPILE) $< -csharp -o "$(csharp_src_dir)/$*Stemmer.generated"
 
 # Dart
 
@@ -448,7 +448,7 @@ $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 
 $(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
-	$(SNOWBALL_COMPILE) $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+	$(SNOWBALL_COMPILE) $< -java -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
 
 # Javascript
 
@@ -486,7 +486,7 @@ $(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
 
 $(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
-	$(SNOWBALL_COMPILE) $< -py -o "$(python_output_dir)/$*_stemmer"
+	$(SNOWBALL_COMPILE) $< -python -o "$(python_output_dir)/$*_stemmer"
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
