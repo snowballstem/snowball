@@ -431,7 +431,7 @@ dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
 
 $(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(dart_src_dir)
-	$(SNOWBALL_COMPILE) $< -d -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
+	$(SNOWBALL_COMPILE) $< -dart -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
 
 # Go
 
