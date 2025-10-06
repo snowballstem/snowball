@@ -359,9 +359,7 @@ struct generator {
     struct str * outbuf;       /* temporary str to store output */
     struct str * declarations; /* str storing variable declarations */
     int next_label;
-#ifndef DISABLE_PYTHON
-    int max_label;
-#endif
+    int max_label;             /* Only used by Python */
     int margin;
 
     /* Target language code to execute in case of failure. */
@@ -442,46 +440,26 @@ extern int repeat_restore(struct generator * g, struct node * p);
 /* Generator for C code. */
 extern void generate_program_c(struct generator * g);
 
-#ifndef DISABLE_JAVA
 /* Generator for Java code. */
 extern void generate_program_java(struct generator * g);
-#endif
 
-#ifndef DISABLE_DART
 /* Generator for Dart code. */
 extern void generate_program_dart(struct generator * g);
-#endif
 
-#ifndef DISABLE_CSHARP
 /* Generator for C# code. */
 extern void generate_program_csharp(struct generator * g);
-#endif
 
-#ifndef DISABLE_PASCAL
 extern void generate_program_pascal(struct generator * g);
-#endif
 
-#ifndef DISABLE_PHP
 extern void generate_program_php(struct generator * g);
-#endif
 
-#ifndef DISABLE_PYTHON
 /* Generator for Python code. */
 extern void generate_program_python(struct generator * g);
-#endif
 
-#ifndef DISABLE_JS
 extern void generate_program_js(struct generator * g);
-#endif
 
-#ifndef DISABLE_RUST
 extern void generate_program_rust(struct generator * g);
-#endif
 
-#ifndef DISABLE_GO
 extern void generate_program_go(struct generator * g);
-#endif
 
-#ifndef DISABLE_ADA
 extern void generate_program_ada(struct generator * g);
-#endif
