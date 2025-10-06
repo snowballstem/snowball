@@ -2,9 +2,10 @@
 #include <stdlib.h> /* for malloc, calloc, free */
 #include "header.h"
 
+static const struct SN_env default_SN_env;
+
 extern struct SN_env * SN_create_env(int S_size, int I_size)
 {
-    static const struct SN_env default_SN_env = {0};
     struct SN_env * z = (struct SN_env *) malloc(sizeof(struct SN_env));
     if (z == NULL) return NULL;
     *z = default_SN_env;
