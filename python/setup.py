@@ -36,7 +36,6 @@ desc = 'This package provides ' + str(n_stemmers) + ' stemmers for ' + \
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
-    'License :: OSI Approved :: BSD License'
 ]
 
 for lang in langs:
