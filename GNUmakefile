@@ -24,13 +24,25 @@ SNOWBALL_COMPILE := ./snowball $(SNOWBALL_FLAGS)
 # Use to hook up runtime tests (see `setup_runtime_tests` target below).
 -include overrides.mk
 
+# Ada
+
+gprbuild ?= gprbuild
+ada_src_main_dir = ada
+ada_src_dir = $(ada_src_main_dir)/algorithms
+
+# C
+
 c_src_dir = src_c
 
-JAVACFLAGS ?=
-JAVAC ?= javac
-JAVA ?= java -ea
-java_src_main_dir = java/org/tartarus/snowball
-java_src_dir = $(java_src_main_dir)/ext
+# C#
+
+MONO ?= mono
+MCS ?= mcs
+csharp_src_main_dir = csharp/Snowball
+csharp_src_dir = $(csharp_src_main_dir)/Algorithms
+csharp_sample_dir = csharp/Stemwords
+
+# Dart
 
 DART ?= dart run --enable-asserts
 dart_src_main_dir = dart/lib
@@ -40,36 +52,7 @@ dart_gen_dir = dart/lib/gen
 dart_example_dir = dart/example
 dart_package_dir = dart
 
-MONO ?= mono
-MCS ?= mcs
-csharp_src_main_dir = csharp/Snowball
-csharp_src_dir = $(csharp_src_main_dir)/Algorithms
-csharp_sample_dir = csharp/Stemwords
-
-FPC ?= fpc
-# Enable warnings, info, notes; select "FILE:LINE:" diagnostic format.
-FPC_FLAGS ?= -veiwnr
-pascal_src_dir = pascal
-
-python ?= python3
-python_output_dir = python_out
-python_runtime_dir = snowballstemmer
-python_sample_dir = sample
-
-js_output_dir = js_out
-js_runtime_dir = javascript
-js_sample_dir = sample
-JSRUN ?= node
-JSTYPE ?= global
-
-php_output_dir = php_out
-php_runtime_dir = php
-PHP ?= php
-
-cargo ?= cargo
-cargoflags ?= --release
-rust_src_main_dir = rust/src
-rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
+# Go
 
 go ?= go
 goflags ?= stemwords/algorithms.go stemwords/main.go
@@ -77,9 +60,48 @@ gofmt ?= gofmt
 go_src_main_dir = go
 go_src_dir = $(go_src_main_dir)/algorithms
 
-gprbuild ?= gprbuild
-ada_src_main_dir = ada
-ada_src_dir = $(ada_src_main_dir)/algorithms
+# Java
+
+JAVACFLAGS ?=
+JAVAC ?= javac
+JAVA ?= java -ea
+java_src_main_dir = java/org/tartarus/snowball
+java_src_dir = $(java_src_main_dir)/ext
+
+# Javascript
+
+js_output_dir = js_out
+js_runtime_dir = javascript
+js_sample_dir = sample
+JSRUN ?= node
+JSTYPE ?= global
+
+# Pascal
+
+FPC ?= fpc
+# Enable warnings, info, notes; select "FILE:LINE:" diagnostic format.
+FPC_FLAGS ?= -veiwnr
+pascal_src_dir = pascal
+
+# PHP
+
+php_output_dir = php_out
+php_runtime_dir = php
+PHP ?= php
+
+# Python
+
+python ?= python3
+python_output_dir = python_out
+python_runtime_dir = snowballstemmer
+python_sample_dir = sample
+
+# Rust
+
+cargo ?= cargo
+cargoflags ?= --release
+rust_src_main_dir = rust/src
+rust_src_dir = $(rust_src_main_dir)/snowball/algorithms
 
 DIFF = diff
 ifeq ($(OS),Windows_NT)
@@ -120,24 +142,26 @@ other_algorithms ?= lovins
 
 all_algorithms = $(libstemmer_algorithms) $(other_algorithms)
 
-COMPILER_SOURCES = compiler/space.c \
-		   compiler/tokeniser.c \
-		   compiler/analyser.c \
-		   compiler/generator.c \
+COMPILER_SOURCES = compiler/analyser.c \
 		   compiler/driver.c \
+		   compiler/generator.c \
+		   compiler/generator_ada.c \
 		   compiler/generator_csharp.c \
-		   compiler/generator_java.c \
 		   compiler/generator_dart.c \
+		   compiler/generator_go.c \
+		   compiler/generator_java.c \
 		   compiler/generator_js.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_php.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
-		   compiler/generator_go.c \
-		   compiler/generator_ada.c
+		   compiler/space.c \
+		   compiler/tokeniser.c
 
 COMPILER_HEADERS = compiler/header.h \
 		   compiler/syswords.h
+
+# C
 
 RUNTIME_SOURCES  = runtime/api.c \
 		   runtime/utilities.c
@@ -145,11 +169,23 @@ RUNTIME_SOURCES  = runtime/api.c \
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/header.h
 
-JAVARUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
-		      java/org/tartarus/snowball/CharArraySequence.java \
-		      java/org/tartarus/snowball/SnowballProgram.java \
-		      java/org/tartarus/snowball/SnowballStemmer.java \
-		      java/org/tartarus/snowball/TestApp.java
+LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
+LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
+LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
+LIBSTEMMER_EXTRA = $(MODULES) libstemmer/libstemmer_c.in
+
+STEMWORDS_SOURCES = examples/stemwords.c
+STEMTEST_SOURCES = tests/stemtest.c
+
+# C#
+
+CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
+			 csharp/Snowball/Stemmer.cs \
+			 csharp/Snowball/AssemblyInfo.cs
+
+CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
+
+# Dart
 
 DART_RUNTIME_SOURCES = dart/lib/src/snowball.dart \
 		       dart/lib/src/algorithms.dart
@@ -162,21 +198,31 @@ DART_PACKAGE_FILES = dart/pubspec.yaml \
 		     dart/analysis_options.yaml \
 		     dart/.gitignore
 
-CSHARP_RUNTIME_SOURCES = csharp/Snowball/Among.cs \
-			 csharp/Snowball/Stemmer.cs \
-			 csharp/Snowball/AssemblyInfo.cs
+# Java
 
-CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
+JAVA_RUNTIME_SOURCES = java/org/tartarus/snowball/Among.java \
+		       java/org/tartarus/snowball/CharArraySequence.java \
+		       java/org/tartarus/snowball/SnowballProgram.java \
+		       java/org/tartarus/snowball/SnowballStemmer.java \
+		       java/org/tartarus/snowball/TestApp.java
+
+# Javascript
 
 JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
 JS_SAMPLE_SOURCES = javascript/stemwords.js
 
+# Pascal
+
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
 PASCAL_STEMWORDS_SOURCES = pascal/stemwords.dpr
 
+# PHP
+
 PHP_RUNTIME_SOURCES = php/base-stemmer.php
+
+# Python
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
 		         python/snowballstemmer/among.py
@@ -188,14 +234,6 @@ PYTHON_PACKAGE_FILES = python/MANIFEST.in \
 		       python/pyproject.toml \
 		       python/setup.py \
 		       python/setup.cfg
-
-LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
-LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
-LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = $(MODULES) libstemmer/libstemmer_c.in
-
-STEMWORDS_SOURCES = examples/stemwords.c
-STEMTEST_SOURCES = tests/stemtest.c
 
 PYTHON_STEMWORDS_SOURCE = python/stemwords.py
 
@@ -214,9 +252,9 @@ C_LIB_HEADERS = $(libstemmer_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h) \
 C_OTHER_SOURCES = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.c)
 C_OTHER_HEADERS = $(other_algorithms:%=$(c_src_dir)/stem_UTF_8_%.h)
 JAVA_SOURCES = $(libstemmer_algorithms:%=$(java_src_dir)/%Stemmer.java)
+CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 DART_SOURCES = $(libstemmer_algorithms:%=$(dart_src_dir)/%_stemmer.dart) \
 	$(dart_runtime_dir)/algorithms.dart
-CSHARP_SOURCES = $(libstemmer_algorithms:%=$(csharp_src_dir)/%Stemmer.generated.cs)
 PASCAL_SOURCES = $(ISO_8859_1_algorithms:%=$(pascal_src_dir)/%Stemmer.pas)
 PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
@@ -239,9 +277,9 @@ STEMWORDS_OBJECTS=$(STEMWORDS_SOURCES:.c=.o)
 STEMTEST_OBJECTS=$(STEMTEST_SOURCES:.c=.o)
 C_LIB_OBJECTS = $(C_LIB_SOURCES:.c=.o)
 C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
-JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
-JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
 DART_BUILD_ARTIFACTS = dart/.dart_tool dart/pubspec.lock dart/.dart_deps
+JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
+JAVA_RUNTIME_CLASSES=$(JAVA_RUNTIME_SOURCES:.java=.class)
 
 CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 CPPFLAGS=
@@ -259,17 +297,17 @@ clean:
 	      libstemmer.a stemwords$(EXEEXT) \
               libstemmer/modules.h \
               libstemmer/modules_utf8.h \
+	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
 	      $(C_LIB_SOURCES) $(C_LIB_HEADERS) $(C_LIB_OBJECTS) \
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
-	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
-	      $(DART_SOURCES) \
 	      $(CSHARP_SOURCES) \
-	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
-	      $(PYTHON_SOURCES) \
+	      $(DART_SOURCES) \
+	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(JS_SOURCES) \
+	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PHP_SOURCES) \
+	      $(PYTHON_SOURCES) \
 	      $(RUST_SOURCES) \
-	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
@@ -277,9 +315,9 @@ clean:
 	rm -rf ada/obj dist
 	rm -rf $(DART_BUILD_ARTIFACTS)
 	-rmdir $(c_src_dir)
-	-rmdir $(python_output_dir)
-	-rmdir $(php_output_dir)
 	-rmdir $(js_output_dir)
+	-rmdir $(php_output_dir)
+	-rmdir $(python_output_dir)
 
 update_version:
 	perl -pi -e '/SNOWBALL_VERSION/ && s/\d+\.\d+\.\d+/$(SNOWBALL_VERSION)/' \
@@ -288,16 +326,16 @@ update_version:
 		dart/pubspec.yaml \
 		python/setup.py
 
-everything: all java dart csharp pascal js rust go python ada
+everything: ada all csharp dart go java js pascal python rust
 
 baseline-create: everything
 	rm -rf *.baseline
-	for d in src_c java dart csharp pascal js_out rust go python_out ada ; do cp -a $$d $$d.baseline ; done
+	for d in ada src_c csharp dart go java js_out pascal python_out rust ; do cp -a $$d $$d.baseline ; done
 	rm -rf *.baseline/*.o ada.baseline/obj pascal.baseline/*.ppu
 	find java.baseline -name '*.class' -delete
 
 baseline-diff:
-	@for d in src_c java dart csharp pascal js_out rust go python_out ada ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
+	@for d in ada src_c csharp dart go java js_out pascal python_out rust ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
 
 .PHONY: all clean update_version everything baseline-create baseline-diff
 
@@ -308,6 +346,26 @@ snowball$(EXEEXT): $(COMPILER_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
+
+# Ada
+
+ifneq '$(filter grouped-target,$(.FEATURES))' ''
+# Grouped-targets were added in GNU make 4.3.
+$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
+else
+# This will fail to recreate the .ads if it is deleted but the corresponding
+# .adb is still present and up-to-date.  That seems better than forcing a
+# serial build with .NOTPARALLEL which it seems can only be applied to an
+# entire makefile, not per-rule.
+$(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
+	@:
+
+$(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
+endif
+	@mkdir -p $(ada_src_dir)
+	$(SNOWBALL_COMPILE) $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
+
+# C
 
 libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
 	sed 's/@MODULES_H@/modules.h/' $^ >$@
@@ -338,18 +396,6 @@ tests/%.o: tests/%.c
 stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
-	dart/generate_algorithms.pl $(libstemmer_algorithms) > $@
-
-csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
-	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
-
-pascal/stemwords.dpr: pascal/stemwords-template.dpr $(MODULES)
-	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
-
-pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
-	$(FPC) $(FPC_FLAGS) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
-
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
 	$(SNOWBALL_COMPILE) $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
@@ -369,32 +415,25 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
 
-$(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
-	@mkdir -p $(java_src_dir)
-	$(SNOWBALL_COMPILE) $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+# C#
 
-$(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
-	@mkdir -p $(dart_src_dir)
-	./snowball $< -d -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
+csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
 
 $(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
 	$(SNOWBALL_COMPILE) $< -cs -o "$(csharp_src_dir)/$*Stemmer.generated"
 
-$(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
-	@mkdir -p $(pascal_src_dir)
-	$(SNOWBALL_COMPILE) $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
+# Dart
 
-$(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
-	@mkdir -p $(python_output_dir)
-	$(SNOWBALL_COMPILE) $< -py -o "$(python_output_dir)/$*_stemmer"
+dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
+	dart/generate_algorithms.pl $(libstemmer_algorithms) > $@
 
-$(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
-	$(python) python/create_init.py $(python_output_dir)
+$(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(dart_src_dir)
+	./snowball $< -d -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
 
-$(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
-	@mkdir -p $(rust_src_dir)
-	$(SNOWBALL_COMPILE) $< -rust -o "$(rust_src_dir)/$*_stemmer"
+# Go
 
 $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 	@echo "Generating algorithms.go"
@@ -405,6 +444,14 @@ $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
+# Java
+
+$(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(java_src_dir)
+	$(SNOWBALL_COMPILE) $< -j -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+
+# Javascript
+
 $(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
 	$(SNOWBALL_COMPILE) $< -js -o "$(js_output_dir)/$*-stemmer"
@@ -412,6 +459,20 @@ $(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
 	cp $< $@
+
+# Pascal
+
+pascal/stemwords.dpr: pascal/stemwords-template.dpr $(MODULES)
+	pascal/generate.pl $(ISO_8859_1_algorithms) < pascal/stemwords-template.dpr > $@
+
+pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL_SOURCES)
+	$(FPC) $(FPC_FLAGS) -o$@ -Mdelphi $(PASCAL_STEMWORDS_SOURCES)
+
+$(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(pascal_src_dir)
+	$(SNOWBALL_COMPILE) $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
+
+# PHP
 
 $(php_output_dir)/%-stemmer.php: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(php_output_dir)
@@ -421,21 +482,20 @@ $(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
 	@mkdir -p $(php_output_dir)
 	cp $< $@
 
-ifneq '$(filter grouped-target,$(.FEATURES))' ''
-# Grouped-targets were added in GNU make 4.3.
-$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
-else
-# This will fail to recreate the .ads if it is deleted but the corresponding
-# .adb is still present and up-to-date.  That seems better than forcing a
-# serial build with .NOTPARALLEL which it seems can only be applied to an
-# entire makefile, not per-rule.
-$(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
-	@:
+# Python
 
-$(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
-endif
-	@mkdir -p $(ada_src_dir)
-	$(SNOWBALL_COMPILE) $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
+$(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(python_output_dir)
+	$(SNOWBALL_COMPILE) $< -py -o "$(python_output_dir)/$*_stemmer"
+
+$(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
+	$(python) python/create_init.py $(python_output_dir)
+
+# Rust
+
+$(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(rust_src_dir)
+	$(SNOWBALL_COMPILE) $< -rust -o "$(rust_src_dir)/$*_stemmer"
 
 .PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_dart dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
@@ -517,26 +577,24 @@ dist_libstemmer_c: \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
-# Make a distribution of all the sources required to compile the Java library.
-dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+# Make a distribution of all the sources required to compile the C# library.
+dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	    $(COMMON_FILES) \
             $(LIBSTEMMER_EXTRA) \
-	    $(JAVA_SOURCES)
-	destname=libstemmer_java-$(SNOWBALL_VERSION); \
+	    $(CSHARP_SOURCES)
+	destname=libstemmer_csharp-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
-	cp -a doc/libstemmer_java_README $${dest}/README && \
-	mkdir -p $${dest}/$(java_src_dir) && \
-	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
-	mkdir -p $${dest}/$(java_src_main_dir) && \
-	cp -a $(JAVARUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
+	cp -a doc/libstemmer_csharp_README $${dest}/README && \
+	mkdir -p $${dest}/$(csharp_src_dir) && \
+	cp -a $(CSHARP_SOURCES) $${dest}/$(csharp_src_dir) && \
+	mkdir -p $${dest}/$(csharp_src_main_dir) && \
+	cp -a $(CSHARP_RUNTIME_SOURCES) $${dest}/$(csharp_src_main_dir) && \
+	mkdir -p $${dest}/$(csharp_sample_dir) && \
+	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
 	cp -a $(COMMON_FILES) $${dest} && \
-	(cd $${dest} && \
-	 echo "README" >> MANIFEST && \
-	 ls $(java_src_dir)/*.java >> MANIFEST && \
-	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
@@ -572,42 +630,27 @@ dist_libstemmer_dart: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
-# Make a distribution of all the sources required to compile the C# library.
-dist_libstemmer_csharp: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
+# Make a distribution of all the sources required to compile the Java library.
+dist_libstemmer_java: $(RUNTIME_SOURCES) $(RUNTIME_HEADERS) \
 	    $(COMMON_FILES) \
             $(LIBSTEMMER_EXTRA) \
-	    $(CSHARP_SOURCES)
-	destname=libstemmer_csharp-$(SNOWBALL_VERSION); \
+	    $(JAVA_SOURCES)
+	destname=libstemmer_java-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}$(tarball_ext) && \
 	mkdir -p $${dest} && \
-	cp -a doc/libstemmer_csharp_README $${dest}/README && \
-	mkdir -p $${dest}/$(csharp_src_dir) && \
-	cp -a $(CSHARP_SOURCES) $${dest}/$(csharp_src_dir) && \
-	mkdir -p $${dest}/$(csharp_src_main_dir) && \
-	cp -a $(CSHARP_RUNTIME_SOURCES) $${dest}/$(csharp_src_main_dir) && \
-	mkdir -p $${dest}/$(csharp_sample_dir) && \
-	cp -a $(CSHARP_STEMWORDS_SOURCES) $${dest}/$(csharp_sample_dir) && \
+	cp -a doc/libstemmer_java_README $${dest}/README && \
+	mkdir -p $${dest}/$(java_src_dir) && \
+	cp -a $(JAVA_SOURCES) $${dest}/$(java_src_dir) && \
+	mkdir -p $${dest}/$(java_src_main_dir) && \
+	cp -a $(JAVA_RUNTIME_SOURCES) $${dest}/$(java_src_main_dir) && \
 	cp -a $(COMMON_FILES) $${dest} && \
+	(cd $${dest} && \
+	 echo "README" >> MANIFEST && \
+	 ls $(java_src_dir)/*.java >> MANIFEST && \
+	 ls $(java_src_main_dir)/*.java >> MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
-	rm -rf $${dest}
-
-dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
-	destname=snowballstemmer-$(SNOWBALL_VERSION); \
-	dest=dist/$${destname}; \
-	rm -rf $${dest} && \
-	rm -f $${dest}$(tarball_ext) && \
-	mkdir -p $${dest} && \
-	mkdir -p $${dest}/src/$(python_runtime_dir) && \
-	mkdir -p $${dest}/src/$(python_sample_dir) && \
-	cp $(MODULES) $${dest} && \
-	cp doc/libstemmer_python_README $${dest}/README.rst && \
-	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
-	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
-	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
-	cp -a $(COMMON_FILES) $(PYTHON_PACKAGE_FILES) $${dest} && \
-	(cd $${dest} && $(python) -m build && cp dist/*.tar.gz dist/*.whl ..) && \
 	rm -rf $${dest}
 
 dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
@@ -643,6 +686,57 @@ dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
 	 ls README.rst $(COMMON_FILES) $(php_runtime_dir)/*.php > MANIFEST) && \
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
+
+dist_libstemmer_python: $(PYTHON_SOURCES) $(COMMON_FILES)
+	destname=snowballstemmer-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/src/$(python_runtime_dir) && \
+	mkdir -p $${dest}/src/$(python_sample_dir) && \
+	cp $(MODULES) $${dest} && \
+	cp doc/libstemmer_python_README $${dest}/README.rst && \
+	cp -a $(PYTHON_SOURCES) $${dest}/src/$(python_runtime_dir) && \
+	cp -a $(PYTHON_SAMPLE_SOURCES) $${dest}/src/$(python_sample_dir) && \
+	cp -a $(PYTHON_RUNTIME_SOURCES) $${dest}/src/$(python_runtime_dir) && \
+	cp -a $(COMMON_FILES) $(PYTHON_PACKAGE_FILES) $${dest} && \
+	(cd $${dest} && $(python) -m build && cp dist/*.tar.gz dist/*.whl ..) && \
+	rm -rf $${dest}
+
+###############################################################################
+# Ada
+###############################################################################
+
+.PHONY: ada check_ada do_check_ada
+
+ada: ada/bin/stemwords
+
+check_ada: ada
+	$(MAKE) do_check_ada
+
+do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
+
+check_ada_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for Ada"
+	@cd ada && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	  ./bin/stemwords $* /dev/stdin $(PWD)/tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
+	else \
+	  ./bin/stemwords $* $</voc.txt /dev/stdout |\
+	      $(DIFF) -u $</output.txt -; \
+	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+
+$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
+	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
+
+ada/bin/generate:
+	cd ada && $(gprbuild) -Pgenerate -p
+
+ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
+	cd ada && $(gprbuild) -Pstemwords -p
 
 ###############################################################################
 # C
@@ -701,31 +795,26 @@ check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	    $(DIFF) -u '$</output.txt' -
 
 ###############################################################################
-# Java
+# C#
 ###############################################################################
 
-.PHONY: java check_java do_check_java
+.PHONY: csharp check_csharp do_check_csharp
 
-.SUFFIXES: .class .java
+csharp: csharp_stemwords$(EXEEXT)
 
-java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
+check_csharp: csharp
+	$(MAKE) do_check_csharp
 
-.java.class:
-	cd java && $(JAVAC) $(JAVACFLAGS) $(patsubst java/%,%,$<)
+do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
 
-check_java: java
-	$(MAKE) do_check_java
-
-do_check_java: $(libstemmer_algorithms:%=check_java_%)
-
-check_java_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Java"
-	@cd java && if test -f '$</voc.txt.gz' ; then \
+check_csharp_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for C#"
+	@if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(JAVA) org/tartarus/snowball/TestApp $* -o $(PWD)/tmp.txt; \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
+	    $(MONO) csharp_stemwords$(EXEEXT) -l $* -o tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt |\
+	  $(MONO) csharp_stemwords$(EXEEXT) -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
@@ -763,49 +852,59 @@ check_dart_%: $(STEMMING_DATA_ABS)/%
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
-# C#
+# Go
 ###############################################################################
 
-.PHONY: csharp check_csharp do_check_csharp
+.PHONY: go check_go do_check_go
 
-csharp: csharp_stemwords$(EXEEXT)
+go: $(GO_SOURCES)
 
-check_csharp: csharp
-	$(MAKE) do_check_csharp
+check_go: go
+	$(MAKE) do_check_go
 
-do_check_csharp: $(libstemmer_algorithms:%=check_csharp_%)
+do_check_go: $(libstemmer_algorithms:%=check_go_%)
 
-check_csharp_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for C#"
-	@if test -f '$</voc.txt.gz' ; then \
+check_go_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for Go"
+	@cd go && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(MONO) csharp_stemwords$(EXEEXT) -l $* -o tmp.txt; \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	      $(go) run $(goflags) -l $* -o $(PWD)/tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
 	else \
-	  $(MONO) csharp_stemwords$(EXEEXT) -l $* -i $</voc.txt |\
+	  $(go) run $(goflags) -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
-# Pascal
+# Java
 ###############################################################################
 
-.PHONY: pascal check_pascal do_check_pascal
+.PHONY: java check_java do_check_java
 
-pascal: pascal/stemwords
+.SUFFIXES: .class .java
 
-check_pascal: pascal
-	$(MAKE) do_check_pascal
+java: $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES)
 
-do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
+.java.class:
+	cd java && $(JAVAC) $(JAVACFLAGS) $(patsubst java/%,%,$<)
 
-check_pascal_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer with ISO_8859_1 for Pascal"
-	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
-	    ./pascal/stemwords -l $* |\
-	    $(ICONV) -f ISO-8859-1 -t UTF-8 |\
-	    $(DIFF) -u $</output.txt -
+check_java: java
+	$(MAKE) do_check_java
+
+do_check_java: $(libstemmer_algorithms:%=check_java_%)
+
+check_java_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for Java"
+	@cd java && if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' |\
+	    $(JAVA) org/tartarus/snowball/TestApp $* -o $(PWD)/tmp.txt; \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
+	else \
+	  $(JAVA) org/tartarus/snowball/TestApp $* $</voc.txt |\
+	      $(DIFF) -u $</output.txt - ;\
+	fi
+	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
 # Javascript
@@ -834,6 +933,26 @@ check_js_%: $(STEMMING_DATA)/%
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
 ###############################################################################
+# Pascal
+###############################################################################
+
+.PHONY: pascal check_pascal do_check_pascal
+
+pascal: pascal/stemwords
+
+check_pascal: pascal
+	$(MAKE) do_check_pascal
+
+do_check_pascal: $(ISO_8859_1_algorithms:%=check_pascal_%)
+
+check_pascal_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer with ISO_8859_1 for Pascal"
+	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
+	    ./pascal/stemwords -l $* |\
+	    $(ICONV) -f ISO-8859-1 -t UTF-8 |\
+	    $(DIFF) -u $</output.txt -
+
+###############################################################################
 # PHP
 ###############################################################################
 
@@ -855,56 +974,6 @@ check_php_%: $(STEMMING_DATA)/%
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
 	  $(PHP) php/stemwords.php $* < $</voc.txt |\
-	      $(DIFF) -u $</output.txt - ;\
-	fi
-	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
-
-###############################################################################
-# Rust
-###############################################################################
-
-.PHONY: rust check_rust do_check_rust
-
-rust: $(RUST_SOURCES)
-
-check_rust: rust
-	$(MAKE) do_check_rust
-
-do_check_rust: $(libstemmer_algorithms:%=check_rust_%)
-
-check_rust_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Rust"
-	@cd rust && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' |\
-	      $(cargo) run $(cargoflags) -- -l $* -o $(PWD)/tmp.txt; \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	else \
-	  $(cargo) run $(cargoflags) -- -l $* -i $</voc.txt |\
-	      $(DIFF) -u $</output.txt - ;\
-	fi
-	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
-
-###############################################################################
-# Go
-###############################################################################
-
-.PHONY: go check_go do_check_go
-
-go: $(GO_SOURCES)
-
-check_go: go
-	$(MAKE) do_check_go
-
-do_check_go: $(libstemmer_algorithms:%=check_go_%)
-
-check_go_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Go"
-	@cd go && if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz' |\
-	      $(go) run $(goflags) -l $* -o $(PWD)/tmp.txt; \
-	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
-	else \
-	  $(go) run $(goflags) -l $* -i $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
@@ -940,38 +1009,29 @@ check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
 
 ###############################################################################
-# Ada
+# Rust
 ###############################################################################
 
-.PHONY: ada check_ada do_check_ada
+.PHONY: rust check_rust do_check_rust
 
-ada: ada/bin/stemwords
+rust: $(RUST_SOURCES)
 
-check_ada: ada
-	$(MAKE) do_check_ada
+check_rust: rust
+	$(MAKE) do_check_rust
 
-do_check_ada: $(libstemmer_algorithms:%=check_ada_%)
+do_check_rust: $(libstemmer_algorithms:%=check_rust_%)
 
-check_ada_%: $(STEMMING_DATA_ABS)/%
-	@echo "Checking output of $* stemmer for Ada"
-	@cd ada && if test -f '$</voc.txt.gz' ; then \
+check_rust_%: $(STEMMING_DATA_ABS)/%
+	@echo "Checking output of $* stemmer for Rust"
+	@cd rust && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	  ./bin/stemwords $* /dev/stdin $(PWD)/tmp.txt; \
+	      $(cargo) run $(cargoflags) -- -l $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
 	else \
-	  ./bin/stemwords $* $</voc.txt /dev/stdout |\
-	      $(DIFF) -u $</output.txt -; \
+	  $(cargo) run $(cargoflags) -- -l $* -i $</voc.txt |\
+	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
-
-$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
-	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
-
-ada/bin/generate:
-	cd ada && $(gprbuild) -Pgenerate -p
-
-ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
-	cd ada && $(gprbuild) -Pstemwords -p
 
 ###############################################################################
 # Runtime tests

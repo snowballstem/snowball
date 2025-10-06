@@ -575,7 +575,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     struct str * a1 = str_copy(g->failure_str);
 
     int end_unreachable = false;
-    int golab = -1;
 
     w(g, "~Mwhile (true) {~N~+");
 
@@ -597,9 +596,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     } else {
         /* include for goto; omit for gopast */
         if (style == 1) write_restorecursor(g, p, savevar);
-        if (golab < 0) golab = new_label(g);
-        g->I[0] = golab;
-        w(g, "~Mgoto lab~I0;~N");
+        w(g, "~Mbreak;~N");
     }
     g->unreachable = false;
     if (g->label_used)
@@ -608,6 +605,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         write_restorecursor(g, p, savevar);
         str_delete(savevar);
     }
+
     g->label_used = used;
     g->failure_label = a0;
     str_delete(g->failure_str);
@@ -616,8 +614,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     write_check_limit(g, p);
     write_inc_cursor(g, p);
     write_block_end(g);
-    if (golab >= 0)
-        wsetl(g, golab);
     g->unreachable = end_unreachable;
 }
 

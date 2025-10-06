@@ -444,10 +444,9 @@ static void generate_not(struct generator * g, struct node * p) {
         write_savecursor(g, p, savevar);
     }
 
-    g->failure_label = new_label(g);
+    int label = new_label(g);
+    g->failure_label = label;
     str_clear(g->failure_str);
-
-    int l = g->failure_label;
 
     generate(g, p->left);
 
@@ -458,7 +457,7 @@ static void generate_not(struct generator * g, struct node * p) {
     if (!g->unreachable) write_failure(g);
 
     if (g->label_used)
-        wsetl(g, l);
+        wsetl(g, label);
 
     g->unreachable = false;
 
@@ -595,10 +594,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     int end_unreachable = false;
 
-    int golab = new_label(g);
-
     w(g, "~MWhile True Do~N");
-    w(g, "~{");
+    write_block_start(g);
 
     struct str * savevar = NULL;
     if (style == 1 || repeat_restore(g, p->left)) {
@@ -618,8 +615,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     } else {
         /* include for goto; omit for gopast */
         if (style == 1) write_restorecursor(g, p, savevar);
-        g->I[0] = golab;
-        w(g, "~Mgoto lab~I0;~N");
+        w(g, "~MBreak;~N");
     }
     g->unreachable = false;
     if (g->label_used)
@@ -628,6 +624,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         write_restorecursor(g, p, savevar);
         str_delete(savevar);
     }
+
     g->label_used = used;
     g->failure_label = a0;
     str_delete(g->failure_str);
@@ -635,9 +632,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 
     write_check_limit(g, p);
     write_inc_cursor(g, p);
-
-    g->I[0] = golab;
-    w(g, "~}lab~I0:~N");
+    write_block_end(g);
     g->unreachable = end_unreachable;
 }
 
@@ -661,7 +656,7 @@ static void generate_loop(struct generator * g, struct node * p) {
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
     int replab = new_label(g);
     g->I[0] = replab;
-    writef(g, "lab~I0:~N~MWhile True Do~N~{", p);
+    writef(g, "lab~I0:~N~{", p);
 
     struct str * savevar = NULL;
     if (repeat_restore(g, p->left)) {
@@ -670,6 +665,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     }
 
     g->failure_label = new_label(g);
+    g->label_used = 0;
     str_clear(g->failure_str);
     generate(g, p->left);
 
@@ -691,7 +687,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
         str_delete(savevar);
     }
 
-    w(g, "~MBreak;~N~}");
+    w(g, "~}");
 }
 
 static void generate_repeat(struct generator * g, struct node * p) {
