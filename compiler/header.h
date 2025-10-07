@@ -11,8 +11,12 @@ typedef unsigned short symbol;
 #define MALLOC check_malloc
 #define FREE check_free
 
-#define NEW(type, p) struct type * p = (struct type *) MALLOC(sizeof(struct type))
-#define NEWVEC(type, p, n) struct type * p = (struct type *) MALLOC(sizeof(struct type) * (n))
+// Declare variable `V` of type `struct TYPE *` and dynamically allocate it.
+// We exit on allocation failure so `V` is always non-NULL.
+#define NEW(TYPE, V) struct TYPE * V = (struct TYPE *) MALLOC(sizeof(struct TYPE))
+
+// Similar to NEW() but allocates an array of N objects of type `struct TYPE *`.
+#define NEWVEC(TYPE, V, N) struct TYPE * V = (struct TYPE *) MALLOC(sizeof(struct TYPE) * (N))
 
 #define SIZE(p)     ((int *)(p))[-1]
 #define CAPACITY(p) ((int *)(p))[-2]
