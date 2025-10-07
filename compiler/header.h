@@ -216,6 +216,7 @@ struct name {
     byte initialised;           /* (For variables) is it ever initialised? */
     byte used_in_definition;    /* (grouping) used in grouping definition? */
     byte amongvar_needed;       /* for routines, externals */
+    byte among_with_function;   /* (routines/externals) contains among with func */
     struct node * definition;   /* (routines/externals) c_define node */
     int used_in_among;          /* (routines/externals) Count of uses in amongs */
     // Initialised to -1; set to -2 if reachable from an external.

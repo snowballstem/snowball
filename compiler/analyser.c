@@ -869,6 +869,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         return p;
     }
 
+    if (x->function_count) {
+        if (a->current_routine) a->current_routine->among_with_function = true;
+    }
+
     x->substring = substring;
     if (substring != NULL) substring->among = x;
 
