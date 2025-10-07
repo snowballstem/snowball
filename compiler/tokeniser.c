@@ -544,24 +544,16 @@ extern void disable_token(struct tokeniser * t, int code) {
 
 extern struct tokeniser * create_tokeniser(byte * p, char * file) {
     NEW(tokeniser, t);
-    t->next = NULL;
+    *t = (struct tokeniser){0};
     t->p = p;
-    t->c = 0;
     t->file = file;
-    t->file_owned = 0;
     t->line_number = 1;
     t->b = create_b(0);
     t->s = create_s(0);
     t->m_start = -1;
-    t->m_pairs = NULL;
-    t->get_depth = 0;
-    t->error_count = 0;
-    t->token_held = false;
-    t->token_reported_as_unexpected = false;
     t->token = -2;
     t->previous_token = -2;
     t->uplusmode = UPLUS_NONE;
-    memset(t->token_disabled, 0, sizeof(t->token_disabled));
     return t;
 }
 

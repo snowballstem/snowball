@@ -2074,18 +2074,10 @@ extern void generate_program_c(struct generator * g) {
 
 extern struct generator * create_generator(struct analyser * a, struct options * o) {
     NEW(generator, g);
+    *g = (struct generator){0};
     g->analyser = a;
     g->options = o;
-    g->margin = 0;
-    g->debug_count = 0;
-    g->copy_from_count = 0;
-    g->line_count = 0;
-    g->line_labelled = 0;
     g->failure_label = -1;
-    g->unreachable = false;
-    g->max_label = 0;
-    g->java_import_arrays = false;
-    g->java_import_chararraysequence = false;
     return g;
 }
 

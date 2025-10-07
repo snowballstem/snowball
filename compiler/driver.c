@@ -85,7 +85,8 @@ static FILE * get_output(byte * s) {
     return output;
 }
 
-static int read_options(struct options * o, int argc, char * argv[]) {
+static struct options * read_options(int * argc_ptr, char * argv[]) {
+    int argc = *argc_ptr;
     int i = 1;
     int new_argc = 1;
     /* Note down the last option used to specify an explicit encoding so
@@ -93,23 +94,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
      */
     const char * encoding_opt = NULL;
 
-    /* set defaults: */
+    NEW(options, o);
+    *o = (struct options){0};
 
-    o->output_file = NULL;
-    o->syntax_tree = false;
-    o->comments = false;
-    o->externals_prefix = NULL;
-    o->variables_prefix = NULL;
-    o->runtime_path = NULL;
-    o->parent_class_name = NULL;
-    o->string_class = NULL;
-    o->among_class = NULL;
-    o->package = NULL;
-    o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
-    o->name = NULL;
+    // Set defaults which differ from empty initialisation.
     o->target_lang = LANG_C;
-    o->includes = NULL;
-    o->includes_end = NULL;
     o->encoding = ENC_SINGLEBYTE;
 
     /* read options: */
@@ -214,9 +203,10 @@ static int read_options(struct options * o, int argc, char * argv[]) {
 
                 {
                     NEW(include, p);
+                    *p = (struct include){0};
                     byte * include_dir = add_sz_to_s(NULL, argv[i++]);
                     include_dir = add_char_to_s(include_dir, '/');
-                    p->next = NULL; p->s = include_dir;
+                    p->s = include_dir;
 
                     if (o->includes == NULL) {
                         o->includes = p;
@@ -307,6 +297,8 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             o->encoding = ENC_UTF8;
             if (!o->package)
                 o->package = DEFAULT_GO_PACKAGE;
+            if (!o->go_snowball_runtime)
+                o->go_snowball_runtime = DEFAULT_GO_SNOWBALL_RUNTIME;
             break;
         case LANG_ADA:
             o->encoding = ENC_UTF8;
@@ -428,13 +420,13 @@ static int read_options(struct options * o, int argc, char * argv[]) {
         }
     }
 
-    return new_argc;
+    *argc_ptr = new_argc;
+    return o;
 }
 
 extern int main(int argc, char * argv[]) {
     int i;
-    NEW(options, o);
-    argc = read_options(o, argc, argv);
+    struct options * o = read_options(&argc, argv);
     {
         char * file = argv[1];
         byte * u = get_input(file);
@@ -453,6 +445,7 @@ extern int main(int argc, char * argv[]) {
              * 'get' uses. */
             for (i = 2; i != argc; ++i) {
                 NEW(input, q);
+                *q = (struct input){0};
                 file = argv[i];
                 u = get_input(file);
                 if (u == NULL) {
@@ -460,9 +453,7 @@ extern int main(int argc, char * argv[]) {
                     exit(1);
                 }
                 q->p = u;
-                q->c = 0;
                 q->file = file;
-                q->file_owned = 0;
                 q->line_number = 1;
                 *next_input_ptr = q;
                 next_input_ptr = &(q->next);

@@ -67,7 +67,7 @@ extern void output_str(FILE * outfile, struct str * str);
 extern int get_utf8(const symbol * p, int * slot);
 extern int put_utf8(int ch, symbol * p);
 
-typedef enum { ENC_SINGLEBYTE, ENC_UTF8, ENC_WIDECHARS } enc;
+typedef enum { ENC_SINGLEBYTE = 0, ENC_UTF8, ENC_WIDECHARS } enc;
 
 /* stringdef name and value */
 struct m_pair {
@@ -142,7 +142,7 @@ enum token_codes {
 };
 
 enum uplus_modes {
-    UPLUS_NONE,
+    UPLUS_NONE = 0,
     UPLUS_DEFINED,
     UPLUS_UNICODE
 };
@@ -403,8 +403,8 @@ struct options {
     byte comments;
     enc encoding;
     enum {
+        LANG_C = 0, // We generate C by default.
         LANG_ADA,
-        LANG_C,
         LANG_CPLUSPLUS,
         LANG_CSHARP,
         LANG_DART,

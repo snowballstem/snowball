@@ -37,16 +37,12 @@ extern void print_program(struct analyser * a) {
 
 static struct node * new_node(struct analyser * a, int type) {
     NEW(node, p);
-    p->next = a->nodes; a->nodes = p;
-    p->left = NULL;
-    p->right = NULL;
-    p->aux = NULL;
-    p->AE = NULL;
-    p->name = NULL;
-    p->literalstring = NULL;
+    *p = (struct node){0};
     p->mode = a->mode;
     p->line_number = a->tokeniser->line_number;
     p->type = type;
+    p->next = a->nodes;
+    a->nodes = p;
     return p;
 }
 
@@ -229,23 +225,13 @@ handle_as_name:
                     fprintf(stderr, "'%.*s' re-declared\n", SIZE(t->s), t->s);
                 } else {
                     NEW(name, p);
+                    *p = (struct name){0};
+                    p->mode = m_unknown; /* used for routines, externals */
                     p->s = copy_s(t->s);
                     p->type = type;
-                    p->mode = m_unknown; /* used for routines, externals */
                     /* We defer assigning counts until after we've eliminated
                      * variables whose values are never used. */
                     p->count = -1;
-                    p->referenced = false;
-                    p->used = NULL;
-                    p->value_used = false;
-                    p->initialised = false;
-                    p->used_in_definition = false;
-                    p->amongvar_needed = false;
-                    p->local_to = NULL;
-                    p->grouping = NULL;
-                    p->definition = NULL;
-                    p->used_in_among = 0;
-                    p->among_index = 0;
                     p->declaration_line_number = t->line_number;
                     p->next = a->names;
                     a->names = p;
@@ -665,17 +651,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     int direction = substring != NULL ? substring->mode : p->mode;
     int backward = direction == m_backward;
 
-    x->next = NULL;
+    *x = (struct among){0};
     x->node = p;
     x->b = v;
-    x->number = 0; // Number after we've identified any unreachable amongs.
-    x->function_count = 0;
-    x->nocommand_count = 0;
-    x->amongvar_needed = false;
-    x->always_matches = false;
-    x->used = false;
     x->shortest_size = INT_MAX;
-    x->longest_size = 0;
     x->in_routine = a->current_routine;
 
     if (q->type == c_bra) {
@@ -1564,6 +1543,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
     int style = c_plus;
     {
         NEW(grouping, p);
+        *p = (struct grouping){0};
         if (a->groupings == NULL) a->groupings = p; else a->groupings_end->next = p;
         a->groupings_end = p;
         if (q) {
@@ -1574,7 +1554,6 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
             }
             q->grouping = p;
         }
-        p->next = NULL;
         p->name = q;
         p->line_number = t->line_number;
         p->b = create_b(0);
@@ -2282,21 +2261,10 @@ extern void read_program(struct analyser * a) {
 
 extern struct analyser * create_analyser(struct tokeniser * t) {
     NEW(analyser, a);
+    *a = (struct analyser){0};
     a->tokeniser = t;
-    a->nodes = NULL;
-    a->names = NULL;
-    a->literalstrings = NULL;
-    a->program = NULL;
-    a->amongs = NULL;
-    a->among_with_function_count = 0;
-    a->groupings = NULL;
     a->mode = m_forward;
     a->modifyable = true;
-    for (int i = 0; i < t_size; i++) a->name_count[i] = 0;
-    a->substring = NULL;
-    a->current_routine = NULL;
-    a->int_limits_used = false;
-    a->debug_used = false;
     return a;
 }
 
