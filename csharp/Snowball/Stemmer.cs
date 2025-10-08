@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2001, Dr Martin Porter
 // Copyright (c) 2002, Richard Boulton
 // Copyright (c) 2015, Cesar Souza
-// Copyright (c) 2018, Olly Betts
+// Copyright (c) 2018-2025, Olly Betts
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
