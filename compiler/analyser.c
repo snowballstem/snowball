@@ -32,7 +32,7 @@ static void print_node_(const struct node * p, int n, const char * s) {
 }
 
 extern void print_program(struct analyser * a) {
-    print_node_(a->program, 0, "");
+    if (a->program) print_node_(a->program, 0, "");
 }
 
 static struct node * new_node(struct analyser * a, int type) {
