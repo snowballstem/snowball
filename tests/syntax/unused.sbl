@@ -1,7 +1,8 @@
-// Test unused routines and groupings.
+// Test unused variables, routines and groupings.
 externals (stem)
-integers (x)
-booleans (b)
+integers (x unused_int)
+booleans (b unused_bool)
+strings (unused string)
 routines (r)
 groupings (g)
 define g 'aeiou'

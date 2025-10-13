@@ -2081,7 +2081,7 @@ extern void read_program(struct analyser * a) {
                 q->type == t_grouping) {
                 fprintf(stderr, "declared but not defined\n");
             } else {
-                fprintf(stderr, "defined but not used\n");
+                fprintf(stderr, "declared but not used\n");
             }
             q->used = NULL;
             continue;
