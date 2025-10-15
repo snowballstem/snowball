@@ -82,14 +82,16 @@ private
 
    type Among_Array_Type is array (Natural range <>) of Among_Type;
 
-   function Eq_S (Context : in out Context_Type'Class;
-                  S       : in String;
-                  Len     : in Char_Index) return Boolean with
+   procedure Eq_S (Context : in out Context_Type'Class;
+                   S       : in String;
+                   Len     : in Char_Index;
+                   Result  : out Boolean) with
      Global => null;
 
-   function Eq_S_Backward (Context : in out Context_Type'Class;
-                           S       : in String;
-                           Len     : in Char_Index) return Boolean with
+   procedure Eq_S_Backward (Context : in out Context_Type'Class;
+                            S       : in String;
+                            Len     : in Char_Index;
+                            Result  : out Boolean) with
      Global => null;
 
    procedure Find_Among (Context : in out Context_Type'Class;

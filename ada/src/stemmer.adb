@@ -50,32 +50,38 @@ package body Stemmer with SPARK_Mode is
       return Context.P (1 .. Context.Len);
    end Get_Result;
 
-   function Eq_S (Context : in out Context_Type'Class;
-                  S       : in String;
-                  Len     : in Char_Index) return Boolean is
+   procedure Eq_S (Context : in out Context_Type'Class;
+                   S       : in String;
+                   Len     : in Char_Index;
+                   Result  : out Boolean) is
    begin
       if Context.L - Context.C < Len then
-         return False;
+         Result := False;
+         return;
       end if;
       if Context.P (Context.C + 1 .. Context.C + Len) /= S (S'First .. Len) then
-         return False;
+         Result := False;
+         return;
       end if;
       Context.C := Context.C + Len;
-      return True;
+      Result := True;
    end Eq_S;
 
-   function Eq_S_Backward (Context : in out Context_Type'Class;
-                           S       : in String;
-                           Len     : in Char_Index) return Boolean is
+   procedure Eq_S_Backward (Context : in out Context_Type'Class;
+                            S       : in String;
+                            Len     : in Char_Index;
+                            Result  : out Boolean) is
    begin
       if Context.C - Context.Lb < Len then
-         return False;
+         Result := False;
+         return;
       end if;
       if Context.P (Context.C + 1 - Len .. Context.C) /= S (S'First .. Len) then
-         return False;
+         Result := False;
+         return;
       end if;
       Context.C := Context.C - Len;
-      return True;
+      Result := True;
    end Eq_S_Backward;
 
    function Length_Utf8 (S   : in String;
