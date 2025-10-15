@@ -33,54 +33,54 @@ package body Stemmer with SPARK_Mode is
    subtype Byte is Interfaces.Unsigned_8;
    use type Interfaces.Unsigned_8;
 
-   procedure Stem_Word (Context  : in out Context_Type'Class;
-                        Word     : in String;
-                        Result   : out Boolean) is
+   procedure Stem_Word (Z      : in out Context_Type'Class;
+                        Word   : in String;
+                        Result : out Boolean) is
    begin
-      Context.P (1 .. Word'Length) := Word;
-      Context.Len := Word'Length;
-      Context.C := 0;
-      Context.L := Word'Length;
-      Context.Lb := 0;
-      Stemmer.Stem (Context, Result);
+      Z.P (1 .. Word'Length) := Word;
+      Z.Len := Word'Length;
+      Z.C := 0;
+      Z.L := Word'Length;
+      Z.Lb := 0;
+      Stemmer.Stem (Z, Result);
    end Stem_Word;
 
-   function Get_Result (Context : in Context_Type'Class) return String is
+   function Get_Result (Z : in Context_Type'Class) return String is
    begin
-      return Context.P (1 .. Context.Len);
+      return Z.P (1 .. Z.Len);
    end Get_Result;
 
-   procedure Eq_S (Context : in out Context_Type'Class;
-                   S       : in String;
-                   Len     : in Char_Index;
-                   Result  : out Boolean) is
+   procedure Eq_S (Z      : in out Context_Type'Class;
+                   S      : in String;
+                   Len    : in Char_Index;
+                   Result : out Boolean) is
    begin
-      if Context.L - Context.C < Len then
+      if Z.L - Z.C < Len then
          Result := False;
          return;
       end if;
-      if Context.P (Context.C + 1 .. Context.C + Len) /= S (S'First .. Len) then
+      if Z.P (Z.C + 1 .. Z.C + Len) /= S (S'First .. Len) then
          Result := False;
          return;
       end if;
-      Context.C := Context.C + Len;
+      Z.C := Z.C + Len;
       Result := True;
    end Eq_S;
 
-   procedure Eq_S_Backward (Context : in out Context_Type'Class;
-                            S       : in String;
-                            Len     : in Char_Index;
-                            Result  : out Boolean) is
+   procedure Eq_S_Backward (Z      : in out Context_Type'Class;
+                            S      : in String;
+                            Len    : in Char_Index;
+                            Result : out Boolean) is
    begin
-      if Context.C - Context.Lb < Len then
+      if Z.C - Z.Lb < Len then
          Result := False;
          return;
       end if;
-      if Context.P (Context.C + 1 - Len .. Context.C) /= S (S'First .. Len) then
+      if Z.P (Z.C + 1 - Len .. Z.C) /= S (S'First .. Len) then
          Result := False;
          return;
       end if;
-      Context.C := Context.C - Len;
+      Z.C := Z.C - Len;
       Result := True;
    end Eq_S_Backward;
 
@@ -100,12 +100,12 @@ package body Stemmer with SPARK_Mode is
       return Count;
    end Length_Utf8;
 
-   function Check_Among (Context : in Context_Type'Class;
-                         Pos     : in Char_Index;
-                         Shift   : in Natural;
-                         Mask    : in Mask_Type) return Boolean is
+   function Check_Among (Z     : in Context_Type'Class;
+                         Pos   : in Char_Index;
+                         Shift : in Natural;
+                         Mask  : in Mask_Type) return Boolean is
       use Interfaces;
-      Val : constant Byte := Character'Pos (Context.P (Pos + 1));
+      Val : constant Byte := Character'Pos (Z.P (Pos + 1));
    begin
       if Natural (Shift_Right (Val, 5)) /= Shift then
          return True;
@@ -113,7 +113,7 @@ package body Stemmer with SPARK_Mode is
       return (Shift_Right (Unsigned_64 (Mask), Natural (Val and 16#1f#)) and 1) = 0;
    end Check_Among;
 
-   procedure Find_Among (Context : in out Context_Type'Class;
+   procedure Find_Among (Z       : in out Context_Type'Class;
                          Amongs  : in Among_Array_Type;
                          Pattern : in String;
                          Execute : access procedure
@@ -126,8 +126,8 @@ package body Stemmer with SPARK_Mode is
       Common_I : Natural := 0;
       Common_J : Natural := 0;
       First_Key_Inspected : Boolean := False;
-      C   : constant Natural := Context.C;
-      L   : constant Integer := Context.L;
+      C   : constant Natural := Z.C;
+      L   : constant Integer := Z.L;
    begin
       loop
          declare
@@ -141,7 +141,7 @@ package body Stemmer with SPARK_Mode is
                   Diff := -1;
                   exit;
                end if;
-               Diff := Character'Pos (Context.P (C + Common + 1))
+               Diff := Character'Pos (Z.P (C + Common + 1))
                  - Character'Pos (Pattern (I2));
                exit when Diff /= 0;
                Common := Common + 1;
@@ -167,14 +167,14 @@ package body Stemmer with SPARK_Mode is
             Status : Boolean;
          begin
             if Common_I >= Len then
-               Context.C := C + Len;
+               Z.C := C + Len;
                if W.Operation = 0 then
                   Result := W.Result;
                   return;
                end if;
-               Execute (Context, W.Operation, Status);
+               Execute (Z, W.Operation, Status);
                if Status then
-                  Context.C := C + Len;
+                  Z.C := C + Len;
                   Result := W.Result;
                   return;
                end if;
@@ -186,7 +186,7 @@ package body Stemmer with SPARK_Mode is
       Result := 0;
    end Find_Among;
 
-   procedure Find_Among_Backward (Context : in out Context_Type'Class;
+   procedure Find_Among_Backward (Z       : in out Context_Type'Class;
                                   Amongs  : in Among_Array_Type;
                                   Pattern : in String;
                                   Execute : access procedure
@@ -199,8 +199,8 @@ package body Stemmer with SPARK_Mode is
       Common_I : Natural := 0;
       Common_J : Natural := 0;
       First_Key_Inspected : Boolean := False;
-      C   : constant Integer := Context.C;
-      Lb  : constant Integer := Context.Lb;
+      C   : constant Integer := Z.C;
+      Lb  : constant Integer := Z.Lb;
    begin
       loop
          declare
@@ -214,7 +214,7 @@ package body Stemmer with SPARK_Mode is
                   Diff := -1;
                   exit;
                end if;
-               Diff := Character'Pos (Context.P (C - Common))
+               Diff := Character'Pos (Z.P (C - Common))
                  - Character'Pos (Pattern (I2));
                exit when Diff /= 0;
                Common := Common + 1;
@@ -240,14 +240,14 @@ package body Stemmer with SPARK_Mode is
             Status : Boolean;
          begin
             if Common_I >= Len then
-               Context.C := C - Len;
+               Z.C := C - Len;
                if W.Operation = 0 then
                   Result := W.Result;
                   return;
                end if;
-               Execute (Context, W.Operation, Status);
+               Execute (Z, W.Operation, Status);
                if Status then
-                  Context.C := C - Len;
+                  Z.C := C - Len;
                   Result := W.Result;
                   return;
                end if;
@@ -259,18 +259,18 @@ package body Stemmer with SPARK_Mode is
       Result := 0;
    end Find_Among_Backward;
 
-   function Skip_Utf8 (Context : in Context_Type'Class) return Result_Index is
-      Pos : Char_Index := Context.C;
+   function Skip_Utf8 (Z : in Context_Type'Class) return Result_Index is
+      Pos : Char_Index := Z.C;
       Val : Byte;
    begin
-      if Pos >= Context.L then
+      if Pos >= Z.L then
          return -1;
       end if;
       Pos := Pos + 1;
-      Val := Character'Pos (Context.P (Pos));
+      Val := Character'Pos (Z.P (Pos));
       if Val >= 16#C0# then
-         while Pos < Context.L loop
-            Val := Character'Pos (Context.P (Pos + 1));
+         while Pos < Z.L loop
+            Val := Character'Pos (Z.P (Pos + 1));
             exit when Val >= 16#C0# or Val < 16#80#;
             Pos := Pos + 1;
          end loop;
@@ -278,23 +278,23 @@ package body Stemmer with SPARK_Mode is
       return Pos;
    end Skip_Utf8;
 
-   function Skip_Utf8 (Context : in Context_Type'Class;
+   function Skip_Utf8 (Z : in Context_Type'Class;
                        N       : in Integer) return Result_Index is
-      Pos : Char_Index := Context.C;
+      Pos : Char_Index := Z.C;
       Val : Byte;
    begin
       if N < 0 then
           return -1;
       end if;
       for I in 1 .. N loop
-         if Pos >= Context.L then
+         if Pos >= Z.L then
             return -1;
          end if;
          Pos := Pos + 1;
-         Val := Character'Pos (Context.P (Pos));
+         Val := Character'Pos (Z.P (Pos));
          if Val >= 16#C0# then
-            while Pos < Context.L loop
-               Val := Character'Pos (Context.P (Pos + 1));
+            while Pos < Z.L loop
+               Val := Character'Pos (Z.P (Pos + 1));
                exit when Val >= 16#C0# or Val < 16#80#;
                Pos := Pos + 1;
             end loop;
@@ -303,18 +303,18 @@ package body Stemmer with SPARK_Mode is
       return Pos;
    end Skip_Utf8;
 
-   function Skip_Utf8_Backward (Context : in Context_Type'Class) return Result_Index is
-      Pos : Char_Index := Context.C;
+   function Skip_Utf8_Backward (Z : in Context_Type'Class) return Result_Index is
+      Pos : Char_Index := Z.C;
       Val : Byte;
    begin
-      if Pos <= Context.Lb then
+      if Pos <= Z.Lb then
          return -1;
       end if;
-      Val := Character'Pos (Context.P (Pos));
+      Val := Character'Pos (Z.P (Pos));
       Pos := Pos - 1;
       if Val >= 16#80# then
-         while Pos > Context.Lb loop
-            Val := Character'Pos (Context.P (Pos + 1));
+         while Pos > Z.Lb loop
+            Val := Character'Pos (Z.P (Pos + 1));
             exit when Val >= 16#C0#;
             Pos := Pos - 1;
          end loop;
@@ -322,23 +322,23 @@ package body Stemmer with SPARK_Mode is
       return Pos;
    end Skip_Utf8_Backward;
 
-   function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Integer) return Result_Index is
-      Pos : Char_Index := Context.C;
+   function Skip_Utf8_Backward (Z : in Context_Type'Class;
+                                N : in Integer) return Result_Index is
+      Pos : Char_Index := Z.C;
       Val : Byte;
    begin
       if N < 0 then
           return -1;
       end if;
       for I in 1 .. N loop
-         if Pos <= Context.Lb then
+         if Pos <= Z.Lb then
             return -1;
          end if;
-         Val := Character'Pos (Context.P (Pos));
+         Val := Character'Pos (Z.P (Pos));
          Pos := Pos - 1;
          if Val >= 16#80# then
-            while Pos > Context.Lb loop
-               Val := Character'Pos (Context.P (Pos + 1));
+            while Pos > Z.Lb loop
+               Val := Character'Pos (Z.P (Pos + 1));
                exit when Val >= 16#C0#;
                Pos := Pos - 1;
             end loop;
@@ -351,67 +351,67 @@ package body Stemmer with SPARK_Mode is
                         Shift : in Natural) return Utf8_Type
      is (Utf8_Type (Interfaces.Shift_Left (Interfaces.Unsigned_32 (Value), Shift)));
 
-   procedure Get_Utf8 (Context : in Context_Type'Class;
-                       Value   : out Utf8_Type;
-                       Count   : out Natural) is
+   procedure Get_Utf8 (Z     : in Context_Type'Class;
+                       Value : out Utf8_Type;
+                       Count : out Natural) is
       B0, B1, B2, B3 : Byte;
    begin
-      if Context.C >= Context.L then
+      if Z.C >= Z.L then
          Value := 0;
          Count := 0;
          return;
       end if;
-      B0 := Character'Pos (Context.P (Context.C + 1));
-      if B0 < 16#C0# or Context.C + 1 >= Context.L then
+      B0 := Character'Pos (Z.P (Z.C + 1));
+      if B0 < 16#C0# or Z.C + 1 >= Z.L then
          Value := Utf8_Type (B0);
          Count := 1;
          return;
       end if;
-      B1 := Character'Pos (Context.P (Context.C + 2)) and 16#3F#;
-      if B0 < 16#E0# or Context.C + 2 >= Context.L then
+      B1 := Character'Pos (Z.P (Z.C + 2)) and 16#3F#;
+      if B0 < 16#E0# or Z.C + 2 >= Z.L then
          Value := Shift_Left (Utf8_Type (B0 and 16#1F#), 6) or Utf8_Type (B1);
          Count := 2;
          return;
       end if;
-      B2 := Character'Pos (Context.P (Context.C + 3)) and 16#3F#;
-      if B0 < 16#F0# or Context.C + 3 >= Context.L then
+      B2 := Character'Pos (Z.P (Z.C + 3)) and 16#3F#;
+      if B0 < 16#F0# or Z.C + 3 >= Z.L then
          Value := Shift_Left (Utf8_Type (B0 and 16#0F#), 12)
            or Shift_Left (Utf8_Type (B1), 6) or Utf8_Type (B2);
          Count := 3;
          return;
       end if;
-      B3 := Character'Pos (Context.P (Context.C + 4)) and 16#3F#;
+      B3 := Character'Pos (Z.P (Z.C + 4)) and 16#3F#;
       Value := Shift_Left (Utf8_Type (B0 and 16#07#), 18)
         or Shift_Left (Utf8_Type (B1), 12)
         or Shift_Left (Utf8_Type (B2), 6) or Utf8_Type (B3);
       Count := 4;
    end Get_Utf8;
 
-   procedure Get_Utf8_Backward (Context : in Context_Type'Class;
-                                Value   : out Utf8_Type;
-                                Count   : out Natural) is
+   procedure Get_Utf8_Backward (Z     : in Context_Type'Class;
+                                Value : out Utf8_Type;
+                                Count : out Natural) is
       B0, B1, B2, B3 : Byte;
    begin
-      if Context.C <= Context.Lb then
+      if Z.C <= Z.Lb then
          Value := 0;
          Count := 0;
          return;
       end if;
-      B3 := Character'Pos (Context.P (Context.C));
-      if B3 < 16#80# or Context.C - 1 <= Context.Lb then
+      B3 := Character'Pos (Z.P (Z.C));
+      if B3 < 16#80# or Z.C - 1 <= Z.Lb then
          Value := Utf8_Type (B3);
          Count := 1;
          return;
       end if;
-      B2 := Character'Pos (Context.P (Context.C - 1));
-      if B2 >= 16#C0# or Context.C - 2 <= Context.Lb then
+      B2 := Character'Pos (Z.P (Z.C - 1));
+      if B2 >= 16#C0# or Z.C - 2 <= Z.Lb then
          B3 := B3 and 16#3F#;
          Value := Shift_Left (Utf8_Type (B2 and 16#1F#), 6) or Utf8_Type (B3);
          Count := 2;
          return;
       end if;
-      B1 := Character'Pos (Context.P (Context.C - 2));
-      if B1 >= 16#E0# or Context.C - 3 <= Context.Lb then
+      B1 := Character'Pos (Z.P (Z.C - 2));
+      if B1 >= 16#E0# or Z.C - 3 <= Z.Lb then
          B3 := B3 and 16#3F#;
          B2 := B2 and 16#3F#;
          Value := Shift_Left (Utf8_Type (B1 and 16#0F#), 12)
@@ -419,7 +419,7 @@ package body Stemmer with SPARK_Mode is
          Count := 3;
          return;
       end if;
-      B0 := Character'Pos (Context.P (Context.C - 3));
+      B0 := Character'Pos (Z.P (Z.C - 3));
       B1 := B1 and 16#1F#;
       B2 := B2 and 16#3F#;
       B3 := B3 and 16#3F#;
@@ -429,22 +429,22 @@ package body Stemmer with SPARK_Mode is
       Count := 4;
    end Get_Utf8_Backward;
 
-   procedure Out_Grouping (Context : in out Context_Type'Class;
-                           S       : in Grouping_Array;
-                           Min     : in Utf8_Type;
-                           Max     : in Utf8_Type;
-                           Repeat  : in Boolean;
-                           Result  : out Result_Index) is
+   procedure Out_Grouping (Z      : in out Context_Type'Class;
+                           S      : in Grouping_Array;
+                           Min    : in Utf8_Type;
+                           Max    : in Utf8_Type;
+                           Repeat : in Boolean;
+                           Result : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C >= Context.L then
+      if Z.C >= Z.L then
          Result := -1;
          return;
       end if;
 
       loop
-         Get_Utf8 (Context, Ch, Count);
+         Get_Utf8 (Z, Ch, Count);
          if Count = 0 then
             Result := -1;
             return;
@@ -456,28 +456,28 @@ package body Stemmer with SPARK_Mode is
                return;
             end if;
          end if;
-         Context.C := Context.C + Count;
+         Z.C := Z.C + Count;
          exit when not Repeat;
       end loop;
       Result := 0;
    end Out_Grouping;
 
-   procedure Out_Grouping_Backward (Context : in out Context_Type'Class;
-                                    S       : in Grouping_Array;
-                                    Min     : in Utf8_Type;
-                                    Max     : in Utf8_Type;
-                                    Repeat  : in Boolean;
-                                    Result  : out Result_Index) is
+   procedure Out_Grouping_Backward (Z      : in out Context_Type'Class;
+                                    S      : in Grouping_Array;
+                                    Min    : in Utf8_Type;
+                                    Max    : in Utf8_Type;
+                                    Repeat : in Boolean;
+                                    Result : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C <= Context.Lb then
+      if Z.C <= Z.Lb then
          Result := -1;
          return;
       end if;
 
       loop
-         Get_Utf8_Backward (Context, Ch, Count);
+         Get_Utf8_Backward (Z, Ch, Count);
          if Count = 0 then
             Result := -1;
             return;
@@ -489,28 +489,28 @@ package body Stemmer with SPARK_Mode is
                return;
             end if;
          end if;
-         Context.C := Context.C - Count;
+         Z.C := Z.C - Count;
          exit when not Repeat;
       end loop;
       Result := 0;
    end Out_Grouping_Backward;
 
-   procedure In_Grouping (Context : in out Context_Type'Class;
-                          S       : in Grouping_Array;
-                          Min     : in Utf8_Type;
-                          Max     : in Utf8_Type;
-                          Repeat  : in Boolean;
-                          Result  : out Result_Index) is
+   procedure In_Grouping (Z      : in out Context_Type'Class;
+                          S      : in Grouping_Array;
+                          Min    : in Utf8_Type;
+                          Max    : in Utf8_Type;
+                          Repeat : in Boolean;
+                          Result : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C >= Context.L then
+      if Z.C >= Z.L then
          Result := -1;
          return;
       end if;
 
       loop
-         Get_Utf8 (Context, Ch, Count);
+         Get_Utf8 (Z, Ch, Count);
          if Count = 0 then
             Result := -1;
             return;
@@ -524,28 +524,28 @@ package body Stemmer with SPARK_Mode is
             Result := Count;
             return;
          end if;
-         Context.C := Context.C + Count;
+         Z.C := Z.C + Count;
          exit when not Repeat;
       end loop;
       Result := 0;
    end In_Grouping;
 
-   procedure In_Grouping_Backward (Context : in out Context_Type'Class;
-                                   S       : in Grouping_Array;
-                                   Min     : in Utf8_Type;
-                                   Max     : in Utf8_Type;
-                                   Repeat  : in Boolean;
-                                   Result  : out Result_Index) is
+   procedure In_Grouping_Backward (Z      : in out Context_Type'Class;
+                                   S      : in Grouping_Array;
+                                   Min    : in Utf8_Type;
+                                   Max    : in Utf8_Type;
+                                   Repeat : in Boolean;
+                                   Result : out Result_Index) is
       Ch    : Utf8_Type;
       Count : Natural;
    begin
-      if Context.C <= Context.Lb then
+      if Z.C <= Z.Lb then
          Result := -1;
          return;
       end if;
 
       loop
-         Get_Utf8_Backward (Context, Ch, Count);
+         Get_Utf8_Backward (Z, Ch, Count);
          if Count = 0 then
             Result := -1;
             return;
@@ -559,62 +559,62 @@ package body Stemmer with SPARK_Mode is
             Result := Count;
             return;
          end if;
-         Context.C := Context.C - Count;
+         Z.C := Z.C - Count;
          exit when not Repeat;
       end loop;
       Result := 0;
    end In_Grouping_Backward;
 
-   procedure Replace (Context    : in out Context_Type'Class;
-                      C_Bra      : in Char_Index;
-                      C_Ket      : in Char_Index;
-                      S          : in String;
-                      Len        : in Char_Index) is
+   procedure Replace (Z     : in out Context_Type'Class;
+                      C_Bra : in Char_Index;
+                      C_Ket : in Char_Index;
+                      S     : in String;
+                      Len   : in Char_Index) is
       Adjustment : Integer;
    begin
       Adjustment := Len - (C_Ket - C_Bra);
       if Adjustment /= 0 then
-         Context.P (C_Ket + Adjustment + 1 .. Context.Len + Adjustment + 1)
-           := Context.P (C_Ket + 1 .. Context.Len + 1);
-         Context.Len := Context.Len + Adjustment;
-         Context.L := Context.L + Adjustment;
-         if Context.C >= C_Ket then
-            Context.C := Context.C + Adjustment;
-         elsif Context.C > C_Bra then
-            Context.C := C_Bra;
+         Z.P (C_Ket + Adjustment + 1 .. Z.Len + Adjustment + 1)
+           := Z.P (C_Ket + 1 .. Z.Len + 1);
+         Z.Len := Z.Len + Adjustment;
+         Z.L := Z.L + Adjustment;
+         if Z.C >= C_Ket then
+            Z.C := Z.C + Adjustment;
+         elsif Z.C > C_Bra then
+            Z.C := C_Bra;
          end if;
       end if;
       if Len > 0 then
-         Context.P (C_Bra + 1 .. C_Bra + Len) := S (S'First .. Len);
+         Z.P (C_Bra + 1 .. C_Bra + Len) := S (S'First .. Len);
       end if;
    end Replace;
 
-   procedure Slice_Del (Context : in out Context_Type'Class) is
+   procedure Slice_Del (Z : in out Context_Type'Class) is
    begin
-      Replace (Context, Context.Bra, Context.Ket, "", 0);
-      Context.Ket := Context.Bra;
+      Replace (Z, Z.Bra, Z.Ket, "", 0);
+      Z.Ket := Z.Bra;
    end Slice_Del;
 
-   procedure Slice_From (Context : in out Context_Type'Class;
-                         Text    : in String;
-                         Len     : in Char_Index) is
+   procedure Slice_From (Z    : in out Context_Type'Class;
+                         Text : in String;
+                         Len  : in Char_Index) is
    begin
-      Replace (Context, Context.Bra, Context.Ket, Text, Len);
-      Context.Ket := Context.Bra + Len;
+      Replace (Z, Z.Bra, Z.Ket, Text, Len);
+      Z.Ket := Z.Bra + Len;
    end Slice_From;
 
-   procedure Insert (Context : in out Context_Type'Class;
-                     S       : in String;
-                     Len     : in Char_Index) is
+   procedure Insert (Z   : in out Context_Type'Class;
+                     S   : in String;
+                     Len : in Char_Index) is
       C : Char_Index;
    begin
-      C := Context.C;
-      Replace (Context, Context.C, Context.C, S, Len);
-      if C <= Context.Bra then
-         Context.Bra := Context.Bra + Len;
+      C := Z.C;
+      Replace (Z, Z.C, Z.C, S, Len);
+      if C <= Z.Bra then
+         Z.Bra := Z.Bra + Len;
       end if;
-      if C <= Context.Ket then
-         Context.Ket := Context.Ket + Len;
+      if C <= Z.Ket then
+         Z.Ket := Z.Ket + Len;
       end if;
    end Insert;
 
