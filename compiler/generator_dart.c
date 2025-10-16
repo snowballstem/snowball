@@ -26,9 +26,9 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    int ch = "SBIrxg"[p->type];
     if (p->type != t_external) {
-        write_char(g, ch);
+        // We use the same naming scheme for both global and local variables.
+        write_char(g, "SBIrxg"[p->type]);
         write_char(g, '_');
     }
     write_s(g, p->s);
@@ -1075,6 +1075,29 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
+    /* Declare local variables. */
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == q) {
+            switch (name->type) {
+                case t_string:
+                    w(g, "~MString ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+                case t_integer:
+                    w(g, "~Mint ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+                case t_boolean:
+                    w(g, "~Mbool ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+            }
+        }
+    }
+
     if (q->amongvar_needed) w(g, "~Mint among_var;~N");
     str_clear(g->failure_str);
     g->failure_label = x_return;
@@ -1381,6 +1404,7 @@ static void generate_members(struct generator * g) {
     int wrote_members = false;
 
     for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to) continue;
         switch (q->type) {
             case t_string:
                 w(g, "~MString ");

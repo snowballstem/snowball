@@ -438,6 +438,7 @@ extern int main(int argc, char * argv[]) {
             struct tokeniser * t = create_tokeniser(u, file);
             struct analyser * a = create_analyser(t);
             struct input ** next_input_ptr = &(t->next);
+            unsigned localise_mask = 0;
             a->encoding = t->encoding = o->encoding;
             t->includes = o->includes;
             /* If multiple source files are specified, set up the others to be
@@ -459,7 +460,73 @@ extern int main(int argc, char * argv[]) {
                 next_input_ptr = &(q->next);
             }
             *next_input_ptr = NULL;
-            read_program(a);
+            /* Whether it's helpful to try to localise string variables varies
+             * greatly between target languages.  One reason for this is likely
+             * to be that strings are immutable in some languages (e.g. Dart,
+             * Javascript, Python) so each string operation creates a new
+             * string anyway.
+             *
+             * We've attempted to benchmark most languages to decide.
+             *
+             * One potential gotcha here is for garbage collected languages,
+             * where our benchmark might not trigger GC and in that case our
+             * timing is missing the cost of that, which any long running
+             * indexing process will eventually incur.
+             *
+             * We've mostly used the following artificial benchmark which
+             * exercises a local string variable to test this:
+             *
+             *   strings ( s )
+             *   routines ( r )
+             *   externals ( stem )
+             *   define r as (-> s s)
+             *   define stem as ( next [tolimit] loop 100000000 do r )
+             *
+             * Replace e.g. english.sbl with this and build the stemwords
+             * equivalent for the target language, then:
+             *
+             * $ echo nonalphabetisations|time ./stemwords
+             *
+             * The appropriate number of iterations to use varies, and is
+             * annotated below.
+             */
+            switch (o->target_lang) {
+                case LANG_ADA:
+                    // 1000000000: local 13.7s vs global 5.2s
+                case LANG_C:
+                    // We lack a way generate lose_s(v) on every `return` from
+                    // the function, but manually adjusting the generated code
+                    // to do this gives:
+                    //
+                    // 1000000000: local 44.9s vs global 6.3s
+                case LANG_CPLUSPLUS:
+                    // Currently handled as LANG_C except uses .cc extension.
+                case LANG_CSHARP:
+                    // 100000000: local 18.8s vs global 12.4s
+                case LANG_JAVA:
+                    // 1000000000: local 10.1s vs global 7.1s
+                case LANG_RUST:
+                    // 1000000000: localising was slightly slower.
+                    localise_mask = (1 << t_boolean) | (1 << t_integer);
+                    break;
+                case LANG_DART:
+                    // Not timed, but strings are immutable so seems likely
+                    // to be helpful to localise.
+                case LANG_GO:
+                    // 1000000000: localising was about 10% faster.
+                case LANG_PASCAL:
+                    // Slightly faster.
+                case LANG_PHP:
+                    // Slightly faster.
+                case LANG_PYTHON:
+                    // Microbenchmarking with timeit shows localising string
+                    // variables is faster for Python.
+                case LANG_JAVASCRIPT:
+                    // 10000000: Slightly faster.
+                    localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
+                    break;
+            }
+            read_program(a, localise_mask);
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
             if (!o->syntax_tree) {

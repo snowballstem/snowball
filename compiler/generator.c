@@ -37,13 +37,21 @@ static void wi3(struct generator * g, int i) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    int ch = "SIIrxg"[p->type];
     switch (p->type) {
         case t_external:
             write_string(g, g->options->externals_prefix); break;
         case t_string:
         case t_boolean:
         case t_integer: {
+            if (p->local_to != NULL) {
+                /* Name local variables using their Snowball name prefixed by
+                 * s_, b_ or i_.
+                 */
+                write_char(g, "sbi"[p->type]);
+                write_char(g, '_');
+                write_s(g, p->s);
+                return;
+            }
             int count = p->count;
             if (count < 0) {
                 p->s[SIZE(p->s)] = 0;
@@ -57,20 +65,22 @@ static void write_varname(struct generator * g, struct name * p) {
                  */
                 count += g->analyser->name_count[t_integer];
             }
-            write_char(g, ch);
+            write_char(g, "SIIrxg"[p->type]);
             write_char(g, '[');
             write_int(g, count);
             write_char(g, ']');
             return;
         }
         default:
-            write_char(g, ch); write_char(g, '_');
+            write_char(g, "SIIrxg"[p->type]);
+            write_char(g, '_');
     }
     write_s(g, p->s);
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
-    if (p->type < t_routine) write_string(g, "z->");
+    if (p->type < t_routine && p->local_to == NULL)
+        write_string(g, "z->");
     write_varname(g, p);
 }
 
@@ -1476,6 +1486,24 @@ static void generate_define(struct generator * g, struct node * p) {
 
     writef(g, "~S0 int ~V(struct SN_env * z) {~N~+", p);
     if (q->amongvar_needed) w(g, "~Mint among_var;~N");
+
+    /* Declare local variables. */
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == q) {
+            switch (name->type) {
+                case t_string:
+                    assert(0);
+                    break;
+                case t_boolean:
+                case t_integer:
+                    w(g, "~Mint ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+            }
+        }
+    }
+
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->label_used = 0;

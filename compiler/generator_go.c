@@ -27,13 +27,15 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
+    // We use the same naming scheme for both global and local variables.
     write_char(g, "SbirrG"[p->type]);
     write_char(g, '_');
     write_s(g, p->s);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-    write_string(g, "context.");
+    if (p->type >= t_routine || p->local_to == NULL)
+        write_string(g, "context.");
     write_varname(g, p);
 }
 
@@ -1021,6 +1023,7 @@ static void generate_setup_context(struct generator * g) {
 
     w(g, "~Mvar context = &Context{~+~N");
     for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to) continue;
         switch (q->type) {
             case t_string:
                 write_margin(g);
@@ -1068,6 +1071,29 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
     if (q->amongvar_needed) w(g, "~Mvar among_var int32~N");
+
+    /* Declare local variables. */
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == q) {
+            switch (name->type) {
+                case t_string:
+                    w(g, "~Mvar ");
+                    write_varname(g, name);
+                    w(g, " string;~N");
+                    break;
+                case t_integer:
+                    w(g, "~Mvar ");
+                    write_varname(g, name);
+                    w(g, " int;~N");
+                    break;
+                case t_boolean:
+                    w(g, "~Mvar ");
+                    write_varname(g, name);
+                    w(g, " bool;~N");
+                    break;
+            }
+        }
+    }
 
     /* Save output. */
     struct str * saved_output = g->outbuf;
@@ -1344,6 +1370,7 @@ static void generate_groupings(struct generator * g) {
 static void generate_members(struct generator * g) {
     w(g, "type Context struct {~+~N");
     for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to) continue;
         switch (q->type) {
             case t_string:
                 write_margin(g);

@@ -26,16 +26,16 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    int ch = "SBIrxg"[p->type];
     if (p->type != t_external) {
-        write_char(g, ch);
+        // We use the same naming scheme for both global and local variables.
+        write_char(g, "SBIrxg"[p->type]);
         write_char(g, '_');
     }
     write_s(g, p->s);
 }
 
 static void write_varref(struct generator * g, struct name * p) {
-    if (p->type != t_grouping) {
+    if (p->type != t_grouping && p->local_to == NULL) {
         w(g, "this.#");
     }
     write_varname(g, p);
@@ -1113,6 +1113,29 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
+    /* Declare local variables. */
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == q) {
+            switch (name->type) {
+                case t_string:
+                    w(g, "~Mlet /** string */ ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+                case t_integer:
+                    w(g, "~Mlet /** number */ ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+                case t_boolean:
+                    w(g, "~Mlet /** boolean */ ");
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
+            }
+        }
+    }
+
     if (q->amongvar_needed) {
         // The "among var" (`a`) is only assigned to, but the initialisation
         // can be generated in a nested block so it seems hard to declare it as
@@ -1443,6 +1466,7 @@ static void generate_members(struct generator * g) {
     int wrote_members = false;
 
     for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to) continue;
         switch (q->type) {
             case t_string:
                 w(g, "~M#");
@@ -1491,6 +1515,8 @@ extern void generate_program_js(struct generator * g) {
          // Among var `a` is only assigned to once per `among`, but is declared
          // at the start of the function and may be initialised in a nested
          // block.
+         //
+         // Some localised variables may only be assigned to once.
          " prefer-const~N~N");
 
     generate_amongs(g);

@@ -53,6 +53,8 @@ static void write_varname(struct generator * g, struct name * p) {
          * seems more helpful to leave those alone and encourage snowball
          * program authors to avoid naming externals which only differ by
          * case.
+         *
+         * We use the same naming scheme for both global and local variables.
          */
         int len = SIZE(p->s);
         int lower_pending = 0;
@@ -1143,6 +1145,32 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     w(g, "~}");
 
+    /* Declare local variables. */
+    struct str * temp = g->outbuf;
+    g->outbuf = g->declarations;
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == q) {
+            switch (name->type) {
+                case t_string:
+                    w(g,  "    ");
+                    write_varname(g, name);
+                    w(g,  " : AnsiString;\n");
+                    break;
+                case t_integer:
+                    w(g,  "    ");
+                    write_varname(g, name);
+                    w(g,  " : Integer;\n");
+                    break;
+                case t_boolean:
+                    w(g,  "    ");
+                    write_varname(g, name);
+                    w(g,  " : Boolean;\n");
+                    break;
+            }
+        }
+    }
+    g->outbuf = temp;
+
     if (g->temporary_used) {
         str_append_string(g->declarations, "    C : Integer;\n");
     }
@@ -1403,6 +1431,7 @@ static void generate_method_decls(struct generator * g) {
 static void generate_member_decls(struct generator * g) {
     int first = true;
     for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to) continue;
         switch (q->type) {
             case t_string:
             case t_integer:

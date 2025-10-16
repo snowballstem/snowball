@@ -28,6 +28,7 @@ static struct str * vars_newname(struct generator * g) {
 
 static void write_varname(struct generator * g, struct name * p) {
     if (p->type != t_external) {
+        // We use the same naming scheme for both global and local variables.
         write_char(g, "SBIRXG"[p->type]);
         write_char(g, '_');
     }
@@ -45,7 +46,7 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
-    if (p->type < t_routine) write_string(g, "Z.");
+    if (p->type < t_routine && p->local_to == NULL) write_string(g, "Z.");
     write_varname(g, p);
 }
 
@@ -1159,6 +1160,30 @@ static void generate_define(struct generator * g, struct node * p) {
 
     writef(g, "~-~Mend ~W;~N", p);
 
+    /* Declare local variables. */
+    struct str * temp = g->outbuf;
+    g->outbuf = saved_output;
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (name->local_to == p->name) {
+            switch (name->type) {
+                case t_string:
+                    assert(0);
+                    break;
+                case t_integer:
+                    w(g,  "      ");
+                    write_varname(g, name);
+                    w(g,  " : Integer;\n");
+                    break;
+                case t_boolean:
+                    w(g,  "      ");
+                    write_varname(g, name);
+                    w(g,  " : Boolean;\n");
+                    break;
+            }
+        }
+    }
+    g->outbuf = temp;
+
     if (g->temporary_used) {
         str_append_string(saved_output, "      C : Result_Index;\n");
     }
@@ -1520,6 +1545,7 @@ static void generate_member_decls(struct generator * g) {
         g->analyser->name_count[t_boolean] > 0) {
         w(g, " record~N~+");
         for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->local_to) continue;
             switch (q->type) {
                 case t_string:
                     write_margin(g);
