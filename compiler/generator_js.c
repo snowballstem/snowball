@@ -1114,10 +1114,10 @@ static void generate_define(struct generator * g, struct node * p) {
     g->var_number = 0;
 
     if (q->amongvar_needed) {
-        // among_var is only assigned to, but the initialisation can be
-        // generated in a nested block so it seems hard to declare it as
+        // The "among var" (`a`) is only assigned to, but the initialisation
+        // can be generated in a nested block so it seems hard to declare it as
         // const and still have it visible when we want to use it.
-        w(g, "~Mlet /** number */ among_var;~N");
+        w(g, "~Mlet /** number */ a;~N");
     }
     str_clear(g->failure_str);
     g->failure_label = x_return;
@@ -1157,9 +1157,9 @@ static void generate_substring(struct generator * g, struct node * p) {
     g->I[0] = x->number;
 
     if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = this.find_among~S0(a_~I0~F);~N", p);
+        writef(g, "~Ma = this.find_among~S0(a_~I0~F);~N", p);
         if (!x->always_matches) {
-            write_failure_if(g, "among_var === 0", p);
+            write_failure_if(g, "a === 0", p);
         }
     } else if (x->always_matches) {
         writef(g, "~Mthis.find_among~S0(a_~I0~F);~N", p);
@@ -1187,7 +1187,7 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
-        w(g, "~Mswitch (among_var) {~N~+");
+        w(g, "~Mswitch (a) {~N~+");
         for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
             w(g, "~Mcase ~I0: {~N~+");
@@ -1488,8 +1488,9 @@ extern void generate_program_js(struct generator * g) {
          " no-constant-condition"
          // Empty blocks may be generated in some cases.
          " no-empty"
-         // among_var is only assigned to once per `among`, but is declared at
-         // the start of the function and may be initialised in a nested block.
+         // Among var `a` is only assigned to once per `among`, but is declared
+         // at the start of the function and may be initialised in a nested
+         // block.
          " prefer-const~N~N");
 
     generate_amongs(g);
