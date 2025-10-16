@@ -1189,14 +1189,12 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = assign_to(z, ~V);~N"
-          "~Mif (~V == 0) return -1;~N", p);
+    writef(g, "~Mif (assign_to(z, &~V) < 0) return -1;~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = slice_to(z, ~V);~N"
-          "~Mif (~V == 0) return -1;~N", p);
+    writef(g, "~Mif (slice_to(z, &~V) < 0) return -1;~N", p);
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {

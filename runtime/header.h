@@ -78,7 +78,7 @@ extern int slice_del(struct SN_env * z);
 extern int insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbol * s);
 extern int insert_v(struct SN_env * z, int bra, int ket, const symbol * p);
 
-extern symbol * slice_to(struct SN_env * z, symbol * p);
-extern symbol * assign_to(struct SN_env * z, symbol * p);
+extern int slice_to(struct SN_env * z, symbol ** p);
+extern int assign_to(struct SN_env * z, symbol ** p);
 
 extern int len_utf8(const symbol * p);

@@ -443,30 +443,29 @@ extern int insert_v(struct SN_env * z, int bra, int ket, const symbol * p) {
     return insert_s(z, bra, ket, SIZE(p), p);
 }
 
-extern symbol * slice_to(struct SN_env * z, symbol * p) {
+extern int slice_to(struct SN_env * z, symbol ** p) {
     if (slice_check(z)) {
-        lose_s(p);
-        return NULL;
+        return -1;
     }
     {
         int len = z->ket - z->bra;
-        if (CAPACITY(p) < len) {
-            if (increase_size(&p, len) < 0) return NULL;
+        if (CAPACITY(*p) < len) {
+            if (increase_size(p, len) < 0) return -1;
         }
-        memmove(p, z->p + z->bra, len * sizeof(symbol));
-        SET_SIZE(p, len);
+        memmove(*p, z->p + z->bra, len * sizeof(symbol));
+        SET_SIZE(*p, len);
     }
-    return p;
+    return 0;
 }
 
-extern symbol * assign_to(struct SN_env * z, symbol * p) {
+extern int assign_to(struct SN_env * z, symbol ** p) {
     int len = z->l;
-    if (CAPACITY(p) < len) {
-        if (increase_size(&p, len) < 0) return NULL;
+    if (CAPACITY(*p) < len) {
+        if (increase_size(p, len) < 0) return -1;
     }
-    memmove(p, z->p, len * sizeof(symbol));
-    SET_SIZE(p, len);
-    return p;
+    memmove(*p, z->p, len * sizeof(symbol));
+    SET_SIZE(*p, len);
+    return 0;
 }
 
 extern int len_utf8(const symbol * p) {
