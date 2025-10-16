@@ -302,6 +302,7 @@ clean:
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(CSHARP_SOURCES) \
 	      $(DART_SOURCES) \
+	      $(go_src_dir)/*_stemmer.go $(go_src_main_dir)/stemwords/algorithms.go \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(JS_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
