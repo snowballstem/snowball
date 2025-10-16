@@ -324,12 +324,12 @@ class SnowballProgram {
     if (c_bra <= ket) ket += adjustment;
   }
 
-  String slice_to(String s) {
+  String slice_to() {
     slice_check();
     return current.substring(bra, ket);
   }
 
-  String assign_to(String s) {
+  String assign_to() {
     return current.substring(0, limit);
   }
 }
