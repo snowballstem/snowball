@@ -677,11 +677,10 @@ namespace Snowball
         /// <summary>
         ///   Replaces a specific region of the buffer with another text.
         /// </summary>
-        public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
+        public static void Replace(StringBuilder sb, int index, int length, string text)
         {
             sb.Remove(index, length - index);
             sb.Insert(index, text);
-            return sb;
         }
 
     }
