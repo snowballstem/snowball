@@ -508,20 +508,26 @@ extern int main(int argc, char * argv[]) {
                 case LANG_RUST:
                     // 1000000000: localising was slightly slower.
                     localise_mask = (1 << t_boolean) | (1 << t_integer);
-                    break;
                 case LANG_DART:
+                case LANG_PHP:
+                case LANG_PYTHON:
+                case LANG_JAVASCRIPT:
+                    // Turn off string localisation for these until we fix the
+                    // code generated for string-$.
+                    break;
+                //case LANG_DART:
                     // Not timed, but strings are immutable so seems likely
                     // to be helpful to localise.
                 case LANG_GO:
                     // 1000000000: localising was about 10% faster.
                 case LANG_PASCAL:
                     // Slightly faster.
-                case LANG_PHP:
+                //case LANG_PHP:
                     // Slightly faster.
-                case LANG_PYTHON:
+                //case LANG_PYTHON:
                     // Microbenchmarking with timeit shows localising string
                     // variables is faster for Python.
-                case LANG_JAVASCRIPT:
+                //case LANG_JAVASCRIPT:
                     // 10000000: Slightly faster.
                     localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
                     break;
