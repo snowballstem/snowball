@@ -616,11 +616,11 @@ static void generate_loop(struct generator * g, struct node * p) {
             w(g, "0");
             if (i > 1) w(g, ", ");
         }
-        writef(g, ":~N", p);
+        writef(g, ":", p);
     } else {
         w(g, "~Mfor _ in range(");
         generate_AE(g, p->AE);
-        writef(g, "):~N", p);
+        writef(g, "):", p);
     }
     writef(g, "~{", p);
 
