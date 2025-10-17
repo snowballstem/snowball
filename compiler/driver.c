@@ -460,6 +460,7 @@ extern int main(int argc, char * argv[]) {
                 next_input_ptr = &(q->next);
             }
             *next_input_ptr = NULL;
+
             /* Whether it's helpful to try to localise string variables varies
              * greatly between target languages.  One reason for this is likely
              * to be that strings are immutable in some languages (e.g. Dart,
@@ -508,26 +509,20 @@ extern int main(int argc, char * argv[]) {
                 case LANG_RUST:
                     // 1000000000: localising was slightly slower.
                     localise_mask = (1 << t_boolean) | (1 << t_integer);
-                case LANG_DART:
-                case LANG_PHP:
-                case LANG_PYTHON:
-                case LANG_JAVASCRIPT:
-                    // Turn off string localisation for these until we fix the
-                    // code generated for string-$.
                     break;
-                //case LANG_DART:
+                case LANG_DART:
                     // Not timed, but strings are immutable so seems likely
                     // to be helpful to localise.
                 case LANG_GO:
                     // 1000000000: localising was about 10% faster.
                 case LANG_PASCAL:
                     // Slightly faster.
-                //case LANG_PHP:
+                case LANG_PHP:
                     // Slightly faster.
-                //case LANG_PYTHON:
-                    // Microbenchmarking with timeit shows localising string
-                    // variables is faster for Python.
-                //case LANG_JAVASCRIPT:
+                case LANG_PYTHON:
+                    // 10000000: local 7.6s vs global 7.9s.  Microbenchmarking
+                    // with timeit alligns with this.
+                case LANG_JAVASCRIPT:
                     // 10000000: Slightly faster.
                     localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
                     break;

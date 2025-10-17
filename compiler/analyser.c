@@ -1953,10 +1953,17 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (p->name != v) {
                 return UNKNOWN;
             }
+#if 0
+            // This check is valid, but currently it's better to not
+            // localise a variable if string-$ is used on it has definitely
+            // been set because for some target languages that means we need to
+            // initialise to an empty string at the start of the function and
+            // incur overhead from doing so.
             if (p->left->type == c_assign) {
                 // Special-case `$x = S` because it's easy to handle.
                 return SET_BEFORE_ANY_USE;
             }
+#endif
             // Otherwise, for now we assume that `$x C` might use `x` before
             // setting it.  If string-$ sees wider use we can do better here.
             return USE_BEFORE_SET;
