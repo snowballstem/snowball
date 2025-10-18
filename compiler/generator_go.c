@@ -1091,17 +1091,17 @@ static void generate_define(struct generator * g, struct node * p) {
                 case t_string:
                     w(g, "~Mvar ");
                     write_varname(g, name);
-                    w(g, " string;~N");
+                    w(g, " string~N");
                     break;
                 case t_integer:
                     w(g, "~Mvar ");
                     write_varname(g, name);
-                    w(g, " int;~N");
+                    w(g, " int~N");
                     break;
                 case t_boolean:
                     w(g, "~Mvar ");
                     write_varname(g, name);
-                    w(g, " bool;~N");
+                    w(g, " bool~N");
                     break;
             }
         }
