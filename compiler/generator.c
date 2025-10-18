@@ -1483,14 +1483,15 @@ static void generate_literalstring(struct generator * g, struct node * p) {
             writef(g, "~Mif (z->c <= z->lb || z->p[z->c - 1] != ~c0) ~f~N"
                   "~Mz->c--;~N", p);
         }
+        return;
+    }
+
+    g->S[0] = p->mode == m_forward ? "" : "_b";
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn eq_s~S0(z, ~s, ~L);~N", p);
+        p->right = NULL;
     } else {
-        g->S[0] = p->mode == m_forward ? "" : "_b";
-        if (tailcallable(g, p)) {
-            writef(g, "~Mreturn eq_s~S0(z, ~s, ~L);~N", p);
-            p->right = NULL;
-        } else {
-            writef(g, "~Mif (!(eq_s~S0(z, ~s, ~L))) ~f~N", p);
-        }
+        writef(g, "~Mif (!(eq_s~S0(z, ~s, ~L))) ~f~N", p);
     }
 }
 
