@@ -1035,7 +1035,23 @@ static void generate_namedstring(struct generator * g, struct node * p) {
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
+    symbol * b = p->literalstring;
     write_comment(g, p);
+    if (SIZE(b) == 1) {
+        /* It's quite common to compare with a single character literal string,
+         * so just inline the simpler code for this case rather than making a
+         * function call.
+         */
+        if (p->mode == m_forward) {
+            writef(g, "~Mif self.cursor == self.limit or self.current[self.cursor] != ~L:~f"
+                  "~Mself.cursor += 1~N", p);
+        } else {
+            writef(g, "~Mif self.cursor <= self.limit_backward or self.current[self.cursor - 1] != ~L:~f"
+                  "~Mself.cursor -= 1~N", p);
+        }
+        return;
+    }
+
     g->S[0] = p->mode == m_forward ? "" : "_b";
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn self.eq_s~S0(~L)~N", p);
