@@ -1373,10 +1373,19 @@ static void generate_integer_assign(struct generator * g, struct node * p, const
     writef(g, "~M~V ~S0 ", p); generate_AE(g, p->AE); writef(g, ";~N", p);
 }
 
+extern int just_return_on_fail(struct generator * g) {
+    return g->failure_label == x_return && str_len(g->failure_str) == 0;
+}
+
+extern int tailcallable(struct generator * g, struct node * p) {
+    return just_return_on_fail(g) &&
+           p->right && p->right->type == c_functionend;
+}
+
 static void generate_integer_test(struct generator * g, struct node * p) {
     write_comment(g, p);
     int relop = p->type;
-    int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
+    int optimise_to_return = tailcallable(g, p);
     if (optimise_to_return) {
         w(g, "~Mreturn ");
         p->right = NULL;
@@ -1398,17 +1407,19 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = p->name->definition->possible_signals;
     write_comment(g, p);
-    if (str_len(g->failure_str) == 0 && g->failure_label == x_return &&
-        (signals == 0 || (p->right && p->right->type == c_functionend))) {
-        /* Always fails or tail call. */
+    if (tailcallable(g, p)) {
+        /* Tail call. */
         writef(g, "~Mreturn ~V(z);~N", p);
-        if (p->right && p->right->type == c_functionend) {
-            p->right = NULL;
-        }
+        p->right = NULL;
+        return;
+    }
+    if (just_return_on_fail(g) && signals == 0) {
+        /* Always fails. */
+        writef(g, "~Mreturn ~V(z);~N", p);
         return;
     }
     writef(g, "~{~Mint ret = ~V(z);~N", p);
-    if (str_len(g->failure_str) == 0 && g->failure_label == x_return) {
+    if (just_return_on_fail(g)) {
         /* Combine the two tests in this special case for better optimisation
          * and clearer generated code. */
         writef(g, "~Mif (ret <= 0) return ret;~N", p);
@@ -1659,9 +1670,7 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     if (x->always_matches) {
         writef(g, "~Mfind_among~S0(z, a_~I0, ~I1, ~F);~N", p);
-    } else if (x->command_count == 0 &&
-               g->failure_label == x_return &&
-               x->node->right && x->node->right->type == c_functionend) {
+    } else if (x->command_count == 0 && tailcallable(g, p)) {
         writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1, ~F) != 0;~N", p);
         x->node->right = NULL;
     } else {
@@ -1695,17 +1704,15 @@ static void generate_among(struct generator * g, struct node * p) {
 
 static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
-    if (g->failure_label == x_return) {
-        if (p->right && p->right->type == c_functionend) {
-            // Optimise at end of function.
-            if (inverted) {
-                writef(g, "~Mreturn !~V;~N", p);
-            } else {
-                writef(g, "~Mreturn ~V;~N", p);
-            }
-            p->right = NULL;
-            return;
+    if (tailcallable(g, p)) {
+        // Optimise at end of function.
+        if (inverted) {
+            writef(g, "~Mreturn !~V;~N", p);
+        } else {
+            writef(g, "~Mreturn ~V;~N", p);
         }
+        p->right = NULL;
+        return;
     }
     if (inverted) {
         writef(g, "~Mif (~V) ~f~N", p);

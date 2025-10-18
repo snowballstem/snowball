@@ -462,6 +462,9 @@ extern void write_start_comment(struct generator * g,
 extern int K_needed(struct generator * g, struct node * p);
 extern int repeat_restore(struct generator * g, struct node * p);
 
+extern int just_return_on_fail(struct generator * g);
+extern int tailcallable(struct generator * g, struct node * p);
+
 /* Generator for C code. */
 extern void generate_program_c(struct generator * g);
 

@@ -941,7 +941,7 @@ static void generate_integer_assign(struct generator * g, struct node * p, const
 static void generate_integer_test(struct generator * g, struct node * p) {
     write_comment(g, p);
     int relop = p->type;
-    int optimise_to_return = (g->failure_label == x_return && p->right && p->right->type == c_functionend);
+    int optimise_to_return = tailcallable(g, p);
     if (optimise_to_return) {
         w(g, "~Mreturn ");
         p->right = NULL;
@@ -968,13 +968,15 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = p->name->definition->possible_signals;
     write_comment(g, p);
-    if (g->failure_label == x_return &&
-        (signals == 0 || (p->right && p->right->type == c_functionend))) {
-        /* Always fails or tail call. */
+    if (tailcallable(g, p)) {
+        /* Tail call. */
         writef(g, "~Mreturn ~W(env, context)~N", p);
-        if (p->right && p->right->type == c_functionend) {
-            p->right = NULL;
-        }
+        p->right = NULL;
+        return;
+    }
+    if (just_return_on_fail(g) && signals == 0) {
+        /* Always fails. */
+        writef(g, "~Mreturn ~W(env, context)~N", p);
         return;
     }
     if (signals == 1) {
@@ -1142,9 +1144,7 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     } else if (x->always_matches) {
         writef(g, "~Menv.FindAmong~S0(A_~I0, context)~N", p);
-    } else if (x->command_count == 0 &&
-               g->failure_label == x_return &&
-               x->node->right && x->node->right->type == c_functionend) {
+    } else if (x->command_count == 0 && tailcallable(g, p)) {
         writef(g, "~Mreturn env.FindAmong~S0(A_~I0, context) != 0~N", p);
         x->node->right = NULL;
         g->unreachable = true;
@@ -1180,17 +1180,15 @@ static void generate_among(struct generator * g, struct node * p) {
 
 static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
-    if (g->failure_label == x_return) {
-        if (p->right && p->right->type == c_functionend) {
-            // Optimise at end of function.
-            if (inverted) {
-                writef(g, "~Mreturn !~V~N", p);
-            } else {
-                writef(g, "~Mreturn ~V~N", p);
-            }
-            p->right = NULL;
-            return;
+    if (tailcallable(g, p)) {
+        // Optimise at end of function.
+        if (inverted) {
+            writef(g, "~Mreturn !~V~N", p);
+        } else {
+            writef(g, "~Mreturn ~V~N", p);
         }
+        p->right = NULL;
+        return;
     }
     if (inverted) {
         write_failure_if(g, "~V", p);
