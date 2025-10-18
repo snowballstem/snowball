@@ -1029,14 +1029,24 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    write_failure_if(g, "!(eq_s~S0(new CharArraySequence(~V, L~V)))", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn eq_s~S0(new CharArraySequence(~V, L~V));", p);
+        p->right = NULL;
+    } else {
+        write_failure_if(g, "!(eq_s~S0(new CharArraySequence(~V, L~V)))", p);
+    }
     g->java_import_chararraysequence = true;
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    write_failure_if(g, "!(eq_s~S0(~L))", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn eq_s~S0(~L);~N", p);
+        p->right = NULL;
+    } else {
+        write_failure_if(g, "!(eq_s~S0(~L))", p);
+    }
 }
 
 static void generate_define(struct generator * g, struct node * p) {

@@ -1454,7 +1454,12 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
-    writef(g, "~Mif (!(eq_v~S0(z, ~V))) ~f~N", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn eq_v~S0(z, ~V);~N", p);
+        p->right = NULL;
+    } else {
+        writef(g, "~Mif (!(eq_v~S0(z, ~V))) ~f~N", p);
+    }
 }
 
 static void generate_literalstring(struct generator * g, struct node * p) {
@@ -1480,7 +1485,12 @@ static void generate_literalstring(struct generator * g, struct node * p) {
         }
     } else {
         g->S[0] = p->mode == m_forward ? "" : "_b";
-        writef(g, "~Mif (!(eq_s~S0(z, ~s, ~L))) ~f~N", p);
+        if (tailcallable(g, p)) {
+            writef(g, "~Mreturn eq_s~S0(z, ~s, ~L);~N", p);
+            p->right = NULL;
+        } else {
+            writef(g, "~Mif (!(eq_s~S0(z, ~s, ~L))) ~f~N", p);
+        }
     }
 }
 
