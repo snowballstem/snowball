@@ -1093,7 +1093,12 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->S[1] = complement ? "Out" : "In";
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    write_failure_if(g, "Not (~S1Grouping~S0(~V, ~I0, ~I1))", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~MResult := ~S1Grouping~S0(~V, ~I0, ~I1);~N", p);
+        p->right = NULL;
+    } else {
+        write_failure_if(g, "Not (~S1Grouping~S0(~V, ~I0, ~I1))", p);
+    }
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {

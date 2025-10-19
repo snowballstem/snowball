@@ -1017,7 +1017,12 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     g->S[1] = complement ? "out" : "in";
     g->I[0] = q->smallest_ch;
     g->I[1] = q->largest_ch;
-    writef(g, "~Mif (~S1_grouping~S0(~V, ~I0, ~I1, false) != 0)~N~f", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn (~S1_grouping~S0(~V, ~I0, ~I1, false) == 0);~N", p);
+        p->right = NULL;
+    } else {
+        writef(g, "~Mif (~S1_grouping~S0(~V, ~I0, ~I1, false) != 0)~N~f", p);
+    }
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {

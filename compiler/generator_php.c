@@ -1059,7 +1059,12 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->S[1] = complement ? "out" : "in";
-    write_failure_if(g, "!($this->~S1_grouping~S0(~V))", p);
+    if (tailcallable(g, p)) {
+        writef(g, "~Mreturn $this->~S1_grouping~S0(~V);~N", p);
+        p->right = NULL;
+    } else {
+        write_failure_if(g, "!($this->~S1_grouping~S0(~V))", p);
+    }
 }
 
 static void generate_namedstring(struct generator * g, struct node * p) {
