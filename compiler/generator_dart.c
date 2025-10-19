@@ -1050,7 +1050,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "_b";
     if (tailcallable(g, p)) {
-        writef(g, "~Mreturn eq_s~S0(~V);", p);
+        writef(g, "~Mreturn eq_s~S0(~V);~N", p);
         p->right = NULL;
     } else {
         write_failure_if(g, "!(eq_s~S0(~V))", p);
