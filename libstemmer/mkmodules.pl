@@ -35,7 +35,7 @@ sub addalgenc($$) {
       my $norm_enc = lc $enc;
       $norm_enc =~ s/_//g;
       if ($norm_enc ne $enc_only) {
-	  return;
+          return;
       }
   }
 
@@ -146,7 +146,7 @@ EOS
 
 struct stemmer_modules {
   const char * name;
-  stemmer_encoding_t enc; 
+  stemmer_encoding_t enc;
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);

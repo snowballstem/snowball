@@ -1,0 +1,114 @@
+define stem
+  (
+    true
+    [
+    substring
+    ]
+    among
+      literal '0'
+      (
+      literal 'a'
+      (
+      literal 'b'
+      (
+      literal 'c'
+      (
+      literal 'd'
+      (
+      literal 'e'
+      (
+      literal 'f'
+      (
+      literal 'g'
+      (
+      literal 'h'
+      (
+      literal 'i'
+      (
+      literal 'j'
+      (
+      literal 'k'
+      (
+      literal 'l'
+      (
+      literal 'm'
+      (
+      literal 'n'
+      (
+      literal 'o'
+      (
+      literal 'p'
+      (
+      literal 'q'
+      (
+      literal 'r'
+      (
+      literal 's'
+      (
+      literal 'A'
+      (
+      literal 'B'
+      (
+      literal 'C'
+      (
+      literal 'D'
+      (
+      literal 'E'
+      (
+      literal 'F'
+      (
+    [
+    substring
+    ]
+    among
+      literal '0'
+      (
+        false
+      literal 'a'
+      (
+        false
+      literal 'b'
+      (
+        false
+      literal 'c'
+      (
+        false
+      literal 'd'
+      (
+        false
+      literal 'e'
+      (
+        false
+      literal 'f'
+      (
+        false
+      literal 'g'
+      (
+        false
+      literal 'h'
+      (
+        false
+      literal 'i'
+      (
+        false
+      literal 'j'
+      (
+        false
+      literal 'A'
+      (
+        false
+      literal 'B'
+      (
+        false
+      literal 'C'
+      (
+        false
+      literal 'D'
+      (
+        false
+      literal 'E'
+      (
+        false
+      literal 'F'
+      (
+        false

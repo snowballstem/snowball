@@ -1,3 +1,19 @@
+General contribution guidelines
+===============================
+
+We don't have a formally defined coding style guide, but please strive to
+make new/changed code look like the code around it.
+
+Use spaces-only for indentation except where there's a syntax reason (e.g.
+``GNUmakefile``) or a strong convention (e.g. Go's standard seems to be tabs,
+and ``gofmt`` reindents code using tabs).
+
+Avoid adding trailing whitespace on lines.  Make sure there's a newline
+character at the end of new text files.
+
+Avoid mixing code reformatting changes with functional changes - doing so
+makes it harder to review patches.
+
 Adding a new stemming algorithm
 ===============================
 
@@ -51,6 +67,8 @@ Some points to note about algorithm implementations:
   and definitely not::
 
     define foo 'oö'
+
+  It's OK to use UTF-8 in comments.
 
 * It's helpful to consistently use the same ``stringdef`` codes across the
   different stemmers - for languages using the latin alphabet our website has
@@ -204,6 +222,13 @@ Key problems to solve
   which instead implements rounding towards negative infinity.  Existing
   backends with special handling here which may be useful to look at
   include Javascript, Pascal and Python.
+
+* Although all the stemmers we currently ship define a single Snowball
+  `external` named `stem`, this should not be assumed.  Also externals
+  should be callable from Snowball code as well as externally (see
+  the Go and Rust generators for examples of how to handle this - if
+  an external is called from Snowball code then it is generated as a
+  routine, with a shim external which just tail calls to this routine).
 
 Don't hardcode algorithm names
 ------------------------------

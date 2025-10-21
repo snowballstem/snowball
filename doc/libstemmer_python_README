@@ -1,9 +1,11 @@
 Snowball stemming library collection for Python
 ===============================================
 
-Python 3 (>= 3.3) is supported.  We no longer actively support Python 2 as
-the Python developers stopped supporting it at the start of 2020.  Snowball
-2.1.0 was the last release to officially support Python 2.
+Python 3 (>= 3.3) is supported.  We no longer support Python 2 as the Python
+developers stopped supporting it at the start of 2020.  Snowball 2.1.0 was the
+last release to officially support Python 2; Snowball 3.0.1 was the last
+release which had the code to support Python 2, but we were no longer testing
+it.
 
 What is Stemming?
 -----------------
@@ -43,8 +45,8 @@ The ``snowballstemmer.stemmer`` function takes an algorithm name and returns a
 
    import snowballstemmer
 
-   stemmer = snowballstemmer.stemmer('english');
-   print(stemmer.stemWords("We are the world".split()));
+   stemmer = snowballstemmer.stemmer('english')
+   print(stemmer.stemWords("We are the world".split()))
 
 Generally you should create a stemmer object and reuse it rather than creating
 a fresh object for each word stemmed (since there's some cost to creating and

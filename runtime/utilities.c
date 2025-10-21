@@ -235,7 +235,8 @@ extern int eq_v_b(struct SN_env * z, const symbol * p) {
     return eq_s_b(z, SIZE(p), p);
 }
 
-extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
+extern int find_among(struct SN_env * z, const struct among * v, int v_size,
+                      int (*call_among_func)(struct SN_env*)) {
 
     int i = 0;
     int j = v_size;
@@ -282,25 +283,26 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size) {
             first_key_inspected = 1;
         }
     }
+    w = v + i;
     while (1) {
-        w = v + i;
         if (common_i >= w->s_size) {
             z->c = c + w->s_size;
-            if (w->function == NULL) return w->result;
-            {
-                int res = w->function(z);
+            if (!w->function) return w->result;
+            z->af = w->function;
+            if (call_among_func(z)) {
                 z->c = c + w->s_size;
-                if (res) return w->result;
+                return w->result;
             }
         }
-        i = w->substring_i;
-        if (i < 0) return 0;
+        if (!w->substring_i) return 0;
+        w += w->substring_i;
     }
 }
 
 /* find_among_b is for backwards processing. Same comments apply */
 
-extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
+extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
+                        int (*call_among_func)(struct SN_env*)) {
 
     int i = 0;
     int j = v_size;
@@ -337,59 +339,49 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size) {
             first_key_inspected = 1;
         }
     }
+    w = v + i;
     while (1) {
-        w = v + i;
         if (common_i >= w->s_size) {
             z->c = c - w->s_size;
-            if (w->function == NULL) return w->result;
-            {
-                int res = w->function(z);
+            if (!w->function) return w->result;
+            z->af = w->function;
+            if (call_among_func(z)) {
                 z->c = c - w->s_size;
-                if (res) return w->result;
+                return w->result;
             }
         }
-        i = w->substring_i;
-        if (i < 0) return 0;
+        if (!w->substring_i) return 0;
+        w += w->substring_i;
     }
 }
 
 
 /* Increase the size of the buffer pointed to by p to at least n symbols.
- * If insufficient memory, returns NULL and frees the old buffer.
+ * On success, returns 0.  If insufficient memory, returns -1.
  */
-static symbol * increase_size(symbol * p, int n) {
-    symbol * q;
+static int increase_size(symbol ** p, int n) {
     int new_size = n + 20;
-    void * mem = realloc((char *) p - HEAD,
+    void * mem = realloc((char *) *p - HEAD,
                          HEAD + (new_size + 1) * sizeof(symbol));
-    if (mem == NULL) {
-        lose_s(p);
-        return NULL;
-    }
+    symbol * q;
+    if (mem == NULL) return -1;
     q = (symbol *) (HEAD + (char *)mem);
     CAPACITY(q) = new_size;
-    return q;
+    *p = q;
+    return 0;
 }
 
 /* to replace symbols between c_bra and c_ket in z->p by the
    s_size symbols at s.
    Returns 0 on success, -1 on error.
-   Also, frees z->p (and sets it to NULL) on error.
 */
 extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s, int * adjptr)
 {
-    int adjustment;
-    int len;
-    if (z->p == NULL) {
-        z->p = create_s();
-        if (z->p == NULL) return -1;
-    }
-    adjustment = s_size - (c_ket - c_bra);
-    len = SIZE(z->p);
+    int adjustment = s_size - (c_ket - c_bra);
+    int len = SIZE(z->p);
     if (adjustment != 0) {
         if (adjustment + len > CAPACITY(z->p)) {
-            z->p = increase_size(z->p, adjustment + len);
-            if (z->p == NULL) return -1;
+            if (increase_size(&z->p, adjustment + len) < 0) return -1;
         }
         memmove(z->p + c_ket + adjustment,
                 z->p + c_ket,
@@ -412,7 +404,6 @@ static int slice_check(struct SN_env * z) {
     if (z->bra < 0 ||
         z->bra > z->ket ||
         z->ket > z->l ||
-        z->p == NULL ||
         z->l > SIZE(z->p)) /* this line could be removed */
     {
 #if 0
@@ -426,7 +417,9 @@ static int slice_check(struct SN_env * z) {
 
 extern int slice_from_s(struct SN_env * z, int s_size, const symbol * s) {
     if (slice_check(z)) return -1;
-    return replace_s(z, z->bra, z->ket, s_size, s, NULL);
+    if (replace_s(z, z->bra, z->ket, s_size, s, NULL) < 0) return -1;
+    z->ket = z->bra + s_size;
+    return 0;
 }
 
 extern int slice_from_v(struct SN_env * z, const symbol * p) {
@@ -450,34 +443,29 @@ extern int insert_v(struct SN_env * z, int bra, int ket, const symbol * p) {
     return insert_s(z, bra, ket, SIZE(p), p);
 }
 
-extern symbol * slice_to(struct SN_env * z, symbol * p) {
+extern int slice_to(struct SN_env * z, symbol ** p) {
     if (slice_check(z)) {
-        lose_s(p);
-        return NULL;
+        return -1;
     }
     {
         int len = z->ket - z->bra;
-        if (CAPACITY(p) < len) {
-            p = increase_size(p, len);
-            if (p == NULL)
-                return NULL;
+        if (CAPACITY(*p) < len) {
+            if (increase_size(p, len) < 0) return -1;
         }
-        memmove(p, z->p + z->bra, len * sizeof(symbol));
-        SET_SIZE(p, len);
+        memmove(*p, z->p + z->bra, len * sizeof(symbol));
+        SET_SIZE(*p, len);
     }
-    return p;
+    return 0;
 }
 
-extern symbol * assign_to(struct SN_env * z, symbol * p) {
+extern int assign_to(struct SN_env * z, symbol ** p) {
     int len = z->l;
-    if (CAPACITY(p) < len) {
-        p = increase_size(p, len);
-        if (p == NULL)
-            return NULL;
+    if (CAPACITY(*p) < len) {
+        if (increase_size(p, len) < 0) return -1;
     }
-    memmove(p, z->p, len * sizeof(symbol));
-    SET_SIZE(p, len);
-    return p;
+    memmove(*p, z->p, len * sizeof(symbol));
+    SET_SIZE(*p, len);
+    return 0;
 }
 
 extern int len_utf8(const symbol * p) {
@@ -489,25 +477,3 @@ extern int len_utf8(const symbol * p) {
     }
     return len;
 }
-
-#if 0
-extern void debug(struct SN_env * z, int number, int line_count) {
-    int i;
-    int limit = SIZE(z->p);
-    /*if (number >= 0) printf("%3d (line %4d): '", number, line_count);*/
-    if (number >= 0) printf("%3d (line %4d): [%d]'", number, line_count,limit);
-    for (i = 0; i <= limit; i++) {
-        if (z->lb == i) printf("{");
-        if (z->bra == i) printf("[");
-        if (z->c == i) printf("|");
-        if (z->ket == i) printf("]");
-        if (z->l == i) printf("}");
-        if (i < limit)
-        {   int ch = z->p[i];
-            if (ch == 0) ch = '#';
-            printf("%c", ch);
-        }
-    }
-    printf("'\n");
-}
-#endif

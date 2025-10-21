@@ -1,0 +1,5 @@
+syntax/unused.sbl:9: warning: routine 'r' defined but not used
+syntax/unused.sbl:5: warning: string 'string' declared but not used
+syntax/unused.sbl:5: warning: string 'unused' declared but not used
+syntax/unused.sbl:4: warning: boolean 'unused_bool' declared but not used
+syntax/unused.sbl:3: warning: integer 'unused_int' declared but not used

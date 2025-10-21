@@ -25,12 +25,12 @@ procedure Generate is
       New_Line (File);
       Put (File, "   type Language_Type is (");
       for Lang of Languages loop
-         Put (File, "L_" & To_Upper (Lang));
-         I := I + 1;
-         if I < Natural (Languages.Length) then
+         if I > 0 then
             Put_Line (File, ",");
             Put (File, "                          ");
          end if;
+         Put (File, "L_" & To_Upper (Lang));
+         I := I + 1;
       end loop;
       Put_Line (File, ");");
       New_Line (File);

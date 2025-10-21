@@ -15,6 +15,10 @@ on:
     paths-ignore:
       - '*.rst'
       - NEWS
+  workflow_call:
+    inputs:
+      runtime-tests: # We reuse this workflow from runtime-tests.yml.
+        type: boolean
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,21 +29,25 @@ jobs:
       matrix:
         include:
         - name: "C distribution build"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -pedantic -Wmissing-prototypes -Wmissing-declarations -Wshadow -Werror'
         - name: "C distribution build (clang)"
-          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -Wdeclaration-after-statement -Werror'
+          CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -pedantic -Wmissing-prototypes -Wmissing-declarations -Wshadow -Werror'
           CC: clang
         - name: "C"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -pedantic -Werror'
         - name: "C (clang)"
           c_tests: y
-          CFLAGS: '-O2 -Wall -W -std=c99 -Werror'
+          WERROR: '-std=c99 -pedantic -Werror'
           CC: clang
         - name: java
           JAVA: java
           JAVAC: javac
           JAVACFLAGS: '-Xlint:all -Werror'
+        - name: dart
+          DART: dart
+          os: 'ubuntu-24.04'
+          dart_sdk: stable
         - name: go_old
           os: 'ubuntu-22.04'
           apt_packages: 'golang-1.13'
@@ -49,7 +57,10 @@ jobs:
           apt_packages: 'golang-1.22'
           GO: go
         - name: javascript_node
-          NODE: node
+          JSRUN: node
+          apt_packages: 'nodejs'
+        - name: javascript_deno
+          JSRUN: 'deno --allow-read --allow-write'
           apt_packages: 'nodejs'
         - name: rust
           RUST: rust
@@ -60,10 +71,16 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
+        - name: PHP 8.4
+          PHP: php
+          apt_packages: 'php php-mbstring'
+        - name: PHP 8.3
+          PHP: php
+          apt_extra_repo: ppa:ondrej/php
+          apt_packages: 'php8.3-cli php8.3-mbstring'
         - name: Python 3.8
-          PYTHON: python3.8
-          os: 'ubuntu-20.04'
-          apt_packages: 'python3.8'
+          PYTHON_VERSION: 3.8
+          os: 'ubuntu-22.04'
           # The pure Python versions run slowly - when we used travis for CI
           # we used to need to thin the testdata for languages such as Arabic
           # where there's a lot to avoid the build exceeding the maximum time
@@ -103,7 +120,7 @@ jobs:
 
     env:
       CC: ${{ matrix.CC || 'gcc' }}
-      MAKE: ${{ matrix.MAKE || 'make' }}
+      MAKE: ${{ matrix.MAKE || 'make' }} --output-sync --jobs=4
       STEMMING_DATA: 'snowball-data'
 
     steps:
@@ -113,6 +130,7 @@ jobs:
         show-progress: false
 
     - name: Checkout data
+      if: ${{ ! inputs.runtime-tests }}
       run: |
         # Try to check out a branch of the same name from the snowball-data
         # repo sibling of this snowball repo, so that PRs requiring changes to
@@ -154,16 +172,35 @@ jobs:
             git clone "$UPSTREAM_REPO_URL"
           fi
         fi
+    - name: Hook up runtime testing
+      if: ${{ inputs.runtime-tests }}
+      run: |
+        make setup_runtime_tests
     - name: Install CCache
       uses: hendrikmuhs/ccache-action@v1
       with:
         key: ${{ matrix.name }}
         variant: ${{ matrix.ccache || 'ccache' }}
+    - name: Enable extra Ubuntu package repo
+      if: matrix.apt_extra_repo
+      run: |
+        sudo apt-get -qq remove "php*-cli" "php*-dev"
+        sudo add-apt-repository -y ${{ matrix.apt_extra_repo }}
+        sudo apt-get update
     - name: Install Ubuntu packages
       if: matrix.apt_packages
       run: |
         sudo apt-get update
         sudo apt-get install -y ${{ matrix.apt_packages }}
+    - uses: denoland/setup-deno@v2
+      if: ${{ startsWith(matrix.JSRUN, 'deno') }}
+      with:
+        deno-version: vx.x.x
+    - name: Install Dart SDK
+      if: matrix.dart_sdk
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ matrix.dart_sdk }}
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
       uses: msys2/setup-msys2@v2
@@ -175,7 +212,7 @@ jobs:
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
-        pip install setuptools
+        pip install setuptools build
         $MAKE dist
         mkdir tmp
         cd tmp
@@ -185,18 +222,31 @@ jobs:
     - name: Test C
       if: matrix.c_tests
       run: $MAKE check CC="$CC"
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.PYTHON_VERSION }}
+      if: matrix.PYTHON_VERSION
     - name: Test Python
-      if: matrix.PYTHON
-      run: $MAKE check_python python="${{ matrix.PYTHON }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
+      if: matrix.PYTHON || matrix.PYTHON_VERSION
+      run: $MAKE check_python python="${{ matrix.PYTHON || 'python' }}" THIN_FACTOR="${{ matrix.THIN_FACTOR }}"
     - name: Test Java
       if: matrix.JAVA && matrix.JAVAC
-      run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}"
+      run: $MAKE check_java JAVA="${{ matrix.JAVA }}" JAVAC="${{ matrix.JAVAC }}" JAVACFLAGS="${{ matrix.JAVACFLAGS }}"
+    - name: Test Dart
+      if: matrix.DART
+      run: $MAKE check_dart DART="${{ matrix.DART }}"
     - name: Test C#
       if: matrix.MCS
       run: $MAKE check_csharp MCS="${{ matrix.MCS }}"
     - name: Test Javascript
-      if: matrix.NODE
-      run: $MAKE check_js NODE="${{ matrix.NODE }}"
+      if: matrix.JSRUN
+      run: $MAKE check_js JSRUN="${{ matrix.JSRUN }}"
+    - name: Lint and check Javascript code
+      if: ${{ startsWith(matrix.JSRUN, 'deno') }}
+      run: |
+        deno lint javascript/*.js js_out/*.js
+        # Currently there are some problems in find_among()/find_among_b().
+        deno check javascript/*.js js_out/*.js || true
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"
@@ -208,6 +258,9 @@ jobs:
     - name: Test Pascal
       if: matrix.FPC
       run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
+    - name: Test PHP
+      if: matrix.PHP
+      run: $MAKE check_php PHP="${{ matrix.PHP }}"
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"

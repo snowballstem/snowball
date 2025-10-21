@@ -1,0 +1,21 @@
+// Test normalisation of arithmetic expressions (AEs).
+integers(x y)
+externals(stem)
+define stem as (
+  $y = size * 0
+  $x = size
+  $x *= 0
+  $x *= -1
+  $y += x
+  $y /= -1
+  $x = size * -1
+  $y += x
+  $x = -1 * size
+  $y += x
+  $x = size / -1
+  $y += x
+  $y -= -1
+  $y += -1
+  $y == 1
+)
+

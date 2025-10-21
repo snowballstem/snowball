@@ -36,18 +36,18 @@ package Stemmer with SPARK_Mode is
    type Context_Type is abstract tagged private;
 
    --  Apply the stemming algorithm on the word initialized in the context.
-   procedure Stem (Context : in out Context_Type;
-                   Result  : out Boolean) is abstract;
+   procedure Stem (Z      : in out Context_Type;
+                   Result : out Boolean) is abstract;
 
    --  Stem the word and return True if it was reduced.
-   procedure Stem_Word (Context  : in out Context_Type'Class;
-                        Word     : in String;
-                        Result   : out Boolean) with
+   procedure Stem_Word (Z      : in out Context_Type'Class;
+                        Word   : in String;
+                        Result : out Boolean) with
      Global => null,
      Pre => Word'Length < WORD_MAX_LENGTH;
 
    --  Get the stem or the input word unmodified.
-   function Get_Result (Context : in Context_Type'Class) return String with
+   function Get_Result (Z : in Context_Type'Class) return String with
      Global => null,
      Post => Get_Result'Result'Length < WORD_MAX_LENGTH;
 
@@ -82,19 +82,19 @@ private
 
    type Among_Array_Type is array (Natural range <>) of Among_Type;
 
-   function Eq_S (Context : in Context_Type'Class;
-                  S       : in String) return Char_Index with
-     Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S'Result = 0 or Eq_S'Result = S'Length;
+   procedure Eq_S (Z      : in out Context_Type'Class;
+                   S      : in String;
+                   Len    : in Char_Index;
+                   Result : out Boolean) with
+     Global => null;
 
-   function Eq_S_Backward (Context : in Context_Type'Class;
-                           S       : in String) return Char_Index with
-     Global => null,
-     Pre => S'Length > 0,
-     Post => Eq_S_Backward'Result = 0 or Eq_S_Backward'Result = S'Length;
+   procedure Eq_S_Backward (Z      : in out Context_Type'Class;
+                            S      : in String;
+                            Len    : in Char_Index;
+                            Result : out Boolean) with
+     Global => null;
 
-   procedure Find_Among (Context : in out Context_Type'Class;
+   procedure Find_Among (Z       : in out Context_Type'Class;
                          Amongs  : in Among_Array_Type;
                          Pattern : in String;
                          Execute : access procedure
@@ -105,7 +105,7 @@ private
      Global => null,
      Pre => Pattern'Length > 0 and Amongs'Length > 0;
 
-   procedure Find_Among_Backward (Context : in out Context_Type'Class;
+   procedure Find_Among_Backward (Z       : in out Context_Type'Class;
                                   Amongs  : in Among_Array_Type;
                                   Pattern : in String;
                                   Execute : access procedure
@@ -116,99 +116,96 @@ private
      Global => null,
      Pre => Pattern'Length > 0 and Amongs'Length > 0;
 
-   function Skip_Utf8 (Context : in Context_Type'Class) return Result_Index with
+   function Skip_Utf8 (Z : in Context_Type'Class) return Result_Index with
      Global => null;
 
-   function Skip_Utf8 (Context : in Context_Type'Class;
-                       N       : in Integer) return Result_Index with
+   function Skip_Utf8 (Z : in Context_Type'Class;
+                       N : in Integer) return Result_Index with
      Global => null;
 
-   function Skip_Utf8_Backward (Context : in Context_Type'Class) return Result_Index with
+   function Skip_Utf8_Backward (Z : in Context_Type'Class) return Result_Index with
      Global => null;
 
-   function Skip_Utf8_Backward (Context : in Context_Type'Class;
-                                N       : in Integer) return Result_Index with
+   function Skip_Utf8_Backward (Z : in Context_Type'Class;
+                                N : in Integer) return Result_Index with
      Global => null;
 
-   procedure Get_Utf8 (Context : in Context_Type'Class;
-                       Value   : out Utf8_Type;
-                       Count   : out Natural);
+   procedure Get_Utf8 (Z     : in Context_Type'Class;
+                       Value : out Utf8_Type;
+                       Count : out Natural);
 
-   procedure Get_Utf8_Backward (Context : in Context_Type'Class;
-                                Value   : out Utf8_Type;
-                                Count   : out Natural);
+   procedure Get_Utf8_Backward (Z     : in Context_Type'Class;
+                                Value : out Utf8_Type;
+                                Count : out Natural);
 
-   function Length (Context : in Context_Type'Class) return Natural;
+   function Length_Utf8 (S   : in String;
+                         Len : in Char_Index) return Natural;
 
-   function Length_Utf8 (Context : in Context_Type'Class) return Natural;
+   function Check_Among (Z     : in Context_Type'Class;
+                         Pos   : in Char_Index;
+                         Shift : in Natural;
+                         Mask  : in Mask_Type) return Boolean;
 
-   function Check_Among (Context : in Context_Type'Class;
-                         Pos     : in Char_Index;
-                         Shift   : in Natural;
-                         Mask    : in Mask_Type) return Boolean;
+   procedure Out_Grouping (Z      : in out Context_Type'Class;
+                           S      : in Grouping_Array;
+                           Min    : in Utf8_Type;
+                           Max    : in Utf8_Type;
+                           Repeat : in Boolean;
+                           Result : out Result_Index);
 
-   procedure Out_Grouping (Context : in out Context_Type'Class;
-                           S       : in Grouping_Array;
-                           Min     : in Utf8_Type;
-                           Max     : in Utf8_Type;
-                           Repeat  : in Boolean;
-                           Result  : out Result_Index);
+   procedure Out_Grouping_Backward (Z      : in out Context_Type'Class;
+                                    S      : in Grouping_Array;
+                                    Min    : in Utf8_Type;
+                                    Max    : in Utf8_Type;
+                                    Repeat : in Boolean;
+                                    Result : out Result_Index);
 
-   procedure Out_Grouping_Backward (Context : in out Context_Type'Class;
-                                    S       : in Grouping_Array;
-                                    Min     : in Utf8_Type;
-                                    Max     : in Utf8_Type;
-                                    Repeat  : in Boolean;
-                                    Result  : out Result_Index);
+   procedure In_Grouping (Z      : in out Context_Type'Class;
+                          S      : in Grouping_Array;
+                          Min    : in Utf8_Type;
+                          Max    : in Utf8_Type;
+                          Repeat : in Boolean;
+                          Result : out Result_Index);
 
-   procedure In_Grouping (Context : in out Context_Type'Class;
-                          S       : in Grouping_Array;
-                          Min     : in Utf8_Type;
-                          Max     : in Utf8_Type;
-                          Repeat  : in Boolean;
-                          Result  : out Result_Index);
+   procedure In_Grouping_Backward (Z      : in out Context_Type'Class;
+                                   S      : in Grouping_Array;
+                                   Min    : in Utf8_Type;
+                                   Max    : in Utf8_Type;
+                                   Repeat : in Boolean;
+                                   Result : out Result_Index);
 
-   procedure In_Grouping_Backward (Context : in out Context_Type'Class;
-                                   S       : in Grouping_Array;
-                                   Min     : in Utf8_Type;
-                                   Max     : in Utf8_Type;
-                                   Repeat  : in Boolean;
-                                   Result  : out Result_Index);
-
-   procedure Replace (Context    : in out Context_Type'Class;
-                      C_Bra      : in Char_Index;
-                      C_Ket      : in Char_Index;
-                      S          : in String;
-                      Adjustment : out Integer) with
+   procedure Replace (Z     : in out Context_Type'Class;
+                      C_Bra : in Char_Index;
+                      C_Ket : in Char_Index;
+                      S     : in String;
+                      Len   : in Char_Index) with
      Global => null,
-     Pre => C_Bra >= Context.Lb and C_Ket >= C_Bra and C_Ket <= Context.L;
+     Pre => C_Bra <= C_Ket and C_Ket <= Z.Len
+     and Z.Len + Len - (C_Ket - C_Bra) < Z.P'Length;
 
-   procedure Slice_Del (Context : in out Context_Type'Class) with
+   procedure Slice_Del (Z : in out Context_Type'Class) with
      Global => null,
-     Pre => Context.Bra >= Context.Lb and Context.Ket >= Context.Bra
-     and Context.Ket <= Context.L;
+     Pre => Z.Bra <= Z.Ket and Z.Ket <= Z.Len;
 
-   procedure Slice_From (Context : in out Context_Type'Class;
-                         Text    : in String) with
+   procedure Slice_From (Z    : in out Context_Type'Class;
+                         Text : in String;
+                         Len  : in Char_Index) with
      Global => null,
-     Pre => Context.Bra >= Context.Lb and Context.Ket >= Context.Bra
-     and Context.Ket <= Context.L
-     and Context.L - Context.Lb + Text'Length + Context.Ket - Context.Bra < Context.P'Length;
+     Pre => Z.Bra <= Z.Ket and Z.Ket <= Z.Len;
 
-   function Slice_To (Context : in Context_Type'Class) return String;
-
-   procedure Insert (Context : in out Context_Type'Class;
-                     C_Bra   : in Char_Index;
-                     C_Ket   : in Char_Index;
-                     S       : in String) with
+   procedure Insert (Z   : in out Context_Type'Class;
+                     S   : in String;
+                     Len : in Char_Index) with
      Global => null,
-     Pre => C_Bra >= Context.Lb and C_Ket >= C_Bra and C_Ket <= Context.L;
+     Pre => Z.C <= Z.Len
+     and Z.Len + Len < Z.P'Length;
 
    --  The context indexes follow the C paradigm: they start at 0 for the first character.
    --  This is necessary because several algorithms rely on this when they compare the
    --  cursor position ('C') or setup some markers from the cursor.
    type Context_Type is abstract tagged record
       C   : Char_Index := 0;
+      Len : Char_Index := 0;
       L   : Char_Index := 0;
       Lb  : Char_Index := 0;
       Bra : Char_Index := 0;

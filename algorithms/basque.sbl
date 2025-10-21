@@ -59,13 +59,8 @@ backwardmode (
             ( RV delete )
             'garri' 'garria' 'tza'
             (R2 delete)
-            'atseden'
-            (<- 'atseden')
-            'arabera'
-            (<- 'arabera')
-            'baditu'
-            (<- 'baditu')
-
+            'atseden' 'arabera' 'baditu'
+            ( )
         )
     )
 
@@ -111,14 +106,8 @@ backwardmode (
             (<- 'tra')
             'minutuko'
             (<- 'minutu')
-            'zehar'
-            (<- 'zehar')
-            'geldi'
-            (<- 'geldi')
-            'igaro'
-            (<- 'igaro')
-            'aurka'
-            (<- 'aurka')
+            'zehar' 'geldi' 'igaro' 'aurka'
+            ( )
         )
     )
 
@@ -143,7 +132,3 @@ define stem as (
     )
 
 )
-
-/*
-    Note 1: additions of 21 Jul 2010
-*/

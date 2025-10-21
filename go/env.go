@@ -43,14 +43,13 @@ func (env *Env) SetCurrent(s string) {
 
 func (env *Env) ReplaceS(bra, ket int, s string) int32 {
 	adjustment := int32(len(s)) - (int32(ket) - int32(bra))
-	result, _ := splitAt(env.current, bra)
+	result := env.current[:bra]
+	result += s
 	rsplit := ket
 	if ket < bra {
 		rsplit = bra
 	}
-	_, rhs := splitAt(env.current, rsplit)
-	result += s
-	result += rhs
+	result += env.current[rsplit:]
 
 	newLim := int32(env.Limit) + adjustment
 	env.Limit = int(newLim)
@@ -93,10 +92,10 @@ func (env *Env) EqSB(s string) bool {
 	}
 }
 
-func (env *Env) SliceFrom(s string) bool {
+func (env *Env) SliceFrom(s string) {
 	bra, ket := env.Bra, env.Ket
 	env.ReplaceS(bra, ket, s)
-	return true
+	env.Ket = bra + len(s)
 }
 
 func (env *Env) NextChar() {
@@ -159,16 +158,34 @@ func (env *Env) InGrouping(chars []byte, min, max int32) bool {
 	}
 
 	r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
-	if r != utf8.RuneError {
-		if r > max || r < min {
+	if r == utf8.RuneError {
+		return false
+	}
+	if r > max || r < min {
+		return false
+	}
+	r -= min
+	if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
+		return false
+	}
+	env.NextChar()
+	return true
+}
+
+func (env *Env) GoInGrouping(chars []byte, min, max int32) bool {
+	for env.Cursor < env.Limit {
+		r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
+		if r == utf8.RuneError {
 			return false
+		}
+		if r > max || r < min {
+			return true
 		}
 		r -= min
 		if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
-			return false
+			return true
 		}
 		env.NextChar()
-		return true
 	}
 	return false
 }
@@ -177,19 +194,41 @@ func (env *Env) InGroupingB(chars []byte, min, max int32) bool {
 	if env.Cursor <= env.LimitBackward {
 		return false
 	}
+	c := env.Cursor
 	env.PrevChar()
 	r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
-	if r != utf8.RuneError {
-		env.NextChar()
-		if r > max || r < min {
+	if r == utf8.RuneError {
+		return false
+	}
+	if r > max || r < min {
+		env.Cursor = c
+		return false
+	}
+	r -= min
+	if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
+		env.Cursor = c
+		return false
+	}
+	return true
+}
+
+func (env *Env) GoInGroupingB(chars []byte, min, max int32) bool {
+	for env.Cursor > env.LimitBackward {
+		c := env.Cursor
+		env.PrevChar()
+		r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
+		if r == utf8.RuneError {
 			return false
+		}
+		if r > max || r < min {
+			env.Cursor = c
+			return true
 		}
 		r -= min
 		if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
-			return false
+			env.Cursor = c
+			return true
 		}
-		env.PrevChar()
-		return true
 	}
 	return false
 }
@@ -199,16 +238,34 @@ func (env *Env) OutGrouping(chars []byte, min, max int32) bool {
 		return false
 	}
 	r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
-	if r != utf8.RuneError {
-		if r > max || r < min {
-			env.NextChar()
-			return true
+	if r == utf8.RuneError {
+		return false
+	}
+	if r > max || r < min {
+		env.NextChar()
+		return true
+	}
+	r -= min
+	if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
+		env.NextChar()
+		return true
+	}
+	return false
+}
+
+func (env *Env) GoOutGrouping(chars []byte, min, max int32) bool {
+	for env.Cursor < env.Limit {
+		r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
+		if r == utf8.RuneError {
+			return false
 		}
-		r -= min
-		if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
-			env.NextChar()
-			return true
+		if r <= max && r >= min {
+			r -= min
+			if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) != 0 {
+				return true
+			}
 		}
+		env.NextChar()
 	}
 	return false
 }
@@ -217,25 +274,44 @@ func (env *Env) OutGroupingB(chars []byte, min, max int32) bool {
 	if env.Cursor <= env.LimitBackward {
 		return false
 	}
+	c := env.Cursor
 	env.PrevChar()
 	r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
-	if r != utf8.RuneError {
-		env.NextChar()
-		if r > max || r < min {
-			env.PrevChar()
-			return true
+	if r == utf8.RuneError {
+		return false
+	}
+	if r > max || r < min {
+		return true
+	}
+	r -= min
+	if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
+		return true
+	}
+	env.Cursor = c
+	return false
+}
+
+func (env *Env) GoOutGroupingB(chars []byte, min, max int32) bool {
+	for env.Cursor > env.LimitBackward {
+		c := env.Cursor
+		env.PrevChar()
+		r, _ := utf8.DecodeRuneInString(env.current[env.Cursor:])
+		if r == utf8.RuneError {
+			return false
 		}
-		r -= min
-		if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) == 0 {
-			env.PrevChar()
-			return true
+		if r <= max && r >= min {
+			r -= min
+			if (chars[uint(r>>3)] & (0x1 << uint(r&0x7))) != 0 {
+				env.Cursor = c
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func (env *Env) SliceDel() bool {
-	return env.SliceFrom("")
+func (env *Env) SliceDel() {
+	env.SliceFrom("")
 }
 
 func (env *Env) Insert(bra, ket int, s string) {
@@ -304,9 +380,8 @@ func (env *Env) FindAmong(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c + len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c + len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c + len(w.Str)
 					return w.B
 				}
 			} else {
@@ -373,9 +448,8 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 		if commonI >= len(w.Str) {
 			env.Cursor = c - len(w.Str)
 			if w.F != nil {
-				res := w.F(env, ctx)
-				env.Cursor = c - len(w.Str)
-				if res {
+				if w.F(env, ctx) {
+					env.Cursor = c - len(w.Str)
 					return w.B
 				}
 			} else {

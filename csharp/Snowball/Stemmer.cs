@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2001, Dr Martin Porter
 // Copyright (c) 2002, Richard Boulton
 // Copyright (c) 2015, Cesar Souza
-// Copyright (c) 2018, Olly Betts
+// Copyright (c) 2018-2025, Olly Betts
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
-//     * Redistributions of source code must retain the above copyright notice,
-//     * this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//     * notice, this list of conditions and the following disclaimer in the
-//     * documentation and/or other materials provided with the distribution.
-//     * Neither the name of the copyright holders nor the names of its contributors
-//     * may be used to endorse or promote products derived from this software
-//     * without specific prior written permission.
-// 
+//
+//    1. Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimer.
+//    2. Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//    3. Neither the name of the Snowball project nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,19 +30,20 @@
 namespace Snowball
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
 
     /// <summary>
     ///   Class holding current state.
     /// </summary>
-    /// 
+    ///
     public class Env
     {
         /// <summary>
         ///   Initializes a new instance of the <see cref="Env"/> class.
         /// </summary>
-        /// 
+        ///
         protected Env()
         {
         }
@@ -50,43 +51,43 @@ namespace Snowball
         /// <summary>
         ///   Gets the current string.
         /// </summary>
-        /// 
+        ///
         protected StringBuilder current;
 
         /// <summary>
         ///   Current cursor position.
         /// </summary>
-        /// 
+        ///
         protected int cursor;
 
         /// <summary>
         ///   Forward limit for inspecting the buffer.
         /// </summary>
-        /// 
+        ///
         protected int limit;
 
         /// <summary>
         ///   Backward limit for inspecting the buffer.
         /// </summary>
-        /// 
+        ///
         protected int limit_backward;
 
         /// <summary>
         ///   Starting bracket position.
         /// </summary>
-        /// 
+        ///
         protected int bra;
 
         /// <summary>
         ///   Ending bracket position.
         /// </summary>
-        /// 
+        ///
         protected int ket;
 
         /// <summary>
         ///   Copy another Env object.
         /// </summary>
-        /// 
+        ///
         public Env(Env other)
         {
             copy_from(other);
@@ -95,7 +96,7 @@ namespace Snowball
         /// <summary>
         ///   Copy another Env object.
         /// </summary>
-        /// 
+        ///
         protected void copy_from(Env other)
         {
             current          = other.current;
@@ -111,13 +112,19 @@ namespace Snowball
     /// <summary>
     ///   Base class for Snowball's stemmer algorithms.
     /// </summary>
-    /// 
+    ///
     public abstract class Stemmer : Env
     {
         /// <summary>
+        ///   Among function being called.
+        /// </summary>
+        ///
+        protected int af;
+
+        /// <summary>
         ///   Initializes a new instance of the <see cref="Stemmer"/> class.
         /// </summary>
-        /// 
+        ///
         protected Stemmer()
         {
             current = new StringBuilder();
@@ -128,14 +135,14 @@ namespace Snowball
         /// <summary>
         ///   Calls the stemmer to process the next word.
         /// </summary>
-        /// 
+        ///
         protected abstract bool stem();
 
 
         /// <summary>
         ///   Stems the buffer's contents.
         /// </summary>
-        /// 
+        ///
         public bool Stem()
         {
             return this.stem();
@@ -144,11 +151,11 @@ namespace Snowball
         /// <summary>
         ///   Stems a given word.
         /// </summary>
-        /// 
+        ///
         /// <param name="word">The word to be stemmed.</param>
-        /// 
+        ///
         /// <returns>The stemmed word.</returns>
-        /// 
+        ///
         public string Stem(string word)
         {
             setBufferContents(word);
@@ -160,7 +167,7 @@ namespace Snowball
         /// <summary>
         ///   Gets the current processing buffer.
         /// </summary>
-        /// 
+        ///
         public StringBuilder Buffer
         {
             get { return current; }
@@ -171,7 +178,7 @@ namespace Snowball
         ///   or the stemmed word, if the stemmer has been
         ///   processed.
         /// </summary>
-        /// 
+        ///
         public string Current
         {
             get { return current.ToString(); }
@@ -192,7 +199,7 @@ namespace Snowball
 
 
         /// <summary>
-        ///   Determines whether the current character is 
+        ///   Determines whether the current character is
         ///   inside a given group of characters <c>s</c>.
         /// </summary>
         protected int in_grouping(string s, int min, int max, bool repeat)
@@ -217,7 +224,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Determines whether the current character is 
+        ///   Determines whether the current character is
         ///   inside a given group of characters <c>s</c>.
         /// </summary>
         protected int in_grouping_b(string s, int min, int max, bool repeat)
@@ -241,7 +248,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Determines whether the current character is 
+        ///   Determines whether the current character is
         ///   outside a given group of characters <c>s</c>.
         /// </summary>
         protected int out_grouping(string s, int min, int max, bool repeat)
@@ -272,7 +279,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Determines whether the current character is 
+        ///   Determines whether the current character is
         ///   outside a given group of characters <c>s</c>.
         /// </summary>
         protected int out_grouping_b(string s, int min, int max, bool repeat)
@@ -385,12 +392,12 @@ namespace Snowball
 
 
         /// <summary>
-        ///   Searches if the current buffer matches against one of the 
+        ///   Searches if the current buffer matches against one of the
         ///   amongs, starting from the current cursor position and going
         ///   forward.
         /// </summary>
-        /// 
-        protected int find_among(Among[] v)
+        ///
+        protected int find_among(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -465,14 +472,14 @@ namespace Snowball
                 {
                     cursor = c + w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    bool res = w.Action();
-                    cursor = c + w.SearchString.Length;
-
-                    if (res)
+                    af = w.Condition;
+                    if (call_among_func()) {
+                        cursor = c + w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;
@@ -483,12 +490,12 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Searches if the current buffer matches against one of the 
+        ///   Searches if the current buffer matches against one of the
         ///   amongs, starting from the current cursor position and going
         ///   backwards.
         /// </summary>
-        /// 
-        protected int find_among_b(Among[] v)
+        ///
+        protected int find_among_b(Among[] v, Func<bool> call_among_func)
         {
             int i = 0;
             int j = v.Length;
@@ -558,14 +565,14 @@ namespace Snowball
                 {
                     cursor = c - w.SearchString.Length;
 
-                    if (w.Action == null)
+                    if (w.Condition == 0)
                         return w.Result;
 
-                    bool res = w.Action();
-                    cursor = c - w.SearchString.Length;
-
-                    if (res)
+                    af = w.Condition;
+                    if (call_among_func()) {
+                        cursor = c - w.SearchString.Length;
                         return w.Result;
+                    }
                 }
 
                 i = w.MatchIndex;
@@ -579,7 +586,7 @@ namespace Snowball
         ///   Replaces the characters between <c>c_bra</c>
         ///   and <c>c_ket</c> by the characters in s.
         /// </summary>
-        ///   
+        ///
         protected int replace_s(int c_bra, int c_ket, String s)
         {
             int adjustment = s.Length - (c_ket - c_bra);
@@ -597,27 +604,28 @@ namespace Snowball
         /// </summary>
         protected void slice_check()
         {
-            if (bra < 0 || bra > ket || ket > limit || limit > current.Length)
-            {
-                System.Diagnostics.Trace.WriteLine("faulty slice operation");
-            }
+            Debug.Assert(bra >= 0);
+            Debug.Assert(bra <= ket);
+            Debug.Assert(ket <= limit);
+            Debug.Assert(limit <= current.Length);
         }
 
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
-        /// 
+        ///
         /// <param name="s">The s.</param>
         protected void slice_from(String s)
         {
             slice_check();
             replace_s(bra, ket, s);
+            ket = bra + s.Length;
         }
 
         /// <summary>
         ///   Removes the current bracket contents.
         /// </summary>
-        /// 
+        ///
         protected void slice_del()
         {
             slice_from("");
@@ -626,7 +634,7 @@ namespace Snowball
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
-        /// 
+        ///
         protected void insert(int c_bra, int c_ket, String s)
         {
             int adjustment = replace_s(c_bra, c_ket, s);
@@ -637,7 +645,7 @@ namespace Snowball
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
-        /// 
+        ///
         protected void insert(int c_bra, int c_ket, StringBuilder s)
         {
             int adjustment = replace_s(c_bra, c_ket, s.ToString());
@@ -648,7 +656,7 @@ namespace Snowball
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
-        /// 
+        ///
         protected void slice_to(StringBuilder s)
         {
             slice_check();
@@ -658,7 +666,7 @@ namespace Snowball
         /// <summary>
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
-        /// 
+        ///
         protected void assign_to(StringBuilder s)
         {
             Replace(s, 0, s.Length, current.ToString(0, limit));
@@ -669,11 +677,10 @@ namespace Snowball
         /// <summary>
         ///   Replaces a specific region of the buffer with another text.
         /// </summary>
-        public static StringBuilder Replace(StringBuilder sb, int index, int length, string text)
+        public static void Replace(StringBuilder sb, int index, int length, string text)
         {
             sb.Remove(index, length - index);
             sb.Insert(index, text);
-            return sb;
         }
 
     }

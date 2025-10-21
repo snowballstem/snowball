@@ -1,4 +1,4 @@
-class BaseStemmer(object):
+class BaseStemmer:
     def __init__(self):
         self.set_current("")
 
@@ -27,113 +27,77 @@ class BaseStemmer(object):
         self.bra              = other.bra
         self.ket              = other.ket
 
-    def in_grouping(self, s, min, max):
+    def in_grouping(self, s):
         if self.cursor >= self.limit:
             return False
-        ch = ord(self.current[self.cursor])
-        if ch > max or ch < min:
-            return False
-        ch -= min
-        if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor] not in s:
             return False
         self.cursor += 1
         return True
 
-    def go_in_grouping(self, s, min, max):
+    def go_in_grouping(self, s):
         while self.cursor < self.limit:
-            ch = ord(self.current[self.cursor])
-            if ch > max or ch < min:
-                return True
-            ch -= min
-            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+            if self.current[self.cursor] not in s:
                 return True
             self.cursor += 1
         return False
 
-    def in_grouping_b(self, s, min, max):
+    def in_grouping_b(self, s):
         if self.cursor <= self.limit_backward:
             return False
-        ch = ord(self.current[self.cursor - 1])
-        if ch > max or ch < min:
-            return False
-        ch -= min
-        if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor - 1] not in s:
             return False
         self.cursor -= 1
         return True
 
-    def go_in_grouping_b(self, s, min, max):
+    def go_in_grouping_b(self, s):
         while self.cursor > self.limit_backward:
-            ch = ord(self.current[self.cursor - 1])
-            if ch > max or ch < min:
-                return True
-            ch -= min
-            if (s[ch >> 3] & (0x1 << (ch & 0x7))) == 0:
+            if self.current[self.cursor - 1] not in s:
                 return True
             self.cursor -= 1
         return False
 
-    def out_grouping(self, s, min, max):
+    def out_grouping(self, s):
         if self.cursor >= self.limit:
             return False
-        ch = ord(self.current[self.cursor])
-        if ch > max or ch < min:
-            self.cursor += 1
-            return True
-        ch -= min
-        if (s[ch >> 3] & (0X1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor] not in s:
             self.cursor += 1
             return True
         return False
 
-    def go_out_grouping(self, s, min, max):
+    def go_out_grouping(self, s):
         while self.cursor < self.limit:
-            ch = ord(self.current[self.cursor])
-            if ch <= max and ch >= min:
-                ch -= min
-                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
-                    return True
+            if self.current[self.cursor] in s:
+                return True
             self.cursor += 1
         return False
 
-    def out_grouping_b(self, s, min, max):
+    def out_grouping_b(self, s):
         if self.cursor <= self.limit_backward:
             return False
-        ch = ord(self.current[self.cursor - 1])
-        if ch > max or ch < min:
-            self.cursor -= 1
-            return True
-        ch -= min
-        if (s[ch >> 3] & (0X1 << (ch & 0x7))) == 0:
+        if self.current[self.cursor - 1] not in s:
             self.cursor -= 1
             return True
         return False
 
-    def go_out_grouping_b(self, s, min, max):
+    def go_out_grouping_b(self, s):
         while self.cursor > self.limit_backward:
-            ch = ord(self.current[self.cursor - 1])
-            if ch <= max and ch >= min:
-                ch -= min
-                if (s[ch >> 3] & (0X1 << (ch & 0x7))):
-                    return True
+            if self.current[self.cursor - 1] in s:
+                return True
             self.cursor -= 1
         return False
 
     def eq_s(self, s):
-        if self.limit - self.cursor < len(s):
-            return False
-        if self.current[self.cursor:self.cursor + len(s)] != s:
-            return False
-        self.cursor += len(s)
-        return True
+        if self.current.startswith(s, self.cursor, self.limit):
+            self.cursor += len(s)
+            return True
+        return False
 
     def eq_s_b(self, s):
-        if self.cursor - self.limit_backward < len(s):
-            return False
-        if self.current[self.cursor - len(s):self.cursor] != s:
-            return False
-        self.cursor -= len(s)
-        return True
+        if self.current.endswith(s, self.limit_backward, self.cursor):
+            self.cursor -= len(s)
+            return True
+        return False
 
     def find_among(self, v):
         i = 0
@@ -183,10 +147,8 @@ class BaseStemmer(object):
                 self.cursor = c + len(w.s)
                 if w.method is None:
                     return w.result
-                method = getattr(self, w.method)
-                res = method()
-                self.cursor = c + len(w.s)
-                if res:
+                if w.method(self):
+                    self.cursor = c + len(w.s)
                     return w.result
             i = w.substring_i
             if i < 0:
@@ -241,10 +203,8 @@ class BaseStemmer(object):
                 self.cursor = c - len(w.s)
                 if w.method is None:
                     return w.result
-                method = getattr(self, w.method)
-                res = method()
-                self.cursor = c - len(w.s)
-                if res:
+                if w.method(self):
+                    self.cursor = c - len(w.s)
                     return w.result
             i = w.substring_i
             if i < 0:
@@ -269,20 +229,16 @@ class BaseStemmer(object):
             self.cursor = c_bra
         return adjustment
 
-    def slice_check(self):
-        if self.bra < 0 or self.bra > self.ket or self.ket > self.limit or self.limit > len(self.current):
-            return False
-        return True
-
     def slice_from(self, s):
         '''
         @type s string
         '''
-        result = False
-        if self.slice_check():
-            self.replace_s(self.bra, self.ket, s)
-            result = True
-        return result
+        assert self.bra >= 0
+        assert self.bra <= self.ket
+        assert self.ket <= self.limit
+        assert self.limit <= len(self.current)
+        self.replace_s(self.bra, self.ket, s)
+        self.ket = self.bra + len(s)
 
     def slice_del(self):
         return self.slice_from("")
@@ -303,10 +259,11 @@ class BaseStemmer(object):
         '''
         Return the slice as a string.
         '''
-        result = ''
-        if self.slice_check():
-            result = self.current[self.bra:self.ket]
-        return result
+        assert self.bra >= 0
+        assert self.bra <= self.ket
+        assert self.ket <= self.limit
+        assert self.limit <= len(self.current)
+        return self.current[self.bra:self.ket]
 
     def assign_to(self):
         '''
