@@ -1149,7 +1149,7 @@ static void generate_hop(struct generator * g, struct node * p) {
             } else {
                 writef(g, "~Mif (z->c ~S0 ~I0 < z->lb) ~f~N", p);
             }
-            writef(g, "~Mz->c = z->c ~S0 ~I0;~N", p);
+            writef(g, "~Mz->c ~S0= ~I0;~N", p);
         } else {
             w(g, "~{~Mint ret = z->c ~S0 ");
             generate_AE(g, p->AE);
