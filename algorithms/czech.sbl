@@ -119,6 +119,7 @@ backwardmode (
       'u' 'y' '{u*}' 'a' 'o' '{a'}' '{e'}' '{y'}'
       (delete)
       '{e^}' '{e^}tem' '{e^}mi' '{e^}te' '{e^}ti'
+      '{e^}m' // e.g. koněm
       (
         delete
         try palatalise_ecaron_or_iacute
