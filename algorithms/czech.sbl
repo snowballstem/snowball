@@ -1,7 +1,7 @@
 routines (
   R1
   palatalise_e
-  palatalise_ecaron_or_iacute
+  palatalise_ecaron
   palatalise_i
   mark_regions
   possessive_suffix
@@ -80,7 +80,7 @@ backwardmode (
     )
   )
 
-  define palatalise_ecaron_or_iacute as (
+  define palatalise_ecaron as (
     [substring] among (
       '{c^}t' (<- 'ck')
       '{s^}t' (<- 'sk')
@@ -122,7 +122,7 @@ backwardmode (
       '{e^}m' // e.g. koněm
       (
         delete
-        try palatalise_ecaron_or_iacute
+        try palatalise_ecaron
       )
       'e' 'ech' 'em' 'emi' 'ete' 'etem'
       (
@@ -130,14 +130,10 @@ backwardmode (
         try palatalise_e
       )
       'i'
-      (
-        delete
-        try palatalise_i
-      )
       '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
       (
         delete
-        try palatalise_ecaron_or_iacute
+        try palatalise_i
       )
     )
   )
