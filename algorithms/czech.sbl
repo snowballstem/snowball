@@ -16,23 +16,23 @@ groupings ( v v_or_syllabic_c )
 
 stringescapes {}
 
-stringdef a' '{U+00E1}'
-stringdef c^ '{U+010D}'
-stringdef d^ '{U+010F}'
-stringdef e' '{U+00E9}'
-stringdef e^ '{U+011B}'
-stringdef i' '{U+00ED}'
-stringdef n^ '{U+0148}'
-stringdef o' '{U+00F3}'
-stringdef r^ '{U+0159}'
-stringdef s^ '{U+0161}'
-stringdef t^ '{U+0165}'
-stringdef u' '{U+00FA}'
-stringdef u* '{U+016F}'
-stringdef y' '{U+00FD}'
-stringdef z^ '{U+017E}'
+stringdef a' '{U+00E1}' // á
+stringdef cv '{U+010D}' // č
+stringdef dv '{U+010F}' // ď
+stringdef e' '{U+00E9}' // é
+stringdef ev '{U+011B}' // ě
+stringdef i' '{U+00ED}' // í
+stringdef nv '{U+0148}' // ň
+stringdef o' '{U+00F3}' // ó
+stringdef rv '{U+0159}' // ř
+stringdef sv '{U+0161}' // š
+stringdef tv '{U+0165}' // ť
+stringdef u' '{U+00FA}' // ú
+stringdef uo '{U+016F}' // ů
+stringdef y' '{U+00FD}' // ý
+stringdef zv '{U+017E}' // ž
 
-define v 'aeiouy{a'}{e^}{e'}{i'}{o'}{u'}{u*}{y'}'
+define v 'aeiouy{a'}{ev}{e'}{i'}{o'}{u'}{uo}{y'}'
 
 // Some consonants in Czech can be syllabic - if these occur between two other
 // consonants then they act in a vowel-like way and it is helpful to include
@@ -75,30 +75,30 @@ backwardmode (
 
   define palatalise_e as (
     [substring] among (
-      'c' '{c^}' (<- 'k')
-      'z' '{z^}' (<- 'h')
+      'c' '{cv}' (<- 'k')
+      'z' '{zv}' (<- 'h')
     )
   )
 
   define palatalise_ecaron as (
     [substring] among (
-      '{c^}t' (<- 'ck')
-      '{s^}t' (<- 'sk')
+      '{cv}t' (<- 'ck')
+      '{sv}t' (<- 'sk')
     )
   )
 
   define palatalise_i as (
     [substring] among (
-      'c' '{c^}' (<- 'k')
-      'z' '{z^}' (<- 'h')
-      '{c^}t' (<- 'ck')
-      '{s^}t' (<- 'sk')
+      'c' '{cv}' (<- 'k')
+      'z' '{zv}' (<- 'h')
+      '{cv}t' (<- 'ck')
+      '{sv}t' (<- 'sk')
     )
   )
 
   define possessive_suffix as (
     [substring] R1 among (
-      'ov' '{u*}v'
+      'ov' '{uo}v'
       (delete)
       'in'
       (
@@ -111,15 +111,15 @@ backwardmode (
   define case_suffix as (
     setlimit tomark p1 for ( [substring] ) among (
       'atech'
-      'at{u*}m'
+      'at{uo}m'
       '{a'}ch' '{y'}ch' 'ov{e'}' '{y'}mi'
       'ata' 'aty' 'ama' 'ami' 'ovi'
-      'at' '{a'}m' 'us' '{u*}m' '{y'}m' 'mi' 'ou'
+      'at' '{a'}m' 'us' '{uo}m' '{y'}m' 'mi' 'ou'
       '{e'}ho' '{e'}m' '{e'}mu'
-      'u' 'y' '{u*}' 'a' 'o' '{a'}' '{e'}' '{y'}'
+      'u' 'y' '{uo}' 'a' 'o' '{a'}' '{e'}' '{y'}'
       (delete)
-      '{e^}' '{e^}tem' '{e^}mi' '{e^}te' '{e^}ti'
-      '{e^}m' // e.g. koněm
+      '{ev}' '{ev}tem' '{ev}mi' '{ev}te' '{ev}ti'
+      '{ev}m' // e.g. koněm
       (
         delete
         try palatalise_ecaron
