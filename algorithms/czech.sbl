@@ -47,9 +47,9 @@ define v_or_syllabic_c v + 'lr'
 
 define mark_regions as (
 
-    $p1 = limit
-    test(hop 3 setmark x)
+    test (hop 3 setmark x) // Signals f if the input < 3 characters.
 
+    $p1 = limit
     do (
         // A syllabic consonant must occur between two consonants, or be
         // preceded by a consonant and at the end of the word.
@@ -140,7 +140,7 @@ backwardmode (
 )
 
 define stem as (
-  do mark_regions
+  mark_regions // Signals f if the input has < 3 characters.
   backwards (
     do case_suffix
     do possessive_suffix
