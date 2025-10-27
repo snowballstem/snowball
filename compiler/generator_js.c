@@ -1145,12 +1145,9 @@ static void generate_define(struct generator * g, struct node * p) {
         w(g, "~Mreturn this.getCurrent();~N");
         w(g, "~-~M}~N");
 
-        if (!strcmp((const char *) q->s, "stem")) {
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
             w(g, "~N");
-            w(g, "~M/**@return{string}*/~N");
-            w(g, "~MstemWord(/**string*/word) {~+~N");
-            w(g, "~Mthis.stem(word);~N");
-            w(g, "~-~M}~N");
+            w(g, "~MstemWord = this.stem;~N");
         }
     }
 
