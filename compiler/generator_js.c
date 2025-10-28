@@ -1176,6 +1176,21 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     w(g, "~-~M}~N");
 
+    if (q->type == t_external) {
+        w(g, "~N");
+        w(g, "~M/**@return{string}*/~N");
+        writef(g, "~M~W(/**string*/input) {~+~N", p);
+        w(g, "~Mthis.setCurrent(input);~N");
+        writef(g, "~Mthis.#~W();~N", p);
+        w(g, "~Mreturn this.getCurrent();~N");
+        w(g, "~-~M}~N");
+
+        if (SIZE(q->s) == 4 && memcmp(q->s, "stem", 4) == 0) {
+            w(g, "~N");
+            w(g, "~MstemWord = this.stem;~N");
+        }
+    }
+
     str_append(saved_output, g->declarations);
     str_append(saved_output, g->outbuf);
     str_delete(g->declarations);
@@ -1369,13 +1384,6 @@ static void generate_class_begin(struct generator * g) {
 }
 
 static void generate_class_end(struct generator * g) {
-    w(g, "~N");
-    w(g, "~M/**@return{string}*/~N");
-    w(g, "~MstemWord(/**string*/word) {~+~N");
-    w(g, "~Mthis.setCurrent(word);~N");
-    w(g, "~Mthis.#stem();~N");
-    w(g, "~Mreturn this.getCurrent();~N");
-    w(g, "~-~M}~N");
     w(g, "~-}~N");
     w(g, "~N");
     w(g, "export { ~n };~N");
