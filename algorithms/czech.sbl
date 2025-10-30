@@ -1,7 +1,6 @@
 routines (
   R1
   palatalise_e
-  palatalise_ecaron
   palatalise_i
   mark_regions
   possessive_suffix
@@ -80,19 +79,21 @@ backwardmode (
     )
   )
 
-  define palatalise_ecaron as (
-    [substring] among (
-      '{cv}t' (<- 'ck')
-      '{sv}t' (<- 'sk')
-    )
-  )
-
   define palatalise_i as (
     [substring] among (
       'c' '{cv}' (<- 'k')
       'z' '{zv}' (<- 'h')
       '{cv}t' (<- 'ck')
-      '{sv}t' (<- 'sk')
+      // -št -> -sk
+      '{sv}t' // e.g. čeština
+        (<-'sk')
+      '{a'}{sv}t' // e.g. plášti
+      'de{sv}t' // e.g. dešti
+      'i{sv}t' // e.g. bojišti
+      '{i'}{sv}t' // e.g. příští
+      'le{sv}t' // e.g. kleští
+      'pou{sv}t' // e.g. poušti, spouští
+        ()
     )
   )
 
@@ -122,7 +123,6 @@ backwardmode (
       '{ev}m' // e.g. koněm
       (
         delete
-        try palatalise_ecaron
       )
       'e' 'ech' 'em' 'emi' 'ete' 'etem'
       (
@@ -139,8 +139,7 @@ backwardmode (
       )
       '{tv}' '{tv}mi'
       ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
-        delete attach 't'
-        try palatalise_ecaron
+        <-'t'
       )
       'i'
       '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
