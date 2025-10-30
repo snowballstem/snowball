@@ -129,6 +129,14 @@ backwardmode (
         delete
         try palatalise_e
       )
+      'ec'
+      ( // Conflate e.g. obec with obce, obcemi, obci, obcí, obcích
+        // The correct linguistic root is the -ec forms, but we map to -c as it
+        // seems much harder to reliably map the various -c- forms to -ec.
+        test non-v
+        delete attach 'c'
+        try palatalise_e
+      )
       '{tv}' '{tv}mi'
       ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
         delete attach 't'
