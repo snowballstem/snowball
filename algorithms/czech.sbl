@@ -129,6 +129,11 @@ backwardmode (
         delete
         try palatalise_e
       )
+      '{tv}' '{tv}mi'
+      ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
+        delete attach 't'
+        try palatalise_ecaron
+      )
       'i'
       '{i'}' '{i'}ch' '{i'}ho' '{i'}m' '{i'}mi' '{i'}mu'
       (
