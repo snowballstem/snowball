@@ -157,6 +157,19 @@ backwardmode (
         )
         <-'k'
       )
+      'et'
+      ( // Conflate e.g. počet with počte, počtu, počty, etc.
+        // The correct linguistic root is the -et form, but we map to -t as
+        // that's easier to do reliably than to map the other way.
+        among (
+          'uc' // e.g. tucet but not dvacet.
+          '{cv}'
+          'h'
+          'ok' // e.g. loket but not paket.
+          'kar' // e.g. karet but not cigaret.
+        )
+        <-'t'
+      )
       '{tv}' '{tv}mi'
       ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
         <-'t'
