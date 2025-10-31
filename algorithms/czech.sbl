@@ -130,12 +130,24 @@ backwardmode (
         try palatalise_e
       )
       'ec'
-      ( // Conflate e.g. obec with obce, obcemi, obci, obcí, obcích
+      ( // Conflate e.g. obec with obce, obcemi, obci, obcí, obcích.
         // The correct linguistic root is the -ec forms, but we map to -c as it
         // seems much harder to reliably map the various -c- forms to -ec.
         test non-v
         delete attach 'c'
         try palatalise_e
+      )
+      'ek'
+      ( // Conflate e.g. článek with článkem, článku, článků, článkům, články.
+        // The correct linguistic root is the -ek forms, but we map to -k as it
+        // seems much harder to reliably map the various -k- forms to -ek.
+        test non-v
+        not among (
+          'dot' // dotek
+          'obl' // oblek
+          'sn' // česnek
+        )
+        <-'k'
       )
       '{tv}' '{tv}mi'
       ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
