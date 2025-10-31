@@ -129,18 +129,26 @@ backwardmode (
         delete
         try palatalise_e
       )
+      'eb'
+      ( // Conflate e.g. skladeb with skladba, skladbě, skladby, etc.
+        // The correct linguistic root is the -eb form, but we map to -b as
+        // that's easier to do reliably than to map the other way.
+        test non-v
+        not 't{rv}' // potřeb
+        <-'b'
+      )
       'ec'
       ( // Conflate e.g. obec with obce, obcemi, obci, obcí, obcích.
-        // The correct linguistic root is the -ec forms, but we map to -c as it
-        // seems much harder to reliably map the various -c- forms to -ec.
+        // The correct linguistic root is the -ec form, but we map to -c as
+        // that's easier to do reliably than to map the other way.
         test non-v
         delete attach 'c'
         try palatalise_e
       )
       'ek'
       ( // Conflate e.g. článek with článkem, článku, článků, článkům, články.
-        // The correct linguistic root is the -ek forms, but we map to -k as it
-        // seems much harder to reliably map the various -k- forms to -ek.
+        // The correct linguistic root is the -ek form, but we map to -k as
+        // that's easier to do reliably than to map the other way.
         test non-v
         not among (
           'dot' // dotek
