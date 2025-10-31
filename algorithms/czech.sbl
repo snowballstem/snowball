@@ -11,7 +11,7 @@ externals ( stem )
 
 integers ( p1 x )
 
-groupings ( v v_or_syllabic_c )
+groupings ( ev_ending v v_or_syllabic_c )
 
 stringescapes {}
 
@@ -43,6 +43,10 @@ define v 'aeiouy{a'}{ev}{e'}{i'}{o'}{u'}{uo}{y'}'
 // vocabulary list (also from wikipedia but with a lower cut-off frequency)
 // all but one of the affected words don't seem to actually be Czech words.
 define v_or_syllabic_c v + 'lr'
+
+// Letters that can occur before -ev.  Actual known exceptions include
+// 'j' (objev, projev, výjev) and 'ř' (ohřev)
+define ev_ending 'hknrtz'
 
 define mark_regions as (
 
@@ -169,6 +173,13 @@ backwardmode (
           'kar' // e.g. karet but not cigaret.
         )
         <-'t'
+      )
+      'ev'
+      ( // Conflate e.g. církev with církve, církve, církvemu, církví, etc.
+        // The correct linguistic root is the -ev form, but we map to -v as
+        // that's easier to do reliably than to map the other way.
+        ev_ending
+        <-'v'
       )
       '{tv}' '{tv}mi'
       ( // Conflate e.g. oběť and oběťmi with obětech; hradišť with hradišti.
