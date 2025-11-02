@@ -50,7 +50,7 @@ define ev_ending 'hknrtz'
 
 // Letters that can occur before -eň.  Actual known exceptions include
 // 'g' (Irgeň), 'l' (zeleň), 'm' (kameň) and 'ř' (třeň).
-define env_ending 'bcdhkščžprstvz'
+define env_ending 'bc{cv}dhkprs{sv}tvz{zv}'
 
 define mark_regions as (
 
