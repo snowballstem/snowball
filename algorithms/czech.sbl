@@ -11,7 +11,7 @@ externals ( stem )
 
 integers ( p1 x )
 
-groupings ( ev_ending v v_or_syllabic_c )
+groupings ( env_ending ev_ending v v_or_syllabic_c )
 
 stringescapes {}
 
@@ -47,6 +47,10 @@ define v_or_syllabic_c v + 'lr'
 // Letters that can occur before -ev.  Actual known exceptions include
 // 'j' (objev, projev, výjev) and 'ř' (ohřev)
 define ev_ending 'hknrtz'
+
+// Letters that can occur before -eň.  Actual known exceptions include
+// 'g' (Irgeň), 'l' (zeleň), 'm' (kameň) and 'ř' (třeň).
+define env_ending 'bcdhkščžprstvz'
 
 define mark_regions as (
 
@@ -161,6 +165,21 @@ backwardmode (
         )
         <-'k'
       )
+      'e{nv}'
+      ( // Conflate e.g. Plzeň with Plzně, Plzni, Plzní.
+        // The correct linguistic root is the -eň form, but we map to -n as
+        // that's easier to do reliably than to map the other way.
+        test env_ending
+        <-'n' // -eň -> -n not -ň
+      )
+      // -eš can also lose the -e- but this seems very uncommon - the only
+      // example I've seen is Aleš (a male given name or diminuitive name)
+      // which can decline as Alše or Aleše, etc.  These alternative
+      // declensions mean that just removing the -e- from Aleš would not
+      // really help (especially as the forms which keep the -e- seem
+      // more common, at least based on cs.wikipedia.org) so if we did this
+      // we would need to also remove -e- from Aleše, etc, which seems a lot
+      // of complication for a single word.
       'et'
       ( // Conflate e.g. počet with počte, počtu, počty, etc.
         // The correct linguistic root is the -et form, but we map to -t as
