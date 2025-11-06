@@ -84,11 +84,12 @@ backwardmode (
             'eed' 'eedly'
                 (
                 do (
+                    R1
                     among (
                         'proc' 'exc' 'succ'
                             (atlimit)
                     ) or (
-                        R1 <-'ee'
+                        <-'ee'
                     )
                 )
             )
