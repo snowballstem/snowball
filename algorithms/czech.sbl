@@ -139,24 +139,18 @@ backwardmode (
       )
       'eb'
       ( // Conflate e.g. skladeb with skladba, skladbě, skladby, etc.
-        // The correct linguistic root is the -eb form, but we map to -b as
-        // that's easier to do reliably than to map the other way.
         test non-v
         not 't{rv}' // potřeb
         <-'b'
       )
       'ec'
       ( // Conflate e.g. obec with obce, obcemi, obci, obcí, obcích.
-        // The correct linguistic root is the -ec form, but we map to -c as
-        // that's easier to do reliably than to map the other way.
         test non-v
         delete attach 'c'
         try palatalise_e
       )
       'ek'
       ( // Conflate e.g. článek with článkem, článku, článků, článkům, články.
-        // The correct linguistic root is the -ek form, but we map to -k as
-        // that's easier to do reliably than to map the other way.
         test non-v
         not among (
           'dot' // dotek
@@ -165,16 +159,21 @@ backwardmode (
         )
         <-'k'
       )
+      '{ev}k'
+      ( // Conflate e.g. daněk with daňka, daňkem, daňki, daňkovi, daňků, etc.
+        'n'] <-'{nv}k'
+      )
       'e{nv}'
       ( // Conflate e.g. Plzeň with Plzně, Plzni, Plzní.
-        // The correct linguistic root is the -eň form, but we map to -n as
-        // that's easier to do reliably than to map the other way.
         test env_ending
         <-'n' // -eň -> -n not -ň
       )
       // -eš can also lose the -e- but this seems very uncommon - the only
       // example I've seen is Aleš (a male given name or diminuitive name)
-      // which can decline as Alše or Aleše, etc.  These alternative
+      // but we require 3 characters before R1 so this won't be considered
+      // for stemming.
+      //
+      // Also this can decline as Alše or Aleše, etc, and these alternative
       // declensions mean that just removing the -e- from Aleš would not
       // really help (especially as the forms which keep the -e- seem
       // more common, at least based on cs.wikipedia.org) so if we did this
@@ -182,8 +181,6 @@ backwardmode (
       // of complication for a single word.
       'et'
       ( // Conflate e.g. počet with počte, počtu, počty, etc.
-        // The correct linguistic root is the -et form, but we map to -t as
-        // that's easier to do reliably than to map the other way.
         among (
           'uc' // e.g. tucet but not dvacet.
           '{cv}'
@@ -195,8 +192,6 @@ backwardmode (
       )
       'ev'
       ( // Conflate e.g. církev with církve, církve, církvemu, církví, etc.
-        // The correct linguistic root is the -ev form, but we map to -v as
-        // that's easier to do reliably than to map the other way.
         ev_ending
         <-'v'
       )
