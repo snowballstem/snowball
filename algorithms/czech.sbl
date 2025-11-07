@@ -83,14 +83,14 @@ backwardmode (
   define palatalise_e as (
     [substring] among (
       'c' (<- 'k')
-      'z' '{zv}' (<- 'h')
+      'z' (<- 'h')
     )
   )
 
   define palatalise_i as (
     [substring] among (
       'c' (<- 'k')
-      'z' '{zv}' (<- 'h')
+      'z' (<- 'h')
       '{cv}t' (<- 'ck')
       // -št -> -sk
       '{sv}t' // e.g. čeština
