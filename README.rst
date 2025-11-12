@@ -46,8 +46,8 @@ target languages.
 
 The first stage builds the Snowball compiler and runs it to create target
 language code (and it can also run tests on each stemmer).  The expectation is
-that you then create a "distribution" tarballs of this code with ``make dist``
-(or to create one for a specific target language, e.g.  ``make
+that you then create "distribution" tarballs of this code with ``make dist``
+(or create one for a specific target language, e.g. with ``make
 dist_libstemmer_c`` for C).  These tarballs are created in the ``dist/``
 subdirectory.
 
