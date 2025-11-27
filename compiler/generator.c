@@ -1859,43 +1859,59 @@ void write_start_comment(struct generator * g,
 }
 
 static void generate_head(struct generator * g) {
+    struct options * o = g->options;
+    const char * slash = strrchr(o->output_file, '/');
+    const char * leaf = (slash == NULL) ? o->output_file : slash + 1;
+
+    slash = strrchr(leaf, '\\');
+    if (slash != NULL) leaf = slash + 1;
+
+    w(g, "#include \"");
+    write_string(g, leaf);
+    w(g, ".h\"~N~N");
+
     if (g->analyser->int_limits_used) {
-        w(g, "#include <limits.h>~N");
+        w(g, "#include <limits.h>~N~N");
     }
+
     if (g->analyser->debug_used) {
         w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
     }
     w(g, "#include \"");
-    if (g->options->runtime_path) {
-        write_string(g, g->options->runtime_path);
-        if (g->options->runtime_path[strlen(g->options->runtime_path) - 1] != '/')
+    if (o->runtime_path) {
+        write_string(g, o->runtime_path);
+        if (o->runtime_path[strlen(o->runtime_path) - 1] != '/')
             write_char(g, '/');
     }
     w(g, "header.h\"~N~N");
 }
 
 static void generate_routine_headers(struct generator * g) {
-    for (struct name * q = g->analyser->names; q; q = q->next) {
-        switch (q->type) {
-            case t_routine:
+    if (g->analyser->name_count[t_external]) {
+        w(g, "#ifdef __cplusplus~N"
+             "extern \"C\" {~N"
+             "#endif~N");
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->type == t_external) {
+                w(g, "extern int ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
+            }
+        }
+        w(g, "#ifdef __cplusplus~N"
+             "}~N"
+             "#endif~N~N");
+    }
+
+    if (g->analyser->name_count[t_routine]) {
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->type == t_routine) {
                 w(g, "static int ");
                 write_varname(g, q);
                 w(g, "(struct SN_env * z);~N");
-                break;
-            case t_external:
-                w(g,
-                  "#ifdef __cplusplus~N"
-                  "extern \"C\" {~N"
-                  "#endif~N"
-                  "extern int ");
-                write_varname(g, q);
-                w(g,
-                  "(struct SN_env * z);~N"
-                  "#ifdef __cplusplus~N"
-                  "}~N"
-                  "#endif~N");
-                break;
+            }
         }
+        write_newline(g);
     }
 }
 
@@ -2018,13 +2034,6 @@ static void generate_close(struct generator * g) {
     w(g, "~Nextern void ~pclose_env(struct SN_env * z) { SN_close_env(z, ~I0); }~N~N");
 }
 
-static void generate_create_and_close_templates(struct generator * g) {
-    w(g, "~N"
-         "extern struct SN_env * ~pcreate_env(void);~N"
-         "extern void ~pclose_env(struct SN_env * z);~N"
-         "~N");
-}
-
 static void generate_header_file(struct generator * g) {
     const char * vp = g->options->variables_prefix;
     g->S[0] = vp;
@@ -2033,7 +2042,11 @@ static void generate_header_file(struct generator * g) {
          "extern \"C\" {~N"
          "#endif~N");            /* for C++ */
 
-    generate_create_and_close_templates(g);
+    w(g, "~N"
+         "extern struct SN_env * ~pcreate_env(void);~N"
+         "extern void ~pclose_env(struct SN_env * z);~N"
+         "~N");
+
     for (struct name * q = g->analyser->names; q; q = q->next) {
         switch (q->type) {
             case t_external:
@@ -2084,15 +2097,6 @@ extern void generate_program_c(struct generator * g) {
     write_start_comment(g, "/* ", " */");
     generate_head(g);
     generate_routine_headers(g);
-    w(g, "#ifdef __cplusplus~N"
-         "extern \"C\" {~N"
-         "#endif~N"
-         "~N");
-    generate_create_and_close_templates(g);
-    w(g, "~N"
-         "#ifdef __cplusplus~N"
-         "}~N"
-         "#endif~N~N");
     g->declarations = g->outbuf;
     g->outbuf = str_new();
     g->literalstring_count = 0;
