@@ -1,6 +1,6 @@
 
 #include <stdlib.h> /* for malloc, calloc, free */
-#include "header.h"
+#include "snowball_runtime.h"
 
 static const struct SN_env default_SN_env;
 

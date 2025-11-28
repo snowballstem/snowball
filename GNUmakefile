@@ -167,7 +167,7 @@ RUNTIME_SOURCES  = runtime/api.c \
 		   runtime/utilities.c
 
 RUNTIME_HEADERS  = runtime/api.h \
-		   runtime/header.h
+		   runtime/snowball_runtime.h
 
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c

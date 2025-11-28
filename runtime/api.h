@@ -5,10 +5,9 @@ typedef unsigned char symbol;
 
    More precisely, replace 'char' with whatever type guarantees the
    character width you need. Note however that sizeof(symbol) should divide
-   HEAD, defined in header.h as 2*sizeof(int), without remainder, otherwise
-   there is an alignment problem. In the unlikely event of a problem here,
-   consult Martin Porter.
-
+   HEAD, defined in snowball_runtime.h as 2*sizeof(int), without remainder,
+   otherwise there is an alignment problem. In the unlikely event of a problem
+   here, consult Martin Porter.
 */
 
 struct SN_env {

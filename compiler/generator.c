@@ -1880,7 +1880,7 @@ static void generate_head(struct generator * g) {
         if (o->runtime_path[strlen(o->runtime_path) - 1] != '/')
             write_char(g, '/');
     }
-    w(g, "header.h\"~N~N");
+    w(g, "snowball_runtime.h\"~N~N");
 
     // Generate the struct SN_local definition, which embeds a struct SN_env and
     // also holds any non-localised variables.  We group variables by type to

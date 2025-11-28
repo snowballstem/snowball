@@ -252,7 +252,7 @@ EOS
     for $srcfile ('include/libstemmer.h',
                   "libstemmer/modules${extn}.h",
                   'runtime/api.h',
-                  'runtime/header.h') {
+                  'runtime/snowball_runtime.h') {
         print OUT " \\\n" if $need_sep;
         print OUT "  $srcfile";
         $need_sep = 1;

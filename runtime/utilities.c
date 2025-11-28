@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "header.h"
+#include "snowball_runtime.h"
 
 #define CREATE_SIZE 1
 
