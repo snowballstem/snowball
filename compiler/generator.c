@@ -1510,6 +1510,14 @@ static void generate_define(struct generator * g, struct node * p) {
                     assert(0);
                     break;
                 case t_boolean:
+                    if (g->options->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "~Mbool ");
+                    } else {
+                        w(g, "~Mint ");
+                    }
+                    write_varname(g, name);
+                    w(g, ";~N");
+                    break;
                 case t_integer:
                     w(g, "~Mint ");
                     write_varname(g, name);
