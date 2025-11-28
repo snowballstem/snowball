@@ -43,32 +43,12 @@ static void write_varname(struct generator * g, struct name * p) {
         case t_string:
         case t_boolean:
         case t_integer: {
-            if (p->local_to != NULL) {
-                /* Name local variables using their Snowball name prefixed by
-                 * s_, b_ or i_.
-                 */
-                write_char(g, "sbi"[p->type]);
-                write_char(g, '_');
-                write_s(g, p->s);
-                return;
-            }
-            int count = p->count;
-            if (count < 0) {
-                p->s[SIZE(p->s)] = 0;
-                fprintf(stderr, "Reference to optimised out variable %s attempted\n",
-                        p->s);
-                exit(1);
-            }
-            if (p->type == t_boolean) {
-                /* We use a single array for booleans and integers, with the
-                 * integers first.
-                 */
-                count += g->analyser->name_count[t_integer];
-            }
-            write_char(g, "SIIrxg"[p->type]);
-            write_char(g, '[');
-            write_int(g, count);
-            write_char(g, ']');
+            /* Name variables using their Snowball name prefixed by
+             * s_, b_ or i_.
+             */
+            write_char(g, "sbi"[p->type]);
+            write_char(g, '_');
+            write_s(g, p->s);
             return;
         }
         default:
@@ -80,7 +60,7 @@ static void write_varname(struct generator * g, struct name * p) {
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
     if (p->type < t_routine && p->local_to == NULL)
-        write_string(g, "z->");
+        write_string(g, "((struct SN_local *)z)->");
     write_varname(g, p);
 }
 
@@ -869,12 +849,20 @@ static void generate_try(struct generator * g, struct node * p) {
 
 static void generate_set(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = 1;~N", p);
+    if (g->options->target_lang == LANG_CPLUSPLUS) {
+        writef(g, "~M~V = true;~N", p);
+    } else {
+        writef(g, "~M~V = 1;~N", p);
+    }
 }
 
 static void generate_unset(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = 0;~N", p);
+    if (g->options->target_lang == LANG_CPLUSPLUS) {
+        writef(g, "~M~V = false;~N", p);
+    } else {
+        writef(g, "~M~V = 0;~N", p);
+    }
 }
 
 static void generate_fail(struct generator * g, struct node * p) {
@@ -1330,8 +1318,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    // only copy start - we don't need to copy variables
-    writef(g, "~{~Mstruct SN_env en~B0 = * z;~N", p);
+    // We only want to save and restore SN_env, not the variables.
+    writef(g, "~{~Mstruct SN_env en~B0 = *z;~N", p);
     if (p->left->possible_signals == -1) {
         /* Assume failure. */
         w(g, "~Mint ~B0_f = 1;~N");
@@ -1355,7 +1343,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     g->B[0] = str_data(savevar);
     writef(g, "~M~V = z->p;~N"
-              "~M* z = en~B0;~N", p);
+              "~M*z = en~B0;~N", p);
     if (p->left->possible_signals == 0) {
         // p->left always signals f.
         w(g, "~M~f~N");
@@ -1871,8 +1859,9 @@ static void generate_head(struct generator * g) {
     w(g, ".h\"~N~N");
 
     if (g->analyser->int_limits_used) {
-        w(g, "#include <limits.h>~N~N");
+        w(g, "#include <limits.h>~N");
     }
+    w(g, "#include <stddef.h>~N~N");
 
     if (g->analyser->debug_used) {
         w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
@@ -1884,6 +1873,42 @@ static void generate_head(struct generator * g) {
             write_char(g, '/');
     }
     w(g, "header.h\"~N~N");
+
+    // Generate the struct SN_local definition, which embeds a struct SN_env and
+    // also holds any non-localised variables.  We group variables by type to
+    // try to produce more efficient struct packing.
+    w(g, "struct SN_local {~N~+"
+         "~Mstruct SN_env z;~N");
+
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (!name->local_to && name->type == t_integer) {
+            w(g, "~Mint ");
+            write_varname(g, name);
+            w(g, ";~N");
+        }
+    }
+
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (!name->local_to && name->type == t_boolean) {
+            if (g->options->target_lang == LANG_CPLUSPLUS) {
+                w(g, "~Mbool ");
+            } else {
+                w(g, "~Munsigned char ");
+            }
+            write_varname(g, name);
+            w(g, ";~N");
+        }
+    }
+
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (!name->local_to && name->type == t_string) {
+            w(g, "~Msymbol * ");
+            write_varname(g, name);
+            w(g, ";~N");
+        }
+    }
+
+    w(g, "~-~M};~N~N");
 }
 
 static void generate_routine_headers(struct generator * g) {
@@ -2020,18 +2045,92 @@ static void generate_groupings(struct generator * g) {
 }
 
 static void generate_create(struct generator * g) {
-    int * p = g->analyser->name_count;
-    g->I[0] = p[t_string];
-    g->I[1] = p[t_integer] + p[t_boolean];
     w(g, "~N"
-         "extern struct SN_env * ~pcreate_env(void) { return SN_create_env(~I0, ~I1); }"
-         "~N");
+         "extern struct SN_env * ~pcreate_env(void) {~N~+"
+         "~Mstruct SN_env * z = SN_new_env(sizeof(struct SN_local));~N");
+
+    if (g->analyser->name_count[t_integer] > 0 ||
+        g->analyser->name_count[t_boolean] > 0 ||
+        g->analyser->name_count[t_string] > 0) {
+        w(g, "~Mif (z) {~N~+");
+
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to) {
+                switch (name->type) {
+                    case t_string:
+                        w(g, "~M");
+                        write_varref(g, name);
+                        w(g, " = NULL;~N");
+                        break;
+                    case t_boolean:
+                        w(g, "~M");
+                        write_varref(g, name);
+                        if (g->options->target_lang == LANG_CPLUSPLUS) {
+                            w(g, " = false;~N");
+                        } else {
+                            w(g, " = 0;~N");
+                        }
+                        break;
+                    case t_integer:
+                        w(g, "~M");
+                        write_varref(g, name);
+                        w(g, " = 0;~N");
+                        break;
+                }
+            }
+        }
+
+        if (g->analyser->name_count[t_string] > 0) {
+            write_newline(g);
+
+            // To simplify error handling, we initialise all strings to NULL
+            // above, then try to allocate them in a second pass.
+            for (struct name * name = g->analyser->names; name; name = name->next) {
+                if (!name->local_to) {
+                    switch (name->type) {
+                        case t_string:
+                            w(g, "~Mif ((");
+                            write_varref(g, name);
+                            w(g, " = create_s()) == NULL) {~N~+"
+                                 "~M~pclose_env(z);~N"
+                                 "~Mreturn NULL;~N~-"
+                                 "~M}~N");
+                            break;
+                    }
+                }
+            }
+        }
+
+        w(g, "~-~M}~N");
+    }
+
+    w(g, "~Mreturn z;~N"
+         "~-}~N");
 }
 
 static void generate_close(struct generator * g) {
-    int * p = g->analyser->name_count;
-    g->I[0] = p[t_string];
-    w(g, "~Nextern void ~pclose_env(struct SN_env * z) { SN_close_env(z, ~I0); }~N~N");
+    w(g, "~Nextern void ~pclose_env(struct SN_env * z) {~N~+");
+
+    if (g->analyser->name_count[t_string] > 0) {
+        w(g, "~Mif (z) {~N~+");
+
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to) {
+                switch (name->type) {
+                    case t_string:
+                        w(g, "~Mlose_s(");
+                        write_varref(g, name);
+                        w(g, ");~N");
+                        break;
+                }
+            }
+        }
+
+        w(g, "~-~M}~N");
+    }
+
+    w(g, "~MSN_delete_env(z);~N"
+         "~-}~N~N");
 }
 
 static void generate_header_file(struct generator * g) {

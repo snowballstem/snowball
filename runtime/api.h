@@ -15,16 +15,14 @@ struct SN_env {
     symbol * p;
     int c; int l; int lb; int bra; int ket;
     int af;
-    symbol * * S;
-    int * I;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern struct SN_env * SN_create_env(int S_size, int I_size);
-extern void SN_close_env(struct SN_env * z, int S_size);
+extern struct SN_env * SN_new_env(int alloc_size);
+extern void SN_delete_env(struct SN_env * z);
 
 extern int SN_set_current(struct SN_env * z, int size, const symbol * s);
 
