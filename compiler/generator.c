@@ -1917,6 +1917,51 @@ static void generate_head(struct generator * g) {
     }
 
     w(g, "~-~M};~N~N");
+
+    const char * vp = g->options->variables_prefix;
+    if (vp) {
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->local_to) continue;
+            switch (q->type) {
+                case t_string:
+                    w(g, "extern const symbol * ");
+                    write_string(g, vp);
+                    write_varname(g, q);
+                    w(g, "(struct SN_env * z) {~N~+");
+                    w(g, "~Msymbol * p = ");
+                    write_varref(g, q);
+                    w(g, ";~N"
+                         "~Mp[SIZE(p)] = 0;~N"
+                         "~Mreturn p;~N~-"
+                         "}~N~N");
+                    break;
+                case t_integer:
+                    w(g, "extern int ");
+                    write_string(g, vp);
+                    write_varname(g, q);
+                    w(g, "(struct SN_env * z) {~N~+"
+                         "~Mreturn ");
+                    write_varref(g, q);
+                    w(g, ";~N~-"
+                         "}~N~N");
+                    break;
+                case t_boolean:
+                    if (g->options->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "extern bool ");
+                    } else {
+                        w(g, "extern int ");
+                    }
+                    write_string(g, vp);
+                    write_varname(g, q);
+                    w(g, "(struct SN_env * z) {~N~+"
+                         "~Mreturn ");
+                    write_varref(g, q);
+                    w(g, ";~N~-"
+                         "}~N~N");
+                    break;
+            }
+        }
+    }
 }
 
 static void generate_routine_headers(struct generator * g) {
@@ -2143,7 +2188,6 @@ static void generate_close(struct generator * g) {
 
 static void generate_header_file(struct generator * g) {
     const char * vp = g->options->variables_prefix;
-    g->S[0] = vp;
 
     w(g, "#ifdef __cplusplus~N"
          "extern \"C\" {~N"
@@ -2162,30 +2206,26 @@ static void generate_header_file(struct generator * g) {
                 w(g, "(struct SN_env * z);~N");
                 break;
             case t_string:
+                if (!vp) break;
+                w(g, "extern symbol * ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
+                break;
             case t_integer:
+                if (!vp) break;
+                w(g, "extern int ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
+                break;
             case t_boolean:
-                if (vp) {
-                    int count = q->count;
-                    if (count < 0) {
-                        /* Unused variables should get removed from `names`. */
-                        q->s[SIZE(q->s)] = 0;
-                        fprintf(stderr, "Optimised out variable %s still in names list\n",
-                                q->s);
-                        exit(1);
-                    }
-                    if (q->type == t_boolean) {
-                        /* We use a single array for booleans and integers,
-                         * with the integers first.
-                         */
-                        count += g->analyser->name_count[t_integer];
-                    }
-                    g->I[0] = count;
-                    w(g, "#define ~S0");
-                    write_s(g, q->s);
-                    w(g, " (");
-                    write_char(g, "SIIrxg"[q->type]);
-                    w(g, "[~I0])~N");
+                if (!vp) break;
+                if (g->options->target_lang == LANG_CPLUSPLUS) {
+                    w(g, "extern bool ");
+                } else {
+                    w(g, "extern int ");
                 }
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
                 break;
         }
     }
