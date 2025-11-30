@@ -375,7 +375,7 @@ static int increase_size(symbol ** p, int n) {
    s_size symbols at s.
    Returns 0 on success, -1 on error.
 */
-extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s, int * adjptr)
+extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s)
 {
     int adjustment = s_size - (c_ket - c_bra);
     int len = SIZE(z->p);
@@ -394,8 +394,6 @@ extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const 
             z->c = c_bra;
     }
     if (s_size) memmove(z->p + c_bra, s, s_size * sizeof(symbol));
-    if (adjptr != NULL)
-        *adjptr = adjustment;
     return 0;
 }
 
@@ -417,7 +415,7 @@ static int slice_check(struct SN_env * z) {
 
 extern int slice_from_s(struct SN_env * z, int s_size, const symbol * s) {
     if (slice_check(z)) return -1;
-    if (replace_s(z, z->bra, z->ket, s_size, s, NULL) < 0) return -1;
+    if (replace_s(z, z->bra, z->ket, s_size, s) < 0) return -1;
     z->ket = z->bra + s_size;
     return 0;
 }
@@ -431,11 +429,13 @@ extern int slice_del(struct SN_env * z) {
 }
 
 extern int insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbol * s) {
-    int adjustment;
-    if (replace_s(z, bra, ket, s_size, s, &adjustment))
+    if (replace_s(z, bra, ket, s_size, s))
         return -1;
-    if (bra <= z->bra) z->bra += adjustment;
-    if (bra <= z->ket) z->ket += adjustment;
+    if (bra <= z->ket) {
+        int adjustment = s_size - (ket - bra);
+        z->ket += adjustment;
+        if (bra <= z->bra) z->bra += adjustment;
+    }
     return 0;
 }
 

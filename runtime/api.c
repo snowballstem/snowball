@@ -26,7 +26,7 @@ extern void SN_delete_env(struct SN_env * z)
 
 extern int SN_set_current(struct SN_env * z, int size, const symbol * s)
 {
-    int err = replace_s(z, 0, z->l, size, s, NULL);
+    int err = replace_s(z, 0, z->l, size, s);
     z->c = 0;
     return err;
 }
