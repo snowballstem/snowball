@@ -378,8 +378,8 @@ static int increase_size(symbol ** p, int n) {
 extern int replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s)
 {
     int adjustment = s_size - (c_ket - c_bra);
-    int len = SIZE(z->p);
     if (adjustment != 0) {
+        int len = SIZE(z->p);
         if (adjustment + len > CAPACITY(z->p)) {
             if (increase_size(&z->p, adjustment + len) < 0) return -1;
         }
