@@ -501,7 +501,7 @@ extern int main(int argc, char * argv[]) {
                     //
                     // 1000000000: local 44.9s vs global 6.3s
                 case LANG_CPLUSPLUS:
-                    // Currently handled as LANG_C except uses .cc extension.
+                    // String variables are handled the same as LANG_C.
                 case LANG_CSHARP:
                     // 100000000: local 18.8s vs global 12.4s
                 case LANG_JAVA:

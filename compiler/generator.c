@@ -485,6 +485,43 @@ static void w(struct generator * g, const char * s) {
     writef(g, s, NULL);
 }
 
+/* Write out a statement with additional code to propagate a negative return
+ * value which indicates an error.
+ *
+ * When generating C++, such errors throw exceptions so we don't need to
+ * check for negative return values.
+ */
+static void write_propagating_error(struct generator * g, const char * s,
+                                    int keep_c,
+                                    struct node *p) {
+    if (g->options->target_lang == LANG_CPLUSPLUS) {
+        if (keep_c) {
+            write_block_start(g);
+            w(g, "~Mint saved_c = z->c;~N");
+        }
+        write_margin(g);
+        writef(g, s, p);
+        w(g, ";~N");
+        if (keep_c) {
+            w(g, "~Mz->c = saved_c;~N");
+            write_block_end(g);
+        }
+    } else {
+        write_block_start(g);
+        if (keep_c) {
+            w(g, "~Mint saved_c = z->c;~N");
+        }
+        w(g, "~Mint ret = ");
+        writef(g, s, p);
+        w(g, ";~N");
+        if (keep_c) {
+            w(g, "~Mz->c = saved_c;~N");
+        }
+        w(g, "~Mif (ret < 0) return ret;~N");
+        write_block_end(g);
+    }
+}
+
 static void generate_AE(struct generator * g, struct node * p) {
     const char * s;
     switch (p->type) {
@@ -908,8 +945,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        writef(g, "~{~Mint ret = ~V(z);~N", p->left);
-        w(g, "~Mif (ret < 0) return ret;~N~}");
+        write_propagating_error(g, "~V(z)", false, p->left);
     } else {
         g->failure_label = new_label(g);
         g->label_used = 0;
@@ -1155,9 +1191,7 @@ static void generate_hop(struct generator * g, struct node * p) {
 
 static void generate_delete(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~{~Mint ret = slice_del(z);~N", p);
-    writef(g, "~Mif (ret < 0) return ret;~N"
-          "~}", p);
+    write_propagating_error(g, "slice_del(z)", false, p);
 }
 
 static void generate_tolimit(struct generator * g, struct node * p) {
@@ -1187,41 +1221,34 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif (assign_to(z, &~V) < 0) return -1;~N", p);
+    write_propagating_error(g, "assign_to(z, &~V)", false, p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~Mif (slice_to(z, &~V) < 0) return -1;~N", p);
+    write_propagating_error(g, "slice_to(z, &~V)", false, p);
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
-    write_comment(g, p);
     if (p->mode == m_backward) keep_c = !keep_c;
-    writef(g, "~{", p);
-    if (keep_c) w(g, "~Mint saved_c = z->c;~N");
-    writef(g, "~Mint ret = insert_~$(z, z->c, z->c, ~a);~N", p);
-    if (keep_c) w(g, "~Mz->c = saved_c;~N");
-    writef(g, "~Mif (ret < 0) return ret;~N~}", p);
+    write_comment(g, p);
+    write_propagating_error(g, "insert_~$(z, z->c, z->c, ~a)", keep_c, p);
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-    int keep_c = p->mode == m_forward; /* like 'attach' */
-
     write_comment(g, p);
-    writef(g, "~{", p);
-    if (keep_c) w(g, "~Mint saved_c = z->c;~N");
-    w(g, "~Mint ret = ");
-    writef(g, keep_c ? "insert_~$(z, z->c, z->l, ~a);~N" : "insert_~$(z, z->lb, z->c, ~a);~N", p);
-    if (keep_c) w(g, "~Mz->c = saved_c;~N");
-    writef(g, "~Mif (ret < 0) return ret;~N~}", p);
+    if (p->mode == m_forward) {
+        /* like 'attach' */
+        write_propagating_error(g, "insert_~$(z, z->c, z->l, ~a)", true, p);
+    } else {
+        write_propagating_error(g, "insert_~$(z, z->lb, z->c, ~a)", false, p);
+    }
 }
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~{~Mint ret = slice_from_~$(z, ~a);~N", p);
-    writef(g, "~Mif (ret < 0) return ret;~N~}", p);
+    write_propagating_error(g, "slice_from_~$(z, ~a)", false, p);
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
@@ -1406,25 +1433,38 @@ static void generate_call(struct generator * g, struct node * p) {
         writef(g, "~Mreturn ~V(z);~N", p);
         return;
     }
-    writef(g, "~{~Mint ret = ~V(z);~N", p);
     if (just_return_on_fail(g)) {
-        /* Combine the two tests in this special case for better optimisation
-         * and clearer generated code. */
-        writef(g, "~Mif (ret <= 0) return ret;~N", p);
+        write_block_start(g);
+        writef(g, "~Mint ret = ~V(z);~N", p);
+        if (g->options->target_lang == LANG_CPLUSPLUS) {
+            writef(g, "~Mif (ret == 0) return ret;~N", p);
+        } else {
+            /* For C, we need to propagate both failures and runtime errors so
+             * we do a combined test for better optimisation and clearer
+             * generated code. */
+            writef(g, "~Mif (ret <= 0) return ret;~N", p);
+        }
+        write_block_end(g);
     } else {
         if (signals == 1) {
             /* Always succeeds - just need to handle runtime errors. */
-            writef(g, "~Mif (ret < 0) return ret;~N", p);
+            write_propagating_error(g, "~V(z)", false, p);
         } else if (signals == 0) {
             /* Always fails. */
-            writef(g, "~Mif (ret < 0) return ret;~N", p);
+            write_propagating_error(g, "~V(z)", false, p);
             writef(g, "~M~f~N", p);
         } else {
-            writef(g, "~Mif (ret == 0) ~f~N", p);
-            writef(g, "~Mif (ret < 0) return ret;~N", p);
+            if (g->options->target_lang == LANG_CPLUSPLUS) {
+                writef(g, "~Mif (!~V(z)) ~f;~N", p);
+            } else {
+                write_block_start(g);
+                writef(g, "~Mint ret = ~V(z);~N", p);
+                writef(g, "~Mif (ret == 0) ~f~N", p);
+                writef(g, "~Mif (ret < 0) return ret;~N", p);
+                write_block_end(g);
+            }
         }
     }
-    writef(g, "~}", p);
 }
 
 static void generate_grouping(struct generator * g, struct node * p, int complement) {
@@ -1871,6 +1911,9 @@ static void generate_head(struct generator * g) {
     }
     w(g, "#include <stddef.h>~N~N");
 
+    if (g->options->target_lang == LANG_CPLUSPLUS) {
+        w(g, "#define SNOWBALL_RUNTIME_THROW_EXCEPTIONS~N");
+    }
     if (g->analyser->debug_used) {
         w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
     }
