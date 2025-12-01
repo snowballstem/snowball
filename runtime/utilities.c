@@ -426,18 +426,20 @@ extern int slice_from_v(struct SN_env * z, const symbol * p) {
 
 extern int slice_del(struct SN_env * z) {
     if (slice_check(z)) return -1;
-    int adjustment = z->ket - z->bra;
-    if (adjustment != 0) {
-        int len = SIZE(z->p);
-        memmove(z->p + z->bra,
-                z->p + z->ket,
-                (len - z->ket) * sizeof(symbol));
-        SET_SIZE(z->p, adjustment + len);
-        z->l += adjustment;
-        if (z->c >= z->ket)
-            z->c += adjustment;
-        else if (z->c > z->bra)
-            z->c = z->bra;
+    {
+        int adjustment = z->ket - z->bra;
+        if (adjustment != 0) {
+            int len = SIZE(z->p);
+            memmove(z->p + z->bra,
+                    z->p + z->ket,
+                    (len - z->ket) * sizeof(symbol));
+            SET_SIZE(z->p, adjustment + len);
+            z->l += adjustment;
+            if (z->c >= z->ket)
+                z->c += adjustment;
+            else if (z->c > z->bra)
+                z->c = z->bra;
+        }
     }
     z->ket = z->bra;
     return 0;
