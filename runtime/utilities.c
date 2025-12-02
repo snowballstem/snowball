@@ -466,7 +466,7 @@ extern SNOWBALL_ERR slice_del(struct SN_env * z) {
     SNOWBALL_RETURN_OK;
 }
 
-extern int insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbol * s) {
+extern SNOWBALL_ERR insert_s(struct SN_env * z, int bra, int ket, int s_size, const symbol * s) {
     REPLACE_S(z, bra, ket, s_size, s);
     if (bra <= z->ket) {
         int adjustment = s_size - (ket - bra);
