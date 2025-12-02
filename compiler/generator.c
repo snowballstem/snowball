@@ -60,7 +60,7 @@ static void write_varname(struct generator * g, struct name * p) {
 
 static void write_varref(struct generator * g, struct name * p) {  /* reference to variable */
     if (p->type < t_routine && p->local_to == NULL)
-        write_string(g, "((struct SN_local *)z)->");
+        write_string(g, "((SN_local *)z)->");
     write_varname(g, p);
 }
 
@@ -1961,6 +1961,10 @@ static void generate_head(struct generator * g) {
 
     w(g, "~-~M};~N~N");
 
+    if (g->options->target_lang == LANG_C) {
+        w(g, "typedef struct SN_local SN_local;~N~N");
+    }
+
     const char * vp = g->options->variables_prefix;
     if (vp) {
         for (struct name * q = g->analyser->names; q; q = q->next) {
@@ -2143,7 +2147,7 @@ static void generate_groupings(struct generator * g) {
 static void generate_create(struct generator * g) {
     w(g, "~N"
          "extern struct SN_env * ~pcreate_env(void) {~N~+"
-         "~Mstruct SN_env * z = SN_new_env(sizeof(struct SN_local));~N");
+         "~Mstruct SN_env * z = SN_new_env(sizeof(SN_local));~N");
 
     if (g->analyser->name_count[t_integer] > 0 ||
         g->analyser->name_count[t_boolean] > 0 ||
