@@ -1455,7 +1455,7 @@ static void generate_call(struct generator * g, struct node * p) {
             writef(g, "~M~f~N", p);
         } else {
             if (g->options->target_lang == LANG_CPLUSPLUS) {
-                writef(g, "~Mif (!~V(z)) ~f;~N", p);
+                writef(g, "~Mif (!~V(z)) ~f~N", p);
             } else {
                 write_block_start(g);
                 writef(g, "~Mint ret = ~V(z);~N", p);
