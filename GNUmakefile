@@ -281,7 +281,7 @@ DART_BUILD_ARTIFACTS = dart/.dart_tool dart/pubspec.lock dart/.dart_deps
 JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
 JAVA_RUNTIME_CLASSES=$(JAVA_RUNTIME_SOURCES:.java=.class)
 
-CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
+CFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 CPPFLAGS=
 
 INCLUDES=-Iinclude

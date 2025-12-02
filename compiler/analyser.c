@@ -205,7 +205,7 @@ static void read_names(struct analyser * a, int type) {
                  * its special meaning, for compatibility with older versions
                  * of snowball.
                  */
-                SIZE(t->s) = 0;
+                SET_SIZE(t->s, 0);
                 t->s = add_literal_to_s(t->s, "len");
                 goto handle_as_name;
             }
@@ -214,7 +214,7 @@ static void read_names(struct analyser * a, int type) {
                  * its special meaning, for compatibility with older versions
                  * of snowball.
                  */
-                SIZE(t->s) = 0;
+                SET_SIZE(t->s, 0);
                 t->s = add_literal_to_s(t->s, "lenof");
                 goto handle_as_name;
             }
@@ -1506,7 +1506,7 @@ static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
             for (int i = 0; i < SIZE(p); i++) {
                 if (p[i] == W) {
                     memmove(p + i, p + i + 1, (SIZE(p) - i - 1) * sizeof(symbol));
-                    SIZE(p)--;
+                    ADD_TO_SIZE(p, -1);
                 }
             }
             j += width;
@@ -1540,7 +1540,7 @@ static int finalise_grouping(struct grouping * p) {
             ch = p->b[j++] = p->b[i];
         }
     }
-    SIZE(p->b) = j;
+    SET_SIZE(p->b, j);
     return true;
 }
 

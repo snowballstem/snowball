@@ -53,7 +53,7 @@
 extern symbol * create_b(int n) {
     symbol * p = (symbol *) (HEAD + (char *) MALLOC(HEAD + (n + 1) * sizeof(symbol)));
     CAPACITY(p) = n;
-    SIZE(p) = 0;
+    SET_SIZE(p, 0);
     return p;
 }
 
@@ -79,14 +79,16 @@ extern void lose_b(symbol * p) {
 extern symbol * increase_capacity_b(symbol * p, int n) {
     symbol * q = create_b(CAPACITY(p) + n + EXTENDER);
     memmove(q, p, CAPACITY(p) * sizeof(symbol));
-    SIZE(q) = SIZE(p);
+    SET_SIZE(q, SIZE(p));
     lose_b(p); return q;
 }
 
 extern symbol * add_to_b(symbol * p, const symbol * q, int n) {
     int x = SIZE(p) + n - CAPACITY(p);
     if (x > 0) p = increase_capacity_b(p, x);
-    memmove(p + SIZE(p), q, n * sizeof(symbol)); SIZE(p) += n; return p;
+    memmove(p + SIZE(p), q, n * sizeof(symbol));
+    ADD_TO_SIZE(p, n);
+    return p;
 }
 
 extern symbol * copy_b(const symbol * p) {
@@ -142,14 +144,14 @@ extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
     int x = k + 1 - CAPACITY(p);
     if (x > 0) p = increase_capacity_b(p, x);
     p[k] = ch;
-    SIZE(p)++;
+    ADD_TO_SIZE(p, 1);
     return p;
 }
 
 extern byte * create_s(int n) {
     byte * p = (byte *) (HEAD + (byte *) MALLOC(HEAD + (n + 1)));
     CAPACITY(p) = n;
-    SIZE(p) = 0;
+    SET_SIZE(p, 0);
     return p;
 }
 
@@ -168,7 +170,7 @@ extern byte * increase_capacity_s(byte * p, int n) {
     if (new_size > 512) new_size *= 2;
     byte * q = create_s(new_size);
     memmove(q, p, CAPACITY(p));
-    SIZE(q) = SIZE(p);
+    SET_SIZE(q, SIZE(p));
     lose_s(p);
     return q;
 }
@@ -194,7 +196,7 @@ extern byte * add_s_to_s(byte * p, const char * s, int n) {
     }
     int k = SIZE(p);
     memcpy(p + k, s, n);
-    SIZE(p) = k + n;
+    SET_SIZE(p, k + n);
     return p;
 }
 
@@ -214,7 +216,8 @@ extern byte * add_char_to_s(byte * p, char ch) {
     } else {
         p = ensure_capacity_s(p, 1);
     }
-    p[SIZE(p)++] = ch;
+    p[SIZE(p)] = ch;
+    ADD_TO_SIZE(p, 1);
     return p;
 }
 
@@ -278,7 +281,7 @@ extern void str_append_int(struct str * str, int i) {
         fprintf(stderr, "str_append_int(%d) would truncate output\n", i);
         exit(1);
     }
-    SIZE(str->data) += r;
+    ADD_TO_SIZE(str->data, r);
 }
 
 /* Append wide character to a string as UTF-8. */
@@ -299,7 +302,7 @@ extern void str_append_wchar_as_utf8(struct str * str, symbol ch) {
 
 /* Clear a string */
 extern void str_clear(struct str * str) {
-    SIZE(str->data) = 0;
+    SET_SIZE(str->data, 0);
 }
 
 /* Set a string */
@@ -338,7 +341,7 @@ extern int str_back(const struct str *str) {
  * Or do nothing if the string is empty.
  */
 extern void str_pop(const struct str *str) {
-    if (SIZE(str->data)) --SIZE(str->data);
+    if (SIZE(str->data)) ADD_TO_SIZE(str->data, -1);
 }
 
 /* Remove the last n characters of the str.
@@ -347,9 +350,9 @@ extern void str_pop(const struct str *str) {
  */
 extern void str_pop_n(const struct str *str, int n) {
     if (SIZE(str->data) > n) {
-        SIZE(str->data) -= n;
+        ADD_TO_SIZE(str->data, -n);
     } else {
-        SIZE(str->data) = 0;
+        SET_SIZE(str->data, 0);
     }
 }
 

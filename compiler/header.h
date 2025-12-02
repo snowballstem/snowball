@@ -18,8 +18,10 @@ typedef unsigned short symbol;
 // Similar to NEW() but allocates an array of N objects of type `struct TYPE *`.
 #define NEWVEC(TYPE, V, N) struct TYPE * V = (struct TYPE *) MALLOC(sizeof(struct TYPE) * (N))
 
-#define SIZE(p)     ((int *)(p))[-1]
-#define CAPACITY(p) ((int *)(p))[-2]
+#define SIZE(p)            ((const int *)(p))[-1]
+#define SET_SIZE(p, n)     ((int *)(p))[-1] = (n)
+#define ADD_TO_SIZE(p, n)  ((int *)(p))[-1] += (n)
+#define CAPACITY(p)        ((int *)(p))[-2]
 
 extern symbol * create_b(int n);
 extern void report_b(FILE * out, const symbol * p);

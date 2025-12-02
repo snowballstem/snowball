@@ -50,7 +50,7 @@ extern byte * get_input(const char * filename) {
         }
     }
     if (input != stdin) fclose(input);
-    SIZE(u) = size;
+    SET_SIZE(u, size);
     return u;
 }
 
@@ -116,7 +116,7 @@ static symbol * find_in_m(struct tokeniser * t, int n, byte * p) {
 
 static int read_literal_string(struct tokeniser * t, int c) {
     byte * p = t->p;
-    SIZE(t->b) = 0;
+    SET_SIZE(t->b, 0);
     while (true) {
         if (c >= SIZE(p) || p[c] == '\n') {
             error1(t, "string literal not terminated");
@@ -182,10 +182,11 @@ static int read_literal_string(struct tokeniser * t, int c) {
                             }
                             /* Ensure there's enough space for a max length
                              * UTF-8 sequence. */
-                            if (CAPACITY(t->b) < SIZE(t->b) + 3) {
+                            int b_size = SIZE(t->b);
+                            if (CAPACITY(t->b) < b_size + 3) {
                                 t->b = increase_capacity_b(t->b, 3);
                             }
-                            SIZE(t->b) += put_utf8(codepoint, t->b + SIZE(t->b));
+                            SET_SIZE(t->b, b_size + put_utf8(codepoint, t->b + b_size));
                         } else {
                             if (t->encoding == ENC_SINGLEBYTE) {
                                 /* Only ISO-8859-1 is handled this way - for
@@ -249,7 +250,7 @@ static int next_token(struct tokeniser * t) {
             while (c < SIZE(p) && (isalnum(p[c]) || p[c] == '_')) c++;
             code = find_word(c - c0, p + c0);
             if (code < 0 || t->token_disabled[code]) {
-                SIZE(t->s) = 0;
+                SET_SIZE(t->s, 0);
                 t->s = add_s_to_s(t->s, (const char*)p + c0, c - c0);
                 code = c_name;
             }
@@ -301,7 +302,7 @@ static void read_chars(struct tokeniser * t) {
         ch = next_char(t);
         if (white_space(t, ch) || ch < 0) break;
     }
-    SIZE(t->s) = 0;
+    SET_SIZE(t->s, 0);
     t->s = add_s_to_s(t->s, (const char*)t->p + c0, t->c - c0 - 1);
 }
 
@@ -359,7 +360,7 @@ static void convert_numeric_string(struct tokeniser * t, symbol * p, int base) {
         else
             p[d++] = number;
     }
-    SIZE(p) = d;
+    SET_SIZE(p, d);
 }
 
 extern int read_token(struct tokeniser * t) {
