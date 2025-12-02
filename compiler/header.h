@@ -311,19 +311,6 @@ enum name_types {
 /*  If this list is extended, adjust write_varname in generator.c  */
 };
 
-/*  In name_count[i] below, remember that
-    type   is
-    ----+----
-      0 |  string
-      1 |  boolean
-      2 |  integer
-      3 |  routine
-      4 |  external
-      5 |  grouping
-
-    Only the C generator currently uses this, and only for the first 3 types.
-*/
-
 struct analyser {
     struct tokeniser * tokeniser;
     struct node * nodes;
@@ -333,7 +320,13 @@ struct analyser {
     byte modifyable;          /* false inside reverse(...) */
     struct node * program;
     struct node * program_end;
-    int name_count[t_size];   /* name_count[i] counts the number of names of type i */
+    /* name_count[i] counts the number of names of type i, where i is an enum
+     * name_types value.  These counts *EXCLUDE* localised variables and
+     * variables which optimised away (e.g. declared but never used).
+     */
+    int name_count[t_size];
+    /* name_count[t_string] + name_count[t_boolean] + name_count[t_integer] */
+    int variable_count;
     struct among * amongs;
     struct among * amongs_end;
     int among_with_function_count; /* number of amongs with functions */

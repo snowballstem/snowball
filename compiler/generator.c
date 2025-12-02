@@ -1925,44 +1925,46 @@ static void generate_head(struct generator * g) {
     }
     w(g, "snowball_runtime.h\"~N~N");
 
-    // Generate the struct SN_local definition, which embeds a struct SN_env and
-    // also holds any non-localised variables.  We group variables by type to
-    // try to produce more efficient struct packing.
-    w(g, "struct SN_local {~N~+"
-         "~Mstruct SN_env z;~N");
+    if (g->analyser->variable_count > 0) {
+        // Generate the struct SN_local definition, which embeds a struct
+        // SN_env and also holds non-localised variables.  We group variables
+        // by type to try to produce more efficient struct packing.
+        w(g, "struct SN_local {~N~+"
+             "~Mstruct SN_env z;~N");
 
-    for (struct name * name = g->analyser->names; name; name = name->next) {
-        if (!name->local_to && name->type == t_integer) {
-            w(g, "~Mint ");
-            write_varname(g, name);
-            w(g, ";~N");
-        }
-    }
-
-    for (struct name * name = g->analyser->names; name; name = name->next) {
-        if (!name->local_to && name->type == t_boolean) {
-            if (g->options->target_lang == LANG_CPLUSPLUS) {
-                w(g, "~Mbool ");
-            } else {
-                w(g, "~Munsigned char ");
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_integer) {
+                w(g, "~Mint ");
+                write_varname(g, name);
+                w(g, ";~N");
             }
-            write_varname(g, name);
-            w(g, ";~N");
         }
-    }
 
-    for (struct name * name = g->analyser->names; name; name = name->next) {
-        if (!name->local_to && name->type == t_string) {
-            w(g, "~Msymbol * ");
-            write_varname(g, name);
-            w(g, ";~N");
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_boolean) {
+                if (g->options->target_lang == LANG_CPLUSPLUS) {
+                    w(g, "~Mbool ");
+                } else {
+                    w(g, "~Munsigned char ");
+                }
+                write_varname(g, name);
+                w(g, ";~N");
+            }
         }
-    }
 
-    w(g, "~-~M};~N~N");
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_string) {
+                w(g, "~Msymbol * ");
+                write_varname(g, name);
+                w(g, ";~N");
+            }
+        }
 
-    if (g->options->target_lang == LANG_C) {
-        w(g, "typedef struct SN_local SN_local;~N~N");
+        w(g, "~-~M};~N~N");
+
+        if (g->options->target_lang == LANG_C) {
+            w(g, "typedef struct SN_local SN_local;~N~N");
+        }
     }
 
     const char * vp = g->options->variables_prefix;
@@ -2146,13 +2148,13 @@ static void generate_groupings(struct generator * g) {
 
 static void generate_create(struct generator * g) {
     w(g, "~N"
-         "extern struct SN_env * ~pcreate_env(void) {~N~+"
-         "~Mstruct SN_env * z = SN_new_env(sizeof(SN_local));~N");
+         "extern struct SN_env * ~pcreate_env(void) {~N~+");
 
-    if (g->analyser->name_count[t_integer] > 0 ||
-        g->analyser->name_count[t_boolean] > 0 ||
-        g->analyser->name_count[t_string] > 0) {
-        w(g, "~Mif (z) {~N~+");
+    if (g->analyser->variable_count == 0) {
+        w(g, "~Mreturn SN_new_env(sizeof(struct SN_env));~N");
+    } else {
+        w(g, "~Mstruct SN_env * z = SN_new_env(sizeof(SN_local));~N"
+             "~Mif (z) {~N~+");
 
         for (struct name * name = g->analyser->names; name; name = name->next) {
             if (!name->local_to) {
@@ -2201,11 +2203,11 @@ static void generate_create(struct generator * g) {
             }
         }
 
-        w(g, "~-~M}~N");
+        w(g, "~-~M}~N"
+             "~Mreturn z;~N");
     }
 
-    w(g, "~Mreturn z;~N"
-         "~-}~N");
+    w(g, "~-}~N");
 }
 
 static void generate_close(struct generator * g) {

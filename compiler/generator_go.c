@@ -1030,9 +1030,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 }
 
 static void generate_setup_context(struct generator * g) {
-    if (!g->analyser->name_count[t_string] &&
-        !g->analyser->name_count[t_integer] &&
-        !g->analyser->name_count[t_boolean]) {
+    if (g->analyser->variable_count == 0) {
         w(g, "~Mvar context = &Context{}~N");
         w(g, "~M_ = context~N");
         return;

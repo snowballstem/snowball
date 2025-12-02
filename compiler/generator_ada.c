@@ -1548,9 +1548,7 @@ static void generate_method_decls(struct generator * g, enum name_types type) {
 
 static void generate_member_decls(struct generator * g) {
     w(g, "   type Context_Type is new Stemmer.Context_Type with");
-    if (g->analyser->name_count[t_string] > 0 ||
-        g->analyser->name_count[t_integer] > 0 ||
-        g->analyser->name_count[t_boolean] > 0) {
+    if (g->analyser->variable_count > 0) {
         w(g, " record~N~+");
         for (struct name * q = g->analyser->names; q; q = q->next) {
             if (q->local_to) continue;

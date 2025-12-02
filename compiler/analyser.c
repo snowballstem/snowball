@@ -2393,10 +2393,8 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
 
     /* We've now identified variables whose values are never used and
      * names which are unreachable, and cleared "used" for them, so go
-     * through and unlink the unused ones and number the others.  The
-     * numbers are used by the C generator.
+     * through and unlink the unused ones.
      */
-    int * name_count = a->name_count;
     struct name * n = a->names;
     struct name ** n_ptr = &(a->names);
     while (n) {
@@ -2415,7 +2413,6 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             *n_ptr = n;
             continue;
         }
-        n->count = name_count[n->type]++;
         n_ptr = &(n->next);
         n = n->next;
     }
@@ -2543,6 +2540,9 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             name->count = a->name_count[name->type]++;
         }
     }
+    a->variable_count = a->name_count[t_string] +
+                        a->name_count[t_boolean] +
+                        a->name_count[t_integer];
 }
 
 extern struct analyser * create_analyser(struct tokeniser * t) {
