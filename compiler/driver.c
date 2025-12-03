@@ -377,22 +377,25 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         }
     }
 
-    if (!o->name) {
-        /* Default class name to basename of output_file - this is the standard
-         * convention for at least Java and C#.
-         */
-        const char * output_base = (const char *)o->output_file;
-        const char * slash = strrchr(output_base, '/');
-        size_t len;
-        const char * leaf = (slash == NULL) ? output_base : slash + 1;
+    {
+        // Set o->output_leaf to o->output_file but without any path.
+        const char * output_file = (const char *)o->output_file;
+        const char * slash = strrchr(output_file, '/');
+        const char * leaf = (slash == NULL) ? output_file : slash + 1;
 
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
 
-        {
-            const char * dot = strchr(leaf, '.');
-            len = (dot == NULL) ? strlen(leaf) : (size_t)(dot - leaf);
-        }
+        o->output_leaf = create_s_from_sz(leaf);
+    }
+
+    if (!o->name) {
+        /* Default class name to basename of output_file - this is the standard
+         * convention for at least Java and C#.
+         */
+        const char * leaf = (const char *)o->output_leaf;
+        const char * dot = strchr(leaf, '.');
+        size_t len = (dot == NULL) ? strlen(leaf) : (size_t)(dot - leaf);
 
         {
             char * new_name = MALLOC(len + 1);
@@ -686,6 +689,7 @@ extern int main(int argc, char * argv[]) {
         }
     }
     lose_s(o->output_file);
+    lose_s(o->output_leaf);
     FREE(o->name);
     FREE(o);
     if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);

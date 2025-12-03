@@ -402,6 +402,8 @@ enum special_labels {
 struct options {
     /* for the command line: */
     byte * output_file;
+    // output_file but without any path.
+    byte * output_leaf;
     char * name;
     FILE * output_src;
     FILE * output_h;
