@@ -251,7 +251,7 @@ static int next_token(struct tokeniser * t) {
             code = find_word(c - c0, p + c0);
             if (code < 0 || t->token_disabled[code]) {
                 SET_SIZE(t->s, 0);
-                t->s = add_s_to_s(t->s, (const char*)p + c0, c - c0);
+                t->s = add_slen_to_s(t->s, (const char*)p + c0, c - c0);
                 code = c_name;
             }
         } else if (isdigit(ch)) {
@@ -303,7 +303,7 @@ static void read_chars(struct tokeniser * t) {
         if (white_space(t, ch) || ch < 0) break;
     }
     SET_SIZE(t->s, 0);
-    t->s = add_s_to_s(t->s, (const char*)t->p + c0, t->c - c0 - 1);
+    t->s = add_slen_to_s(t->s, (const char*)t->p + c0, t->c - c0 - 1);
 }
 
 static int decimal_to_num(int ch) {

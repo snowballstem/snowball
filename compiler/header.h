@@ -43,11 +43,12 @@ extern void lose_s(byte * p);
 extern byte * increase_capacity_s(byte * p, int n);
 extern byte * ensure_capacity_s(byte * p, int n);
 extern byte * copy_s(const byte * p);
-extern byte * add_s_to_s(byte * p, const char * s, int n);
+extern byte * add_s_to_s(byte * p, const byte * s);
+extern byte * add_slen_to_s(byte * p, const char * s, int n);
 extern byte * add_sz_to_s(byte * p, const char * s);
 extern byte * add_char_to_s(byte * p, char ch);
 // "" LIT is a trick to make compilation fail if LIT is not a string literal.
-#define add_literal_to_s(P, LIT) add_s_to_s(P, "" LIT, sizeof(LIT) - 1)
+#define add_literal_to_s(P, LIT) add_slen_to_s(P, "" LIT, sizeof(LIT) - 1)
 
 struct str; /* defined in space.c */
 

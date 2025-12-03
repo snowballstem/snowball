@@ -198,13 +198,13 @@ extern byte * ensure_capacity_s(byte * p, int n) {
 }
 
 extern byte * copy_s(const byte * p) {
-    return add_s_to_s(NULL, (const char*)p, SIZE(p));
+    return add_s_to_s(NULL, p);
 }
 
 /* Add a string with given length to a byte block. If p = 0 the
    block is created. */
 
-extern byte * add_s_to_s(byte * p, const char * s, int n) {
+extern byte * add_slen_to_s(byte * p, const char * s, int n) {
     if (p == NULL) {
         p = create_s(n);
     } else {
@@ -216,11 +216,18 @@ extern byte * add_s_to_s(byte * p, const char * s, int n) {
     return p;
 }
 
+/* Add a byte block to a byte block. If p = 0 the
+   block is created. */
+
+extern byte * add_s_to_s(byte * p, const byte * s) {
+    return add_slen_to_s(p, s, SIZE(s));
+}
+
 /* Add a zero terminated string to a byte block. If p = 0 the
    block is created. */
 
 extern byte * add_sz_to_s(byte * p, const char * s) {
-    return add_s_to_s(p, s, strlen(s));
+    return add_slen_to_s(p, s, strlen(s));
 }
 
 /* Add a single character to a byte block. If p = 0 the
@@ -260,8 +267,7 @@ extern void str_delete(struct str * str) {
 
 /* Append a str to this str. */
 extern void str_append(struct str * str, const struct str * add) {
-    byte * q = add->data;
-    str->data = add_s_to_s(str->data, (char *)q, SIZE(q));
+    str->data = add_s_to_s(str->data, add->data);
 }
 
 /* Append a character to this str. */
@@ -271,7 +277,7 @@ extern void str_append_ch(struct str * str, char add) {
 
 /* Append a low level byte block to a str. */
 extern void str_append_s(struct str * str, const byte * q) {
-    str->data = add_s_to_s(str->data, (const char *)q, SIZE(q));
+    str->data = add_s_to_s(str->data, q);
 }
 
 /* Append a (char *, null terminated) string to a str. */
