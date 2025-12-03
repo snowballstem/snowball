@@ -1896,8 +1896,8 @@ void write_start_comment(struct generator * g,
 
 static void generate_head(struct generator * g) {
     struct options * o = g->options;
-    const char * slash = strrchr(o->output_file, '/');
-    const char * leaf = (slash == NULL) ? o->output_file : slash + 1;
+    const char * slash = strrchr((const char *)o->output_file, '/');
+    const char * leaf = (slash == NULL) ? (const char *)o->output_file : slash + 1;
 
     slash = strrchr(leaf, '\\');
     if (slash != NULL) leaf = slash + 1;

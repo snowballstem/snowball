@@ -114,7 +114,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         {
             if (eq(s, "-o") || eq(s, "-output")) {
                 check_lim(i, argc);
-                o->output_file = argv[i++];
+                o->output_file = create_s_from_sz(argv[i++]);
                 continue;
             }
             if (eq(s, "-n") || eq(s, "-name")) {
@@ -359,13 +359,32 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
-    if (!o->name && o->output_file) {
+    if (!o->output_file) {
+        // Default output uses the basename from the first Snowball source.
+        // E.g. algorithms/english.sbl -> english
+        const char * first_source = argv[1];
+        const char * slash = strrchr(first_source, '/');
+        const char * leaf = (slash == NULL) ? first_source : slash + 1;
+
+        slash = strrchr(leaf, '\\');
+        if (slash != NULL) leaf = slash + 1;
+
+        const char * dot = strrchr(leaf, '.');
+        if (dot) {
+            o->output_file = create_s_from_data(leaf, dot - leaf);
+        } else {
+            o->output_file = create_s_from_sz(leaf);
+        }
+    }
+
+    if (!o->name) {
         /* Default class name to basename of output_file - this is the standard
          * convention for at least Java and C#.
          */
-        const char * slash = strrchr(o->output_file, '/');
+        const char * output_base = (const char *)o->output_file;
+        const char * slash = strrchr(output_base, '/');
         size_t len;
-        const char * leaf = (slash == NULL) ? o->output_file : slash + 1;
+        const char * leaf = (slash == NULL) ? output_base : slash + 1;
 
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
@@ -531,18 +550,11 @@ extern int main(int argc, char * argv[]) {
             if (t->error_count > 0) exit(1);
             if (o->syntax_tree) print_program(a);
             if (!o->syntax_tree) {
-                struct generator * g;
-
-                const char * output_base = o->output_file;
-                if (!output_base) {
-                    fprintf(stderr, "Please include the -o option\n");
-                    print_arglist(1);
-                }
-                g = create_generator(a, o);
+                struct generator * g = create_generator(a, o);
                 switch (o->target_lang) {
                     case LANG_C:
                     case LANG_CPLUSPLUS: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".h");
                         o->output_h = get_output(s);
                         s[SIZE(s) - 1] = 'c';
@@ -559,7 +571,7 @@ extern int main(int argc, char * argv[]) {
                     }
 #ifndef TARGET_C_ONLY
                     case LANG_ADA: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".ads");
                         o->output_h = get_output(s);
                         s[SIZE(s) - 1] = 'b';
@@ -572,7 +584,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_CSHARP: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".cs");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -581,7 +593,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_DART: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".dart");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -590,7 +602,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_GO: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".go");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -599,7 +611,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_JAVA: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".java");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -608,7 +620,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_JAVASCRIPT: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".js");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -617,7 +629,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_PASCAL: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".pas");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -626,7 +638,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_PHP: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".php");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -635,7 +647,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_PYTHON: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".py");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -644,7 +656,7 @@ extern int main(int argc, char * argv[]) {
                         break;
                     }
                     case LANG_RUST: {
-                        byte * s = add_sz_to_s(NULL, output_base);
+                        byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".rs");
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -673,6 +685,7 @@ extern int main(int argc, char * argv[]) {
             p = q;
         }
     }
+    lose_s(o->output_file);
     FREE(o->name);
     FREE(o);
     if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);

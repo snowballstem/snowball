@@ -155,6 +155,22 @@ extern byte * create_s(int n) {
     return p;
 }
 
+extern byte * create_s_from_sz(const char * s) {
+    int n = strlen(s);
+    byte * p = create_s(n);
+    memcpy(p, s, n + 1);
+    SET_SIZE(p, n);
+    return p;
+}
+
+extern byte * create_s_from_data(const char * s, int n) {
+    byte * p = create_s(n);
+    memcpy(p, s, n);
+    p[n] = '\0';
+    SET_SIZE(p, n);
+    return p;
+}
+
 extern void report_s(FILE * out, const byte * p) {
     fwrite(p, 1, SIZE(p), out);
 }

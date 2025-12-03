@@ -35,6 +35,9 @@ extern symbol * add_symbol_to_b(symbol * p, symbol ch);
 // These routines are like those above but work in byte instead of symbol.
 
 extern byte * create_s(int n);
+extern byte * create_s_from_sz(const char * s);
+extern byte * create_s_from_data(const char * s, int n);
+
 extern void report_s(FILE * out, const byte * p);
 extern void lose_s(byte * p);
 extern byte * increase_capacity_s(byte * p, int n);
@@ -398,7 +401,7 @@ enum special_labels {
 
 struct options {
     /* for the command line: */
-    const char * output_file;
+    byte * output_file;
     char * name;
     FILE * output_src;
     FILE * output_h;
