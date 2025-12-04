@@ -348,7 +348,6 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
             fprintf(stderr, "warning: -vp/-vprefix only meaningful for C and C++\n");
         }
     }
-    if (!o->externals_prefix) o->externals_prefix = "";
 
     // Split any extension off o->output_file and set o->output_leaf to just
     // its leafname (which e.g. is used to generate `#include "english.h"` in

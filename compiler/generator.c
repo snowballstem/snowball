@@ -39,7 +39,9 @@ static void wi3(struct generator * g, int i) {
 static void write_varname(struct generator * g, struct name * p) {
     switch (p->type) {
         case t_external:
-            write_string(g, g->options->externals_prefix); break;
+            if (g->options->externals_prefix)
+                write_string(g, g->options->externals_prefix);
+            break;
         case t_string:
         case t_boolean:
         case t_integer: {
@@ -468,7 +470,10 @@ continue_outer_loop:
             case '$': /* insert_s, insert_v etc */
                 write_char(g, p->literalstring == NULL ? 'v' : 's');
                 continue;
-            case 'p': write_string(g, g->options->externals_prefix); continue;
+            case 'p':
+                if (g->options->externals_prefix)
+                    write_string(g, g->options->externals_prefix);
+                continue;
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
                        ch, input);
