@@ -467,6 +467,7 @@ continue_outer_loop:
             case 'a': write_data_address(g, p); continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
+            case 'n': write_s(g, g->options->name); continue;
             case '$': /* insert_s, insert_v etc */
                 write_char(g, p->literalstring == NULL ? 'v' : 's');
                 continue;

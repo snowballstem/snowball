@@ -22,6 +22,9 @@
 #define DEFAULT_CS_AMONG_CLASS "Among"
 #define DEFAULT_CS_STRING_CLASS "StringBuilder"
 
+#define DEFAULT_CPLUSPLUS_NAMESPACE "Snowball"
+#define DEFAULT_CPLUSPLUS_BASE_CLASS "Stemmer"
+
 #define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
@@ -264,8 +267,14 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     /* Set language-dependent defaults. */
     switch (o->target_lang) {
         case LANG_C:
+            encoding_opt = NULL;
+            break;
         case LANG_CPLUSPLUS:
             encoding_opt = NULL;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_CPLUSPLUS_BASE_CLASS;
+            if (!o->package)
+                o->package = DEFAULT_CPLUSPLUS_NAMESPACE;
             break;
         case LANG_CSHARP:
             o->encoding = ENC_WIDECHARS;
@@ -399,6 +408,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                 /* Upper case initial letter. */
                 o->name[0] = toupper(o->name[0]);
                 break;
+            case LANG_CPLUSPLUS:
             case LANG_JAVASCRIPT:
             case LANG_PHP:
             case LANG_PYTHON: {
