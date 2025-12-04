@@ -1974,7 +1974,7 @@ static void generate_head(struct generator * g) {
                 case t_string:
                     w(g, "extern const symbol * ");
                     write_string(g, vp);
-                    write_varname(g, q);
+                    write_s(g, q->s);
                     w(g, "(struct SN_env * z) {~N~+");
                     w(g, "~Msymbol * p = ");
                     write_varref(g, q);
@@ -1986,7 +1986,7 @@ static void generate_head(struct generator * g) {
                 case t_integer:
                     w(g, "extern int ");
                     write_string(g, vp);
-                    write_varname(g, q);
+                    write_s(g, q->s);
                     w(g, "(struct SN_env * z) {~N~+"
                          "~Mreturn ");
                     write_varref(g, q);
@@ -2000,7 +2000,7 @@ static void generate_head(struct generator * g) {
                         w(g, "extern int ");
                     }
                     write_string(g, vp);
-                    write_varname(g, q);
+                    write_s(g, q->s);
                     w(g, "(struct SN_env * z) {~N~+"
                          "~Mreturn ");
                     write_varref(g, q);
@@ -2256,13 +2256,15 @@ static void generate_header_file(struct generator * g) {
             case t_string:
                 if (!vp) break;
                 w(g, "extern symbol * ");
-                write_varname(g, q);
+                write_string(g, vp);
+                write_s(g, q->s);
                 w(g, "(struct SN_env * z);~N");
                 break;
             case t_integer:
                 if (!vp) break;
                 w(g, "extern int ");
-                write_varname(g, q);
+                write_string(g, vp);
+                write_s(g, q->s);
                 w(g, "(struct SN_env * z);~N");
                 break;
             case t_boolean:
@@ -2272,7 +2274,8 @@ static void generate_header_file(struct generator * g) {
                 } else {
                     w(g, "extern int ");
                 }
-                write_varname(g, q);
+                write_string(g, vp);
+                write_s(g, q->s);
                 w(g, "(struct SN_env * z);~N");
                 break;
         }
