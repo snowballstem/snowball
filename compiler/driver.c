@@ -58,6 +58,8 @@ static void print_arglist(int exit_code) {
                "  -vp, -vprefix VARIABLE_PREFIX\n"
                "  -i, -include DIRECTORY\n"
                "  -r, -runtime DIRECTORY\n"
+               "  -cheader                         header name to include from C/C++ file\n"
+               "  -hheader                         header name to include from C/C++ header\n"
                "  -p, -parentclassname CLASS_NAME  fully qualified parent class name\n"
                "  -P, -Package PACKAGE_NAME        package name for stemmers\n"
                "  -S, -Stringclass STRING_CLASS    StringBuffer-compatible class\n"
@@ -189,6 +191,16 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
             if (eq(s, "-vp") || eq(s, "-vprefix")) {
                 check_lim(i, argc);
                 o->variables_prefix = argv[i++];
+                continue;
+            }
+            if (eq(s, "-cheader")) {
+                check_lim(i, argc);
+                o->cheader = argv[i++];
+                continue;
+            }
+            if (eq(s, "-hheader")) {
+                check_lim(i, argc);
+                o->hheader = argv[i++];
                 continue;
             }
             if (eq(s, "-i") || eq(s, "-include")) {

@@ -39,8 +39,14 @@ static void wi3(struct generator * g, int i) {
 static void write_varname(struct generator * g, struct name * p) {
     switch (p->type) {
         case t_external:
-            if (g->options->externals_prefix)
+            if (g->options->target_lang == LANG_CPLUSPLUS) {
+                write_string(g, g->options->package);
+                write_string(g, "::");
+                write_s(g, g->options->name);
+                write_string(g, "::");
+            } else if (g->options->externals_prefix) {
                 write_string(g, g->options->externals_prefix);
+            }
             break;
         case t_string:
         case t_boolean:
@@ -1543,9 +1549,12 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    g->S[0] = q->type == t_routine ? "static" : "extern";
-
-    writef(g, "~S0 int ~V(struct SN_env * z) {~N~+", p);
+    if (q->type == t_routine) {
+        write_string(g, "static ");
+    } else if (g->options->target_lang == LANG_C) {
+        write_string(g, "extern ");
+    }
+    writef(g, "int ~V(struct SN_env * z) {~N~+", p);
     if (q->amongvar_needed) w(g, "~Mint among_var;~N");
 
     /* Declare local variables. */
@@ -1902,6 +1911,23 @@ void write_start_comment(struct generator * g,
 
 static void generate_head(struct generator * g) {
     struct options * o = g->options;
+    if (o->cheader) {
+        int quoted = (o->cheader[0] == '<' || o->cheader[0] == '"');
+        w(g, "#include ");
+        if (!quoted) write_char(g, '<');
+        write_string(g, o->cheader);
+        if (!quoted) write_char(g, '>');
+        write_newline(g);
+        write_newline(g);
+    }
+
+    if (o->target_lang == LANG_CPLUSPLUS) {
+        w(g, "#define SNOWBALL_RUNTIME_THROW_EXCEPTIONS~N");
+    }
+    if (g->analyser->debug_used) {
+        w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
+    }
+
     w(g, "#include \"");
     write_s(g, o->output_leaf);
     w(g, ".h\"~N~N");
@@ -1911,18 +1937,20 @@ static void generate_head(struct generator * g) {
     }
     w(g, "#include <stddef.h>~N~N");
 
-    if (g->options->target_lang == LANG_CPLUSPLUS) {
-        w(g, "#define SNOWBALL_RUNTIME_THROW_EXCEPTIONS~N");
+    if (o->target_lang == LANG_CPLUSPLUS) {
+        w(g, "~Mtypedef ");
+        write_string(g, o->package);
+        w(g, "::~n::SN_local SN_local;~N~N");
+        return;
     }
-    if (g->analyser->debug_used) {
-        w(g, "#define SNOWBALL_DEBUG_COMMAND_USED~N");
-    }
+
     w(g, "#include \"");
     if (o->runtime_path) {
         write_string(g, o->runtime_path);
         if (o->runtime_path[strlen(o->runtime_path) - 1] != '/')
             write_char(g, '/');
     }
+
     w(g, "snowball_runtime.h\"~N~N");
 
     if (g->analyser->variable_count > 0) {
@@ -2014,7 +2042,7 @@ static void generate_head(struct generator * g) {
 }
 
 static void generate_routine_declarations(struct generator * g) {
-    if (g->analyser->name_count[t_external]) {
+    if (g->options->target_lang == LANG_C) {
         w(g, "#ifdef __cplusplus~N"
              "extern \"C\" {~N"
              "#endif~N");
@@ -2232,58 +2260,237 @@ static void generate_close(struct generator * g) {
 }
 
 static void generate_header_file(struct generator * g) {
-    const char * vp = g->options->variables_prefix;
+    struct options * o = g->options;
+    if (o->hheader) {
+        int quoted = (o->hheader[0] == '<' || o->hheader[0] == '"');
+        w(g, "#include ");
+        if (!quoted) write_char(g, '<');
+        write_string(g, o->hheader);
+        if (!quoted) write_char(g, '>');
+        write_newline(g);
+        write_newline(g);
+    }
 
-    w(g, "#ifdef __cplusplus~N"
-         "extern \"C\" {~N"
-         "#endif~N");            /* for C++ */
+    if (o->target_lang == LANG_CPLUSPLUS) {
+        w(g, "#define SNOWBALL_RUNTIME_THROW_EXCEPTIONS~N"
+             "#include \"");
+        if (o->runtime_path) {
+            write_string(g, o->runtime_path);
+            if (o->runtime_path[strlen(o->runtime_path) - 1] != '/')
+                write_char(g, '/');
+        }
+        w(g, "snowball_runtime.h\"~N~N");
 
-    w(g, "~N"
-         "extern struct SN_env * ~pcreate_env(void);~N"
-         "extern void ~pclose_env(struct SN_env * z);~N"
-         "~N");
+        w(g, "namespace ");
+        write_string(g, o->package);
+        w(g, " {~N~N");
 
-    for (struct name * q = g->analyser->names; q; q = q->next) {
-        switch (q->type) {
-            case t_external:
-                w(g, "extern int ");
-                write_varname(g, q);
-                w(g, "(struct SN_env * z);~N");
-                break;
-            case t_string:
-                if (!vp) break;
-                w(g, "extern symbol * ");
-                write_string(g, vp);
-                write_s(g, q->s);
-                w(g, "(struct SN_env * z);~N");
-                break;
-            case t_integer:
-                if (!vp) break;
-                w(g, "extern int ");
-                write_string(g, vp);
-                write_s(g, q->s);
-                w(g, "(struct SN_env * z);~N");
-                break;
-            case t_boolean:
-                if (!vp) break;
-                if (g->options->target_lang == LANG_CPLUSPLUS) {
-                    w(g, "extern bool ");
-                } else {
-                    w(g, "extern int ");
-                }
-                write_string(g, vp);
-                write_s(g, q->s);
-                w(g, "(struct SN_env * z);~N");
-                break;
+        w(g, "class ~n : public ");
+        write_string(g, o->parent_class_name);
+        w(g, " {~N"
+             "  public:~N~+");
+    }
+
+    if (o->target_lang == LANG_C) {
+        w(g, "#ifdef __cplusplus~N"
+             "extern \"C\" {~N"
+             "#endif~N");            /* for C++ */
+
+        w(g, "~N"
+             "extern struct SN_env * ~pcreate_env(void);~N"
+             "extern void ~pclose_env(struct SN_env * z);~N"
+             "~N");
+    }
+
+    const char * vp = o->variables_prefix;
+    if (vp) {
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->local_to) continue;
+            switch (q->type) {
+                case t_string:
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "~Mconst symbol * ");
+                    } else {
+                        w(g, "extern const symbol * ");
+                    }
+                    write_string(g, vp);
+                    write_s(g, q->s);
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "() {~N~+"
+                             "~Mstruct SN_env * z = &(zlocal.z);~N"
+                             "~Msymbol * p = ");
+                        write_varref(g, q);
+                        w(g, ";~N"
+                             "~Mp[SIZE(p)] = 0;~N"
+                             "~Mreturn p;~N~-"
+                             "~M}~N~N");
+                    } else {
+                        w(g, "(struct SN_env * z);~N");
+                    }
+                    break;
+                case t_integer:
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "~Mint ");
+                    } else {
+                        w(g, "extern int ");
+                    }
+                    write_string(g, vp);
+                    write_s(g, q->s);
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "() {~N~+"
+                             "~Mstruct SN_env * z = &(zlocal.z);~N"
+                             "~Mreturn ");
+                        write_varref(g, q);
+                        w(g, ";~N~-"
+                             "~M}~N~N");
+                    } else {
+                        w(g, "(struct SN_env * z);~N");
+                    }
+                    break;
+                case t_boolean:
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "~Mbool ");
+                    } else {
+                        w(g, "extern int ");
+                    }
+                    write_string(g, vp);
+                    write_s(g, q->s);
+                    if (o->target_lang == LANG_CPLUSPLUS) {
+                        w(g, "() {~N~+"
+                             "~Mstruct SN_env * z = &(zlocal.z);~N"
+                             "~Mreturn ");
+                        write_varref(g, q);
+                        w(g, ";~N~-"
+                             "~M}~N~N");
+                    } else {
+                        w(g, "(struct SN_env * z);~N");
+                    }
+                    break;
+            }
         }
     }
 
-    w(g, "~N"
-         "#ifdef __cplusplus~N"
-         "}~N"
-         "#endif~N");            /* for C++ */
+    if (o->target_lang == LANG_C) {
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (q->type == t_external) {
+                w(g, "extern int ");
+                write_varname(g, q);
+                w(g, "(struct SN_env * z);~N");
+            }
+        }
 
-    w(g, "~N");
+        w(g, "~N"
+             "#ifdef __cplusplus~N"
+             "}~N"
+             "#endif~N");            /* for C++ */
+    }
+
+    if (o->target_lang == LANG_CPLUSPLUS) {
+        // Generate the struct SN_local definition, which embeds a struct
+        // SN_env and also holds any non-localised variables.  We group
+        // variables by type to try to produce more efficient struct packing.
+        w(g, "~Mstruct SN_local {~N~+"
+             "~Mstruct SN_env z;~N");
+
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_integer) {
+                w(g, "~Mint ");
+                write_varname(g, name);
+                w(g, ";~N");
+            }
+        }
+
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_boolean) {
+                if (g->options->target_lang == LANG_CPLUSPLUS) {
+                    w(g, "~Mbool ");
+                } else {
+                    w(g, "~Munsigned char ");
+                }
+                write_varname(g, name);
+                w(g, ";~N");
+            }
+        }
+
+        for (struct name * name = g->analyser->names; name; name = name->next) {
+            if (!name->local_to && name->type == t_string) {
+                w(g, "~Msymbol * ");
+                write_varname(g, name);
+                w(g, ";~N");
+            }
+        }
+
+        w(g, "~-~M};~N"
+             "~N");
+
+        w(g, "~-  private:~N~+"
+             "~MSN_local zlocal = {};~N"
+             "~N"
+             "~Mvoid close_env() {~N~+"
+             "~Mstruct SN_env * z = &(zlocal.z);~N");
+        if (g->analyser->name_count[t_string] > 0) {
+            for (struct name * name = g->analyser->names; name; name = name->next) {
+                if (!name->local_to && name->type == t_string) {
+                    w(g, "~Mlose_s(");
+                    write_varref(g, name);
+                    w(g, ");~N");
+                }
+            }
+        }
+        w(g, "~Mlose_s(z->p);~N"
+             "~-~M}~N~N");
+
+        for (struct name * q = g->analyser->names; q; q = q->next) {
+            if (!q->local_to && q->type == t_external) {
+                w(g, "~Mstatic int ");
+                write_s(g, q->s);
+                w(g, "(struct SN_env * z);~N~N");
+            }
+        }
+
+        w(g, "~-  public:~N~+"
+             "~M~n() {~N~+"
+             "~Mstruct SN_env * z = &(zlocal.z);~N"
+             "~Mz->p = create_s();~N");
+        if (g->analyser->name_count[t_string] > 0) {
+            w(g, "~Mtry {~N~+");
+            for (struct name * name = g->analyser->names; name; name = name->next) {
+                if (!name->local_to && name->type == t_string) {
+                    write_margin(g);
+                    write_varref(g, name);
+                    w(g, " = create_s();~N");
+                }
+            }
+            w(g, "~-~M} catch (...) {~N~+"
+                 "~Mclose_env();~N"
+                 "~Mthrow;~N"
+                 "~-~M}~N");
+        }
+        w(g, "~-~M}~N~N"
+             "~M~~~n() {~N~+"
+             "~Mclose_env();~N"
+             "~-~M}~N~N"
+             "~Mstd::string operator()(const std::string& word) override {~N~+"
+             "~Mstruct SN_env* z = &(zlocal.z);~N"
+             "~Mconst symbol* s = reinterpret_cast<const symbol*>(word.data());~N"
+             "~Mreplace_s(z, 0, z->l, word.size(), s);~N"
+             "~Mz->c = 0;~N"
+             "~M");
+        write_string(g, o->package);
+        write_string(g, "::");
+        write_s(g, o->name);
+        write_string(g, "::");
+        w(g, "stem(z);~N"
+             "~Mreturn std::string(reinterpret_cast<const char*>(z->p), SIZE(z->p));~N"
+             "~-~M}~N"
+             "~N"
+             "~Mstd::string get_description() const override {~N~+"
+             "~Mreturn \"~n\";~N"
+             "~-~M}~N"
+             "~-~M};~N~N");
+
+        w(g, "}~N");
+    }
 }
 
 extern void generate_program_c(struct generator * g) {
@@ -2303,8 +2510,10 @@ extern void generate_program_c(struct generator * g) {
     generate_amongs(g);
     generate_groupings(g);
 
-    generate_create(g);
-    generate_close(g);
+    if (g->options->target_lang != LANG_CPLUSPLUS) {
+        generate_create(g);
+        generate_close(g);
+    }
 
     output_str(g->options->output_src, g->declarations);
     str_delete(g->declarations);

@@ -429,6 +429,8 @@ struct options {
     } target_lang;
     const char * externals_prefix;
     const char * variables_prefix;
+    const char * cheader;
+    const char * hheader;
     const char * runtime_path;
     const char * parent_class_name;
     const char * package;
