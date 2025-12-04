@@ -302,7 +302,7 @@ clean:
 	      $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS) \
 	      $(CSHARP_SOURCES) \
 	      $(DART_SOURCES) \
-	      $(go_src_dir)/*_stemmer.go $(go_src_main_dir)/stemwords/algorithms.go \
+	      $(go_src_dir)/*/*_stemmer.go $(go_src_main_dir)/stemwords/algorithms.go \
 	      $(JAVA_SOURCES) $(JAVA_CLASSES) $(JAVA_RUNTIME_CLASSES) \
 	      $(JS_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
@@ -442,7 +442,7 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 
 $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
-	$(SNOWBALL_COMPILE) $< -go -o $@ -gop $*
+	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
 # Java
