@@ -59,7 +59,6 @@ static void print_arglist(int exit_code) {
                "  -P, -Package PACKAGE_NAME        package name for stemmers\n"
                "  -S, -Stringclass STRING_CLASS    StringBuffer-compatible class\n"
                "  -a, -amongclass AMONG_CLASS      fully qualified name of the Among class\n"
-               "  -gop, -gopackage PACKAGE_NAME    Go package name for stemmers\n"
                "  -gor, -goruntime PACKAGE_NAME    Go snowball runtime package\n"
                "  --help                           display this help and exit\n"
                "  --version                        output version information and exit\n"
@@ -236,11 +235,6 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
             if (eq(s, "-a") || eq(s, "-amongclass")) {
                 check_lim(i, argc);
                 o->among_class = argv[i++];
-                continue;
-            }
-            if (eq(s, "-gop") || eq(s, "-gopackage")) {
-                check_lim(i, argc);
-                o->package = argv[i++];
                 continue;
             }
             if (eq(s, "-gor") || eq(s, "-goruntime")) {

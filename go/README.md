@@ -11,9 +11,12 @@ $ snowball path/to/algorithm.sbl -go -o algorithm
 
 ### Go specific options
 
-`-gop[ackage]` the package name used in the generated go file (defaults to `snowball`)
+`-Package`/`-P`: the package name used in the generated go file (defaults to `snowball`)
 
-`-gor[untime]` the import path used for the Go Snowball runtime (defaults to `github.com/snowballstem/snowball/go`)
+`-goruntime`/`-gor`: the import path used for the Go Snowball runtime (defaults to `github.com/snowballstem/snowball/go`)
+
+Snowball 3.0.1 and earlier supported `-go`/`-gopackage`, but this was just an
+alias for `-Package`/`-P` since Snowball 2.0.0.
 
 ## Code Organization
 

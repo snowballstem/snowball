@@ -442,7 +442,7 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 
 $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
-	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
+	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -P $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
 # Java
