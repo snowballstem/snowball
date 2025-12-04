@@ -364,7 +364,7 @@ $(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
 $(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
 endif
 	@mkdir -p $(ada_src_dir)
-	$(SNOWBALL_COMPILE) $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
+	$(SNOWBALL_COMPILE) $< -ada -P $* -o $@
 
 # C
 
@@ -399,19 +399,19 @@ stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	$(SNOWBALL_COMPILE) $< -o "$(c_src_dir)/stem_UTF_8_$*" -eprefix $*_UTF_8_ -r ../runtime -u
+	$(SNOWBALL_COMPILE) $< -o $@ -eprefix $*_UTF_8_ -r ../runtime -u
 
 $(c_src_dir)/stem_KOI8_R_%.c $(c_src_dir)/stem_KOI8_R_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	$(SNOWBALL_COMPILE) charsets/KOI8-R.sbl $< -o "$(c_src_dir)/stem_KOI8_R_$*" -eprefix $*_KOI8_R_ -r ../runtime
+	$(SNOWBALL_COMPILE) charsets/KOI8-R.sbl $< -o $@ -eprefix $*_KOI8_R_ -r ../runtime
 
 $(c_src_dir)/stem_ISO_8859_1_%.c $(c_src_dir)/stem_ISO_8859_1_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	$(SNOWBALL_COMPILE) $< -o "$(c_src_dir)/stem_ISO_8859_1_$*" -eprefix $*_ISO_8859_1_ -r ../runtime
+	$(SNOWBALL_COMPILE) $< -o $@ -eprefix $*_ISO_8859_1_ -r ../runtime
 
 $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
-	$(SNOWBALL_COMPILE) charsets/ISO-8859-2.sbl $< -o "$(c_src_dir)/stem_ISO_8859_2_$*" -eprefix $*_ISO_8859_2_ -r ../runtime
+	$(SNOWBALL_COMPILE) charsets/ISO-8859-2.sbl $< -o $@ -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
@@ -423,7 +423,7 @@ csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES)
 
 $(csharp_src_dir)/%Stemmer.generated.cs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(csharp_src_dir)
-	$(SNOWBALL_COMPILE) $< -csharp -o "$(csharp_src_dir)/$*Stemmer.generated"
+	$(SNOWBALL_COMPILE) $< -csharp -o $@
 
 # Dart
 
@@ -432,7 +432,7 @@ dart/lib/src/algorithms.dart: dart/generate_algorithms.pl libstemmer/modules.txt
 
 $(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(dart_src_dir)
-	$(SNOWBALL_COMPILE) $< -dart -o "$(dart_src_dir)/$*_stemmer" -p SnowballStemmer
+	$(SNOWBALL_COMPILE) $< -dart -o $@ -p SnowballStemmer
 
 # Go
 
@@ -442,20 +442,20 @@ $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 
 $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
-	$(SNOWBALL_COMPILE) $< -go -o "$(go_src_dir)/$*/$*_stemmer" -gop $*
+	$(SNOWBALL_COMPILE) $< -go -o $@ -gop $*
 	$(gofmt) -s -w $(go_src_dir)/$*/$*_stemmer.go
 
 # Java
 
 $(java_src_dir)/%Stemmer.java: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(java_src_dir)
-	$(SNOWBALL_COMPILE) $< -java -o "$(java_src_dir)/$*Stemmer" -p org.tartarus.snowball.SnowballStemmer
+	$(SNOWBALL_COMPILE) $< -java -o $@ -p org.tartarus.snowball.SnowballStemmer
 
 # Javascript
 
 $(js_output_dir)/%-stemmer.js: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(js_output_dir)
-	$(SNOWBALL_COMPILE) $< -js -o "$(js_output_dir)/$*-stemmer"
+	$(SNOWBALL_COMPILE) $< -js -o $@
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
@@ -471,13 +471,13 @@ pascal/stemwords: $(PASCAL_STEMWORDS_SOURCES) $(PASCAL_RUNTIME_SOURCES) $(PASCAL
 
 $(pascal_src_dir)/%Stemmer.pas: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(pascal_src_dir)
-	$(SNOWBALL_COMPILE) $< -pascal -o "$(pascal_src_dir)/$*Stemmer"
+	$(SNOWBALL_COMPILE) $< -pascal -o $@
 
 # PHP
 
 $(php_output_dir)/%-stemmer.php: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(php_output_dir)
-	$(SNOWBALL_COMPILE) $< -php -o "$(php_output_dir)/$*-stemmer"
+	$(SNOWBALL_COMPILE) $< -php -o $@
 
 $(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
 	@mkdir -p $(php_output_dir)
@@ -487,7 +487,7 @@ $(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
 
 $(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
-	$(SNOWBALL_COMPILE) $< -python -o "$(python_output_dir)/$*_stemmer"
+	$(SNOWBALL_COMPILE) $< -python -o $@
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)
@@ -496,7 +496,7 @@ $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:
 
 $(rust_src_dir)/%_stemmer.rs: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(rust_src_dir)
-	$(SNOWBALL_COMPILE) $< -rust -o "$(rust_src_dir)/$*_stemmer"
+	$(SNOWBALL_COMPILE) $< -rust -o $@
 
 .PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_dart dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 

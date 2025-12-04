@@ -362,7 +362,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
 
-        const char * dot = strchr(leaf, '.');
+        const char * dot = strrchr(leaf, '.');
         if (dot) {
             o->extension = create_s_from_sz(dot);
             o->output_file = create_s_from_data(leaf, dot - leaf);
@@ -373,6 +373,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     } else {
         // Remove any extension from o->output_file so `-o path/to/english.c`
         // works.
+        o->output_file[SIZE(o->output_file)] = '\0';
         const char * output_file = (const char *)o->output_file;
         const char * slash = strrchr(output_file, '/');
         const char * leaf = (slash == NULL) ? output_file : slash + 1;
@@ -380,7 +381,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
 
-        const char * dot = strchr(leaf, '.');
+        const char * dot = strrchr(leaf, '.');
         if (dot) {
             o->extension = create_s_from_sz(dot);
             SET_SIZE(o->output_file, dot - output_file);
@@ -391,10 +392,13 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     }
 
     if (!o->name) {
-        /* Default class name to basename of output_file - this is the standard
-         * convention for at least Java and C#.
-         */
         o->name = copy_s(o->output_leaf);
+        const byte * dot = memchr(o->name, '.', SIZE(o->name));
+        if (dot) {
+            // Trim off any extension (we only remove the last of multiple
+            // extensions above).
+            SET_SIZE(o->name, dot - o->name);
+        }
         switch (o->target_lang) {
             case LANG_CSHARP:
             case LANG_PASCAL:
@@ -429,7 +433,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                 break;
             }
             default:
-                /* Just use as-is. */
+                /* Just use as-is, e.g. that's the Java convention. */
                 break;
         }
     }
