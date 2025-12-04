@@ -1274,7 +1274,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         assert(q->right == NULL);
 
         g->B[0] = str_data(varname);
-        writef(g, "~N~{~Mint ~B0;~N", p);
+        writef(g, "~{~Mint ~B0;~N", p);
 
         g->S[0] = q->mode == m_forward ? ">" : "<";
 
