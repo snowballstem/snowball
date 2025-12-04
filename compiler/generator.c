@@ -2216,14 +2216,10 @@ static void generate_close(struct generator * g) {
         w(g, "~Mif (z) {~N~+");
 
         for (struct name * name = g->analyser->names; name; name = name->next) {
-            if (!name->local_to) {
-                switch (name->type) {
-                    case t_string:
-                        w(g, "~Mlose_s(");
-                        write_varref(g, name);
-                        w(g, ");~N");
-                        break;
-                }
+            if (!name->local_to && name->type == t_string) {
+                w(g, "~Mlose_s(");
+                write_varref(g, name);
+                w(g, ");~N");
             }
         }
 
