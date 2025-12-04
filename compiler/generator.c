@@ -2012,7 +2012,7 @@ static void generate_head(struct generator * g) {
     }
 }
 
-static void generate_routine_headers(struct generator * g) {
+static void generate_routine_declarations(struct generator * g) {
     if (g->analyser->name_count[t_external]) {
         w(g, "#ifdef __cplusplus~N"
              "extern \"C\" {~N"
@@ -2290,7 +2290,7 @@ extern void generate_program_c(struct generator * g) {
     g->failure_str = str_new();
     write_start_comment(g, "/* ", " */");
     generate_head(g);
-    generate_routine_headers(g);
+    generate_routine_declarations(g);
     g->declarations = g->outbuf;
     g->outbuf = str_new();
     g->literalstring_count = 0;
