@@ -557,7 +557,8 @@ extern int main(int argc, char * argv[]) {
                         s = add_literal_to_s(s, ".h");
                         o->output_h = get_output(s);
                         SET_SIZE(s, SIZE(o->output_file));
-                        if (o->extension) {
+                        if (o->extension &&
+                            !(SIZE(o->extension) == 2 && memcmp(o->extension, ".h", 2) == 0)) {
                             s = add_s_to_s(s, o->extension);
                         } else if (o->target_lang == LANG_CPLUSPLUS) {
                             s = add_literal_to_s(s, ".cc");
@@ -578,7 +579,9 @@ extern int main(int argc, char * argv[]) {
                         s = add_literal_to_s(s, ".ads");
                         o->output_h = get_output(s);
                         SET_SIZE(s, SIZE(o->output_file));
-                        if (o->extension) {
+                        if (o->extension &&
+                            !(SIZE(o->extension) == 4 && memcmp(o->extension, ".ads", 2) == 0)) {
+                            s = add_s_to_s(s, o->extension);
                             s = add_s_to_s(s, o->extension);
                         } else {
                             s = add_literal_to_s(s, ".adb");
