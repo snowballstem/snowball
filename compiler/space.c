@@ -220,7 +220,7 @@ extern byte * add_slen_to_s(byte * p, const char * s, int n) {
    block is created. */
 
 extern byte * add_s_to_s(byte * p, const byte * s) {
-    return add_slen_to_s(p, s, SIZE(s));
+    return add_slen_to_s(p, (const char *)s, SIZE(s));
 }
 
 /* Add a zero terminated string to a byte block. If p = 0 the
