@@ -225,7 +225,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
-            case 'n': write_string(g, g->options->name); continue;
+            case 'n': write_s(g, g->options->name); continue;
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
                        ch, input);
@@ -1343,13 +1343,13 @@ static void generate_equals(struct generator * g) {
          "~M@Override~N"
          "~Mpublic boolean equals( Object o ) {~N"
          "~+~Mreturn o instanceof ");
-    w(g, g->options->name);
+    write_s(g, g->options->name);
     w(g, ";~N~-~M}~N"
          "~N"
          "~M@Override~N"
          "~Mpublic int hashCode() {~N"
          "~+~Mreturn ");
-    w(g, g->options->name);
+    write_s(g, g->options->name);
     w(g, ".class.getName().hashCode();~N"
          "~-~M}~N");
 }

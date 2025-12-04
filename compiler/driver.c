@@ -350,8 +350,8 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
-    // Sort out o->output_file and set o->output_leaf to just its leafname
-    // (which e.g. is used to generate `#include "english.h"` in
+    // Split any extension off o->output_file and set o->output_leaf to just
+    // its leafname (which e.g. is used to generate `#include "english.h"` in
     // path/to/english.c).
     if (!o->output_file) {
         // Default output uses the basename from the first Snowball source.
@@ -365,6 +365,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
 
         const char * dot = strchr(leaf, '.');
         if (dot) {
+            o->extension = create_s_from_sz(dot);
             o->output_file = create_s_from_data(leaf, dot - leaf);
         } else {
             o->output_file = create_s_from_sz(leaf);
@@ -382,6 +383,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
 
         const char * dot = strchr(leaf, '.');
         if (dot) {
+            o->extension = create_s_from_sz(dot);
             SET_SIZE(o->output_file, dot - output_file);
             o->output_leaf = create_s_from_data(leaf, dot - leaf);
         } else {
@@ -551,9 +553,13 @@ extern int main(int argc, char * argv[]) {
                         byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".h");
                         o->output_h = get_output(s);
-                        s[SIZE(s) - 1] = 'c';
-                        if (o->target_lang == LANG_CPLUSPLUS) {
-                            s = add_char_to_s(s, 'c');
+                        SET_SIZE(s, SIZE(o->output_file));
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else if (o->target_lang == LANG_CPLUSPLUS) {
+                            s = add_literal_to_s(s, ".cc");
+                        } else {
+                            s = add_literal_to_s(s, ".c");
                         }
                         o->output_src = get_output(s);
                         lose_s(s);
@@ -568,7 +574,12 @@ extern int main(int argc, char * argv[]) {
                         byte * s = copy_s(o->output_file);
                         s = add_literal_to_s(s, ".ads");
                         o->output_h = get_output(s);
-                        s[SIZE(s) - 1] = 'b';
+                        SET_SIZE(s, SIZE(o->output_file));
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".adb");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
 
@@ -579,7 +590,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_CSHARP: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".cs");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".cs");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_csharp(g);
@@ -588,7 +603,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_DART: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".dart");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".dart");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_dart(g);
@@ -597,7 +616,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_GO: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".go");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".go");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_go(g);
@@ -606,7 +629,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_JAVA: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".java");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".java");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_java(g);
@@ -615,7 +642,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_JAVASCRIPT: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".js");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".js");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_js(g);
@@ -624,7 +655,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_PASCAL: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".pas");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".pas");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_pascal(g);
@@ -633,7 +668,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_PHP: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".php");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".php");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_php(g);
@@ -642,7 +681,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_PYTHON: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".py");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".py");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_python(g);
@@ -651,7 +694,11 @@ extern int main(int argc, char * argv[]) {
                     }
                     case LANG_RUST: {
                         byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".rs");
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".rs");
+                        }
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_rust(g);
@@ -679,9 +726,10 @@ extern int main(int argc, char * argv[]) {
             p = q;
         }
     }
+    lose_s(o->extension);
+    lose_s(o->name);
     lose_s(o->output_file);
     lose_s(o->output_leaf);
-    lose_s(o->name);
     FREE(o);
     if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);
     return 0;

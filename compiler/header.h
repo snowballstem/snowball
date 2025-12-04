@@ -405,6 +405,8 @@ struct options {
     byte * output_file;
     // output_file but without any path.
     byte * output_leaf;
+    // Extension specified in -o option (or NULL if none).
+    byte * extension;
     byte * name;
     FILE * output_src;
     FILE * output_h;
