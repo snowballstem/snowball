@@ -405,7 +405,7 @@ struct options {
     byte * output_file;
     // output_file but without any path.
     byte * output_leaf;
-    char * name;
+    byte * name;
     FILE * output_src;
     FILE * output_h;
     byte syntax_tree;

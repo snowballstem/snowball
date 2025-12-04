@@ -118,17 +118,8 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                 continue;
             }
             if (eq(s, "-n") || eq(s, "-name")) {
-                char * new_name;
-                size_t len;
-
                 check_lim(i, argc);
-                /* Take a copy of the argument here, because
-                 * later we will free o->name */
-                len = strlen(argv[i]);
-                new_name = MALLOC(len + 1);
-                memcpy(new_name, argv[i++], len);
-                new_name[len] = '\0';
-                o->name = new_name;
+                o->name = create_s_from_sz(argv[i++]);
                 continue;
             }
             if (eq(s, "-js")) {
@@ -359,6 +350,9 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     }
     if (!o->externals_prefix) o->externals_prefix = "";
 
+    // Sort out o->output_file and set o->output_leaf to just its leafname
+    // (which e.g. is used to generate `#include "english.h"` in
+    // path/to/english.c).
     if (!o->output_file) {
         // Default output uses the basename from the first Snowball source.
         // E.g. algorithms/english.sbl -> english
@@ -369,16 +363,16 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
 
-        const char * dot = strrchr(leaf, '.');
+        const char * dot = strchr(leaf, '.');
         if (dot) {
             o->output_file = create_s_from_data(leaf, dot - leaf);
         } else {
             o->output_file = create_s_from_sz(leaf);
         }
-    }
-
-    {
-        // Set o->output_leaf to o->output_file but without any path.
+        o->output_leaf = copy_s(o->output_file);
+    } else {
+        // Remove any extension from o->output_file so `-o path/to/english.c`
+        // works.
         const char * output_file = (const char *)o->output_file;
         const char * slash = strrchr(output_file, '/');
         const char * leaf = (slash == NULL) ? output_file : slash + 1;
@@ -386,59 +380,56 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         slash = strrchr(leaf, '\\');
         if (slash != NULL) leaf = slash + 1;
 
-        o->output_leaf = create_s_from_sz(leaf);
+        const char * dot = strchr(leaf, '.');
+        if (dot) {
+            SET_SIZE(o->output_file, dot - output_file);
+            o->output_leaf = create_s_from_data(leaf, dot - leaf);
+        } else {
+            o->output_leaf = create_s_from_sz(leaf);
+        }
     }
 
     if (!o->name) {
         /* Default class name to basename of output_file - this is the standard
          * convention for at least Java and C#.
          */
-        const char * leaf = (const char *)o->output_leaf;
-        const char * dot = strchr(leaf, '.');
-        size_t len = (dot == NULL) ? strlen(leaf) : (size_t)(dot - leaf);
-
-        {
-            char * new_name = MALLOC(len + 1);
-            switch (o->target_lang) {
-                case LANG_CSHARP:
-                case LANG_PASCAL:
-                    /* Upper case initial letter. */
-                    memcpy(new_name, leaf, len);
-                    new_name[0] = toupper(new_name[0]);
-                    break;
-                case LANG_JAVASCRIPT:
-                case LANG_PHP:
-                case LANG_PYTHON: {
-                    /* Upper case initial letter and change each
-                     * underscore+letter or hyphen+letter to an upper case
-                     * letter.
-                     */
-                    size_t new_len = 0;
-                    int uc_next = true;
-                    for (size_t j = 0; j != len; ++j) {
-                        unsigned char ch = leaf[j];
-                        if (ch == '_' || ch == '-') {
-                            uc_next = true;
+        o->name = copy_s(o->output_leaf);
+        switch (o->target_lang) {
+            case LANG_CSHARP:
+            case LANG_PASCAL:
+                /* Upper case initial letter. */
+                o->name[0] = toupper(o->name[0]);
+                break;
+            case LANG_JAVASCRIPT:
+            case LANG_PHP:
+            case LANG_PYTHON: {
+                /* Upper case initial letter and change each
+                 * underscore+letter or hyphen+letter to an upper case
+                 * letter.
+                 */
+                size_t len = SIZE(o->name);
+                size_t new_len = 0;
+                int uc_next = true;
+                for (size_t j = 0; j != len; ++j) {
+                    byte ch = o->name[j];
+                    if (ch == '_' || ch == '-') {
+                        uc_next = true;
+                    } else {
+                        if (uc_next) {
+                            o->name[new_len] = toupper(ch);
+                            uc_next = false;
                         } else {
-                            if (uc_next) {
-                                new_name[new_len] = toupper(ch);
-                                uc_next = false;
-                            } else {
-                                new_name[new_len] = ch;
-                            }
-                            ++new_len;
+                            o->name[new_len] = ch;
                         }
+                        ++new_len;
                     }
-                    len = new_len;
-                    break;
                 }
-                default:
-                    /* Just copy. */
-                    memcpy(new_name, leaf, len);
-                    break;
+                SET_SIZE(o->name, new_len);
+                break;
             }
-            new_name[len] = '\0';
-            o->name = new_name;
+            default:
+                /* Just use as-is. */
+                break;
         }
     }
 
@@ -690,7 +681,7 @@ extern int main(int argc, char * argv[]) {
     }
     lose_s(o->output_file);
     lose_s(o->output_leaf);
-    FREE(o->name);
+    lose_s(o->name);
     FREE(o);
     if (space_count) fprintf(stderr, "%d blocks unfreed\n", space_count);
     return 0;
