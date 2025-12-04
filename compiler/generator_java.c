@@ -1291,7 +1291,7 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_class_begin(struct generator * g) {
     w(g, "package ");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, ";~N~N");
 
     if (g->java_import_arrays) {
@@ -1300,7 +1300,7 @@ static void generate_class_begin(struct generator * g) {
 
     if (g->analyser->amongs) {
         w(g, "import ");
-        w(g, g->options->among_class);
+        write_string(g, g->options->among_class);
         w(g, ";~N~N");
     }
 
@@ -1323,7 +1323,7 @@ static void generate_class_begin(struct generator * g) {
          "@SuppressWarnings(\"unused\")~N"
          "public class ~n extends ");
 
-    w(g, g->options->parent_class_name);
+    write_string(g, g->options->parent_class_name);
     w(g, " {~+~N"
          "~N"
          "~Mprivate static final long serialVersionUID = 1L;~N");

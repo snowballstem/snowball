@@ -1886,10 +1886,10 @@ void write_start_comment(struct generator * g,
                          const char * comment_start,
                          const char * comment_end) {
     write_margin(g);
-    w(g, comment_start);
+    write_string(g, comment_start);
     write_generated_comment_content(g);
     if (comment_end) {
-        w(g, comment_end);
+        write_string(g, comment_end);
     }
     w(g, "~N~N");
 }

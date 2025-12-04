@@ -1307,12 +1307,12 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_class_begin(struct generator * g) {
     w(g, "package ");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, "~N~N");
 
     w(g, "import (~N");
     w(g, "~+~MsnowballRuntime \"");
-    w(g, g->options->go_snowball_runtime);
+    write_string(g, g->options->go_snowball_runtime);
     w(g, "\"~N~-)~N~N");
 }
 

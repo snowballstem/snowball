@@ -1318,7 +1318,7 @@ static void generate_class_begin(struct generator * g) {
     write_generated_comment_content(g);
     w(g, "~N */~N"
             "class ~n extends ");
-    w(g, g->options->parent_class_name);
+    write_string(g, g->options->parent_class_name);
     w(g, " {~+~N");
 }
 

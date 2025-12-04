@@ -1755,7 +1755,7 @@ extern void generate_program_ada(struct generator * g) {
 
     /* generate implementation. */
     w(g, "package body Stemmer.");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, " is~N~+~N");
     w(g, "~Mpragma Style_Checks (\"-mr\");~N");
     w(g, "~Mpragma Warnings (Off, \"*variable*is never read and never assigned*\");~N");
@@ -1787,7 +1787,7 @@ extern void generate_program_ada(struct generator * g) {
     generate_groupings(g);
 
     w(g, "end Stemmer.");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, ";~N");
 
     output_str(g->options->output_src, g->declarations);
@@ -1798,7 +1798,7 @@ extern void generate_program_ada(struct generator * g) {
     g->margin = 0;
     write_start_comment(g, "--  ", NULL);
     w(g, "package Stemmer.");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, " with SPARK_Mode is~N~+");
     w(g, "   type Context_Type is new Stemmer.Context_Type with private;~N");
     generate_method_decls(g, t_external);
@@ -1806,7 +1806,7 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "private~N");
     generate_member_decls(g);
     w(g, "end Stemmer.");
-    w(g, g->options->package);
+    write_string(g, g->options->package);
     w(g, ";~N");
     output_str(g->options->output_h, g->outbuf);
     str_delete(g->failure_str);

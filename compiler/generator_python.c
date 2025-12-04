@@ -1287,13 +1287,13 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_class_begin(struct generator * g) {
     w(g, "from .basestemmer import ");
-    w(g, g->options->parent_class_name);
+    write_string(g, g->options->parent_class_name);
     w(g, "~N"
          "from .among import Among~N"
          "~N"
          "~N"
          "class ~n(");
-    w(g, g->options->parent_class_name);
+    write_string(g, g->options->parent_class_name);
     w(g, "):~N"
          "~+~M'''~N"
          "~MThis class implements the stemming algorithm defined by a snowball script.~N"
