@@ -51,9 +51,10 @@ func main() {
 
 	var err error
 	scanner := bufio.NewScanner(reader)
+	env := snowballRuntime.NewEnv("")
 	for scanner.Scan() {
 		word := scanner.Text()
-		env := snowballRuntime.NewEnv(word)
+		env.SetCurrent(word)
 		stemmer(env)
 		fmt.Fprintf(writer, "%s\n", env.Current())
 	}
