@@ -2483,10 +2483,6 @@ static void generate_header_file(struct generator * g) {
         w(g, "stem(z);~N"
              "~Mreturn std::string(reinterpret_cast<const char*>(z->p), SIZE(z->p));~N"
              "~-~M}~N"
-             "~N"
-             "~Mstd::string get_description() const override {~N~+"
-             "~Mreturn \"~n\";~N"
-             "~-~M}~N"
              "~-~M};~N~N");
 
         w(g, "}~N");
