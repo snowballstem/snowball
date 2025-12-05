@@ -1,3 +1,5 @@
+#ifndef SNOWBALL_INCLUDED_SNOWBALL_RUNTIME_H
+#define SNOWBALL_INCLUDED_SNOWBALL_RUNTIME_H
 
 #include "api.h"
 
@@ -95,4 +97,6 @@ extern int len_utf8(const symbol * p);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

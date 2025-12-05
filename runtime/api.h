@@ -1,3 +1,5 @@
+#ifndef SNOWBALL_API_H_INCLUDED
+#define SNOWBALL_API_H_INCLUDED
 
 typedef unsigned char symbol;
 
@@ -27,4 +29,6 @@ extern int SN_set_current(struct SN_env * z, int size, const symbol * s);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
