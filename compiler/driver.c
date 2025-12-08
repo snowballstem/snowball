@@ -379,7 +379,6 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
 
         const char * dot = strrchr(leaf, '.');
         if (dot) {
-            o->extension = create_s_from_sz(dot);
             o->output_file = create_s_from_data(leaf, dot - leaf);
         } else {
             o->output_file = create_s_from_sz(leaf);
