@@ -92,6 +92,7 @@ define remove_nominal_suffixes as (
       [substring] among(
         'nyana'   /* diminutive form */
         'ana'     /* diminutive form */
+        'ano'
         'oa'
         'i'
         (delete)

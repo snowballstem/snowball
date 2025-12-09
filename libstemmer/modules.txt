@@ -40,7 +40,7 @@ swedish         UTF_8,ISO_8859_1        swedish,sv,swe
 tamil           UTF_8                   tamil,ta,tam
 turkish         UTF_8                   turkish,tr,tur
 yiddish         UTF_8                   yiddish,yi,yid
-sesotho         UTF_8                   sesotho,st,sot
+sesotho         UTF_8,ISO_8859_1        sesotho,st,sot
 
 # Also include the traditional porter algorithm for english.
 # The porter algorithm is included in the libstemmer distribution to assist
