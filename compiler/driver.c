@@ -528,9 +528,9 @@ extern int main(int argc, char * argv[]) {
                 case LANG_ADA:
                     // 1000000000: local 13.7s vs global 5.2s
                 case LANG_C:
-                    // We lack a way generate lose_s(v) on every `return` from
-                    // the function, but manually adjusting the generated code
-                    // to do this gives:
+                    // We lack a way to generate lose_s(v) on every `return`
+                    // from the function, but manually adjusting the generated
+                    // code to do this gives:
                     //
                     // 1000000000: local 44.9s vs global 6.3s
                 case LANG_CPLUSPLUS:
