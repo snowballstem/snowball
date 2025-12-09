@@ -533,7 +533,9 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     g->I[1] = q->largest_ch;
     write_failure_if(g, "!env.go_~S1_grouping~S0(~W, ~I0, ~I1)", p);
     if (!is_goto) {
+        write_margin(g);
         write_string(g, p->mode == m_forward ? "env.next_char();" : "env.previous_char();");
+        write_newline(g);
     }
 }
 
