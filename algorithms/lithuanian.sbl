@@ -44,7 +44,7 @@ backwardmode (
     setlimit tomark p1 for ([substring]) among (
       // Daiktavardžiai (Nouns)
       // I linksniuotė (declension I)
-      'as' 'ias' 'is' 'ys'        // vyras, kelias, brolis, gaidys
+      'as' 'ias' 'is' 'ys' 'eris' // vyras, kelias, brolis, gaidys, seseris
       'o'    'io'                 // vyro, kelio
       'ui'   'iui'                // vyrui, keliui
       '{ak}' 'i{ak}' '{ik}'       // vyrą, kelią, brolį
@@ -112,7 +112,7 @@ backwardmode (
 
       // V linksniuote (declension V)
       'ies' 'ens' 'enio' 'ers'    // avies, vandens, sesers
-      'eniui' 'eriai'             // vandeniui, eriai
+      'eniui' 'eriai' 'eriui'     // vandeniui, seseriai, bleberiui
       'en{ik}' 'er{ik}'           // vandenį, seserį
       'imi' 'eniu' 'erimi' 'eria' // avimi, vandeniu, seserimi, seseria
       'enyje' 'eryje'             // vandenyje, seseryje
