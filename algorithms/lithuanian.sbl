@@ -44,7 +44,7 @@ backwardmode (
     setlimit tomark p1 for ([substring]) among (
       // Daiktavardžiai (Nouns)
       // I linksniuotė (declension I)
-      'as' 'ias' 'is' 'ys' 'eris' // vyras, kelias, brolis, gaidys, seseris
+      'as' 'ias' 'is' 'ys'        // vyras, kelias, brolis, gaidys
       'o'    'io'                 // vyro, kelio
       'ui'   'iui'                // vyrui, keliui
       '{ak}' 'i{ak}' '{ik}'       // vyrą, kelią, brolį
@@ -111,21 +111,20 @@ backwardmode (
 
 
       // V linksniuote (declension V)
-      'ies' 'ens' 'enio' 'ers'    // avies, vandens, sesers
-      'eniui' 'eriai' 'eriui'     // vandeniui, seseriai, bleberiui
-      'en{ik}' 'er{ik}'           // vandenį, seserį
-      'imi' 'eniu' 'erimi' 'eria' // avimi, vandeniu, seserimi, seseria
-      'enyje' 'eryje'             // vandenyje, seseryje
-      'ie' 'enie' 'erie'          // avie, vandenie, seserie
+      'ies' 'ens' 'enio'          // avies, vandens, sesers
+      'eniui'                     // vandeniui
+      'en{ik}'                    // vandenį
+      'imi' 'eniu'                // avimi, vandeniu
+      'enyje'                     // vandenyje
+      'ie' 'enie'                 // avie, vandenide
 
-      'enys' 'erys'               // vandenys, seserys
+      'enys'                      // vandenys
       // 'en{uk}' konfliktas su 'žandenų' 'antenų'
-      'er{uk}'                    // seserų
-      'ims' 'enims' 'erims'       // avims, vandemins, seserims
+      'ims' 'enims'               // avims, vandemins
       'enis'                      // vandenis
       'imis'                      // žebenkštimis
       'enimis'                    // vandenimis
-      'yse' 'enyse' 'eryse'       // avyse, vandenyse, seseryse
+      'yse' 'enyse'               // avyse, vandenyse
 
 
       // Būdvardžiai (Adjectives)
