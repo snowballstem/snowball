@@ -4,7 +4,7 @@ externals ( stem )
 stringescapes { }
 
 /* Special characters in Unicode Latin Extended-A */
-// ' nosine
+// k nosine
 stringdef ak   '{U+0105}'  // ą a + ogonek
 stringdef ek   '{U+0119}'  // ę e + ogonek
 stringdef ik   '{U+012F}'  // į i + ogonek
