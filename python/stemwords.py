@@ -1,13 +1,14 @@
 import sys
 import codecs
 import snowballstemmer
+from typing import Any, TextIO
 
-def usage():
+def usage() -> None:
     print('''usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]
 
 The input file consists of a list of words to be stemmed, one per
 line. Words should be in lower case, but (for English) A-Z letters
-are mapped to their a-z equivalents anyway. If omitted, stdin is
+are mapped to their a-z aquivalents anyway. If omitted, stdin is
 used.
 
 If -c is given, the argument is the character encoding of the input
@@ -24,7 +25,7 @@ line.
 
 -h displays this help''' % sys.argv[0])
 
-def main():
+def main() -> None:
     pretty = 0
     input = ''
     output = ''
@@ -83,7 +84,7 @@ def main():
         infile.close()
 
 
-def stemming(stemmer, infile, outfile, pretty):
+def stemming(stemmer: Any, infile: TextIO, outfile: TextIO, pretty: int) -> None:
     for original in infile.readlines():
         original = original.strip()
         # Convert only ASCII-letters to lowercase, to match C behavior

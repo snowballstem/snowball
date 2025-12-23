@@ -3,6 +3,7 @@
 import sys
 import re
 import os
+from typing import Dict, List, Type
 
 python_out_folder = sys.argv[1]
 
@@ -24,23 +25,26 @@ languages.sort()
 if len(languages) == 0:
     raise AssertionError('languages list is empty!')
 
-src = '''__all__ = ('language', 'stemmer')
+src = '''from typing import Dict, List, Type
+
+__all__ = ('algorithms', 'stemmer')
 
 try:
     import Stemmer
     algorithms = Stemmer.algorithms
     stemmer = Stemmer.Stemmer
 except ImportError:
+    from .basestemmer import BaseStemmer
 %(imports)s
 
-    _languages = {
+    _languages: Dict[str, Type[BaseStemmer]] = {
 %(languages)s
     }
 
-    def algorithms():
+    def algorithms() -> List[str]:
         return list(_languages.keys())
 
-    def stemmer(lang):
+    def stemmer(lang: str) -> BaseStemmer:
         lang = lang.lower()
         if lang in _languages:
             return _languages[lang]()

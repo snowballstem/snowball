@@ -77,6 +77,7 @@ setup(name='snowballstemmer',
       license="BSD-3-Clause",
       packages=['snowballstemmer'],
       package_dir={"snowballstemmer": "src/snowballstemmer"},
+      package_data={"snowballstemmer": ["py.typed"]},
       python_requires='>=3.3',
       classifiers = classifiers
 )

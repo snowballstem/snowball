@@ -225,7 +225,8 @@ PHP_RUNTIME_SOURCES = php/base-stemmer.php
 # Python
 
 PYTHON_RUNTIME_SOURCES = python/snowballstemmer/basestemmer.py \
-		         python/snowballstemmer/among.py
+		         python/snowballstemmer/among.py \
+		         python/snowballstemmer/py.typed
 
 PYTHON_SAMPLE_SOURCES = python/testapp.py \
 		        python/stemwords.py
