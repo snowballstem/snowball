@@ -2,6 +2,7 @@ include *.rst
 include modules.txt
 include setup.*
 recursive-include src *.py
+include src/snowballstemmer/py.typed
 include MANIFEST.in
 include COPYING
 include NEWS

@@ -1,8 +1,12 @@
+from typing import List, Sequence
+
+from .among import Among
+
 class BaseStemmer:
-    def __init__(self):
+    def __init__(self) -> None:
         self.set_current("")
 
-    def set_current(self, value):
+    def set_current(self, value: str) -> None:
         '''
         Set the self.current string.
         '''
@@ -13,13 +17,13 @@ class BaseStemmer:
         self.bra = self.cursor
         self.ket = self.limit
 
-    def get_current(self):
+    def get_current(self) -> str:
         '''
         Get the self.current string.
         '''
         return self.current
 
-    def copy_from(self, other):
+    def copy_from(self, other: "BaseStemmer") -> None:
         self.current          = other.current
         self.cursor           = other.cursor
         self.limit            = other.limit
@@ -27,7 +31,7 @@ class BaseStemmer:
         self.bra              = other.bra
         self.ket              = other.ket
 
-    def in_grouping(self, s):
+    def in_grouping(self, s: str) -> bool:
         if self.cursor >= self.limit:
             return False
         if self.current[self.cursor] not in s:
@@ -35,14 +39,14 @@ class BaseStemmer:
         self.cursor += 1
         return True
 
-    def go_in_grouping(self, s):
+    def go_in_grouping(self, s: str) -> bool:
         while self.cursor < self.limit:
             if self.current[self.cursor] not in s:
                 return True
             self.cursor += 1
         return False
 
-    def in_grouping_b(self, s):
+    def in_grouping_b(self, s: str) -> bool:
         if self.cursor <= self.limit_backward:
             return False
         if self.current[self.cursor - 1] not in s:
@@ -50,14 +54,14 @@ class BaseStemmer:
         self.cursor -= 1
         return True
 
-    def go_in_grouping_b(self, s):
+    def go_in_grouping_b(self, s: str) -> bool:
         while self.cursor > self.limit_backward:
             if self.current[self.cursor - 1] not in s:
                 return True
             self.cursor -= 1
         return False
 
-    def out_grouping(self, s):
+    def out_grouping(self, s: str) -> bool:
         if self.cursor >= self.limit:
             return False
         if self.current[self.cursor] not in s:
@@ -65,14 +69,14 @@ class BaseStemmer:
             return True
         return False
 
-    def go_out_grouping(self, s):
+    def go_out_grouping(self, s: str) -> bool:
         while self.cursor < self.limit:
             if self.current[self.cursor] in s:
                 return True
             self.cursor += 1
         return False
 
-    def out_grouping_b(self, s):
+    def out_grouping_b(self, s: str) -> bool:
         if self.cursor <= self.limit_backward:
             return False
         if self.current[self.cursor - 1] not in s:
@@ -80,26 +84,26 @@ class BaseStemmer:
             return True
         return False
 
-    def go_out_grouping_b(self, s):
+    def go_out_grouping_b(self, s: str) -> bool:
         while self.cursor > self.limit_backward:
             if self.current[self.cursor - 1] in s:
                 return True
             self.cursor -= 1
         return False
 
-    def eq_s(self, s):
+    def eq_s(self, s: str) -> bool:
         if self.current.startswith(s, self.cursor, self.limit):
             self.cursor += len(s)
             return True
         return False
 
-    def eq_s_b(self, s):
+    def eq_s_b(self, s: str) -> bool:
         if self.current.endswith(s, self.limit_backward, self.cursor):
             self.cursor -= len(s)
             return True
         return False
 
-    def find_among(self, v):
+    def find_among(self, v: Sequence[Among]) -> int:
         i = 0
         j = len(v)
 
@@ -155,7 +159,7 @@ class BaseStemmer:
                 return 0
         return -1 # not reachable
 
-    def find_among_b(self, v):
+    def find_among_b(self, v: Sequence[Among]) -> int:
         '''
         find_among_b is for backwards processing. Same comments apply
         '''
@@ -211,7 +215,7 @@ class BaseStemmer:
                 return 0
         return -1 # not reachable
 
-    def replace_s(self, c_bra, c_ket, s):
+    def replace_s(self, c_bra: int, c_ket: int, s: str) -> int:
         '''
         to replace chars between c_bra and c_ket in self.current by the
         chars in s.
@@ -229,7 +233,7 @@ class BaseStemmer:
             self.cursor = c_bra
         return adjustment
 
-    def slice_from(self, s):
+    def slice_from(self, s: str) -> None:
         '''
         @type s string
         '''
@@ -240,10 +244,10 @@ class BaseStemmer:
         self.replace_s(self.bra, self.ket, s)
         self.ket = self.bra + len(s)
 
-    def slice_del(self):
-        return self.slice_from("")
+    def slice_del(self) -> None:
+        self.slice_from("")
 
-    def insert(self, c_bra, c_ket, s):
+    def insert(self, c_bra: int, c_ket: int, s: str) -> None:
         '''
         @type c_bra int
         @type c_ket int
@@ -255,7 +259,7 @@ class BaseStemmer:
         if c_bra <= self.ket:
             self.ket += adjustment
 
-    def slice_to(self):
+    def slice_to(self) -> str:
         '''
         Return the slice as a string.
         '''
@@ -265,16 +269,19 @@ class BaseStemmer:
         assert self.limit <= len(self.current)
         return self.current[self.bra:self.ket]
 
-    def assign_to(self):
+    def assign_to(self) -> str:
         '''
         Return the current string up to the limit.
         '''
         return self.current[0:self.limit]
 
-    def stemWord(self, word):
+    def _stem(self) -> bool:
+        raise NotImplementedError()
+
+    def stemWord(self, word: str) -> str:
         self.set_current(word)
         self._stem()
         return self.get_current()
 
-    def stemWords(self, words):
+    def stemWords(self, words: Sequence[str]) -> List[str]:
         return [self.stemWord(word) for word in words]

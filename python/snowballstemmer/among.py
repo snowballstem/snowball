@@ -1,5 +1,7 @@
+from typing import Callable, Optional
+
 class Among:
-    def __init__(self, s, substring_i, result, method=None):
+    def __init__(self, s: str, substring_i: int, result: int, method: Optional[Callable[..., bool]] = None) -> None:
         """
         @ivar s search string
         @ivar substring index to longest matching substring

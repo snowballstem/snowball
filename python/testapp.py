@@ -3,10 +3,10 @@ import re
 import snowballstemmer
 
 
-def usage():
+def usage() -> None:
     print("testapp.py <algorithm> \"sentence\"...")
 
-def main():
+def main() -> None:
     argv = sys.argv
     if len(argv) < 1:
         usage()
