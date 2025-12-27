@@ -429,7 +429,7 @@ Behavioural changes to existing algorithms
 
 * Spanish: Handle -acion like -ación and -ucion like -ución.  It's apparently
   common to miss off accents in Spanish, and there are examples in our test
-  vocabulary that these change helps.  Proposed by Damian Janowski.
+  vocabulary that these changes help.  Proposed by Damian Janowski.
 
 * Swedish: Replace suffix "öst" with "ös" when preceded by any of 'iklnprtuv'
   rather than just 'l'.  The new rule only requires the "öst" to be in R1
