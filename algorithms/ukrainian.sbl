@@ -281,7 +281,7 @@ backwardmode (
         [substring] among (
             // Collective/abstract nouns (specific, safe without R2)
             '{s}{t}{v}{o}'            // -ство (багатство→багат)
-            '{t}{v}{o}'              // -тво (братство→брат via -ство, козацтво via -цтво in derivational)
+            '{t}{v}{o}'              // -тво (words in -цтво like козацтво match -ство above)
 
             // Longest plural endings first
             '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural
@@ -364,6 +364,9 @@ backwardmode (
             '{i}{n}{'}{k}'        // -іньк
             '{i}{t}{k}'           // -ітк
             '{a}{t}{k}'           // -атк
+            // Note: -ятк intentionally excluded — it occurs in stems
+            // like десятк(а), пам'ятк(а), початк(ів); -ятко is handled
+            // as a whole in the diminutive section above
                 (delete)
         )
     )
