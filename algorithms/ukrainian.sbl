@@ -4,7 +4,7 @@ stringescapes {}
  * Based on Ukrainian morphology analysis and dictionary research
  *
  * Primary source: "Словник мовних покручів" by Олекса Тихий (1964-1977)
- * Additional analysis: UKRAINIAN_MORPHOLOGY.md
+ * Additional analysis: Ukrainian morphology notes (internal)
  *
  * Key features:
  * - Professional suffixes: -ар/-ник/-ач (каменяр, копач)
@@ -206,12 +206,13 @@ backwardmode (
             '{o}{n}{n}{a}'                // -онна
             '{o}{n}{n}{e}'                // -онне
             '{o}{n}{n}{i}'                // -онні
+                (R2 delete)
 
             // -аці- noun forms (інформація, організація — tried here before verb -ію intercepts)
             '{a}{ts}{i}{ia}{m}{y}'        // -аціями
             '{a}{ts}{i}{ia}{kh}'          // -аціях
             '{a}{ts}{i}{ia}{m}'           // -аціям
-            '{a}{ts}{i}{ie}{iu}'          // -аціє ю (inst)
+            '{a}{ts}{i}{ie}{iu}'          // -аціє́ю (inst)
             '{a}{ts}{i}{iu}'              // -ацію
             '{a}{ts}{i}{ia}'              // -ація
             '{a}{ts}{i}{yi}'              // -ації (gen/dat/loc — ї=U+0457)
@@ -280,7 +281,7 @@ backwardmode (
         [substring] among (
             // Collective/abstract nouns (specific, safe without R2)
             '{s}{t}{v}{o}'            // -ство (багатство→багат)
-            '{t}{v}{o}'              // -тво (козацтво→козац, жіноцтво→жіноц)
+            '{t}{v}{o}'              // -тво (братство→брат via -ство, козацтво via -цтво in derivational)
 
             // Longest plural endings first
             '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural

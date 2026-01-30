@@ -35,11 +35,11 @@ portuguese      UTF_8,ISO_8859_1        portuguese,pt,por
 romanian        UTF_8                   romanian,ro,rum,ron
 russian         UTF_8,KOI8_R            russian,ru,rus
 serbian         UTF_8                   serbian,sr,srp
-ukrainian       UTF_8                   ukrainian,uk,ukr
 spanish         UTF_8,ISO_8859_1        spanish,es,esl,spa
 swedish         UTF_8,ISO_8859_1        swedish,sv,swe
 tamil           UTF_8                   tamil,ta,tam
 turkish         UTF_8                   turkish,tr,tur
+ukrainian       UTF_8                   ukrainian,uk,ukr
 yiddish         UTF_8                   yiddish,yi,yid
 
 # Also include the traditional porter algorithm for english.
