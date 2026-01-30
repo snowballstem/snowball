@@ -245,7 +245,7 @@ backwardmode (
             '{i}{i`}'                               // Dative/Locative singular fem
             '{y}{i`}'                               // Nominative singular masc
             '{o}{i`}'                               // Various
-                (delete)
+                (delete)  // standard adjective endings (no R2 needed)
         )
     )
 
@@ -370,7 +370,8 @@ backwardmode (
 
     define verbal_noun as (
         [substring] R2 among (
-            // Verbal nouns (in R2 to avoid over-stemming short words)
+            // Verbal nouns — R2 required to protect short words like
+            // мигтіння, боління, бродіння from over-stemming
             '{a}{n}{n}{ia}'        // -ання
             '{ia}{n}{n}{ia}'       // -яння
             '{i}{n}{n}{ia}'        // -іння
