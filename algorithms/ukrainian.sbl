@@ -1,0 +1,472 @@
+stringescapes {}
+
+/* Ukrainian stemmer for Snowball
+ * Based on Ukrainian morphology analysis and dictionary research
+ *
+ * Primary source: "Словник мовних покручів" by Олекса Тихий (1964-1977)
+ * Additional analysis: UKRAINIAN_MORPHOLOGY.md
+ *
+ * Key features:
+ * - Professional suffixes: -ар/-ник/-ач (каменяр, копач)
+ * - Verbal nouns: -ання/-яння/-іння (калякання, мурликання)
+ * - Rich diminutives: -еня/-атко (козеня, лисеня) + standard forms
+ * - Derivational: -ство/-ниця (козацтво, годувальниця)
+ * - Full noun/adjective/verb declension support
+ *
+ * Covers: nouns, adjectives, verbs, diminutives, verbal nouns, reflexives
+ */
+
+stringdef a    '{U+0430}'
+stringdef b    '{U+0431}'
+stringdef v    '{U+0432}'
+stringdef h    '{U+0433}'  // г
+stringdef g    '{U+0491}'  // ґ - Ukrainian specific
+stringdef d    '{U+0434}'
+stringdef e    '{U+0435}'
+stringdef ie   '{U+0454}'  // є - Ukrainian specific
+stringdef zh   '{U+0436}'
+stringdef z    '{U+0437}'
+stringdef y    '{U+0438}'  // и (not ы like in Russian)
+stringdef i    '{U+0456}'  // і - Ukrainian specific
+stringdef yi   '{U+0457}'  // ї - Ukrainian specific
+stringdef i`   '{U+0439}'  // й
+stringdef k    '{U+043A}'
+stringdef l    '{U+043B}'
+stringdef m    '{U+043C}'
+stringdef n    '{U+043D}'
+stringdef o    '{U+043E}'
+stringdef p    '{U+043F}'
+stringdef r    '{U+0440}'
+stringdef s    '{U+0441}'
+stringdef t    '{U+0442}'
+stringdef u    '{U+0443}'
+stringdef f    '{U+0444}'
+stringdef kh   '{U+0445}'
+stringdef ts   '{U+0446}'
+stringdef ch   '{U+0447}'
+stringdef sh   '{U+0448}'
+stringdef shch '{U+0449}'
+stringdef '    '{U+044C}'  // м'який знак (soft sign)
+stringdef iu   '{U+044E}'
+stringdef ia   '{U+044F}'
+
+
+routines ( mark_regions R2
+           perfective_gerund
+           reflexive
+           adjective
+           verb
+           noun
+           professional
+           diminutive
+           diminutive_stem
+           verbal_noun
+           derivational
+           tidy_up
+)
+
+externals ( stem )
+
+integers ( pV p2 )
+
+booleans ( found_diminutive found_professional )
+
+groupings ( v )
+
+define v '{a}{e}{y}{i}{o}{u}{ie}{yi}{iu}{ia}'
+
+define mark_regions as (
+    $pV = limit
+    $p2 = limit
+    do (
+        gopast v  setmark pV  gopast non-v
+        gopast v  gopast non-v  setmark p2
+    )
+)
+
+backwardmode (
+
+    define R2 as $p2 <= cursor
+
+    define perfective_gerund as (
+        [substring] among (
+            // Perfective gerunds (деепричастия доконаного виду)
+            // With {a}/{ia} prefix check
+            '{v}{sh}{y}'
+            '{v}{sh}{y}{s}{'}'
+                ('{a}' or '{ia}' delete)
+            // With {y} (и) - no prefix check needed (зробивши)
+            '{y}{v}{sh}{y}'
+            '{y}{v}{sh}{y}{s}{'}'
+                (delete)
+        )
+    )
+
+    define reflexive as (
+        [substring] among (
+            // Reflexive verb endings
+            '{t}{y}{s}{ia}' '{t}{y}{s}{'}'  // -тися/-тись (infinitive reflexive)
+            '{l}{a}{s}{'}'                  // -лась (past fem reflexive)
+            '{v}{s}{ia}' '{v}{s}{'}'        // -вся/-всь (past masc reflexive)
+            '{s}{ia}' '{s}{'}'              // -ся/-сь (generic reflexive)
+                (delete)
+        )
+    )
+
+    define adjective as (
+        [substring] among (
+            // Compound derivational+inflectional (longest first, R2-protected)
+            // These combine derivational suffix + case ending in one step
+            // e.g. інформаційний → інформ (not інформаційн)
+
+            // -аційн- (інформаційний, організаційний)
+            '{a}{ts}{i}{i`}{n}{y}{m}{y}'  // -аційними
+            '{a}{ts}{i}{i`}{n}{o}{h}{o}'  // -аційного
+            '{a}{ts}{i}{i`}{n}{o}{m}{u}'  // -аційному
+            '{a}{ts}{i}{i`}{n}{o}{iu}'    // -аційною
+            '{a}{ts}{i}{i`}{n}{o}{yi}'    // -аційної
+            '{a}{ts}{i}{i`}{n}{o}{i}'     // -аційної (alt)
+            '{a}{ts}{i}{i`}{n}{y}{kh}'    // -аційних
+            '{a}{ts}{i}{i`}{n}{y}{m}'     // -аційним
+            '{a}{ts}{i}{i`}{n}{y}{i`}'    // -аційний
+            '{a}{ts}{i}{i`}{n}{i}{i`}'    // -аційній
+            '{a}{ts}{i}{i`}{n}{a}'        // -аційна
+            '{a}{ts}{i}{i`}{n}{e}'        // -аційне
+            '{a}{ts}{i}{i`}{n}{i}'        // -аційні
+
+            // -ічн-/-ичн- (лінгвістичний, історичний, логічний)
+            '{i}{ch}{n}{y}{m}{y}'         // -ічними
+            '{i}{ch}{n}{o}{h}{o}'         // -ічного
+            '{i}{ch}{n}{o}{m}{u}'         // -ічному
+            '{i}{ch}{n}{o}{iu}'           // -ічною
+            '{i}{ch}{n}{o}{yi}'           // -ічної
+            '{i}{ch}{n}{o}{i}'            // -ічної (alt)
+            '{i}{ch}{n}{y}{kh}'           // -ічних
+            '{i}{ch}{n}{y}{m}'            // -ічним
+            '{i}{ch}{n}{y}{i`}'           // -ічний
+            '{i}{ch}{n}{i}{i`}'           // -ічній
+            '{i}{ch}{n}{a}'               // -ічна
+            '{i}{ch}{n}{e}'               // -ічне
+            '{i}{ch}{n}{i}'               // -ічні
+            '{y}{ch}{n}{y}{m}{y}'         // -ичними
+            '{y}{ch}{n}{o}{h}{o}'         // -ичного
+            '{y}{ch}{n}{o}{m}{u}'         // -ичному
+            '{y}{ch}{n}{o}{iu}'           // -ичною
+            '{y}{ch}{n}{o}{yi}'           // -ичної
+            '{y}{ch}{n}{o}{i}'            // -ичної (alt)
+            '{y}{ch}{n}{y}{kh}'           // -ичних
+            '{y}{ch}{n}{y}{m}'            // -ичним
+            '{y}{ch}{n}{y}{i`}'           // -ичний
+            '{y}{ch}{n}{i}{i`}'           // -ичній
+            '{y}{ch}{n}{a}'               // -ична
+            '{y}{ch}{n}{e}'               // -ичне
+            '{y}{ch}{n}{i}'               // -ичні
+
+            // -ійн- (комерційний, традиційний)
+            '{i}{i`}{n}{y}{m}{y}'         // -ійними
+            '{i}{i`}{n}{o}{h}{o}'         // -ійного
+            '{i}{i`}{n}{o}{m}{u}'         // -ійному
+            '{i}{i`}{n}{o}{iu}'           // -ійною
+            '{i}{i`}{n}{o}{yi}'           // -ійної
+            '{i}{i`}{n}{o}{i}'            // -ійної (alt)
+            '{i}{i`}{n}{y}{kh}'           // -ійних
+            '{i}{i`}{n}{y}{m}'            // -ійним
+            '{i}{i`}{n}{y}{i`}'           // -ійний
+            '{i}{i`}{n}{i}{i`}'           // -ійній
+            '{i}{i`}{n}{a}'               // -ійна
+            '{i}{i`}{n}{e}'               // -ійне
+            '{i}{i`}{n}{i}'               // -ійні
+
+            // -уальн- (інтелектуальний, віртуальний, актуальний)
+            '{u}{a}{l}{'}{n}{y}{m}{y}'    // -уальними
+            '{u}{a}{l}{'}{n}{o}{h}{o}'    // -уального
+            '{u}{a}{l}{'}{n}{o}{m}{u}'    // -уальному
+            '{u}{a}{l}{'}{n}{o}{iu}'      // -уальною
+            '{u}{a}{l}{'}{n}{o}{yi}'      // -уальної
+            '{u}{a}{l}{'}{n}{o}{i}'       // -уальної (alt)
+            '{u}{a}{l}{'}{n}{y}{kh}'      // -уальних
+            '{u}{a}{l}{'}{n}{y}{m}'       // -уальним
+            '{u}{a}{l}{'}{n}{y}{i`}'      // -уальний
+            '{u}{a}{l}{'}{n}{i}{i`}'      // -уальній
+            '{u}{a}{l}{'}{n}{a}'          // -уальна
+            '{u}{a}{l}{'}{n}{e}'          // -уальне
+            '{u}{a}{l}{'}{n}{i}'          // -уальні
+
+            // -онн- (електронний, нейронний)
+            '{o}{n}{n}{y}{m}{y}'          // -онними
+            '{o}{n}{n}{o}{h}{o}'          // -онного
+            '{o}{n}{n}{o}{m}{u}'          // -онному
+            '{o}{n}{n}{o}{iu}'            // -онною
+            '{o}{n}{n}{o}{yi}'            // -онної
+            '{o}{n}{n}{o}{i}'             // -онної (alt)
+            '{o}{n}{n}{y}{kh}'            // -онних
+            '{o}{n}{n}{y}{m}'             // -онним
+            '{o}{n}{n}{y}{i`}'            // -онний
+            '{o}{n}{n}{i}{i`}'            // -онній
+            '{o}{n}{n}{a}'                // -онна
+            '{o}{n}{n}{e}'                // -онне
+            '{o}{n}{n}{i}'                // -онні
+
+            // -аці- noun forms (інформація, організація — tried here before verb -ію intercepts)
+            '{a}{ts}{i}{ia}{m}{y}'        // -аціями
+            '{a}{ts}{i}{ia}{kh}'          // -аціях
+            '{a}{ts}{i}{ia}{m}'           // -аціям
+            '{a}{ts}{i}{ie}{iu}'          // -аціє ю (inst)
+            '{a}{ts}{i}{iu}'              // -ацію
+            '{a}{ts}{i}{ia}'              // -ація
+            '{a}{ts}{i}{yi}'              // -ації (gen/dat/loc — ї=U+0457)
+                (R2 delete)
+
+            // Participles (longest first - verbal adjectives)
+            '{o}{v}{a}{n}{y}{i`}' '{u}{v}{a}{n}{y}{i`}'  // -ований/-уваний
+            '{o}{v}{a}{n}{a}' '{u}{v}{a}{n}{a}'           // -ована/-увана
+            '{o}{v}{a}{n}{e}' '{u}{v}{a}{n}{e}'           // -оване/-уване
+            '{o}{v}{a}{n}{i}' '{u}{v}{a}{n}{i}'           // -овані/-увані
+            '{o}{v}{a}{n}{o}' '{u}{v}{a}{n}{o}'           // -овано/-увано
+            '{u}{ch}{y}{i`}' '{iu}{ch}{y}{i`}'            // -учий/-ючий
+            '{u}{ch}{a}' '{iu}{ch}{a}'                    // -уча/-юча
+            '{u}{ch}{e}' '{iu}{ch}{e}'                    // -уче/-юче
+            '{u}{ch}{i}' '{iu}{ch}{i}'                    // -учі/-ючі
+            '{v}{sh}{y}{i`}'                               // -вший
+
+            // Longest standard endings first
+            '{yi}{m}{y}' '{i}{m}{y}' '{y}{m}{y}'    // Instrumental plural
+            '{'}{'}{o}{yi}' '{'}{'}{o}{i}'          // Genitive singular fem (soft)
+            '{'}{'}{o}{h}{o}'                       // Genitive singular masc/neut (soft)
+            '{'}{'}{o}{m}{u}'                       // Dative singular masc/neut (soft)
+            '{'}{'}{o}{iu}'                         // Instrumental singular fem (soft)
+            '{ie}{h}{o}' '{o}{h}{o}'                // Genitive singular masc/neut
+            '{o}{yi}' '{o}{i}'                      // Genitive singular fem
+            '{o}{m}{u}'                             // Dative singular masc/neut
+            '{o}{iu}'                               // Instrumental singular fem
+            '{yi}{kh}' '{i}{kh}' '{y}{kh}'          // Genitive/Locative plural
+            '{yi}{m}' '{i}{m}' '{y}{m}'             // Dative plural
+            '{i}{i`}'                               // Dative/Locative singular fem
+            '{y}{i`}'                               // Nominative singular masc
+            '{o}{i`}'                               // Various
+                (delete)
+        )
+    )
+
+    define verb as (
+        [substring] among (
+            // Longest endings first
+            '{a}{t}{y}' '{i}{t}{y}'         // Infinitive (читати→чит, робити→роб)
+            '{y}{t}{y}'                     // Infinitive (робити with и)
+            '{a}{v}' '{i}{v}'               // Past masc (читав→чит, робів→роб)
+            '{y}{v}'                        // Past masc (робив→роб)
+            '{a}{iu}' '{i}{iu}'             // Present 1st sg
+            '{iu}{t}{'}'  '{u}{t}{'}'       // Present 3rd pl
+            '{a}{iu}{t}{'}'                 // Present 3rd pl variant
+            '{ie}{m}{o}' '{i}{m}{o}'        // Present 1st pl
+            '{y}{m}{o}'                     // Present 1st pl (робимо)
+            '{ie}{t}{e}' '{i}{t}{e}'        // Present 2nd pl
+            '{y}{t}{e}'                     // Present 2nd pl (робите)
+            '{i`}{t}{e}'                    // Imperative pl variant
+            '{ie}{m}' '{i}{m}'              // Present 1st pl short
+            '{y}{m}'                        // Present 1st pl short (робим)
+            '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
+            '{t}{y}'                        // Infinitive (fallback)
+            '{ie}{sh}' '{y}{sh}'            // Present 2nd sg
+            '{ie}'                          // Present 3rd sg/future
+            '{i`}'                          // Imperative sg
+            '{iu}' '{u}'                    // Present 1st sg (fallback)
+            '{v}'                           // Past masc (fallback)
+                (delete)
+        )
+    )
+
+    define noun as (
+        [substring] among (
+            // Collective/abstract nouns (specific, safe without R2)
+            '{s}{t}{v}{o}'            // -ство (багатство→багат)
+            '{t}{v}{o}'              // -тво (козацтво→козац, жіноцтво→жіноц)
+
+            // Longest plural endings first
+            '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural
+            '{ia}{kh}' '{a}{kh}'            // Locative plural
+            '{ia}{m}' '{a}{m}'              // Dative plural
+            '{i}{v}' '{e}{v}' '{e}{i`}'     // Genitive plural masc
+
+            // Singular specific endings
+            '{o}{v}{i}'                      // -ові (братові→брат)
+            '{e}{v}{i}'
+            // Instrumental singular
+            '{ie}{m}' '{e}{m}' '{o}{m}'
+            '{ie}{iu}' '{e}{iu}' '{o}{iu}'
+
+            // Shorter endings
+            '{ia}' '{a}' '{u}' '{iu}' '{i}' '{yi}' '{y}' '{e}' '{ie}' '{o}'
+                (delete)
+        )
+    )
+
+    define professional as (
+        [substring] among (
+            '{i}{v}{n}{y}{k}'  '{a}{l}{'}{n}{y}{k}'  '{e}{l}{'}{n}{y}{k}'  // -івник, -альник, -ельник
+            '{ia}{r}' '{a}{r}'  // -яр, -ар (каменяр)
+            '{n}{y}{k}'         // -ник (generic agent)
+            '{a}{ch}'           // -ач (копач)
+                (delete)
+        )
+    )
+
+    define diminutive as (
+        [substring] among (
+            // Double diminutives (longest first)
+            '{o}{ch}{e}{ch}{o}{k}' '{o}{ch}{e}{ch}{k}{a}' '{o}{ch}{e}{ch}{k}{y}' '{o}{ch}{e}{ch}{k}{o}' '{o}{ch}{e}{ch}{k}{i}'
+
+            // Animal young (from dictionary analysis)
+            '{i}{t}{k}{o}'         // -ітко (собаченітко → собачен)
+            '{ia}{t}{k}{o}'        // -ятко (солов'ятко → солов, соколенятко → соколен)
+            '{a}{t}{k}{o}'         // -атко (babies)
+
+            // Most diminutive forms
+            '{o}{ch}{o}{k}' '{o}{ch}{k}{a}' '{o}{ch}{k}{y}' '{o}{ch}{k}{o}' '{o}{ch}{k}{i}'
+            '{e}{ch}{o}{k}' '{e}{ch}{k}{a}' '{e}{ch}{k}{y}' '{e}{ch}{k}{o}' '{e}{ch}{k}{i}'
+            '{i}{ch}{o}{k}' '{i}{ch}{k}{a}' '{i}{ch}{k}{y}' '{i}{ch}{k}{o}' '{i}{ch}{k}{i}'
+
+            // Intensive diminutives (longest first)
+            '{e}{s}{e}{n}{'}{k}{a}' '{e}{s}{e}{n}{'}{k}{y}' '{e}{s}{e}{n}{'}{k}{o}' '{e}{s}{e}{n}{'}{k}{i}'  // -есеньк-
+            '{i}{s}{i}{n}{'}{k}{a}' '{i}{s}{i}{n}{'}{k}{y}' '{i}{s}{i}{n}{'}{k}{o}' '{i}{s}{i}{n}{'}{k}{i}'  // -ісіньк-
+            '{iu}{s}{i}{n}{'}{k}{a}' '{iu}{s}{i}{n}{'}{k}{y}' '{iu}{s}{i}{n}{'}{k}{o}' '{iu}{s}{i}{n}{'}{k}{i}'  // -юсіньк-
+            '{o}{n}{'}{k}{a}' '{o}{n}{'}{k}{y}' '{o}{n}{'}{k}{o}' '{o}{n}{'}{k}{i}'  // -оньк-
+
+            // Regular -еньк-, -іньк- patterns
+            '{e}{n}{'}{k}{u}'
+            '{e}{n}{'}{k}{a}' '{e}{n}{'}{k}{y}' '{e}{n}{'}{k}{o}' '{e}{n}{'}{k}{i}'
+            '{i}{n}{'}{k}{a}' '{i}{n}{'}{k}{y}' '{i}{n}{'}{k}{o}' '{i}{n}{'}{k}{i}'
+
+            // Animal young (shorter forms)
+            '{e}{n}{ia}'  // -еня (козеня, лисеня)
+
+            // Short diminutives (3+ chars to avoid conflicts with regular nouns)
+            '{ch}{y}{k}'          // -чик (хлопчик)
+            '{y}{n}{k}{a}' '{i}{n}{k}{a}'  // -инка/-інка (дівчинка)
+            '{u}{s}{'}'  '{i}{s}{'}'  '{o}{s}{'}'
+            '{u}{n}{'}'  '{i}{n}{'}'  '{e}{n}{'}'
+            // 2-char: -ик/-ік/-ок safe (few non-diminutive nouns end with these)
+            // NOT -ка/-ко (too common as regular noun endings)
+            '{y}{k}' '{i}{k}' '{o}{k}'
+                (delete)
+        )
+    )
+
+    define diminutive_stem as (
+        [substring] among (
+            '{e}{s}{e}{n}{'}{k}'  // -есеньк
+            '{i}{s}{i}{n}{'}{k}'  // -ісіньк
+            '{iu}{s}{i}{n}{'}{k}' // -юсіньк
+            '{o}{ch}{e}{ch}'      // -очеч
+            '{e}{n}{'}{k}'        // -еньк
+            '{o}{n}{'}{k}'        // -оньк
+            '{i}{n}{'}{k}'        // -іньк
+            '{i}{t}{k}'           // -ітк
+            '{a}{t}{k}'           // -атк
+                (delete)
+        )
+    )
+
+    define verbal_noun as (
+        [substring] R2 among (
+            // Verbal nouns (in R2 to avoid over-stemming short words)
+            '{a}{n}{n}{ia}'        // -ання
+            '{ia}{n}{n}{ia}'       // -яння
+            '{i}{n}{n}{ia}'        // -іння
+            '{e}{n}{n}{ia}'        // -ення
+                (delete)
+        )
+    )
+
+    define derivational as (
+        [substring] R2 among (
+            // Derivational suffixes (only in R2 region!)
+            '{i}{z}{a}{ts}{i}{ia}'  // -ізація
+            '{a}{ts}{i}{ia}'        // -ація
+            '{i}{v}{shch}{y}{n}{a}' // -івщина (бабівщина → баб)
+
+            // Place/female forms
+            '{a}{r}{n}{ia}'       // -арня
+            '{i}{v}{n}{ia}'       // -івня
+            '{n}{y}{ts}{ia}'      // -ниця
+
+            // Collective/abstract
+            '{ts}{t}{v}{o}'       // -цтво
+            '{s}{t}{v}{o}'        // -ство
+
+            // Quality/abstract
+            '{n}{i}{s}{t}{'}'     // -ність
+            '{o}{v}{i}{s}{t}{'}'  // -овість
+            '{i}{s}{t}{'}'        // -ість
+
+            // Adjectival derivational
+            '{e}{l}{'}{n}'        // -ельн (кахельний → кахел after adj -ий)
+            '{l}{'}{n}'           // -льн (кахльний → кахл)
+            '{s}{'}{k}'           // -ськ (козацький → козац)
+            '{z}{'}{k}'           // -зьк
+            '{u}{v}{a}{t}'        // -уват
+            '{o}{v}{a}{t}'        // -оват
+            '{i}{v}{n}'           // -івн (пасічниківна → пасічник)
+            '{o}{v}'              // -ов (дощовий → дощ after adj -ий)
+            '{ia}{n}'             // -ян (кахляний → кахл after adj -ий)
+
+            // Other
+            '{i}{z}{m}'           // -ізм
+            '{i}{s}{t}'           // -іст
+            '{y}{shch}'           // -ищ
+                (delete)
+        )
+    )
+
+    define tidy_up as (
+        [substring] among (
+            // Superlative/comparative forms
+            '{i}{sh}'
+               (delete
+                ['{n}'] '{n}' delete
+               )
+            // Consonant alternations in verbs
+            '{l}'
+               ('{b}' or '{p}' or '{v}' or '{m}' delete)
+            // Double consonants
+            '{n}'
+               ('{n}' delete)
+            // Soft sign cleanup
+            '{'}'
+               (delete)
+        )
+    )
+)
+
+define stem as (
+    // Strip най- prefix (superlative)
+    do (
+        ['{n}{a}{i`}'] delete
+    )
+    unset found_diminutive
+    unset found_professional
+    do mark_regions
+    backwards setlimit tomark pV for (
+        do (
+             perfective_gerund or
+             ( try reflexive
+               ( verbal_noun or
+                 ( try ( ( professional (set found_professional) )
+                         or ( diminutive (set found_diminutive) ) )
+                   not found_professional ( adjective or verb or noun )
+                 )
+               )
+             )
+        )
+        // Diminutive stems (after adjective endings removed)
+        try ( diminutive_stem (set found_diminutive) )
+
+        // Professional suffixes (after noun declension removed)
+        // Skip if diminutive already fired (prevents -ач removal on собач- from собаченітко)
+        not found_diminutive not found_professional try professional
+
+        // Derivational suffixes (in R2 only)
+        do derivational
+        do tidy_up
+    )
+)
