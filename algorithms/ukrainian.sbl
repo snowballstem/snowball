@@ -362,11 +362,10 @@ backwardmode (
             '{e}{n}{'}{k}'        // -еньк
             '{o}{n}{'}{k}'        // -оньк
             '{i}{n}{'}{k}'        // -іньк
+            // -ятк intentionally excluded: occurs in stems like
+            // десятк(а), пам'ятк(а); -ятко handled in diminutive above
             '{i}{t}{k}'           // -ітк
             '{a}{t}{k}'           // -атк
-            // Note: -ятк intentionally excluded — it occurs in stems
-            // like десятк(а), пам'ятк(а), початк(ів); -ятко is handled
-            // as a whole in the diminutive section above
                 (delete)
         )
     )
