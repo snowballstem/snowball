@@ -61,6 +61,20 @@ backwardmode (
 
     define remove_particles as (
         [substring] among (
+            '{U+C74C}{U+C5D0}'      /* 음에 */
+            '{U+D558}{U+C5EC}'      /* 하여 */
+            '{U+C5D0}{U+B294}'      /* 에는 */
+            '{U+C5B4}{U+C11C}'      /* 어서 */
+            '{U+C73C}{U+B85C}{U+C11C}' /* 으로서 */
+            '{U+B85C}{U+C11C}'      /* 로서 */
+            '{U+C73C}{U+B098}'      /* 으나 */
+            '{U+C73C}{U+BA70}'      /* 으며 */
+            '{U+BA70}'              /* 며 */
+            '{U+C774}{U+C5C8}{U+B2E4}' /* 이었다 */
+            '{U+C600}{U+B2E4}'      /* 였다 */
+            '{U+BA74}{U+C11C}'      /* 면서 */
+            '{U+B294}{U+B370}'      /* 는데 */
+            '{U+C5B4}{U+C57C}'      /* 어야 */
             '{U+C5D0}{U+C11C}'  /* 에서 */
             '{U+C5D0}{U+AC8C}'  /* 에게 */
             '{U+C73C}{U+B85C}'  /* 으로 */
@@ -77,26 +91,29 @@ backwardmode (
             '{U+B3C4}'          /* 도 */
             '{U+B9CC}'          /* 만 */
             '{U+B85C}'          /* 로 */
-            (delete)
+            '{U+B3C4}{U+B85D}'  /* 도록 */
+            (not atlimit delete)
         )
     )
 
     define remove_predicate_endings as (
         [substring] among (
+            '{U+C774}{U+C5C8}{U+B2E4}'  (not atlimit delete) /* 이었다 -> (remove) */
+            '{U+C600}{U+B2E4}'          (not atlimit delete) /* 였다 -> (remove) */
             '{U+C9C0}{U+C740}'          (<- '{U+C9D3}{U+B2E4}') /* 지은 -> 짓다 */
             '{U+C9D3}{U+B294}'          (<- '{U+C9D3}{U+B2E4}') /* 짓는 -> 짓다 */
             '{U+B974}{U+B294}'          (<- '{U+B974}{U+B2E4}') /* 르는 -> 르다 */
-            '{U+C2B5}{U+B2C8}{U+B2E4}'  (<- '{U+B2E4}') /* 습니다 -> 다 */
-            '{U+C5B4}{U+C694}'          (<- '{U+B2E4}') /* 어요 -> 다 */
-            '{U+C544}{U+C694}'          (<- '{U+B2E4}') /* 아요 -> 다 */
-            '{U+C5C8}{U+B2E4}'          (<- '{U+B2E4}') /* 었다 -> 다 */
-            '{U+C558}{U+B2E4}'          (<- '{U+B2E4}') /* 았다 -> 다 */
-            '{U+B294}{U+B2E4}'          (<- '{U+B2E4}') /* 는다 -> 다 */
-            '{U+B2C8}{U+B2E4}'          (<- '{U+B2E4}') /* 니다 -> 다 */
-            '{U+C694}'                  (<- '{U+B2E4}') /* 요 -> 다 */
-            '{U+ACE0}'                  (<- '{U+B2E4}') /* 고 -> 다 */
-            '{U+BA74}'                  (<- '{U+B2E4}') /* 면 -> 다 */
-            '{U+C9C0}'                  (<- '{U+B2E4}') /* 지 -> 다 */
+            '{U+C2B5}{U+B2C8}{U+B2E4}'  (not atlimit <- '{U+B2E4}') /* 습니다 -> 다 */
+            '{U+C5B4}{U+C694}'          (not atlimit <- '{U+B2E4}') /* 어요 -> 다 */
+            '{U+C544}{U+C694}'          (not atlimit <- '{U+B2E4}') /* 아요 -> 다 */
+            '{U+C5C8}{U+B2E4}'          (not atlimit <- '{U+B2E4}') /* 었다 -> 다 */
+            '{U+C558}{U+B2E4}'          (not atlimit <- '{U+B2E4}') /* 았다 -> 다 */
+            '{U+B294}{U+B2E4}'          (not atlimit <- '{U+B2E4}') /* 는다 -> 다 */
+            '{U+B2C8}{U+B2E4}'          (not atlimit <- '{U+B2E4}') /* 니다 -> 다 */
+            '{U+C694}'                  (not atlimit <- '{U+B2E4}') /* 요 -> 다 */
+            '{U+ACE0}'                  (not atlimit <- '{U+B2E4}') /* 고 -> 다 */
+            '{U+BA74}'                  (not atlimit <- '{U+B2E4}') /* 면 -> 다 */
+            '{U+C9C0}'                  (not atlimit <- '{U+B2E4}') /* 지 -> 다 */
             '{U+B2E4}'                  /* already dictionary form */
         )
     )
