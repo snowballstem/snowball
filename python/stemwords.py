@@ -66,14 +66,14 @@ def main():
     else:
         stemmer = snowballstemmer.stemmer(language)
         if input != '':
-            infile = codecs.open(input, "r", encoding)
+            infile = open(input, "r", encoding=encoding)
         else:
             infile = sys.stdin
             # reconfigure() requires Python 3.7 so check existing encoding.
             if infile.encoding.lower() != encoding.lower():
                 infile.reconfigure(encoding = encoding)
         if output != '':
-                outfile = codecs.open(output, "w", encoding)
+                outfile = open(output, "w", encoding=encoding)
         else:
             outfile = sys.stdout
             if outfile.encoding.lower() != encoding.lower():
