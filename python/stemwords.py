@@ -1,5 +1,4 @@
 import sys
-import codecs
 import snowballstemmer
 
 def usage():
