@@ -61,6 +61,8 @@ backwardmode (
 
     define remove_particles as (
         [substring] among (
+            '{U+D55C}{U+BC18}{U+B3C4}' /* 한반도: keep lexical "도" */
+            (atlimit)
             '{U+C74C}{U+C5D0}'      /* 음에 */
             '{U+D558}{U+C5EC}'      /* 하여 */
             '{U+C5D0}{U+B294}'      /* 에는 */
@@ -121,6 +123,9 @@ backwardmode (
 
 define stem as (
     do remove_mixed_tokens
+    /* Skip stemming for tokens with 2 or fewer characters. */
+    $ascii_count = len
+    ($ascii_count > 2)
     backwards (
         do remove_conjunctions
         do remove_predicate_endings
