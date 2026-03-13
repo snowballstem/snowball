@@ -84,3 +84,18 @@ like this for the libstemmer build::
     make CC=x86_64-w64-mingw32-gcc EXEEXT=.exe
 
 When going the other way, you'll need to use ``EXEEXT=``.
+
+Korean Stemmer Notes (Summary)
+==============================
+
+The Korean stemmer in this repository is a lightweight rule-based stemmer
+focused on common particles and predicate endings.
+
+Recent behavior highlights:
+
+- Tokens with 2 or fewer characters are not stemmed.
+- The proper noun ``한반도`` is preserved as-is (its final ``도`` is not removed).
+
+Quick check::
+
+    printf "한반도\n남부에\n동아시아의\n" | ./stemwords -l korean -p2
