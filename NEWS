@@ -1,6 +1,11 @@
 Snowball 3.0.1 (2025-05-09)
 ===========================
 
+Zig
+---
+
+* Add Zig backend.  Requires Zig 0.16-dev or later.
+
 Python
 ------
 

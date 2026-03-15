@@ -51,6 +51,7 @@ static void print_arglist(int exit_code) {
                "  -php                             generate PHP\n"
                "  -py, -python                     generate Python\n"
                "  -rust                            generate Rust\n"
+               "  -zig                             generate Zig\n"
                "  -w, -widechars\n"
                "  -u, -utf8\n"
                "  -n, -name CLASS_NAME\n"
@@ -136,6 +137,10 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
             }
             if (eq(s, "-rust")) {
                 o->target_lang = LANG_RUST;
+                continue;
+            }
+            if (eq(s, "-zig")) {
+                o->target_lang = LANG_ZIG;
                 continue;
             }
             if (eq(s, "-go")) {
@@ -341,6 +346,9 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                 o->parent_class_name = DEFAULT_PYTHON_BASE_CLASS;
             break;
         case LANG_RUST:
+            o->encoding = ENC_UTF8;
+            break;
+        case LANG_ZIG:
             o->encoding = ENC_UTF8;
             break;
         default:
@@ -557,6 +565,7 @@ extern int main(int argc, char * argv[]) {
                     // with timeit alligns with this.
                 case LANG_JAVASCRIPT:
                     // 10000000: Slightly faster.
+                case LANG_ZIG:
                     localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
                     break;
             }
@@ -723,6 +732,19 @@ extern int main(int argc, char * argv[]) {
                         o->output_src = get_output(s);
                         lose_s(s);
                         generate_program_rust(g);
+                        fclose(o->output_src);
+                        break;
+                    }
+                    case LANG_ZIG: {
+                        byte * s = copy_s(o->output_file);
+                        if (o->extension) {
+                            s = add_s_to_s(s, o->extension);
+                        } else {
+                            s = add_literal_to_s(s, ".zig");
+                        }
+                        o->output_src = get_output(s);
+                        lose_s(s);
+                        generate_program_zig(g);
                         fclose(o->output_src);
                         break;
                     }

@@ -432,7 +432,8 @@ struct options {
         LANG_PASCAL,
         LANG_PHP,
         LANG_PYTHON,
-        LANG_RUST
+        LANG_RUST,
+        LANG_ZIG
     } target_lang;
     const char * externals_prefix;
     const char * variables_prefix;
@@ -503,3 +504,5 @@ extern void generate_program_rust(struct generator * g);
 extern void generate_program_go(struct generator * g);
 
 extern void generate_program_ada(struct generator * g);
+
+extern void generate_program_zig(struct generator * g);

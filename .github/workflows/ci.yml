@@ -65,6 +65,8 @@ jobs:
         - name: rust
           RUST: rust
           apt_packages: 'rustc'
+        - name: zig
+          ZIG: zig
         - name: csharp
           MCS: mcs
           apt_packages: 'mono-devel'
@@ -206,6 +208,11 @@ jobs:
       uses: dart-lang/setup-dart@v1
       with:
         sdk: ${{ matrix.dart_sdk }}
+    - name: Install Zig
+      if: matrix.ZIG
+      uses: mlugg/setup-zig@v2
+      with:
+        version: 0.16.0-dev
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
       uses: msys2/setup-msys2@v2
@@ -268,6 +275,9 @@ jobs:
       run: |
         ${{ matrix.PHP }} --version
         $MAKE check_php PHP="${{ matrix.PHP }}"
+    - name: Test Zig
+      if: matrix.ZIG
+      run: $MAKE check_zig zig="${{ matrix.ZIG }}"
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"

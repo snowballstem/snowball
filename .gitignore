@@ -28,3 +28,6 @@
 /rust/target/
 /go/algorithms/
 /go/stemwords/algorithms.go
+/zig/*_stemmer.zig
+/zig/algorithms.zig
+/zig/stemwords
