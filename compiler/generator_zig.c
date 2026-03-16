@@ -49,10 +49,12 @@ static void write_literal_string(struct generator * g, symbol * p) {
             if (ch == '"' || ch == '\\') write_char(g, '\\');
             write_wchar_as_utf8(g, ch);
         } else {
-            /* Zig uses \u{XXXX} for unicode escapes */
-            write_string(g, "\\u{");
-            write_hex4(g, ch);
-            write_char(g, '}');
+            /* Zig uses \u{XXXX} for unicode escapes (variable width) */
+            {
+                char buf[16];
+                sprintf(buf, "\\u{%X}", ch);
+                write_string(g, buf);
+            }
         }
     }
     write_char(g, '"');
@@ -936,6 +938,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     generate_AE(g, p->AE);
     if (optimise_to_return) {
         w(g, ";~N");
+        g->unreachable = true;
     } else {
         write_string(g, ") ");
         write_block_start(g);
@@ -951,10 +954,12 @@ static void generate_call(struct generator * g, struct node * p) {
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
         p->right = NULL;
+        g->unreachable = true;
         return;
     }
     if (just_return_on_fail(g) && signals == 0) {
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
+        g->unreachable = true;
         return;
     }
     if (signals == 1) {
@@ -978,6 +983,7 @@ static void generate_grouping(struct generator * g, struct node * p, int complem
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn env.~S1Grouping~S0(&~W, ~I0, ~I1);~N", p);
         p->right = NULL;
+        g->unreachable = true;
     } else {
         write_failure_if(g, "!env.~S1Grouping~S0(&~W, ~I0, ~I1)", p);
     }
@@ -989,6 +995,7 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn env.eqS~S0(~V);~N", p);
         p->right = NULL;
+        g->unreachable = true;
     } else {
         write_failure_if(g, "!env.eqS~S0(~V)", p);
     }
@@ -1000,6 +1007,7 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn env.eqS~S0(~L);~N", p);
         p->right = NULL;
+        g->unreachable = true;
     } else {
         write_failure_if(g, "!env.eqS~S0(~L)", p);
     }
@@ -1163,6 +1171,7 @@ static void generate_booltest(struct generator * g, struct node * p, int inverte
             writef(g, "~Mreturn ~V;~N", p);
         }
         p->right = NULL;
+        g->unreachable = true;
         return;
     }
     if (inverted) {

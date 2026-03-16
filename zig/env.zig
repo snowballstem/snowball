@@ -57,21 +57,18 @@ pub const Env = struct {
     pub fn replaceS(self: *Env, bra_arg: usize, ket_arg: usize, s: []const u8) !i32 {
         const adjustment: i32 = @as(i32, @intCast(s.len)) - (@as(i32, @intCast(ket_arg)) - @as(i32, @intCast(bra_arg)));
 
+        // Always build a new buffer: current[0..bra] + s + current[rsplit..limit]
+        // This matches Go's string concatenation semantics and avoids aliasing.
         const rsplit = if (ket_arg < bra_arg) bra_arg else ket_arg;
-        const new_len = bra_arg + s.len + (self.current.len - rsplit);
+        const tail_len = self.limit - rsplit;
+        const new_len = bra_arg + s.len + tail_len;
 
-        if (new_len > self.current.len) {
-            const new_buf = try self.allocator.alloc(u8, new_len);
-            @memcpy(new_buf[0..bra_arg], self.current[0..bra_arg]);
-            @memcpy(new_buf[bra_arg..][0..s.len], s);
-            @memcpy(new_buf[bra_arg + s.len ..][0 .. self.current.len - rsplit], self.current[rsplit..self.current.len]);
-            self.allocator.free(self.current);
-            self.current = new_buf;
-        } else {
-            // Shift tail left (may overlap), keep existing allocation
-            std.mem.copyForwards(u8, self.current[bra_arg + s.len ..], self.current[rsplit..self.current.len]);
-            @memcpy(self.current[bra_arg..][0..s.len], s);
-        }
+        const new_buf = try self.allocator.alloc(u8, new_len);
+        @memcpy(new_buf[0..bra_arg], self.current[0..bra_arg]);
+        @memcpy(new_buf[bra_arg..][0..s.len], s);
+        @memcpy(new_buf[bra_arg + s.len ..][0..tail_len], self.current[rsplit..][0..tail_len]);
+        self.allocator.free(self.current);
+        self.current = new_buf;
 
         const new_limit: i32 = @as(i32, @intCast(self.limit)) + adjustment;
         self.limit = @intCast(new_limit);
