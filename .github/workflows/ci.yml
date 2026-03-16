@@ -222,7 +222,7 @@ jobs:
     - name: Test C
       if: matrix.c_tests
       run: $MAKE check CC="$CC"
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
       if: matrix.PYTHON_VERSION
