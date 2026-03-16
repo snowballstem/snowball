@@ -50,11 +50,9 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_wchar_as_utf8(g, ch);
         } else {
             /* Zig uses \u{XXXX} for unicode escapes (variable width) */
-            {
-                char buf[16];
-                sprintf(buf, "\\u{%X}", ch);
-                write_string(g, buf);
-            }
+            char buf[16];
+            snprintf(buf, sizeof(buf), "\\u{%X}", ch);
+            write_string(g, buf);
         }
     }
     write_char(g, '"');
