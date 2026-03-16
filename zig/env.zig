@@ -67,12 +67,9 @@ pub const Env = struct {
             @memcpy(new_buf[bra_arg + s.len ..][0 .. self.current.len - rsplit], self.current[rsplit..self.current.len]);
             self.allocator.free(self.current);
             self.current = new_buf;
-        } else if (new_len < self.current.len) {
-            // Shift tail left (may overlap)
-            std.mem.copyForwards(u8, self.current[bra_arg + s.len ..], self.current[rsplit..self.current.len]);
-            @memcpy(self.current[bra_arg..][0..s.len], s);
-            self.current = self.allocator.realloc(self.current, new_len) catch self.current[0..new_len];
         } else {
+            // Shift tail left (may overlap), keep existing allocation
+            std.mem.copyForwards(u8, self.current[bra_arg + s.len ..], self.current[rsplit..self.current.len]);
             @memcpy(self.current[bra_arg..][0..s.len], s);
         }
 
