@@ -264,12 +264,13 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_plus:
             s = " + "; goto label0;
         case c_minus:
-            s = " - "; goto label0;
-        case c_divide:
-            s = " / ";
+            s = " - ";
         label0:
             write_char(g, '('); generate_AE(g, p->left);
             write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
+        case c_divide:
+            write_string(g, "@divTrunc("); generate_AE(g, p->left);
+            write_string(g, ", "); generate_AE(g, p->right); write_char(g, ')'); break;
         case c_cursor:
             w(g, "@as(i32, @intCast(env.cursor))"); break;
         case c_limit:
@@ -1100,8 +1101,8 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     } else {
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
-        generate_setup_context(g);
         if (q->used != q->definition) {
+            generate_setup_context(g);
             writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
             w(g, "~-~M}~N~N");
             writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
@@ -1110,6 +1111,8 @@ static void generate_define(struct generator * g, struct node * p) {
             } else {
                 w(g, "~M_ = ctx;~N");
             }
+        } else if (body_uses_context) {
+            generate_setup_context(g);
         }
     }
 
@@ -1255,7 +1258,12 @@ static void generate(struct generator * g, struct node * p) {
         case c_plusassign:    generate_integer_assign(g, p, "+="); break;
         case c_minusassign:   generate_integer_assign(g, p, "-="); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
-        case c_divideassign:  generate_integer_assign(g, p, "/="); break;
+        case c_divideassign:
+            write_comment(g, p);
+            writef(g, "~M~V = @divTrunc(~V, ", p);
+            generate_AE(g, p->AE);
+            w(g, ");~N");
+            break;
         case c_eq:
         case c_ne:
         case c_gt:
