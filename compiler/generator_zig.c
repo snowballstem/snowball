@@ -1078,7 +1078,17 @@ static void generate_define(struct generator * g, struct node * p) {
     g->margin = save_margin;
 
     /* Check if body references "context" */
-    int body_uses_context = (memmem(str_data(body), str_len(body), "context", 7) != NULL);
+    int body_uses_context = 0;
+    {
+        int i, blen = str_len(body);
+        const byte * bdata = str_data(body);
+        for (i = 0; i + 7 <= blen; i++) {
+            if (memcmp(bdata + i, "context", 7) == 0) {
+                body_uses_context = 1;
+                break;
+            }
+        }
+    }
 
     /* Now emit the function header */
     if (q->type == t_routine) {
