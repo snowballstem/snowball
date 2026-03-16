@@ -57,10 +57,10 @@ pub const Env = struct {
     pub fn replaceS(self: *Env, bra_arg: usize, ket_arg: usize, s: []const u8) !i32 {
         const adjustment: i32 = @as(i32, @intCast(s.len)) - (@as(i32, @intCast(ket_arg)) - @as(i32, @intCast(bra_arg)));
 
-        // Always build a new buffer: current[0..bra] + s + current[rsplit..limit]
-        // This matches Go's string concatenation semantics and avoids aliasing.
+        // Always build a new buffer: current[0..bra] + s + current[rsplit..]
+        // Must include content beyond limit (setlimit may be active).
         const rsplit = if (ket_arg < bra_arg) bra_arg else ket_arg;
-        const tail_len = self.limit - rsplit;
+        const tail_len = self.current.len - rsplit;
         const new_len = bra_arg + s.len + tail_len;
 
         const new_buf = try self.allocator.alloc(u8, new_len);
