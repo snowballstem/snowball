@@ -1,5 +1,6 @@
 
 #include <limits.h>
+#include <stdarg.h>
 #include <stdio.h>    /* for printf */
 #include <stdlib.h>   /* malloc, free */
 #include <string.h>   /* memmove */
@@ -117,6 +118,26 @@ extern void * check_malloc(size_t n) {
 extern void check_free(void * p) {
     if (p) space_count--;
     free(p);
+}
+
+extern int checked_snprintf(size_t size;
+                             char str[restrict size], size_t size,
+                             const char *restrict format, ...) {
+    va_list ap;
+    va_start(ap, format);
+    // Some pre-C99 snprintf implementations return -1 if the buffer is too
+    // small so cast to unsigned for a simpler test (we require C99, but better
+    // to be robust if we encounter a C99 compiler with pre-C99 quirks in its
+    // runtime library).
+    int r = vsnprintf(str, size, format, ap);
+    if ((unsigned)r >= size) {
+        va_end(ap);
+        fprintf(stderr, "snprintf(buf, %zu, \"%s\", ...) would overflow\n",
+                size, format);
+        exit(1);
+    }
+    va_end(ap);
+    return r;
 }
 
 /* To convert a block to a zero terminated string:  */
@@ -296,13 +317,8 @@ extern void str_append_int(struct str * str, int i) {
     // Ensure there's enough space then snprintf() directly onto the end.
     int max_size = (CHAR_BIT * sizeof(int) + 5) / 3;
     str->data = ensure_capacity_s(str->data, max_size);
-    int r = snprintf((char*)str->data + SIZE(str->data), max_size, "%d", i);
-    // Some pre-C99 snprintf implementations return -1 if the buffer is too
-    // small so cast to unsigned for a simpler test.
-    if ((unsigned)r >= (unsigned)max_size) {
-        fprintf(stderr, "str_append_int(%d) would truncate output\n", i);
-        exit(1);
-    }
+    int r = checked_snprintf((char*)str->data + SIZE(str->data), max_size,
+                             "%d", i);
     ADD_TO_SIZE(str->data, r);
 }
 

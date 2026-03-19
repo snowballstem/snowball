@@ -1667,7 +1667,8 @@ static void generate_substring(struct generator * g, struct node * p) {
         g->I[3] = bitmap;
         g->I[4] = shortest_size - 1;
         if (p->mode == m_forward) {
-            sprintf(buf, "z->p[z->c + %d]", shortest_size - 1);
+            checked_snprintf(buf, sizeof(buf),
+                             "z->p[z->c + %d]", shortest_size - 1);
             g->S[1] = buf;
             if (shortest_size == 1) {
                 writef(g, "~Mif (z->c >= z->l", p);

@@ -1290,13 +1290,16 @@ static void generate_substring(struct generator * g, struct node * p) {
         g->I[3] = bitmap;
         g->I[4] = shortest_size - 1;
         g->S[3] = buf3;
-        snprintf(buf3, sizeof(buf3), "16#%x#", bitmap);
+        checked_snprintf(buf3, sizeof(buf3), "16#%x#", bitmap);
         if (p->mode == m_forward) {
-            if (shortest_size == 1)
-                sprintf(buf, "Z.C");
-            else
-                sprintf(buf, "Z.C + %d", shortest_size - 1);
-            snprintf(buf2, sizeof(buf2), "Character'Pos (Z.P (%s + 1))", buf);
+            if (shortest_size == 1) {
+                checked_snprintf(buf, sizeof(buf), "Z.C");
+            } else {
+                checked_snprintf(buf, sizeof(buf),
+                                 "Z.C + %d", shortest_size - 1);
+            }
+            checked_snprintf(buf2, sizeof(buf2),
+                             "Character'Pos (Z.P (%s + 1))", buf);
             g->S[1] = buf;
             g->S[2] = buf2;
             if (shortest_size == 1) {
