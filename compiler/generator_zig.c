@@ -136,7 +136,6 @@ static void write_failure(struct generator * g) {
             g->unreachable = true;
             break;
         default:
-            g->I[0] = g->failure_label;
             w(g, "~Mbreak :lab");
             write_int(g, g->failure_label);
             write_string(g, ";");
@@ -1037,7 +1036,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     /* Generate function body. */
     int save_margin = g->margin;
-    g->margin = 2;
+    g->margin = 1;
     if (q->amongvar_needed) w(g, "~Mvar among_var: i32 = 0;~N");
 
     /* Declare local variables. */
@@ -1117,6 +1116,7 @@ static void generate_define(struct generator * g, struct node * p) {
     /* Append the pre-generated body */
     str_append(g->outbuf, body);
     str_delete(body);
+    g->margin = save_margin;
 }
 
 static void generate_functionend(struct generator * g, struct node * p) {
