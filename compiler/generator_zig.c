@@ -32,9 +32,20 @@ static void write_varname(struct generator * g, struct name * p) {
     write_s(g, p->s);
 }
 
+/* Track whether the current function body references context (non-local
+ * variables, routine calls, or among lookups).  Used to decide whether to
+ * emit `_ = context;` to suppress Zig's unused constant error. */
+static int body_references_context;
+
+static void write_context(struct generator * g) {
+    write_string(g, "context");
+    body_references_context = 1;
+}
+
 static void write_varref(struct generator * g, struct name * p) {
     if (p->local_to == NULL) {
-        write_string(g, "context.");
+        write_context(g);
+        write_char(g, '.');
     }
     write_varname(g, p);
 }
@@ -494,6 +505,7 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
+        body_references_context = 1;
         writef(g, "~M_ = ~W(env, @ptrCast(context));~N", p->left);
     } else {
         int label = new_label(g);
@@ -949,6 +961,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = p->name->definition->possible_signals;
     write_comment(g, p);
+    body_references_context = 1;
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
         p->right = NULL;
@@ -1011,6 +1024,14 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     }
 }
 
+static void generate_cast_context(struct generator * g) {
+    if (body_references_context) {
+        w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
+    } else {
+        w(g, "~M_ = ctx;~N");
+    }
+}
+
 static void generate_setup_context(struct generator * g) {
     w(g, "~Mvar context_val = Context{};~N");
     w(g, "~Mconst context = &context_val;~N");
@@ -1022,7 +1043,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    /* First generate the body into a buffer to check if context is used */
+    /* Generate the body into a buffer so we can check if context is used. */
     struct str * saved_output = g->outbuf;
     g->outbuf = str_new();
 
@@ -1034,9 +1055,9 @@ static void generate_define(struct generator * g, struct node * p) {
     g->unreachable = false;
     int signals = p->left->possible_signals;
 
-    /* Generate function body. */
     int save_margin = g->margin;
     g->margin = 1;
+    body_references_context = 0;
     if (q->amongvar_needed) w(g, "~Mvar among_var: i32 = 0;~N");
 
     /* Declare local variables. */
@@ -1075,27 +1096,10 @@ static void generate_define(struct generator * g, struct node * p) {
     g->outbuf = saved_output;
     g->margin = save_margin;
 
-    /* Check if body references "context" */
-    int body_uses_context = 0;
-    {
-        int i, blen = str_len(body);
-        const byte * bdata = str_data(body);
-        for (i = 0; i + 7 <= blen; i++) {
-            if (memcmp(bdata + i, "context", 7) == 0) {
-                body_uses_context = 1;
-                break;
-            }
-        }
-    }
-
-    /* Now emit the function header */
+    /* Emit the function header. */
     if (q->type == t_routine) {
         writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-        if (body_uses_context) {
-            w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
-        } else {
-            w(g, "~M_ = ctx;~N");
-        }
+        generate_cast_context(g);
     } else {
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
         if (q->used != q->definition) {
@@ -1103,17 +1107,13 @@ static void generate_define(struct generator * g, struct node * p) {
             writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
             w(g, "~-~M}~N~N");
             writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-            if (body_uses_context) {
-                w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
-            } else {
-                w(g, "~M_ = ctx;~N");
-            }
-        } else if (body_uses_context) {
+            generate_cast_context(g);
+        } else if (body_references_context) {
             generate_setup_context(g);
         }
     }
 
-    /* Append the pre-generated body */
+    /* Append the pre-generated body. */
     str_append(g->outbuf, body);
     str_delete(body);
     g->margin = save_margin;
@@ -1126,6 +1126,7 @@ static void generate_functionend(struct generator * g, struct node * p) {
 
 static void generate_substring(struct generator * g, struct node * p) {
     write_comment(g, p);
+    body_references_context = 1;
 
     struct among * x = p->among;
 
