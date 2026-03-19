@@ -566,7 +566,8 @@ extern int main(int argc, char * argv[]) {
                 case LANG_JAVASCRIPT:
                     // 10000000: Slightly faster.
                 case LANG_ZIG:
-                    localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
+                    // 10000000: localising strings was slightly slower.
+                    localise_mask = (1 << t_boolean) | (1 << t_integer);
                     break;
             }
             read_program(a, localise_mask);
