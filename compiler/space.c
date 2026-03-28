@@ -120,9 +120,8 @@ extern void check_free(void * p) {
     free(p);
 }
 
-extern int checked_snprintf(size_t size;
-                             char str[restrict size], size_t size,
-                             const char *restrict format, ...) {
+extern int checked_snprintf(char *str, size_t size,
+                            const char *restrict format, ...) {
     va_list ap;
     va_start(ap, format);
     // Some pre-C99 snprintf implementations return -1 if the buffer is too
