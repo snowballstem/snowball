@@ -10,6 +10,27 @@ pub const Among = struct {
     method: ?*const fn (*Env, *anyopaque) bool,
 };
 
+pub const String = struct {
+    value: []u8 = &.{},
+
+    pub fn deinit(self: *String, allocator: std.mem.Allocator) void {
+        if (self.value.len > 0) {
+            allocator.free(self.value);
+        }
+        self.value = &.{};
+    }
+
+    pub fn assign(self: *String, allocator: std.mem.Allocator, s: []const u8) !void {
+        const new_value = try dupeOrEmpty(allocator, s);
+        self.deinit(allocator);
+        self.value = new_value;
+    }
+
+    pub fn slice(self: *const String) []const u8 {
+        return self.value;
+    }
+};
+
 pub const Env = struct {
     current: []u8,
     cursor: usize,
@@ -41,8 +62,7 @@ pub const Env = struct {
         if (self.current.len > 0) {
             self.allocator.free(self.current);
         }
-        self.current = try self.allocator.alloc(u8, s.len);
-        @memcpy(self.current, s);
+        self.current = try dupeOrEmpty(self.allocator, s);
         self.cursor = 0;
         self.limit = s.len;
         self.limit_backward = 0;
@@ -63,19 +83,19 @@ pub const Env = struct {
         const tail_len = self.current.len - rsplit;
         const new_len = bra_arg + s.len + tail_len;
 
-        const new_buf = try self.allocator.alloc(u8, new_len);
-        @memcpy(new_buf[0..bra_arg], self.current[0..bra_arg]);
-        @memcpy(new_buf[bra_arg..][0..s.len], s);
-        @memcpy(new_buf[bra_arg + s.len ..][0..tail_len], self.current[rsplit..][0..tail_len]);
-        self.allocator.free(self.current);
+        const new_buf = try allocOrEmpty(self.allocator, new_len);
+        std.mem.copyForwards(u8, new_buf[0..bra_arg], self.current[0..bra_arg]);
+        std.mem.copyForwards(u8, new_buf[bra_arg..][0..s.len], s);
+        std.mem.copyForwards(u8, new_buf[bra_arg + s.len ..][0..tail_len], self.current[rsplit..][0..tail_len]);
+        if (self.current.len > 0) {
+            self.allocator.free(self.current);
+        }
         self.current = new_buf;
 
-        const new_limit: i32 = @as(i32, @intCast(self.limit)) + adjustment;
-        self.limit = @intCast(new_limit);
+        self.limit = adjustIndex(self.limit, adjustment);
 
         if (self.cursor >= ket_arg) {
-            const new_cursor: i32 = @as(i32, @intCast(self.cursor)) + adjustment;
-            self.cursor = @intCast(new_cursor);
+            self.cursor = adjustIndex(self.cursor, adjustment);
         } else if (self.cursor > bra_arg) {
             self.cursor = bra_arg;
         }
@@ -111,10 +131,10 @@ pub const Env = struct {
     pub fn insert(self: *Env, bra_arg: usize, ket_arg: usize, s: []const u8) !void {
         const adjustment = try self.replaceS(bra_arg, ket_arg, s);
         if (bra_arg <= self.bra) {
-            self.bra = @intCast(@as(i32, @intCast(self.bra)) + adjustment);
+            self.bra = adjustIndex(self.bra, adjustment);
         }
         if (bra_arg <= self.ket) {
-            self.ket = @intCast(@as(i32, @intCast(self.ket)) + adjustment);
+            self.ket = adjustIndex(self.ket, adjustment);
         }
     }
 
@@ -418,10 +438,7 @@ pub const Env = struct {
 
     pub fn clone(self: *const Env) !Env {
         var c = self.*;
-        if (self.current.len > 0) {
-            c.current = try self.allocator.alloc(u8, self.current.len);
-            @memcpy(c.current, self.current);
-        }
+        c.current = try dupeOrEmpty(self.allocator, self.current);
         return c;
     }
 
@@ -429,12 +446,7 @@ pub const Env = struct {
         if (self.current.len > 0) {
             self.allocator.free(self.current);
         }
-        if (other.current.len > 0) {
-            self.current = try self.allocator.alloc(u8, other.current.len);
-            @memcpy(self.current, other.current);
-        } else {
-            self.current = &.{};
-        }
+        self.current = try dupeOrEmpty(self.allocator, other.current);
         self.cursor = other.cursor;
         self.limit = other.limit;
         self.limit_backward = other.limit_backward;
@@ -447,6 +459,23 @@ pub const Env = struct {
         std.log.debug("snowball debug, count: {d}, line: {d}", .{ count, line_number });
     }
 };
+
+fn allocOrEmpty(allocator: std.mem.Allocator, len: usize) ![]u8 {
+    if (len == 0) return &.{};
+    return allocator.alloc(u8, len);
+}
+
+fn dupeOrEmpty(allocator: std.mem.Allocator, s: []const u8) ![]u8 {
+    if (s.len == 0) return &.{};
+    return allocator.dupe(u8, s);
+}
+
+fn adjustIndex(value: usize, adjustment: i32) usize {
+    if (adjustment >= 0) {
+        return value + @as(usize, @intCast(adjustment));
+    }
+    return value - @as(usize, @intCast(-adjustment));
+}
 
 fn inBitmap(chars: []const u8, idx: i32) bool {
     const u_idx: u32 = @intCast(idx);

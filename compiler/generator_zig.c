@@ -38,6 +38,9 @@ static void write_varref(struct generator * g, struct name * p) {
         write_char(g, '.');
     }
     write_varname(g, p);
+    if (p->type == t_string) {
+        write_string(g, ".slice()");
+    }
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
@@ -736,12 +739,24 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = env.assignTo();~N", p);
+    write_margin(g);
+    if (p->name->local_to == NULL) {
+        write_string(g, "context.");
+    }
+    write_varname(g, p->name);
+    write_string(g, ".assign(env.allocator, env.assignTo()) catch return false;");
+    write_newline(g);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V = env.sliceTo();~N", p);
+    write_margin(g);
+    if (p->name->local_to == NULL) {
+        write_string(g, "context.");
+    }
+    write_varname(g, p->name);
+    write_string(g, ".assign(env.allocator, env.sliceTo()) catch return false;");
+    write_newline(g);
 }
 
 static void generate_address(struct generator * g, struct node * p) {
@@ -901,8 +916,14 @@ static void generate_dollar(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     g->B[0] = str_data(savevar);
-    writef(g, "~M~V = env.allocator.dupe(u8, env.getCurrent()) catch return false;~N"
-              "~Menv.copyFrom(&~B0) catch return false;~N", p);
+    write_margin(g);
+    if (p->name->local_to == NULL) {
+        write_string(g, "context.");
+    }
+    write_varname(g, p->name);
+    write_string(g, ".assign(env.allocator, env.getCurrent()) catch return false;");
+    write_newline(g);
+    writef(g, "~Menv.copyFrom(&~B0) catch return false;~N", p);
     if (p->left->possible_signals == 0) {
         write_failure(g);
     } else if (p->left->possible_signals == -1) {
@@ -1020,6 +1041,12 @@ static void generate_setup_context(struct generator * g) {
     w(g, "~Mvar context_val = Context{};~N");
     w(g, "~Mconst context = &context_val;~N");
     w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
+    for (struct name * q = g->analyser->names; q; q = q->next) {
+        if (q->local_to != NULL || q->type != t_string) continue;
+        w(g, "~Mdefer context.");
+        write_varname(g, q);
+        w(g, ".deinit(env.allocator);~N");
+    }
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -1051,7 +1078,10 @@ static void generate_define(struct generator * g, struct node * p) {
                 case t_string:
                     w(g, "~Mvar ");
                     write_varname(g, name);
-                    w(g, ": []const u8 = \"\";~N");
+                    w(g, ": snowball.String = .{};~N");
+                    w(g, "~Mdefer ");
+                    write_varname(g, name);
+                    w(g, ".deinit(env.allocator);~N");
                     break;
                 case t_integer:
                     w(g, "~Mvar ");
@@ -1351,7 +1381,7 @@ static void generate_members(struct generator * g) {
             case t_string:
                 write_margin(g);
                 write_varname(g, q);
-                w(g, ": []const u8 = \"\",~N");
+                w(g, ": snowball.String = .{},~N");
                 break;
             case t_integer:
                 write_margin(g);
