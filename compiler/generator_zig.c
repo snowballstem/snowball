@@ -32,19 +32,9 @@ static void write_varname(struct generator * g, struct name * p) {
     write_s(g, p->s);
 }
 
-/* Track whether the current function body references context (non-local
- * variables, routine calls, or among lookups).  Used to decide whether to
- * emit `_ = context;` to suppress Zig's unused constant error. */
-static int body_references_context;
-
-static void write_context(struct generator * g) {
-    write_string(g, "context");
-    body_references_context = 1;
-}
-
 static void write_varref(struct generator * g, struct name * p) {
     if (p->local_to == NULL) {
-        write_context(g);
+        write_string(g, "context");
         write_char(g, '.');
     }
     write_varname(g, p);
@@ -222,7 +212,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'E': {
-                /* Write an external name - lowercase for Zig */
                 write_s(g, p->name->s);
                 continue;
             }
@@ -505,7 +494,6 @@ static void generate_do(struct generator * g, struct node * p) {
     if (p->left->type == c_call) {
         /* Optimise do <call> */
         write_comment(g, p->left);
-        body_references_context = 1;
         writef(g, "~M_ = ~W(env, @ptrCast(context));~N", p->left);
     } else {
         int label = new_label(g);
@@ -961,7 +949,6 @@ static void generate_integer_test(struct generator * g, struct node * p) {
 static void generate_call(struct generator * g, struct node * p) {
     int signals = p->name->definition->possible_signals;
     write_comment(g, p);
-    body_references_context = 1;
     if (tailcallable(g, p)) {
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
         p->right = NULL;
@@ -1025,16 +1012,14 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 }
 
 static void generate_cast_context(struct generator * g) {
-    if (body_references_context) {
-        w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
-    } else {
-        w(g, "~M_ = ctx;~N");
-    }
+    w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
+    w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
 }
 
 static void generate_setup_context(struct generator * g) {
     w(g, "~Mvar context_val = Context{};~N");
     w(g, "~Mconst context = &context_val;~N");
+    w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
 }
 
 static void generate_define(struct generator * g, struct node * p) {
@@ -1043,7 +1028,7 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    /* Generate the body into a buffer so we can check if context is used. */
+    /* Generate the body into a buffer. */
     struct str * saved_output = g->outbuf;
     g->outbuf = str_new();
 
@@ -1057,7 +1042,6 @@ static void generate_define(struct generator * g, struct node * p) {
 
     int save_margin = g->margin;
     g->margin = 1;
-    body_references_context = 0;
     if (q->amongvar_needed) w(g, "~Mvar among_var: i32 = 0;~N");
 
     /* Declare local variables. */
@@ -1102,14 +1086,12 @@ static void generate_define(struct generator * g, struct node * p) {
         generate_cast_context(g);
     } else {
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
+        generate_setup_context(g);
         if (q->used != q->definition) {
-            generate_setup_context(g);
             writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
             w(g, "~-~M}~N~N");
             writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
             generate_cast_context(g);
-        } else if (body_references_context) {
-            generate_setup_context(g);
         }
     }
 
@@ -1126,7 +1108,6 @@ static void generate_functionend(struct generator * g, struct node * p) {
 
 static void generate_substring(struct generator * g, struct node * p) {
     write_comment(g, p);
-    body_references_context = 1;
 
     struct among * x = p->among;
 
@@ -1294,7 +1275,10 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    w(g, "const snowball = @import(\"env.zig\");~N~N");
+    w(g, "const snowball = @import(\"env.zig\");~N~N"
+         "fn suppress_any_unused_warning(ctx: *anyopaque) void {~N~+"
+         "~M_ = ctx;~N"
+         "~-~M}~N~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {

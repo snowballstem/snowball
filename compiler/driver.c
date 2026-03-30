@@ -549,6 +549,8 @@ extern int main(int argc, char * argv[]) {
                     // 1000000000: local 10.1s vs global 7.1s
                 case LANG_RUST:
                     // 1000000000: localising was slightly slower.
+                case LANG_ZIG:
+                    // 10000000: localising strings was slightly slower.
                     localise_mask = (1 << t_boolean) | (1 << t_integer);
                     break;
                 case LANG_DART:
@@ -565,9 +567,7 @@ extern int main(int argc, char * argv[]) {
                     // with timeit alligns with this.
                 case LANG_JAVASCRIPT:
                     // 10000000: Slightly faster.
-                case LANG_ZIG:
-                    // 10000000: localising strings was slightly slower.
-                    localise_mask = (1 << t_boolean) | (1 << t_integer);
+                    localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
                     break;
             }
             read_program(a, localise_mask);
