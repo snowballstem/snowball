@@ -59,10 +59,11 @@ pub const Env = struct {
     }
 
     pub fn setCurrent(self: *Env, s: []const u8) !void {
+        const new_current = try dupeOrEmpty(self.allocator, s);
         if (self.current.len > 0) {
             self.allocator.free(self.current);
         }
-        self.current = try dupeOrEmpty(self.allocator, s);
+        self.current = new_current;
         self.cursor = 0;
         self.limit = s.len;
         self.limit_backward = 0;
@@ -443,10 +444,12 @@ pub const Env = struct {
     }
 
     pub fn copyFrom(self: *Env, other: *const Env) !void {
+        if (self == other) return;
+        const new_current = try dupeOrEmpty(self.allocator, other.current);
         if (self.current.len > 0) {
             self.allocator.free(self.current);
         }
-        self.current = try dupeOrEmpty(self.allocator, other.current);
+        self.current = new_current;
         self.cursor = other.cursor;
         self.limit = other.limit;
         self.limit_backward = other.limit_backward;
@@ -521,4 +524,76 @@ pub fn runeCountInString(s: []const u8) i32 {
         count += 1;
     }
     return count;
+}
+
+test "setCurrent preserves existing state on allocation failure" {
+    var failing_allocator = std.testing.FailingAllocator.init(std.testing.allocator, .{
+        .fail_index = 1,
+    });
+    var env = Env.init(failing_allocator.allocator());
+    defer env.deinit();
+
+    try env.setCurrent("abc");
+    env.cursor = 1;
+    env.limit_backward = 1;
+    env.bra = 1;
+    env.ket = 2;
+
+    try std.testing.expectError(error.OutOfMemory, env.setCurrent("wxyz"));
+    try std.testing.expectEqualStrings("abc", env.current);
+    try std.testing.expectEqual(@as(usize, 1), env.cursor);
+    try std.testing.expectEqual(@as(usize, 3), env.limit);
+    try std.testing.expectEqual(@as(usize, 1), env.limit_backward);
+    try std.testing.expectEqual(@as(usize, 1), env.bra);
+    try std.testing.expectEqual(@as(usize, 2), env.ket);
+}
+
+test "copyFrom preserves existing state on allocation failure" {
+    var failing_allocator = std.testing.FailingAllocator.init(std.testing.allocator, .{
+        .fail_index = 2,
+    });
+    const allocator = failing_allocator.allocator();
+
+    var env = Env.init(allocator);
+    defer env.deinit();
+    try env.setCurrent("abc");
+    env.cursor = 1;
+    env.limit_backward = 1;
+    env.bra = 1;
+    env.ket = 2;
+
+    var other = Env.init(allocator);
+    defer other.deinit();
+    try other.setCurrent("wxyz");
+    other.cursor = 3;
+    other.limit_backward = 1;
+    other.bra = 2;
+    other.ket = 4;
+
+    try std.testing.expectError(error.OutOfMemory, env.copyFrom(&other));
+    try std.testing.expectEqualStrings("abc", env.current);
+    try std.testing.expectEqual(@as(usize, 1), env.cursor);
+    try std.testing.expectEqual(@as(usize, 3), env.limit);
+    try std.testing.expectEqual(@as(usize, 1), env.limit_backward);
+    try std.testing.expectEqual(@as(usize, 1), env.bra);
+    try std.testing.expectEqual(@as(usize, 2), env.ket);
+}
+
+test "copyFrom supports self copy" {
+    var env = Env.init(std.testing.allocator);
+    defer env.deinit();
+
+    try env.setCurrent("abc");
+    env.cursor = 1;
+    env.limit_backward = 1;
+    env.bra = 1;
+    env.ket = 2;
+
+    try env.copyFrom(&env);
+    try std.testing.expectEqualStrings("abc", env.current);
+    try std.testing.expectEqual(@as(usize, 1), env.cursor);
+    try std.testing.expectEqual(@as(usize, 3), env.limit);
+    try std.testing.expectEqual(@as(usize, 1), env.limit_backward);
+    try std.testing.expectEqual(@as(usize, 1), env.bra);
+    try std.testing.expectEqual(@as(usize, 2), env.ket);
 }
