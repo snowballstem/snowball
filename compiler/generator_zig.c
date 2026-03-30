@@ -38,9 +38,12 @@ static void write_varref(struct generator * g, struct name * p) {
         write_char(g, '.');
     }
     write_varname(g, p);
-    if (p->type == t_string) {
-        write_string(g, ".slice()");
-    }
+}
+
+static void write_stringref(struct generator * g, struct name * p) {
+    assert(p->type == t_string);
+    write_varref(g, p);
+    write_string(g, ".slice()");
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
@@ -276,10 +279,14 @@ static void generate_AE(struct generator * g, struct node * p) {
         case c_limit:
             w(g, p->mode == m_forward ? "@as(i32, @intCast(env.limit))" : "@as(i32, @intCast(env.limit_backward))"); break;
         case c_lenof:
-            writef(g, "snowball.runeCountInString(~V)", p);
+            write_string(g, "snowball.runeCountInString(");
+            write_stringref(g, p->name);
+            write_char(g, ')');
             break;
         case c_sizeof:
-            writef(g, "@as(i32, @intCast(~V.len))", p);
+            write_string(g, "@as(i32, @intCast(");
+            write_stringref(g, p->name);
+            write_string(g, ".len))");
             break;
         case c_len:
             w(g, "snowball.runeCountInString(env.getCurrent())");
@@ -764,7 +771,7 @@ static void generate_address(struct generator * g, struct node * p) {
     if (b != NULL) {
         write_literal_string(g, b);
     } else {
-        write_varref(g, p->name);
+        write_stringref(g, p->name);
     }
 }
 
@@ -894,8 +901,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
-    writef(g, "~Mvar ~B0 = env.clone() catch return false;~N"
-              "~Menv.setCurrent(~V) catch return false;~N", p);
+    writef(g, "~Mvar ~B0 = env.clone() catch return false;~N", p);
+    write_margin(g);
+    write_string(g, "env.setCurrent(");
+    write_stringref(g, p->name);
+    write_string(g, ") catch return false;");
+    write_newline(g);
     if (p->left->possible_signals == -1) {
         w(g, "~Mvar ~B0_f = true;~N");
     }
@@ -1012,11 +1023,26 @@ static void generate_namedstring(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "" : "B";
     if (tailcallable(g, p)) {
-        writef(g, "~Mreturn env.eqS~S0(~V);~N", p);
+        write_margin(g);
+        write_string(g, "return env.eqS");
+        write_string(g, g->S[0]);
+        write_char(g, '(');
+        write_stringref(g, p->name);
+        write_string(g, ");");
+        write_newline(g);
         p->right = NULL;
         g->unreachable = true;
     } else {
-        write_failure_if(g, "!env.eqS~S0(~V)", p);
+        write_margin(g);
+        write_string(g, "if (!env.eqS");
+        write_string(g, g->S[0]);
+        write_char(g, '(');
+        write_stringref(g, p->name);
+        write_string(g, ")) ");
+        write_block_start(g);
+        write_failure(g);
+        write_block_end(g);
+        g->unreachable = false;
     }
 }
 
