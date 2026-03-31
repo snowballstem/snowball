@@ -18,6 +18,7 @@ define stem as (
 
   test ([ next ] delete <-'boo') test ('book' atlimit) or fail='delete did not adjust slice as expected'
   test ([ next ] <-'ch' <-'outl') test ('outlook' atlimit) or fail='<- did not adjust slice as expected'
+  test (='abc' [ next ] ->s delete <-s) test ('abc' atlimit) or fail='stored slice did not survive later mutation'
 
   // Regression test for https://github.com/snowballstem/snowball/issues/242
   [] ->s $(sizeof s == 0) or fail='-> on empty slice was not empty'

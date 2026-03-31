@@ -782,6 +782,7 @@ static void generate_address(struct generator * g, struct node * p) {
         write_literal_string(g, b);
     } else {
         write_varref(g, p->name);
+        write_string(g, ".ToString()");
     }
 }
 

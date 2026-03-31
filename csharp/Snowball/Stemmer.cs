@@ -646,17 +646,6 @@ namespace Snowball
         ///   Replaces the contents of the bracket with the string s.
         /// </summary>
         ///
-        protected void insert(int c_bra, int c_ket, StringBuilder s)
-        {
-            int adjustment = replace_s(c_bra, c_ket, s.ToString());
-            if (c_bra <= bra) bra += adjustment;
-            if (c_bra <= ket) ket += adjustment;
-        }
-
-        /// <summary>
-        ///   Replaces the contents of the bracket with the string s.
-        /// </summary>
-        ///
         protected void slice_to(StringBuilder s)
         {
             slice_check();
