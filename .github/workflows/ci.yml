@@ -73,10 +73,11 @@ jobs:
           apt_packages: 'fpc'
         - name: PHP 8.4
           PHP: php
-          apt_packages: 'php php-mbstring'
+          apt_extra_repo: ppa:ondrej/php
+          apt_packages: 'php8.4-cli php8.4-mbstring'
         - name: PHP 8.3
           PHP: php
-          apt_extra_repo: ppa:ondrej/php
+          os: 'ubuntu-24.04'
           apt_packages: 'php8.3-cli php8.3-mbstring'
         - name: Python 3.8
           PYTHON_VERSION: 3.8
