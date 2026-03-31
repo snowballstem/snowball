@@ -71,6 +71,10 @@ jobs:
         - name: Pascal
           FPC: fpc
           apt_packages: 'fpc'
+        - name: PHP 8.5
+          PHP: php
+          apt_extra_repo: ppa:ondrej/php
+          apt_packages: 'php8.5-cli php8.5-mbstring'
         - name: PHP 8.4
           PHP: php
           apt_extra_repo: ppa:ondrej/php
