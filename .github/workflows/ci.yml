@@ -260,7 +260,9 @@ jobs:
       run: $MAKE check_pascal FPC="${{ matrix.FPC }}"
     - name: Test PHP
       if: matrix.PHP
-      run: $MAKE check_php PHP="${{ matrix.PHP }}"
+      run: |
+        ${{ matrix.PHP }} --version
+        $MAKE check_php PHP="${{ matrix.PHP }}"
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
