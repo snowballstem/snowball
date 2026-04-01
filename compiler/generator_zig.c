@@ -2,7 +2,6 @@
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
-#include <ctype.h> /* for toupper */
 #include "header.h"
 
 /* prototypes */
