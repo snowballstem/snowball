@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2001, Dr Martin Porter
 // Copyright (c) 2002, Richard Boulton
 // Copyright (c) 2015, Cesar Souza
-// Copyright (c) 2018-2025, Olly Betts
+// Copyright (c) 2018-2026, Olly Betts
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Gets the current string.
+        ///   The current string.
         /// </summary>
         ///
         protected StringBuilder current;
@@ -73,13 +73,13 @@ namespace Snowball
         protected int limit_backward;
 
         /// <summary>
-        ///   Starting bracket position.
+        ///   Start of the slice.
         /// </summary>
         ///
         protected int bra;
 
         /// <summary>
-        ///   Ending bracket position.
+        ///   End of the slice.
         /// </summary>
         ///
         protected int ket;
@@ -611,10 +611,10 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Replaces the contents of the bracket with the string s.
+        ///   Replaces the contents of the slice with the string s.
         /// </summary>
         ///
-        /// <param name="s">The s.</param>
+        /// <param name="s">The string.</param>
         protected void slice_from(String s)
         {
             slice_check();
@@ -623,7 +623,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Removes the current bracket contents.
+        ///   Removes the current slice contents.
         /// </summary>
         ///
         protected void slice_del()
@@ -643,7 +643,7 @@ namespace Snowball
         }
 
         /// <summary>
-        ///   Replaces the contents of the bracket with the string s.
+        ///   Replaces the contents of s with the slice.
         /// </summary>
         ///
         protected void slice_to(StringBuilder s)
