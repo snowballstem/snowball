@@ -1,3 +1,11 @@
+Snowball 3.0.2 (unreleased)
+===========================
+
+Zig
+---
+
+* Add Zig backend.  Requires Zig 0.16-dev or later.
+
 Snowball 3.0.1 (2025-05-09)
 ===========================
 
