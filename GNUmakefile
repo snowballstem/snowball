@@ -44,7 +44,8 @@ csharp_sample_dir = csharp/Stemwords
 
 # Dart
 
-DART ?= dart run --enable-asserts
+DART ?= dart
+DART_RUN_FLAGS ?= --enable-asserts
 dart_src_main_dir = dart/lib
 dart_src_dir = $(dart_src_main_dir)/ext
 dart_runtime_dir = dart/lib/src
@@ -850,7 +851,7 @@ dart: $(DART_SOURCES) dart/.dart_deps
 
 dart/.dart_deps: dart/pubspec.yaml
 	@echo "Fetching Dart package dependencies..."
-	@cd dart && dart pub get
+	@cd dart && $(DART) pub get
 	@touch $@
 
 check_dart: dart
@@ -862,10 +863,10 @@ check_dart_%: $(STEMMING_DATA_ABS)/%
 	@echo "Checking output of $* stemmer for Dart"
 	@cd dart && if test -f '$</voc.txt.gz' ; then \
 	  gzip -dc '$</voc.txt.gz' |\
-	    $(DART) example/test_app.dart $* -o $(PWD)/tmp.txt; \
+	    $(DART) run $(DART_RUN_FLAGS) example/test_app.dart $* -o $(PWD)/tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - $(PWD)/tmp.txt; \
 	else \
-	  $(DART) example/test_app.dart $* $</voc.txt |\
+	  $(DART) run $(DART_RUN_FLAGS) example/test_app.dart $* $</voc.txt |\
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
