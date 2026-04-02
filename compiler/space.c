@@ -139,8 +139,7 @@ extern int checked_snprintf(char *str, size_t size,
     return r;
 }
 
-/* To convert a block to a zero terminated string:  */
-
+/* Convert a block to a zero terminated string. */
 extern char * b_to_sz(const symbol * p) {
     int n = SIZE(p);
     char * s = (char *)xmalloc(n + 1);
@@ -155,9 +154,7 @@ extern char * b_to_sz(const symbol * p) {
     return s;
 }
 
-/* Add a single symbol to a block. If p = 0 the
-   block is created. */
-
+/* Add a single symbol to a block. If p = 0 the block is created. */
 extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
     if (p == NULL) p = create_b(1);
     int k = SIZE(p);

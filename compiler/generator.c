@@ -727,7 +727,6 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
 }
 
 /* tests if an expression requires cursor reinstatement in a repeat */
-
 extern int repeat_restore(struct generator * g, struct node * p) {
     return repeat_score(g, p, 0) >= 2;
 }
@@ -918,7 +917,6 @@ static void generate_fail(struct generator * g, struct node * p) {
 }
 
 /* generate_test() also implements 'reverse' */
-
 static void generate_test(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {
