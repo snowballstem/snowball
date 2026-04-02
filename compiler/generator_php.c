@@ -414,7 +414,6 @@ static void generate_backwards(struct generator * g, struct node * p) {
     w(g, "~M$this->cursor = $this->limit_backward;~N");
 }
 
-
 static void generate_not(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {
@@ -451,7 +450,6 @@ static void generate_not(struct generator * g, struct node * p) {
         str_delete(savevar);
     }
 }
-
 
 static void generate_try(struct generator * g, struct node * p) {
     struct str * savevar = NULL;

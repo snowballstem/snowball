@@ -383,7 +383,6 @@ static void generate_backwards(struct generator * g, struct node * p) {
     w(g, "~Menv.cursor = env.limit_backward;~N");
 }
 
-
 static void generate_not(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {
@@ -420,7 +419,6 @@ static void generate_not(struct generator * g, struct node * p) {
         str_delete(savevar);
     }
 }
-
 
 static void generate_try(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
@@ -464,7 +462,6 @@ static void generate_fail(struct generator * g, struct node * p) {
 }
 
 /* generate_test() also implements 'reverse' */
-
 static void generate_test(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {

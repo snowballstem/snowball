@@ -430,7 +430,6 @@ static void generate_backwards(struct generator * g, struct node * p) {
     w(g, "~MFCursor := FBkLimit;~N");
 }
 
-
 static void generate_not(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {
@@ -469,7 +468,6 @@ static void generate_not(struct generator * g, struct node * p) {
         str_delete(savevar);
     }
 }
-
 
 static void generate_try(struct generator * g, struct node * p) {
     struct str * savevar = NULL;

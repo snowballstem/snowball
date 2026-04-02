@@ -365,7 +365,6 @@ static void write_failure(struct generator * g) {
     if (str_len(g->failure_str) != 0) write_string(g, " }");
 }
 
-
 /* if at limit fail */
 static void write_check_limit(struct generator * g, struct node * p) {
     write_string(g, p->mode == m_forward ? "if (z->c >= z->l) " :
@@ -826,7 +825,6 @@ static void generate_backwards(struct generator * g, struct node * p) {
     w(g, "~Mz->c = z->lb;~N");
 }
 
-
 static void generate_not(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
     if (K_needed(g, p->left)) {
@@ -866,7 +864,6 @@ static void generate_not(struct generator * g, struct node * p) {
         str_delete(savevar);
     }
 }
-
 
 static void generate_try(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
