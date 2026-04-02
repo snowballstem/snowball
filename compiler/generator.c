@@ -1080,12 +1080,6 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     g->label_used = 0;
     str_clear(g->failure_str);
 
-    int possible_signals = p->left->possible_signals;
-    if (possible_signals != -1) {
-        fprintf(stderr, "%s:%d: warning: body of '%s' always signals '%c'\n",
-                g->analyser->tokeniser->file, p->line_number,
-                loopvar ? "atleast" : "repeat", possible_signals ? 't' : 'f');
-    }
     generate(g, p->left);
 
     if (loopvar != NULL) {

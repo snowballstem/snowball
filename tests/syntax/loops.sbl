@@ -1,0 +1,14 @@
+// Test loop commands
+externals (stem)
+define stem as (
+  atleast 0 'x'
+  atleast -1 'y'
+  loop 1 'i'
+  repeat 'y'
+  try atleast len ()
+  try atleast len true
+  try atleast len false
+  repeat ()
+  repeat true
+  repeat false
+)

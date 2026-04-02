@@ -2032,7 +2032,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_do:
         case c_insert:
         case c_leftslice:
-        case c_repeat:
         case c_rightslice:
         case c_set:
         case c_setmark:
@@ -2051,6 +2050,16 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_functionend:
             /* Always gives signal t. */
             return 1;
+        case c_repeat: {
+            int possible_signals = p->left->possible_signals;
+            if (possible_signals != -1) {
+            fprintf(stderr, "%s:%d: warning: body of 'repeat' always signals '%c'\n",
+                    a->tokeniser->file, p->line_number,
+                    possible_signals ? 't' : 'f');
+            }
+            /* Always gives signal t. */
+            return 1;
+        }
         case c_not: {
             int res = p->left->possible_signals;
             if (res >= 0)
@@ -2100,7 +2109,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             }
             return r;
         }
-        case c_atleast:
         case c_backwards:
         case c_dollar:
         case c_loop:
@@ -2108,6 +2116,16 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_test:
             /* Give same signal as p->left. */
             return p->left->possible_signals;
+        case c_atleast: {
+            int possible_signals = p->left->possible_signals;
+            if (possible_signals != -1) {
+            fprintf(stderr, "%s:%d: warning: body of 'atleast' always signals '%c'\n",
+                    a->tokeniser->file, p->line_number,
+                    possible_signals ? 't' : 'f');
+            }
+            /* Give same signal as p->left. */
+            return possible_signals;
+        }
         case c_call:
             // If the call recurses back into the current routine then this
             // will still be -1.

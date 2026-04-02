@@ -1,0 +1,28 @@
+define stem
+  (
+    repeat
+      literal 'x'
+    repeat
+      literal 'y'
+    literal 'i'
+    repeat
+      literal 'y'
+    try
+      atleast
+      # len
+        (
+    try
+      atleast
+      # len
+        true
+    try
+      atleast
+      # len
+        false
+    repeat
+      (
+    repeat
+      true
+    repeat
+      false
+    Function end
