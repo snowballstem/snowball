@@ -340,12 +340,12 @@ everything: ada all csharp dart go java js pascal python rust zig
 
 baseline-create: everything
 	rm -rf *.baseline
-	for d in ada src_c csharp dart go java js_out pascal python_out rust ; do cp -a $$d $$d.baseline ; done
+	for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do cp -a $$d $$d.baseline ; done
 	rm -rf *.baseline/*.o ada.baseline/obj pascal.baseline/*.ppu
 	find java.baseline -name '*.class' -delete
 
 baseline-diff:
-	@for d in ada src_c csharp dart go java js_out pascal python_out rust ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
+	@for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
 
 .PHONY: all clean update_version everything baseline-create baseline-diff
 
