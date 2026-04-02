@@ -26,6 +26,7 @@ static struct str * vars_newname(struct generator * g) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
+    // We use the same naming scheme for both global and local variables.
     write_char(g, "SbirrG"[p->type]);
     write_char(g, '_');
     write_s(g, p->s);
@@ -55,8 +56,11 @@ static void write_literal_string(struct generator * g, symbol * p) {
             if (ch == '"' || ch == '\\') write_char(g, '\\');
             write_wchar_as_utf8(g, ch);
         } else {
-            /* Zig uses \u{XXXX} for unicode escapes (variable width) */
+            // Use escapes for anything over 0x590 as a crude way to avoid
+            // LTR characters affecting the rendering of source character
+            // order in confusing ways.
             char buf[16];
+            /* Zig uses \u{XXXX} for unicode escapes (variable width) */
             checked_snprintf(buf, sizeof(buf), "\\u{%X}", ch);
             write_string(g, buf);
         }
@@ -216,6 +220,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 continue;
             }
             case 'E': {
+                // Write an external name.
                 write_s(g, p->name->s);
                 continue;
             }
@@ -348,6 +353,8 @@ static void generate_or(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
 
     if (p == NULL) {
+        /* p should never be NULL after an or: there should be at least two
+         * sub nodes. */
         fprintf(stderr, "Error: \"or\" node without children nodes.");
         exit(1);
     }
@@ -564,8 +571,11 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     generate(g, p->left);
 
     if (g->unreachable) {
+        /* Cannot break out of this loop: therefore the code after the
+         * end of the loop is unreachable.*/
         end_unreachable = true;
     } else {
+        /* include for goto; omit for gopast */
         if (style == 1) write_restorecursor(g, p, savevar);
         g->I[0] = golab;
         w(g, "~Mbreak :golab~I0;~N");
@@ -700,6 +710,8 @@ static void generate_atmark(struct generator * g, struct node * p) {
 
 static void generate_hop(struct generator * g, struct node * p) {
     write_comment(g, p);
+    // Generate the AE to a temporary block so we can substitute it in
+    // write_failure_if().
     struct str * ae = str_new();
     struct str * s = g->outbuf;
     g->outbuf = ae;
@@ -819,6 +831,14 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     struct str * varname = vars_newname(g);
     write_comment(g, p);
     if (p->left && p->left->type == c_tomark) {
+        /* Special case for:
+         *
+         *   setlimit tomark AE for C
+         *
+         * All uses of setlimit in the current stemmers we ship follow this
+         * pattern, and by special-casing we can avoid having to save and
+         * restore c.
+         */
         struct node * q = p->left;
         write_comment(g, q);
         g->S[0] = q->mode == m_forward ? ">" : "<";
@@ -889,6 +909,8 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     str_delete(varname);
 }
 
+/* dollar sets snowball up to operate on a string variable as if it were the
+ * current string */
 static void generate_dollar(struct generator * g, struct node * p) {
     write_comment(g, p);
 
@@ -906,6 +928,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_string(g, ") catch return false;");
     write_newline(g);
     if (p->left->possible_signals == -1) {
+        /* Assume failure. */
         w(g, "~Mvar ~B0_f = true;~N");
     }
 
@@ -914,6 +937,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     generate(g, p->left);
 
     if (!g->unreachable && p->left->possible_signals == -1) {
+        /* Mark success. */
         g->B[0] = str_data(savevar);
         w(g, "~M~B0_f = false;~N");
     }
@@ -934,6 +958,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     write_newline(g);
     writef(g, "~Menv.copyFrom(&~B0) catch return false;~N", p);
     if (p->left->possible_signals == 0) {
+        // p->left always signals f.
         write_failure(g);
     } else if (p->left->possible_signals == -1) {
         write_failure_if(g, "~B0_f", p);
@@ -959,9 +984,11 @@ static void generate_integer_test(struct generator * g, struct node * p) {
         p->right = NULL;
     } else {
         w(g, "~Mif (");
+        // We want the inverse of the snowball test here.
         relop ^= 1;
     }
     generate_AE(g, p->left);
+    // Relational operators are the same as C.
     write_c_relop(g, relop);
     generate_AE(g, p->AE);
     if (optimise_to_return) {
@@ -980,19 +1007,23 @@ static void generate_call(struct generator * g, struct node * p) {
     int signals = p->name->definition->possible_signals;
     write_comment(g, p);
     if (tailcallable(g, p)) {
+        /* Tail call. */
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
         p->right = NULL;
         g->unreachable = true;
         return;
     }
     if (just_return_on_fail(g) && signals == 0) {
+        /* Always fails. */
         writef(g, "~Mreturn ~W(env, @ptrCast(context));~N", p);
         g->unreachable = true;
         return;
     }
     if (signals == 1) {
+        /* Always succeeds. */
         writef(g, "~M_ = ~W(env, @ptrCast(context));~N", p);
     } else if (signals == 0) {
+        /* Always fails. */
         writef(g, "~M_ = ~W(env, @ptrCast(context));~N", p);
         write_failure(g);
     } else {
@@ -1100,6 +1131,7 @@ static void generate_define(struct generator * g, struct node * p) {
         if (name->local_to == q) {
             switch (name->type) {
                 case t_string:
+                    // String variables not localised for Zig currently.
                     w(g, "~Mvar ");
                     write_varname(g, name);
                     w(g, ": snowball.String = .{};~N");
@@ -1194,6 +1226,7 @@ static void generate_among(struct generator * g, struct node * p) {
     }
 
     if (x->command_count == 1 && x->nocommand_count == 0) {
+        /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
         w(g, "~Mswitch (among_var) {~N~+");
@@ -1212,6 +1245,7 @@ static void generate_among(struct generator * g, struct node * p) {
 static void generate_booltest(struct generator * g, struct node * p, int inverted) {
     write_comment(g, p);
     if (tailcallable(g, p)) {
+        // Optimise at end of function.
         if (inverted) {
             writef(g, "~Mreturn !~V;~N", p);
         } else {
@@ -1371,7 +1405,7 @@ static void set_bit(symbol * b, int i) { b[i/8] |= 1 << i%8; }
 
 static void generate_grouping_table(struct generator * g, struct grouping * q) {
     int range = q->largest_ch - q->smallest_ch + 1;
-    int size = (range + 7)/ 8;
+    int size = (range + 7)/ 8;  /* assume 8 bits per symbol */
     symbol * b = q->b;
     symbol * map = create_b(size);
 
