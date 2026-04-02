@@ -37,31 +37,23 @@ static void wi3(struct generator * g, int i) {
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    switch (p->type) {
-        case t_external:
-            if (g->options->target_lang == LANG_CPLUSPLUS) {
-                write_string(g, g->options->package);
-                write_string(g, "::");
-                write_s(g, g->options->name);
-                write_string(g, "::");
-            } else if (g->options->externals_prefix) {
-                write_string(g, g->options->externals_prefix);
-            }
-            break;
-        case t_string:
-        case t_boolean:
-        case t_integer: {
-            /* Name variables using their Snowball name prefixed by
-             * s_, b_ or i_.
-             */
-            write_char(g, "sbi"[p->type]);
-            write_char(g, '_');
-            write_s(g, p->s);
-            return;
+    if (p->type == t_external) {
+        if (g->options->target_lang == LANG_CPLUSPLUS) {
+            write_string(g, g->options->package);
+            write_string(g, "::");
+            write_s(g, g->options->name);
+            write_string(g, "::");
+        } else if (g->options->externals_prefix) {
+            write_string(g, g->options->externals_prefix);
         }
-        default:
-            write_char(g, "SIIrxg"[p->type]);
-            write_char(g, '_');
+    } else {
+        /* Name variables using their Snowball name prefixed by s_, b_ or i_
+         * depending on their type.
+         *
+         * We use the same naming scheme for both global and local variables.
+         */
+        write_char(g, "sbirxg"[p->type]);
+        write_char(g, '_');
     }
     write_s(g, p->s);
 }
