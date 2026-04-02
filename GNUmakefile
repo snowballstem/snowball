@@ -339,14 +339,17 @@ update_version:
 
 everything: ada all csharp dart go java js pascal python rust zig
 
+# When runtime tests are enabled, this gets overridden by overrides.mk.
+BASELINE ?= baseline
+
 baseline-create: everything
-	rm -rf *.baseline
-	for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do cp -a $$d $$d.baseline ; done
-	rm -rf *.baseline/*.o ada.baseline/obj pascal.baseline/*.ppu
-	find java.baseline -name '*.class' -delete
+	rm -rf *.$(BASELINE)
+	for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do cp -a $$d $$d.$(BASELINE) ; done
+	rm -rf *.$(BASELINE)/*.o ada.$(BASELINE)/obj pascal.$(BASELINE)/*.ppu
+	find java.$(BASELINE) -name '*.class' -delete
 
 baseline-diff:
-	@for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.baseline $$d ; done
+	@for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.$(BASELINE) $$d ; done
 
 .PHONY: all clean update_version everything baseline-create baseline-diff
 
@@ -1111,7 +1114,7 @@ setup_runtime_tests: clean_runtime_tests
 	  echo ok > $$r/$$d/output.txt ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
-	printf '%s:=%s\n' STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime  MODULES $(RUNTIME_DATA_DIR)/modules.txt THIN_FACTOR '' other_algorithms > overrides.mk
+	printf '%s:=%s\n' BASELINE rbaseline STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime MODULES $(RUNTIME_DATA_DIR)/modules.txt THIN_FACTOR '' other_algorithms > overrides.mk
 	rm -f algorithms.mk
 	$(MAKE) algorithms.mk
 
