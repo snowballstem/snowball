@@ -186,16 +186,15 @@ static void write_failure(struct generator * g) {
     switch (g->failure_label) {
         case x_return:
             write_string(g, "Begin Result := False; Exit; End;");
-            g->unreachable = true;
             break;
         default:
             write_string(g, "goto lab");
             write_int(g, g->failure_label);
             write_string(g, ";");
             g->label_used = 1;
-            g->unreachable = true;
     }
     write_newline(g);
+    g->unreachable = true;
 }
 
 static void write_failure_if(struct generator * g, const char * s, struct node * p) {

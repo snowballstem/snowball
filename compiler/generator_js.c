@@ -34,6 +34,7 @@ static void write_varname(struct generator * g, struct name * p) {
     write_s(g, p->s);
 }
 
+/* Reference to variable, e.g. when assigning to or using in an expression. */
 static void write_varref(struct generator * g, struct name * p) {
     if (p->type != t_grouping && p->local_to == NULL) {
         w(g, "this.#");
@@ -143,15 +144,14 @@ static void write_failure_(struct generator * g, byte after_if) {
     switch (g->failure_label) {
         case x_return:
             write_string(g, "return false;");
-            g->unreachable = true;
             break;
         default:
             write_string(g, "break lab");
             write_int(g, g->failure_label);
             write_string(g, ";");
-            g->unreachable = true;
     }
     write_newline(g);
+    g->unreachable = true;
     if (after_if && str_len(g->failure_str) != 0) {
         w(g, "~-~M}~N");
     }
