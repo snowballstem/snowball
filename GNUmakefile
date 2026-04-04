@@ -337,19 +337,24 @@ update_version:
 		dart/pubspec.yaml \
 		python/setup.py
 
+# Generate code for all languages.
 everything: ada all csharp dart go java js pascal python rust zig
+
+# The directories where generated code goes for all languages.
+ALL_CODE_DIRS := \
+	ada src_c csharp dart go java js_out pascal python_out rust zig
 
 # When runtime tests are enabled, this gets overridden by overrides.mk.
 BASELINE ?= baseline
 
 baseline-create: everything
 	rm -rf *.$(BASELINE)
-	for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do cp -a $$d $$d.$(BASELINE) ; done
+	for d in $(ALL_CODE_DIRS) ; do cp -a $$d $$d.$(BASELINE) ; done
 	rm -rf *.$(BASELINE)/*.o ada.$(BASELINE)/obj pascal.$(BASELINE)/*.ppu
 	find java.$(BASELINE) -name '*.class' -delete
 
 baseline-diff:
-	@for d in ada src_c csharp dart go java js_out pascal python_out rust zig ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x 'target' $$d.$(BASELINE) $$d ; done
+	@for d in $(ALL_CODE_DIRS) ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x'target' $$d.$(BASELINE) $$d ; done
 
 .PHONY: all clean update_version everything baseline-create baseline-diff
 
