@@ -285,6 +285,10 @@ backwardmode (
 
     define noun as (
         [substring] among (
+            // Fleeting vowel: -ець → -ц (nominative → oblique stem)
+            // живописець→живописц (groups with живописця/цю/цем/ці)
+            '{e}{ts}{'}' (<- '{ts}')
+
             // Collective/abstract nouns (specific, safe without R2)
             '{s}{t}{v}{o}'            // -ство (багатство→багат)
             '{t}{v}{o}'              // -тво (words in -цтво like козацтво match -ство above)
