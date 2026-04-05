@@ -90,7 +90,7 @@ backwardmode (
 
     define perfective_gerund as (
         [substring] among (
-            // Perfective gerunds (деепричастия доконаного виду)
+            // Perfective gerunds (дієприслівники доконаного виду)
             // With {a}/{ia} prefix check
             '{v}{sh}{y}'
             '{v}{sh}{y}{s}{'}'
