@@ -67,7 +67,7 @@ routines ( mark_regions R2
 
 externals ( stem )
 
-integers ( pV p2 )
+integers ( pV p2 minStem )
 
 booleans ( found_diminutive found_professional )
 
@@ -82,6 +82,12 @@ define mark_regions as (
         gopast v  setmark pV  gopast non-v
         gopast v  gopast non-v  setmark p2
     )
+    // Minimum 3-character stem to avoid over-stemming short words
+    // (e.g. жив should stay жив, not reduce to жи via verb -в)
+    // Uses hop 3 for encoding-aware character counting
+    $minStem = 0
+    do (tomark minStem  hop 3  setmark minStem)
+    do ($pV < minStem  $pV = minStem)
 )
 
 backwardmode (
@@ -260,15 +266,15 @@ backwardmode (
             '{iu}{t}{'}'  '{u}{t}{'}'       // Present 3rd pl
             '{a}{iu}{t}{'}'                 // Present 3rd pl variant
             '{ie}{m}{o}' '{i}{m}{o}'        // Present 1st pl
-            '{y}{m}{o}'                     // Present 1st pl (робимо)
+            '{e}{m}{o}' '{y}{m}{o}'         // Present 1st pl (живемо, робимо)
             '{ie}{t}{e}' '{i}{t}{e}'        // Present 2nd pl
-            '{y}{t}{e}'                     // Present 2nd pl (робите)
+            '{e}{t}{e}' '{y}{t}{e}'         // Present 2nd pl (живете, робите)
             '{i`}{t}{e}'                    // Imperative pl variant
             '{ie}{m}' '{i}{m}'              // Present 1st pl short
             '{y}{m}'                        // Present 1st pl short (робим)
             '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
             '{t}{y}'                        // Infinitive (fallback)
-            '{ie}{sh}' '{y}{sh}'            // Present 2nd sg
+            '{ie}{sh}' '{e}{sh}' '{y}{sh}'  // Present 2nd sg (знаєш, живеш, робиш)
             '{ie}'                          // Present 3rd sg/future
             '{i`}'                          // Imperative sg
             '{iu}' '{u}'                    // Present 1st sg (fallback)
@@ -447,30 +453,38 @@ define stem as (
     do (
         ['{n}{a}{i`}'] delete
     )
-    unset found_diminutive
-    unset found_professional
-    do mark_regions
-    backwards setlimit tomark pV for (
-        do (
-             perfective_gerund or
-             ( try reflexive
-               ( verbal_noun or
-                 ( try ( ( professional (set found_professional) )
-                         or ( diminutive (set found_diminutive) ) )
-                   not found_professional ( adjective or verb or noun )
+    // Exception: окремо is adverb (not verb -емо), stem as окрем
+    // to group with окремий/окрема/окремі (adj -ий/-а/-і → окрем)
+    ( test ('{o}{k}{r}{e}{m}{o}' atlimit)
+      backwards (['{o}'] delete)
+    )
+    or
+    (
+        unset found_diminutive
+        unset found_professional
+        do mark_regions
+        backwards setlimit tomark pV for (
+            do (
+                 perfective_gerund or
+                 ( try reflexive
+                   ( verbal_noun or
+                     ( try ( ( professional (set found_professional) )
+                             or ( diminutive (set found_diminutive) ) )
+                       not found_professional ( adjective or verb or noun )
+                     )
+                   )
                  )
-               )
-             )
+            )
+            // Diminutive stems (after adjective endings removed)
+            try ( diminutive_stem (set found_diminutive) )
+
+            // Professional suffixes (after noun declension removed)
+            // Skip if diminutive already fired (prevents -ач removal on собач- from собаченітко)
+            not found_diminutive not found_professional try professional
+
+            // Derivational suffixes (in R2 only)
+            do derivational
+            do tidy_up
         )
-        // Diminutive stems (after adjective endings removed)
-        try ( diminutive_stem (set found_diminutive) )
-
-        // Professional suffixes (after noun declension removed)
-        // Skip if diminutive already fired (prevents -ач removal on собач- from собаченітко)
-        not found_diminutive not found_professional try professional
-
-        // Derivational suffixes (in R2 only)
-        do derivational
-        do tidy_up
     )
 )
