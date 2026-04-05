@@ -251,6 +251,8 @@ backwardmode (
             '{i}{i`}'                               // Dative/Locative singular fem
             '{y}{i`}'                               // Nominative singular masc
             '{o}{i`}'                               // Various
+            // -ія noun instrumental (before verb -ю intercepts)
+            '{ie}{iu}'                              // -єю (поліграфією→поліграфі)
                 (delete)  // standard adjective endings (no R2 needed)
         )
     )
@@ -262,7 +264,10 @@ backwardmode (
             '{y}{t}{y}'                     // Infinitive (робити with и)
             '{a}{v}' '{i}{v}'               // Past masc (читав→чит, робів→роб)
             '{y}{v}'                        // Past masc (робив→роб)
-            '{a}{iu}' '{i}{iu}'             // Present 1st sg
+            '{a}{iu}'                       // Present 1st sg (читаю)
+            // Note: -ію ({i}{iu}) removed — it falsely captures noun accusative
+            // of -ія words (поліграфію, демократію). Verb -ію (я дію) handled
+            // by -ю fallback below, giving ді instead of д (better grouping)
             '{iu}{t}{'}'  '{u}{t}{'}'       // Present 3rd pl
             '{a}{iu}{t}{'}'                 // Present 3rd pl variant
             '{ie}{m}{o}' '{i}{m}{o}'        // Present 1st pl
