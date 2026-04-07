@@ -183,7 +183,7 @@ backwardmode (
   //     Small curated set of stems ending in orthographic -AN that are not plural.
   //     Used by `Protect_Lexical_AN` to prevent stripping on place names / lexical nouns.
   define AN_LexHash as (
-    [substring] among (
+    substring among (
       '{aa}{lam}{mim}{alef}{nun}'         ( set protect_lex_an ) // alman
       '{aa}{sin}{alef}{nun}'              ( set protect_lex_an ) // asan
       '{alef}{ye}{mim}{alef}{nun}'        ( set protect_lex_an ) // eiman
