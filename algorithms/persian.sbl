@@ -97,7 +97,7 @@ routines (
 
   // Noun tier (HPS categories)
   AN_LexHash N_Hash
-  Noun_Possessive  Noun_Plural  Noun_Other  Stem_Noun
+  Stem_Noun
   Stem_Adjective
   Participle_Clitic_Tails
   Verb_Person_Endings  Verb_Tense_Mood_Markers  Stem_Verb
@@ -249,50 +249,39 @@ backwardmode (
     )
   )
 
-  // --- Noun possessive suffixes (long + short clitics)
-  define Noun_Possessive as (
-    not protect_lex_an
-    setlimit tomark p1 for ( [substring] among (
-      '{alef}{mim}'      (delete) // -AM
-      '{alef}{te}'       (delete) // -AT
-      '{alef}{shin}'     (delete) // -ASH
-      '{mim}{alef}{nun}' (delete) // -MAN
-      '{te}{alef}{nun}'  (delete) // -TAN
-      '{shin}{alef}{nun}'(delete) // -SHAN
-    ) )
-  )
-
-  // --- Noun plurals.
-  //     -YAN and -GAN are productive; -AN is guarded by 'protect_lex_an' probe.
-  define Noun_Plural as (
-    not protect_lex_an
-    setlimit tomark p1 for ( [substring] among (
-      '{ye}{alef}{nun}'     (delete) // -YAN
-      '{gaf}{alef}{nun}'    (delete) // -GAN
-      '{heh}{alef}{ye}'     (delete)                 // -HAY
-      '{alef}{nun}{ye}'     (delete)                 // -ANI
-      '{heh}{alef}'         (delete)                 // -HA
-      '{alef}{nun}'         (delete) // -AN (only if not lexical)
-      '{ye}{nun}'           (delete)                 // -IN
-      '{alef}{te}'          (delete)                 // -AT
-    ) )
-  )
-
-  // --- Other derivational noun endings (conservative set).
-  //     Order: longer patterns before shorter (e.g., -YAT before -Y).
-  define Noun_Other as (
-    setlimit tomark p1 for ( [substring] among (
-      '{gaf}{alef}{heh}'  (delete) // -GAH
-      '{be}{alef}{nun}'   (delete) // -BAN
-      '{gaf}{ye}'         (delete) // -GI (abstract noun)
-      '{ye}{te}'          (delete) // -YAT
-      '{ye}{ye}'          (delete) // -YY (double Y)
-    ) )
-  )
-
-  // --- Composite noun step (OR chain).
+  // --- Noun step.
   define Stem_Noun as (
-    N_Hash or Noun_Other or Noun_Plural or Noun_Possessive
+    not protect_lex_an
+    N_Hash or
+    setlimit tomark p1 for (
+      [substring] among (
+        // Noun possessive suffixes (long + short clitics)
+        '{alef}{mim}'       (delete) // -AM
+        '{alef}{te}'        (delete) // -AT (can also be a noun plural)
+        '{alef}{shin}'      (delete) // -ASH
+// FIXME: These were dominated by -AN below before refactoring.
+//        '{mim}{alef}{nun}'  (delete) // -MAN
+//        '{te}{alef}{nun}'   (delete) // -TAN
+//        '{shin}{alef}{nun}' (delete) // -SHAN
+
+        // Noun plurals.
+        // -YAN and -GAN are productive.
+        '{ye}{alef}{nun}'   (delete) // -YAN
+        '{gaf}{alef}{nun}'  (delete) // -GAN
+        '{heh}{alef}{ye}'   (delete) // -HAY
+        '{alef}{nun}{ye}'   (delete) // -ANI
+        '{heh}{alef}'       (delete) // -HA
+        '{alef}{nun}'       (delete) // -AN (only if not lexical)
+        '{ye}{nun}'         (delete) // -IN
+
+        // Other derivational noun endings (conservative set).
+        '{gaf}{alef}{heh}'  (delete) // -GAH
+        '{be}{alef}{nun}'   (delete) // -BAN
+        '{gaf}{ye}'         (delete) // -GI (abstract noun)
+        '{ye}{te}'          (delete) // -YAT
+        '{ye}{ye}'          (delete) // -YY (double Y)
+      )
+    )
   )
 
   // --- Adjective step.
