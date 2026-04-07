@@ -204,45 +204,46 @@ backwardmode (
   //     Used by `Protect_Lexical_AN` to prevent stripping on place names / lexical nouns.
   define AN_LexHash as (
     substring among (
-      '{aa}{lam}{mim}{alef}{nun}'                    ( atlimit set protect_lex_an ) // alman
-      '{aa}{sin}{alef}{nun}'                         ( atlimit set protect_lex_an ) // asan
-      '{aa}{sin}{mim}{alef}{nun}'                    ( atlimit set protect_lex_an ) // asman
-      '{alef}{ye}{mim}{alef}{nun}'                   ( atlimit set protect_lex_an ) // eiman
-      '{alef}{ye}{shin}{alef}{nun}'                  ( atlimit set protect_lex_an ) // ishan
-      '{alef}{ye}{re}{alef}{nun}'                    ( atlimit set protect_lex_an ) // iran
-      '{alef}{mim}{kaf}{alef}{nun}'                  ( atlimit set protect_lex_an ) // emkan
-      '{alef}{nun}{sin}{alef}{nun}'                  ( atlimit set protect_lex_an ) // ensan
-      '{alef}{sad}{fe}{heh}{alef}{nun}'              ( atlimit set protect_lex_an ) // esfahan
-      '{aa}{zal}{re}{be}{alef}{ye}{jim}{alef}{nun}'  ( atlimit set protect_lex_an ) // azerbaijan
-      '{be}{ye}{alef}{nun}'                          ( atlimit set protect_lex_an ) // bayan
-      '{pe}{alef}{ye}{alef}{nun}'                    ( atlimit set protect_lex_an ) // payan
-      '{pe}{ye}{mim}{alef}{nun}'                     ( atlimit set protect_lex_an ) // payman
-      '{te}{heh}{re}{alef}{nun}'                     ( atlimit set protect_lex_an ) // tehran
-      '{jim}{re}{ye}{alef}{nun}'                     ( atlimit set protect_lex_an ) // jaryan
-      '{dal}{re}{mim}{alef}{nun}'                    ( atlimit set protect_lex_an ) // darman
-      '{dal}{vav}{re}{alef}{nun}'                    ( atlimit set protect_lex_an ) // dowran
-      '{dal}{ye}{vav}{alef}{nun}'                    ( atlimit set protect_lex_an ) // divan
-      '{re}{mim}{alef}{nun}'                         ( atlimit set protect_lex_an ) // roman
-      '{ze}{nun}{dal}{alef}{nun}'                    ( atlimit set protect_lex_an ) // zendan
-      '{sin}{alef}{ze}{mim}{alef}{nun}'              ( atlimit set protect_lex_an ) // sazman
-      '{sin}{lam}{ta}{alef}{nun}'                    ( atlimit set protect_lex_an ) // soltan
-      '{gaf}{ye}{lam}{alef}{nun}'                    ( atlimit set protect_lex_an ) // Gilan
-      '{ghaf}{heh}{re}{mim}{alef}{nun}'              ( atlimit set protect_lex_an ) // ghahramaan
-      '{kaf}{re}{mim}{alef}{nun}'                    ( atlimit set protect_lex_an ) // Kerman
-      '{khe}{alef}{nun}{dal}{alef}{nun}'             ( atlimit set protect_lex_an ) // khandan
-      '{lam}{be}{nun}{alef}{nun}'                    ( atlimit set protect_lex_an ) // lobnan
-      '{mim}{ye}{ze}{alef}{nun}'                     ( atlimit set protect_lex_an ) // mizan
-      '{mim}{sin}{lam}{mim}{alef}{nun}'              ( atlimit set protect_lex_an ) // mosalman
-      '{nun}{shin}{alef}{nun}'                       ( atlimit set protect_lex_an ) // neshan
-      '{heh}{mim}{dal}{alef}{nun}'                   ( atlimit set protect_lex_an ) // hamedan
-      '{ye}{vav}{nun}{alef}{nun}'                    ( atlimit set protect_lex_an ) // yunan
-      '{kaf}{heh}{kaf}{shin}{alef}{nun}'             ( atlimit set protect_lex_an ) // kahkeshan (galaxy)
-      '{aa}{te}{shin}{fe}{shin}{alef}{nun}'        ( atlimit set protect_lex_an ) // atashfeshan (volcano)
-      '{pe}{re}{ye}{shin}{alef}{nun}'                ( atlimit set protect_lex_an ) // perishan (confused)
-      '{dal}{re}{khe}{shin}{alef}{nun}'              ( atlimit set protect_lex_an ) // darakhshan (shining)
-      '{heh}{mim}{ze}{mim}{alef}{nun}'              ( atlimit set protect_lex_an ) // hamzaman (simultaneous)
-      '{sin}{alef}{khe}{te}{mim}{alef}{nun}'         ( atlimit set protect_lex_an ) // sakhteman (building)
-      '{sin}{lam}{ye}{mim}{alef}{nun}'               ( atlimit set protect_lex_an ) // soleyman (Solomon)
+      '{aa}{lam}{mim}{alef}{nun}'                     // alman
+      '{aa}{sin}{alef}{nun}'                          // asan
+      '{aa}{sin}{mim}{alef}{nun}'                     // asman
+      '{alef}{ye}{mim}{alef}{nun}'                    // eiman
+      '{alef}{ye}{shin}{alef}{nun}'                   // ishan
+      '{alef}{ye}{re}{alef}{nun}'                     // iran
+      '{alef}{mim}{kaf}{alef}{nun}'                   // emkan
+      '{alef}{nun}{sin}{alef}{nun}'                   // ensan
+      '{alef}{sad}{fe}{heh}{alef}{nun}'               // esfahan
+      '{aa}{zal}{re}{be}{alef}{ye}{jim}{alef}{nun}'   // azerbaijan
+      '{be}{ye}{alef}{nun}'                           // bayan
+      '{pe}{alef}{ye}{alef}{nun}'                     // payan
+      '{pe}{ye}{mim}{alef}{nun}'                      // payman
+      '{te}{heh}{re}{alef}{nun}'                      // tehran
+      '{jim}{re}{ye}{alef}{nun}'                      // jaryan
+      '{dal}{re}{mim}{alef}{nun}'                     // darman
+      '{dal}{vav}{re}{alef}{nun}'                     // dowran
+      '{dal}{ye}{vav}{alef}{nun}'                     // divan
+      '{re}{mim}{alef}{nun}'                          // roman
+      '{ze}{nun}{dal}{alef}{nun}'                     // zendan
+      '{sin}{alef}{ze}{mim}{alef}{nun}'               // sazman
+      '{sin}{lam}{ta}{alef}{nun}'                     // soltan
+      '{gaf}{ye}{lam}{alef}{nun}'                     // Gilan
+      '{ghaf}{heh}{re}{mim}{alef}{nun}'               // ghahramaan
+      '{kaf}{re}{mim}{alef}{nun}'                     // Kerman
+      '{khe}{alef}{nun}{dal}{alef}{nun}'              // khandan
+      '{lam}{be}{nun}{alef}{nun}'                     // lobnan
+      '{mim}{ye}{ze}{alef}{nun}'                      // mizan
+      '{mim}{sin}{lam}{mim}{alef}{nun}'               // mosalman
+      '{nun}{shin}{alef}{nun}'                        // neshan
+      '{heh}{mim}{dal}{alef}{nun}'                    // hamedan
+      '{ye}{vav}{nun}{alef}{nun}'                     // yunan
+      '{kaf}{heh}{kaf}{shin}{alef}{nun}'              // kahkeshan (galaxy)
+      '{aa}{te}{shin}{fe}{shin}{alef}{nun}'           // atashfeshan (volcano)
+      '{pe}{re}{ye}{shin}{alef}{nun}'                 // perishan (confused)
+      '{dal}{re}{khe}{shin}{alef}{nun}'               // darakhshan (shining)
+      '{heh}{mim}{ze}{mim}{alef}{nun}'                // hamzaman (simultaneous)
+      '{sin}{alef}{khe}{te}{mim}{alef}{nun}'          // sakhteman (building)
+      '{sin}{lam}{ye}{mim}{alef}{nun}'                // soleyman (Solomon)
+          ( atlimit set protect_lex_an)
     )
   )
 
