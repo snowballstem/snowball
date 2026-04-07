@@ -107,14 +107,12 @@ externals ( stem )
 // Loop/guard flags and marks:
 //  - 'changed'           : set true whenever a rule modifies the buffer in this pass.
 //  - 'protect_lex_an'    : true when final -AN is lexical (not plural) in this pass.
-//  - 'freeze_pass'       : true when a noun rule requests skipping adj/verb tiers
-//                          in the current pass (e.g., after -gah / -dan stripping).
 //  - 'saw_present_prefix': true when a present-tense prefix (mi-/nemi-) is stripped;
 //                          used to enable verb person-ending rules in this pass.
 //  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
 //                          also enables verb person-ending rules in this pass.
 //  - 'temp_mark'         : temporary cursor save/restore during probes or rewrites.
-booleans ( changed protect_lex_an freeze_pass saw_present_prefix saw_inf_or_part )
+booleans ( changed protect_lex_an saw_present_prefix saw_inf_or_part )
 integers ( temp_mark )
 
 // ============================================================================
@@ -257,9 +255,9 @@ backwardmode (
   //     Order: longer patterns before shorter (e.g., -YAT before -Y).
   define Noun_Other as (
     [substring] among (
-      '{gaf}{alef}{heh}'  ($(len > 5) delete set changed set freeze_pass ) // -GAH
+      '{gaf}{alef}{heh}'  ($(len > 5) delete set changed) // -GAH
       '{be}{alef}{nun}'   ($(len > 5) delete set changed) // -BAN
-      '{dal}{alef}{nun}'  ($(len > 5) delete set changed set freeze_pass ) // -DAN
+      '{dal}{alef}{nun}'  ($(len > 5) delete set changed) // -DAN
       '{gaf}{ye}'         ($(len > 4) delete set changed) // -GI (abstract noun)
       '{ye}{te}'          ($(len > 4) delete set changed) // -YAT
       '{ye}{ye}'          ($(len > 4) delete set changed) // -YY (double Y)
@@ -267,12 +265,8 @@ backwardmode (
   )
 
   // --- Composite noun step (OR chain).
-  //     Any noun success sets `freeze_pass` so adj/verb do not run this pass.
   define Stem_Noun as (
-    ( N_Hash set freeze_pass )
-    or ( Noun_Other set freeze_pass )
-    or ( Noun_Plural set freeze_pass )
-    or ( Noun_Possessive set freeze_pass )
+    N_Hash or Noun_Other or Noun_Plural or Noun_Possessive
   )
 
   // --- Adjective: comparative/superlative (HPS).
@@ -369,9 +363,9 @@ backwardmode (
 // ============================================================================
 //  MAIN (HPS pipeline)
 //  - 1) Normalize script/spacing.
-//  - 2) Strip all leading prefixes (one per call; repeat while changed).
-//  - 3) In each pass: try Noun; if Noun changed, `freeze_pass` short-circuits
-//       Adjective/Verb for this pass. Otherwise try Adjective, then Verb.
+//  - 2) Strip all leading prefixes.
+//  - 3) In each pass: try Noun; if Noun doesn't make a change try Adjective,
+//       then Verb.
 //  Invariants:
 //    - After each outer iteration, either the buffer is shorter or unchanged.
 //    - 'changed' controls loop termination (no infinite loop).
@@ -390,8 +384,7 @@ define stem as (
     do Protect_Lexical_AN
     backwards (
       // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
-       unset freeze_pass
-      ( do Stem_Noun and ( freeze_pass or ( do Stem_Adjective or do Stem_Verb ) ) )
+      ( Stem_Noun or ( do Stem_Adjective or do Stem_Verb ) )
       or
       ( do Stem_Adjective or do Stem_Verb )
     )
