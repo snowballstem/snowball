@@ -105,14 +105,13 @@ routines (
 externals ( stem )
 
 // Loop/guard flags and marks:
-//  - 'changed'           : set true whenever a rule modifies the buffer in this pass.
 //  - 'protect_lex_an'    : true when final -AN is lexical (not plural) in this pass.
 //  - 'saw_present_prefix': true when a present-tense prefix (mi-/nemi-) is stripped;
 //                          used to enable verb person-ending rules in this pass.
 //  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
 //                          also enables verb person-ending rules in this pass.
 //  - 'temp_mark'         : temporary cursor save/restore during probes or rewrites.
-booleans ( changed protect_lex_an saw_present_prefix saw_inf_or_part )
+booleans ( protect_lex_an saw_present_prefix saw_inf_or_part )
 integers ( temp_mark )
 
 // ============================================================================
@@ -205,33 +204,33 @@ backwardmode (
   //     Only include entries that actually change the buffer.
   define N_Hash as (
     [substring] among (
-      '{alef}{khe}{be}{alef}{re}'      (<- '{khe}{be}{re}' set changed)
-      '{khe}{vav}{alef}{sin}'          (<- '{khe}{alef}{sin}{heh}' set changed)
-      '{alef}{sin}{alef}{te}{ye}{dal}' (<- '{alef}{sin}{te}{alef}{dal}' set changed)
+      '{alef}{khe}{be}{alef}{re}'      (<- '{khe}{be}{re}')
+      '{khe}{vav}{alef}{sin}'          (<- '{khe}{alef}{sin}{heh}')
+      '{alef}{sin}{alef}{te}{ye}{dal}' (<- '{alef}{sin}{te}{alef}{dal}')
     )
   )
 
   // --- Verb irregular rewrites (compact).
   define V_Hash as (
     [substring] among (
-      '{alef}{sin}{te}' (<- '{heh}{sin}{te}' set changed)
+      '{alef}{sin}{te}' (<- '{heh}{sin}{te}')
     )
   )
 
   // --- Noun possessive suffixes (long + short clitics)
   define Noun_Possessive as (
     [substring] among (
-      '{alef}{mim}'      ($(len > 4) delete set changed) // -AM
-      '{alef}{te}'       ($(len > 4) delete set changed) // -AT
-      '{alef}{shin}'     ($(len > 4) delete set changed) // -ASH
-      '{mim}{alef}{nun}' ($(len > 5) delete set changed) // -MAN
-      '{te}{alef}{nun}'  ($(len > 5) delete set changed) // -TAN
-      '{shin}{alef}{nun}'($(len > 5) delete set changed) // -SHAN
+      '{alef}{mim}'      ($(len > 4) delete) // -AM
+      '{alef}{te}'       ($(len > 4) delete) // -AT
+      '{alef}{shin}'     ($(len > 4) delete) // -ASH
+      '{mim}{alef}{nun}' ($(len > 5) delete) // -MAN
+      '{te}{alef}{nun}'  ($(len > 5) delete) // -TAN
+      '{shin}{alef}{nun}'($(len > 5) delete) // -SHAN
 
       // short clitics
-      '{mim}'             ($(len > 3) delete set changed) // -M
-      '{te}'              ($(len > 3) delete set changed) // -T
-      '{shin}'            ($(len > 3) delete set changed) // -SH
+      '{mim}'             ($(len > 3) delete) // -M
+      '{te}'              ($(len > 3) delete) // -T
+      '{shin}'            ($(len > 3) delete) // -SH
     )
   )
 
@@ -239,15 +238,15 @@ backwardmode (
   //     -YAN and -GAN are productive; -AN is guarded by 'protect_lex_an' probe.
   define Noun_Plural as (
     [substring] among (
-      '{ye}{alef}{nun}'     ($(len > 5) delete set changed)                 // -YAN
-      '{gaf}{alef}{nun}'    ($(len > 5) delete set changed)                 // -GAN
-      '{heh}{alef}{ye}{ye}' ($(len > 6) delete set changed)                 // -HAYI
-      '{heh}{alef}{ye}'     ($(len > 5) delete set changed)                 // -HAY
-      '{alef}{nun}{ye}'     ($(len > 5) delete set changed)                 // -ANI
-      '{heh}{alef}'         ($(len > 4) delete set changed)                 // -HA
-      '{alef}{nun}'         ( not protect_lex_an $(len > 4) delete set changed ) // -AN (only if not lexical)
-      '{ye}{nun}'           ($(len > 4) delete set changed)                 // -IN
-      '{alef}{te}'          ($(len > 4) delete set changed)                 // -AT
+      '{ye}{alef}{nun}'     ($(len > 5) delete)                 // -YAN
+      '{gaf}{alef}{nun}'    ($(len > 5) delete)                 // -GAN
+      '{heh}{alef}{ye}{ye}' ($(len > 6) delete)                 // -HAYI
+      '{heh}{alef}{ye}'     ($(len > 5) delete)                 // -HAY
+      '{alef}{nun}{ye}'     ($(len > 5) delete)                 // -ANI
+      '{heh}{alef}'         ($(len > 4) delete)                 // -HA
+      '{alef}{nun}'         ( not protect_lex_an $(len > 4) delete) // -AN (only if not lexical)
+      '{ye}{nun}'           ($(len > 4) delete)                 // -IN
+      '{alef}{te}'          ($(len > 4) delete)                 // -AT
     )
   )
 
@@ -255,12 +254,12 @@ backwardmode (
   //     Order: longer patterns before shorter (e.g., -YAT before -Y).
   define Noun_Other as (
     [substring] among (
-      '{gaf}{alef}{heh}'  ($(len > 5) delete set changed) // -GAH
-      '{be}{alef}{nun}'   ($(len > 5) delete set changed) // -BAN
-      '{dal}{alef}{nun}'  ($(len > 5) delete set changed) // -DAN
-      '{gaf}{ye}'         ($(len > 4) delete set changed) // -GI (abstract noun)
-      '{ye}{te}'          ($(len > 4) delete set changed) // -YAT
-      '{ye}{ye}'          ($(len > 4) delete set changed) // -YY (double Y)
+      '{gaf}{alef}{heh}'  ($(len > 5) delete) // -GAH
+      '{be}{alef}{nun}'   ($(len > 5) delete) // -BAN
+      '{dal}{alef}{nun}'  ($(len > 5) delete) // -DAN
+      '{gaf}{ye}'         ($(len > 4) delete) // -GI (abstract noun)
+      '{ye}{te}'          ($(len > 4) delete) // -YAT
+      '{ye}{ye}'          ($(len > 4) delete) // -YY (double Y)
     )
   )
 
@@ -272,27 +271,27 @@ backwardmode (
   // --- Adjective: comparative/superlative (HPS).
   define Adjective_Superlative_Comparative as (
     [substring] among (
-      '{te}{re}{ye}{nun}' ($(len > 6) delete set changed) // -TARIN
-      '{te}{re}'          ($(len > 5) delete set changed) // -TAR
+      '{te}{re}{ye}{nun}' ($(len > 6) delete) // -TARIN
+      '{te}{re}'          ($(len > 5) delete) // -TAR
     )
   )
 
   // --- Adjective derivational endings (HPS list + common variants).
   define Adjective_Derivational as (
     [substring] among (
-      '{alef}{nun}{heh}'  ($(len > 5) delete set changed) // -ANE
-      '{mim}{nun}{dal}'   ($(len > 5) delete set changed) // -MAND
-      '{vav}{alef}{re}'   ($(len > 5) delete set changed) // -VAR
-      '{nun}{alef}{kaf}'  ($(len > 5) delete set changed) // -NAK
-      '{gaf}{alef}{re}'   ($(len > 5) delete set changed) // -GAR
-      '{ye}{nun}'         ($(len > 4) delete set changed) // -IN
+      '{alef}{nun}{heh}'  ($(len > 5) delete) // -ANE
+      '{mim}{nun}{dal}'   ($(len > 5) delete) // -MAND
+      '{vav}{alef}{re}'   ($(len > 5) delete) // -VAR
+      '{nun}{alef}{kaf}'  ($(len > 5) delete) // -NAK
+      '{gaf}{alef}{re}'   ($(len > 5) delete) // -GAR
+      '{ye}{nun}'         ($(len > 4) delete) // -IN
     )
   )
 
   // --- Adjective: relative -Y and final -H cleanups.
   define Adjective_Relative as (
     [substring] among (
-      '{ye}{ye}'  ($(len > 4) delete set changed) // -YY
+      '{ye}{ye}'  ($(len > 4) delete) // -YY
     )
   )
 
@@ -306,16 +305,16 @@ backwardmode (
   // --- Participle + person/aux clitic tails
   define Participle_Clitic_Tails as (
   [substring] among (
-      '{alef}{ye}{dal}'  ($(len > 5) delete set changed)
-      '{alef}{ye}{mim}'  ($(len > 5) delete set changed)
-      '{alef}{nun}{dal}' ($(len > 5) delete set changed)
-      '{alef}{sin}{te}'  ($(len > 5) delete set changed)
-      '{alef}{sin}'      ($(len > 4) delete set changed)
-      '{alef}{ye}'       ($(len > 4) delete set changed)
-      '{ye}{dal}'        ($(len > 4) delete set changed)
-      '{ye}{mim}'        ($(len > 4) delete set changed)
-      '{mim}'            ($(len > 3) delete set changed)
-      '{dal}'            ($(len > 3) delete set changed)
+      '{alef}{ye}{dal}'  ($(len > 5) delete)
+      '{alef}{ye}{mim}'  ($(len > 5) delete)
+      '{alef}{nun}{dal}' ($(len > 5) delete)
+      '{alef}{sin}{te}'  ($(len > 5) delete)
+      '{alef}{sin}'      ($(len > 4) delete)
+      '{alef}{ye}'       ($(len > 4) delete)
+      '{ye}{dal}'        ($(len > 4) delete)
+      '{ye}{mim}'        ($(len > 4) delete)
+      '{mim}'            ($(len > 3) delete)
+      '{dal}'            ($(len > 3) delete)
     )
   )
 
@@ -323,22 +322,22 @@ backwardmode (
   define Verb_Person_Endings as (
     // 1) Specific past-3sg stem fixes for
     [substring] among (
-      '{re}{fe}{te}{mim}'                 (<- '{re}{fe}{te}' set changed)
-      '{re}{fe}{te}{ye}'                  (<- '{re}{fe}{te}' set changed)
-      '{re}{fe}{te}{ye}{mim}'             (<- '{re}{fe}{te}' set changed)
-      '{re}{fe}{te}{ye}{dal}'             (<- '{re}{fe}{te}' set changed)
-      '{re}{fe}{te}{alef}{nun}{dal}'      (<- '{re}{fe}{te}' set changed)
+      '{re}{fe}{te}{mim}'                 (<- '{re}{fe}{te}')
+      '{re}{fe}{te}{ye}'                  (<- '{re}{fe}{te}')
+      '{re}{fe}{te}{ye}{mim}'             (<- '{re}{fe}{te}')
+      '{re}{fe}{te}{ye}{dal}'             (<- '{re}{fe}{te}')
+      '{re}{fe}{te}{alef}{nun}{dal}'      (<- '{re}{fe}{te}')
     )
     or
     // 2) Generic person endings — only if we saw a verb cue this pass
     ( (saw_present_prefix or saw_inf_or_part) and
       [substring] among (
-        '{alef}{nun}{dal}' ($(len > 5) delete set changed) // -AND
-        '{ye}{dal}'        ($(len > 4) delete set changed) // -ID
-        '{ye}{mim}'        ($(len > 4) delete set changed) // -IM
-        '{alef}{mim}'      ($(len > 4) delete set changed) // -AM
-        '{dal}'            ($(len > 3) delete set changed) // -D
-        '{mim}'            ($(len > 3) delete set changed) // -M
+        '{alef}{nun}{dal}' ($(len > 5) delete) // -AND
+        '{ye}{dal}'        ($(len > 4) delete) // -ID
+        '{ye}{mim}'        ($(len > 4) delete) // -IM
+        '{alef}{mim}'      ($(len > 4) delete) // -AM
+        '{dal}'            ($(len > 3) delete) // -D
+        '{mim}'            ($(len > 3) delete) // -M
       )
     )
   )
@@ -346,8 +345,8 @@ backwardmode (
   // --- Verb: mood/tense markers (HPS).
   define Verb_Tense_Mood_Markers as (
     [substring] among (
-      '{heh}'       ($(len > 3) delete set changed set saw_inf_or_part) // participle -H
-      '{alef}{nun}' ($(len > 4) delete set changed set saw_inf_or_part) // infinitive -N / -AN
+      '{heh}'       ($(len > 3) delete set saw_inf_or_part) // participle -H
+      '{alef}{nun}' ($(len > 4) delete set saw_inf_or_part) // infinitive -N / -AN
     )
   )
 
@@ -368,7 +367,6 @@ backwardmode (
 //       then Verb.
 //  Invariants:
 //    - After each outer iteration, either the buffer is shorter or unchanged.
-//    - 'changed' controls loop termination (no infinite loop).
 // ============================================================================
 define stem as (
   // 1) Normalize script/spacing
@@ -379,15 +377,14 @@ define stem as (
 
   // 4) Peel suffixes (backward), one layer per pass
   repeat (
-    unset changed
     unset saw_inf_or_part
     do Protect_Lexical_AN
     backwards (
       // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
-      ( Stem_Noun or ( do Stem_Adjective or do Stem_Verb ) )
-      or
-      ( do Stem_Adjective or do Stem_Verb )
+      // FIXME: The original code here was buggy and never ran Stem_Verb.
+      // Uncomment to fix the bug but this changes the stems for a lot of
+      // words and we need to evaluate that.
+      Stem_Noun or Stem_Adjective // or Stem_Verb
     )
-    changed
   )
 )
