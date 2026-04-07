@@ -368,10 +368,10 @@ define stem as (
   // 1) Normalize script/spacing
   do Normalize_Characters
 
-  // 3) Peel prefixes (forward, anchored)
+  // 2) Peel prefixes (forward, anchored)
   repeat Strip_Prefix_At_Start
 
-  // 4) Peel suffixes (backward), one layer per pass
+  // 3) Peel suffixes (backward), one layer per pass
   repeat (
     unset saw_inf_or_part
     do Protect_Lexical_AN
