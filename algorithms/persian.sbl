@@ -205,23 +205,17 @@ backwardmode (
   define AN_LexHash as (
     substring among (
       '{aa}{lam}{mim}{alef}{nun}'                     // alman
-      '{aa}{sin}{alef}{nun}'                          // asan
       '{aa}{sin}{mim}{alef}{nun}'                     // asman
       '{alef}{ye}{mim}{alef}{nun}'                    // eiman
       '{alef}{ye}{shin}{alef}{nun}'                   // ishan
-      '{alef}{ye}{re}{alef}{nun}'                     // iran
       '{alef}{mim}{kaf}{alef}{nun}'                   // emkan
-      '{alef}{nun}{sin}{alef}{nun}'                   // ensan
       '{alef}{sad}{fe}{heh}{alef}{nun}'               // esfahan
       '{aa}{zal}{re}{be}{alef}{ye}{jim}{alef}{nun}'   // azerbaijan
       '{be}{ye}{alef}{nun}'                           // bayan
       '{pe}{alef}{ye}{alef}{nun}'                     // payan
       '{pe}{ye}{mim}{alef}{nun}'                      // payman
-      '{te}{heh}{re}{alef}{nun}'                      // tehran
       '{jim}{re}{ye}{alef}{nun}'                      // jaryan
       '{dal}{re}{mim}{alef}{nun}'                     // darman
-      '{dal}{vav}{re}{alef}{nun}'                     // dowran
-      '{dal}{ye}{vav}{alef}{nun}'                     // divan
       '{re}{mim}{alef}{nun}'                          // roman
       '{ze}{nun}{dal}{alef}{nun}'                     // zendan
       '{sin}{alef}{ze}{mim}{alef}{nun}'               // sazman
