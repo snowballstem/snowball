@@ -114,6 +114,8 @@ externals ( stem )
 //                          also enables verb person-ending rules in this pass.
 booleans ( protect_lex_an saw_present_prefix saw_inf_or_part )
 
+integers ( p1 )
+
 // ============================================================================
 //  PHASE 1 — NORMALIZATION (forward)
 //  - Unify Arabic forms to Persian letters for stable downstream matching.
@@ -251,43 +253,42 @@ backwardmode (
   // --- Noun possessive suffixes (long + short clitics)
   define Noun_Possessive as (
     not protect_lex_an
-    [substring] among (
-      '{alef}{mim}'      ($(len > 4) delete) // -AM
-      '{alef}{te}'       ($(len > 4) delete) // -AT
-      '{alef}{shin}'     ($(len > 4) delete) // -ASH
-      '{mim}{alef}{nun}' ($(len > 5) delete) // -MAN
-      '{te}{alef}{nun}'  ($(len > 5) delete) // -TAN
-      '{shin}{alef}{nun}'($(len > 5) delete) // -SHAN
-
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{alef}{mim}'      (delete) // -AM
+      '{alef}{te}'       (delete) // -AT
+      '{alef}{shin}'     (delete) // -ASH
+      '{mim}{alef}{nun}' (delete) // -MAN
+      '{te}{alef}{nun}'  (delete) // -TAN
+      '{shin}{alef}{nun}'(delete) // -SHAN
+    ) )
   )
 
   // --- Noun plurals.
   //     -YAN and -GAN are productive; -AN is guarded by 'protect_lex_an' probe.
   define Noun_Plural as (
     not protect_lex_an
-    [substring] among (
-      '{ye}{alef}{nun}'     ($(len > 5) delete) // -YAN
-      '{gaf}{alef}{nun}'    ($(len > 5) delete) // -GAN
-      '{heh}{alef}{ye}'     ($(len > 5) delete)                 // -HAY
-      '{alef}{nun}{ye}'     ($(len > 5) delete)                 // -ANI
-      '{heh}{alef}'         ($(len > 4) delete)                 // -HA
-      '{alef}{nun}'         ($(len > 4) delete) // -AN (only if not lexical)
-      '{ye}{nun}'           ($(len > 4) delete)                 // -IN
-      '{alef}{te}'          ($(len > 4) delete)                 // -AT
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{ye}{alef}{nun}'     (delete) // -YAN
+      '{gaf}{alef}{nun}'    (delete) // -GAN
+      '{heh}{alef}{ye}'     (delete)                 // -HAY
+      '{alef}{nun}{ye}'     (delete)                 // -ANI
+      '{heh}{alef}'         (delete)                 // -HA
+      '{alef}{nun}'         (delete) // -AN (only if not lexical)
+      '{ye}{nun}'           (delete)                 // -IN
+      '{alef}{te}'          (delete)                 // -AT
+    ) )
   )
 
   // --- Other derivational noun endings (conservative set).
   //     Order: longer patterns before shorter (e.g., -YAT before -Y).
   define Noun_Other as (
-    [substring] among (
-      '{gaf}{alef}{heh}'  ($(len > 5) delete) // -GAH
-      '{be}{alef}{nun}'   ($(len > 5) delete) // -BAN
-      '{gaf}{ye}'         ($(len > 4) delete) // -GI (abstract noun)
-      '{ye}{te}'          ($(len > 4) delete) // -YAT
-      '{ye}{ye}'          ($(len > 4) delete) // -YY (double Y)
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{gaf}{alef}{heh}'  (delete) // -GAH
+      '{be}{alef}{nun}'   (delete) // -BAN
+      '{gaf}{ye}'         (delete) // -GI (abstract noun)
+      '{ye}{te}'          (delete) // -YAT
+      '{ye}{ye}'          (delete) // -YY (double Y)
+    ) )
   )
 
   // --- Composite noun step (OR chain).
@@ -297,29 +298,29 @@ backwardmode (
 
   // --- Adjective: comparative/superlative (HPS).
   define Adjective_Superlative_Comparative as (
-    [substring] among (
-      '{te}{re}{ye}{nun}' ($(len > 6) delete) // -TARIN
-      '{te}{re}'          ($(len > 5) delete) // -TAR
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{te}{re}{ye}{nun}' (delete) // -TARIN
+      '{te}{re}'          (not atlimit delete) // -TAR
+    ) )
   )
 
   // --- Adjective derivational endings (HPS list + common variants).
   define Adjective_Derivational as (
-    [substring] among (
-      '{alef}{nun}{heh}'  ($(len > 5) delete) // -ANE
-      '{mim}{nun}{dal}'   ($(len > 5) delete) // -MAND
-      '{vav}{alef}{re}'   ($(len > 5) delete) // -VAR
-      '{nun}{alef}{kaf}'  ($(len > 5) delete) // -NAK
-      '{gaf}{alef}{re}'   ($(len > 5) delete) // -GAR
-      '{ye}{nun}'         ($(len > 4) delete) // -IN
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{alef}{nun}{heh}'  (delete) // -ANE
+      '{mim}{nun}{dal}'   (delete) // -MAND
+      '{vav}{alef}{re}'   (delete) // -VAR
+      '{nun}{alef}{kaf}'  (delete) // -NAK
+      '{gaf}{alef}{re}'   (delete) // -GAR
+      '{ye}{nun}'         (delete) // -IN
+    ) )
   )
 
   // --- Adjective: relative -Y suffix.
   define Adjective_Relative as (
-    [substring] among (
-      '{ye}{ye}'  ($(len > 4) delete) // -YY
-    )
+    setlimit tomark p1 for ( [substring] among (
+      '{ye}{ye}'  (delete) // -YY
+    ) )
   )
 
   // --- Composite adjective step (OR chain).
@@ -400,6 +401,10 @@ define stem as (
 
   // 2b) Delete remaining ZWNJs now that prefix detection is done
   do Delete_ZWNJ
+
+  // Set p1 to be 3 characters into the string.
+  $p1 = limit
+  do ( hop 3 setmark p1 )
 
   // 3) Peel suffixes (backward), one layer per pass
   backwards repeat test (
