@@ -236,7 +236,9 @@ backwardmode (
     [substring] among (
       '{ye}{alef}{nun}'     ($(len > 5) delete)                 // -YAN
       '{gaf}{alef}{nun}'    ($(len > 5) delete)                 // -GAN
-      '{heh}{alef}{ye}{ye}' ($(len > 6) delete)                 // -HAYI
+// FIXME: This rule is dominated by a rule in Noun_Other:
+// '{ye}{ye}'          ($(len > 4) delete) // -YY (double Y)
+//      '{heh}{alef}{ye}{ye}' ($(len > 6) delete)                 // -HAYI
       '{heh}{alef}{ye}'     ($(len > 5) delete)                 // -HAY
       '{alef}{nun}{ye}'     ($(len > 5) delete)                 // -ANI
       '{heh}{alef}'         ($(len > 4) delete)                 // -HA
