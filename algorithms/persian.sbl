@@ -160,10 +160,7 @@ define Strip_Prefix_At_Start as (
 // ============================================================================
 define Delete_ZWNJ as (
   repeat (
-    [substring] among (
-      '{half_space}' ( delete )
-      ''             ( next )
-    )
+    goto (['{half_space}'] delete)
   )
 )
 
