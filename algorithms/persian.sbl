@@ -104,15 +104,13 @@ routines (
 
 externals ( stem )
 
-// Loop/guard flags and marks:
+// Guard flags:
 //  - 'protect_lex_an'    : true when final -AN is lexical (not plural) in this pass.
 //  - 'saw_present_prefix': true when a present-tense prefix (mi-/nemi-) is stripped;
 //                          used to enable verb person-ending rules in this pass.
 //  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
 //                          also enables verb person-ending rules in this pass.
-//  - 'temp_mark'         : temporary cursor save/restore during probes or rewrites.
 booleans ( protect_lex_an saw_present_prefix saw_inf_or_part )
-integers ( temp_mark )
 
 // ============================================================================
 //  PHASE 1 — NORMALIZATION (forward)
@@ -157,12 +155,10 @@ define Strip_Prefix_At_Start as (
 //      stems such as Iran/Tehran/Ensan/Ostan.
 //  - We set 'protect_lex_an' per pass if a trailing pattern indicates lexical AN.
 //  - This is a probe only: it NEVER edits the buffer; it only sets a flag.
-//  - We always restore the cursor with 'temp_mark' after probing.
 // ============================================================================
 
 define Protect_Lexical_AN as (
   unset protect_lex_an
-  setmark temp_mark
   backwards (
     do AN_LexHash or
     [substring] among (
@@ -171,7 +167,6 @@ define Protect_Lexical_AN as (
       '{re}{alef}{nun}'       ( set protect_lex_an )  // …ran
     )
   )
-  tomark temp_mark
 )
 
 // ============================================================================
