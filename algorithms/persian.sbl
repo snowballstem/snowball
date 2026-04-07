@@ -113,10 +113,9 @@ externals ( stem )
 //                          used to enable verb person-ending rules in this pass.
 //  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
 //                          also enables verb person-ending rules in this pass.
-//  - 'start_mark'        : index of token start for anchored prefix matching.
 //  - 'temp_mark'         : temporary cursor save/restore during probes or rewrites.
 booleans ( changed protect_lex_an freeze_pass saw_present_prefix saw_inf_or_part )
-integers ( start_mark temp_mark )
+integers ( temp_mark )
 
 // ============================================================================
 //  PHASE 1 — NORMALIZATION (forward)
@@ -145,16 +144,13 @@ define Normalize_Characters as (
 //  - Sets `saw_present_prefix` when matching {mi}/{nemi} to enable person endings later.
 // ============================================================================
 define Strip_Prefix_At_Start as (
-  setmark temp_mark
-  tomark start_mark
   [substring] among (
     // with optional space variants to handle ZWNJ → space
-    '{nun}{mim}{ye}'         ($(len > 4) delete set changed set saw_present_prefix) // NEMI
-    '{mim}{ye}'              ($(len > 3) delete set changed set saw_present_prefix) // MI
-    '{nun}{alef}'            ($(len > 3) delete set changed) // NA
-    '{be}{ye}'               ($(len > 3) delete set changed) // BI
+    '{nun}{mim}{ye}'         ($(len > 4) delete set saw_present_prefix) // NEMI
+    '{mim}{ye}'              ($(len > 3) delete set saw_present_prefix) // MI
+    '{nun}{alef}'            ($(len > 3) delete) // NA
+    '{be}{ye}'               ($(len > 3) delete) // BI
   )
-  tomark temp_mark
 )
 
 // ============================================================================
@@ -384,15 +380,8 @@ define stem as (
   // 1) Normalize script/spacing
   do Normalize_Characters
 
-  // 2) Anchor start for prefix stripping
-  setmark start_mark
-
   // 3) Peel prefixes (forward, anchored)
-  repeat (
-    unset changed
-    Strip_Prefix_At_Start
-    changed
-  )
+  repeat Strip_Prefix_At_Start
 
   // 4) Peel suffixes (backward), one layer per pass
   repeat (
