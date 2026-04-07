@@ -159,12 +159,13 @@ define Strip_Prefix_At_Start as (
 
 define Protect_Lexical_AN as (
   unset protect_lex_an
-  backwards (
-    do AN_LexHash or
-    [substring] among (
+  do backwards (
+    AN_LexHash or (
+    among (
       '{sin}{te}{alef}{nun}'  ( set protect_lex_an )  // …stan
       '{sin}{alef}{nun}'      ( set protect_lex_an )  // …san
       '{re}{alef}{nun}'       ( set protect_lex_an )  // …ran
+    )
     )
   )
 )
