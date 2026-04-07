@@ -148,6 +148,8 @@ define Strip_Prefix_At_Start as (
   )
 )
 
+backwardmode (
+
 // ============================================================================
 //  PROBE — PROTECT LEXICAL "-AN" (not plural)
 //  - HPS strips -AN as a plural; however, many stems end in orthographic "AN":
@@ -156,19 +158,18 @@ define Strip_Prefix_At_Start as (
 //  - We set 'protect_lex_an' per pass if a trailing pattern indicates lexical AN.
 //  - This is a probe only: it NEVER edits the buffer; it only sets a flag.
 // ============================================================================
-
-define Protect_Lexical_AN as (
-  unset protect_lex_an
-  do backwards (
-    AN_LexHash or (
-    among (
-      '{sin}{te}{alef}{nun}'  ( set protect_lex_an )  // …stan
-      '{sin}{alef}{nun}'      ( set protect_lex_an )  // …san
-      '{re}{alef}{nun}'       ( set protect_lex_an )  // …ran
-    )
+  define Protect_Lexical_AN as (
+    unset protect_lex_an
+    do (
+      AN_LexHash or (
+      among (
+        '{sin}{te}{alef}{nun}'  ( set protect_lex_an )  // …stan
+        '{sin}{alef}{nun}'      ( set protect_lex_an )  // …san
+        '{re}{alef}{nun}'       ( set protect_lex_an )  // …ran
+      )
+      )
     )
   )
-)
 
 // ============================================================================
 //  PHASE 3 — SUFFIX STRIPPING (backward)
@@ -177,7 +178,6 @@ define Protect_Lexical_AN as (
 //    This ensures 'repeat' loops terminate.
 //  - Length guards $(len > N) reduce over-stemming risk on short words.
 // ============================================================================
-backwardmode (
 
   // --- Lexical "-AN" hash list (exact matches).
   //     Small curated set of stems ending in orthographic -AN that are not plural.
@@ -372,15 +372,13 @@ define stem as (
   repeat Strip_Prefix_At_Start
 
   // 3) Peel suffixes (backward), one layer per pass
-  repeat (
+  backwards repeat test (
     unset saw_inf_or_part
     do Protect_Lexical_AN
-    backwards (
-      // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
-      // FIXME: The original code here was buggy and never ran Stem_Verb.
-      // Uncomment to fix the bug but this changes the stems for a lot of
-      // words and we need to evaluate that.
-      Stem_Noun or Stem_Adjective // or Stem_Verb
-    )
+    // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
+    // FIXME: The original code here was buggy and never ran Stem_Verb.
+    // Uncomment to fix the bug but this changes the stems for a lot of
+    // words and we need to evaluate that.
+    Stem_Noun or Stem_Adjective // or Stem_Verb
   )
 )
