@@ -250,13 +250,14 @@ backwardmode (
 
   // --- Noun possessive suffixes (long + short clitics)
   define Noun_Possessive as (
+    not protect_lex_an
     [substring] among (
       '{alef}{mim}'      ($(len > 4) delete) // -AM
       '{alef}{te}'       ($(len > 4) delete) // -AT
       '{alef}{shin}'     ($(len > 4) delete) // -ASH
-      '{mim}{alef}{nun}' ( not protect_lex_an $(len > 5) delete) // -MAN
-      '{te}{alef}{nun}'  ( not protect_lex_an $(len > 5) delete) // -TAN
-      '{shin}{alef}{nun}'( not protect_lex_an $(len > 5) delete) // -SHAN
+      '{mim}{alef}{nun}' ($(len > 5) delete) // -MAN
+      '{te}{alef}{nun}'  ($(len > 5) delete) // -TAN
+      '{shin}{alef}{nun}'($(len > 5) delete) // -SHAN
 
     )
   )
@@ -264,13 +265,14 @@ backwardmode (
   // --- Noun plurals.
   //     -YAN and -GAN are productive; -AN is guarded by 'protect_lex_an' probe.
   define Noun_Plural as (
+    not protect_lex_an
     [substring] among (
-      '{ye}{alef}{nun}'     ( not protect_lex_an $(len > 5) delete) // -YAN
-      '{gaf}{alef}{nun}'    ( not protect_lex_an $(len > 5) delete) // -GAN
+      '{ye}{alef}{nun}'     ($(len > 5) delete) // -YAN
+      '{gaf}{alef}{nun}'    ($(len > 5) delete) // -GAN
       '{heh}{alef}{ye}'     ($(len > 5) delete)                 // -HAY
       '{alef}{nun}{ye}'     ($(len > 5) delete)                 // -ANI
       '{heh}{alef}'         ($(len > 4) delete)                 // -HA
-      '{alef}{nun}'         ( not protect_lex_an $(len > 4) delete) // -AN (only if not lexical)
+      '{alef}{nun}'         ($(len > 4) delete) // -AN (only if not lexical)
       '{ye}{nun}'           ($(len > 4) delete)                 // -IN
       '{alef}{te}'          ($(len > 4) delete)                 // -AT
     )
@@ -362,10 +364,11 @@ backwardmode (
 
   // --- Verb: mood/tense markers (HPS).
   define Verb_Tense_Mood_Markers as (
+    not protect_lex_an
     [substring] among (
       '{nun}{dal}{heh}'  ($(len > 5) delete set saw_inf_or_part) // agent noun -NDEH → present root
       '{heh}'            ( ( test '{dal}' or test '{te}' ) $(len > 2) delete set saw_inf_or_part) // past part. -ده/-ته
-      '{alef}{nun}'      ( not protect_lex_an $(len > 4) delete set saw_inf_or_part) // infinitive -N / -AN
+      '{alef}{nun}'      ($(len > 4) delete set saw_inf_or_part) // infinitive -N / -AN
     )
   )
 
