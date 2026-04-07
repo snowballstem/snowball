@@ -1,0 +1,18 @@
+// Test unused variables, routines and groupings.
+externals (stem)
+integers (x unused_int)
+booleans (b unused_bool)
+strings (unused string)
+routines (r)
+groupings (g)
+define g 'aeiou'
+define r as (
+   unset b
+   try (next set b)
+   $x = size
+   b
+   $(x > 2)
+   g
+)
+
+define stem as true

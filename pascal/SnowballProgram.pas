@@ -28,15 +28,16 @@ Type
 
     Protected
         Function InGrouping(s : array of char; min, max : Integer) : Boolean;
+        Function GoInGrouping(s : array of char; min, max : Integer) : Boolean;
         Function InGroupingBk(s : array of char; min, max : Integer) : Boolean;
+        Function GoInGroupingBk(s : array of char; min, max : Integer) : Boolean;
         Function OutGrouping(s : array of char; min, max : Integer) : Boolean;
+        Function GoOutGrouping(s : array of char; min, max : Integer) : Boolean;
         Function OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
+        Function GoOutGroupingBk(s : array of char; min, max : Integer) : Boolean;
 
-        Function EqS(s_size : Integer; s : AnsiString) : Boolean;
-        Function EqSBk(s_size : Integer; s : AnsiString) : Boolean;
-
-        Function EqV(s : AnsiString) : Boolean;
-        Function EqVBk(s : AnsiString) : Boolean;
+        Function EqS(s : AnsiString) : Boolean;
+        Function EqSBk(s : AnsiString) : Boolean;
 
         Function FindAmong(v : array of TAmong; v_size : Integer) : Integer;
         Function FindAmongBk(v : array of TAmong; v_size : Integer) : Integer;
@@ -45,7 +46,7 @@ Type
         Procedure SliceCheck;
         Procedure SliceFrom(s : AnsiString);
 
-        Function  ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;        
+        Function  ReplaceS(bra, ket : Integer; s : AnsiString) : Integer;
         Procedure Insert(bra, ket : Integer; s : AnsiString);
 
         Function SliceTo : AnsiString;
@@ -89,6 +90,23 @@ Begin
     Result := True;
 End;
 
+Function TSnowballProgram.GoInGrouping(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+    While (FCursor < FLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor + 1]);
+        If (ch > max) Or (ch < min) Then Exit;
+
+        ch := ch - min;
+        If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+
+        Inc(FCursor);
+    End;
+    Result := False;
+End;
+
 Function TSnowballProgram.InGroupingBk(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
@@ -103,6 +121,23 @@ Begin
 
     Dec(FCursor);
     Result := True;
+End;
+
+Function TSnowballProgram.GoInGroupingBk(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+    While (FCursor > FBkLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor]);
+        If (ch > max) Or (ch < min) Then Exit;
+
+        ch := ch - min;
+        If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) = 0 Then Exit;
+
+        Dec(FCursor);
+    End;
+    Result := False;
 End;
 
 Function TSnowballProgram.OutGrouping(s : array of char; min, max : Integer) : Boolean;
@@ -128,6 +163,29 @@ Begin
     End;
 End;
 
+Function TSnowballProgram.GoOutGrouping(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+
+    While (FCursor < FLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor + 1]);
+
+        If (ch <= max) And (ch >= min) Then
+        Begin
+            ch := ch - min;
+            If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) <> 0 Then
+            Begin
+                Exit;
+            End;
+        End;
+
+        Inc(FCursor);
+    End;
+    Result := False;
+End;
+
 Function TSnowballProgram.OutGroupingBk(s : array of char; min, max : Integer) : Boolean;
 Var ch : Integer;
 Begin
@@ -151,10 +209,32 @@ Begin
     End;
 End;
 
-Function TSnowballProgram.EqS(s_size : Integer; s : AnsiString) : Boolean;
-Var I : Integer;
+Function TSnowballProgram.GoOutGroupingBk(s : array of char; min, max : Integer) : Boolean;
+Var ch : Integer;
+Begin
+    Result := True;
+
+    While (FCursor > FBkLimit) Do
+    Begin
+        ch := Ord(FCurrent[FCursor]);
+        If (ch <= max) And (ch >= min) Then
+        Begin
+            ch := ch - min;
+            If (Ord(s[ch Shr 3]) And Ord(1 Shl (ch And $7))) <> 0 Then
+            Begin
+                Exit;
+            End;
+        End;
+        Dec(FCursor);
+    End;
+    Result := False;
+End;
+
+Function TSnowballProgram.EqS(s : AnsiString) : Boolean;
+Var I, s_size : Integer;
 Begin
     Result := False;
+    s_size := Length(s);
 
     If (FLimit - FCursor) < s_size Then Exit;
 
@@ -166,10 +246,11 @@ Begin
     Result := True;
 End;
 
-Function TSnowballProgram.EqSBk(s_size : Integer; s : AnsiString) : Boolean;
-Var I : Integer;
+Function TSnowballProgram.EqSBk(s : AnsiString) : Boolean;
+Var I, s_size : Integer;
 Begin
     Result := False;
+    s_size := Length(s);
 
     if (FCursor - FBkLimit) < s_size Then Exit;
 
@@ -181,19 +262,9 @@ Begin
     Result := True;
 End;
 
-Function TSnowballProgram.EqV(s : AnsiString) : Boolean;
-Begin
-    Result := EqS(Length(s), s);
-End;
-
-Function TSnowballProgram.EqVBk(s : AnsiString) : Boolean;
-Begin
-    Result := EqSBk(Length(s), s);
-End;
-
 Function TSnowballProgram.FindAmong(v : array of TAmong; v_size : Integer) : Integer;
 Var i, i2, j, c, l, common_i, common_j, k, diff, common : Integer;
-    first_key_inspected, res : Boolean;
+    first_key_inspected : Boolean;
     w : TAmong;
 Begin
     i := 0;
@@ -262,13 +333,12 @@ Begin
             If Not Assigned(w.Method) Then
             Begin
                 Result := w.Result;
-                Exit;   
+                Exit;
             End;
 
-            res := w.Method;
-
-            FCursor := c + Length(w.Str);
-            if (res) Then Begin
+            if w.Method Then
+            Begin
+                FCursor := c + Length(w.Str);
                 Result := w.Result;
                 Exit;
             End;
@@ -285,7 +355,7 @@ End;
 
 Function TSnowballProgram.FindAmongBk(v : array of TAmong; v_size : Integer) : Integer;
 Var i, j, c, lb, common_i, common_j, k, diff, common, i2 : Integer;
-    first_key_inspected, res : Boolean;
+    first_key_inspected : Boolean;
     w : TAmong;
 Begin
     i := 0;
@@ -351,11 +421,9 @@ Begin
                 Exit;
             End;
 
-            res := w.Method;
-
-            FCursor := c - Length(w.Str);
-            If Res Then
+            if w.Method Then
             Begin
+                FCursor := c - Length(w.Str);
                 Result := w.Result;
                 Exit;
             End;
@@ -364,8 +432,8 @@ Begin
         i := w.Index;
         If i < 0 Then
         Begin
-                Result := 0;
-                Exit;
+            Result := 0;
+            Exit;
         End;
     End;
 End;
@@ -420,6 +488,7 @@ Procedure TSnowballProgram.SliceFrom(s : AnsiString);
 Begin
     SliceCheck();
     ReplaceS(FBra, FKet, s);
+    FKet := FBra + Length(s);
 End;
 
 Function TSnowballProgram.AssignTo() : AnsiString;

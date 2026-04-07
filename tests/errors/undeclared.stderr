@@ -1,0 +1,9 @@
+errors/undeclared.sbl:3: 'rb' re-declared
+errors/undeclared.sbl:4: 'rg' re-declared
+errors/undeclared.sbl:5: 'ri' re-declared
+errors/undeclared.sbl:6: 'rs' re-declared
+errors/undeclared.sbl:10: 'rg' redefined
+errors/undeclared.sbl:14: 'xb' undeclared
+errors/undeclared.sbl:16: 'xi' undeclared
+errors/undeclared.sbl:17: integer name 'ri' misplaced
+errors/undeclared.sbl:19: 'xs' undeclared

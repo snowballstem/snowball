@@ -1,38 +1,40 @@
 // @ts-check
 
-/**@constructor*/
-const BaseStemmer = function() {
-    /** @protected */
-    this.current = '';
-    this.cursor = 0;
-    this.limit = 0;
-    this.limit_backward = 0;
-    this.bra = 0;
-    this.ket = 0;
+class BaseStemmer {
+    constructor() {
+        /** @protected */
+        this.current = '';
+        this.cursor = 0;
+        this.limit = 0;
+        this.limit_backward = 0;
+        this.bra = 0;
+        this.ket = 0;
+        this.af = 0;
+    }
 
     /**
      * @param {string} value
      */
-    this.setCurrent = function(value) {
+    setCurrent(value) {
         this.current = value;
         this.cursor = 0;
         this.limit = this.current.length;
         this.limit_backward = 0;
         this.bra = this.cursor;
         this.ket = this.limit;
-    };
+    }
 
     /**
      * @return {string}
      */
-    this.getCurrent = function() {
+    getCurrent() {
         return this.current;
-    };
+    }
 
     /**
      * @param {BaseStemmer} other
      */
-    this.copy_from = function(other) {
+    copy_from(other) {
         /** @protected */
         this.current          = other.current;
         this.cursor           = other.cursor;
@@ -40,153 +42,234 @@ const BaseStemmer = function() {
         this.limit_backward   = other.limit_backward;
         this.bra              = other.bra;
         this.ket              = other.ket;
-    };
+    }
 
     /**
-     * @param {number[]} s
+     * @param {Array<number>} s
      * @param {number} min
      * @param {number} max
      * @return {boolean}
      */
-    this.in_grouping = function(s, min, max) {
+    in_grouping(s, min, max) {
         /** @protected */
         if (this.cursor >= this.limit) return false;
-        var ch = this.current.charCodeAt(this.cursor);
+        let ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) return false;
         ch -= min;
-        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return false;
+        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return false;
         this.cursor++;
         return true;
-    };
+    }
 
     /**
-     * @param {number[]} s
+     * @param {Array<number>} s
      * @param {number} min
      * @param {number} max
      * @return {boolean}
      */
-    this.in_grouping_b = function(s, min, max) {
+    go_in_grouping(s, min, max) {
+        /** @protected */
+        while (this.cursor < this.limit) {
+            let ch = this.current.charCodeAt(this.cursor);
+            if (ch > max || ch < min)
+                return true;
+            ch -= min;
+            if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0)
+                return true;
+            this.cursor++;
+        }
+        return false;
+    }
+
+    /**
+     * @param {Array<number>} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    in_grouping_b(s, min, max) {
         /** @protected */
         if (this.cursor <= this.limit_backward) return false;
-        var ch = this.current.charCodeAt(this.cursor - 1);
+        let ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) return false;
         ch -= min;
-        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) return false;
+        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return false;
         this.cursor--;
         return true;
-    };
+    }
 
     /**
-     * @param {number[]} s
+     * @param {Array<number>} s
      * @param {number} min
      * @param {number} max
      * @return {boolean}
      */
-    this.out_grouping = function(s, min, max) {
+    go_in_grouping_b(s, min, max) {
+        /** @protected */
+        while (this.cursor > this.limit_backward) {
+            let ch = this.current.charCodeAt(this.cursor - 1);
+            if (ch > max || ch < min) return true;
+            ch -= min;
+            if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return true;
+            this.cursor--;
+        }
+        return false;
+    }
+
+    /**
+     * @param {Array<number>} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    out_grouping(s, min, max) {
         /** @protected */
         if (this.cursor >= this.limit) return false;
-        var ch = this.current.charCodeAt(this.cursor);
+        let ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) {
             this.cursor++;
             return true;
         }
         ch -= min;
-        if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) == 0) {
+        if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) === 0) {
             this.cursor++;
             return true;
         }
         return false;
-    };
+    }
 
     /**
-     * @param {number[]} s
+     * @param {Array<number>} s
      * @param {number} min
      * @param {number} max
      * @return {boolean}
      */
-    this.out_grouping_b = function(s, min, max) {
+    go_out_grouping(s, min, max) {
+        /** @protected */
+        while (this.cursor < this.limit) {
+            let ch = this.current.charCodeAt(this.cursor);
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) !== 0) {
+                    return true;
+                }
+            }
+            this.cursor++;
+        }
+        return false;
+    }
+
+    /**
+     * @param {Array<number>} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    out_grouping_b(s, min, max) {
         /** @protected */
         if (this.cursor <= this.limit_backward) return false;
-        var ch = this.current.charCodeAt(this.cursor - 1);
+        let ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) {
             this.cursor--;
             return true;
         }
         ch -= min;
-        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) == 0) {
+        if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) {
             this.cursor--;
             return true;
         }
         return false;
-    };
+    }
+
+    /**
+     * @param {Array<number>} s
+     * @param {number} min
+     * @param {number} max
+     * @return {boolean}
+     */
+    go_out_grouping_b(s, min, max) {
+        /** @protected */
+        while (this.cursor > this.limit_backward) {
+            let ch = this.current.charCodeAt(this.cursor - 1);
+            if (ch <= max && ch >= min) {
+                ch -= min;
+                if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) !== 0) {
+                    return true;
+                }
+            }
+            this.cursor--;
+        }
+        return false;
+    }
 
     /**
      * @param {string} s
      * @return {boolean}
      */
-    this.eq_s = function(s)
+    eq_s(s)
     {
         /** @protected */
         if (this.limit - this.cursor < s.length) return false;
-        if (this.current.slice(this.cursor, this.cursor + s.length) != s)
+        if (!this.current.startsWith(s, this.cursor))
         {
             return false;
         }
         this.cursor += s.length;
         return true;
-    };
+    }
 
     /**
      * @param {string} s
      * @return {boolean}
      */
-    this.eq_s_b = function(s)
+    eq_s_b(s)
     {
         /** @protected */
         if (this.cursor - this.limit_backward < s.length) return false;
-        if (this.current.slice(this.cursor - s.length, this.cursor) != s)
+        if (!this.current.endsWith(s, this.cursor))
         {
             return false;
         }
         this.cursor -= s.length;
         return true;
-    };
+    }
 
     /**
-     * @param {Among[]} v
+     * @param {Array<Array<string|number>>} v
+     * @param {?function(): boolean} call_among_func
      * @return {number}
      */
-    this.find_among = function(v)
+    find_among(v, call_among_func)
     {
         /** @protected */
-        var i = 0;
-        var j = v.length;
+        let i = 0;
+        let j = v.length;
 
-        var c = this.cursor;
-        var l = this.limit;
+        const c = this.cursor;
+        const l = this.limit;
 
-        var common_i = 0;
-        var common_j = 0;
+        let common_i = 0;
+        let common_j = 0;
 
-        var first_key_inspected = false;
+        let first_key_inspected = false;
 
         while (true)
         {
-            var k = i + ((j - i) >>> 1);
-            var diff = 0;
-            var common = common_i < common_j ? common_i : common_j; // smaller
+            const k = i + ((j - i) >>> 1);
+            let diff = 0;
+            let common = common_i < common_j ? common_i : common_j; // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
-            var w = v[k];
-            var i2;
+            const w = v[k];
+            let i2;
             for (i2 = common; i2 < w[0].length; i2++)
             {
-                if (c + common == l)
+                if (c + common === l)
                 {
                     diff = -1;
                     break;
                 }
                 diff = this.current.charCodeAt(c + common) - w[0].charCodeAt(i2);
-                if (diff != 0) break;
+                if (diff !== 0) break;
                 common++;
             }
             if (diff < 0)
@@ -202,7 +285,7 @@ const BaseStemmer = function() {
             if (j - i <= 1)
             {
                 if (i > 0) break; // v->s has been inspected
-                if (j == i) break; // only one item in v
+                if (j === i) break; // only one item in v
 
                 // - but now we need to go round once more to get
                 // v->s inspected. This looks messy, but is actually
@@ -213,55 +296,58 @@ const BaseStemmer = function() {
             }
         }
         do {
-            var w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c + w[0].length;
                 if (w.length < 4) return w[2];
-                var res = w[3](this);
-                this.cursor = c + w[0].length;
-                if (res) return w[2];
+                this.af = w[3];
+                if (call_among_func.call(this))
+                {
+                    this.cursor = c + w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);
         return 0;
-    };
+    }
 
     // find_among_b is for backwards processing. Same comments apply
     /**
-     * @param {Among[]} v
-     * @return {number}
+     * @param {Array<Array<string|number>>} v
+     * @param {?function(): boolean} call_among_func
      */
-    this.find_among_b = function(v)
+    find_among_b(v, call_among_func)
     {
         /** @protected */
-        var i = 0;
-        var j = v.length
+        let i = 0;
+        let j = v.length
 
-        var c = this.cursor;
-        var lb = this.limit_backward;
+        const c = this.cursor;
+        const lb = this.limit_backward;
 
-        var common_i = 0;
-        var common_j = 0;
+        let common_i = 0;
+        let common_j = 0;
 
-        var first_key_inspected = false;
+        let first_key_inspected = false;
 
         while (true)
         {
-            var k = i + ((j - i) >> 1);
-            var diff = 0;
-            var common = common_i < common_j ? common_i : common_j;
-            var w = v[k];
-            var i2;
+            const k = i + ((j - i) >> 1);
+            let diff = 0;
+            let common = common_i < common_j ? common_i : common_j;
+            const w = v[k];
+            let i2;
             for (i2 = w[0].length - 1 - common; i2 >= 0; i2--)
             {
-                if (c - common == lb)
+                if (c - common === lb)
                 {
                     diff = -1;
                     break;
                 }
                 diff = this.current.charCodeAt(c - 1 - common) - w[0].charCodeAt(i2);
-                if (diff != 0) break;
+                if (diff !== 0) break;
                 common++;
             }
             if (diff < 0)
@@ -277,25 +363,28 @@ const BaseStemmer = function() {
             if (j - i <= 1)
             {
                 if (i > 0) break;
-                if (j == i) break;
+                if (j === i) break;
                 if (first_key_inspected) break;
                 first_key_inspected = true;
             }
         }
         do {
-            var w = v[i];
+            const w = v[i];
             if (common_i >= w[0].length)
             {
                 this.cursor = c - w[0].length;
                 if (w.length < 4) return w[2];
-                var res = w[3](this);
-                this.cursor = c - w[0].length;
-                if (res) return w[2];
+                this.af = w[3];
+                if (call_among_func.call(this))
+                {
+                    this.cursor = c - w[0].length;
+                    return w[2];
+                }
             }
             i = w[1];
         } while (i >= 0);
         return 0;
-    };
+    }
 
     /* to replace chars between c_bra and c_ket in this.current by the
      * chars in s.
@@ -306,93 +395,67 @@ const BaseStemmer = function() {
      * @param {string} s
      * @return {number}
      */
-    this.replace_s = function(c_bra, c_ket, s)
+    #replace_s(c_bra, c_ket, s)
     {
-        /** @protected */
-        var adjustment = s.length - (c_ket - c_bra);
+        const adjustment = s.length - (c_ket - c_bra);
         this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
         this.limit += adjustment;
         if (this.cursor >= c_ket) this.cursor += adjustment;
         else if (this.cursor > c_bra) this.cursor = c_bra;
         return adjustment;
-    };
+    }
 
     /**
-     * @return {boolean}
      */
-    this.slice_check = function()
+    #slice_check()
     {
-        /** @protected */
-        if (this.bra < 0 ||
-            this.bra > this.ket ||
-            this.ket > this.limit ||
-            this.limit > this.current.length)
-        {
-            return false;
-        }
-        return true;
-    };
+        console.assert(this.bra >= 0);
+        console.assert(this.bra <= this.ket);
+        console.assert(this.ket <= this.limit);
+        console.assert(this.limit <= this.current.length);
+    }
 
     /**
-     * @param {number} c_bra
-     * @return {boolean}
+     * @param {string} s
      */
-    this.slice_from = function(s)
+    slice_from(s)
     {
         /** @protected */
-        var result = false;
-        if (this.slice_check())
-        {
-            this.replace_s(this.bra, this.ket, s);
-            result = true;
-        }
-        return result;
-    };
+        this.#slice_check();
+        this.#replace_s(this.bra, this.ket, s);
+        this.ket = this.bra + s.length;
+    }
 
     /**
-     * @return {boolean}
      */
-    this.slice_del = function()
+    slice_del()
     {
         /** @protected */
-        return this.slice_from("");
-    };
+        this.slice_from("");
+    }
 
     /**
      * @param {number} c_bra
      * @param {number} c_ket
      * @param {string} s
      */
-    this.insert = function(c_bra, c_ket, s)
+    insert(c_bra, c_ket, s)
     {
         /** @protected */
-        var adjustment = this.replace_s(c_bra, c_ket, s);
+        const adjustment = this.#replace_s(c_bra, c_ket, s);
         if (c_bra <= this.bra) this.bra += adjustment;
         if (c_bra <= this.ket) this.ket += adjustment;
-    };
+    }
 
     /**
      * @return {string}
      */
-    this.slice_to = function()
+    slice_to()
     {
         /** @protected */
-        var result = '';
-        if (this.slice_check())
-        {
-            result = this.current.slice(this.bra, this.ket);
-        }
-        return result;
-    };
+        this.#slice_check();
+        return this.current.slice(this.bra, this.ket);
+    }
+}
 
-    /**
-     * @return {string}
-     */
-    this.assign_to = function()
-    {
-        /** @protected */
-        return this.current.slice(0, this.limit);
-    };
-};
-
-if (typeof module === 'object' && module.exports) module.exports = BaseStemmer;
+export { BaseStemmer };

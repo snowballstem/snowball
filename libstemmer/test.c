@@ -13,7 +13,7 @@ int main () {
     struct sb_stemmer * s;
     const char ** list = sb_stemmer_list();
     if (*list == 0) error("TEST FAIL: empty list of stemmers");
-    
+
     s = sb_stemmer_new("e");
     if (s != 0) error("TEST FAIL: non zero return for unrecognised language");
     s = sb_stemmer_new("english");

@@ -8,7 +8,6 @@ routines (
     R1 R2
     Step_1a Step_1b Step_1c Step_2 Step_3 Step_4 Step_5
     exception1
-    exception2
 )
 
 externals ( stem )
@@ -35,9 +34,15 @@ define mark_regions as (
     $p2 = limit
     do(
         among (
-            'gener'
-            'commun'  //  added May 2005
-            'arsen'   //  added Nov 2006 (arsenic/arsenal)
+            'gener'   // generate/general/generic/generous
+            'commun'  // communication/communism/community
+            'arsen'   // arsenic/arsenal
+            'past'    // past/paste
+            'univers' // universe/universal/university
+            'later'   // lateral/later
+            'emerg'   // emerge/emergency
+            'organ'   // organ/organic/organize
+            'inter'   // intern/internal/international/internment; interfere; interval
             // ... extensions possible here ...
         ) or (gopast v  gopast non-v)
         setmark p1
@@ -51,6 +56,8 @@ backwardmode (
         ( non-v_WXY v non-v )
         or
         ( non-v v atlimit )
+        or
+        ( 'past' ) // pasted/pasting
     )
 
     define R1 as $p1 <= cursor
@@ -75,22 +82,45 @@ backwardmode (
     define Step_1b as (
         [substring] among (
             'eed' 'eedly'
-                (R1 <-'ee')
-            'ed' 'edly' 'ing' 'ingly'
                 (
-                test gopast v  delete
-                [] test (
-                    substring among(
-                        'at' 'bl' 'iz'
-                             (fail(<- 'e'))
-                        'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
-                        // ignoring double c, h, j, k, q, v, w, and x
-                             (not (aeo atlimit))
-                        ''   (fail(atmark p1  test shortv  <- 'e'))
+                do (
+                    R1
+                    among (
+                        'proc' 'exc' 'succ'
+                            (atlimit)
+                    ) or (
+                        <-'ee'
                     )
                 )
-                [next]  delete
             )
+            'ed' 'edly' 'ingly'
+                (false) // Handled below.
+            'ing'
+                ( // Handle exceptional cases here, rest handled below.
+                among (
+                    // dying->die, lying->die, tying->tie, vying->vie
+                    'y'
+                        (test(non-v atlimit) ] <-'ie')
+                    // Leave inning, outing, etc alone.
+                    'inn' 'out' 'cann' 'herr' 'earr' 'even'
+                        (atlimit)
+                )
+            )
+            ''  ()
+        ) or (
+            // Handle 'ed' 'edly' 'ing' 'ingly'
+            test gopast v  delete
+            [] test (
+                substring among(
+                    'at' 'bl' 'iz'
+                         (fail(<- 'e'))
+                    'bb' 'dd' 'ff' 'gg' 'mm' 'nn' 'pp' 'rr' 'tt'
+                    // ignoring double c, h, j, k, q, v, w, and x
+                         (not (aeo atlimit))
+                    ''   (fail(atmark p1  test shortv  <- 'e'))
+                )
+            )
+            [next]  delete
         )
     )
 
@@ -120,6 +150,7 @@ backwardmode (
                       (<-'ive')
             'biliti' 'bli'
                       (<-'ble')
+            'ogist'   (<-'og')
             'ogi'     ('l' <-'og')
             'fulli'   (<-'ful')
             'lessli'  (<-'less')
@@ -129,15 +160,15 @@ backwardmode (
 
     define Step_3 as (
         [substring] R1 among (
-            'tional'  (<- 'tion')
-            'ational' (<- 'ate')
+            'tional'  (<-'tion')
+            'ational' (<-'ate')
             'alize'   (<-'al')
             'icate' 'iciti' 'ical'
                       (<-'ic')
             'ful' 'ness'
                       (delete)
             'ative'
-                      (R2 delete)  // 'R2' added Dec 2001
+                      (R2 delete)
         )
     )
 
@@ -156,17 +187,6 @@ backwardmode (
             'l' (R2 'l' delete)
         )
     )
-
-    define exception2 as (
-
-        [substring] atlimit among(
-            'inning' 'outing' 'canning' 'herring' 'earring'
-            'proceed' 'exceed' 'succeed'
-
-            // ... extensions possible here ...
-
-        )
-    )
 )
 
 define exception1 as (
@@ -177,9 +197,6 @@ define exception1 as (
 
         'skis'      (<-'ski')
         'skies'     (<-'sky')
-        'dying'     (<-'die')
-        'lying'     (<-'lie')
-        'tying'     (<-'tie')
 
         /* special -LY cases */
 
@@ -216,17 +233,14 @@ define stem as (
 
             do Step_1a
 
-            exception2 or (
+            do Step_1b
+            do Step_1c
 
-                do Step_1b
-                do Step_1c
+            do Step_2
+            do Step_3
+            do Step_4
 
-                do Step_2
-                do Step_3
-                do Step_4
-
-                do Step_5
-            )
+            do Step_5
         )
         do postlude
     )

@@ -1,20 +1,21 @@
 // Copyright (c) 2001, Dr Martin Porter
 // Copyright (c) 2002, Richard Boulton
 // Copyright (c) 2015, Cesar Souza
+// Copyright (c) 2025, Olly Betts
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
-//     * Redistributions of source code must retain the above copyright notice,
-//     * this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//     * notice, this list of conditions and the following disclaimer in the
-//     * documentation and/or other materials provided with the distribution.
-//     * Neither the name of the copyright holders nor the names of its contributors
-//     * may be used to endorse or promote products derived from this software
-//     * without specific prior written permission.
-// 
+//
+//    1. Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimer.
+//    2. Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//    3. Neither the name of the Snowball project nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,24 +33,23 @@ namespace Snowball
     using System.IO;
     using System.Reflection;
     using System.Linq;
-    using System.Text;
 
     /// <summary>
     ///   Snowball's Stemmer program.
     /// </summary>
-    /// 
+    ///
     public static class Program
     {
 
         private static void usage()
         {
-            Console.WriteLine("Usage: stemwords.exe -l <language> -i <input file> [-o <output file>]");
+            Console.WriteLine("Usage: stemwords.exe -l <language> [-i <input file>] [-o <output file>]");
         }
 
         /// <summary>
         ///   Main program entrypoint.
         /// </summary>
-        /// 
+        ///
         public static void Main(String[] args)
         {
             string language = null;
@@ -62,11 +62,11 @@ namespace Snowball
                     language = args[i + 1];
                 else if (args[i] == "-i")
                     inputName = args[i + 1];
-                if (args[i] == "-o")
+                else if (args[i] == "-o")
                     outputName = args[i + 1];
             }
 
-            if (language == null || inputName == null)
+            if (language == null)
             {
                 usage();
                 return;
@@ -86,16 +86,26 @@ namespace Snowball
                 return;
             }
 
-            Console.WriteLine("Using " + stemmer.GetType());
+            TextReader input = System.Console.In;
+            if (inputName != null)
+                input = new StreamReader(inputName);
 
-            TextWriter output = System.Console.Out;
-
-            if (outputName != null)
+            TextWriter output;
+            if (outputName != null) {
                 output = new StreamWriter(outputName);
+            } else {
+                // For some reason this is much faster than using
+                // System.Console.Out, at least with mono on Linux.
+                //
+                // `make check_sharp_tamil` takes 0.842s wallclock instead of
+                // 1.848s.
+                output = new StreamWriter(Console.OpenStandardOutput());
+            }
 
-
-            foreach (var line in File.ReadAllLines(inputName))
+            while (true)
             {
+                var line = input.ReadLine();
+                if (line == null) break;
                 var o = stemmer.Stem(line);
                 output.WriteLine(o);
             }
@@ -105,7 +115,7 @@ namespace Snowball
 
         private static bool match(string stemmerName, string language)
         {
-            string expectedName = language.Replace("_", "") + "Stemmer";
+            string expectedName = language + "Stemmer";
 
             return stemmerName.StartsWith(expectedName,
                 StringComparison.CurrentCultureIgnoreCase);

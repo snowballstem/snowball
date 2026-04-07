@@ -73,16 +73,16 @@ EOS
     my @algorithms = sort keys(%algorithms);
     print OUT "\nlibstemmer_algorithms =";
     foreach $lang (@algorithms) {
-	print OUT "\\\n    ", $lang;
+        print OUT "\\\n    ", $lang;
     }
     print OUT "\n";
 
     for my $enc (qw(ISO_8859_1 ISO_8859_2 KOI8_R)) {
-	print OUT "\n${enc}_algorithms =";
-	foreach $lang (@algorithms) {
-	    print OUT "\\\n    ", $lang if exists $algorithm_encs{$lang}->{$enc};
-	}
-	print OUT "\n";
+        print OUT "\n${enc}_algorithms =";
+        foreach $lang (@algorithms) {
+            print OUT "\\\n    ", $lang if exists $algorithm_encs{$lang}->{$enc};
+        }
+        print OUT "\n";
     }
 }
 

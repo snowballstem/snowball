@@ -11,9 +11,12 @@ $ snowball path/to/algorithm.sbl -go -o algorithm
 
 ### Go specific options
 
-`-gop[ackage]` the package name used in the generated go file (defaults to `snowball`)
+`-Package`/`-P`: the package name used in the generated go file (defaults to `snowball`)
 
-`-gor[untime]` the import path used for the Go Snowball runtime (defaults to `github.com/snowballstem/snowball/go`)
+`-goruntime`/`-gor`: the import path used for the Go Snowball runtime (defaults to `github.com/snowballstem/snowball/go`)
+
+Snowball 3.0.1 and earlier supported `-go`/`-gopackage`, but this was just an
+alias for `-Package`/`-P` since Snowball 2.0.0.
 
 ## Code Organization
 
@@ -30,12 +33,17 @@ $ snowball path/to/algorithm.sbl -go -o algorithm
 Assuming you generated a stemmer, put that code in a package which is imported by this code as `english`.
 
 ```
-env := snowball.NewEnv("beautiful")
+env := snowball.NewEnv("")
+env.SetCurrent("beautiful")
 english.Stem(env)
 fmt.Printf("stemmed word is: %s", env.Current())
 ```
 
-NOTE: you can use the env.SetCurrent("new_word") to reuse the env on subsequent calls to the stemmer.
+If you are stemming many words you should reuse `env` as shown above.  If you
+are stemming a single word, you can set the current string when you create it
+with `env:= snowball.NewEnv("beautiful")`, but doing this when stemming many
+words is not recommended as the overhead is measurable (stemwords for the arabic
+stemmer on the sample vocabulary is about 12% faster if you reuse `env`).
 
 ## Testing
 

@@ -4,7 +4,7 @@ externals ( stem )
 stringescapes { }
 
 /* Special characters in Unicode Latin Extended-A */
-// ' nosine
+// k nosine
 stringdef ak   '{U+0105}'  // ą a + ogonek
 stringdef ek   '{U+0119}'  // ę e + ogonek
 stringdef ik   '{U+012F}'  // į i + ogonek
@@ -111,21 +111,20 @@ backwardmode (
 
 
       // V linksniuote (declension V)
-      'ies' 'ens' 'enio' 'ers'    // avies, vandens, sesers
-      'eniui' 'eriai'             // vandeniui, eriai
-      'en{ik}' 'er{ik}'           // vandenį, seserį
-      'imi' 'eniu' 'erimi' 'eria' // avimi, vandeniu, seserimi, seseria
-      'enyje' 'eryje'             // vandenyje, seseryje
-      'ie' 'enie' 'erie'          // avie, vandenie, seserie
+      'ies' 'ens' 'enio'          // avies, vandens, sesers
+      'eniui'                     // vandeniui
+      'en{ik}'                    // vandenį
+      'imi' 'eniu'                // avimi, vandeniu
+      'enyje'                     // vandenyje
+      'ie' 'enie'                 // avie, vandenide
 
-      'enys' 'erys'               // vandenys, seserys
+      'enys'                      // vandenys
       // 'en{uk}' konfliktas su 'žandenų' 'antenų'
-      'er{uk}'                    // seserų
-      'ims' 'enims' 'erims'       // avims, vandemins, seserims
+      'ims' 'enims'               // avims, vandemins
       'enis'                      // vandenis
       'imis'                      // žebenkštimis
       'enimis'                    // vandenimis
-      'yse' 'enyse' 'eryse'       // avyse, vandenyse, seseryse
+      'yse' 'enyse'               // avyse, vandenyse
 
 
       // Būdvardžiai (Adjectives)
@@ -355,7 +354,7 @@ define stem as (
 
   do (
     // priešdėlis 'a' ilgeniuose nei 6 raidės žodžiuose, pvz. 'a-liejus'.
-    try (test 'a' $(len > 6) hop 1)
+    try ('a' $(len > 6))
 
     gopast v  gopast non-v  setmark p1
   )

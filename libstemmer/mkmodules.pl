@@ -35,7 +35,7 @@ sub addalgenc($$) {
       my $norm_enc = lc $enc;
       $norm_enc =~ s/_//g;
       if ($norm_enc ne $enc_only) {
-	  return;
+          return;
       }
   }
 
@@ -146,7 +146,7 @@ EOS
 
 struct stemmer_modules {
   const char * name;
-  stemmer_encoding_t enc; 
+  stemmer_encoding_t enc;
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
@@ -252,7 +252,7 @@ EOS
     for $srcfile ('include/libstemmer.h',
                   "libstemmer/modules${extn}.h",
                   'runtime/api.h',
-                  'runtime/header.h') {
+                  'runtime/snowball_runtime.h') {
         print OUT " \\\n" if $need_sep;
         print OUT "  $srcfile";
         $need_sep = 1;
