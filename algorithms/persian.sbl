@@ -98,8 +98,7 @@ routines (
   // Noun tier (HPS categories)
   AN_LexHash N_Hash
   Noun_Possessive  Noun_Plural  Noun_Other  Stem_Noun
-  Adjective_Superlative_Comparative  Adjective_Derivational
-  Adjective_Relative Stem_Adjective
+  Stem_Adjective
   Participle_Clitic_Tails
   Verb_Person_Endings  Verb_Tense_Mood_Markers  Stem_Verb
 )
@@ -296,38 +295,26 @@ backwardmode (
     N_Hash or Noun_Other or Noun_Plural or Noun_Possessive
   )
 
-  // --- Adjective: comparative/superlative (HPS).
-  define Adjective_Superlative_Comparative as (
-    setlimit tomark p1 for ( [substring] among (
-      '{te}{re}{ye}{nun}' (delete) // -TARIN
-      '{te}{re}'          (not atlimit delete) // -TAR
-    ) )
-  )
-
-  // --- Adjective derivational endings (HPS list + common variants).
-  define Adjective_Derivational as (
-    setlimit tomark p1 for ( [substring] among (
-      '{alef}{nun}{heh}'  (delete) // -ANE
-      '{mim}{nun}{dal}'   (delete) // -MAND
-      '{vav}{alef}{re}'   (delete) // -VAR
-      '{nun}{alef}{kaf}'  (delete) // -NAK
-      '{gaf}{alef}{re}'   (delete) // -GAR
-      '{ye}{nun}'         (delete) // -IN
-    ) )
-  )
-
-  // --- Adjective: relative -Y suffix.
-  define Adjective_Relative as (
-    setlimit tomark p1 for ( [substring] among (
-      '{ye}{ye}'  (delete) // -YY
-    ) )
-  )
-
-  // --- Composite adjective step (OR chain).
+  // --- Adjective step.
   define Stem_Adjective as (
-    Adjective_Superlative_Comparative or
-    Adjective_Derivational or
-    Adjective_Relative
+    setlimit tomark p1 for (
+      [substring] among (
+        // Adjective: comparative/superlative (HPS).
+        '{te}{re}{ye}{nun}' (delete) // -TARIN
+        '{te}{re}'          (not atlimit delete) // -TAR
+
+        // Adjective derivational endings (HPS list + common variants).
+        '{alef}{nun}{heh}'  (delete) // -ANE
+        '{mim}{nun}{dal}'   (delete) // -MAND
+        '{vav}{alef}{re}'   (delete) // -VAR
+        '{nun}{alef}{kaf}'  (delete) // -NAK
+        '{gaf}{alef}{re}'   (delete) // -GAR
+        '{ye}{nun}'         (delete) // -IN
+
+        // Adjective: relative -Y suffix.
+        '{ye}{ye}'          (delete) // -YY
+      )
+    )
   )
 
   // --- Participle + person/aux clitic tails
