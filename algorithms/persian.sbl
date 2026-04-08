@@ -346,7 +346,8 @@ backwardmode (
   define Verb_Tense_Mood_Markers as (
     [substring] among (
       '{nun}{dal}{heh}'  ($(len > 5) delete set saw_inf_or_part) // agent noun -NDEH → present root
-      '{heh}'            ( ( test '{dal}' or test '{te}' ) $(len > 2) delete set saw_inf_or_part) // past part. -deh/-teh
+      '{dal}{heh}'       ($(len > 2) <-'{dal}' set saw_inf_or_part) // past part. -deh
+      '{te}{heh}'        ($(len > 2) <-'{te}'  set saw_inf_or_part) // past part. -teh
       '{alef}{nun}'      ($(len > 4) delete set saw_inf_or_part) // infinitive -N / -AN
     )
   )
