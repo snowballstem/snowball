@@ -152,6 +152,7 @@ COMPILER_SOURCES = compiler/analyser.c \
 		   compiler/driver.c \
 		   compiler/generator.c \
 		   compiler/generator_ada.c \
+		   compiler/generator_c.c \
 		   compiler/generator_csharp.c \
 		   compiler/generator_dart.c \
 		   compiler/generator_go.c \
