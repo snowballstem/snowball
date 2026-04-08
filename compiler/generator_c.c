@@ -1039,15 +1039,6 @@ static void generate_integer_assign(struct generator * g, struct node * p, const
     writef(g, "~M~V ~S0 ", p); generate_AE(g, p->AE); writef(g, ";~N", p);
 }
 
-extern int just_return_on_fail(struct generator * g) {
-    return g->failure_label == x_return && str_len(g->failure_str) == 0;
-}
-
-extern int tailcallable(struct generator * g, struct node * p) {
-    return just_return_on_fail(g) &&
-           p->right && p->right->type == c_functionend;
-}
-
 static void generate_integer_test(struct generator * g, struct node * p) {
     write_comment(g, p);
     int relop = p->type;
@@ -1522,31 +1513,6 @@ static void generate(struct generator * g, struct node * p) {
     g->failure_label = a0;
     str_delete(g->failure_str);
     g->failure_str = a1;
-}
-
-void write_generated_comment_content(struct generator * g) {
-    // Report only the leafname of the Snowball source file to make output
-    // reproducible even if an absolute path to the source file is specified.
-    write_string(g, "Generated from ");
-    const char * leaf = g->analyser->tokeniser->file;
-    const char * p = strrchr(leaf, '/');
-    if (p) leaf = p + 1;
-    p = strrchr(leaf, '\\');
-    if (p) leaf = p + 1;
-    write_string(g, leaf);
-    write_string(g, " by Snowball " SNOWBALL_VERSION " - https://snowballstem.org/");
-}
-
-void write_start_comment(struct generator * g,
-                         const char * comment_start,
-                         const char * comment_end) {
-    write_margin(g);
-    write_string(g, comment_start);
-    write_generated_comment_content(g);
-    if (comment_end) {
-        write_string(g, comment_end);
-    }
-    w(g, "~N~N");
 }
 
 static void generate_head(struct generator * g) {
