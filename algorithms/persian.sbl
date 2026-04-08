@@ -322,7 +322,7 @@ backwardmode (
     )
   )
 
-  // --- Verb: person/number endings
+  // --- Verb: person endings
   define Verb_Person_Endings as (
     [substring] among (
       // Specific past-3sg stem fixes
