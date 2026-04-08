@@ -105,11 +105,6 @@ static void write_comment(struct generator * g, struct node * p) {
     write_newline(g);
 }
 
-/* margin + string */
-static void wms(struct generator * g, const char * s) {
-    write_margin(g); write_string(g, s);
-}
-
 static void write_block_start(struct generator * g) {
     w(g, "~M{~+~N");
 }
@@ -150,7 +145,11 @@ static void winc(struct generator * g, struct node * p) {     /* increment c */
 
 static void wsetl(struct generator * g, int n) {
     g->margin--;
-    wms(g, "lab"); write_int(g, n); write_char(g, ':'); write_newline(g);
+    write_margin(g);
+    write_string(g, "lab");
+    write_int(g, n);
+    write_char(g, ':');
+    write_newline(g);
     g->line_labelled = g->line_count;
     g->margin++;
 }
