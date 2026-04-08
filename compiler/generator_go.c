@@ -11,10 +11,6 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-static int new_label(struct generator * g) {
-    return g->next_label++;
-}
-
 static struct str * vars_newname(struct generator * g) {
     struct str * output;
     g->var_number++;

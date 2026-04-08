@@ -454,6 +454,10 @@ struct options {
 extern struct generator * create_generator(struct analyser * a, struct options * o);
 extern void close_generator(struct generator * g);
 
+static inline int new_label(struct generator * g) {
+    return g->next_label++;
+} 
+
 extern void write_char(struct generator * g, int ch);
 extern void write_newline(struct generator * g);
 extern void write_string(struct generator * g, const char * s);

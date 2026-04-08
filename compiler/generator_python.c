@@ -10,11 +10,13 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-static int new_label(struct generator * g) {
-    int next_label = g->next_label++;
+static int new_label_python(struct generator * g) {
+    int next_label = new_label(g);
     if (next_label > g->max_label) g->max_label = next_label;
     return next_label;
 }
+
+#define new_label(G) new_label_python(G)
 
 static struct str * vars_newname(struct generator * g) {
     struct str * output;
