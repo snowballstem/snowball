@@ -379,6 +379,7 @@ static void generate_AE(struct generator * g, struct node * p) {
 }
 
 static void generate_bra(struct generator * g, struct node * p) {
+    write_comment(g, p);
     p = p->left;
     while (p) {
         generate(g, p);
@@ -591,6 +592,8 @@ static void generate_do(struct generator * g, struct node * p) {
     if (K_needed(g, p->left)) {
         savevar = vars_newname(g);
     }
+
+    write_comment(g, p);
     if (savevar) {
         write_block_start(g);
         write_savecursor(g, p, savevar);
