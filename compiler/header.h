@@ -400,6 +400,10 @@ struct generator {
     int temporary_used;  /* track if temporary variable used (Ada and Pascal) */
     char java_import_arrays; /* need `import java.util.Arrays;` */
     char java_import_chararraysequence; /* need `import org.tartarus.snowball.CharArraySequence;` */
+    // Prefix for generated variable names (`v_` by default).
+    const char * varname_prefix;
+    // String to indent by for each margin level (four spaces by default).
+    const char * margin_indent;
 };
 
 /* Special values for failure_label in struct generator. */
@@ -457,6 +461,10 @@ extern void close_generator(struct generator * g);
 static inline int new_label(struct generator * g) {
     return g->next_label++;
 } 
+
+extern struct str * vars_newname(struct generator * g);
+
+extern void write_margin(struct generator * g);
 
 extern void write_char(struct generator * g, int ch);
 extern void write_newline(struct generator * g);

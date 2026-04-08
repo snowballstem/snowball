@@ -18,15 +18,6 @@ static int new_label_python(struct generator * g) {
 
 #define new_label(G) new_label_python(G)
 
-static struct str * vars_newname(struct generator * g) {
-    struct str * output;
-    g->var_number++;
-    output = str_new();
-    str_append_string(output, "v_");
-    str_append_int(output, g->var_number);
-    return output;
-}
-
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
@@ -88,10 +79,6 @@ static void write_literal_char(struct generator * g, symbol ch) {
         write_hex4(g, ch);
     }
     write_char(g, '"');
-}
-
-static void write_margin(struct generator * g) {
-    for (int i = 0; i < g->margin; i++) write_string(g, "    ");
 }
 
 static void write_comment(struct generator * g, struct node * p) {

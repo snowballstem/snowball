@@ -11,15 +11,6 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
-static struct str * vars_newname(struct generator * g) {
-    struct str * output;
-    g->var_number++;
-    output = str_new();
-    str_append_string(output, "v_");
-    str_append_int(output, g->var_number);
-    return output;
-}
-
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
@@ -67,10 +58,6 @@ static void write_literal_string(struct generator * g, symbol * p) {
         }
     }
     write_char(g, '"');
-}
-
-static void write_margin(struct generator * g) {
-    for (int i = 0; i < g->margin; i++) write_string(g, "   ");
 }
 
 static void write_relop(struct generator * g, int relop) {
@@ -1746,6 +1733,8 @@ static void generate_groupings(struct generator * g) {
 }
 
 extern void generate_program_ada(struct generator * g) {
+    g->margin_indent = "   ";
+
     g->outbuf = str_new();
     g->failure_str = str_new();
 

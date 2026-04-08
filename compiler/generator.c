@@ -12,11 +12,26 @@ extern struct generator * create_generator(struct analyser * a, struct options *
     g->analyser = a;
     g->options = o;
     g->failure_label = -1;
+    g->varname_prefix = "v_";
+    g->margin_indent = "    ";
     return g;
 }
 
 extern void close_generator(struct generator * g) {
     FREE(g);
+}
+
+extern struct str * vars_newname(struct generator * g) {
+    struct str * output;
+    g->var_number++;
+    output = str_new();
+    str_append_string(output, g->varname_prefix);
+    str_append_int(output, g->var_number);
+    return output;
+}
+
+extern void write_margin(struct generator * g) {
+    for (int i = 0; i < g->margin; i++) write_string(g, g->margin_indent);
 }
 
 /* Language-independent write routines for simple entities */
