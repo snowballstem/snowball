@@ -253,10 +253,18 @@ backwardmode (
         '{alef}{mim}'       (delete) // -AM
         '{alef}{te}'        (delete) // -AT (can also be a noun plural)
         '{alef}{shin}'      (delete) // -ASH
-// FIXME: These were dominated by -AN below before refactoring.
-//        '{mim}{alef}{nun}'  (delete) // -MAN
-//        '{te}{alef}{nun}'   (delete) // -TAN
-//        '{shin}{alef}{nun}' (delete) // -SHAN
+
+        // -MAN/-TAN/-SHAN are intentionally disabled: these 3-char suffixes
+        // are ambiguous with plurals of nouns whose root ends in the same letter:
+        //   ketab+maan (our book)   -> strip -maan -> ketab  (correct)
+        //   mardom+an  (people pl.) -> strip -an   -> mardom (correct, NOT mardom->mard)
+        //   naqqash+an (painters)   -> strip -an   -> naqqash (correct, NOT ->naqqaa)
+        //   derakht+an (trees)      -> strip -an   -> derakht (correct, NOT ->derakh)
+        // Without a lexicon we cannot distinguish the two cases. The -AN
+        // rule below handles both at the cost of missing possessive stripping.
+        //        '{mim}{alef}{nun}'  (delete) // -MAN
+        //        '{te}{alef}{nun}'   (delete) // -TAN
+        //        '{shin}{alef}{nun}' (delete) // -SHAN
 
         // Noun plurals.
         // -YAN and -GAN are productive.
