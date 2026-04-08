@@ -108,11 +108,13 @@ routines (
 externals ( stem )
 
 // Guard flags:
-//  - 'saw_present_prefix': true when a present-tense prefix (mi-/nemi-) is stripped;
-//                          used to enable verb person-ending rules in this pass.
-//  - 'saw_inf_or_part'   : true when an infinitive (-n/an) or participle (-h) is stripped;
-//                          also enables verb person-ending rules in this pass.
-booleans ( saw_present_prefix saw_inf_or_part )
+//  - 'saw_present_prefix':
+//    true when a present-tense prefix (mi-/nemi-) is stripped; used as the
+//    default for `remove_verb_person_endings` for all suffix removal passes.
+//  - 'remove_verb_person_endings':
+//    true if a verb cue has been seen; used to enable verb person-ending rules
+//    in this pass.
+booleans ( saw_present_prefix remove_verb_person_endings )
 
 integers ( p1 x )
 
@@ -344,22 +346,22 @@ backwardmode (
       '{re}{fe}{te}{ye}{dal}'       (<- '{re}{fe}{te}')
       '{re}{fe}{te}{alef}{nun}{dal}'(<- '{re}{fe}{te}')
       // Generic person endings — only when a verb cue is active
-      '{alef}{nun}{dal}' ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -AND
-      '{ye}{dal}'        ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -ID
-      '{ye}{mim}'        ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -IM
-      '{alef}{mim}'      ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -AM
-      '{dal}'            ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -D
-      '{mim}'            ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -M
+      '{alef}{nun}{dal}' ( remove_verb_person_endings R1 delete ) // -AND
+      '{ye}{dal}'        ( remove_verb_person_endings R1 delete ) // -ID
+      '{ye}{mim}'        ( remove_verb_person_endings R1 delete ) // -IM
+      '{alef}{mim}'      ( remove_verb_person_endings R1 delete ) // -AM
+      '{dal}'            ( remove_verb_person_endings R1 delete ) // -D
+      '{mim}'            ( remove_verb_person_endings R1 delete ) // -M
     )
   )
 
   // --- Verb: mood/tense markers (HPS).
   define Verb_Tense_Mood_Markers as (
     [substring] among (
-      '{nun}{dal}{heh}'  (R1 delete set saw_inf_or_part) // agent noun -NDEH → present root
-      '{dal}{heh}'       (not atlimit <-'{dal}' set saw_inf_or_part) // past part. -deh
-      '{te}{heh}'        (not atlimit <-'{te}'  set saw_inf_or_part) // past part. -teh
-      '{alef}{nun}'      (R1 delete set saw_inf_or_part) // infinitive -N / -AN
+      '{nun}{dal}{heh}'  (R1 delete set remove_verb_person_endings) // agent noun -NDEH → present root
+      '{dal}{heh}'       (not atlimit <-'{dal}' set remove_verb_person_endings) // past part. -deh
+      '{te}{heh}'        (not atlimit <-'{te}'  set remove_verb_person_endings) // past part. -teh
+      '{alef}{nun}'      (R1 delete set remove_verb_person_endings) // infinitive -N / -AN
     )
   )
 
@@ -398,7 +400,9 @@ define stem as (
 
   // 3) Peel suffixes (backward), one layer per pass
   backwards repeat test (
-    unset saw_inf_or_part
+    // Set remove_verb_person_endings = saw_present_prefix.
+    unset remove_verb_person_endings
+    try ( saw_present_prefix set remove_verb_person_endings )
     Protect_Lexical_AN
     // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
     Stem_Noun or Stem_Adjective or Stem_Verb
