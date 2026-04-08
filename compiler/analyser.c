@@ -2561,6 +2561,18 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
     a->variable_count = a->name_count[t_string] +
                         a->name_count[t_boolean] +
                         a->name_count[t_integer];
+
+    // Now number the locals (which e.g. Ada and Pascal use to avoid clashes
+    // from case-insensitive variable names).  We use a copy of the counters
+    // to do this so that a->name_count[] reflects the number of non-localised
+    // variables of each type.
+    int name_count[t_size];
+    memcpy(name_count, a->name_count, sizeof(name_count));
+    for (struct name * name = a->names; name; name = name->next) {
+        if (name->count < 0) {
+            name->count = name_count[name->type]++;
+        }
+    }
 }
 
 extern struct analyser * create_analyser(struct tokeniser * t) {

@@ -1,0 +1,20 @@
+// Test target language naming problem cases.
+// Test handling of names which only differ by case (for e.g. Pascal).
+strings (notable NoTable NOTABLE)
+// Test handling of name ending `_`.
+// (Regression test for bug in Ada generator fixed in 3.1.0.)
+integers (x_ x_e x_ee)
+externals (stem)
+define stem as (
+  try (
+    [next] -> notable
+    next] -> NoTable
+    next] -> NOTABLE
+    $x_ = lenof notable + lenof NoTable + lenof NOTABLE
+    $x_ee = 2
+    $x_e = len
+    $(x_ + x_ee < x_e)
+    delete
+  )
+  [tolimit] <- 'ok'
+)

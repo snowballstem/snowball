@@ -14,9 +14,47 @@ static void writef(struct generator * g, const char * s, struct node * p);
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
+    int ends_in_underscore = (p->s[SIZE(p->s) - 1] == '_');
     if (p->type != t_external) {
-        // We use the same naming scheme for both global and local variables.
+        /* Ada identifiers are case-insensitive but Snowball identifiers
+         * should be case-sensitive.  To address this, if an identifier
+         * includes any upper case letters we insert a counter after the
+         * type-code.  This count is unique within each type of variable
+         * so this avoid collisions while being minimally instrusive on
+         * the readability of the generated code.
+         *
+         * Ada also doesn't allow identifiers to end in an underscore,
+         * so we append a `E` to such identifiers.  To avoid potential
+         * collisions from doing so, we also insert the counter after
+         * the type-code.
+         *
+         * So for example (noting that we upper-case the first character of
+         * the Snowball name below):
+         *
+         * Snowball integer `i` -> Ada `I_I`
+         * Snowball integer `I` -> Ada `I2_I`
+         * Snowball integer `i_` -> Ada `I3_I_E`
+         * Snowball integer `i_e` -> Ada `I_I_e`
+         *
+         * We don't try to solve this problem for external identifiers - it
+         * seems more helpful to leave those alone and encourage snowball
+         * program authors to avoid naming externals which only differ by
+         * case.
+         *
+         * We use the same naming scheme for both global and local variables.
+         */
+        int len = SIZE(p->s);
         write_char(g, "SBIRXG"[p->type]);
+        if (ends_in_underscore) {
+            write_int(g, p->count);
+        } else {
+            for (int i = 0; i != len; ++i) {
+                if (isupper(p->s[i])) {
+                    write_int(g, p->count);
+                    break;
+                }
+            }
+        }
         write_char(g, '_');
     }
 
@@ -27,9 +65,7 @@ static void write_varname(struct generator * g, struct name * p) {
         p->s[0] = save_initial;
     }
 
-    if (p->s[SIZE(p->s) - 1] == '_') {
-        write_char(g, 'E');
-    }
+    if (ends_in_underscore) write_char(g, 'E');
 }
 
 /* Reference to variable, e.g. when assigning to or using in an expression. */
