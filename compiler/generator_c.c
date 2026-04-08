@@ -82,20 +82,6 @@ static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal
     }
 }
 
-extern void write_c_relop(struct generator * g, int relop) {
-    switch (relop) {
-        case c_eq: write_string(g, " == "); break;
-        case c_ne: write_string(g, " != "); break;
-        case c_gt: write_string(g, " > "); break;
-        case c_ge: write_string(g, " >= "); break;
-        case c_lt: write_string(g, " < "); break;
-        case c_le: write_string(g, " <= "); break;
-        default:
-            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
-            exit(1);
-    }
-}
-
 static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);

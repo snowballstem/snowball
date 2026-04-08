@@ -21,6 +21,21 @@ extern void close_generator(struct generator * g) {
     FREE(g);
 }
 
+// Write a C-style relational operator (also used by some other languages).
+extern void write_c_relop(struct generator * g, int relop) {
+    switch (relop) {
+        case c_eq: write_string(g, " == "); break;
+        case c_ne: write_string(g, " != "); break;
+        case c_gt: write_string(g, " > "); break;
+        case c_ge: write_string(g, " >= "); break;
+        case c_lt: write_string(g, " < "); break;
+        case c_le: write_string(g, " <= "); break;
+        default:
+            fprintf(stderr, "Unexpected type #%d in write_c_relop\n", relop);
+            exit(1);
+    }
+}
+
 static void write_comment_literalstring(struct generator * g, const symbol *s,
                                         const char * end) {
     if (end) {
