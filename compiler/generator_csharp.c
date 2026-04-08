@@ -1153,7 +1153,8 @@ static void generate_among(struct generator * g, struct node * p) {
              *
              * The c5 variable is initialised at point of declaration and we
              * don't `goto` into the block it is declared in from outside so
-             * this seems to be buggy code flow analysis in the compiler.
+             * this seems to be buggy code flow analysis in the C# compiler.
+             *
              * Unclear where to usefully report mono bugs in 2025 so I've
              * not tried.
              */
