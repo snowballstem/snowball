@@ -83,7 +83,7 @@ static int compare_words(int m, const byte * p, int n, const byte * q) {
 static int find_word(int n, const byte * p) {
     int i = 0; int j = vocab->code;
     do {
-        int k = i + (j - i)/2;
+        int k = i + (j - i) / 2;
         const struct system_word * w = vocab + k;
         int diff = compare_words(n, p, w->s_size, w->s);
         if (diff == 0) return w->code;
