@@ -99,8 +99,7 @@ routines (
 
   // Noun tier (HPS categories)
   AN_LexHash N_Hash
-  Stem_Noun
-  Stem_Adjective
+  Stem_Noun_or_Adjective
   Stem_Verb
 )
 
@@ -257,8 +256,8 @@ backwardmode (
     )
   )
 
-  // --- Noun step.
-  define Stem_Noun as (
+  // --- Noun/Adjective step.
+  define Stem_Noun_or_Adjective as (
     N_Hash or
     setlimit tomark p1 for (
       [substring] among (
@@ -287,24 +286,23 @@ backwardmode (
         '{heh}{alef}'       (delete) // -HA
         '{alef}{te}'        (delete) // -AT (Arabic sound plural; can also be possessive "your")
         '{alef}{nun}'       (delete) // -AN (only if not lexical)
-        '{ye}{nun}'         (delete) // -IN
+        '{ye}{nun}'         (delete) // -IN (also adjective derivation ending)
 
         // Other derivational noun endings (conservative set).
         '{gaf}{alef}{heh}'  (delete) // -GAH
         '{be}{alef}{nun}'   (delete) // -BAN
         '{gaf}{ye}'         (delete) // -GI (abstract noun)
         '{ye}{te}'          (delete) // -YAT
-        '{ye}{ye}'          (delete) // -YY (double Y)
-      )
-    )
-  )
+        '{ye}{ye}'          (delete) // -YY (double Y; also adj. relative -Y)
 
-  // --- Adjective step.
-  define Stem_Adjective as (
-    setlimit tomark p1 for (
-      [substring] among (
         // Adjective: comparative/superlative (HPS).
-        '{te}{re}{ye}{nun}' (delete) // -TARIN
+// This rule couldn't trigger before the refactor as -TARIN was handled as -IN
+// in Stem_Noun then on a later pass -TAR in Stem_Adjective.
+//
+// That means we don't remove it tight against the limit.  saeiddrv says it
+// helps to uncomment this, but do that as a separate step to show this
+// refactor doesn't change the stemmer's output.
+//        '{te}{re}{ye}{nun}' (delete) // -TARIN
         '{te}{re}'          (not atlimit delete) // -TAR
 
         // Adjective derivational endings (HPS list + common variants).
@@ -313,10 +311,6 @@ backwardmode (
         '{vav}{alef}{re}'   (delete) // -VAR
         '{nun}{alef}{kaf}'  (delete) // -NAK
         '{gaf}{alef}{re}'   (delete) // -GAR
-        '{ye}{nun}'         (delete) // -IN
-
-        // Adjective: relative -Y suffix.
-        '{ye}{ye}'          (delete) // -YY
       )
     )
   )
@@ -400,6 +394,6 @@ define stem as (
     try ( saw_present_prefix set remove_verb_person_endings )
     Protect_Lexical_AN
     // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
-    Stem_Noun or Stem_Adjective or Stem_Verb
+    Stem_Noun_or_Adjective or Stem_Verb
   )
 )
