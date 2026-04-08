@@ -124,18 +124,17 @@ extern int checked_snprintf(char *str, size_t size,
                             const char *restrict format, ...) {
     va_list ap;
     va_start(ap, format);
+    int r = vsnprintf(str, size, format, ap);
+    va_end(ap);
     // Some pre-C99 snprintf implementations return -1 if the buffer is too
     // small so cast to unsigned for a simpler test (we require C99, but better
     // to be robust if we encounter a C99 compiler with pre-C99 quirks in its
     // runtime library).
-    int r = vsnprintf(str, size, format, ap);
     if ((unsigned)r >= size) {
-        va_end(ap);
         fprintf(stderr, "snprintf(buf, %zu, \"%s\", ...) would overflow\n",
                 size, format);
         exit(1);
     }
-    va_end(ap);
     return r;
 }
 
