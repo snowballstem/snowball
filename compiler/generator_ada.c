@@ -167,15 +167,6 @@ static void write_failure_if(struct generator * g, const char * s, struct node *
     g->unreachable = false;
 }
 
-/* if at limit fail */
-static void write_check_limit(struct generator * g, struct node * p) {
-    if (p->mode == m_forward) {
-        write_failure_if(g, "Z.C >= Z.L", p);
-    } else {
-        write_failure_if(g, "Z.C <= Z.Lb", p);
-    }
-}
-
 /* Formatted write. */
 static void writef(struct generator * g, const char * input, struct node * p) {
     int i = 0;
@@ -623,7 +614,6 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     g->label_used = used;
     g->failure_label = a0;
 
-    write_check_limit(g, p);
     generate_next(g, p);
 
     w(g, "~-~Mend loop;~N");
