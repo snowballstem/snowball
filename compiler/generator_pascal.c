@@ -2,6 +2,7 @@
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
 #include <stdio.h> /* for fprintf etc */
+#include <ctype.h>
 #include "header.h"
 
 #define BASE_UNIT   "SnowballProgram"
@@ -18,23 +19,15 @@ static void writef(struct generator * g, const char * s, struct node * p);
 static void write_varname(struct generator * g, struct name * p) {
     if (p->type != t_external) {
         /* Pascal identifiers are case-insensitive but Snowball identifiers
-         * should be case-sensitive.  To address this, we encode the case of
-         * the identifier.  For readability of the generated code, the
-         * encoding tries to be minimally intrusive for common cases.
+         * should be case-sensitive.  To address this, if an identifier
+         * includes any upper case letters we insert a counter after the
+         * type-code.  This count is unique within each type of variable
+         * so this avoid collisions while being minimally instrusive on
+         * the readability of the generated code.
+         * So for example:
          *
-         * After the letter which indicates the type and before the "_" we
-         * encode the case pattern in the Snowball identifier using "U" for
-         * an upper-case letter, "l" for a lower-case letter and nothing for
-         * other characters.  Any trailing string of "l" is omitted (since
-         * it's redundant and decreases readability).
-         *
-         * Identifiers without any upper-case encode most simply, e.g. I_foo2
-         *
-         * A capitalised identifier is also concise, e.g. IU_Foo2
-         *
-         * All-caps gives a string of Us, e.g. IUUUUUUUU_SHOUTING
-         *
-         * But any example can be handled, e.g. IUllU_Foo79_Bar
+         * Snowball integer `i` -> Pascal `I_i`
+         * Snowball integer `I` -> Pascal `I2_i`
          *
          * We don't try to solve this problem for external identifiers - it
          * seems more helpful to leave those alone and encourage snowball
@@ -44,21 +37,13 @@ static void write_varname(struct generator * g, struct name * p) {
          * We use the same naming scheme for both global and local variables.
          */
         int len = SIZE(p->s);
-        int lower_pending = 0;
         write_char(g, "SBIrxg"[p->type]);
         for (int i = 0; i != len; ++i) {
-            int ch = p->s[i];
-            if (ch >= 'a' && ch <= 'z') {
-                ++lower_pending;
-            } else if (ch >= 'A' && ch <= 'Z') {
-                while (lower_pending) {
-                    write_char(g, 'l');
-                    --lower_pending;
-                }
-                write_char(g, 'U');
+            if (isupper(p->s[i])) {
+                write_int(g, p->count);
+                break;
             }
         }
-
         write_char(g, '_');
     }
     write_s(g, p->s);
