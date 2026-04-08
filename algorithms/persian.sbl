@@ -101,8 +101,7 @@ routines (
   AN_LexHash N_Hash
   Stem_Noun
   Stem_Adjective
-  Participle_Clitic_Tails
-  Verb_Person_Endings  Verb_Tense_Mood_Markers  Stem_Verb
+  Stem_Verb
 )
 
 externals ( stem )
@@ -322,54 +321,50 @@ backwardmode (
     )
   )
 
-  // --- Participle + person/aux clitic tails
-  define Participle_Clitic_Tails as (
-    [substring] among (
-      '{alef}{ye}{dal}'  (R1 delete)
-      '{alef}{ye}{mim}'  (R1 delete)
-      '{alef}{nun}{dal}' (R1 delete)
-      '{alef}{sin}{te}'  (R1 delete)
-      '{alef}{sin}'      (R1 delete)
-      '{alef}{ye}'       (R1 delete)
-      '{ye}{dal}'        (R1 delete)
-      '{ye}{mim}'        (R1 delete)
-    )
-  )
-
-  // --- Verb: person endings
-  define Verb_Person_Endings as (
-    [substring] among (
-      // Specific past-3sg stem fixes
-      '{re}{fe}{te}{mim}'           (<- '{re}{fe}{te}')
-      '{re}{fe}{te}{ye}'            (<- '{re}{fe}{te}')
-      '{re}{fe}{te}{ye}{mim}'       (<- '{re}{fe}{te}')
-      '{re}{fe}{te}{ye}{dal}'       (<- '{re}{fe}{te}')
-      '{re}{fe}{te}{alef}{nun}{dal}'(<- '{re}{fe}{te}')
-      // Generic person endings — only when a verb cue is active
-      '{alef}{nun}{dal}' ( remove_verb_person_endings R1 delete ) // -AND
-      '{ye}{dal}'        ( remove_verb_person_endings R1 delete ) // -ID
-      '{ye}{mim}'        ( remove_verb_person_endings R1 delete ) // -IM
-      '{alef}{mim}'      ( remove_verb_person_endings R1 delete ) // -AM
-      '{dal}'            ( remove_verb_person_endings R1 delete ) // -D
-      '{mim}'            ( remove_verb_person_endings R1 delete ) // -M
-    )
-  )
-
-  // --- Verb: mood/tense markers (HPS).
-  define Verb_Tense_Mood_Markers as (
-    [substring] among (
-      '{nun}{dal}{heh}'  (R1 delete set remove_verb_person_endings) // agent noun -NDEH → present root
-      '{dal}{heh}'       (not atlimit <-'{dal}' set remove_verb_person_endings) // past part. -deh
-      '{te}{heh}'        (not atlimit <-'{te}'  set remove_verb_person_endings) // past part. -teh
-      '{alef}{nun}'      (R1 delete set remove_verb_person_endings) // infinitive -N / -AN
-    )
-  )
-
-  // --- Composite verb step (OR chain).
+  // --- Verb step.
   define Stem_Verb as (
-    Participle_Clitic_Tails or
-    Verb_Person_Endings or
-    Verb_Tense_Mood_Markers
+    (
+      // Participle + person/aux clitic tails
+      [substring] among (
+        '{alef}{ye}{dal}'
+        '{alef}{ye}{mim}'
+        '{alef}{nun}{dal}'
+        '{alef}{sin}{te}'
+        '{alef}{sin}'
+        '{alef}{ye}'
+        '{ye}{dal}'
+        '{ye}{mim}'
+            (R1 delete)
+      )
+    ) or (
+      [substring] among (
+        // Specific past-3sg stem fixes
+        '{re}{fe}{te}{mim}'
+        '{re}{fe}{te}{ye}'
+        '{re}{fe}{te}{ye}{mim}'
+        '{re}{fe}{te}{ye}{dal}'
+        '{re}{fe}{te}{alef}{nun}{dal}'
+            (<- '{re}{fe}{te}')
+
+        // Generic person endings — only when a verb cue is active
+        '{alef}{nun}{dal}'  // -AND
+        '{ye}{dal}'         // -ID
+        '{ye}{mim}'         // -IM
+        '{alef}{mim}'       // -AM
+        '{dal}'             // -D
+        '{mim}'             // -M
+            ( remove_verb_person_endings R1 delete )
+
+        // Mood/tense markers (HPS).
+        '{nun}{dal}{heh}'   // agent noun -NDEH → present root
+        '{alef}{nun}'       // infinitive -N / -AN
+            (R1 delete set remove_verb_person_endings)
+        '{dal}{heh}'        // past part. -deh
+            (not atlimit <-'{dal}' set remove_verb_person_endings)
+        '{te}{heh}'         // past part. -teh
+            (not atlimit <-'{te}'  set remove_verb_person_endings)
+      )
+    )
   )
 )
 
