@@ -140,16 +140,17 @@ define Normalize_Characters as (
 //  PHASE 2 — PREFIX STRIPPING (forward, anchored)
 //  - HPS: remove known prefixes before suffix processing.
 //  - Requires ZWNJ (U+200C) between prefix and stem to avoid stripping from
-//    words that begin with these syllables but are not prefixed forms
-//    (e.g. biroon, bishtar, milaadi, miyaan).
+//    words that begin with the same syllables but are not prefixed forms.
 //  - Sets `saw_present_prefix` when matching {mi}/{nemi} to enable person endings later.
+//  - Note: negating derivational prefixes na- and bi- are intentionally not
+//    stripped as they create words with opposite meanings (e.g. na+dorost =
+//    incorrect, bi+khatr = safe) and conflating them with their base forms
+//    would harm search precision.
 // ============================================================================
 define Strip_Prefix_At_Start as (
   [substring] among (
     '{nun}{mim}{ye}{half_space}' ($(len > 5) delete set saw_present_prefix) // NEMI + ZWNJ
     '{mim}{ye}{half_space}'      ($(len > 4) delete set saw_present_prefix) // MI + ZWNJ
-    '{nun}{alef}{half_space}'    ($(len > 4) delete) // NA + ZWNJ
-    '{be}{ye}{half_space}'       ($(len > 4) delete) // BI + ZWNJ
   )
 )
 
