@@ -95,6 +95,8 @@ routines (
   Delete_ZWNJ           // Forward: delete remaining ZWNJs after prefix stripping
   Protect_Lexical_AN    // Probe: flag lexical -AN endings (per pass)
 
+  R1 // Test if cursor is in R1
+
   // Noun tier (HPS categories)
   AN_LexHash N_Hash
   Stem_Noun
@@ -167,6 +169,8 @@ define Delete_ZWNJ as (
 
 backwardmode (
 
+  define R1 as $p1 <= cursor
+
 // ============================================================================
 //  PROBE — PROTECT LEXICAL "-AN" (not plural)
 //  - HPS strips -AN as a plural; however, many stems end in orthographic "AN":
@@ -190,7 +194,8 @@ backwardmode (
 //  - All routines in backward mode start matching from the end of the token.
 //  - IMPORTANT: no successful "no-op" arms; every success must modify the text.
 //    This ensures 'repeat' loops terminate.
-//  - Length guards $(len > N) reduce over-stemming risk on short words.
+//  - Most suffixes are only removed/replaced if they are entirely in R1 to
+//    avoid over-stemming short words.
 // ============================================================================
 
   // --- Lexical "-AN" suffix list.
@@ -312,14 +317,14 @@ backwardmode (
   // --- Participle + person/aux clitic tails
   define Participle_Clitic_Tails as (
     [substring] among (
-      '{alef}{ye}{dal}'  ($(len > 5) delete)
-      '{alef}{ye}{mim}'  ($(len > 5) delete)
-      '{alef}{nun}{dal}' ($(len > 5) delete)
-      '{alef}{sin}{te}'  ($(len > 5) delete)
-      '{alef}{sin}'      ($(len > 4) delete)
-      '{alef}{ye}'       ($(len > 4) delete)
-      '{ye}{dal}'        ($(len > 4) delete)
-      '{ye}{mim}'        ($(len > 4) delete)
+      '{alef}{ye}{dal}'  (R1 delete)
+      '{alef}{ye}{mim}'  (R1 delete)
+      '{alef}{nun}{dal}' (R1 delete)
+      '{alef}{sin}{te}'  (R1 delete)
+      '{alef}{sin}'      (R1 delete)
+      '{alef}{ye}'       (R1 delete)
+      '{ye}{dal}'        (R1 delete)
+      '{ye}{mim}'        (R1 delete)
     )
   )
 
@@ -333,22 +338,22 @@ backwardmode (
       '{re}{fe}{te}{ye}{dal}'       (<- '{re}{fe}{te}')
       '{re}{fe}{te}{alef}{nun}{dal}'(<- '{re}{fe}{te}')
       // Generic person endings — only when a verb cue is active
-      '{alef}{nun}{dal}' ( (saw_present_prefix or saw_inf_or_part) $(len > 5) delete ) // -AND
-      '{ye}{dal}'        ( (saw_present_prefix or saw_inf_or_part) $(len > 4) delete ) // -ID
-      '{ye}{mim}'        ( (saw_present_prefix or saw_inf_or_part) $(len > 4) delete ) // -IM
-      '{alef}{mim}'      ( (saw_present_prefix or saw_inf_or_part) $(len > 4) delete ) // -AM
-      '{dal}'            ( (saw_present_prefix or saw_inf_or_part) $(len > 3) delete ) // -D
-      '{mim}'            ( (saw_present_prefix or saw_inf_or_part) $(len > 3) delete ) // -M
+      '{alef}{nun}{dal}' ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -AND
+      '{ye}{dal}'        ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -ID
+      '{ye}{mim}'        ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -IM
+      '{alef}{mim}'      ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -AM
+      '{dal}'            ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -D
+      '{mim}'            ( (saw_present_prefix or saw_inf_or_part) R1 delete ) // -M
     )
   )
 
   // --- Verb: mood/tense markers (HPS).
   define Verb_Tense_Mood_Markers as (
     [substring] among (
-      '{nun}{dal}{heh}'  ($(len > 5) delete set saw_inf_or_part) // agent noun -NDEH → present root
-      '{dal}{heh}'       ($(len > 2) <-'{dal}' set saw_inf_or_part) // past part. -deh
-      '{te}{heh}'        ($(len > 2) <-'{te}'  set saw_inf_or_part) // past part. -teh
-      '{alef}{nun}'      ($(len > 4) delete set saw_inf_or_part) // infinitive -N / -AN
+      '{nun}{dal}{heh}'  (R1 delete set saw_inf_or_part) // agent noun -NDEH → present root
+      '{dal}{heh}'       (not atlimit <-'{dal}' set saw_inf_or_part) // past part. -deh
+      '{te}{heh}'        (not atlimit <-'{te}'  set saw_inf_or_part) // past part. -teh
+      '{alef}{nun}'      (R1 delete set saw_inf_or_part) // infinitive -N / -AN
     )
   )
 
