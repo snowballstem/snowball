@@ -249,9 +249,8 @@ backwardmode (
     N_Hash or
     setlimit tomark p1 for (
       [substring] among (
-        // Noun possessive suffixes (long + short clitics)
+        // Noun possessive suffixes
         '{alef}{mim}'       (delete) // -AM
-        '{alef}{te}'        (delete) // -AT (can also be a noun plural)
         '{alef}{shin}'      (delete) // -ASH
 
         // -MAN/-TAN/-SHAN are intentionally disabled: these 3-char suffixes
@@ -273,6 +272,7 @@ backwardmode (
         '{heh}{alef}{ye}'   (delete) // -HAY
         '{alef}{nun}{ye}'   (delete) // -ANI
         '{heh}{alef}'       (delete) // -HA
+        '{alef}{te}'        (delete) // -AT (Arabic sound plural; can also be possessive "your")
         '{alef}{nun}'       (delete) // -AN (only if not lexical)
         '{ye}{nun}'         (delete) // -IN
 
