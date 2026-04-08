@@ -1,11 +1,11 @@
 #include <assert.h>
+#include <ctype.h> /* for toupper */
+#include <stdio.h> /* for fprintf etc */
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
-#include <stdio.h> /* for fprintf etc */
-#include <ctype.h> /* for toupper */
 #include "header.h"
 
-/* prototypes */
+/* prototype functions for recursive use: */
 
 static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
@@ -233,41 +233,56 @@ static void generate_AE(struct generator * g, struct node * p) {
     const char * s;
     switch (p->type) {
         case c_name:
-            write_varref(g, p->name); break;
+            write_varref(g, p->name);
+            break;
         case c_number:
-            write_int(g, p->number); break;
+            write_int(g, p->number);
+            break;
         case c_maxint:
-            write_string(g, "snowballRuntime.MaxInt"); break;
+            write_string(g, "snowballRuntime.MaxInt");
+            break;
         case c_minint:
-            write_string(g, "snowballRuntime.MinInt"); break;
+            write_string(g, "snowballRuntime.MinInt");
+            break;
         case c_neg:
-            write_char(g, '-'); generate_AE(g, p->right); break;
+            write_char(g, '-');
+            generate_AE(g, p->right);
+            break;
         case c_multiply:
-            s = " * "; goto label0;
-        case c_plus:
-            s = " + "; goto label0;
-        case c_minus:
-            s = " - "; goto label0;
+            s = " * ";
+            goto label0;
         case c_divide:
             s = " / ";
+            goto label0;
+        case c_plus:
+            s = " + ";
+            goto label0;
+        case c_minus:
+            s = " - ";
         label0:
-            write_char(g, '('); generate_AE(g, p->left);
-            write_string(g, s); generate_AE(g, p->right); write_char(g, ')'); break;
-        case c_cursor:
-            w(g, "env.Cursor"); break;
-        case c_limit:
-            w(g, p->mode == m_forward ? "env.Limit" : "env.LimitBackward"); break;
-        case c_lenof:
-            writef(g, "snowballRuntime.RuneCountInString(~V)", p);
+            write_char(g, '(');
+            generate_AE(g, p->left);
+            write_string(g, s);
+            generate_AE(g, p->right);
+            write_char(g, ')');
             break;
-        case c_sizeof:
-            writef(g, "len(~V)", p);
+        case c_cursor:
+            w(g, "env.Cursor");
+            break;
+        case c_limit:
+            w(g, p->mode == m_forward ? "env.Limit" : "env.LimitBackward");
             break;
         case c_len:
             w(g, "snowballRuntime.RuneCountInString(env.Current())");
             break;
         case c_size:
             w(g, "len(env.Current())");
+            break;
+        case c_lenof:
+            writef(g, "snowballRuntime.RuneCountInString(~V)", p);
+            break;
+        case c_sizeof:
+            writef(g, "len(~V)", p);
             break;
     }
 }
@@ -289,7 +304,9 @@ static void generate_and(struct generator * g, struct node * p) {
 
     write_comment(g, p);
 
-    if (savevar) write_savecursor(g, p, savevar);
+    if (savevar) {
+        write_savecursor(g, p, savevar);
+    }
 
     p = p->left;
     while (p) {
@@ -319,7 +336,9 @@ static void generate_or(struct generator * g, struct node * p) {
     write_comment(g, p);
     wsetlab_begin(g, out_lab);
 
-    if (savevar) write_savecursor(g, p, savevar);
+    if (savevar) {
+        write_savecursor(g, p, savevar);
+    }
 
     p = p->left;
     str_clear(g->failure_str);
@@ -339,9 +358,12 @@ static void generate_or(struct generator * g, struct node * p) {
             wgotol(g, out_lab);
             end_unreachable = false;
         }
+
         wsetlab_end(g, label);
         g->unreachable = false;
-        if (savevar) write_restorecursor(g, p, savevar);
+        if (savevar) {
+            write_restorecursor(g, p, savevar);
+        }
         p = p->right;
     }
 
@@ -350,6 +372,7 @@ static void generate_or(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     generate(g, p);
+
     wsetlab_end(g, out_lab);
     if (!end_unreachable) {
         g->unreachable = false;
@@ -395,6 +418,7 @@ static void generate_not(struct generator * g, struct node * p) {
     g->failure_str = a1;
 
     if (!g->unreachable) write_failure(g);
+
     wsetlab_end(g, label);
 
     g->unreachable = false;
@@ -420,6 +444,7 @@ static void generate_try(struct generator * g, struct node * p) {
         write_savecursor(g, p, savevar);
         append_restore_string(p, g->failure_str, savevar);
     }
+
     wsetlab_begin(g, label);
     generate(g, p->left);
     wsetlab_end(g, label);
@@ -476,7 +501,9 @@ static void generate_do(struct generator * g, struct node * p) {
     }
 
     write_comment(g, p);
-    if (savevar) write_savecursor(g, p, savevar);
+    if (savevar) {
+        write_savecursor(g, p, savevar);
+    }
 
     if (p->left->type == c_call) {
         /* Optimise do <call> */
@@ -489,6 +516,7 @@ static void generate_do(struct generator * g, struct node * p) {
 
         wsetlab_begin(g, label);
         generate(g, p->left);
+
         wsetlab_end(g, label);
         g->unreachable = false;
     }
@@ -537,7 +565,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
         write_savecursor(g, p, savevar);
     }
 
-    g->failure_label = new_label(g);
+    int label = new_label(g);
+    g->failure_label = label;
     str_clear(g->failure_str);
     wsetlab_begin(g, g->failure_label);
     generate(g, p->left);
@@ -571,8 +600,8 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
 }
 
 static void generate_loop(struct generator * g, struct node * p) {
-    struct str * loopvar = vars_newname(g);
     write_comment(g, p);
+    struct str * loopvar = vars_newname(g);
     w(g, "~Mfor _ = range make([]struct{}, ");
     generate_AE(g, p->AE);
     writef(g, ") {~N~+", p);
@@ -595,7 +624,8 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
         write_savecursor(g, p, savevar);
     }
 
-    g->failure_label = new_label(g);
+    int label = new_label(g);
+    g->failure_label = label;
     str_clear(g->failure_str);
     g->I[0] = g->failure_label;
     w(g, "~-~Mlab~I0:~N~+~Mfor range [2]struct{}{} {~N~+");
@@ -628,9 +658,9 @@ static void generate_repeat(struct generator * g, struct node * p) {
 }
 
 static void generate_atleast(struct generator * g, struct node * p) {
-    struct str * loopvar = vars_newname(g);
-
     write_comment(g, p);
+
+    struct str * loopvar = vars_newname(g);
     g->B[0] = str_data(loopvar);
     w(g, "~Mvar ~B0 = ");
     generate_AE(g, p->AE);
@@ -742,11 +772,10 @@ static void generate_address(struct generator * g, struct node * p) {
 }
 
 static void generate_insert(struct generator * g, struct node * p, int style) {
-    int keep_c = style == c_attach;
-
     write_margin(g);
     write_block_start(g);
     write_comment(g, p);
+    int keep_c = style == c_attach;
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) w(g, "~Mvar c = env.Cursor~N");
     w(g, "~Mbra, ket := env.Cursor, env.Cursor~N");
@@ -758,12 +787,13 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
 }
 
 static void generate_assignfrom(struct generator * g, struct node * p) {
-    int keep_c = p->mode == m_forward; /* like 'attach' */
-
     write_margin(g);
     write_block_start(g);
     write_comment(g, p);
-    if (keep_c) writef(g, "~Mvar c = env.Cursor~N", p);
+    int keep_c = p->mode == m_forward; /* like 'attach' */
+    if (keep_c) {
+        writef(g, "~Mvar c = env.Cursor~N", p);
+    }
     if (p->mode == m_forward) {
         writef(g, "~Menv.Insert(env.Cursor, env.Limit, ", p);
     } else {
@@ -771,7 +801,9 @@ static void generate_assignfrom(struct generator * g, struct node * p) {
     }
     generate_address(g, p);
     writef(g, ")~N", p);
-    if (keep_c) w(g, "~Menv.Cursor = c~N");
+    if (keep_c) {
+        w(g, "~Menv.Cursor = c~N");
+    }
     write_block_end(g);
 }
 
@@ -783,8 +815,9 @@ static void generate_slicefrom(struct generator * g, struct node * p) {
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
-    struct str * varname = vars_newname(g);
     write_comment(g, p);
+    struct str * varname = vars_newname(g);
+
     if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
@@ -796,6 +829,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
          */
         struct node * q = p->left;
         write_comment(g, q);
+
         g->S[0] = q->mode == m_forward ? ">" : "<";
         w(g, "~Mif env.Cursor ~S0 "); generate_AE(g, q->AE); w(g, " ");
         write_block_start(g);
@@ -867,7 +901,8 @@ static void generate_dollar(struct generator * g, struct node * p) {
 
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
-    g->failure_label = new_label(g);
+    int label = new_label(g);
+    g->failure_label = label;
     str_clear(g->failure_str);
 
     struct str * savevar = vars_newname(g);
@@ -899,6 +934,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     /* Update string variable; restore env. */
     writef(g, "~M~V = env.Current()~N"
               "~M*env = *~B0~N", p);
+
     if (p->left->possible_signals == 0) {
         // p->left always signals f.
         write_failure(g);
@@ -1041,11 +1077,10 @@ static void generate_setup_context(struct generator * g) {
 }
 
 static void generate_define(struct generator * g, struct node * p) {
-    struct name * q = p->name;
-
     write_newline(g);
     write_comment(g, p);
 
+    struct name * q = p->name;
     if (q->type == t_routine) {
         writef(g, "~Mfunc ~W(env *snowballRuntime.Env, ctx interface{}) bool {~+~N", p);
         w(g, "~Mcontext := ctx.(*Context)~N");
@@ -1064,9 +1099,12 @@ static void generate_define(struct generator * g, struct node * p) {
             w(g, "~M_ = context~N");
         }
     }
-    if (q->amongvar_needed) w(g, "~Mvar among_var int32~N");
 
-    /* Declare local variables. */
+    if (q->amongvar_needed) {
+        w(g, "~Mvar among_var int32~N");
+    }
+
+    /* Declare localised variables. */
     for (struct name * name = g->analyser->names; name; name = name->next) {
         if (name->local_to == q) {
             switch (name->type) {
