@@ -91,7 +91,7 @@ stringdef ar_vav_with_hamza_above  '{U+0624}'
 // ============================================================================
 routines (
   Normalize_Characters  // Forward: Unicode/script normalization
-  Strip_Prefix_At_Start // Forward: anchored prefix peeling (one per call)
+  Strip_Prefixes        // Forward: anchored prefix peeling
   Delete_ZWNJ           // Forward: delete remaining ZWNJs after prefix stripping
   Protect_Lexical_AN    // Probe: flag lexical -AN endings (per pass)
 
@@ -114,7 +114,7 @@ externals ( stem )
 //                          also enables verb person-ending rules in this pass.
 booleans ( saw_present_prefix saw_inf_or_part )
 
-integers ( p1 )
+integers ( p1 x )
 
 // ============================================================================
 //  PHASE 1 — NORMALIZATION (forward)
@@ -149,10 +149,16 @@ define Normalize_Characters as (
 //    incorrect, bi+khatr = safe) and conflating them with their base forms
 //    would harm search precision.
 // ============================================================================
-define Strip_Prefix_At_Start as (
-  [substring] among (
-    '{nun}{mim}{ye}{half_space}' ($(len > 5) delete set saw_present_prefix) // NEMI + ZWNJ
-    '{mim}{ye}{half_space}'      ($(len > 4) delete set saw_present_prefix) // MI + ZWNJ
+define Strip_Prefixes as (
+  // We set the limit for this 2 characters from the end of the string so
+  // that we only remove remove a prefix if it leaves at least two characters.
+  // (The clumsy setmark+tomark here seems to be needed because `backwards`
+  // restores the cursor after running its subcommand.)
+  setlimit try (backwards (hop 2 setmark x) tomark x) for repeat (
+    [substring] among (
+      '{nun}{mim}{ye}{half_space}' (delete set saw_present_prefix) // NEMI‌ + ZWNJ
+      '{mim}{ye}{half_space}'      (delete set saw_present_prefix) // MI‌ + ZWNJ
+    )
   )
 )
 
@@ -381,7 +387,7 @@ define stem as (
   do Normalize_Characters
 
   // 2) Peel prefixes (forward, anchored; requires ZWNJ separator)
-  repeat Strip_Prefix_At_Start
+  do Strip_Prefixes
 
   // 2b) Delete remaining ZWNJs now that prefix detection is done
   do Delete_ZWNJ
