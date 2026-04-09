@@ -317,7 +317,6 @@ clean:
 	      $(JS_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PHP_SOURCES) \
-	      $(RUST_SOURCES) \
 	      $(ZIG_SOURCES) zig/stemwords$(EXEEXT) \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
@@ -1072,6 +1071,9 @@ check_rust_%: $(STEMMING_DATA_ABS)/%
 	      $(DIFF) -u $</output.txt - ;\
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
+
+CLEANFILES += $(RUST_SOURCES) rust/Cargo.lock
+CLEANDIRS += rust/target
 
 ###############################################################################
 # Zig
