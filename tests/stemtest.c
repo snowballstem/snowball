@@ -1,4 +1,24 @@
 /* Unit tests for handling of cases the vocabularies don't cover.
+ *
+ * In general we test the stemming algorithms via vocabulary lists
+ * and corresponding lists of expected stems, which are in the snowball-data
+ * repo.  These are used to verify that each stemmer produces the expected
+ * output for all the different programming languages Snowball can generate
+ * code for (whereas testcases here only exercise the C stemmers).
+ *
+ * Test coverage for a change to a stemmer's behaviour should generally be
+ * implemented by adding new words its the vocabulary (if words already there
+ * don't adequately cover the change).
+ *
+ * Only cases which can't be exercised by real words in the language being
+ * stemmed should go here.  Each vocabulary lists also serves as a sample
+ * vocabulary for evalutating its corresponding stemmer, so we don't want to
+ * add entries which would be junk for such use (such as emoji, numbers, hex
+ * codes, etc).
+ *
+ * Testcases here can run for a specified stemmer or for all stemmers.  This
+ * provides an easy way to test behaviours which any good stemmer should
+ * have (such as not mangling numbers).
  */
 
 #include <stdio.h>
