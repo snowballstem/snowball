@@ -1,34 +1,26 @@
 /*
-* -----------------------------------------------------------------------------
-* Persian Stemmer (HPS-like)
-* -----------------------------------------------------------------------------
-* Based on the paper:
-*   "HPS: A Hierarchical Persian Stemming Method"
-*   Ayshe Rashidi, Mina Zolfy Lighvan (2014)
-* -----------------------------------------------------------------------------
-* Differences from original HPS:
-* 1) No POS-tagger stage:
-*      - HPS uses a POS tagger to route tokens to Noun, Adjective, or Verb
-*        suffix rules directly.
-*      - Here we fall back to the fixed order: Noun → Adjective → Verb
-*        when POS is unknown.
-*      Reason: Implementation is tagger-agnostic and lightweight.
-* 2) Lexical "-AN" guard:
-*      - Added `Protect_Lexical_AN` to avoid stripping true lexical endings
-*        like "...stan", "...ran", and known stems (Iran, Tehran, Ensan).
-*      Reason: reduces over-stemming where HPS relied on explicit hash lists.
-* -----------------------------------------------------------------------------
-* PIPELINE (HPS-like, POS-tagger free):
-*   1) Normalize characters : unify Arabic variants; delete ZWJ/spaces
-*      (ZWNJ preserved for step 2; deleted after prefix stripping)
-*   2) Strip start-anchored prefixes (repeatable)
-*   3) Iteratively peel one suffix layer per pass, in fixed order:
-*        Noun → Adjective → Verb
-*      If a noun rule fires, the pass is frozen (no adj/verb in that pass).
-* -----------------------------------------------------------------------------
-* Implemented by: https://saeiddrv.com
-* -----------------------------------------------------------------------------
-*/
+ * -----------------------------------------------------------------------------
+ * Persian Stemmer (HPS-like)
+ * -----------------------------------------------------------------------------
+ * Based on the paper:
+ *   "HPS: A Hierarchical Persian Stemming Method"
+ *   Ayshe Rashidi, Mina Zolfy Lighvan (2014)
+ * -----------------------------------------------------------------------------
+ * Differences from original HPS:
+ * 1) No POS-tagger stage:
+ *      - HPS uses a POS tagger to route tokens to Noun, Adjective, or Verb
+ *        suffix rules directly.
+ *      - Here we fall back to the fixed order: Noun or Adjective, then Verb
+ *        when POS is unknown.
+ *      Reason: Implementation is tagger-agnostic and lightweight.
+ * 2) Lexical "-AN" guard:
+ *      - Added `Protect_Lexical_AN` to avoid stripping true lexical endings
+ *        like "...stan", "...ran", and known stems (Iran, Tehran, Ensan).
+ *      Reason: reduces over-stemming where HPS relied on explicit hash lists.
+ * -----------------------------------------------------------------------------
+ * Implemented by: https://saeiddrv.com
+ * -----------------------------------------------------------------------------
+ */
 
 stringescapes { }
 
@@ -76,7 +68,7 @@ stringdef half_space        '{U+200C}' // zero-width non-joiner (ZWNJ)
 // Although this name is not standard in English Unicode terminology, it reflects its widespread use
 // in Persian as a morpheme separator within words. This character is here to normalize
 
-// Arabic variants to normalize → Persian forms
+// Arabic variants to normalize to Persian forms
 stringdef ar_kaf                   '{U+0643}'
 stringdef ar_ye                    '{U+064A}'
 stringdef ar_ye_with_hamza_above   '{U+0626}'
@@ -358,12 +350,6 @@ backwardmode (
 
 // ============================================================================
 //  MAIN (HPS pipeline)
-//  - 1) Normalize script/spacing.
-//  - 2) Strip all leading prefixes.
-//  - 3) In each pass: try Noun; if Noun doesn't make a change try Adjective,
-//       then Verb.
-//  Invariants:
-//    - After each outer iteration, either the buffer is shorter or unchanged.
 // ============================================================================
 define stem as (
   unset saw_present_prefix
@@ -371,7 +357,7 @@ define stem as (
   // 1) Normalize script/spacing (ZWNJ preserved for prefix detection)
   do Normalize_Characters
 
-  // 2) Peel prefixes (forward, anchored; requires ZWNJ separator)
+  // 2) Strip all leading prefixes (requires ZWNJ separator)
   do Strip_Prefixes
 
   // 2b) Delete remaining ZWNJs now that prefix detection is done
@@ -381,13 +367,22 @@ define stem as (
   $p1 = limit
   do ( hop 3 setmark p1 )
 
-  // 3) Peel suffixes (backward), one layer per pass
+  // 3) Remove suffixes.  Each pass removes one suffix, trying noun and
+  // adjective endings first, then verb endings.  So if we remove a noun
+  // or adjective ending, we next check for another noun or adjective
+  // ending.
+  //
+  // Note: The loop exits if no suffix is removed and the buffer gets
+  // shorter when a suffix is removed so we can't loop forever.
   backwards repeat test (
     // Set remove_verb_person_endings = saw_present_prefix.
     unset remove_verb_person_endings
     try ( saw_present_prefix set remove_verb_person_endings )
+
     Protect_Lexical_AN
-    // HPS heuristic order when POS is unknown: Noun → Adjective → Verb
+    // HPS as described in the paper uses a POS tagger.  We don't have that
+    // information so we use a heuristic and try noun/adjective endings first,
+    // then verb endings.
     Stem_Noun_or_Adjective or Stem_Verb
   )
 )
