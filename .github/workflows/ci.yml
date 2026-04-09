@@ -205,7 +205,7 @@ jobs:
         deno-version: vx.x.x
     - name: Install Dart SDK
       if: matrix.dart_sdk
-      uses: dart-lang/setup-dart@v1
+      uses: dart-lang/setup-dart@v1.72
       with:
         sdk: ${{ matrix.dart_sdk }}
     - name: Install Zig
