@@ -5,9 +5,14 @@
 /overrides.mk
 /tmp_runtime_tests_snowball_data/
 #
+/algorithms.mk
+/snowball
+/stemtest
+/dist
+# Ada
 /ada/bin/
 /ada/obj/
-/algorithms.mk
+# C
 /libstemmer/libstemmer.c
 /libstemmer/libstemmer_utf8.c
 /libstemmer/mkinc.mak
@@ -15,26 +20,31 @@
 /libstemmer/modules.h
 /libstemmer/modules_utf8.h
 /libstemmer.a
-/csharp_stemwords
-/snowball
 /src_c
-/stemtest
 /stemwords
-/dist
-/java/org/tartarus/snowball/ext/
-/java/org/tartarus/snowball/*.class
+# C#
+/csharp_stemwords
+/csharp/Snowball/Algorithms/*.generated.cs
+# Dart
 /dart/lib/ext/
 /dart/lib/src/algorithms.dart
+# Go
+/go/algorithms/
+/go/stemwords/algorithms.go
+# Java
+/java/org/tartarus/snowball/ext/
+# JS
 /js_out
+# PHP
 /php_out
+# Python
 /python_check
 /python_out
-*.generated.cs
+# Rust
 /rust/Cargo.lock
 /rust/src/snowball/algorithms/*.rs
 /rust/target/
-/go/algorithms/
-/go/stemwords/algorithms.go
+# Zig
 /zig/*_stemmer.zig
 /zig/algorithms.zig
 /zig/stemwords
