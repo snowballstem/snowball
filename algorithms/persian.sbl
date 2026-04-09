@@ -296,13 +296,7 @@ backwardmode (
         '{ye}{ye}'          (delete) // -YY (double Y; also adj. relative -Y)
 
         // Adjective: comparative/superlative (HPS).
-// This rule couldn't trigger before the refactor as -TARIN was handled as -IN
-// in Stem_Noun then on a later pass -TAR in Stem_Adjective.
-//
-// That means we don't remove it tight against the limit.  saeiddrv says it
-// helps to uncomment this, but do that as a separate step to show this
-// refactor doesn't change the stemmer's output.
-//        '{te}{re}{ye}{nun}' (delete) // -TARIN
+        '{te}{re}{ye}{nun}' (delete) // -TARIN
         '{te}{re}'          (not atlimit delete) // -TAR
 
         // Adjective derivational endings (HPS list + common variants).
