@@ -1336,7 +1336,8 @@ static void generate_class_begin(struct generator * g) {
 
     w(g, "/**~N"
          " * This class implements the stemming algorithm defined by a snowball script.~N"
-         " *~N");
+         " *~N"
+         " * ");
     write_generated_comment_content(g);
     w(g, "~N */~N"
             "class ~n extends ");
