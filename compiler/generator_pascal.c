@@ -19,11 +19,11 @@ static void writef(struct generator * g, const char * s, struct node * p);
 static void write_varname(struct generator * g, struct name * p) {
     if (p->type != t_external) {
         /* Pascal identifiers are case-insensitive but Snowball identifiers
-         * should be case-sensitive.  To address this, if an identifier
-         * includes any upper case letters we insert a counter after the
-         * type-code.  This count is unique within each type of variable
-         * so this avoid collisions while being minimally instrusive on
-         * the readability of the generated code.
+         * should be case-sensitive.  To address this, if any groups of
+         * identifiers of the same type have the same case, we insert a counter
+         * after the type-code for all but one of them.  This count is unique
+         * within each type of variable so this avoid collisions while being
+         * minimally intrusive on the readability of the generated code.
          *
          * So for example:
          *
@@ -38,12 +38,8 @@ static void write_varname(struct generator * g, struct name * p) {
          * We use the same naming scheme for both global and local variables.
          */
         write_char(g, "SBIrxg"[p->type]);
-        int len = SIZE(p->s);
-        for (int i = 0; i != len; ++i) {
-            if (isupper(p->s[i])) {
-                write_int(g, p->count);
-                break;
-            }
+        if (p->case_collision) {
+            write_int(g, p->count);
         }
         write_char(g, '_');
     }

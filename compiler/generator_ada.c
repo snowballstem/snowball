@@ -17,16 +17,18 @@ static void write_varname(struct generator * g, struct name * p) {
     int ends_in_underscore = (p->s[SIZE(p->s) - 1] == '_');
     if (p->type != t_external) {
         /* Ada identifiers are case-insensitive but Snowball identifiers
-         * should be case-sensitive.  To address this, if an identifier
-         * includes any upper case letters we insert a counter after the
-         * type-code.  This count is unique within each type of variable
-         * so this avoid collisions while being minimally instrusive on
-         * the readability of the generated code.
+         * should be case-sensitive.  To address this, if any groups of
+         * identifiers of the same type have the same case, we insert a counter
+         * after the type-code for all but one of them.  This count is unique
+         * within each type of variable so this avoid collisions while being
+         * minimally intrusive on the readability of the generated code.
          *
          * Ada also doesn't allow identifiers to end in an underscore,
          * so we append a `E` to such identifiers.  To avoid potential
          * collisions from doing so, we also insert the counter after
-         * the type-code.
+         * the type-code in this case (which may not be necessary, but this
+         * case seems more of a theoretical concern, whereas identifiers
+         * differing only by case has been seen in real-world Snowball code).
          *
          * So for example (noting that we upper-case the first character of
          * the Snowball name below):
@@ -44,16 +46,8 @@ static void write_varname(struct generator * g, struct name * p) {
          * We use the same naming scheme for both global and local variables.
          */
         write_char(g, "SBIRXG"[p->type]);
-        if (ends_in_underscore) {
+        if (ends_in_underscore || p->case_collision) {
             write_int(g, p->count);
-        } else {
-            int len = SIZE(p->s);
-            for (int i = 0; i != len; ++i) {
-                if (isupper(p->s[i])) {
-                    write_int(g, p->count);
-                    break;
-                }
-            }
         }
         write_char(g, '_');
     }
