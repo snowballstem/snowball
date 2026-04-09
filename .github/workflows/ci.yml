@@ -281,3 +281,8 @@ jobs:
     - name: Test Ada
       if: matrix.gprbuild
       run: $MAKE check_ada gprbuild="${{ matrix.gprbuild }}"
+    - name: make clean
+      run: |
+        git status --porcelain=v1|grep '^' && { echo 'The generated files listed above are not in .gitignore' ; exit 1; }; true
+        $MAKE clean
+        git status --porcelain=v1 --ignored|grep '^' && { echo 'The generated files listed above were not removed by `make clean`' ; exit 1; }; true
