@@ -23,7 +23,9 @@ static int new_label_python(struct generator * g) {
 static void write_varname(struct generator * g, struct name * p) {
     switch (p->type) {
         case t_external:
-            write_char(g, '_');
+            if (g->options->externals_prefix) {
+                write_string(g, g->options->externals_prefix);
+            }
             break;
         case t_routine:
             write_string(g, "__");

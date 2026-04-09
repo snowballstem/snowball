@@ -195,6 +195,9 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             }
             case 'E': {
                 // Write an external name.
+                if (g->options->externals_prefix) {
+                    write_string(g, g->options->externals_prefix);
+                }
                 char save_initial = p->name->s[0];
                 p->name->s[0] = toupper(save_initial);
                 write_s(g, p->name->s);

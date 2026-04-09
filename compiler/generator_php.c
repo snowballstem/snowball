@@ -13,7 +13,11 @@ static void writef(struct generator * g, const char * s, struct node * p);
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    if (p->type != t_external) {
+    if (p->type == t_external) {
+        if (g->options->externals_prefix) {
+            write_string(g, g->options->externals_prefix);
+        }
+    } else {
         // We use the same naming scheme for both global and local variables.
         write_char(g, "SBIrxG"[p->type]);
         write_char(g, '_');

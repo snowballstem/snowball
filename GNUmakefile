@@ -506,7 +506,7 @@ $(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
 
 $(python_output_dir)/%_stemmer.py: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(python_output_dir)
-	$(SNOWBALL_COMPILE) $< -python -o $@
+	$(SNOWBALL_COMPILE) $< -python -eprefix _ -o $@
 
 $(python_output_dir)/__init__.py: python/create_init.py $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py)
 	$(python) python/create_init.py $(python_output_dir)

@@ -364,9 +364,6 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         if (o->runtime_path) {
             fprintf(stderr, "warning: -r/-runtime only meaningful for C and C++\n");
         }
-        if (o->externals_prefix) {
-            fprintf(stderr, "warning: -ep/-eprefix only meaningful for C and C++\n");
-        }
         if (o->variables_prefix) {
             fprintf(stderr, "warning: -vp/-vprefix only meaningful for C and C++\n");
         }

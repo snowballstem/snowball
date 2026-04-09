@@ -17,7 +17,11 @@ static void writef(struct generator * g, const char * s, struct node * p);
 /* Write routines for items from the syntax tree */
 
 static void write_varname(struct generator * g, struct name * p) {
-    if (p->type != t_external) {
+    if (p->type == t_external) {
+        if (g->options->externals_prefix) {
+            write_string(g, g->options->externals_prefix);
+        }
+    } else {
         /* Pascal identifiers are case-insensitive but Snowball identifiers
          * should be case-sensitive.  To address this, if any groups of
          * identifiers of the same type have the same case, we insert a counter

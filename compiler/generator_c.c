@@ -22,7 +22,8 @@ static void write_varname(struct generator * g, struct name * p) {
             write_string(g, "::");
             write_s(g, g->options->name);
             write_string(g, "::");
-        } else if (g->options->externals_prefix) {
+        }
+        if (g->options->externals_prefix) {
             write_string(g, g->options->externals_prefix);
         }
     } else {
@@ -2096,6 +2097,9 @@ static void generate_header_file(struct generator * g) {
         for (struct name * q = g->analyser->names; q; q = q->next) {
             if (!q->local_to && q->type == t_external) {
                 w(g, "~Mstatic int ");
+                if (g->options->externals_prefix) {
+                    write_string(g, g->options->externals_prefix);
+                }
                 write_s(g, q->s);
                 w(g, "(struct SN_env * z);~N~N");
             }
