@@ -16,6 +16,15 @@ static void writef(struct generator * g, const char * s, struct node * p);
 
 /* Write routines for items from the syntax tree */
 
+static void write_relop(struct generator * g, int relop) {
+    // Relational operators are the same as C, save for (in-)equality.
+    switch (relop) {
+        case c_eq: write_string(g, " = "); break;
+        case c_ne: write_string(g, " <> "); break;
+        default: write_c_relop(g, relop);
+    }
+}
+
 static void write_varname(struct generator * g, struct name * p) {
     if (p->type == t_external) {
         if (g->options->externals_prefix) {
@@ -66,20 +75,6 @@ static void write_literal_string(struct generator * g, symbol * p) {
         }
     }
     write_char(g, '\'');
-}
-
-static void write_relop(struct generator * g, int relop) {
-    switch (relop) {
-        case c_eq: write_string(g, " = "); break;
-        case c_ne: write_string(g, " <> "); break;
-        case c_gt: write_string(g, " > "); break;
-        case c_ge: write_string(g, " >= "); break;
-        case c_lt: write_string(g, " < "); break;
-        case c_le: write_string(g, " <= "); break;
-        default:
-            fprintf(stderr, "Unexpected type #%d in generate_integer_test\n", relop);
-            exit(1);
-    }
 }
 
 /* Write a variable declaration. */
