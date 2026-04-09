@@ -22,6 +22,7 @@
 /stemwords
 /dist
 /java/org/tartarus/snowball/ext/
+/java/org/tartarus/snowball/*.class
 /dart/lib/ext/
 /dart/lib/src/algorithms.dart
 /js_out
