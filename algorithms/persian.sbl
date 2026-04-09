@@ -90,7 +90,8 @@ routines (
   R1 // Test if cursor is in R1
 
   // Noun tier (HPS categories)
-  AN_LexHash N_Hash
+  AN_Exception
+  Irregular_Noun
   Stem_Noun_or_Adjective
   Stem_Verb
 )
@@ -178,7 +179,7 @@ backwardmode (
 //  - This is a probe only: it NEVER edits the buffer; it only signals.
 // ============================================================================
   define Protect_Lexical_AN as (
-    not AN_LexHash
+    not AN_Exception
     not among (
       '{sin}{te}{alef}{nun}'  // ...stan
       '{sin}{alef}{nun}'      // ...san
@@ -199,7 +200,7 @@ backwardmode (
   // --- Lexical "-AN" suffix list.
   //     Small curated set of stems ending in orthographic -AN that are not plural.
   //     Used by `Protect_Lexical_AN` to prevent stripping on place names / lexical nouns.
-  define AN_LexHash as (
+  define AN_Exception as (
     among (
       '{aa}{lam}{mim}{alef}{nun}'                     // alman
       '{aa}{sin}{mim}{alef}{nun}'                     // asman
@@ -238,9 +239,9 @@ backwardmode (
     )
   )
 
-  // --- Noun irregular rewrites (small hash table).
+  // --- Noun irregular rewrites.
   //     Only include entries that actually change the buffer.
-  define N_Hash as (
+  define Irregular_Noun as (
     [substring] among (
       '{alef}{khe}{be}{alef}{re}'      (<- '{khe}{be}{re}')
       '{khe}{vav}{alef}{sin}'          (<- '{khe}{alef}{sin}{heh}')
@@ -250,7 +251,7 @@ backwardmode (
 
   // --- Noun/Adjective step.
   define Stem_Noun_or_Adjective as (
-    N_Hash or
+    Irregular_Noun or
     setlimit tomark p1 for (
       [substring] among (
         // Noun possessive suffixes
