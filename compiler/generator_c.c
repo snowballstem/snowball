@@ -2137,6 +2137,9 @@ static void generate_header_file(struct generator * g) {
         write_string(g, "::");
         write_s(g, o->name);
         write_string(g, "::");
+        if (g->options->externals_prefix) {
+            write_string(g, g->options->externals_prefix);
+        }
         w(g, "stem(z);~N"
              "~Mreturn std::string(reinterpret_cast<const char*>(z->p), SIZE(z->p));~N"
              "~-~M}~N"
