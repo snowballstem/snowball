@@ -46,10 +46,11 @@ static void write_literal_string(struct generator * g, symbol * p) {
             // Use escapes for anything over 0x590 as a crude way to avoid
             // LTR characters affecting the rendering of source character
             // order in confusing ways.
-            char buf[16];
-            /* Zig uses \u{XXXX} for unicode escapes (variable width) */
-            checked_snprintf(buf, sizeof(buf), "\\u{%X}", ch);
-            write_string(g, buf);
+            //
+            // Zig Unicode escape are variable width: \u{XXXX}
+            write_string(g, "\\u{");
+            write_hex(g, ch);
+            write_char(g, '}');
         }
     }
     write_char(g, '"');
