@@ -1134,6 +1134,9 @@ static void generate_define(struct generator * g, struct node * p) {
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
         generate_setup_context(g);
         if (q->used != q->definition) {
+            // This external needs to be callable as a routine, so generate
+            // the actual code like a routine with an external which just
+            // forwards to that.
             writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
             w(g, "~-~M}~N~N");
             writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
