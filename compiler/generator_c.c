@@ -1897,7 +1897,7 @@ static void generate_close(struct generator * g) {
     w(g, "~Nextern void ~pclose_env(struct SN_env * z) {~N~+");
 
     if (g->analyser->name_count[t_string] > 0) {
-        w(g, "~Mif (z) {~N~+");
+        w(g, "~Mif (!z) return;~N");
 
         for (struct name * name = g->analyser->names; name; name = name->next) {
             if (!name->local_to && name->type == t_string) {
@@ -1906,10 +1906,9 @@ static void generate_close(struct generator * g) {
                 w(g, ");~N");
             }
         }
-
-        w(g, "~-~M}~N");
     }
 
+    // Note: SN_delete_env() no-ops if z is NULL so we don't to gate this call.
     w(g, "~MSN_delete_env(z);~N"
          "~-}~N~N");
 }
