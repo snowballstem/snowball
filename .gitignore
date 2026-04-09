@@ -1,6 +1,10 @@
 .DS_Store
 *.exe
 *.o
+# Created by `setup_runtime_tests`:
+/overrides.mk
+/tmp_runtime_tests_snowball_data/
+#
 /ada/bin/
 /ada/obj/
 /algorithms.mk
