@@ -1572,7 +1572,6 @@ static void generate(struct generator * g, struct node * p) {
 
 /* Class declaration generation. */
 static void generate_unit_start(struct generator * g) {
-    g->margin = 0;
     write_start_comment(g, "--  ", NULL);
 }
 
@@ -1832,7 +1831,7 @@ extern void generate_program_ada(struct generator * g) {
     generate_amongs(g);
     generate_groupings(g);
 
-    w(g, "end Stemmer.");
+    w(g, "~-end Stemmer.");
     write_string(g, g->options->package);
     w(g, ";~N");
 
@@ -1841,7 +1840,6 @@ extern void generate_program_ada(struct generator * g) {
     output_str(g->options->output_src, g->outbuf);
     str_clear(g->outbuf);
 
-    g->margin = 0;
     write_start_comment(g, "--  ", NULL);
     w(g, "package Stemmer.");
     write_string(g, g->options->package);
