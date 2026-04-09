@@ -40,8 +40,9 @@ static void write_varname(struct generator * g, struct name * p) {
 
 /* Reference to variable, e.g. when assigning to or using in an expression. */
 static void write_varref(struct generator * g, struct name * p) {
-    if (p->type < t_routine && p->local_to == NULL)
+    if (p->type < t_routine && p->local_to == NULL) {
         write_string(g, "((SN_local *)z)->");
+    }
     write_varname(g, p);
 }
 
