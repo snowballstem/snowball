@@ -45,6 +45,8 @@ for t ; do
     if [ -z "$f" ] && [ -f "$b.syntax" ] ; then
       if ! diff "$b.syntax" tmp.syntax ; then
 	f="syntax tree not as expected"
+      else
+	rm tmp.syntax
       fi
     fi
   else
@@ -52,6 +54,7 @@ for t ; do
   fi
   if [ -z "$f" ] ; then
     echo "ok - $b"
+    rm -f tmp.stderr tmp.syntax
   else
     echo "not ok - $b: $f"
     r=1
