@@ -317,19 +317,18 @@ clean:
 	      $(JS_SOURCES) \
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PHP_SOURCES) \
-	      $(PYTHON_SOURCES) \
 	      $(RUST_SOURCES) \
 	      $(ZIG_SOURCES) zig/stemwords$(EXEEXT) \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
               libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak \
               libstemmer/libstemmer.c libstemmer/libstemmer_utf8.c \
 	      algorithms.mk
+	rm -rf $(CLEANDIRS)
 	rm -rf ada/obj dist
 	rm -rf $(DART_BUILD_ARTIFACTS)
 	-rmdir $(c_src_dir)
 	-rmdir $(js_output_dir)
 	-rmdir $(php_output_dir)
-	-rmdir $(python_output_dir)
 
 update_version:
 	perl -pi -e '/SNOWBALL_VERSION/ && s/\d+\.\d+\.\d+/$(SNOWBALL_VERSION)/' \
@@ -370,6 +369,10 @@ $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 # List of files/glob patterns to remove on clean.  This gets appended to by
 # each target language section.
 CLEANFILES :=
+
+# List of directories to recursively remove on clean.  This gets appended to by
+# each target language section.
+CLEANDIRS :=
 
 # Ada
 
@@ -1042,6 +1045,8 @@ check_python_stemwords: $(PYTHON_STEMWORDS_SOURCE) $(PYTHON_SOURCES)
 	cp -a $(PYTHON_RUNTIME_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_SOURCES) python_check/snowballstemmer
 	cp -a $(PYTHON_STEMWORDS_SOURCE) python_check/
+
+CLEANDIRS += python_check python_out
 
 ###############################################################################
 # Rust
