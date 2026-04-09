@@ -334,7 +334,7 @@ backwardmode (
         '{re}{fe}{te}{alef}{nun}{dal}'
             (<- '{re}{fe}{te}')
 
-        // Generic person endings — only when a verb cue is active
+        // Generic person and singular/plural endings — only when a verb cue is active
         '{alef}{nun}{dal}'  // -AND
         '{ye}{dal}'         // -ID
         '{ye}{mim}'         // -IM
