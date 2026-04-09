@@ -34,6 +34,7 @@
 /go/stemwords/algorithms.go
 # Java
 /java/org/tartarus/snowball/ext/
+/java/org/tartarus/snowball/*.class
 # JS
 /js_out
 # PHP
