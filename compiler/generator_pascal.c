@@ -1145,12 +1145,11 @@ static void generate_define(struct generator * g, struct node * p) {
 
     /* Generate function body. */
     w(g, "~{");
-    int signals = p->left->possible_signals;
     g->temporary_used = false;
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
-        if (signals) {
+        if (p->left->possible_signals) {
             generate(g, p->left->right);
         }
     }

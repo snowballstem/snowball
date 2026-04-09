@@ -1127,20 +1127,19 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    /* Generate the body into a buffer. */
-    struct str * saved_output = g->outbuf;
-    g->outbuf = str_new();
-
-    g->next_label = 0;
-    g->var_number = 0;
-
-    str_clear(g->failure_str);
-    g->failure_label = x_return;
-    g->unreachable = false;
-    int signals = p->left->possible_signals;
-
-    int save_margin = g->margin;
-    g->margin = 1;
+    if (q->type == t_routine) {
+        writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
+        generate_cast_context(g);
+    } else {
+        writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
+        generate_setup_context(g);
+        if (q->used != q->definition) {
+            writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
+            w(g, "~-~M}~N~N");
+            writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
+            generate_cast_context(g);
+        }
+    }
 
     if (q->amongvar_needed) {
         w(g, "~Mvar among_var: i32 = 0;~N");
@@ -1173,38 +1172,22 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
 
+    g->next_label = 0;
+    g->var_number = 0;
+
+    str_clear(g->failure_str);
+    g->failure_label = x_return;
+    g->unreachable = false;
+
+    /* Generate function body. */
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
-        if (signals) {
+        if (p->left->possible_signals) {
             generate(g, p->left->right);
         }
     }
     w(g, "~-~M}~N");
-
-    struct str * body = g->outbuf;
-    g->outbuf = saved_output;
-    g->margin = save_margin;
-
-    /* Emit the function header. */
-    if (q->type == t_routine) {
-        writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-        generate_cast_context(g);
-    } else {
-        writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
-        generate_setup_context(g);
-        if (q->used != q->definition) {
-            writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
-            w(g, "~-~M}~N~N");
-            writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-            generate_cast_context(g);
-        }
-    }
-
-    /* Append the pre-generated body. */
-    str_append(g->outbuf, body);
-    str_delete(body);
-    g->margin = save_margin;
 }
 
 static void generate_functionend(struct generator * g, struct node * p) {

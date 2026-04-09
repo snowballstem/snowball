@@ -1219,9 +1219,6 @@ static void generate_define(struct generator * g, struct node * p) {
     write_newline(g);
     write_comment(g, p);
 
-    g->next_label = 0;
-    g->var_number = 0;
-
     if (q->type == t_routine) {
         write_string(g, "static ");
     } else if (g->options->target_lang == LANG_C) {
@@ -1257,6 +1254,9 @@ static void generate_define(struct generator * g, struct node * p) {
             }
         }
     }
+
+    g->next_label = 0;
+    g->var_number = 0;
 
     str_clear(g->failure_str);
     g->failure_label = x_return;

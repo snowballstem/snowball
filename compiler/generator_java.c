@@ -1084,10 +1084,6 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     writef(g, "~M~S0 boolean ~V() {~+~N", p);
 
-    /* Save output. */
-    struct str * saved_output = g->outbuf;
-    g->outbuf = str_new();
-
     g->next_label = 0;
     g->var_number = 0;
 
@@ -1119,21 +1115,16 @@ static void generate_define(struct generator * g, struct node * p) {
     str_clear(g->failure_str);
     g->failure_label = x_return;
     g->unreachable = false;
-    int signals = p->left->possible_signals;
 
     /* Generate function body. */
     generate(g, p->left);
     if (p->left->right) {
         assert(p->left->right->type == c_functionend);
-        if (signals) {
+        if (p->left->possible_signals) {
             generate(g, p->left->right);
         }
     }
     w(g, "~}");
-
-    str_append(saved_output, g->outbuf);
-    str_delete(g->outbuf);
-    g->outbuf = saved_output;
 }
 
 static void generate_functionend(struct generator * g, struct node * p) {
