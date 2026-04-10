@@ -460,9 +460,9 @@ extern SNOWBALL_ERR slice_del(struct SN_env * z) {
                 z->c -= slice_size;
             else if (z->c > z->bra)
                 z->c = z->bra;
+            z->ket = z->bra;
         }
     }
-    z->ket = z->bra;
     SNOWBALL_RETURN_OK;
 }
 
