@@ -292,5 +292,5 @@ jobs:
         # `.ccache`/`.sccache` is specific to CI.  We can't just delete it here
         # or else ccache-action won't save the cache.
         git status --porcelain=v1|grep -v '^?? \.s\?ccache/$'|grep '^' && { echo 'The generated files listed above are not in .gitignore' ; exit 1; }; true
-        $MAKE clean
+        $MAKE clean ${{ case(inputs.runtime-tests == true, 'clean_runtime_tests', '') }}
         git status --porcelain=v1 --ignored|grep -v '^?? \.s\?ccache/$'|grep '^' && { echo 'The generated files listed above were not removed by `make clean`' ; exit 1; }; true
