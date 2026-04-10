@@ -259,8 +259,7 @@ jobs:
       if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       run: |
         deno lint javascript/*.js js_out/*.js
-        # Currently there are some problems in find_among()/find_among_b().
-        deno check javascript/*.js js_out/*.js || true
+        deno check javascript/*.js js_out/*.js
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"
