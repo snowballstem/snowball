@@ -10,6 +10,7 @@
 /stemtest
 /dist
 # Ada
+/ada/algorithms/
 /ada/bin/
 /ada/obj/
 # C
