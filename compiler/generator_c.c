@@ -989,6 +989,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         extra_block = true;
         struct str * savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
+
         generate(g, p->left);
 
         g->B[0] = str_data(varname);
