@@ -574,8 +574,8 @@ package body Stemmer with SPARK_Mode is
    begin
       Adjustment := Len - (C_Ket - C_Bra);
       if Adjustment /= 0 then
-         Z.P (C_Ket + Adjustment + 1 .. Z.Len + Adjustment + 1)
-           := Z.P (C_Ket + 1 .. Z.Len + 1);
+         Z.P (C_Ket + Adjustment + 1 .. Z.Len + Adjustment)
+           := Z.P (C_Ket + 1 .. Z.Len);
          Z.Len := Z.Len + Adjustment;
          Z.L := Z.L + Adjustment;
          if Z.C >= C_Ket then
