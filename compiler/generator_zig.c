@@ -877,7 +877,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             w(g, "~Menv.limit = @intCast(@as(u32, @intCast(");
             generate_AE(g, q->AE);
             w(g, ")));~N");
-            w(g, "~M~B0 -= limit;~N");
+            w(g, "~M~B0 -= env.limit;~N");
         } else {
             w(g, "~Mconst ~B0 = env.limit_backward;~N");
             w(g, "~Menv.limit_backward = @intCast(@as(u32, @intCast(");
