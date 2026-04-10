@@ -918,14 +918,15 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         w(g, "~-~Mend if;~N");
         g->unreachable = false;
 
-        w(g, "~M~B0");
         if (p->mode == m_forward) {
-            w(g, " := Z.L - Z.C; Z.L := ");
+            w(g, "~M~B0 := Z.L; Z.L := ");
+            generate_AE(g, q->AE);
+            w(g, "; ~B0 := ~B0 - Z.L;~N");
         } else {
-            w(g, " := Z.Lb; Z.Lb := ");
+            w(g, "~M~B0 := Z.Lb; Z.Lb := ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
         }
-        generate_AE(g, q->AE);
-        w(g, ";~N");
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "Z.L := Z.L + ");

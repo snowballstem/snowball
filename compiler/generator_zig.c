@@ -873,13 +873,17 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
-            w(g, "~Mconst ~B0 = env.limit - env.cursor;~N");
+            w(g, "~Mvar ~B0 = env.limit;~N");
             w(g, "~Menv.limit = @intCast(@as(u32, @intCast(");
+            generate_AE(g, q->AE);
+            w(g, ")));~N");
+            w(g, "~M~B0 -= limit;~N");
         } else {
             w(g, "~Mconst ~B0 = env.limit_backward;~N");
             w(g, "~Menv.limit_backward = @intCast(@as(u32, @intCast(");
+            generate_AE(g, q->AE);
+            w(g, ")));~N");
         }
-        generate_AE(g, q->AE); writef(g, ")));~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "env.limit += ");

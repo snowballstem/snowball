@@ -867,13 +867,17 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
-            w(g, "~M~B0 = self.limit - self.cursor~N");
+            w(g, "~M~B0 = self.limit~N");
             w(g, "~Mself.limit = ");
+            generate_AE(g, q->AE);
+            w(g, "~N");
+            w(g, "~M~B0 -= self.limit~N");
         } else {
             w(g, "~M~B0 = self.limit_backward~N");
             w(g, "~Mself.limit_backward = ");
+            generate_AE(g, q->AE);
+            w(g, "~N");
         }
-        generate_AE(g, q->AE); writef(g, "~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "self.limit += ");

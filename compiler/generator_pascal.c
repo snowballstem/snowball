@@ -877,14 +877,17 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->B[0] = str_data(varname);
         write_declare(g, "~B0 : Integer", p);
         if (p->mode == m_forward) {
-            w(g, "~M~B0 := FLimit - FCursor;~N");
+            w(g, "~M~B0 := FLimit;~N");
             w(g, "~MFLimit := ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
+            w(g, "~M~B0 := ~B0 - FLimit;~N");
         } else {
             w(g, "~M~B0 := FBkLimit;~N");
             w(g, "~MFBkLimit := ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
         }
-        generate_AE(g, q->AE);
-        writef(g, ";~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "FLimit := FLimit + ");

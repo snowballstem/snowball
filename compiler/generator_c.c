@@ -965,14 +965,15 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         w(g, "~Mif (z->c ~S0 "); generate_AE(g, q->AE); writef(g, ") ~f~N", q);
 
         g->B[0] = str_data(varname);
-        w(g, "~M~B0 = ");
         if (p->mode == m_forward) {
-            w(g, "z->l - z->c; z->l = ");
+            w(g, "~M~B0 = z->l; z->l = ");
+            generate_AE(g, q->AE);
+            w(g, "; ~B0 -= z->l;~N");
         } else {
-            w(g, "z->lb; z->lb = ");
+            w(g, "~M~B0 = z->lb; z->lb = ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
         }
-        generate_AE(g, q->AE);
-        w(g, ";~N");
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "z->l += ");

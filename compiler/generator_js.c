@@ -896,15 +896,18 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->unreachable = false;
 
         g->B[0] = str_data(varname);
-        w(g, "~Mconst /** number */ ~B0 = ");
         if (p->mode == m_forward) {
-            w(g, "this.limit - this.cursor;~N");
+            w(g, "~Mlet /** number */ ~B0 = this.limit;~N");
             w(g, "~Mthis.limit = ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
+            w(g, "~M~B0 -= this.limit;~N");
         } else {
-            w(g, "this.limit_backward;~N");
+            w(g, "~Mconst /** number */ ~B0 = this.limit_backward;~N");
             w(g, "~Mthis.limit_backward = ");
+            generate_AE(g, q->AE);
+            w(g, ";~N");
         }
-        generate_AE(g, q->AE); writef(g, ";~N", q);
 
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "this.limit += ");

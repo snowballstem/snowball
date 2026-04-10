@@ -1,0 +1,24 @@
+// Test setlimit
+externals (stem)
+routines (setlimit_tomark)
+
+define stem as (
+  setlimit_tomark
+  ='ok'
+)
+
+define setlimit_tomark as (
+  // Regression test for bug fixed in 3.1.0.
+  test (
+    ='abcd'
+    next
+    // Forwards `setlimit tomark` restored limit incorrectly.
+    setlimit tomark 3 for $(limit == 3) or fail='setlimit tomark set wrong limit'
+    $(cursor == 1) or fail='cursor changed after setlimit tomark'
+    $(limit == 4) or fail='limit not restored after setlimit tomark'
+    // Make sure restoring of limit copes with setting the limit to itself!
+    setlimit tomark limit for $(limit == 4) or fail='setlimit tomark limit set wrong limit'
+    $(cursor == 1) or fail='cursor changed after setlimit tomark'
+    $(limit == 4) or fail='limit not restored after setlimit tomark'
+  )
+)
