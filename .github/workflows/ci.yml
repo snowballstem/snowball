@@ -231,6 +231,8 @@ jobs:
         tar xf ../dist/libstemmer_c-*.tar.gz
         cd libstemmer_c-*
         $MAKE CFLAGS="${{ matrix.CFLAGS_DIST_BUILD }}"
+        cd ../..
+        rm -rf tmp
     - name: Test C
       if: matrix.c_tests
       run: $MAKE check CC="$CC"
