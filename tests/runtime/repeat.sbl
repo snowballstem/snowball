@@ -1,0 +1,16 @@
+// Test `repeat`.
+
+stringescapes { }
+
+externals ( stem )
+
+define stem as (
+  ='ok'
+
+  $(limit==size) or fail='limit not size by default'
+
+  // Regression tests for Ada `repeat` codegen bug.
+  // https://github.com/snowballstem/snowball/issues/275
+  setlimit tomark cursor+1 for repeat 'Q'  $(limit==size) or fail='limit not restored after repeat'
+  setlimit next for repeat 'Q'  $(limit==size) or fail='limit not restored after repeat (2)'
+)

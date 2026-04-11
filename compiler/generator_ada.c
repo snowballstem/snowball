@@ -715,6 +715,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     int label = new_label(g);
     g->failure_label = label;
     g->label_used = 0;
+    str_clear(g->failure_str);
 
     generate(g, p->left);
 
