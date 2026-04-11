@@ -700,6 +700,10 @@ static void generate_loop(struct generator * g, struct node * p) {
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
     int replab = new_label(g);
     wsetl(g, replab);
+    // We only actually loop via `goto` to replab, but if we don't generate
+    // a dummy `loop` ... `exit; end loop;` structure then gnat emits:
+    //
+    // info: code between label and backwards goto rewritten as loop [enabled by default]
     writef(g, "~N~Mloop~N~+", p);
 
     struct str * savevar = NULL;
