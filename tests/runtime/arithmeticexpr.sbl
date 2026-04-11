@@ -64,6 +64,10 @@ define operators as (
   $(x == -1) or fail='/ should truncate towards zero (+/-)'
 
   $(7 / -4 * 4 == -4) or fail='should use integer / (+/-)'
+
+  // Some target languages warn or even error for self-assignment.
+  $x = x  $(x == -1) or fail='self assignment changed value'
+  $x = cursor  tomark cursor  $(x == cursor) or fail='tomark cursor moved cursor'
 )
 
 define pseudovars as (

@@ -1168,10 +1168,30 @@ static struct node * read_C(struct analyser * a) {
             }
             return n;
         }
-        case c_tomark:
         case c_atmark: {
             struct node * n = new_node(a, token);
-            n->AE = read_AE(a, NULL, 0);
+            struct node * AE = read_AE(a, NULL, 0);
+            if (AE->type == c_cursor) {
+                fprintf(stderr,
+                        "%s:%d: warning: `atmark cursor` is always true\n",
+                        t->file, n->line_number);
+                n->type = c_true;
+            } else {
+                n->AE = AE;
+            }
+            return n;
+        }
+        case c_tomark: {
+            struct node * n = new_node(a, token);
+            struct node * AE = read_AE(a, NULL, 0);
+            if (AE->type == c_cursor) {
+                fprintf(stderr,
+                        "%s:%d: warning: `tomark cursor` is a no-op\n",
+                        t->file, n->line_number);
+                n->type = c_true;
+            } else {
+                n->AE = AE;
+            }
             return n;
         }
         case c_hop: {
@@ -1248,6 +1268,12 @@ static struct node * read_C(struct analyser * a) {
             n->left = read_C(a);
             get_token(a, c_for);
             n->aux = read_C(a);
+            if (n->left->type == c_tomark && n->left->AE == c_limit) {
+                fprintf(stderr,
+                        "%s:%d: warning: `setlimit tomark limit` is a no-op\n",
+                        t->file, n->line_number);
+                return n->aux;
+            }
             return n;
         }
         case c_set:

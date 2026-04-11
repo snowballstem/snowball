@@ -17,17 +17,19 @@ define stem as (
     'h' ($x -= 0)
     'i' ($x *= 1)
     'j' ($x /= 1)
+    'k' (atmark cursor)
+    'l' (tomark cursor)
 
     // Values set are unused.
-    'k' ($y = 1)
-    'l' ($y += 1)
-    'm' ($y -= 1)
-    'n' ($y *= 2)
-    'o' ($y /= 2)
-    'p' (setmark y)
-    'q' (set b)
-    'r' (unset b)
-    's' (-> s)
+    'm' ($y = 1)
+    'n' ($y += 1)
+    'o' ($y -= 1)
+    'p' ($y *= 2)
+    'q' ($y /= 2)
+    'r' (setmark y)
+    's' (set b)
+    't' (unset b)
+    'u' (-> s)
 
     // Integer tests.
     'A' ($(1 == 1))
