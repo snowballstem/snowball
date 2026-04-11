@@ -747,7 +747,7 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 	fi
 	@if test -f '$</voc.txt.gz' ; then rm tmp.txt ; fi
 
-$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate
+$(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate $(MODULES)
 	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
 
 ada/bin/generate:
