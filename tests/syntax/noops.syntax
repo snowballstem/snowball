@@ -33,21 +33,23 @@ define stem
       (
       literal 'm'
       (
-      literal 'n'
+      literal 'aa'
       (
-      literal 'o'
+      literal 'ab'
       (
-      literal 'p'
+      literal 'ac'
       (
-      literal 'q'
+      literal 'ad'
       (
-      literal 'r'
+      literal 'ae'
       (
-      literal 's'
+      literal 'af'
       (
-      literal 't'
+      literal 'ag'
       (
-      literal 'u'
+      literal 'ah'
+      (
+      literal 'ai'
       (
       literal 'A'
       (
@@ -61,6 +63,7 @@ define stem
       (
       literal 'F'
       (
+    literal 'X'
     [
     substring
     ]
