@@ -2135,13 +2135,13 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             return res;
         }
         case c_setlimit: {
-            /* If either always signals f, setlimit does to. */
+            /* If either always signals f, setlimit does too. */
             int res = p->left->possible_signals;
             int res2 = p->aux->possible_signals;
             if (res == 0 || res2 == 0) {
                 return 0;
             }
-            // If both always signal t, setlimit does to.  Otherwise we know at
+            // If both always signal t, setlimit does too.  Otherwise we know at
             // least one is unknown and that means setlimit's signal is unknown.
             // We can achieve that with a simple bitwise or.
             return res | res2;
