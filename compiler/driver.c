@@ -555,6 +555,8 @@ extern int main(int argc, char * argv[]) {
                     // to be helpful to localise.
                 case LANG_GO:
                     // 1000000000: localising was about 10% faster.
+                case LANG_JAVASCRIPT:
+                    // 10000000: Slightly faster.
                 case LANG_PASCAL:
                     // Slightly faster.
                 case LANG_PHP:
@@ -562,8 +564,6 @@ extern int main(int argc, char * argv[]) {
                 case LANG_PYTHON:
                     // 10000000: local 7.6s vs global 7.9s.  Microbenchmarking
                     // with timeit alligns with this.
-                case LANG_JAVASCRIPT:
-                    // 10000000: Slightly faster.
                     localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
                     break;
             }
