@@ -378,15 +378,15 @@ extern int repeat_restore(struct generator * g, struct node * p) {
 
 /* Language-independent write routines for simple entities */
 
-static void write_hexdigit(struct generator * g, int i) {
+static void write_hexdigit(struct generator * g, unsigned i) {
     str_append_ch(g->outbuf, "0123456789ABCDEF"[i & 0xF]); /* hexchar */
 }
 
-extern void write_hex4(struct generator * g, int ch) {
+extern void write_hex4(struct generator * g, unsigned ch) {
     for (int i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i);
 }
 
-extern void write_hex(struct generator * g, int i) {
+extern void write_hex(struct generator * g, unsigned i) {
     if (i >> 4) write_hex(g, i >> 4);
     write_hexdigit(g, i); /* hex integer */
 }
