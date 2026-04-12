@@ -1484,7 +1484,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~Mdebug(Z, ~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1799,6 +1799,11 @@ extern void generate_program_ada(struct generator * g) {
     generate_unit_start(g);
 
     /* generate implementation. */
+    if (g->analyser->debug_used) {
+        // System.Io is GNAT-specific, but apparently we can't use Text_IO in a
+        // preelaborated package.
+        w(g, "with System.Io;~N");
+    }
     w(g, "package body Stemmer.");
     write_string(g, g->options->package);
     w(g, " is~N~+~N");
@@ -1810,6 +1815,62 @@ extern void generate_program_ada(struct generator * g) {
     w(g, "~Mpragma Warnings (Off, \"*is not referenced*\");~N");
     w(g, "~N");
 
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprocedure Debug (Z : in Context_Type'Class; N : in Integer; Line : in Integer) is~N~+"
+            "~MLen : Integer;~N"
+            "~MCh  : Integer;~N"
+            "~-~Mbegin~N~+"
+            "~Mif N < 10 then~N~+"
+            "~MSystem.Io.Put (\" \");~N"
+            "~-~Mend if;~N"
+            "~Mif N < 100 then~N~+"
+            "~MSystem.Io.Put (\" \");~N"
+            "~-~Mend if;~N"
+            "~MSystem.Io.Put (N);~N"
+            "~MSystem.Io.Put (\" (line \");~N"
+            "~Mif Line < 10 then~N~+"
+            "~MSystem.Io.Put (\" \");~N"
+            "~-~Mend if;~N"
+            "~Mif Line < 100 then~N~+"
+            "~MSystem.Io.Put (\" \");~N"
+            "~-~Mend if;~N"
+            "~Mif Line < 1000 then~N~+"
+            "~MSystem.Io.Put (\" \");~N"
+            "~-~Mend if;~N"
+            "~MSystem.Io.Put (Line);~N"
+            "~MSystem.Io.Put (\"): [\");~N"
+            "~MSystem.Io.Put (Z.Len);~N"
+            "~MSystem.Io.Put (\"]'\");~N"
+            "~MLen := Z.Len;~N"
+            "~Mfor I in 0 .. Len + 1 loop~N~+"
+            "~Mif Z.Lb = I then~N~+"
+            "~MSystem.Io.Put (\"{\");~N"
+            "~-~Mend if;~N"
+            "~Mif Z.Bra = I then~N~+"
+            "~MSystem.Io.Put (\"[\");~N"
+            "~-~Mend if;~N"
+            "~Mif Z.C = I then~N~+"
+            "~MSystem.Io.Put (\"|\");~N"
+            "~-~Mend if;~N"
+            "~Mif Z.Ket = I then~N~+"
+            "~MSystem.Io.Put (\"]\");~N"
+            "~-~Mend if;~N"
+            "~Mif Z.L = I then~N~+"
+            "~MSystem.Io.Put (\"}\");~N"
+            "~-~Mend if;~N"
+            "~Mif I < Len then~N~+"
+            "~MCh := Character'Pos (Z.P (I + 1));~N"
+            "~Mif Ch = 0 then~N~+"
+            "~MSystem.Io.Put (\"#\");~N"
+            "~-~Melse~N~+"
+            "~MSystem.Io.Put (Z.P (I + 1 .. I + 1));~N"
+            "~-~Mend if;~N"
+            "~-~Mend if;~N"
+            "~-~Mend loop;~N"
+            "~MSystem.Io.Put_Line (\"'\");~N"
+            "~-~Mend Debug;~N");
+    }
     generate_method_decls(g, t_routine);
 
     int need_among_handler = false;
