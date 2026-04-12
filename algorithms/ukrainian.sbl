@@ -114,6 +114,13 @@ backwardmode (
             '{t}{y}{s}{ia}' '{t}{y}{s}{'}'  // -тися/-тись (infinitive reflexive)
             '{l}{a}{s}{'}'                  // -лась (past fem reflexive)
             '{v}{s}{ia}' '{v}{s}{'}'        // -вся/-всь (past masc reflexive)
+            // Present-tense reflexive: strip full ending to reach verb root
+            // e.g. будується→буду, вважається→вваж, пишеться→пиш, водиться→вод
+            '{u}{ie}{t}{'}{s}{ia}'          // -ується (будується, виконується)
+            '{a}{ie}{t}{'}{s}{ia}'          // -ається (вважається, займається)
+            '{ie}{t}{'}{s}{ia}'             // -ється  (б'ється, дається)
+            '{e}{t}{'}{s}{ia}'             // -еться  (пишеться, береться, бореться)
+            '{y}{t}{'}{s}{ia}'             // -иться  (водиться, вводиться)
             '{s}{ia}' '{s}{'}'              // -ся/-сь (generic reflexive)
                 (delete)
         )
@@ -238,10 +245,10 @@ backwardmode (
 
             // Longest standard endings first
             '{yi}{m}{y}' '{i}{m}{y}' '{y}{m}{y}'    // Instrumental plural
-            '{'}{'}{o}{yi}' '{'}{'}{o}{i}'          // Genitive singular fem (soft)
-            '{'}{'}{o}{h}{o}'                       // Genitive singular masc/neut (soft)
-            '{'}{'}{o}{m}{u}'                       // Dative singular masc/neut (soft)
-            '{'}{'}{o}{iu}'                         // Instrumental singular fem (soft)
+            '{'}{o}{yi}' '{'}{o}{i}'                // Genitive singular fem (soft) e.g. синьої
+            '{'}{o}{h}{o}'                          // Genitive singular masc/neut (soft) e.g. синього
+            '{'}{o}{m}{u}'                          // Dative singular masc/neut (soft) e.g. синьому
+            '{'}{o}{iu}'                            // Instrumental singular fem (soft) e.g. синьою
             '{ie}{h}{o}' '{o}{h}{o}'                // Genitive singular masc/neut
             '{o}{yi}' '{o}{i}'                      // Genitive singular fem
             '{o}{m}{u}'                             // Dative singular masc/neut

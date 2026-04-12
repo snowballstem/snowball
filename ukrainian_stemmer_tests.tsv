@@ -1,0 +1,233 @@
+word	stem	note
+книга	книг	noun
+учитель	учител	noun
+місто	міст	noun
+братові	брат	noun
+гарний	гарн	adjective
+гарна	гарн	adjective
+гарне	гарн	adjective
+великого	велик	adjective
+читати	чит	verb
+читаю	чит	verb
+читав	чит	verb
+робити	роб	verb
+роблю	робл	verb_bl_alternation (bl-alternation blocked by minStem: б at byte 4 < pV=6; root is роб but tidy_up can't reach it)
+робив	роб	verb
+хлопчик	хлоп	diminutive
+дівчинка	дівч	diminutive
+будиночок	будин	diminutive
+однісінький	одн	intensive_diminutive
+одинюсінький	один	intensive_diminutive
+повнісінько	повн	adverb_intensifier
+солов'ятко	солов'	animal_young (apostrophe preserved — Ukrainian orthography)
+цуценітко	цуцен	animal_young
+вчитися	вчи	reflexive
+сміятися	смі	reflexive (-тися removed, then verb -яти fires)
+прочитавши	прочита	perfective_gerund
+будиночечок	будин	diminutive
+козеня	коз	animal_young
+гарного	гарн	adjective
+прочитає	прочита	verb
+столами	стол	noun
+каменяр	камен	professional
+малювання	малюв	verbal_noun (R2 passes for long word, -ання fires)
+козацтво	козац	noun_collective
+килимар	килим	professional
+копач	коп	professional
+месник	мес	professional (-ник fires before diminutive -ик)
+лисеня	лис	animal_young
+мишеня	миш	animal_young
+кав'ярня	кав'ярн	place_suffix (R2 blocks -арня for short word)
+кузня	кузн	place_suffix
+крамниця	крамниц	place_suffix (R2 blocks -ниця for short word)
+калякання	каляк	verbal_noun
+мурликання	мурлик	verbal_noun
+мигтіння	мигтін	verbal_noun (R2 blocks -іння — word too short)
+кахельний	кахельн	adjective_variant (R2 blocks -ельн derivational)
+кахльний	кахльн	adjective_variant (R2 blocks -льн derivational)
+кахляний	кахлян	adjective_variant (R2 blocks -ян derivational)
+козачий	коз	adjective_variant (adj -ий removed, professional -ач fires)
+козацький	козацьк	adjective_variant (adj -ий removed, R2 blocks -ськ)
+синій	син	adjective_soft
+синього	син	adjective_soft
+нічний	нічн	adjective (-ий removed; -н is root, not derivational)
+нічного	нічн	adjective (-ого removed via compound ending)
+новіший	нов	comparative
+найновіший	нов	superlative
+працьований	прац	participle_passive (-ований removed, tidy_up removes ь)
+малюваний	малюван	participle_passive (adj -ий removed only)
+переписаний	переписан	participle_passive (adj -ий removed only)
+бігучий	біг	participle_active
+міцніючий	міцні	participle_active (-ючий removed)
+дощовий	дощов	adjective (R2 blocks -ов derivational)
+сільський	сільськ	derivational_sk
+київський	київськ	derivational_sk
+бабівщина	бабівщин	derivational_ivshchyna (R2 blocks -івщина)
+жіноцтво	жіноц	noun_collective
+багатство	багат	noun_collective
+боління	болін	verbal_noun (R2 blocks -іння — word too short)
+бродіння	бродін	verbal_noun (R2 blocks -іння — word too short)
+змагання	змаган	verbal_noun (R2 blocks -ання, noun -я + tidy_up -н)
+купування	купув	verbal_noun (R2 passes, -ання fires)
+моделювання	моделюв	verbal_noun (R2 passes, -ання fires)
+можливість	можлив	derivational_ість
+людяність	людяніст	derivational_ність (R2 blocks -ність)
+пасічниківна	пасічник	patronymic_female
+пекарівна	пекар	patronymic_female
+писарівна	писар	patronymic_female
+собаченітко	собачен	animal_young
+совенітко	совен	animal_young
+соколенятко	соколен	animal_young
+котик	кот	diminutive
+листочок	лист	diminutive
+будиночечко	будин	diminutive
+пальчики	пальчик	diminutive_plural
+долонька	дол	diminutive (-онька removes root material — inherent stemmer limitation)
+рученята	рученят	diminutive_plural
+киця	киц	noun_short
+ціль	ціл	noun_soft_sign (tidy_up removes soft sign consistently)
+кінь	кін	noun_soft_sign
+вірність	вірніст	derivational_ність (R2 blocks -ність)
+молодість	молод	derivational_ість
+веселенький	весел	diminutive_intensive
+легенький	лег	diminutive_intensive
+тонесенький	тон	diminutive_intensive
+повнісінький	повн	diminutive_intensive
+точнісінько	точн	adverb_intensifier
+прямесенько	прям	adverb_intensifier
+пізнісінько	пізн	adverb_intensifier
+здоровенький	здоров	diminutive_intensive
+швиденько	швид	adverb_diminutive
+потихеньку	пот	adverb_diminutive (diminutive -еньку fires, then adj -их matches residue)
+зробивши	зроб	perfective_gerund (-ивши removed)
+помившись	пом	perfective_gerund_reflexive (-сь removed, then -ивши pattern)
+купатися	куп	reflexive (-тися removed, then verb -а fires)
+сміючись	сміюч	present_gerund (only -сь reflexive removed; no -ючи pattern)
+сидячи	сидяч	present_gerund (no -ячи pattern; verb -и matches but stops here)
+матися	мат	reflexive_short (pV=6 blocks -тися for 6-char word; only -ся strips → мати → verb -и → мат)
+йшов	йшо	past_masc (verb -в removed from short irregular stem)
+йшла	йшла	past_fem (pV blocks — word too short)
+йшли	йшли	past_pl (pV blocks — word too short)
+# negative tests (avoid over-stemming)
+і	і	negative
+та	та	negative
+але	але	negative (3-char word: pV=minStem=end, no stripping possible)
+що	що	negative
+як	як	negative
+не	не	negative
+ми	ми	negative
+ви	ви	negative
+він	він	negative
+вона	вон	negative (noun -а fires — normal stemmer behavior for pronouns)
+вони	вон	negative (noun -и fires)
+цей	цей	negative (3-char: pV=end, nothing stripped)
+ця	ця	negative
+це	це	negative
+себе	себ	negative (noun -е fires)
+мати	мат	negative_short (pV blocks -ти for 4-char word; verb -и fires → мат)
+щось	щос	reflexive_pronoun (pV blocks -сь for 4-char word; tidy_up -ь fires → щос)
+хтось	хто	reflexive_pronoun (-сь removed)
+де	де	negative
+там	там	negative
+тут	тут	negative
+йти	йти	negative_keep
+бути	бут	negative_short (pV blocks -ти for 4-char word; tidy_up -ь fires → бут)
+їсти	їст	negative_short (pV blocks -ти for 4-char word; noun -и fires → їст)
+дати	дат	negative_short (pV blocks -ти for 4-char word; noun -и fires → дат)
+жити	жит	verb_stem (pV blocks -ти; tidy_up -ь fires → жит; stemmers can't ADD chars)
+пити	пит	verb_stem (pV blocks -ти; tidy_up -ь fires → пит)
+мити	мит	verb_stem (pV blocks -ти; tidy_up -ь fires → мит)
+# extra consistency tests (real Ukrainian words)
+українська	україн	adjective_consistency
+українського	україн	adjective_consistency
+мова	мов	noun_basic
+працювати	працюв	verb_consistency
+працюю	працю	verb_consistency (stem vowel difference — inherent limitation)
+працював	працюв	verb_consistency
+домашній	домашн	adjective_consistency
+домашня	домашн	adjective_consistency
+домашнього	домашн	adjective_consistency
+бібліотека	бібліотек	noun_consistency
+бібліотеки	бібліотек	noun_consistency
+бібліотекар	бібліотек	professional (noun -а removed from stem, -ар professional fires)
+переможець	переможц	noun_fleeting_vowel (fleeting-vowel rule: ець→ц; groups with переможця→переможц)
+переможці	переможц	noun_case
+навчання	навчан	verbal_noun (R2 blocks -ання, noun -я + tidy_up -н)
+навчати	навч	verb
+вчитель	вчител	noun
+вчителька	вчительк	noun (noun -а fires)
+вчительки	вчительк	noun (noun -и fires)
+школярик	школяр	diminutive (diminutive_stem -ик fires)
+маленький	мал	diminutive_intensive (-еньк- + adj -ий)
+маленька	мал	diminutive_intensive (-еньк- + noun -а)
+добрий	добр	adjective
+доброта	доброт	noun (noun -а fires)
+перемога	перемог	noun
+перемоги	перемог	noun
+# real-word consistency tests (batch 2)
+свобода	свобод	noun_consistency
+свободи	свобод	noun_consistency
+свободу	свобод	noun_consistency
+вільний	вільн	adjective_consistency
+вільна	вільн	adjective_consistency
+вільного	вільн	adjective_consistency
+запитання	запит	verbal_noun_consistency
+запитати	запит	verb_consistency
+запитує	запиту	verb_consistency (stem vowel difference — inherent limitation)
+відповідь	відповід	noun_consistency (tidy_up removes soft sign)
+відповіді	відповід	noun_consistency
+відповідати	відповід	verb_consistency
+сонячний	сонячн	adjective_consistency
+сонячна	сонячн	adjective_consistency
+сонячного	сонячн	adjective_consistency
+будівництво	будівниц	noun_collective (R2 blocks -ництво, noun -о + derivational -тв)
+будівельник	будів	professional (-ельник fires before diminutive -ик)
+будівельники	будів	professional_consistency (noun -и, then professional -ельник)
+красивий	красив	adjective_consistency
+красива	красив	adjective_consistency
+# compound derivational+inflectional tests (from Vysotska 2024 paper stems)
+інформація	інформ	compound_noun (-ація removed in one step, R2 passes for long word)
+інформації	інформ	compound_noun (-ації with ї=U+0457)
+інформацію	інформ	compound_noun (-ацію)
+інформаційний	інформ	compound_adj (-аційний removed in one step)
+інформаційного	інформ	compound_adj (-аційного)
+комерційний	комерц	compound_adj (-ійний)
+комерційного	комерц	compound_adj (-ійного)
+лінгвістичний	лінгвіст	compound_adj (-ичний)
+лінгвістичного	лінгвіст	compound_adj (-ичного)
+електронний	електр	compound_adj (-онний)
+електронного	електр	compound_adj (-онного)
+інтелектуальний	інтелект	compound_adj (-уальний)
+інтелектуального	інтелект	compound_adj (-уального)
+традиційний	традиц	compound_adj (-ійний)
+традиційного	традиц	compound_adj (-ійного)
+акація	акаці	noun_short (R2 blocks compound -ація, noun -я fires)
+акації	акаці	noun_short (R2 blocks compound -ації, noun -ї fires)
+система	систем	noun_basic
+системний	системн	adjective (adj -ий removed, R2 blocks -емн derivational)
+мова	мов	noun_basic
+мовний	мовн	adjective (adj -ий removed)
+опрацювання	опрацюв	verbal_noun (-ання in R2)
+опрацювати	опрацюв	verb (-ати)
+пошук	пошук	noun_invariant
+пошуковий	пошук	adjective+derivational (-овий: adj -ий + derivational -ов)
+ресурс	ресурс	noun_invariant
+ресурсу	ресурс	noun (-у)
+контент	контент	noun_invariant
+контенту	контент	noun (-у)
+текст	текст	noun_invariant
+текстовий	текстов	adjective (adj -ий removed, R2 blocks -ов derivational)
+аналіз	аналіз	noun_invariant
+аналізу	аналіз	noun (-у)
+# reflexive present-tense forms (PR #277 review fix)
+будується	буд	reflexive_ується (-ується stripped, verb -у stripped)
+вважається	вваж	reflexive_ається (-ається stripped)
+б'ється	б'єт	reflexive_ється (pV limit blocks -ється for б+apostr+є prefix; only -ся strips)
+пишеться	пиш	reflexive_еться (-еться stripped)
+водиться	вод	reflexive_иться (-иться stripped)
+виконується	викон	reflexive_ується (-ується stripped, verb -у stripped)
+знаходиться	знаход	reflexive_иться (-иться stripped)
+береться	бер	reflexive_еться (-еться stripped)
+# soft adjective forms — verified consistent after typo fix
+останній	остан	soft_adj (compound -онній strips to -ост)
+останнього	остан	soft_adj (-ього strips нн→н via tidy_up)
