@@ -251,7 +251,6 @@ backwardmode (
   define N_Hash as (
     [substring] among (
       '{alef}{khe}{be}{alef}{re}'      (<- '{khe}{be}{re}')
-      '{khe}{vav}{alef}{sin}'          (<- '{khe}{alef}{sin}{heh}')
       '{alef}{sin}{alef}{te}{ye}{dal}' (<- '{alef}{sin}{te}{alef}{dal}')
     )
   )
