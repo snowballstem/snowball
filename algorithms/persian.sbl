@@ -318,14 +318,6 @@ backwardmode (
       )
     ) or (
       [substring] among (
-        // Specific past-3sg stem fixes
-        '{re}{fe}{te}{mim}'
-        '{re}{fe}{te}{ye}'
-        '{re}{fe}{te}{ye}{mim}'
-        '{re}{fe}{te}{ye}{dal}'
-        '{re}{fe}{te}{alef}{nun}{dal}'
-            (<- '{re}{fe}{te}')
-
         // Generic person and singular/plural endings — only when a verb cue is active
         '{alef}{nun}{dal}'  // -AND
         '{ye}{dal}'         // -ID
@@ -334,6 +326,14 @@ backwardmode (
         '{dal}'             // -D
         '{mim}'             // -M
             ( remove_verb_person_endings R1 delete )
+
+        // Specific past-3sg stem fixes
+        '{re}{fe}{te}{mim}'
+        '{re}{fe}{te}{ye}'
+        '{re}{fe}{te}{ye}{mim}'
+        '{re}{fe}{te}{ye}{dal}'
+        '{re}{fe}{te}{alef}{nun}{dal}'
+            (<- '{re}{fe}{te}')
 
         // Mood/tense markers (HPS).
         '{nun}{dal}{heh}'   // agent noun -NDEH → present root
