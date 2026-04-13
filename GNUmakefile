@@ -446,7 +446,7 @@ $(dart_src_dir)/%_stemmer.dart: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 
 $(go_src_main_dir)/stemwords/algorithms.go: go/stemwords/generate.go $(MODULES)
 	@echo "Generating algorithms.go"
-	@cd go/stemwords && go generate
+	@cd go/stemwords && $(go) generate
 
 $(go_src_dir)/%_stemmer.go: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(go_src_dir)/$*
