@@ -321,6 +321,11 @@ ALL_CODE_DIRS := \
 # When runtime tests are enabled, this gets overridden by overrides.mk.
 BASELINE ?= baseline
 
+baseline-create: gprbuild=perl -e '$$ARGV[0] eq "-Pgenerate" and unshift @ARGV, "gprbuild" and exec @ARGV' --
+baseline-create: mcs=:
+baseline-create: DART=:
+baseline-create: go=:
+baseline-create: JAVAC=:
 baseline-create: everything
 	rm -rf *.$(BASELINE)
 	for d in $(ALL_CODE_DIRS) ; do cp -a $$d $$d.$(BASELINE) ; done
