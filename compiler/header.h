@@ -302,7 +302,7 @@ struct node {
     // (e.g. 42, 2+2, lenof '{U+0246}') from constant AEs which can have a
     // different value depending on platform and/or target language and/or
     // Unicode mode (e.g. maxint, sizeof '{U+0246}') - some warnings which
-    // depend on a constant AEs value should only fire for the first set.
+    // depend on a constant AE's value should only fire for the first set.
     byte fixed_constant;
     // Return 0 for always f.
     // Return 1 for always t.
