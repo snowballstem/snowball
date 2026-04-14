@@ -39,7 +39,7 @@ define stem as (
   test ( $(len == 17) $(cursor == 0) 'australopithecine' atlimit ) or fail='string assignment does not replace c:l (longer)'
 
   // Test string literals are properly escaped for various target languages.
-  $s='$xxx \x42 \u0042 \u{0042} {$xxx}' $(lenof s == 32) or fail='bad target language string literal escaping'
+  $s='$xxx \x42 \u0042 \u{0042} \u000a {$xxx}' $(lenof s == 39) or fail='bad target language string literal escaping'
 
   // Test ASCII control characters in string literals
   stringescapes {}

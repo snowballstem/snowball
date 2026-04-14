@@ -70,7 +70,12 @@ next_outer: ;
             write_char(g, '{');
             write_char(g, c);
             write_char(g, '}');
-        } else if (c < 32 || c == 127) {
+        } else if (c < 32 || c == '\\' || c == 127) {
+            // In Java, `\u000a` in a comment is interpreted as a newline and
+            // so exits the comment, which `\uq` gives compilation error
+            // `illegal unicode escape`.  Since `\` is unusual in Snowball
+            // literal strings, we simply escape it as `{U+5C}` for all target
+            // languages.
             write_string(g, "{U+");
             write_hex(g, c);
             write_char(g, '}');
