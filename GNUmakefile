@@ -755,10 +755,10 @@ check_ada_%: $(STEMMING_DATA_ABS)/%
 $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb: ada/bin/generate $(MODULES)
 	cd $(ada_src_dir) && ../bin/generate $(libstemmer_algorithms)
 
-ada/bin/generate:
+ada/bin/generate: ada/generate.gpr ada/generate/generate.adb
 	cd ada && $(gprbuild) -Pgenerate -p
 
-ada/bin/stemwords: $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
+ada/bin/stemwords: ada/stemwords.gpr $(ADA_SOURCES) ada/src/stemmer.adb ada/src/stemmer.ads ada/src/stemwords.adb
 	cd ada && $(gprbuild) -Pstemwords -p
 
 CLEANDIRS += $(ada_src_dir) ada/bin ada/obj
