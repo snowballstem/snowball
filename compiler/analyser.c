@@ -2171,12 +2171,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
                                     (p->type == c_and ? "'and'" : "command list"));
                         }
                         q->right = NULL;
-                        if (p->left == q) {
-                            // That leaves `q` as the only sub-clause so
-                            // replace the parent node with `q`.
-                            q->right = p->right;
-                            p = q;
-                        }
                     }
                     return res;
                 }
@@ -2291,12 +2285,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
                                     q->line_number);
                         }
                         q->right = NULL;
-                        if (p->left == q) {
-                            // That leaves `q` as the only sub-clause of the
-                            // OR, so replace the OR with `q`.
-                            q->right = p->right;
-                            p = q;
-                        }
                     }
                     return 1;
                 }
