@@ -81,7 +81,7 @@ stringdef ar_kaf                   '{U+0643}'
 stringdef ar_ye                    '{U+064A}'
 stringdef ar_ye_with_hamza_above   '{U+0626}'
 stringdef ar_heh                   '{U+06C1}'
-stringdef ar_he_marbuta            '{U+0629}'
+stringdef ar_teh_marbuta           '{U+0629}'
 stringdef ar_alef_with_hamza_above '{U+0623}'
 stringdef ar_alef_with_hamza_below '{U+0625}'
 stringdef ar_vav_with_hamza_above  '{U+0624}'
@@ -128,7 +128,7 @@ define Normalize_Characters as (
     [substring] among (
       '{ar_kaf}'                                                 (<- '{kaf}')
       '{ar_ye}' '{ar_ye_with_hamza_above}'                       (<- '{ye}')
-      '{ar_heh}' '{ar_he_marbuta}'                               (<- '{heh}')
+      '{ar_teh_marbuta}' '{ar_heh}'                              (<- '{heh}')
       '{ar_alef_with_hamza_above}' '{ar_alef_with_hamza_below}'  (<- '{alef}')
       '{ar_vav_with_hamza_above}'                                (<- '{vav}')
       '{zero_width_joiner}'                                      ( delete )
