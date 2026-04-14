@@ -1,0 +1,10 @@
+// Test `not`.
+
+externals (stem)
+
+define stem as (
+    not (next fail='this should never be seen')
+    $(cursor == 0) or fail='`not` failed to restore cursor'
+    ='ok'
+    not true and fail='`not true` raised signal t'
+)

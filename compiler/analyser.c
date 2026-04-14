@@ -2124,17 +2124,24 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             return 1;
         }
         case c_not: {
+            // `not` signals the opposite to the command it is applied to.
             int res = p->left->possible_signals;
-            if (res >= 0)
-                res = !res;
-            if (res == 0 && p->right) {
-                if (p->right->type != c_functionend) {
-                    fprintf(stderr, "%s:%d: warning: 'not' always signals f here so following commands are unreachable\n",
-                            a->tokeniser->file, p->line_number);
-                }
-                p->right = NULL;
+            if (res < 0) {
+                // `not` applied to command which can signal `t` or `f`.
+                return res;
             }
-            return res;
+            if (res == 0) {
+                fprintf(stderr, "%s:%d: warning: 'not' applied to command which always signals f\n",
+                        a->tokeniser->file, p->line_number);
+                // Handling the failure will restore the cursor, so equivalent to `do`.
+                p->type = c_do;
+                return 1;
+            }
+            fprintf(stderr, "%s:%d: warning: 'not' applied to command which always signals t\n",
+                    a->tokeniser->file, p->line_number);
+            // This `not` is equivalent to `fail`.
+            p->type = c_fail;
+            return 0;
         }
         case c_setlimit: {
             /* If either always signals f, setlimit does too. */
