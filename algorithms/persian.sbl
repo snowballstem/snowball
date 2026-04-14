@@ -154,9 +154,9 @@ define Strip_Prefixes as (
   // that we only remove remove a prefix if it leaves at least two characters.
   // (The clumsy setmark+tomark here seems to be needed because `backwards`
   // restores the cursor after running its subcommand.)
-  setlimit try (backwards (hop 2 setmark x) tomark x) for repeat (
+  setlimit try (backwards (hop 2 setmark x) tomark x) for (
     [substring] among (
-      '{nun}{mim}{ye}{half_space}' (delete set saw_present_prefix) // NEMI‌ + ZWNJ
+      '{nun}{mim}{ye}{half_space}' (set saw_present_prefix  false) // NEMI‌ + ZWNJ: detect but keep
       '{mim}{ye}{half_space}'      (delete set saw_present_prefix) // MI‌ + ZWNJ
     )
   )
