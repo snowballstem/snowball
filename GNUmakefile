@@ -16,13 +16,13 @@ TEE_TO_TMP_TXT:=tee tmp.txt|
 CLEAN_TMP_TXT:=rm -f tmp.txt
 endif
 
+# Use to hook up runtime tests (see `setup_runtime_tests` target below).
+-include overrides.mk
+
 # `make SNOWBALL_FLAGS=-comments` to generate target language code with
 # comments indicating the corresponding lines in the .sbl source.
 SNOWBALL_FLAGS ?=
 SNOWBALL_COMPILE := ./snowball $(SNOWBALL_FLAGS)
-
-# Use to hook up runtime tests (see `setup_runtime_tests` target below).
--include overrides.mk
 
 # Ada
 
@@ -1142,7 +1142,15 @@ setup_runtime_tests: clean_runtime_tests
 	  echo ok > $$r/$$d/output.txt ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
-	printf '%s:=%s\n' BASELINE rbaseline STEMMING_DATA $(RUNTIME_DATA_DIR) ALGORITHMS tests/runtime MODULES $(RUNTIME_DATA_DIR)/modules.txt THIN_FACTOR '' other_algorithms > overrides.mk
+	printf '%s:=%s\n' \
+	  ALGORITHMS 'tests/runtime' \
+	  BASELINE 'rbaseline' \
+	  MODULES '$(RUNTIME_DATA_DIR)/modules.txt' \
+	  other_algorithms '' \
+	  SNOWBALL_FLAGS '-comments' \
+	  STEMMING_DATA '$(RUNTIME_DATA_DIR)' \
+	  THIN_FACTOR '' \
+	  > overrides.mk
 	rm -f algorithms.mk
 	$(MAKE) algorithms.mk
 
