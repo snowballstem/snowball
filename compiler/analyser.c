@@ -686,6 +686,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         p->left = q = q->right;
     }
 
+    int string_index = 0;
     while (q) {
         if (q->type == c_literalstring) {
             symbol * b = q->literalstring;
@@ -695,6 +696,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             w1->size = SIZE(b);  /* number of characters in string */
             w1->i = -1;          /* index of longest substring */
             w1->result = -1;     /* number of corresponding case expression */
+            w1->string_index = string_index++;
             if (q->left) {
                 struct name * function = q->left->name;
                 w1->function = function;

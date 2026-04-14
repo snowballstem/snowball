@@ -40,6 +40,7 @@ static void print_arglist(int exit_code) {
                "  -o, -output OUTPUT_BASE\n"
                "  -s, -syntax                      show syntax tree and stop\n"
                "  -comments                        generate comments\n"
+               "  -coverage                        generate coverage report\n"
                "  -ada                             generate Ada\n"
                "  -c++                             generate C++\n"
                "  -cs, -csharp                     generate C#\n"
@@ -186,6 +187,10 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
             }
             if (eq(s, "-comments")) {
                 o->comments = true;
+                continue;
+            }
+            if (eq(s, "-coverage")) {
+                o->coverage = true;
                 continue;
             }
             if (eq(s, "-ep") || eq(s, "-eprefix")) {
@@ -366,6 +371,9 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         }
         if (o->variables_prefix) {
             fprintf(stderr, "warning: -vp/-vprefix only meaningful for C and C++\n");
+        }
+        if (o->coverage) {
+            fprintf(stderr, "warning: -coverage only currently supported for C and C++\n");
         }
     }
 

@@ -258,6 +258,7 @@ struct amongvec {
     int result;      /* the numeric result for the case */
     int line_number; /* for diagnostics and stable sorting */
     int function_index; /* 1-based */
+    int string_index; /* 0-based index giving order of strings in source */
     struct name * function;
 };
 
@@ -424,6 +425,7 @@ struct options {
     FILE * output_h;
     byte syntax_tree;
     byte comments;
+    byte coverage;
     enc encoding;
     enum {
         LANG_C = 0, // We generate C by default.

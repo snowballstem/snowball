@@ -135,13 +135,47 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
     return 4;
 }
 
+#ifdef SNOWBALL_COVERAGE
+static void report_coverage(const unsigned char * s, int min, int max, int ch, const unsigned char * p, int w) {
+    int i = 0;
+    int outof = 0;
+    /* Adjust ch be an offset from min if it's past the end of the range.  If
+     * we already subtracted min then this will condition will be false.  Only
+     * needed for the "out" case but the condition can never be true for the
+     * "in" case.
+     */
+    if (ch > max) ch -= min;
+    /* Find the index of this character in the grouping. */
+    for (int j = 0; j != max - min; ++j) {
+        if (s[j >> 3] & (0X1 << (j & 0X7))) {
+            ++outof;
+            if (j < ch) ++i;
+        }
+    }
+    s += (max - min + 8) / 8;
+    fprintf(stderr, "%s index %d of %d '%.*s'\n", s, i, outof + 1, w, p);
+}
+
+static void report_coverage_nomatch(const unsigned char * s, int min, int max) {
+    s += (max - min + 8) / 8;
+    fprintf(stderr, "%s no match\n", s);
+}
+#endif
+
 extern int in_grouping_U(struct SN_env * z, const unsigned char * s, int min, int max, int repeat) {
     do {
         int ch;
         int w = get_utf8(z->p, z->c, z->l, & ch);
         if (!w) return -1;
-        if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+        if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) {
+#ifdef SNOWBALL_COVERAGE
+            report_coverage_nomatch(s, min, max);
+#endif
             return w;
+        }
+#ifdef SNOWBALL_COVERAGE
+        report_coverage(s, min, max, ch, z->p + z->c, w);
+#endif
         z->c += w;
     } while (repeat);
     return 0;
@@ -152,8 +186,15 @@ extern int in_grouping_b_U(struct SN_env * z, const unsigned char * s, int min, 
         int ch;
         int w = get_b_utf8(z->p, z->c, z->lb, & ch);
         if (!w) return -1;
-        if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)
+        if (ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) {
+#ifdef SNOWBALL_COVERAGE
+            report_coverage_nomatch(s, min, max);
+#endif
             return w;
+        }
+#ifdef SNOWBALL_COVERAGE
+        report_coverage(s, min, max, ch, z->p + z->c - w, w);
+#endif
         z->c -= w;
     } while (repeat);
     return 0;
@@ -164,8 +205,15 @@ extern int out_grouping_U(struct SN_env * z, const unsigned char * s, int min, i
         int ch;
         int w = get_utf8(z->p, z->c, z->l, & ch);
         if (!w) return -1;
-        if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
+        if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)) {
+#ifdef SNOWBALL_COVERAGE
+            report_coverage(s, min, max, ch, z->p + z->c, w);
+#endif
             return w;
+        }
+#ifdef SNOWBALL_COVERAGE
+        report_coverage_nomatch(s, min, max);
+#endif
         z->c += w;
     } while (repeat);
     return 0;
@@ -176,8 +224,15 @@ extern int out_grouping_b_U(struct SN_env * z, const unsigned char * s, int min,
         int ch;
         int w = get_b_utf8(z->p, z->c, z->lb, & ch);
         if (!w) return -1;
-        if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0))
+        if (!(ch > max || (ch -= min) < 0 || (s[ch >> 3] & (0X1 << (ch & 0X7))) == 0)) {
+#ifdef SNOWBALL_COVERAGE
+            report_coverage(s, min, max, ch, z->p + z->c - w, w);
+#endif
             return w;
+        }
+#ifdef SNOWBALL_COVERAGE
+        report_coverage_nomatch(s, min, max);
+#endif
         z->c -= w;
     } while (repeat);
     return 0;
@@ -267,6 +322,10 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
 
     int first_key_inspected = 0;
 
+#ifdef SNOWBALL_COVERAGE
+    if (v[v_size * 2].s_size == -1)
+        fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, v[v_size].s_size);
+#endif
     while (1) {
         int k = i + ((j - i) >> 1);
         int diff = 0;
@@ -303,14 +362,28 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
     while (1) {
         if (common_i >= w->s_size) {
             z->c = c + w->s_size;
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
             if (!w->function) return w->result;
             z->af = w->function;
             if (call_among_func(z)) {
                 z->c = c + w->s_size;
+#ifdef SNOWBALL_COVERAGE
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
                 return w->result;
             }
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
         }
-        if (!w->substring_i) return 0;
+        if (!w->substring_i) {
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, v[v_size * 2].s_size);
+#endif
+            return 0;
+        }
         w += w->substring_i;
     }
 }
@@ -333,6 +406,10 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
 
     int first_key_inspected = 0;
 
+#ifdef SNOWBALL_COVERAGE
+    if (v[v_size * 2].s_size == -1)
+        fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, v[v_size].s_size);
+#endif
     while (1) {
         int k = i + ((j - i) >> 1);
         int diff = 0;
@@ -359,14 +436,28 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
     while (1) {
         if (common_i >= w->s_size) {
             z->c = c - w->s_size;
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
             if (!w->function) return w->result;
             z->af = w->function;
             if (call_among_func(z)) {
+#ifdef SNOWBALL_COVERAGE
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
                 z->c = c - w->s_size;
                 return w->result;
             }
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+#endif
         }
-        if (!w->substring_i) return 0;
+        if (!w->substring_i) {
+#ifdef SNOWBALL_COVERAGE
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, v[v_size * 2].s_size);
+#endif
+            return 0;
+        }
         w += w->substring_i;
     }
 }

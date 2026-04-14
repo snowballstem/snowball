@@ -1345,6 +1345,10 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     int pre_check = (block != -1 || n_cases <= 2);
+    if (g->options->coverage) {
+        // Don't shortcut if generating coverage.
+        pre_check = false;
+    }
     if (pre_check) {
         char buf[64];
         g->I[2] = block;
@@ -1749,6 +1753,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
     }
 
     g->I[1] = x->literalstring_count;
+    if (g->options->coverage) {
+        g->I[1] = g->I[1] * 2 + 1;
+    }
     w(g, "~Mstatic const struct among a_~I0[~I1] = {~N");
 
     for (int i = 0; i < x->literalstring_count; i++) {
@@ -1769,6 +1776,26 @@ static void generate_among_table(struct generator * g, struct among * x) {
             w(g, "s_~I0_~I1,");
         }
         w(g, " ~I3, ~I4, ~I5}");
+    }
+    if (g->options->coverage) {
+        w(g, ",~N");
+        g->S[1] = g->analyser->tokeniser->file;
+        for (int i = 0; i < x->literalstring_count; i++) {
+            if (g->options->comments) {
+                w(g, "/* coverage */ ");
+            }
+            g->I[1] = x->b[i].line_number;
+            g->I[2] = x->b[i].string_index;
+            w(g, "{ ~I0, (const symbol*)\"~S1:~I1\", 0, ~I2, 0 },~N");
+        }
+        if (x->always_matches) {
+            g->I[0] = -1;
+        }
+        if (g->options->comments) {
+            w(g, "/* coverage */ ");
+        }
+        g->I[1] = x->node->line_number;
+        w(g, "{ ~I0, (const symbol*)\"~S1:~I1\", 0, 0, 0 },~N");
     }
     w(g, "~N};~N");
 
@@ -1820,6 +1847,17 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     for (int i = 0; i < size; i++) {
         if (i) w(g, ", ");
         write_int(g, map[i]);
+    }
+    if (g->options->coverage) {
+        char buf[1024];
+        checked_snprintf(buf, sizeof(buf), "%s:%d: grouping %.*s",
+                         g->analyser->tokeniser->file, q->line_number,
+                         SIZE(q->name->s), q->name->s);
+        for (const char * p = buf; *p; ++p) {
+            w(g, ", ");
+            wlitch(g, (int)*p);
+        }
+        w(g, ", '\\0'");
     }
     w(g, " };~N");
 
