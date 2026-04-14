@@ -48,8 +48,12 @@ static const struct testcase {
     // The Finnish stemmer used to damage numbers ending with two or more of
     // the same digit.  Regression test, applied to all stemmers.
     // https://github.com/snowballstem/snowball/issues/66
-    { 0, 0, "2000", 0 },
+    { 0, 0, "00", 0 },
+    { 0, 0, "555", 0 },
     { 0, 0, "999", 0 },
+    { 0, 0, "1899", 0 },
+    { 0, 0, "2000", 0 },
+    { 0, 0, "9999", 0 },
     { 0, 0, "1000000000", 0 },
     // The Danish stemmer used to damage a number at the end of a word.
     // Regression test, applied to all stemmers.
