@@ -41,7 +41,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\') write_string(g, "\\");
+            if (ch == '\"' || ch == '\\') write_char(g, '\\');
             write_char(g, ch);
         } else if (ch < 128) {
             // Escape as octal.
