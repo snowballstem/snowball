@@ -275,8 +275,8 @@ ZIG_SOURCES = $(libstemmer_algorithms:%=$(zig_src_dir)/%_stemmer.zig) \
 	$(zig_src_dir)/algorithms.zig
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
-ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.ads) \
-        $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-%.adb) \
+ADA_SOURCES = $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-s_%.ads) \
+        $(libstemmer_algorithms:%=$(ada_src_dir)/stemmer-s_%.adb) \
         $(ada_src_dir)/stemmer-factory.ads $(ada_src_dir)/stemmer-factory.adb
 
 COMPILER_OBJECTS=$(COMPILER_SOURCES:.c=.o)
@@ -365,19 +365,19 @@ CLEANDIRS := dist
 
 ifneq '$(filter grouped-target,$(.FEATURES))' ''
 # Grouped-targets were added in GNU make 4.3.
-$(ada_src_dir)/stemmer-%.adb $(ada_src_dir)/stemmer-%.ads &: $(ALGORITHMS)/%.sbl snowball
+$(ada_src_dir)/stemmer-s_%.adb $(ada_src_dir)/stemmer-s_%.ads &: $(ALGORITHMS)/%.sbl snowball
 else
 # This will fail to recreate the .ads if it is deleted but the corresponding
 # .adb is still present and up-to-date.  That seems better than forcing a
 # serial build with .NOTPARALLEL which it seems can only be applied to an
 # entire makefile, not per-rule.
-$(ada_src_dir)/stemmer-%.ads: $(ada_src_dir)/stemmer-%.adb
+$(ada_src_dir)/stemmer-s_%.ads: $(ada_src_dir)/stemmer-s_%.adb
 	@:
 
-$(ada_src_dir)/stemmer-%.adb: $(ALGORITHMS)/%.sbl snowball
+$(ada_src_dir)/stemmer-s_%.adb: $(ALGORITHMS)/%.sbl snowball
 endif
 	@mkdir -p $(ada_src_dir)
-	$(SNOWBALL_COMPILE) $< -ada -P $* -o $@
+	$(SNOWBALL_COMPILE) $< -ada -P 'S_$*' -o $@
 
 # C
 

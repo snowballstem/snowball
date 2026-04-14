@@ -46,7 +46,7 @@ procedure Generate is
    begin
       Create (File, Out_File, "stemmer-factory.adb");
       for Lang of Languages loop
-         Put_Line (File, "with Stemmer." & Capitalize (Lang) & ";");
+         Put_Line (File, "with Stemmer.S_" & Capitalize (Lang) & ";");
       end loop;
       Put_Line (File, "package body Stemmer.Factory with SPARK_Mode is");
       New_Line (File);
@@ -58,7 +58,7 @@ procedure Generate is
       for Lang of Languages loop
          Put_Line (File, "      when L_" & To_Upper (Lang) & " =>");
          Put_Line (File, "         declare");
-         Put_Line (File, "            C : Stemmer." & Capitalize (Lang) & ".Context_Type;");
+         Put_Line (File, "            C : Stemmer.S_" & Capitalize (Lang) & ".Context_Type;");
          Put_Line (File, "         begin");
          Put_Line (File, "            C.Stem_Word (Word, Result);");
          Put_Line (File, "            return Get_Result (C);");
