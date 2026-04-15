@@ -681,7 +681,7 @@ static int compare_amongvec(const void *pv, const void *qv) {
         if (b_p[i] != b_q[i]) return b_p[i] - b_q[i];
     if (p_size - q_size)
         return p_size - q_size;
-    return p->line_number - q->line_number;
+    return p->string_index - q->string_index;
 }
 
 #define nodes_equivalent(P, Q) \

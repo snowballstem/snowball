@@ -256,9 +256,11 @@ struct amongvec {
     struct node * action; /* the corresponding action */
     int i;           /* the amongvec index of the longest substring of b */
     int result;      /* the numeric result for the case */
-    int line_number; /* for diagnostics and stable sorting */
+    int line_number; /* for diagnostics */
     int function_index; /* 1-based */
-    int string_index; /* 0-based index giving order of strings in source */
+    // 0-based index giving order of strings in source.  Used for stable
+    // sorting of amongvec entries and -coverage.
+    int string_index;
     struct name * function;
 };
 
