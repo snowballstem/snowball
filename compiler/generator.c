@@ -63,6 +63,10 @@ next_outer: ;
             }
         }
     }
+    symbol c_max = 0x9F;
+    if (g->options->encoding == ENC_SINGLEBYTE) {
+        c_max = 0xFF;
+    }
     write_char(g, '\'');
     for (int i = 0; i < SIZE(s); ++i) {
         symbol c = s[i];
@@ -70,21 +74,35 @@ next_outer: ;
             write_char(g, '{');
             write_char(g, c);
             write_char(g, '}');
-        } else if (c < 32 || c == '\\' || c == 127) {
-            // In Java, `\u000a` in a comment is interpreted as a newline and
-            // so exits the comment, which `\uq` gives compilation error
-            // `illegal unicode escape`.  Since `\` is unusual in Snowball
-            // literal strings, we simply escape it as `{U+5C}` for all target
-            // languages.
+        } else if (c < 32 ||
+                   (c >= 127 && c <= c_max) ||
+                   c == '\\' ||
+                   c >= 0x590) {
+            // Encode characters which are problematic if emitted literally
+            // using Snowball-style `{U+xx}`:
+            //
+            // * Control characters.
+            //
+            // * For ENC_SINGLEBYTE we encode all non-ASCII to avoid invalid
+            //   UTF-8 in comments (which clang warns about with option
+            //   `-pedantic` or `-Winvalid-utf8`).
+            //
+            // * `\`: In Java, `\u000a` in a comment is interpreted as a
+            //   newline and so exits the comment, while `\uq` gives
+            //   compilation error `illegal unicode escape`.  Since `\` is
+            //   unusual in Snowball literal strings we take the simple
+            //   approach of escaping it for all target languages.
+            //
+            // * Anything >= 0x590 as a crude way to avoid LTR characters
+            //   affecting the rendering of source character order in confusing
+            //   ways.
             write_string(g, "{U+");
             write_hex(g, c);
             write_char(g, '}');
+        } else if (g->options->encoding == ENC_WIDECHARS) {
+            write_wchar_as_utf8(g, s[i]);
         } else {
-            if (g->options->encoding == ENC_WIDECHARS) {
-                write_wchar_as_utf8(g, s[i]);
-            } else {
-                write_char(g, s[i]);
-            }
+            write_char(g, s[i]);
         }
     }
     write_char(g, '\'');
