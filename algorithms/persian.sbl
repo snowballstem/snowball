@@ -83,8 +83,8 @@ stringdef ar_vav_with_hamza_above  '{U+0624}'
 // ============================================================================
 routines (
   Normalize_Characters  // Forward: Unicode/script normalization
-  Strip_Prefixes        // Forward: anchored prefix peeling
-  Delete_ZWNJ           // Forward: delete remaining ZWNJs after prefix stripping
+  Prefixes              // Forward: handles prefixes
+  Delete_ZWNJ           // Forward: delete remaining ZWNJs after prefix handling
   Protect_Lexical_AN    // Probe: flag lexical -AN endings (per pass)
 
   R1 // Test if cursor is in R1
@@ -107,7 +107,7 @@ externals ( stem )
 //    in this pass.
 booleans ( saw_present_prefix remove_verb_person_endings )
 
-integers ( p1 x )
+integers ( p1 )
 
 // ============================================================================
 //  PHASE 1 — NORMALIZATION (forward)
@@ -132,26 +132,25 @@ define Normalize_Characters as (
 )
 
 // ============================================================================
-//  PHASE 2 — PREFIX STRIPPING (forward, anchored)
-//  - HPS: remove known prefixes before suffix processing.
-//  - Requires ZWNJ (U+200C) between prefix and stem to avoid stripping from
+//  PHASE 2 — PREFIX HANDLING (forward, anchored)
+//  - HPS: handle known prefixes before suffix processing.
+//  - Requires ZWNJ (U+200C) between prefix and stem to avoid mishandling
 //    words that begin with the same syllables but are not prefixed forms.
+//  - At least two characters are required after the prefix.
 //  - Sets `saw_present_prefix` when matching {mi}/{nemi} to enable person endings later.
 //  - Note: negating derivational prefixes na- and bi- are intentionally not
 //    stripped as they create words with opposite meanings (e.g. na+dorost =
 //    incorrect, bi+khatr = safe) and conflating them with their base forms
 //    would harm search precision.
+//  - Similarly, nemi- negates the meaning so we don't remove it but do still
+//    set `saw_present_prefix` when it is present.
 // ============================================================================
-define Strip_Prefixes as (
-  // We set the limit for this 2 characters from the end of the string so
-  // that we only remove remove a prefix if it leaves at least two characters.
-  // (The clumsy setmark+tomark here seems to be needed because `backwards`
-  // restores the cursor after running its subcommand.)
-  setlimit try (backwards (hop 2 setmark x) tomark x) for (
-    [substring] among (
-      '{nun}{mim}{ye}{half_space}' (set saw_present_prefix  false) // NEMI‌ + ZWNJ: detect but keep
-      '{mim}{ye}{half_space}'      (delete set saw_present_prefix) // MI‌ + ZWNJ
-    )
+define Prefixes as (
+  [substring] among (
+    '{nun}{mim}{ye}{half_space}'  // NEMI‌ + ZWNJ: detect but keep
+        (hop 2  set saw_present_prefix)
+    '{mim}{ye}{half_space}'       // MI‌ + ZWNJ
+        (hop 2  delete  set saw_present_prefix)
   )
 )
 
@@ -357,8 +356,8 @@ define stem as (
   // 1) Normalize script/spacing (ZWNJ preserved for prefix detection)
   do Normalize_Characters
 
-  // 2) Strip all leading prefixes (requires ZWNJ separator)
-  do Strip_Prefixes
+  // 2) Handle leading prefixes (requires ZWNJ separator)
+  do Prefixes
 
   // 2b) Delete remaining ZWNJs now that prefix detection is done
   do Delete_ZWNJ
