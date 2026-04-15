@@ -300,6 +300,19 @@ extern int K_needed(struct generator * g, struct node * p) {
     return K_needed_(p, 0);
 }
 
+// Like K_needed(), but for the sub-node chain of c_and/c_or.  For both
+// of these, the cursor only needs to be restored between nodes so we don't
+// need to check the final node in the chain.
+extern int K_needed_for_connective(struct generator * g, struct node * p) {
+    while (p->right) {
+        if (K_needed(g, p)) {
+            return true;
+        }
+        p = p->right;
+    }
+    return false;
+}
+
 static int repeat_score(struct generator * g, struct node * p, int call_depth) {
     int score = 0;
     while (p) {

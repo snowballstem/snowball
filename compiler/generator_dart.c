@@ -330,7 +330,7 @@ static void generate_bra(struct generator * g, struct node * p) {
 
 static void generate_and(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
-    if (K_needed(g, p->left)) {
+    if (K_needed_for_connective(g, p->left)) {
         savevar = vars_newname(g);
     }
 
@@ -355,7 +355,7 @@ static void generate_and(struct generator * g, struct node * p) {
 
 static void generate_or(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
-    if (K_needed(g, p->left)) {
+    if (K_needed_for_connective(g, p->left)) {
         savevar = vars_newname(g);
     }
 
