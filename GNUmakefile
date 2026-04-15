@@ -311,8 +311,17 @@ update_version:
 		dart/pubspec.yaml \
 		python/setup.py
 
-# Generate code for all languages.
+# Generate and build for all target languages.
 everything: ada all csharp dart go java js pascal python rust zig
+
+# Generate code for all languages.  Override build tools to do as little code
+# building as possible.
+generate: gprbuild=perl -e '$$ARGV[0] eq "-Pgenerate" and unshift @ARGV, "gprbuild" and exec @ARGV' --
+generate: mcs=:
+generate: DART=:
+generate: go=:
+generate: JAVAC=:
+generate: everything
 
 # The directories where generated code goes for all languages.
 ALL_CODE_DIRS := \
@@ -321,12 +330,7 @@ ALL_CODE_DIRS := \
 # When runtime tests are enabled, this gets overridden by overrides.mk.
 BASELINE ?= baseline
 
-baseline-create: gprbuild=perl -e '$$ARGV[0] eq "-Pgenerate" and unshift @ARGV, "gprbuild" and exec @ARGV' --
-baseline-create: mcs=:
-baseline-create: DART=:
-baseline-create: go=:
-baseline-create: JAVAC=:
-baseline-create: everything
+baseline-create: generate
 	rm -rf *.$(BASELINE)
 	for d in $(ALL_CODE_DIRS) ; do cp -a $$d $$d.$(BASELINE) ; done
 	rm -rf *.$(BASELINE)/*.o ada.$(BASELINE)/obj pascal.$(BASELINE)/*.ppu
@@ -335,7 +339,7 @@ baseline-create: everything
 baseline-diff:
 	@for d in $(ALL_CODE_DIRS) ; do diff -ru -x'*.o' -x'obj' -x'*.ppu' -x'*.class' -x'Cargo.lock' -x'target' $$d.$(BASELINE) $$d ; done
 
-.PHONY: all clean update_version everything baseline-create baseline-diff
+.PHONY: all clean update_version everything generate baseline-create baseline-diff
 
 $(STEMMING_DATA)/% $(STEMMING_DATA_ABS)/%:
 	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
