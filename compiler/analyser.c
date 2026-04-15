@@ -2379,6 +2379,17 @@ static void visit_node(struct analyser * a, struct node * p) {
 
         p->possible_signals = check_possible_signals(a, p);
 
+        if ((p->type == c_and || p->type == c_or) && !p->left->right) {
+            // Pruning of unreachable code can leave single-entry c_and and
+            // c_or nodes.  These can lead to unused variables in the generated
+            // code and may also hinder further optimisations.
+            //
+            // Ideally we'd replace these with their subnode, but that's fiddly
+            // to do as we need to update the location we got the current value
+            // of `p` from, so for now we turn them into c_bra instead.
+            p->type = c_bra;
+        }
+
         p = p->right;
     }
 }
