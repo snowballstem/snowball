@@ -242,6 +242,7 @@ extern void write_margin(struct generator * g) {
 static int K_needed_(struct node * p, int call_depth) {
     while (p) {
         switch (p->type) {
+            case c_assign:
             case c_atlimit:
             case c_do:
             case c_dollar:
@@ -268,6 +269,7 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_debug:
             case c_functionend:
             case c_not:
+                // Doesn't change the cursor or always restores it.
                 break;
 
             case c_call:
