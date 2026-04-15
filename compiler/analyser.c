@@ -343,7 +343,9 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
     struct node * p;
     struct node * q;
     switch (read_token(t)) {
-        case c_minus: /* monadic */
+        case c_minus: { /* monadic */
+            // Note current line number so c_neg node reports the right line.
+            int neg_line = a->tokeniser->line_number;
             q = read_AE(a, assigned_to, 100);
             if (q->type == c_neg) {
                 /* Optimise away double negation, which avoids generators
@@ -360,9 +362,10 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                 p = q;
                 break;
             }
-            p = new_node(a, c_neg);
+            p = new_node_at_line(a, c_neg, neg_line);
             p->right = q;
             break;
+        }
         case c_bra:
             p = read_AE(a, assigned_to, 0);
             get_token(a, c_ket);
@@ -438,27 +441,26 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
             // Can't evaluate division by zero.
             !(token == c_divide && r->number == 0)) {
             // Evaluate constant sub-expression.
-            q = new_node(a, c_number);
+            q = p;
             switch (token) {
                 case c_plus:
-                    q->number = p->number + r->number;
+                    q->number += r->number;
                     break;
                 case c_minus:
-                    q->number = p->number - r->number;
+                    q->number -= r->number;
                     break;
                 case c_multiply:
-                    q->number = p->number * r->number;
+                    q->number *= r->number;
                     break;
                 case c_divide:
-                    q->number = p->number / r->number;
+                    q->number /= r->number;
                     break;
                 default:
                     fprintf(stderr, "Unexpected AE operator %s\n",
                             name_of_token(token));
                     exit(1);
             }
-            q->fixed_constant = p->fixed_constant && r->fixed_constant;
-            q->line_number = p->line_number;
+            q->fixed_constant = q->fixed_constant && r->fixed_constant;
         } else {
             // Check for specific constant or no-op cases.
             q = NULL;
@@ -478,7 +480,7 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                 case c_minus:
                     // 0 - r is -r
                     if (p->type == c_number && p->number == 0) {
-                        q = new_node(a, c_neg);
+                        q = new_node_at_line(a, c_neg, op_line);
                         q->right = r;
                         break;
                     }
@@ -497,27 +499,23 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     // p * 0 is 0
                     if (r->type == c_number && r->number == 0) {
                         q = r;
-                        q->line_number = p->line_number;
                         break;
                     }
                     // -1 * r is -r
                     if (p->type == c_number && p->number == -1) {
-                        q = new_node(a, c_neg);
+                        q = new_node_at_line(a, c_neg, p->line_number);
                         q->right = r;
-                        q->line_number = p->line_number;
                         break;
                     }
                     // p * -1 is -p
                     if (r->type == c_number && r->number == -1) {
-                        q = new_node(a, c_neg);
+                        q = new_node_at_line(a, c_neg, r->line_number);
                         q->right = p;
-                        q->line_number = p->line_number;
                         break;
                     }
                     // 1 * r is r
                     if (p->type == c_number && p->number == 1) {
                         q = r;
-                        q->line_number = p->line_number;
                         break;
                     }
                     // p * 1 is p
@@ -534,9 +532,8 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     }
                     // p / -1 is -p
                     if (r->type == c_number && r->number == -1) {
-                        q = new_node(a, c_neg);
+                        q = new_node_at_line(a, c_neg, r->line_number);
                         q->right = p;
-                        q->line_number = p->line_number;
                         break;
                     }
                     // p / 0 is an error!
@@ -558,6 +555,8 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
 
 static struct node * read_or(struct analyser * a, struct node * n) {
     struct tokeniser * t = a->tokeniser;
+    // Note current line number so c_or node reports the right line.
+    int or_line = t->line_number;
     struct node * p = n->type == c_false ? NULL : n;
     struct node * p_end = p;
     do {
@@ -579,7 +578,7 @@ static struct node * read_or(struct analyser * a, struct node * n) {
     } else if (p->right == NULL) {
         return p;
     }
-    n = new_node(a, c_or);
+    n = new_node_at_line(a, c_or, or_line);
     n->left = p;
     return n;
 }
@@ -594,6 +593,8 @@ is_just_true(struct node * q)
 
 static struct node * read_and(struct analyser * a, struct node * n) {
     struct tokeniser * t = a->tokeniser;
+    // Note current line number so c_and node reports the right line.
+    int and_line = t->line_number;
     struct node * p = is_just_true(n) ? NULL : n;
     struct node * p_end = p;
     do {
@@ -615,7 +616,7 @@ static struct node * read_and(struct analyser * a, struct node * n) {
     } else if (p->right == NULL) {
         return p;
     }
-    n = new_node(a, c_and);
+    n = new_node_at_line(a, c_and, and_line);
     n->left = p;
     return n;
 }
@@ -872,11 +873,11 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
 
     if (starter) {
         starter->right = p;
-        p = new_node(a, c_bra);
+        p = new_node_at_line(a, c_bra, starter->line_number);
         if (substring) {
             p->left = starter;
         } else {
-            substring = new_node(a, c_substring);
+            substring = new_node_at_line(a, c_substring, starter->line_number);
             substring->right = starter;
             p->left = substring;
         }
@@ -912,7 +913,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 // becomes:
                 //
                 // S ... true
-                p = new_node(a, c_true);
+                p = new_node_at_line(a, c_true, v[0].line_number);
             }
         } else {
             if (v[0].action) {
