@@ -16,13 +16,14 @@ define stem
       # len
         true
     try
-      atleast
-      # len
-        false
-    repeat
       (
-    repeat
-      true
-    repeat
+        false
+    try
+      repeat
+        (
+    try
+      repeat
+        true
+    do
       false
     Function end

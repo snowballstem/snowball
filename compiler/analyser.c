@@ -2161,10 +2161,17 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             return 1;
         case c_repeat: {
             int possible_signals = p->left->possible_signals;
-            if (possible_signals != -1) {
-            fprintf(stderr, "%s:%d: warning: body of 'repeat' always signals '%c'\n",
-                    a->tokeniser->file, p->line_number,
-                    possible_signals ? 't' : 'f');
+            if (possible_signals == 1) {
+                fprintf(stderr, "%s:%d: warning: infinite loop: body of 'repeat' always signals 't'\n",
+                        a->tokeniser->file, p->line_number);
+                // Any code after this is unreachable.
+                // FIXME: This only prunes the rest of this command list - we
+                // want to prune anything that's only reachable from here.
+                p->right = NULL;
+            } else if (possible_signals == 0) {
+                fprintf(stderr, "%s:%d: warning: body of 'repeat' always signals 'f'\n",
+                        a->tokeniser->file, p->line_number);
+                p->type = c_do;
             }
             /* Always gives signal t. */
             return 1;
@@ -2234,10 +2241,18 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             return p->left->possible_signals;
         case c_atleast: {
             int possible_signals = p->left->possible_signals;
-            if (possible_signals != -1) {
-            fprintf(stderr, "%s:%d: warning: body of 'atleast' always signals '%c'\n",
-                    a->tokeniser->file, p->line_number,
-                    possible_signals ? 't' : 'f');
+            if (possible_signals == 1) {
+                fprintf(stderr, "%s:%d: warning: infinite loop: body of 'atleast' always signals 't'\n",
+                        a->tokeniser->file, p->line_number);
+                // Any code after this is unreachable.
+                // FIXME: This only prunes the rest of this command list - we
+                // want to prune anything that's only reachable from here.
+                p->right = NULL;
+            } else if (possible_signals == 0) {
+                fprintf(stderr, "%s:%d: warning: body of 'atleast' always signals 'f'\n",
+                        a->tokeniser->file, p->line_number);
+                p->type = c_bra;
+                p->AE = NULL;
             }
             /* Give same signal as p->left. */
             return possible_signals;

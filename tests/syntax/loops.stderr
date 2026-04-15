@@ -1,9 +1,9 @@
 syntax/loops.sbl:4: warning: atleast 0 C is just repeat C
 syntax/loops.sbl:5: warning: atleast -1 C is just repeat C
 syntax/loops.sbl:6: warning: loop 1 C is just C
-syntax/loops.sbl:8: warning: body of 'atleast' always signals 't'
-syntax/loops.sbl:9: warning: body of 'atleast' always signals 't'
+syntax/loops.sbl:8: warning: infinite loop: body of 'atleast' always signals 't'
+syntax/loops.sbl:9: warning: infinite loop: body of 'atleast' always signals 't'
 syntax/loops.sbl:10: warning: body of 'atleast' always signals 'f'
-syntax/loops.sbl:11: warning: body of 'repeat' always signals 't'
-syntax/loops.sbl:12: warning: body of 'repeat' always signals 't'
+syntax/loops.sbl:11: warning: infinite loop: body of 'repeat' always signals 't'
+syntax/loops.sbl:12: warning: infinite loop: body of 'repeat' always signals 't'
 syntax/loops.sbl:13: warning: body of 'repeat' always signals 'f'
