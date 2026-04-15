@@ -1,0 +1,32 @@
+externals (stem)
+integers (x)
+define stem as (
+  // One token per line to check which token the line number is taken from.
+
+  $x
+  =
+  1
+  / // Error here
+  0
+
+  $x
+  /= // Error here
+  0
+
+  $
+  (
+  x
+  = // Error here
+  0
+  )
+
+  $
+  stem // Error here
+  =
+  0
+
+  $
+  unknown // Error here
+  =
+  0
+)

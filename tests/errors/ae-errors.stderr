@@ -1,0 +1,5 @@
+errors/ae-errors.sbl:9: Division by zero
+errors/ae-errors.sbl:13: Division by zero
+errors/ae-errors.sbl:19: Expected relational operator (did you mean '=='?)
+errors/ae-errors.sbl:24: 'stem' not of type integer or string
+errors/ae-errors.sbl:29: 'unknown' undeclared

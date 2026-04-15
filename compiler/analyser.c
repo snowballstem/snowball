@@ -36,15 +36,19 @@ extern void print_program(struct analyser * a) {
     if (a->program) print_node_(a->program, 0, "");
 }
 
-static struct node * new_node(struct analyser * a, int type) {
+static struct node * new_node_at_line(struct analyser * a, int type, int line) {
     NEW(node, p);
     *p = (struct node){0};
     p->mode = a->mode;
-    p->line_number = a->tokeniser->line_number;
+    p->line_number = line;
     p->type = type;
     p->next = a->nodes;
     a->nodes = p;
     return p;
+}
+
+static struct node * new_node(struct analyser * a, int type) {
+    return new_node_at_line(a, type, a->tokeniser->line_number);
 }
 
 static const char * name_of_mode(int n) {
@@ -75,10 +79,15 @@ static void count_error(struct analyser * a) {
     t->error_count++;
 }
 
-static void report_error_location(struct analyser * a) {
+static void report_error_location_line(struct analyser * a, int line) {
     struct tokeniser * t = a->tokeniser;
     count_error(a);
-    fprintf(stderr, "%s:%d: ", t->file, t->line_number);
+    fprintf(stderr, "%s:%d: ", t->file, line);
+}
+
+static void report_error_location(struct analyser * a) {
+    struct tokeniser * t = a->tokeniser;
+    report_error_location_line(a, t->line_number);
 }
 
 static void report_error_after(struct analyser * a) {
@@ -417,13 +426,17 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
     }
     while (true) {
         int token = read_token(t);
+        int op_line = t->line_number;
         int b = binding(token);
         if (binding(token) <= B) {
             hold_token(t);
             return p;
         }
         struct node * r = read_AE(a, assigned_to, b);
-        if (p->type == c_number && r->type == c_number) {
+        if (p->type == c_number &&
+            r->type == c_number &&
+            // Can't evaluate division by zero.
+            !(token == c_divide && r->number == 0)) {
             // Evaluate constant sub-expression.
             q = new_node(a, c_number);
             switch (token) {
@@ -437,11 +450,6 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     q->number = p->number * r->number;
                     break;
                 case c_divide:
-                    if (r->number == 0) {
-                        fprintf(stderr, "%s:%d: Division by zero\n",
-                                t->file, t->line_number);
-                        exit(1);
-                    }
                     q->number = p->number / r->number;
                     break;
                 default:
@@ -533,14 +541,13 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
                     }
                     // p / 0 is an error!
                     if (r->type == c_number && r->number == 0) {
-                        fprintf(stderr, "%s:%d: Division by zero\n",
-                                t->file, t->line_number);
-                        exit(1);
+                        report_error_location_line(a, op_line);
+                        fprintf(stderr, "Division by zero\n");
                     }
                     break;
             }
             if (!q) {
-                q = new_node(a, token);
+                q = new_node_at_line(a, token, op_line);
                 q->left = p;
                 q->right = r;
             }
@@ -1334,6 +1341,7 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_dollar: {
+            int dollar_line = t->line_number;
             read_token(t);
             if (t->token == c_bra) {
                 /* Handle newer $(AE REL_OP AE) syntax. */
@@ -1342,9 +1350,8 @@ static struct node * read_C(struct analyser * a) {
                 token = t->token;
                 switch (token) {
                     case c_assign:
-                        count_error(a);
-                        fprintf(stderr, "%s:%d: Expected relational operator (did you mean '=='?)\n",
-                                t->file, t->line_number);
+                        report_error_location(a);
+                        fprintf(stderr, "Expected relational operator (did you mean '=='?)\n");
                         // Assume it was == to try to avoid an error avalanche.
                         token = c_eq;
                         /* FALLTHRU */
@@ -1405,7 +1412,7 @@ static struct node * read_C(struct analyser * a) {
             if (t->token != c_name) {
                 unexpected_token_error(a, "integer test expression");
                 hold_token(t);
-                return new_node(a, c_dollar);
+                return new_node_at_line(a, c_dollar, dollar_line);
             }
 
             struct name * q = find_name(a);
@@ -1415,7 +1422,7 @@ static struct node * read_C(struct analyser * a) {
                  */
                 q->initialised = true;
                 q->value_used = true;
-                struct node * p = new_node(a, c_dollar);
+                struct node * p = new_node_at_line(a, c_dollar, dollar_line);
                 int mode = a->mode;
                 int modifyable = a->modifyable;
                 a->mode = m_forward;
@@ -1489,13 +1496,17 @@ static struct node * read_C(struct analyser * a) {
                             p->name = NULL;
                             p->AE = NULL;
                         } else if (p->AE->number == 0) {
-                            if (p->type == c_divide) {
-                                fprintf(stderr, "%s:%d: Division by zero\n",
-                                        t->file, t->line_number);
-                                exit(1);
+                            if (p->type == c_divideassign) {
+                                report_error_location_line(a, p->line_number);
+                                fprintf(stderr, "Division by zero\n");
+                                // Set the largest possible value.
+                                p->type = c_maxint;
+                                p->name = NULL;
+                                p->AE = NULL;
+                            } else {
+                                // `$x*=0` -> `$x=0`
+                                p->type = c_mathassign;
                             }
-                            // `$x*=0` -> `$x=0`
-                            p->type = c_mathassign;
                         } else if (p->AE->number == -1) {
                             // `$x/=-1` -> `$x*=-1`
                             p->type = c_multiplyassign;
