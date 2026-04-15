@@ -549,17 +549,68 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
     }
 }
 
-static struct node * read_C_connection(struct analyser * a, struct node * q, int op) {
+static struct node * read_or(struct analyser * a, struct node * n) {
     struct tokeniser * t = a->tokeniser;
-    struct node * p = new_node(a, op);
-    struct node * p_end = q;
-    p->left = q;
+    struct node * p = n->type == c_false ? NULL : n;
+    struct node * p_end = p;
     do {
-        q = read_C(a);
-        p_end->right = q; p_end = q;
-    } while (read_token(t) == op);
+        struct node * q = read_C(a);
+        // Discard `false` nodes in an `or` chain.
+        if (q->type != c_false) {
+            if (p_end) {
+                p_end->right = q;
+            } else {
+                p = q;
+            }
+            p_end = q;
+        }
+    } while (read_token(t) == c_or);
     hold_token(t);
-    return p;
+    if (p == NULL) {
+        // All sub-nodes are `false` so return the first.
+        return n;
+    } else if (p->right == NULL) {
+        return p;
+    }
+    n = new_node(a, c_or);
+    n->left = p;
+    return n;
+}
+
+static int
+is_just_true(struct node * q)
+{
+    if (!q) return 1;
+    if (q->type != c_bra && q->type != c_true) return 0;
+    return is_just_true(q->left) && is_just_true(q->right);
+}
+
+static struct node * read_and(struct analyser * a, struct node * n) {
+    struct tokeniser * t = a->tokeniser;
+    struct node * p = is_just_true(n) ? NULL : n;
+    struct node * p_end = p;
+    do {
+        struct node * q = read_C(a);
+        // Discard nodes equivalent to `true` in an `and` chain.
+        if (!is_just_true(q)) {
+            if (p_end) {
+                p_end->right = q;
+            } else {
+                p = q;
+            }
+            p_end = q;
+        }
+    } while (read_token(t) == c_and);
+    hold_token(t);
+    if (p == NULL) {
+        // Note: is_just_true(n).
+        return n;
+    } else if (p->right == NULL) {
+        return p;
+    }
+    n = new_node(a, c_and);
+    n->left = p;
+    return n;
 }
 
 static struct node * read_C_list(struct analyser * a) {
@@ -575,11 +626,14 @@ static struct node * read_C_list(struct analyser * a) {
         struct node * q = read_C(a);
         while (true) {
             token = read_token(t);
-            if (token != c_and && token != c_or) {
+            if (token == c_or) {
+                q = read_or(a, q);
+            } else if (token == c_and) {
+                q = read_and(a, q);
+            } else {
                 hold_token(t);
                 break;
             }
-            q = read_C_connection(a, q, token);
         }
         if (p_end == NULL) p->left = q; else p_end->right = q;
         p_end = q;
@@ -906,14 +960,6 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     a->amongs_end = x;
 
     return p;
-}
-
-static int
-is_just_true(struct node * q)
-{
-    if (!q) return 1;
-    if (q->type != c_bra && q->type != c_true) return 0;
-    return is_just_true(q->left) && is_just_true(q->right);
 }
 
 static struct node * read_among(struct analyser * a) {
