@@ -148,10 +148,31 @@ backwardmode (
       (
         delete
       )
-      'e' 'ech' 'em' 'emi' 'ete' 'etem'
+      'e' 'ech' 'em' 'emi'
       (
         delete
         try palatalise_e
+      )
+      'ete' 'eti' 'etem'
+      (
+        // t-stem neuter nouns
+        among (
+          '{cv}'  // e.g. dvojčetem
+          'l'     // e.g. batolete
+          '{rv}'  // e.g. zvířete
+          's'     // e.g. prasete
+          '{zv}'  // e.g. pážete
+              (delete)
+          'e{cv}' // e.g. pečeti
+          'tl'    // e.g. atleti
+          'es'    // e.g. deseti
+          ''
+              (
+                // Remove -e, -i, or -em; stem now ends -et so no palatalise
+                // step is needed.
+                <-'et'
+              )
+        )
       )
       'eb'
       ( // Conflate e.g. skladeb with skladba, skladbě, skladby, etc.
