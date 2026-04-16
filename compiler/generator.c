@@ -307,6 +307,13 @@ static int K_needed_(struct node * p, int call_depth) {
                 if (K_needed_(p->left, call_depth)) return true;
                 break;
 
+            case c_backwards:
+            case c_reverse:
+            case c_test:
+                if (p->possible_signals != 1) return true;
+                // Restores cursor on t and the subcommand can't fail.
+                break;
+
             default: return true;
         }
         p = p->right;
