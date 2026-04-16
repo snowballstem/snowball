@@ -212,7 +212,7 @@ jobs:
       if: matrix.ZIG
       uses: mlugg/setup-zig@v2
       with:
-        version: master
+        version: 0.16.0
     - name: Install mingw64 packages
       if: matrix.mingw64_packages
       uses: msys2/setup-msys2@v2
