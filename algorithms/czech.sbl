@@ -157,15 +157,15 @@ backwardmode (
       (
         // t-stem neuter nouns
         among (
-          '{cv}'  // e.g. dvojčetem
-          'l'     // e.g. batolete
-          '{rv}'  // e.g. zvířete
-          's'     // e.g. prasete
-          '{zv}'  // e.g. pážete
+          '{cv}'  // e.g. dvojč-etem
+          'l'     // e.g. batol-ete
+          '{rv}'  // e.g. zvíř-ete
+          's'     // e.g. pras-ete
+          '{zv}'  // e.g. páž-ete
               (delete)
-          'e{cv}' // e.g. pečeti
-          'tl'    // e.g. atleti
-          'es'    // e.g. deseti
+          'e{cv}' // e.g. pečet-i
+          'tl'    // e.g. atlet-i
+          'es'    // e.g. deset-i
           ''
               (
                 // Remove -e, -i, or -em; stem now ends -et so no palatalise
