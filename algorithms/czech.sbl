@@ -82,14 +82,32 @@ backwardmode (
 
   define palatalise_e as (
     [substring] among (
-      'c' (<- 'k')
+      // -c -> -k
+      'c'
+        (<- 'k')
+      'nc' // e.g. finance
+      'avc' // e.g. dravce
+      'ovc' // e.g. jalovce
+        ()
+      '{i'}nc' // e.g. podmínce
+        (<- '{i'}nk')
     )
   )
 
   define palatalise_i as (
     [substring] among (
-      'c' (<- 'k')
+      // -c -> -k
+      'c'
+        (<- 'k')
+      'nc' // e.g. financí
+      'avc' // e.g. nástavci
+      'ovc' // e.g. pískovci
+        ()
+      '{i'}nc' // e.g. podmínce
+        (<- '{i'}nk')
+
       '{cv}t' (<- 'ck')
+
       // -št -> -sk
       '{sv}t' // e.g. čeština
         (<-'sk')
