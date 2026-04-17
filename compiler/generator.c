@@ -262,6 +262,7 @@ static int K_needed_(struct node * p, int call_depth) {
         switch (p->type) {
             case c_assign:
             case c_atlimit:
+            case c_atmark:
             case c_do:
             case c_dollar:
             case c_leftslice:
@@ -287,6 +288,7 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_debug:
             case c_functionend:
             case c_not:
+            case c_setmark:
                 // Doesn't change the cursor or always restores it.
                 break;
 
