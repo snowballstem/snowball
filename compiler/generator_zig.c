@@ -89,7 +89,7 @@ static void append_restore_string(struct node * p, struct str * out, struct str 
     str_append_string(out, "env.cursor = ");
     if (p->mode != m_forward) str_append_string(out, "env.limit - ");
     str_append(out, savevar);
-    str_append_string(out, ";");
+    str_append_ch(out, ';');
 }
 
 static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
@@ -136,7 +136,7 @@ static void write_failure(struct generator * g) {
         default:
             w(g, "~Mbreak :lab");
             write_int(g, g->failure_label);
-            w(g, ";");
+            write_char(g, ';');
     }
     write_newline(g);
     g->unreachable = true;
@@ -888,11 +888,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         if (p->mode == m_forward) {
             str_assign(g->failure_str, "env.limit += ");
             str_append(g->failure_str, varname);
-            str_append_string(g->failure_str, ";");
+            str_append_ch(g->failure_str, ';');
         } else {
             str_assign(g->failure_str, "env.limit_backward = ");
             str_append(g->failure_str, varname);
-            str_append_string(g->failure_str, ";");
+            str_append_ch(g->failure_str, ';');
         }
     } else {
         struct str * savevar = vars_newname(g);
@@ -914,11 +914,11 @@ static void generate_setlimit(struct generator * g, struct node * p) {
             if (p->mode == m_forward) {
                 str_assign(g->failure_str, "env.limit += ");
                 str_append(g->failure_str, varname);
-                str_append_string(g->failure_str, ";");
+                str_append_ch(g->failure_str, ';');
             } else {
                 str_assign(g->failure_str, "env.limit_backward = ");
                 str_append(g->failure_str, varname);
-                str_append_string(g->failure_str, ";");
+                str_append_ch(g->failure_str, ';');
             }
         }
         str_delete(savevar);

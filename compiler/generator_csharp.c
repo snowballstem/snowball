@@ -83,7 +83,7 @@ static void append_restore_string(struct node * p, struct str * out, struct str 
     str_append_string(out, "cursor = ");
     if (p->mode != m_forward) str_append_string(out, "limit - ");
     str_append(out, savevar);
-    str_append_string(out, ";");
+    str_append_ch(out, ';');
 }
 
 static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
@@ -108,7 +108,7 @@ static void wgotol(struct generator * g, int n) {
     write_margin(g);
     write_string(g, "goto lab");
     write_int(g, n);
-    write_string(g, ";");
+    write_char(g, ';');
     write_newline(g);
 }
 
@@ -127,7 +127,7 @@ static void write_failure(struct generator * g) {
         default:
             write_string(g, "goto lab");
             write_int(g, g->failure_label);
-            write_string(g, ";");
+            write_char(g, ';');
             g->label_used = 1;
     }
     write_newline(g);

@@ -53,7 +53,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
         int ch;
         i += get_utf8(p + i, &ch);
         if (32 <= ch && ch < 127) {
-            if (ch == '\"' || ch == '\\' || ch == '$') write_string(g, "\\");
+            if (ch == '\"' || ch == '\\' || ch == '$') write_char(g, '\\');
             write_char(g, ch);
         } else {
             write_string(g, "\\u{");
@@ -67,7 +67,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
 static void write_literal_char(struct generator * g, symbol ch) {
     write_char(g, '"');
     if (32 <= ch && ch < 127) {
-        if (ch == '\"' || ch == '\\') write_string(g, "\\");
+        if (ch == '\"' || ch == '\\') write_char(g, '\\');
         write_char(g, ch);
     } else {
         write_string(g, "\\u{");
@@ -105,7 +105,7 @@ static void append_restore_string(struct node * p, struct str * out, struct str 
     str_append_string(out, "$this->cursor = ");
     if (p->mode != m_forward) str_append_string(out, "$this->limit - ");
     str_append(out, savevar);
-    str_append_string(out, ";");
+    str_append_ch(out, ';');
 }
 
 static void write_restorecursor(struct generator * g, struct node * p, struct str * savevar) {
@@ -130,7 +130,7 @@ static void wgotol(struct generator * g, int n) {
     write_margin(g);
     write_string(g, "goto lab");
     write_int(g, n);
-    write_string(g, ";");
+    write_char(g, ';');
     write_newline(g);
     g->unreachable = true;
 }
@@ -149,7 +149,7 @@ static void write_failure(struct generator * g) {
         default:
             write_string(g, "goto lab");
             write_int(g, g->failure_label);
-            write_string(g, ";");
+            write_char(g, ';');
             g->label_used = 1;
     }
     write_newline(g);

@@ -114,7 +114,7 @@ static void wgotol(struct generator * g, int n) {
     write_margin(g);
     write_string(g, "break lab");
     write_int(g, n);
-    write_string(g, ";");
+    write_char(g, ';');
     write_newline(g);
     g->unreachable = true;
 }
@@ -133,7 +133,7 @@ static void write_failure(struct generator * g) {
         default:
             write_string(g, "break lab");
             write_int(g, g->failure_label);
-            write_string(g, ";");
+            write_char(g, ';');
     }
     write_newline(g);
     g->unreachable = true;
