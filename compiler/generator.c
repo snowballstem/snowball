@@ -312,6 +312,7 @@ static int K_needed_(struct node * p, int call_depth) {
 
             case c_bra:
             case c_loop:
+            case c_fail:
                 if (K_needed_(p->left, call_depth)) return true;
                 break;
 
