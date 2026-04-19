@@ -408,7 +408,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
     generate(g, p);
 
-    w(g, "~MUntil True;~N");
+    w(g, "~-~MUntil True;~N");
     if (!end_unreachable) {
         g->unreachable = false;
     }
