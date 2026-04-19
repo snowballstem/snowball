@@ -27,8 +27,13 @@
 
 #include "libstemmer.h"
 
+#define U_0622 "\xd8\xa2"
+#define U_0627 "\xd8\xa7"
+#define U_062B "\xd8\xab"
+#define U_0631 "\xd8\xb1"
 #define EMOJI_FACE_THROWING_A_KISS "\xf0\x9f\x98\x98"
 #define U_40079 "\xf1\x80\x81\xb9"
+
 static const struct testcase {
     /* Stemmer to use, or 0 to test with all stemmers */
     const char * language;
@@ -45,6 +50,16 @@ static const struct testcase {
       "a" EMOJI_FACE_THROWING_A_KISS "ing",
       "a" EMOJI_FACE_THROWING_A_KISS "e" },
     { "en", 0, U_40079 "wing", 0 },
+      "a" EMOJI_FACE_THROWING_A_KISS "e" },
+    { "en", 0, U_40079 "wing", 0 },
+
+    // The Persian stemmer removes ASCII space inside a word.  It shouldn't
+    // appear there if our tokenisation recommendations are followed, and
+    // it seems more appropriate to test here rather than adding instances
+    // to persian/voc.txt.
+    { "fa", 0, U_0622 U_062B " " U_0627 U_0631,
+      U_0622 U_062B U_0627 U_0631, 0 },
+
     // The Finnish stemmer used to damage numbers ending with two or more of
     // the same digit.  Regression test, applied to all stemmers.
     // https://github.com/snowballstem/snowball/issues/66
@@ -55,6 +70,7 @@ static const struct testcase {
     { 0, 0, "2000", 0 },
     { 0, 0, "9999", 0 },
     { 0, 0, "1000000000", 0 },
+
     // The Danish stemmer used to damage a number at the end of a word.
     // Regression test, applied to all stemmers.
     // https://github.com/snowballstem/snowball/issues/81
