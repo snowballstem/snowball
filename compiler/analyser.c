@@ -2411,10 +2411,16 @@ static void visit_node(struct analyser * a, struct node * p) {
             // c_or nodes.  These can lead to unused variables in the generated
             // code and may also hinder further optimisations.
             //
-            // Ideally we'd replace these with their subnode, but that's fiddly
-            // to do as we need to update the location we got the current value
-            // of `p` from, so for now we turn them into c_bra instead.
-            p->type = c_bra;
+            // We want to replace these with their subnode.  It's fiddly to do
+            // an actual replacement as we'd need to update the location we got
+            // the current value of `p` from, so instead we swap the contents
+            // of the two nodes.
+            struct node * p_left = p->left;
+            struct node * p_right = p->right;
+            struct node tmp = *p;
+            *p = *p_left;
+            p->right = p_right;
+            *p_left = tmp;
         }
 
         p = p->right;
