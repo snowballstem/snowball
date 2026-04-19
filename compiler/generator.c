@@ -267,6 +267,7 @@ static int K_needed_(struct node * p, int call_depth) {
     while (p) {
         switch (p->type) {
             case c_assign:
+            case c_assignto:
             case c_atlimit:
             case c_atmark:
             case c_do:
@@ -296,6 +297,16 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_not:
             case c_setmark:
                 // Doesn't change the cursor or always restores it.
+                break;
+
+            case c_attach:
+                // Cursor restored in backwards mode.
+                if (p->mode == m_backward) return true;
+                break;
+
+            case c_insert:
+                // Cursor restored in forwards mode.
+                if (p->mode == m_forward) return true;
                 break;
 
             case c_call:
