@@ -43,7 +43,8 @@ define stem as (
 
   // Test ASCII control characters in string literals
   stringescapes {}
-  $s='{U+000A}{U+001F}{U+007F}{U+0000}x' $(lenof s == 5) or fail='ASCII control characters not handled'
+  $s='{U+A}{U+1F}{U+7F}{U+0}x' $(lenof s == 5) or fail='ASCII control characters not handled'
+  $s='a{U+80}{U+A0}b{U+00FF}' $(lenof s == 5) or fail='Unicode characters not handled'
 
   // Test that using a C close-comment sequence doesn't trip anything up.
   not '*/' or fail='C close comment sequence mishandled'

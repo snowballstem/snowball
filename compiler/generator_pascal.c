@@ -60,21 +60,32 @@ static void write_varname(struct generator * g, struct name * p) {
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
-    write_char(g, '\'');
+    if (SIZE(p) == 0) {
+        write_string(g, "''");
+        return;
+    }
+    int in_quotes = false;
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
-        if (ch == '\'') {
-            write_string(g, "''");
-        } else if (32 <= ch && ch < 127) {
+        if (32 <= ch && ch < 127) {
+            if (!in_quotes) {
+                write_char(g, '\'');
+                in_quotes = true;
+            }
+            if (ch == '\'') write_char(g, '\'');
             write_char(g, ch);
         } else {
-            write_char(g, '\'');
+            if (in_quotes) {
+                write_char(g, '\'');
+                in_quotes = false;
+            }
             write_char(g, '#');
-            write_int (g, ch);
-            write_char(g, '\'');
+            write_int(g, ch);
         }
     }
-    write_char(g, '\'');
+    if (in_quotes) {
+        write_char(g, '\'');
+    }
 }
 
 /* Write a variable declaration. */
