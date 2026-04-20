@@ -1391,7 +1391,7 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    w(g, "import { ~P } from './base-stemmer.js'~N"
+    w(g, "import ~P from './base-stemmer.js'~N"
          "~N"
          "export default class extends ~P {~+~N");
     write_newline(g);

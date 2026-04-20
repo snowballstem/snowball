@@ -25,7 +25,7 @@
 #define DEFAULT_CPLUSPLUS_NAMESPACE "Snowball"
 #define DEFAULT_CPLUSPLUS_BASE_CLASS "Stemmer"
 
-#define DEFAULT_JS_BASE_CLASS "BaseStemmer"
+#define DEFAULT_JS_BASE_CLASS "B"
 
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
