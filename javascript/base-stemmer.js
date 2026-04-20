@@ -1,6 +1,6 @@
 // @ts-check
 
-class BaseStemmer {
+export default class BaseStemmer {
     constructor() {
         /** @protected */
         this.current = '';
@@ -475,5 +475,3 @@ class BaseStemmer {
         return this.current.slice(this.bra, this.ket);
     }
 }
-
-export { BaseStemmer };
