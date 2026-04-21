@@ -4,7 +4,7 @@ export default class BaseStemmer {
     constructor() {
         /** @protected */
         this.current = '';
-        this.c = 0;
+        this.cursor = 0;
         this.limit = 0;
         this.limit_backward = 0;
         this.bra = 0;
@@ -17,10 +17,10 @@ export default class BaseStemmer {
      */
     setCurrent(value) {
         this.current = value;
-        this.c = 0;
+        this.cursor = 0;
         this.limit = this.current.length;
         this.limit_backward = 0;
-        this.bra = this.c;
+        this.bra = this.cursor;
         this.ket = this.limit;
     }
 
@@ -37,7 +37,7 @@ export default class BaseStemmer {
     copy_from(other) {
         /** @protected */
         this.current          = other.current;
-        this.c                = other.c;
+        this.cursor           = other.cursor;
         this.limit            = other.limit;
         this.limit_backward   = other.limit_backward;
         this.bra              = other.bra;
@@ -52,12 +52,12 @@ export default class BaseStemmer {
      */
     in_grouping(s, min, max) {
         /** @protected */
-        if (this.c >= this.limit) return false;
-        let ch = this.current.charCodeAt(this.c);
+        if (this.cursor >= this.limit) return false;
+        let ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) return false;
         ch -= min;
         if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return false;
-        this.c++;
+        this.cursor++;
         return true;
     }
 
@@ -69,14 +69,14 @@ export default class BaseStemmer {
      */
     go_in_grouping(s, min, max) {
         /** @protected */
-        while (this.c < this.limit) {
-            let ch = this.current.charCodeAt(this.c);
+        while (this.cursor < this.limit) {
+            let ch = this.current.charCodeAt(this.cursor);
             if (ch > max || ch < min)
                 return true;
             ch -= min;
             if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0)
                 return true;
-            this.c++;
+            this.cursor++;
         }
         return false;
     }
@@ -89,12 +89,12 @@ export default class BaseStemmer {
      */
     in_grouping_b(s, min, max) {
         /** @protected */
-        if (this.c <= this.limit_backward) return false;
-        let ch = this.current.charCodeAt(this.c - 1);
+        if (this.cursor <= this.limit_backward) return false;
+        let ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) return false;
         ch -= min;
         if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return false;
-        this.c--;
+        this.cursor--;
         return true;
     }
 
@@ -106,12 +106,12 @@ export default class BaseStemmer {
      */
     go_in_grouping_b(s, min, max) {
         /** @protected */
-        while (this.c > this.limit_backward) {
-            let ch = this.current.charCodeAt(this.c - 1);
+        while (this.cursor > this.limit_backward) {
+            let ch = this.current.charCodeAt(this.cursor - 1);
             if (ch > max || ch < min) return true;
             ch -= min;
             if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) return true;
-            this.c--;
+            this.cursor--;
         }
         return false;
     }
@@ -124,15 +124,15 @@ export default class BaseStemmer {
      */
     out_grouping(s, min, max) {
         /** @protected */
-        if (this.c >= this.limit) return false;
-        let ch = this.current.charCodeAt(this.c);
+        if (this.cursor >= this.limit) return false;
+        let ch = this.current.charCodeAt(this.cursor);
         if (ch > max || ch < min) {
-            this.c++;
+            this.cursor++;
             return true;
         }
         ch -= min;
         if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) === 0) {
-            this.c++;
+            this.cursor++;
             return true;
         }
         return false;
@@ -146,15 +146,15 @@ export default class BaseStemmer {
      */
     go_out_grouping(s, min, max) {
         /** @protected */
-        while (this.c < this.limit) {
-            let ch = this.current.charCodeAt(this.c);
+        while (this.cursor < this.limit) {
+            let ch = this.current.charCodeAt(this.cursor);
             if (ch <= max && ch >= min) {
                 ch -= min;
                 if ((s[ch >>> 3] & (0X1 << (ch & 0x7))) !== 0) {
                     return true;
                 }
             }
-            this.c++;
+            this.cursor++;
         }
         return false;
     }
@@ -167,15 +167,15 @@ export default class BaseStemmer {
      */
     out_grouping_b(s, min, max) {
         /** @protected */
-        if (this.c <= this.limit_backward) return false;
-        let ch = this.current.charCodeAt(this.c - 1);
+        if (this.cursor <= this.limit_backward) return false;
+        let ch = this.current.charCodeAt(this.cursor - 1);
         if (ch > max || ch < min) {
-            this.c--;
+            this.cursor--;
             return true;
         }
         ch -= min;
         if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) === 0) {
-            this.c--;
+            this.cursor--;
             return true;
         }
         return false;
@@ -189,15 +189,15 @@ export default class BaseStemmer {
      */
     go_out_grouping_b(s, min, max) {
         /** @protected */
-        while (this.c > this.limit_backward) {
-            let ch = this.current.charCodeAt(this.c - 1);
+        while (this.cursor > this.limit_backward) {
+            let ch = this.current.charCodeAt(this.cursor - 1);
             if (ch <= max && ch >= min) {
                 ch -= min;
                 if ((s[ch >>> 3] & (0x1 << (ch & 0x7))) !== 0) {
                     return true;
                 }
             }
-            this.c--;
+            this.cursor--;
         }
         return false;
     }
@@ -209,12 +209,12 @@ export default class BaseStemmer {
     eq_s(s)
     {
         /** @protected */
-        if (this.limit - this.c < s.length) return false;
-        if (!this.current.startsWith(s, this.c))
+        if (this.limit - this.cursor < s.length) return false;
+        if (!this.current.startsWith(s, this.cursor))
         {
             return false;
         }
-        this.c += s.length;
+        this.cursor += s.length;
         return true;
     }
 
@@ -225,12 +225,12 @@ export default class BaseStemmer {
     eq_s_b(s)
     {
         /** @protected */
-        if (this.c - this.limit_backward < s.length) return false;
-        if (!this.current.endsWith(s, this.c))
+        if (this.cursor - this.limit_backward < s.length) return false;
+        if (!this.current.endsWith(s, this.cursor))
         {
             return false;
         }
-        this.c -= s.length;
+        this.cursor -= s.length;
         return true;
     }
 
@@ -245,7 +245,7 @@ export default class BaseStemmer {
         let i = 0;
         let j = v.length;
 
-        const c = this.c;
+        const c = this.cursor;
         const l = this.limit;
 
         let common_i = 0;
@@ -303,7 +303,7 @@ export default class BaseStemmer {
             if (common_i >= w[0].length)
             {
                 // @ts-expect-error: w[0] always string.
-                this.c = c + w[0].length;
+                this.cursor = c + w[0].length;
                 // @ts-expect-error: w[2] always number.
                 if (w.length < 4) return w[2];
                 // @ts-expect-error: w[3] always number.
@@ -312,7 +312,7 @@ export default class BaseStemmer {
                 if (call_among_func.call(this))
                 {
                     // @ts-expect-error: w[0] always string.
-                    this.c = c + w[0].length;
+                    this.cursor = c + w[0].length;
                     // @ts-expect-error: w[3] always number.
                     return w[2];
                 }
@@ -334,7 +334,7 @@ export default class BaseStemmer {
         let i = 0;
         let j = v.length
 
-        const c = this.c;
+        const c = this.cursor;
         const lb = this.limit_backward;
 
         let common_i = 0;
@@ -386,7 +386,7 @@ export default class BaseStemmer {
             if (common_i >= w[0].length)
             {
                 // @ts-expect-error: w[0] always string.
-                this.c = c - w[0].length;
+                this.cursor = c - w[0].length;
                 if (w.length < 4) return w[2];
                 // @ts-expect-error: w[3] always number.
                 this.af = w[3];
@@ -394,7 +394,7 @@ export default class BaseStemmer {
                 if (call_among_func.call(this))
                 {
                     // @ts-expect-error: w[0] always string.
-                    this.c = c - w[0].length;
+                    this.cursor = c - w[0].length;
                     return w[2];
                 }
             }
@@ -418,8 +418,8 @@ export default class BaseStemmer {
         const adjustment = s.length - (c_ket - c_bra);
         this.current = this.current.slice(0, c_bra) + s + this.current.slice(c_ket);
         this.limit += adjustment;
-        if (this.c >= c_ket) this.c += adjustment;
-        else if (this.c > c_bra) this.c = c_bra;
+        if (this.cursor >= c_ket) this.cursor += adjustment;
+        else if (this.cursor > c_bra) this.cursor = c_bra;
         return adjustment;
     }
 
