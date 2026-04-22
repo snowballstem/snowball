@@ -266,7 +266,6 @@ extern void write_margin(struct generator * g) {
 static int K_needed_(struct node * p, int call_depth) {
     while (p) {
         switch (p->type) {
-            case c_assign:
             case c_assignto:
             case c_atlimit:
             case c_atmark:
