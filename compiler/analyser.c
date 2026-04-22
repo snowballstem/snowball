@@ -291,7 +291,7 @@ static symbol * new_literalstring(struct analyser * a) {
 static int read_AE_test(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     switch (read_token(t)) {
-        case c_assign: return c_mathassign;
+        case c_assign:
         case c_plusassign:
         case c_minusassign:
         case c_multiplyassign:
@@ -301,7 +301,8 @@ static int read_AE_test(struct analyser * a) {
         case c_gt:
         case c_ge:
         case c_lt:
-        case c_le: return t->token;
+        case c_le:
+            return t->token;
         default:
             unexpected_token_error(a, "integer test expression");
             hold_token(t);
@@ -1311,6 +1312,8 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_assign:
+            token = c_stringassign;
+            /* FALLTHRU */
         case c_insert:
         case c_attach:
         case c_slicefrom: {
@@ -1537,7 +1540,7 @@ handle_rel_op:
                                 p->AE = NULL;
                             } else {
                                 // `$x*=0` -> `$x=0`
-                                p->type = c_mathassign;
+                                p->type = c_assign;
                             }
                         } else if (p->AE->number == -1) {
                             // `$x/=-1` -> `$x*=-1`
@@ -1546,7 +1549,7 @@ handle_rel_op:
                         break;
                 }
             }
-            if (p->type == c_mathassign && q) {
+            if (p->type == c_assign && q) {
                 if (ae_uses_name(p->AE, q)) {
                     if (p->AE->type == c_name) {
                         fprintf(stderr,
@@ -1885,7 +1888,7 @@ static void remove_dead_assignments(struct node * p, struct name * q) {
         switch (p->type) {
             case c_assignto:
             case c_sliceto:
-            case c_mathassign:
+            case c_assign:
             case c_plusassign:
             case c_minusassign:
             case c_multiplyassign:
@@ -2003,7 +2006,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return always_set_before_use_(p->left, func, v);
-        case c_mathassign:
+        case c_assign:
             // Check AE first: `x = x + 1` uses `x` before it sets it.
             if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
@@ -2043,7 +2046,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return UNKNOWN;
-        case c_assign:
+        case c_stringassign:
         case c_attach:
         case c_booltest:
         case c_insert:
@@ -2111,7 +2114,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             // variable because for some target languages that means we need to
             // initialise to an empty string at the start of the function and
             // we would incur overhead from doing so.
-            if (p->left->type == c_assign) {
+            if (p->left->type == c_stringassign) {
                 // Special-case `$x = S` because it's easy to handle.
                 return SET_BEFORE_ANY_USE;
             }
@@ -2177,7 +2180,7 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_false:
             /* Always gives signal f. */
             return 0;
-        case c_assign:
+        case c_stringassign:
         case c_attach:
         case c_debug:
         case c_delete:
@@ -2194,7 +2197,7 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_true:
         case c_try:
         case c_unset:
-        case c_mathassign:
+        case c_assign:
         case c_plusassign:
         case c_minusassign:
         case c_multiplyassign:

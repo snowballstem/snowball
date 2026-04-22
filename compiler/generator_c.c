@@ -925,7 +925,7 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     write_propagating_error(g, "insert_~$(z, z->c, z->c, ~a)", keep_c, p);
 }
 
-static void generate_assignfrom(struct generator * g, struct node * p) {
+static void generate_stringassign(struct generator * g, struct node * p) {
     write_comment(g, p);
     if (p->mode == m_forward) {
         /* like 'attach' */
@@ -1530,13 +1530,13 @@ static void generate(struct generator * g, struct node * p) {
         case c_rightslice:    generate_rightslice(g, p); break;
         case c_assignto:      generate_assignto(g, p); break;
         case c_sliceto:       generate_sliceto(g, p); break;
-        case c_assign:        generate_assignfrom(g, p); break;
+        case c_stringassign:  generate_stringassign(g, p); break;
         case c_insert:
         case c_attach:        generate_insert(g, p, p->type); break;
         case c_slicefrom:     generate_slicefrom(g, p); break;
         case c_setlimit:      generate_setlimit(g, p); break;
         case c_dollar:        generate_dollar(g, p); break;
-        case c_mathassign:    generate_integer_assign(g, p, "="); break;
+        case c_assign:        generate_integer_assign(g, p, "="); break;
         case c_plusassign:    generate_integer_assign(g, p, "+="); break;
         case c_minusassign:   generate_integer_assign(g, p, "-="); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;

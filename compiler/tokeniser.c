@@ -574,7 +574,7 @@ extern const char * name_of_token(int code) {
         case c_minus:           return "-";
         case c_divide:          return "/";
         case c_lt:              return "<";
-        case c_mathassign:
+        case c_stringassign:
         case c_assign:          return "=";
         case c_gt:              return ">";
         case c_debug:           return "?";

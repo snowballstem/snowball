@@ -161,7 +161,7 @@ static void write_comment_AE(struct generator * g, struct node * p) {
 void write_comment_content(struct generator * g, struct node * p,
                            const char * end) {
     switch (p->type) {
-        case c_mathassign:
+        case c_assign:
         case c_plusassign:
         case c_minusassign:
         case c_multiplyassign:
@@ -273,7 +273,7 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_dollar:
             case c_leftslice:
             case c_rightslice:
-            case c_mathassign:
+            case c_assign:
             case c_plusassign:
             case c_minusassign:
             case c_multiplyassign:
@@ -297,6 +297,8 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_setmark:
                 // Doesn't change the cursor or always restores it.
                 break;
+
+//            case c_stringassign:
 
             case c_attach:
                 // Cursor restored in backwards mode.
@@ -366,7 +368,7 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
             case c_dollar:
             case c_leftslice:
             case c_rightslice:
-            case c_mathassign:
+            case c_assign:
             case c_plusassign:
             case c_minusassign:
             case c_multiplyassign:

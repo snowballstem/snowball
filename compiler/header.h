@@ -132,7 +132,7 @@ enum token_codes {
     c_literalstring,
 
     /* These token values are synthesised by the analyser. */
-    c_mathassign,
+    c_stringassign,
     c_neg,
     c_call,
     c_grouping,
