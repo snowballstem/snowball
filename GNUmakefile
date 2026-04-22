@@ -167,7 +167,7 @@ COMPILER_SOURCES = compiler/analyser.c \
 		   compiler/tokeniser.c
 
 COMPILER_HEADERS = compiler/header.h \
-		   compiler/syswords.h
+		   compiler/tokens.h
 
 # C
 
