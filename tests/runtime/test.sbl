@@ -1,0 +1,19 @@
+// Test `test`.
+
+externals (stem)
+
+strings (s)
+
+define stem as (
+  backwards (
+    $(cursor == 2) or fail='backwards failed to swap cursor and limit'
+    test (
+      ='juggernaut'
+      $(cursor == 10) or fail='string= failed to update cursor'
+      next or fail='next failed'
+    )
+    $(cursor == 10) or fail='test failed to restore cursor'
+  )
+
+  ='ok'
+)
