@@ -1349,22 +1349,53 @@ static struct node * read_C(struct analyser * a) {
                 struct node * n = read_AE(a, NULL, 0);
                 read_token(t);
                 token = t->token;
+                bool eval_constant_expr = false;
                 switch (token) {
                     case c_assign:
-                        report_error_location(a);
-                        fprintf(stderr, "Expected relational operator (did you mean '=='?)\n");
-                        // Assume it was == to try to avoid an error avalanche.
+                        // Assume `==` was meant to try to avoid an error avalanche.
                         token = c_eq;
-                        /* FALLTHRU */
+report_assumed_rel_op_error:
+                        report_error_location(a);
+                        fprintf(stderr, "Expected relational operator, got '%s' (did you mean '%s'?)\n",
+                                name_of_token(t->token), name_of_token(token));
+                        goto handle_rel_op;
+                    case c_assignto:
+                        // Assume `>=` was meant to try to avoid an error avalanche.
+                        // (`=>` instead of `>=` is a possible typo.)
+                        token = c_ge;
+                        goto report_assumed_rel_op_error;
+                    case c_divideassign:
+                        // Assume `!=` was meant to try to avoid an error avalanche.
+                        // (Ada, Erlang, Fortran90, etc use `/=` for not-equal.)
+                        token = c_ne;
+                        goto report_assumed_rel_op_error;
+                    case c_minusassign:
+                    case c_multiplyassign:
+                    case c_plusassign:
+                        // Give a better error if any other assignment operator
+                        // is used in this context.
+                        report_error_location(a);
+                        fprintf(stderr, "Expected relational operator, got '%s'\n",
+                                name_of_token(token));
+                        // Assume `==` was meant to try to avoid an error avalanche.
+                        token = c_eq;
+                        goto handle_rel_op;
                     case c_eq:
                     case c_ne:
                     case c_gt:
                     case c_ge:
                     case c_lt:
                     case c_le: {
+                        // Only evaluate constant expressions if we got a valid
+                        // relational operator to avoid spurious unreachable
+                        // code warnings after an error.
+                        eval_constant_expr = true;
+handle_rel_op:
                         struct node * lhs = n;
                         struct node * rhs = read_AE(a, NULL, 0);
-                        if (lhs->type == c_number && rhs->type == c_number) {
+                        if (eval_constant_expr &&
+                            lhs->type == c_number &&
+                            rhs->type == c_number) {
                             // Evaluate constant numeric test expression.
                             int result;
                             switch (token) {

@@ -29,4 +29,25 @@ define stem as (
   unknown // Error here
   =
   0
+
+  $
+  (
+  x
+  => // Error here
+  0
+  )
+
+  $
+  (
+  x
+  /= // Error here
+  0
+  )
+
+  $
+  (
+  x
+  += // Error here
+  0
+  )
 )

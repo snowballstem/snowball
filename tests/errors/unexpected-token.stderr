@@ -2,7 +2,13 @@ errors/unexpected-token.sbl:4: unexpected + in grouping definition after name
 errors/unexpected-token.sbl:7: unexpected next in integer test expression after $
 errors/unexpected-token.sbl:8: unexpected number 0 in integer test expression after name
 errors/unexpected-token.sbl:9: unexpected hop in integer expression after =
-errors/unexpected-token.sbl:10: Expected relational operator (did you mean '=='?)
+errors/unexpected-token.sbl:10: Expected relational operator, got '=' (did you mean '=='?)
 errors/unexpected-token.sbl:10: unexpected ) in integer expression after =
 errors/unexpected-token.sbl:11: unexpected backwardmode after )
-errors/unexpected-token.sbl:13: unexpected next after )
+errors/unexpected-token.sbl:12: Expected relational operator, got '=' (did you mean '=='?)
+errors/unexpected-token.sbl:13: Expected relational operator, got '/=' (did you mean '!='?)
+errors/unexpected-token.sbl:14: Expected relational operator, got '=>' (did you mean '>='?)
+errors/unexpected-token.sbl:15: Expected relational operator, got '+='
+errors/unexpected-token.sbl:16: Expected relational operator, got '-='
+errors/unexpected-token.sbl:17: Expected relational operator, got '*='
+errors/unexpected-token.sbl:19: unexpected next after )

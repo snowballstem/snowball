@@ -9,5 +9,11 @@ define stem as (
   $i = hop 2
   $(i = )
   backwardmode (next)
+  $(i = 1)
+  $(i /= 1)
+  $(i => 1)
+  $(i += 1)
+  $(i -= 1)
+  $(i *= 1)
 )
 next
