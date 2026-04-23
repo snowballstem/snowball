@@ -67,7 +67,7 @@ routines ( mark_regions R2
 
 externals ( stem )
 
-integers ( pV p2 minStem )
+integers ( pV p2 )
 
 booleans ( found_diminutive found_professional )
 
@@ -82,12 +82,7 @@ define mark_regions as (
         gopast v  setmark pV  gopast non-v
         gopast v  gopast non-v  setmark p2
     )
-    // Minimum 3-character stem to avoid over-stemming short words
-    // (e.g. жив should stay жив, not reduce to жи via verb -в)
-    // Uses hop 3 for encoding-aware character counting
-    $minStem = 0
-    do (tomark minStem  hop 3  setmark minStem)
-    do ($pV < minStem  $pV = minStem)
+    do (hop 3  $(pV < cursor)  $pV = cursor)
 )
 
 backwardmode (
