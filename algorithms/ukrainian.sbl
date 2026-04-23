@@ -388,7 +388,7 @@ backwardmode (
     )
 
     define verbal_noun as (
-        [substring] R2 among (
+        setlimit tomark p2 for ([substring]) among (
             // Verbal nouns — R2 required to protect short words like
             // мигтіння, боління, бродіння from over-stemming
             '{a}{n}{n}{ia}'        // -ання
