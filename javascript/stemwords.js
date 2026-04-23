@@ -129,7 +129,3 @@ async function create (name) {
         console.error(error);
     }
 }
-
-function titleCase (s) {
-    return s.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-}
