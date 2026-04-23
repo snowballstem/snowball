@@ -462,7 +462,7 @@ backwardmode (
 define stem as (
     // Strip най- prefix (superlative)
     do (
-        ['{n}{a}{i`}'] delete
+        ['{n}{a}{i`}'] not atlimit delete
     )
     // Exception: окремо is adverb (not verb -емо), stem as окрем
     // to group with окремий/окрема/окремі (adj -ий/-а/-і → окрем)
