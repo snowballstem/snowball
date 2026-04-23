@@ -389,8 +389,8 @@ backwardmode (
 
     define verbal_noun as (
         setlimit tomark p2 for ([substring]) among (
-            // Verbal nouns — R2 required to protect short words like
-            // мигтіння, боління, бродіння from over-stemming
+            // R2 guard prevents over-stemming of short verbal nouns.
+            // (Inline examples removed; words added to voc.txt instead.)
             '{a}{n}{n}{ia}'        // -ання
             '{ia}{n}{n}{ia}'       // -яння
             '{i}{n}{n}{ia}'        // -іння
