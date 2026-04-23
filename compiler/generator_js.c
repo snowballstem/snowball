@@ -251,7 +251,6 @@ continue_outer_loop:
                 continue;
             case '+': g->margin++; continue;
             case '-': g->margin--; continue;
-            case 'n': write_s(g, g->options->name); continue;
             case 'P': write_string(g, g->options->parent_class_name); continue;
             default:
                 printf("Invalid escape sequence ~%c in writef(g, \"%s\", p)\n",
@@ -1394,14 +1393,13 @@ static void generate(struct generator * g, struct node * p) {
 static void generate_class_begin(struct generator * g) {
     w(g, "import { ~P } from './base-stemmer.js'~N"
          "~N"
-         "class ~n extends ~P {~+~N");
+         "export default class extends ~P {~+~N");
     write_newline(g);
 }
 
 static void generate_class_end(struct generator * g) {
     w(g, "~-}~N");
     w(g, "~N");
-    w(g, "export { ~n };~N");
 }
 
 static void generate_among_table(struct generator * g, struct among * x) {

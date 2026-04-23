@@ -433,7 +433,6 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                 o->name[0] = toupper(o->name[0]);
                 break;
             case LANG_CPLUSPLUS:
-            case LANG_JAVASCRIPT:
             case LANG_PHP:
             case LANG_PYTHON: {
                 /* Upper case initial letter and change each
