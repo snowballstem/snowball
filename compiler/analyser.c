@@ -1352,7 +1352,7 @@ static struct node * read_C(struct analyser * a) {
                 struct node * n = read_AE(a, NULL, 0);
                 read_token(t);
                 token = t->token;
-                bool eval_constant_expr = false;
+                int eval_constant_expr = false;
                 switch (token) {
                     case c_assign:
                         // Assume `==` was meant to try to avoid an error avalanche.
