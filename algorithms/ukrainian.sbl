@@ -334,7 +334,7 @@ backwardmode (
             // Short diminutives (3+ chars to avoid conflicts with regular nouns)
             '{ch}{y}{k}'          // -чик (хлопчик)
             '{y}{n}{k}{a}' '{i}{n}{k}{a}'  // -инка/-інка (дівчинка)
-            '{u}{s}{'}'
+            // Note: -усь omitted — reflexive(-сь)+verb(-у) handles these (дідусь→дід, братусь→брат)
             '{u}{n}{'}'  '{i}{n}{'}'  '{e}{n}{'}'
             // 2-char: -ик/-ік/-ок safe (few non-diminutive nouns end with these)
             // NOT -ка/-ко (too common as regular noun endings)
