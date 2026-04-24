@@ -348,7 +348,7 @@ backwardmode (
             // Short diminutives (3+ chars to avoid conflicts with regular nouns)
             '{ch}{y}{k}'          // -чик (хлопчик)
             '{y}{n}{k}{a}' '{i}{n}{k}{a}'  // -инка/-інка (дівчинка)
-            '{u}{s}{'}'  '{i}{s}{'}'  '{o}{s}{'}'
+            '{u}{s}{'}'
             '{u}{n}{'}'  '{i}{n}{'}'  '{e}{n}{'}'
             // 2-char: -ик/-ік/-ок safe (few non-diminutive nouns end with these)
             // NOT -ка/-ко (too common as regular noun endings)
@@ -362,7 +362,6 @@ backwardmode (
             '{e}{s}{e}{n}{'}{k}'  // -есеньк
             '{i}{s}{i}{n}{'}{k}'  // -ісіньк
             '{iu}{s}{i}{n}{'}{k}' // -юсіньк
-            '{o}{ch}{e}{ch}'      // -очеч
             '{e}{n}{'}{k}'        // -еньк
             '{o}{n}{'}{k}'        // -оньк
             '{i}{n}{'}{k}'        // -іньк
