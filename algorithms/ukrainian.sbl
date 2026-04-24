@@ -133,7 +133,6 @@ backwardmode (
             '{a}{ts}{i}{i`}{n}{o}{m}{u}'  // -аційному
             '{a}{ts}{i}{i`}{n}{o}{iu}'    // -аційною
             '{a}{ts}{i}{i`}{n}{o}{yi}'    // -аційної
-            '{a}{ts}{i}{i`}{n}{o}{i}'     // -аційної (alt)
             '{a}{ts}{i}{i`}{n}{y}{kh}'    // -аційних
             '{a}{ts}{i}{i`}{n}{y}{m}'     // -аційним
             '{a}{ts}{i}{i`}{n}{y}{i`}'    // -аційний
@@ -148,7 +147,6 @@ backwardmode (
             '{i}{ch}{n}{o}{m}{u}'         // -ічному
             '{i}{ch}{n}{o}{iu}'           // -ічною
             '{i}{ch}{n}{o}{yi}'           // -ічної
-            '{i}{ch}{n}{o}{i}'            // -ічної (alt)
             '{i}{ch}{n}{y}{kh}'           // -ічних
             '{i}{ch}{n}{y}{m}'            // -ічним
             '{i}{ch}{n}{y}{i`}'           // -ічний
@@ -161,7 +159,6 @@ backwardmode (
             '{y}{ch}{n}{o}{m}{u}'         // -ичному
             '{y}{ch}{n}{o}{iu}'           // -ичною
             '{y}{ch}{n}{o}{yi}'           // -ичної
-            '{y}{ch}{n}{o}{i}'            // -ичної (alt)
             '{y}{ch}{n}{y}{kh}'           // -ичних
             '{y}{ch}{n}{y}{m}'            // -ичним
             '{y}{ch}{n}{y}{i`}'           // -ичний
@@ -176,7 +173,6 @@ backwardmode (
             '{i}{i`}{n}{o}{m}{u}'         // -ійному
             '{i}{i`}{n}{o}{iu}'           // -ійною
             '{i}{i`}{n}{o}{yi}'           // -ійної
-            '{i}{i`}{n}{o}{i}'            // -ійної (alt)
             '{i}{i`}{n}{y}{kh}'           // -ійних
             '{i}{i`}{n}{y}{m}'            // -ійним
             '{i}{i`}{n}{y}{i`}'           // -ійний
@@ -191,7 +187,6 @@ backwardmode (
             '{u}{a}{l}{'}{n}{o}{m}{u}'    // -уальному
             '{u}{a}{l}{'}{n}{o}{iu}'      // -уальною
             '{u}{a}{l}{'}{n}{o}{yi}'      // -уальної
-            '{u}{a}{l}{'}{n}{o}{i}'       // -уальної (alt)
             '{u}{a}{l}{'}{n}{y}{kh}'      // -уальних
             '{u}{a}{l}{'}{n}{y}{m}'       // -уальним
             '{u}{a}{l}{'}{n}{y}{i`}'      // -уальний
@@ -206,7 +201,6 @@ backwardmode (
             '{o}{n}{n}{o}{m}{u}'          // -онному
             '{o}{n}{n}{o}{iu}'            // -онною
             '{o}{n}{n}{o}{yi}'            // -онної
-            '{o}{n}{n}{o}{i}'             // -онної (alt)
             '{o}{n}{n}{y}{kh}'            // -онних
             '{o}{n}{n}{y}{m}'             // -онним
             '{o}{n}{n}{y}{i`}'            // -онний
@@ -236,16 +230,14 @@ backwardmode (
             '{u}{ch}{a}' '{iu}{ch}{a}'                    // -уча/-юча
             '{u}{ch}{e}' '{iu}{ch}{e}'                    // -уче/-юче
             '{u}{ch}{i}' '{iu}{ch}{i}'                    // -учі/-ючі
-            '{v}{sh}{y}{i`}'                               // -вший
 
-            // Longest standard endings first
             '{yi}{m}{y}' '{i}{m}{y}' '{y}{m}{y}'    // Instrumental plural
-            '{'}{o}{yi}' '{'}{o}{i}'                // Genitive singular fem (soft) e.g. синьої
+            '{'}{o}{yi}'                             // Genitive singular fem (soft) e.g. синьої
             '{'}{o}{h}{o}'                          // Genitive singular masc/neut (soft) e.g. синього
             '{'}{o}{m}{u}'                          // Dative singular masc/neut (soft) e.g. синьому
             '{'}{o}{iu}'                            // Instrumental singular fem (soft) e.g. синьою
-            '{ie}{h}{o}' '{o}{h}{o}'                // Genitive singular masc/neut
-            '{o}{yi}' '{o}{i}'                      // Genitive singular fem
+            '{o}{h}{o}'                             // Genitive singular masc/neut
+            '{o}{yi}'                               // Genitive singular fem
             '{o}{m}{u}'                             // Dative singular masc/neut
             '{o}{iu}'                               // Instrumental singular fem
             '{yi}{kh}' '{i}{kh}' '{y}{kh}'          // Genitive/Locative plural
@@ -261,7 +253,6 @@ backwardmode (
 
     define verb as (
         [substring] among (
-            // Longest endings first
             '{a}{t}{y}' '{i}{t}{y}'         // Infinitive (читати→чит, робити→роб)
             '{y}{t}{y}'                     // Infinitive (робити with и)
             '{a}{v}' '{i}{v}'               // Past masc (читав→чит, робів→роб)
@@ -277,7 +268,7 @@ backwardmode (
             '{ie}{t}{e}' '{i}{t}{e}'        // Present 2nd pl
             '{e}{t}{e}' '{y}{t}{e}'         // Present 2nd pl (живете, робите)
             '{i`}{t}{e}'                    // Imperative pl variant
-            '{ie}{m}' '{i}{m}'              // Present 1st pl short
+            '{ie}{m}'                       // Present 1st pl short
             '{y}{m}'                        // Present 1st pl short (робим)
             '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
             '{t}{y}'                        // Infinitive (fallback)
@@ -300,21 +291,18 @@ backwardmode (
             '{s}{t}{v}{o}'            // -ство (багатство→багат)
             '{t}{v}{o}'              // -тво (words in -цтво like козацтво match -ство above)
 
-            // Longest plural endings first
             '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural
             '{ia}{kh}' '{a}{kh}'            // Locative plural
             '{ia}{m}' '{a}{m}'              // Dative plural
-            '{i}{v}' '{e}{v}' '{e}{i`}'     // Genitive plural masc
-
             // Singular specific endings
             '{o}{v}{i}'                      // -ові (братові→брат)
             '{e}{v}{i}'
             // Instrumental singular
-            '{ie}{m}' '{e}{m}' '{o}{m}'
-            '{ie}{iu}' '{e}{iu}' '{o}{iu}'
+            '{e}{m}' '{o}{m}'
+            '{e}{iu}' '{o}{iu}'
 
             // Shorter endings
-            '{ia}' '{a}' '{u}' '{iu}' '{i}' '{yi}' '{y}' '{e}' '{ie}' '{o}'
+            '{ia}' '{a}' '{i}' '{yi}' '{y}' '{e}' '{o}'
                 (delete)
         )
     )
@@ -389,8 +377,7 @@ backwardmode (
 
     define verbal_noun as (
         setlimit tomark p2 for ([substring]) among (
-            // R2 guard prevents over-stemming of short verbal nouns.
-            // (Inline examples removed; words added to voc.txt instead.)
+            // R2 guard prevents over-stemming. мигтіння, боління, бродіння
             '{a}{n}{n}{ia}'        // -ання
             '{ia}{n}{n}{ia}'       // -яння
             '{i}{n}{n}{ia}'        // -іння
