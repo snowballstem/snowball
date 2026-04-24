@@ -1849,10 +1849,16 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
         write_int(g, map[i]);
     }
     if (g->options->coverage) {
+        int grouping_number = q->name->count;
+        if (grouping_number > 255) grouping_number = 255;
+        w(g, ", ");
+        wlitch(g, grouping_number);
+
         char buf[1024];
         checked_snprintf(buf, sizeof(buf), "%s:%d: grouping %.*s",
                          g->analyser->tokeniser->file, q->line_number,
                          SIZE(q->name->s), q->name->s);
+
         for (const char * p = buf; *p; ++p) {
             w(g, ", ");
             wlitch(g, (int)*p);

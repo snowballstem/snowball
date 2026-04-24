@@ -136,9 +136,15 @@ static int get_b_utf8(const symbol * p, int c, int lb, int * slot) {
 }
 
 #ifdef SNOWBALL_COVERAGE
+/* The grouping number gets stored in a byte, clamped to 255. */
+static char grouping_seen[255];
+
 static void report_coverage(const unsigned char * s, int min, int max, int ch, const unsigned char * p, int w) {
     int i = 0;
+    int j;
     int outof = 0;
+    const unsigned char * loc = s + (max - min + 8) / 8;
+    int grouping_number = *loc++;
     /* Adjust ch be an offset from min if it's past the end of the range.  If
      * we already subtracted min then this will condition will be false.  Only
      * needed for the "out" case but the condition can never be true for the
@@ -146,19 +152,45 @@ static void report_coverage(const unsigned char * s, int min, int max, int ch, c
      */
     if (ch > max) ch -= min;
     /* Find the index of this character in the grouping. */
-    for (int j = 0; j != max - min; ++j) {
+    for (j = 0; j != max - min; ++j) {
         if (s[j >> 3] & (0X1 << (j & 0X7))) {
             ++outof;
             if (j < ch) ++i;
         }
     }
-    s += (max - min + 8) / 8;
-    fprintf(stderr, "%s index %d of %d '%.*s'\n", s, i, outof + 1, w, p);
+    if (grouping_number < (int)sizeof(grouping_seen) &&
+        grouping_seen[grouping_number] == 0) {
+        /* Report every entry once, then unused cases will appear (and we can
+         * decrement each count when generating the coverage report).
+         */
+        int k = 0;
+        for (j = 0; j != max - min; ++j) {
+            if (s[j >> 3] & (0X1 << (j & 0X7))) {
+                fprintf(stderr, "%s index %d of %d '", loc, k, outof + 1);
+                int codepoint = j + min;
+                if (codepoint < 0x80) {
+                    putc(codepoint, stderr);
+                } else if (codepoint < 0x800) {
+                    putc((codepoint >> 6) | 0xC0, stderr);
+                    putc((codepoint & 0x3F) | 0x80, stderr);
+                } else {
+                    putc((codepoint >> 12) | 0xE0, stderr);
+                    putc(((codepoint >> 6) & 0x3F) | 0x80, stderr);
+                    putc((codepoint & 0x3F) | 0x80, stderr);
+                }
+                fprintf(stderr, "'\n");
+                ++k;
+            }
+        }
+        grouping_seen[grouping_number] = 1;
+    }
+    fprintf(stderr, "%s index %d of %d '%.*s'\n", loc, i, outof + 1, w, p);
 }
 
 static void report_coverage_nomatch(const unsigned char * s, int min, int max) {
-    s += (max - min + 8) / 8;
-    fprintf(stderr, "%s no match\n", s);
+    const unsigned char * loc = s + (max - min + 8) / 8;
+    ++loc;
+    fprintf(stderr, "%s no match\n", loc);
 }
 #endif
 
@@ -307,7 +339,7 @@ extern int eq_v_b(struct SN_env * z, const symbol * p) {
 }
 
 #ifdef SNOWBALL_COVERAGE
-// Declare more entries than any real Snowball program will have.
+/* Declare more entries than any real Snowball program will have. */
 static char among_seen[4096];
 #endif
 
@@ -329,7 +361,8 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
 
 #ifdef SNOWBALL_COVERAGE
     int among_number = v[v_size].s_size;
-    if (among_number < sizeof(among_seen) && among_seen[among_number] == 0) {
+    if (among_number < (int)sizeof(among_seen) &&
+        among_seen[among_number] == 0) {
         /* Report every entry once, then unused cases will appear (and we can
          * decrement each count when generating the coverage report).
          */
@@ -428,7 +461,8 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
 
 #ifdef SNOWBALL_COVERAGE
     int among_number = v[v_size].s_size;
-    if (among_number < sizeof(among_seen) && among_seen[among_number] == 0) {
+    if (among_number < (int)sizeof(among_seen) &&
+        among_seen[among_number] == 0) {
         /* Report every entry once, then unused cases will appear (and we can
          * decrement each count when generating the coverage report).
          */
