@@ -306,6 +306,11 @@ extern int eq_v_b(struct SN_env * z, const symbol * p) {
     return eq_s_b(z, SIZE(p), p);
 }
 
+#ifdef SNOWBALL_COVERAGE
+// Declare more entries than any real Snowball program will have.
+static char among_seen[4096];
+#endif
+
 extern int find_among(struct SN_env * z, const struct among * v, int v_size,
                       int (*call_among_func)(struct SN_env*)) {
 
@@ -323,8 +328,23 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
     int first_key_inspected = 0;
 
 #ifdef SNOWBALL_COVERAGE
-    if (v[v_size * 2].s_size == -1)
-        fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, v[v_size].s_size);
+    int among_number = v[v_size].s_size;
+    if (among_number < sizeof(among_seen) && among_seen[among_number] == 0) {
+        /* Report every entry once, then unused cases will appear (and we can
+         * decrement each count when generating the coverage report).
+         */
+        int k;
+        for (k = 0; k < v_size; ++k) {
+            w = v + k;
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+        }
+        if (v[v_size * 2].s_size == -1) {
+            fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, among_number);
+        } else {
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, among_number);
+        }
+        among_seen[among_number] = 1;
+    }
 #endif
     while (1) {
         int k = i + ((j - i) >> 1);
@@ -363,24 +383,24 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
         if (common_i >= w->s_size) {
             z->c = c + w->s_size;
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
             if (!w->function) return w->result;
             z->af = w->function;
             if (call_among_func(z)) {
                 z->c = c + w->s_size;
 #ifdef SNOWBALL_COVERAGE
-                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
                 return w->result;
             }
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
         }
         if (!w->substring_i) {
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, v[v_size * 2].s_size);
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, among_number);
 #endif
             return 0;
         }
@@ -407,8 +427,23 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
     int first_key_inspected = 0;
 
 #ifdef SNOWBALL_COVERAGE
-    if (v[v_size * 2].s_size == -1)
-        fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, v[v_size].s_size);
+    int among_number = v[v_size].s_size;
+    if (among_number < sizeof(among_seen) && among_seen[among_number] == 0) {
+        /* Report every entry once, then unused cases will appear (and we can
+         * decrement each count when generating the coverage report).
+         */
+        int k;
+        for (k = 0; k < v_size; ++k) {
+            w = v + k;
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+        }
+        if (v[v_size * 2].s_size == -1) {
+            fprintf(stderr, "%s: among %d no match impossible\n", v[v_size * 2].s, among_number);
+        } else {
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, among_number);
+        }
+        among_seen[among_number] = 1;
+    }
 #endif
     while (1) {
         int k = i + ((j - i) >> 1);
@@ -437,24 +472,24 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
         if (common_i >= w->s_size) {
             z->c = c - w->s_size;
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+            fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
             if (!w->function) return w->result;
             z->af = w->function;
             if (call_among_func(z)) {
 #ifdef SNOWBALL_COVERAGE
-                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
                 z->c = c - w->s_size;
                 return w->result;
             }
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, w[v_size].s_size, w[v_size].result, v_size, w->s_size, w->s);
+            fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
 #endif
         }
         if (!w->substring_i) {
 #ifdef SNOWBALL_COVERAGE
-            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, v[v_size * 2].s_size);
+            fprintf(stderr, "%s: among %d no match\n", v[v_size * 2].s, among_number);
 #endif
             return 0;
         }
