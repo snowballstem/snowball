@@ -299,7 +299,6 @@ backwardmode (
             '{e}{v}{i}'
             // Instrumental singular
             '{e}{m}' '{o}{m}'
-            '{e}{iu}' '{o}{iu}'
 
             // Shorter endings
             '{ia}' '{a}' '{i}' '{yi}' '{y}' '{e}' '{o}'
