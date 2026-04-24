@@ -1543,8 +1543,14 @@ handle_rel_op:
                                 p->type = c_assign;
                             }
                         } else if (p->AE->number == -1) {
-                            // `$x/=-1` -> `$x*=-1`
-                            p->type = c_multiplyassign;
+                            // `$x/=-1` -> `$x=-x`
+                            // `$x*=-1` -> `$x=-x`
+                            p->type = c_assign;
+                            p->AE->number = 0;
+                            p->AE->type = c_neg;
+                            p->AE->right = new_node_at_line(a, c_name,
+                                                            p->AE->line_number);
+                            p->AE->right->name = p->name;
                         }
                         break;
                 }

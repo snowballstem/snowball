@@ -6,12 +6,14 @@ define stem
     # size
     = x
     # number 0
-    *= x
-    # number -1
+    = x
+    # neg
+      name x
     += y
     # name x
-    *= y
-    # number -1
+    = y
+    # neg
+      name y
     = x
     # neg
       size
