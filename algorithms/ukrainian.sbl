@@ -123,7 +123,7 @@ backwardmode (
 
     define adjective as (
         [substring] among (
-            // Compound derivational+inflectional (longest first, R2-protected)
+            // Compound derivational+inflectional (R2-protected)
             // These combine derivational suffix + case ending in one step
             // e.g. інформаційний → інформ (not інформаційн)
 
@@ -194,20 +194,6 @@ backwardmode (
             '{u}{a}{l}{'}{n}{a}'          // -уальна
             '{u}{a}{l}{'}{n}{e}'          // -уальне
             '{u}{a}{l}{'}{n}{i}'          // -уальні
-
-            // -онн- (електронний, нейронний)
-            '{o}{n}{n}{y}{m}{y}'          // -онними
-            '{o}{n}{n}{o}{h}{o}'          // -онного
-            '{o}{n}{n}{o}{m}{u}'          // -онному
-            '{o}{n}{n}{o}{iu}'            // -онною
-            '{o}{n}{n}{o}{yi}'            // -онної
-            '{o}{n}{n}{y}{kh}'            // -онних
-            '{o}{n}{n}{y}{m}'             // -онним
-            '{o}{n}{n}{y}{i`}'            // -онний
-            '{o}{n}{n}{i}{i`}'            // -онній
-            '{o}{n}{n}{a}'                // -онна
-            '{o}{n}{n}{e}'                // -онне
-            '{o}{n}{n}{i}'                // -онні
                 (R2 delete)
 
             // -аці- noun forms (інформація, організація — tried here before verb -ію intercepts)
@@ -220,7 +206,7 @@ backwardmode (
             '{a}{ts}{i}{yi}'              // -ації (gen/dat/loc — ї=U+0457)
                 (R2 delete)
 
-            // Participles (longest first - verbal adjectives)
+            // Participles (verbal adjectives)
             '{o}{v}{a}{n}{y}{i`}' '{u}{v}{a}{n}{y}{i`}'  // -ований/-уваний
             '{o}{v}{a}{n}{a}' '{u}{v}{a}{n}{a}'           // -ована/-увана
             '{o}{v}{a}{n}{e}' '{u}{v}{a}{n}{e}'           // -оване/-уване
@@ -318,7 +304,7 @@ backwardmode (
 
     define diminutive as (
         [substring] among (
-            // Double diminutives (longest first)
+            // Double diminutives
             '{o}{ch}{e}{ch}{o}{k}' '{o}{ch}{e}{ch}{k}{a}' '{o}{ch}{e}{ch}{k}{y}' '{o}{ch}{e}{ch}{k}{o}' '{o}{ch}{e}{ch}{k}{i}'
 
             // Animal young (from dictionary analysis)
@@ -331,7 +317,7 @@ backwardmode (
             '{e}{ch}{o}{k}' '{e}{ch}{k}{a}' '{e}{ch}{k}{y}' '{e}{ch}{k}{o}' '{e}{ch}{k}{i}'
             '{i}{ch}{o}{k}' '{i}{ch}{k}{a}' '{i}{ch}{k}{y}' '{i}{ch}{k}{o}' '{i}{ch}{k}{i}'
 
-            // Intensive diminutives (longest first)
+            // Intensive diminutives
             '{e}{s}{e}{n}{'}{k}{a}' '{e}{s}{e}{n}{'}{k}{y}' '{e}{s}{e}{n}{'}{k}{o}' '{e}{s}{e}{n}{'}{k}{i}'  // -есеньк-
             '{i}{s}{i}{n}{'}{k}{a}' '{i}{s}{i}{n}{'}{k}{y}' '{i}{s}{i}{n}{'}{k}{o}' '{i}{s}{i}{n}{'}{k}{i}'  // -ісіньк-
             '{iu}{s}{i}{n}{'}{k}{a}' '{iu}{s}{i}{n}{'}{k}{y}' '{iu}{s}{i}{n}{'}{k}{o}' '{iu}{s}{i}{n}{'}{k}{i}'  // -юсіньк-
