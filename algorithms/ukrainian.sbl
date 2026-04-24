@@ -388,20 +388,6 @@ backwardmode (
 
     define derivational as (
         [substring] R2 among (
-            // Derivational suffixes (only in R2 region!)
-            '{i}{z}{a}{ts}{i}{ia}'  // -ізація
-            '{a}{ts}{i}{ia}'        // -ація
-            '{i}{v}{shch}{y}{n}{a}' // -івщина (бабівщина → баб)
-
-            // Place/female forms
-            '{a}{r}{n}{ia}'       // -арня
-            '{i}{v}{n}{ia}'       // -івня
-            '{n}{y}{ts}{ia}'      // -ниця
-
-            // Collective/abstract
-            '{ts}{t}{v}{o}'       // -цтво
-            '{s}{t}{v}{o}'        // -ство
-
             // Quality/abstract
             '{n}{i}{s}{t}{'}'     // -ність
             '{o}{v}{i}{s}{t}{'}'  // -овість
