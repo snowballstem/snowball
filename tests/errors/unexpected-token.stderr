@@ -12,3 +12,4 @@ errors/unexpected-token.sbl:15: Expected relational operator, got '+='
 errors/unexpected-token.sbl:16: Expected relational operator, got '-='
 errors/unexpected-token.sbl:17: Expected relational operator, got '*='
 errors/unexpected-token.sbl:19: unexpected next after )
+errors/unexpected-token.sbl:21: name omitted after define

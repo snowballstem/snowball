@@ -1882,7 +1882,7 @@ static void read_program_(struct analyser * a, int terminator) {
             default:
                 if (token == terminator) return;
                 unexpected_token_error(a, 0);
-                return;
+                break;
             case -1:
                 return;
         }

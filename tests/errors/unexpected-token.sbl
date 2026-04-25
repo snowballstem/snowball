@@ -17,3 +17,4 @@ define stem as (
   $(i *= 1)
 )
 next
+define
