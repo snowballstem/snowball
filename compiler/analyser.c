@@ -195,13 +195,14 @@ static void check_routine_mode(struct analyser * a, struct name * p, int mode) {
     }
 }
 
-static void check_name_type(struct analyser * a, struct name * p, int type) {
-    if (p->type == type) return;
-    if (type == t_routine && p->type == t_external) return;
+static int check_name_type(struct analyser * a, struct name * p, int type) {
+    if (p->type == type) return true;
+    if (type == t_routine && p->type == t_external) return true;
     report_error_location(a);
     fprintf(stderr, "'%.*s' not of type %s\n",
             SIZE(p->s), p->s,
             name_of_type(type));
+    return false;
 }
 
 static void read_names(struct analyser * a, int type) {
@@ -1708,6 +1709,7 @@ static int finalise_grouping(struct grouping * p) {
 static void read_define_grouping(struct analyser * a, struct name * q) {
     struct tokeniser * t = a->tokeniser;
     int style = c_plus;
+    int check_nonempty = true;
     {
         NEW(grouping, p);
         *p = (struct grouping){0};
@@ -1730,15 +1732,18 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     struct name * r = find_name(a);
                     if (!r) break;
 
-                    check_name_type(a, r, t_grouping);
                     if (r == q) {
                         count_error(a);
                         fprintf(stderr, "%s:%d: %.*s defined in terms of itself\n",
                                 t->file, t->line_number, SIZE(r->s), r->s);
+                        check_nonempty = false;
                     } else if (!r->grouping) {
-                        count_error(a);
-                        fprintf(stderr, "%s:%d: %.*s undefined\n",
-                                t->file, t->line_number, SIZE(r->s), r->s);
+                        if (check_name_type(a, r, t_grouping)) {
+                            count_error(a);
+                            fprintf(stderr, "%s:%d: %.*s undefined\n",
+                                    t->file, t->line_number, SIZE(r->s), r->s);
+                        }
+                        check_nonempty = false;
                     } else {
                         p->b = alter_grouping(p->b, r->grouping->b, style, false);
                     }
@@ -1763,8 +1768,10 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         }
     label0:
         if (!finalise_grouping(p)) {
-            report_error_location(a);
-            fprintf(stderr, "empty grouping\n");
+            if (check_nonempty) {
+                report_error_location_line(a, p->line_number);
+                fprintf(stderr, "empty grouping\n");
+            }
         }
         hold_token(t);
     }

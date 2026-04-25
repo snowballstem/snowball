@@ -1,6 +1,9 @@
-groupings (g1 g2 g3)
+groupings (g1 g2 g3 g4 gempty gself)
 define g1
 define g2 'abc' -
 define g3
 externals (stem)
 define stem as ()
+define gempty 'a' - 'a'
+define gself gself
+define g4 stem

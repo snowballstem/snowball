@@ -1,3 +1,6 @@
 errors/bad-grouping-definition.sbl:3: unexpected define in grouping definition after name
 errors/bad-grouping-definition.sbl:4: unexpected define in grouping definition after -
 errors/bad-grouping-definition.sbl:5: unexpected externals in grouping definition after name
+errors/bad-grouping-definition.sbl:7: empty grouping
+errors/bad-grouping-definition.sbl:8: gself defined in terms of itself
+errors/bad-grouping-definition.sbl:9: 'stem' not of type grouping
