@@ -259,8 +259,9 @@ extern void write_margin(struct generator * g) {
 }
 
 /* K_needed() tests to see if we really need to keep c. Not true when the
-   command does not touch the cursor. This and repeat_score() could be
-   elaborated almost indefinitely.
+   command does not touch the cursor (and in backwardmode, also does not
+   change the limit by inserting, deleting, or replacing text in the string).
+   This and repeat_score() could be elaborated almost indefinitely.
 */
 
 static int K_needed_(struct node * p, int call_depth);
