@@ -201,7 +201,7 @@ static int check_name_type(struct analyser * a, struct name * p, int type) {
     report_error_location(a);
     fprintf(stderr, "'%.*s' not of type %s\n",
             SIZE(p->s), p->s,
-            name_of_type(type));
+            type == t_routine ? "routine or external" : name_of_type(type));
     return false;
 }
 
@@ -1781,12 +1781,6 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     struct node * p = new_node(a, c_define);
     a->current_routine = q;
     if (q) {
-        int type = q->type;
-        if (type != t_grouping && type != t_routine && type != t_external) {
-            report_error_location(a);
-            fprintf(stderr, "'%.*s' not of type grouping, routine or external\n",
-                    SIZE(q->s), q->s);
-        }
         if (q->definition != NULL) {
             report_error_location(a);
             fprintf(stderr, "'%.*s' redefined\n", SIZE(q->s), q->s);
@@ -1834,32 +1828,38 @@ static void read_define_routine(struct analyser * a, struct name * q) {
 }
 
 static void read_define(struct analyser * a) {
-    if (get_token(a, c_name)) {
-        struct name * q = find_name(a);
-        int type;
-        if (q) {
-            type = q->type;
-        } else {
-            /* No declaration so sniff next token - if it is a string or name
-             * we parse as a grouping, otherwise we parse as a routine.  This
-             * avoids an avalanche of further errors if `as` is missing from a
-             * routine definition.
-             */
-            switch (peek_token(a->tokeniser)) {
-                case c_literalstring:
-                case c_name:
-                    type = t_grouping;
-                    break;
-                default:
-                    type = t_routine;
-            }
-        }
+    if (!get_token(a, c_name)) return;
 
-        if (type == t_grouping) {
-            read_define_grouping(a, q);
-        } else {
-            read_define_routine(a, q);
+    struct name * q = find_name(a);
+    int type;
+    if (q) {
+        type = q->type;
+        if (type != t_grouping && type != t_routine && type != t_external) {
+            // If integer, boolean, or string name then generate error and
+            // parse based on the next token.
+            type = (peek_token(a->tokeniser) == c_as) ? t_routine : t_grouping;
+            check_name_type(a, q, type);
         }
+    } else {
+        /* No declaration so sniff next token - if it is a string or name
+         * we parse as a grouping, otherwise we parse as a routine.  This
+         * avoids an avalanche of further errors if `as` is missing from a
+         * routine definition.
+         */
+        switch (peek_token(a->tokeniser)) {
+            case c_literalstring:
+            case c_name:
+                type = t_grouping;
+                break;
+            default:
+                type = t_routine;
+        }
+    }
+
+    if (type == t_grouping) {
+        read_define_grouping(a, q);
+    } else {
+        read_define_routine(a, q);
     }
 }
 

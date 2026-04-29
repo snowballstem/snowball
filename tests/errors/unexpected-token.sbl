@@ -17,4 +17,8 @@ define stem as (
   $(i *= 1)
 )
 next
+
+strings (s1 s2)
+define s1 'string'
+define s2 as 'string'
 define

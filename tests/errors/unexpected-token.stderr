@@ -12,4 +12,6 @@ errors/unexpected-token.sbl:15: Expected relational operator, got '+='
 errors/unexpected-token.sbl:16: Expected relational operator, got '-='
 errors/unexpected-token.sbl:17: Expected relational operator, got '*='
 errors/unexpected-token.sbl:19: unexpected next after )
-errors/unexpected-token.sbl:21: name omitted after define
+errors/unexpected-token.sbl:22: 's1' not of type grouping
+errors/unexpected-token.sbl:23: 's2' not of type routine or external
+errors/unexpected-token.sbl:25: name omitted after define
