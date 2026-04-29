@@ -297,7 +297,10 @@ static int K_needed_(struct node * p, int call_depth) {
                 // Doesn't change the cursor or always restores it.
                 break;
 
-//            case c_stringassign:
+            case c_stringassign:
+                // Doesn't change the cursor in forwards mode; in backwards
+                // mode the cursor and forwards limit move in step.
+                break;
 
             case c_attach:
                 // Cursor modified in backwardmode.

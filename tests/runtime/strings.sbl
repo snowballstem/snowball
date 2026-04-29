@@ -13,6 +13,7 @@ define stem as (
   test ('ok' $(cursor == 2) atlimit) or fail='atlimit failed after string match'
   not 'x' or fail='incorrectly matched single character string'
   not 'ko' or fail='incorrectly matched string'
+  $(cursor == 0) or fail='cursor not restored after string literal tests'
 
   $s=''
   s or fail='failed to match empty string var'
@@ -25,6 +26,18 @@ define stem as (
   test (s $(cursor == 2) atlimit) or fail='atlimit failed after string var match'
   $s='x' not s or fail='incorrectly matched single character string var'
   $s='ko' not s or fail='incorrectly matched string var'
+
+  do (
+    ='test'
+  )
+  $(cursor == 0) or fail='cursor not restored by do'
+
+  backwards (
+    do (
+      ='test'
+    )
+    $(cursor == size) or fail='cursor not restored by do'
+  )
 
   ='abcde'
   test ( $(len == 5) $(cursor == 0) 'abcde' atlimit ) or fail='string assignment wrong'
