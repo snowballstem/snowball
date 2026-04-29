@@ -263,82 +263,89 @@ extern void write_margin(struct generator * g) {
    elaborated almost indefinitely.
 */
 
+static int K_needed_(struct node * p, int call_depth);
+
+static int K_needed_node(struct node * p, int call_depth) {
+    switch (p->type) {
+        case c_assignto:
+        case c_atlimit:
+        case c_atmark:
+        case c_do:
+        case c_dollar:
+        case c_leftslice:
+        case c_rightslice:
+        case c_assign:
+        case c_plusassign:
+        case c_minusassign:
+        case c_multiplyassign:
+        case c_divideassign:
+        case c_eq:
+        case c_ne:
+        case c_gt:
+        case c_ge:
+        case c_lt:
+        case c_le:
+        case c_sliceto:
+        case c_booltest:
+        case c_not_booltest:
+        case c_set:
+        case c_unset:
+        case c_true:
+        case c_false:
+        case c_debug:
+        case c_functionend:
+        case c_setmark:
+            // Doesn't change the cursor or always restores it.
+            break;
+
+        case c_stringassign:
+            // Doesn't change the cursor in forwards mode; in backwards
+            // mode the cursor and forwards limit move in step.
+            break;
+
+        case c_attach:
+            // Cursor modified in backwardmode.
+            if (p->mode == m_backward) return true;
+            break;
+
+        case c_insert:
+            // Cursor modified in forwards mode.
+            if (p->mode == m_forward) return true;
+            break;
+
+        case c_call:
+            /* Recursive functions aren't typical in snowball programs, so
+             * make the pessimistic assumption that keep is needed if we
+             * hit a generous limit on recursion.  It's not likely to make
+             * a difference to any real world program, but means we won't
+             * recurse until we run out of stack for pathological cases.
+             */
+            if (call_depth >= 100) return true;
+            if (K_needed_(p->name->definition->left, call_depth + 1))
+                return true;
+            break;
+
+        case c_bra:
+        case c_loop:
+        case c_fail:
+            if (K_needed_(p->left, call_depth)) return true;
+            break;
+
+        case c_backwards:
+        case c_reverse:
+        case c_test:
+            if (p->possible_signals != 1) return true;
+            // Restores cursor on t and the subcommand can't fail.
+            break;
+
+        default: return true;
+    }
+    return false;
+}
+
 static int K_needed_(struct node * p, int call_depth) {
     while (p) {
-        switch (p->type) {
-            case c_assignto:
-            case c_atlimit:
-            case c_atmark:
-            case c_do:
-            case c_dollar:
-            case c_leftslice:
-            case c_rightslice:
-            case c_assign:
-            case c_plusassign:
-            case c_minusassign:
-            case c_multiplyassign:
-            case c_divideassign:
-            case c_eq:
-            case c_ne:
-            case c_gt:
-            case c_ge:
-            case c_lt:
-            case c_le:
-            case c_sliceto:
-            case c_booltest:
-            case c_not_booltest:
-            case c_set:
-            case c_unset:
-            case c_true:
-            case c_false:
-            case c_debug:
-            case c_functionend:
-            case c_setmark:
-                // Doesn't change the cursor or always restores it.
-                break;
-
-            case c_stringassign:
-                // Doesn't change the cursor in forwards mode; in backwards
-                // mode the cursor and forwards limit move in step.
-                break;
-
-            case c_attach:
-                // Cursor modified in backwardmode.
-                if (p->mode == m_backward) return true;
-                break;
-
-            case c_insert:
-                // Cursor modified in forwards mode.
-                if (p->mode == m_forward) return true;
-                break;
-
-            case c_call:
-                /* Recursive functions aren't typical in snowball programs, so
-                 * make the pessimistic assumption that keep is needed if we
-                 * hit a generous limit on recursion.  It's not likely to make
-                 * a difference to any real world program, but means we won't
-                 * recurse until we run out of stack for pathological cases.
-                 */
-                if (call_depth >= 100) return true;
-                if (K_needed_(p->name->definition->left, call_depth + 1))
-                    return true;
-                break;
-
-            case c_bra:
-            case c_loop:
-            case c_fail:
-                if (K_needed_(p->left, call_depth)) return true;
-                break;
-
-            case c_backwards:
-            case c_reverse:
-            case c_test:
-                if (p->possible_signals != 1) return true;
-                // Restores cursor on t and the subcommand can't fail.
-                break;
-
-            default: return true;
-        }
+        if (K_needed_node(p, call_depth)) return true;
         p = p->right;
     }
     return false;
@@ -353,10 +360,9 @@ extern int K_needed(struct generator * g, struct node * p) {
 // of these, the cursor only needs to be restored between nodes so we don't
 // need to check the final node in the chain.
 extern int K_needed_for_connective(struct generator * g, struct node * p) {
+    (void)g;
     while (p->right) {
-        if (K_needed(g, p)) {
-            return true;
-        }
+        if (K_needed_node(p, 0)) return true;
         p = p->right;
     }
     return false;
