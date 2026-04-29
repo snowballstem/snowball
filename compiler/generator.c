@@ -300,12 +300,12 @@ static int K_needed_(struct node * p, int call_depth) {
 //            case c_stringassign:
 
             case c_attach:
-                // Cursor restored in backwards mode.
+                // Cursor modified in backwardmode.
                 if (p->mode == m_backward) return true;
                 break;
 
             case c_insert:
-                // Cursor restored in forwards mode.
+                // Cursor modified in forwards mode.
                 if (p->mode == m_forward) return true;
                 break;
 
