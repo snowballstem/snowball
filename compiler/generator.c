@@ -293,7 +293,6 @@ static int K_needed_(struct node * p, int call_depth) {
             case c_false:
             case c_debug:
             case c_functionend:
-            case c_not:
             case c_setmark:
                 // Doesn't change the cursor or always restores it.
                 break;

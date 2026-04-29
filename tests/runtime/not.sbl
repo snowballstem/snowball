@@ -3,8 +3,28 @@
 externals (stem)
 
 define stem as (
-    not (next fail='this should never be seen')
-    $(cursor == 0) or fail='`not` failed to restore cursor'
-    ='ok'
-    not true and fail='`not true` raised signal t'
+  ='stopknot'
+
+  test (
+    $(cursor == 0) or fail='cursor not 0 before test'
+    next or fail='next failed'
+    do (
+       not ([next] delete 'o')
+    )
+    $(cursor == 1) or fail='do failed to restore cursor'
+  )
+
+  backwards (
+    $(cursor == 7) or fail='cursor not 7 before test'
+    next or fail='next failed'
+    do (
+       not ([next] delete 'n')
+    )
+    $(cursor == 5) or fail='backwards do failed to restore cursor'
+  )
+
+  not (next fail='this should never be seen')
+  $(cursor == 0) or fail='`not` failed to restore cursor'
+  ='ok'
+  not true and fail='`not true` raised signal t'
 )
