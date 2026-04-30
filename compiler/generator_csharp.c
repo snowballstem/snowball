@@ -578,7 +578,7 @@ static void generate_GO_grouping(struct generator * g, struct node * p, int is_g
     }
 }
 
-static void generate_GO(struct generator * g, struct node * p, int style) {
+static void generate_GO(struct generator * g, struct node * p, int is_goto) {
     write_comment(g, p);
 
     int used = g->label_used;
@@ -588,7 +588,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     w(g, "~Mwhile (true)~N~{");
 
     struct str * savevar = NULL;
-    if (style == 1 || repeat_restore(g, p->left)) {
+    if (is_goto || repeat_restore(g, p->left)) {
         savevar = vars_newname(g);
         write_savecursor(g, p, savevar);
     }
@@ -600,7 +600,7 @@ static void generate_GO(struct generator * g, struct node * p, int style) {
     generate(g, p->left);
 
     /* include for goto; omit for gopast */
-    if (style == 1) write_restorecursor(g, p, savevar);
+    if (is_goto) write_restorecursor(g, p, savevar);
     w(g, "~Mbreak;~N");
 
     if (g->label_used)
