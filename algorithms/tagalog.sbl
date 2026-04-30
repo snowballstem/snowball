@@ -8,6 +8,7 @@ routines (
     has_minimum_remainder
     has_replacement_remainder
     has_minimum_infix_remainder
+    check_ka_prefix
     remove_partial_duplication
     remove_prefix
     remove_infix
@@ -68,6 +69,11 @@ define has_minimum_infix_remainder as (
     test (gopast vowel gopast vowel)
 )
 
+define check_ka_prefix as (
+    not 'ny'
+    has_minimum_remainder
+)
+
 define remove_partial_duplication as (
     (
         $(size >= 5)
@@ -92,32 +98,65 @@ define remove_partial_duplication as (
 
 define remove_prefix as (
     [substring] among (
-        'nakikipag' 'pakikipag'
-            (has_minimum_remainder delete set removed)
-        'pinakama'
-            (has_minimum_remainder delete set removed)
-        'panganga'
-            (has_replacement_remainder <- 'ka' set removed)
-        'makapag' 'nakapag' 'tagapag' 'makipag' 'nakipag'
-            (has_minimum_remainder delete set removed)
-        'pagpapa' 'pinagka'
-            (has_minimum_remainder delete set removed)
-        'pakiki' 'napaka' 'pinaka' 'ipinag'
-            (has_minimum_remainder delete set removed)
-        'magpa' 'pagka' 'pinag' 'mapag'
-            (has_minimum_remainder delete set removed)
-        'mapa' 'taga' 'ipag' 'tiga' 'pala' 'pina' 'pang'
-            (has_minimum_remainder delete set removed)
-        'naka' 'nang' 'mang' 'sing'
-            (has_minimum_remainder delete set removed)
-        'ipa' 'pam' 'pan' 'pag' 'tag'
-            (has_minimum_remainder delete set removed)
-        'mai' 'mag' 'nam' 'nag' 'man' 'may'
-            (has_minimum_remainder delete set removed)
-        'ma' 'na' 'ni' 'pa'
-            (has_minimum_remainder delete set removed)
-        'ka'
-            (not 'ny' has_minimum_remainder delete set removed)
+        'nakikipag' has_minimum_remainder
+        'pakikipag' has_minimum_remainder
+            (delete set removed)
+        'pinakama' has_minimum_remainder
+            (delete set removed)
+        'panganga' has_replacement_remainder
+            (<- 'ka' set removed)
+        'makapag' has_minimum_remainder
+        'nakapag' has_minimum_remainder
+        'tagapag' has_minimum_remainder
+        'makipag' has_minimum_remainder
+        'nakipag' has_minimum_remainder
+            (delete set removed)
+        'pagpapa' has_minimum_remainder
+        'pinagka' has_minimum_remainder
+            (delete set removed)
+        'pakiki' has_minimum_remainder
+        'napaka' has_minimum_remainder
+        'pinaka' has_minimum_remainder
+        'ipinag' has_minimum_remainder
+            (delete set removed)
+        'magpa' has_minimum_remainder
+        'pagka' has_minimum_remainder
+        'pinag' has_minimum_remainder
+        'mapag' has_minimum_remainder
+            (delete set removed)
+        'mapa' has_minimum_remainder
+        'taga' has_minimum_remainder
+        'ipag' has_minimum_remainder
+        'tiga' has_minimum_remainder
+        'pala' has_minimum_remainder
+        'pina' has_minimum_remainder
+        'pang' has_minimum_remainder
+            (delete set removed)
+        'naka' has_minimum_remainder
+        'nang' has_minimum_remainder
+        'mang' has_minimum_remainder
+        'sing' has_minimum_remainder
+            (delete set removed)
+        'ipa' has_minimum_remainder
+        'pam' has_minimum_remainder
+        'pan' has_minimum_remainder
+        'pag' has_minimum_remainder
+        'tag' has_minimum_remainder
+            (delete set removed)
+        'mai' has_minimum_remainder
+        'mag' has_minimum_remainder
+        'nam' has_minimum_remainder
+        'nag' has_minimum_remainder
+        'man' has_minimum_remainder
+        'may' has_minimum_remainder
+            (delete set removed)
+        'ma' has_minimum_remainder
+        'na' has_minimum_remainder
+        'ni' has_minimum_remainder
+        'pa' has_minimum_remainder
+            (delete set removed)
+        'ka' check_ka_prefix
+            (delete set removed)
     )
 )
 
@@ -131,11 +170,7 @@ define remove_infix as (
             (
                 test vowel
                 has_minimum_infix_remainder
-                not (
-                    atlimit 'd'
-                    goto ('i' 'y' 'a' or 'i' 't' 'a')
-                    atlimit
-                )
+                not backwards among ('iya' 'ita')
                 delete
                 set removed
             )
