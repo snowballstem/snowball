@@ -352,16 +352,14 @@ static int K_needed_(struct node * p, int call_depth) {
     return false;
 }
 
-extern int K_needed(struct generator * g, struct node * p) {
-    (void)g;
+extern int K_needed(struct node * p) {
     return K_needed_(p, 0);
 }
 
 // Like K_needed(), but for the sub-node chain of c_and/c_or.  For both
 // of these, the cursor only needs to be restored between nodes so we don't
 // need to check the final node in the chain.
-extern int K_needed_for_connective(struct generator * g, struct node * p) {
-    (void)g;
+extern int K_needed_for_connective(struct node * p) {
     while (p->right) {
         if (K_needed_node(p, 0)) return true;
         p = p->right;
@@ -369,7 +367,7 @@ extern int K_needed_for_connective(struct generator * g, struct node * p) {
     return false;
 }
 
-static int repeat_score(struct generator * g, struct node * p, int call_depth) {
+static int repeat_score(struct node * p, int call_depth) {
     int score = 0;
     while (p) {
         switch (p->type) {
@@ -410,13 +408,13 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
                 if (call_depth >= 100) {
                     return 2;
                 }
-                score += repeat_score(g, p->name->definition->left, call_depth + 1);
+                score += repeat_score(p->name->definition->left, call_depth + 1);
                 if (score >= 2)
                     return score;
                 break;
 
             case c_bra:
-                score += repeat_score(g, p->left, call_depth);
+                score += repeat_score(p->left, call_depth);
                 if (score >= 2)
                     return score;
                 break;
@@ -448,8 +446,8 @@ static int repeat_score(struct generator * g, struct node * p, int call_depth) {
 }
 
 /* tests if an expression requires cursor reinstatement in a repeat */
-extern int repeat_restore(struct generator * g, struct node * p) {
-    return repeat_score(g, p, 0) >= 2;
+extern int repeat_restore(struct node * p) {
+    return repeat_score(p, 0) >= 2;
 }
 
 /* Language-independent write routines for simple entities */
