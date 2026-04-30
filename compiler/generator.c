@@ -356,10 +356,121 @@ extern int K_needed(struct node * p) {
     return K_needed_(p, 0);
 }
 
-// Like K_needed(), but for the sub-node chain of c_and/c_or.  For both
-// of these, the cursor only needs to be restored between nodes so we don't
+static int K_needed_node_on_f_(struct node * p, int call_depth) {
+    switch (p->type) {
+        case c_assignto:
+        case c_atlimit:
+        case c_atmark:
+        case c_do:
+        case c_dollar:
+        case c_leftslice:
+        case c_rightslice:
+        case c_assign:
+        case c_plusassign:
+        case c_minusassign:
+        case c_multiplyassign:
+        case c_divideassign:
+        case c_eq:
+        case c_ne:
+        case c_gt:
+        case c_ge:
+        case c_lt:
+        case c_le:
+        case c_sliceto:
+        case c_booltest:
+        case c_not_booltest:
+        case c_set:
+        case c_unset:
+        case c_true:
+        case c_false:
+        case c_debug:
+        case c_functionend:
+        case c_setmark:
+            // Doesn't change the cursor or always restores it.
+            break;
+
+        case c_grouping:
+        case c_literalstring:
+        case c_name:
+        case c_non:
+        case c_hop:
+        case c_next:
+        case c_substring:
+        case c_tomark:
+            // Doesn't modify the cursor on failure.
+            break;
+
+        case c_delete:
+        case c_repeat:
+        case c_slicefrom:
+        case c_tolimit:
+        case c_attach:
+        case c_insert:
+            // Can't fail, so can't modify the cursor on failure.
+            break;
+
+        case c_goto:
+        case c_try:
+            // Restores the cursor on failure.
+            break;
+
+        case c_gopast:
+            // Restores the cursor on failure if repeat_restore() is true.
+            if (!repeat_restore(p->left)) return true;
+            break;
+
+        case c_call:
+            /* Recursive functions aren't typical in snowball programs, so
+             * make the pessimistic assumption that keep is needed if we
+             * hit a generous limit on recursion.  It's not likely to make
+             * a difference to any real world program, but means we won't
+             * recurse until we run out of stack for pathological cases.
+             */
+            if (call_depth >= 100) return true;
+            if (K_needed_(p->name->definition->left, call_depth + 1))
+                return true;
+            break;
+
+        case c_bra:
+        case c_loop:
+        case c_fail:
+            if (K_needed_(p->left, call_depth)) return true;
+            break;
+
+        case c_backwards:
+        case c_reverse:
+        case c_test:
+            if (p->possible_signals != 1) return true;
+            // Restores cursor on t and the subcommand can't fail.
+            break;
+
+        default:
+            // FIXME: Can we handle c_or c_and c_among c_atleast c_setlimit
+            // better?
+            return true;
+    }
+    return false;
+}
+
+extern int K_needed_node_on_f(struct node * p) {
+    return K_needed_node_on_f_(p, 0);
+}
+
+// Like K_needed(), but for the sub-node chain of c_or.  We only restore on
+// signal f, and the cursor only needs to be restored between nodes so we don't
 // need to check the final node in the chain.
-extern int K_needed_for_connective(struct node * p) {
+extern int K_needed_for_or(struct node * p) {
+    while (p->right) {
+        if (K_needed_node_on_f(p)) return true;
+        p = p->right;
+    }
+    return false;
+}
+
+// Like K_needed(), but for the sub-node chain of c_and.  The cursor only needs
+// to be restored between nodes so we don't need to check the final node in the
+// chain.
+extern int K_needed_for_and(struct node * p) {
     while (p->right) {
         if (K_needed_node(p, 0)) return true;
         p = p->right;

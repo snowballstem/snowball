@@ -492,7 +492,9 @@ extern void write_start_comment(struct generator * g,
                                 const char * comment_end);
 
 extern int K_needed(struct node * p);
-extern int K_needed_for_connective(struct node * p);
+extern int K_needed_node_on_f(struct node * p);
+extern int K_needed_for_and(struct node * p);
+extern int K_needed_for_or(struct node * p);
 extern int repeat_restore(struct node * p);
 
 extern int just_return_on_fail(struct generator * g);

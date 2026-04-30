@@ -411,7 +411,7 @@ static void generate_bra(struct generator * g, struct node * p) {
 
 static void generate_and(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
-    if (K_needed_for_connective(p->left)) {
+    if (K_needed_for_and(p->left)) {
         savevar = vars_newname(g);
     }
 
@@ -437,7 +437,7 @@ static void generate_and(struct generator * g, struct node * p) {
 
 static void generate_or(struct generator * g, struct node * p) {
     struct str * savevar = NULL;
-    if (K_needed_for_connective(p->left)) {
+    if (K_needed_for_or(p->left)) {
         savevar = vars_newname(g);
     }
 
@@ -470,7 +470,7 @@ static void generate_or(struct generator * g, struct node * p) {
 
         if (g->label_used)
             wsetl(g, g->failure_label);
-        if (savevar) {
+        if (savevar && K_needed_node_on_f(p)) {
             write_restorecursor(g, p, savevar);
         }
         p = p->right;
