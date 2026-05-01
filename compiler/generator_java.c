@@ -1343,9 +1343,7 @@ static void generate_class_begin(struct generator * g) {
          "public class ~n extends ");
 
     write_string(g, g->options->parent_class_name);
-    w(g, " {~+~N"
-         "~N"
-         "~Mprivate static final long serialVersionUID = 1L;~N");
+    w(g, " {~+~N");
     if (g->analyser->among_with_function_count > 0) {
         w(g, "~Mprivate static final java.lang.invoke.MethodHandles.Lookup methodObject = java.lang.invoke.MethodHandles.lookup();~N");
     }

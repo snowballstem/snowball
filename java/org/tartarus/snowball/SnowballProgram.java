@@ -1,13 +1,12 @@
 
 package org.tartarus.snowball;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Base class for a snowball stemmer
  */
-public class SnowballProgram implements Serializable {
+public class SnowballProgram {
     protected SnowballProgram()
     {
         cursor = 0;
@@ -16,8 +15,6 @@ public class SnowballProgram implements Serializable {
         bra = cursor;
         ket = limit;
     }
-
-    static final long serialVersionUID = 2016072500L;
 
     /**
      * Set the current string.
