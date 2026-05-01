@@ -1191,6 +1191,20 @@ static void generate_among(struct generator * g, struct node * p) {
         /* Only one outcome ("no match" already handled). */
         generate(g, x->commands[0]);
     } else if (x->command_count > 0) {
+        if (x->same_action == c_slicefrom && x->command_count > 1) {
+            if (x->nocommand_count > 0) {
+                w(g, "~Mif ($among_var > 0) {~N~+");
+            }
+            write_comment(g, x->commands[0]);
+            g->I[0] = x->number;
+            w(g, "~M$this->slice_from(self::AS_~I0[$among_var - 1]);~N");
+            if (x->nocommand_count > 0) {
+                write_block_end(g);
+            }
+            g->unreachable = false;
+            return;
+        }
+
         w(g, "~Mswitch ($among_var) {~N~+");
         for (int i = 1; i <= x->command_count; i++) {
             g->I[0] = i;
@@ -1359,6 +1373,16 @@ static void generate_among_table(struct generator * g, struct among * x) {
         w(g, "]");
     }
     w(g, "~N~-~M];~N~N");
+
+    if (x->same_action == c_slicefrom && x->command_count > 1) {
+        g->I[0] = x->number;
+        w(g, "~Mprivate const array AS_~I0 = [");
+        for (int i = 1; i <= x->command_count; i++) {
+            if (i > 1) w(g, ", ");
+            write_literal_string(g, x->commands[i - 1]->left->literalstring);
+        }
+        w(g, "];~N~N");
+    }
 }
 
 static void generate_amongs(struct generator * g) {
