@@ -817,6 +817,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->command_count = result - 1;
     {
         NEWVEC(node*, commands, x->command_count);
+        x->same_action = -2;
         for (int i = 0; i != x->command_count; ++i)
             commands[i] = NULL;
         for (w0 = v; w0 < w1; w0++) {
@@ -826,8 +827,25 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                     fprintf(stderr, "More among codes than expected\n");
                     exit(1);
                 }
-                if (!commands[w0->result - 1])
+                if (!commands[w0->result - 1]) {
                     commands[w0->result - 1] = w0->action;
+                    // Check if all actions are a single command of the same
+                    // type with a literalstring argument.
+                    if (x->same_action > -1) {
+                        if (w0->action->left->right ||
+                            !w0->action->left->literalstring ||
+                            x->same_action != w0->action->left->type) {
+                            x->same_action = -1;
+                        }
+                    } else if (x->same_action == -2) {
+                        if (w0->action->left->right ||
+                            !w0->action->left->literalstring) {
+                            x->same_action = -1;
+                        } else {
+                            x->same_action = w0->action->left->type;
+                        }
+                    }
+                }
             } else {
                 ++x->nocommand_count;
             }

@@ -275,6 +275,7 @@ struct among {
     byte amongvar_needed;     /* do we need to set among_var? */
     byte always_matches;      /* will this among always match? */
     byte used;                /* is this among in reachable code? */
+    int same_action;          /* type code if same for all actions; <0 otherwise */
     int shortest_size;        /* smallest non-zero string length in this among */
     int longest_size;         /* longest string length in this among */
     struct node * substring;  /* i.e. substring ... among ( ... ) */
