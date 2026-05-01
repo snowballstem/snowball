@@ -1412,7 +1412,7 @@ report_assumed_rel_op_error:
                         // relational operator to avoid spurious unreachable
                         // code warnings after an error.
                         eval_constant_expr = true;
-handle_rel_op:
+handle_rel_op: ;
                         struct node * lhs = n;
                         struct node * rhs = read_AE(a, NULL, 0);
                         if (eval_constant_expr &&
