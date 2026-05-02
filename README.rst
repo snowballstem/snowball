@@ -84,3 +84,32 @@ like this for the libstemmer build::
     make CC=x86_64-w64-mingw32-gcc EXEEXT=.exe
 
 When going the other way, you'll need to use ``EXEEXT=``.
+
+Test Environment
+-----------------
+A Dockerfile is provided to create a consistent build environment for Snowball.
+This is particularly useful for testing or if you don't want to install the required toolchain on your host system.
+
+Build the Docker image
+From the root of the Snowball repository, run:
+
+```bash
+docker build -t snowball-dev .
+Run the container
+Mount your current directory (the repository) to /app inside the container and start an interactive shell:
+```
+
+```bash
+docker run --rm -it \
+  -v ${PWD}:/app \
+  snowball-dev
+Build Snowball inside the container
+Once inside the container, simply run:
+```
+
+```bash
+make
+```
+The container includes all necessary dependencies (e.g., a C99 compiler, GNU make).
+When you exit the shell, the container is automatically removed (thanks to --rm). Any generated files will remain on your host because the repository is mounted.
+
