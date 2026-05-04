@@ -1456,6 +1456,7 @@ static void generate_label_classes(struct generator * g)
 extern void generate_program_python(struct generator * g) {
     g->outbuf = str_new();
     g->failure_str = str_new();
+    g->max_label = -1;
 
     write_start_comment(g, "# ", NULL);
     if (g->analyser->int_limits_used) {
