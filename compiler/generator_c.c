@@ -60,7 +60,8 @@ static void wlitch(struct generator * g, int ch) {
         write_char(g, ch);
         write_char(g, '\'');
     } else {
-        write_string(g, "0x"); write_hex(g, ch);
+        write_string(g, "0x");
+        write_hex(g, ch);
     }
 }
 

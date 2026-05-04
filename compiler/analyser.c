@@ -1119,7 +1119,7 @@ static struct node * read_C(struct analyser * a) {
             int mode = a->mode;
             int modifyable = a->modifyable;
             a->modifyable = false;
-            a->mode = mode == m_forward ? m_backward : m_forward;
+            a->mode = (mode == m_forward) ? m_backward : m_forward;
             struct node * p = new_node(a, token);
             p->left = read_C(a);
             a->mode = mode;

@@ -464,8 +464,13 @@ extern int read_token(struct tokeniser * t) {
                 int base = 0;
                 read_chars(t);
                 code = read_token(t);
-                if (code == c_hex) { base = 16; code = read_token(t); } else
-                if (code == c_decimal) { base = 10; code = read_token(t); }
+                if (code == c_hex) {
+                    base = 16;
+                    code = read_token(t);
+                } else if (code == c_decimal) {
+                    base = 10;
+                    code = read_token(t);
+                }
                 if (code != c_literalstring) {
                     error1(t, "string omitted after stringdef");
                     continue;
@@ -490,7 +495,8 @@ extern int read_token(struct tokeniser * t) {
             case c_get: {
                 code = read_token(t);
                 if (code != c_literalstring) {
-                    error1(t, "string omitted after get"); continue;
+                    error1(t, "string omitted after get");
+                    continue;
                 }
                 t->get_depth++;
                 if (t->get_depth > 10) {
@@ -539,7 +545,8 @@ extern int read_token(struct tokeniser * t) {
                     lose_s(p);
 
                     struct input * q = t->next;
-                    memmove(t, q, sizeof(struct input)); p = t->p;
+                    memmove(t, q, sizeof(struct input));
+                    p = t->p;
                     FREE(q);
 
                     t->get_depth--;

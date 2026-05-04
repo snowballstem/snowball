@@ -33,10 +33,8 @@
     For example:
 
         symbol * b = create_b(0);
-        {   symbol i;
-            for (i = 'A'; i <= 'Z'; i++) {
-                add_symbol_to_b(b, i);
-            }
+        for (symbol i = 'A'; i <= 'Z'; i++) {
+            add_symbol_to_b(b, i);
         }
 
     After running the above code b contains:

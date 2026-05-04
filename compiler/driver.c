@@ -470,310 +470,307 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
 }
 
 extern int main(int argc, char * argv[]) {
-    int i;
     struct options * o = read_options(&argc, argv);
-    {
-        char * file = argv[1];
-        byte * u = get_input(file);
+    char * file = argv[1];
+    byte * u = get_input(file);
+    if (u == NULL) {
+        fprintf(stderr, "Can't open input %s\n", file);
+        exit(1);
+    }
+
+    struct tokeniser * t = create_tokeniser(u, file);
+    struct analyser * a = create_analyser(t);
+    struct input ** next_input_ptr = &(t->next);
+    unsigned localise_mask = 0;
+    a->encoding = t->encoding = o->encoding;
+    t->includes = o->includes;
+    /* If multiple source files are specified, set up the others to be
+     * read after the first in order, using the same mechanism as
+     * 'get' uses. */
+    for (int i = 2; i != argc; ++i) {
+        NEW(input, q);
+        *q = (struct input){0};
+        file = argv[i];
+        u = get_input(file);
         if (u == NULL) {
             fprintf(stderr, "Can't open input %s\n", file);
             exit(1);
         }
-        {
-            struct tokeniser * t = create_tokeniser(u, file);
-            struct analyser * a = create_analyser(t);
-            struct input ** next_input_ptr = &(t->next);
-            unsigned localise_mask = 0;
-            a->encoding = t->encoding = o->encoding;
-            t->includes = o->includes;
-            /* If multiple source files are specified, set up the others to be
-             * read after the first in order, using the same mechanism as
-             * 'get' uses. */
-            for (i = 2; i != argc; ++i) {
-                NEW(input, q);
-                *q = (struct input){0};
-                file = argv[i];
-                u = get_input(file);
-                if (u == NULL) {
-                    fprintf(stderr, "Can't open input %s\n", file);
-                    exit(1);
+        q->p = u;
+        q->file = file;
+        q->line_number = 1;
+        *next_input_ptr = q;
+        next_input_ptr = &(q->next);
+    }
+    *next_input_ptr = NULL;
+
+    /* Whether it's helpful to try to localise string variables varies
+     * greatly between target languages.  One reason for this is likely
+     * to be that strings are immutable in some languages (e.g. Dart,
+     * Javascript, Python) so each string operation creates a new
+     * string anyway.
+     *
+     * We've attempted to benchmark most languages to decide.
+     *
+     * One potential gotcha here is for garbage collected languages,
+     * where our benchmark might not trigger GC and in that case our
+     * timing is missing the cost of that, which any long running
+     * indexing process will eventually incur.
+     *
+     * We've mostly used the following artificial benchmark which
+     * exercises a local string variable to test this:
+     *
+     *   strings ( s )
+     *   routines ( r )
+     *   externals ( stem )
+     *   define r as (-> s s)
+     *   define stem as ( next [tolimit] loop 100000000 do r )
+     *
+     * Replace e.g. english.sbl with this and build the stemwords
+     * equivalent for the target language, then:
+     *
+     * $ echo nonalphabetisations|time ./stemwords
+     *
+     * The appropriate number of iterations to use varies, and is
+     * annotated below.
+     */
+    switch (o->target_lang) {
+        case LANG_ADA:
+            // 1000000000: local 13.7s vs global 5.2s
+        case LANG_C:
+            // We lack a way to generate lose_s(v) on every `return`
+            // from the function, but manually adjusting the generated
+            // code to do this gives:
+            //
+            // 1000000000: local 44.9s vs global 6.3s
+        case LANG_CPLUSPLUS:
+            // String variables are handled the same as LANG_C.
+        case LANG_CSHARP:
+            // 100000000: local 18.8s vs global 12.4s
+        case LANG_JAVA:
+            // 1000000000: local 10.1s vs global 7.1s
+        case LANG_RUST:
+            // 1000000000: localising was slightly slower.
+        case LANG_ZIG:
+            // 10000000: localising strings was slightly slower.
+            localise_mask = (1 << t_boolean) | (1 << t_integer);
+            break;
+        case LANG_DART:
+            // Not timed, but strings are immutable so seems likely
+            // to be helpful to localise.
+        case LANG_GO:
+            // 1000000000: localising was about 10% faster.
+        case LANG_JAVASCRIPT:
+            // 10000000: Slightly faster.
+        case LANG_PASCAL:
+            // Slightly faster.
+        case LANG_PHP:
+            // Slightly faster.
+        case LANG_PYTHON:
+            // 10000000: local 7.6s vs global 7.9s.  Microbenchmarking
+            // with timeit alligns with this.
+            localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
+            break;
+    }
+    read_program(a, localise_mask);
+    if (t->error_count > 0) exit(1);
+    if (o->syntax_tree) print_program(a);
+    if (!o->syntax_tree) {
+        struct generator * g = create_generator(a, o);
+        switch (o->target_lang) {
+            case LANG_C:
+            case LANG_CPLUSPLUS: {
+                byte * s = copy_s(o->output_file);
+                s = add_literal_to_s(s, ".h");
+                o->output_h = get_output(s);
+                SET_SIZE(s, SIZE(o->output_file));
+                if (o->extension &&
+                    !(SIZE(o->extension) == 2 && memcmp(o->extension, ".h", 2) == 0)) {
+                    s = add_s_to_s(s, o->extension);
+                } else if (o->target_lang == LANG_CPLUSPLUS) {
+                    s = add_literal_to_s(s, ".cc");
+                } else {
+                    s = add_literal_to_s(s, ".c");
                 }
-                q->p = u;
-                q->file = file;
-                q->line_number = 1;
-                *next_input_ptr = q;
-                next_input_ptr = &(q->next);
-            }
-            *next_input_ptr = NULL;
+                o->output_src = get_output(s);
+                lose_s(s);
 
-            /* Whether it's helpful to try to localise string variables varies
-             * greatly between target languages.  One reason for this is likely
-             * to be that strings are immutable in some languages (e.g. Dart,
-             * Javascript, Python) so each string operation creates a new
-             * string anyway.
-             *
-             * We've attempted to benchmark most languages to decide.
-             *
-             * One potential gotcha here is for garbage collected languages,
-             * where our benchmark might not trigger GC and in that case our
-             * timing is missing the cost of that, which any long running
-             * indexing process will eventually incur.
-             *
-             * We've mostly used the following artificial benchmark which
-             * exercises a local string variable to test this:
-             *
-             *   strings ( s )
-             *   routines ( r )
-             *   externals ( stem )
-             *   define r as (-> s s)
-             *   define stem as ( next [tolimit] loop 100000000 do r )
-             *
-             * Replace e.g. english.sbl with this and build the stemwords
-             * equivalent for the target language, then:
-             *
-             * $ echo nonalphabetisations|time ./stemwords
-             *
-             * The appropriate number of iterations to use varies, and is
-             * annotated below.
-             */
-            switch (o->target_lang) {
-                case LANG_ADA:
-                    // 1000000000: local 13.7s vs global 5.2s
-                case LANG_C:
-                    // We lack a way to generate lose_s(v) on every `return`
-                    // from the function, but manually adjusting the generated
-                    // code to do this gives:
-                    //
-                    // 1000000000: local 44.9s vs global 6.3s
-                case LANG_CPLUSPLUS:
-                    // String variables are handled the same as LANG_C.
-                case LANG_CSHARP:
-                    // 100000000: local 18.8s vs global 12.4s
-                case LANG_JAVA:
-                    // 1000000000: local 10.1s vs global 7.1s
-                case LANG_RUST:
-                    // 1000000000: localising was slightly slower.
-                case LANG_ZIG:
-                    // 10000000: localising strings was slightly slower.
-                    localise_mask = (1 << t_boolean) | (1 << t_integer);
-                    break;
-                case LANG_DART:
-                    // Not timed, but strings are immutable so seems likely
-                    // to be helpful to localise.
-                case LANG_GO:
-                    // 1000000000: localising was about 10% faster.
-                case LANG_JAVASCRIPT:
-                    // 10000000: Slightly faster.
-                case LANG_PASCAL:
-                    // Slightly faster.
-                case LANG_PHP:
-                    // Slightly faster.
-                case LANG_PYTHON:
-                    // 10000000: local 7.6s vs global 7.9s.  Microbenchmarking
-                    // with timeit alligns with this.
-                    localise_mask = (1 << t_boolean) | (1 << t_integer) | (1 << t_string);
-                    break;
+                generate_program_c(g);
+                fclose(o->output_src);
+                fclose(o->output_h);
+                break;
             }
-            read_program(a, localise_mask);
-            if (t->error_count > 0) exit(1);
-            if (o->syntax_tree) print_program(a);
-            if (!o->syntax_tree) {
-                struct generator * g = create_generator(a, o);
-                switch (o->target_lang) {
-                    case LANG_C:
-                    case LANG_CPLUSPLUS: {
-                        byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".h");
-                        o->output_h = get_output(s);
-                        SET_SIZE(s, SIZE(o->output_file));
-                        if (o->extension &&
-                            !(SIZE(o->extension) == 2 && memcmp(o->extension, ".h", 2) == 0)) {
-                            s = add_s_to_s(s, o->extension);
-                        } else if (o->target_lang == LANG_CPLUSPLUS) {
-                            s = add_literal_to_s(s, ".cc");
-                        } else {
-                            s = add_literal_to_s(s, ".c");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-
-                        generate_program_c(g);
-                        fclose(o->output_src);
-                        fclose(o->output_h);
-                        break;
-                    }
 #ifndef TARGET_C_ONLY
-                    case LANG_ADA: {
-                        byte * s = copy_s(o->output_file);
-                        s = add_literal_to_s(s, ".ads");
-                        o->output_h = get_output(s);
-                        SET_SIZE(s, SIZE(o->output_file));
-                        if (o->extension &&
-                            !(SIZE(o->extension) == 4 && memcmp(o->extension, ".ads", 2) == 0)) {
-                            s = add_s_to_s(s, o->extension);
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".adb");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-
-                        generate_program_ada(g);
-                        fclose(o->output_src);
-                        fclose(o->output_h);
-                        break;
-                    }
-                    case LANG_CSHARP: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".cs");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_csharp(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_DART: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".dart");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_dart(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_GO: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".go");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_go(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_JAVA: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".java");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_java(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_JAVASCRIPT: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".js");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_js(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_PASCAL: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".pas");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_pascal(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_PHP: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".php");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_php(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_PYTHON: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".py");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_python(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_RUST: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".rs");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_rust(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-                    case LANG_ZIG: {
-                        byte * s = copy_s(o->output_file);
-                        if (o->extension) {
-                            s = add_s_to_s(s, o->extension);
-                        } else {
-                            s = add_literal_to_s(s, ".zig");
-                        }
-                        o->output_src = get_output(s);
-                        lose_s(s);
-                        generate_program_zig(g);
-                        fclose(o->output_src);
-                        break;
-                    }
-#else
-                    default:
-                        fprintf(stderr, "Support for requested target language not enabled\n");
-                        exit(1);
-#endif
+            case LANG_ADA: {
+                byte * s = copy_s(o->output_file);
+                s = add_literal_to_s(s, ".ads");
+                o->output_h = get_output(s);
+                SET_SIZE(s, SIZE(o->output_file));
+                if (o->extension &&
+                    !(SIZE(o->extension) == 4 && memcmp(o->extension, ".ads", 2) == 0)) {
+                    s = add_s_to_s(s, o->extension);
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".adb");
                 }
-                close_generator(g);
+                o->output_src = get_output(s);
+                lose_s(s);
+
+                generate_program_ada(g);
+                fclose(o->output_src);
+                fclose(o->output_h);
+                break;
             }
-            close_tokeniser(t);
-            close_analyser(a);
+            case LANG_CSHARP: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".cs");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_csharp(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_DART: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".dart");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_dart(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_GO: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".go");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_go(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_JAVA: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".java");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_java(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_JAVASCRIPT: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".js");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_js(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_PASCAL: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".pas");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_pascal(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_PHP: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".php");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_php(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_PYTHON: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".py");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_python(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_RUST: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".rs");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_rust(g);
+                fclose(o->output_src);
+                break;
+            }
+            case LANG_ZIG: {
+                byte * s = copy_s(o->output_file);
+                if (o->extension) {
+                    s = add_s_to_s(s, o->extension);
+                } else {
+                    s = add_literal_to_s(s, ".zig");
+                }
+                o->output_src = get_output(s);
+                lose_s(s);
+                generate_program_zig(g);
+                fclose(o->output_src);
+                break;
+            }
+#else
+            default:
+                fprintf(stderr, "Support for requested target language not enabled\n");
+                exit(1);
+#endif
         }
-        lose_s(u);
+        close_generator(g);
     }
-    {   struct include * p = o->includes;
-        while (p) {
-            struct include * q = p->next;
-            lose_s(p->s);
-            FREE(p);
-            p = q;
-        }
+    close_tokeniser(t);
+    close_analyser(a);
+    lose_s(u);
+
+    struct include * p = o->includes;
+    while (p) {
+        struct include * q = p->next;
+        lose_s(p->s);
+        FREE(p);
+        p = q;
     }
+
     lose_s(o->extension);
     lose_s(o->name);
     lose_s(o->output_file);
