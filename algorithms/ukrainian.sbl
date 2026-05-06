@@ -243,58 +243,71 @@ backwardmode (
     )
 
     define verb as (
-        [substring] among (
-            '{a}{t}{y}' '{i}{t}{y}'         // Infinitive (читати→чит, робити→роб)
-            '{y}{t}{y}'                     // Infinitive (робити with и)
-            '{a}{v}' '{i}{v}'               // Past masc (читав→чит, робів→роб)
-            '{y}{v}'                        // Past masc (робив→роб)
-            '{a}{iu}'                       // Present 1st sg (читаю)
-            // Note: -ію ({i}{iu}) removed — it falsely captures noun accusative
-            // of -ія words (поліграфію, демократію). Verb -ію (я дію) handled
-            // by -ю fallback below, giving ді instead of д (better grouping)
-            '{iu}{t}{'}'  '{u}{t}{'}'       // Present 3rd pl
-            '{a}{iu}{t}{'}'                 // Present 3rd pl variant
-            '{ie}{m}{o}' '{i}{m}{o}'        // Present 1st pl
-            '{e}{m}{o}' '{y}{m}{o}'         // Present 1st pl (живемо, робимо)
-            '{ie}{t}{e}' '{i}{t}{e}'        // Present 2nd pl
-            '{e}{t}{e}' '{y}{t}{e}'         // Present 2nd pl (живете, робите)
-            '{i`}{t}{e}'                    // Imperative pl variant
-            '{ie}{m}'                       // Present 1st pl short
-            // Note: -{y}{m} (-им) removed — adj standard ending '{y}{m}' (instr.sg/dat.pl)
-            // always fires first, so verb -им is unreachable
-            '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
-            '{t}{y}'                        // Infinitive (fallback)
-            '{ie}{sh}' '{e}{sh}' '{y}{sh}'  // Present 2nd sg (знаєш, живеш, робиш)
-            '{ie}'                          // Present 3rd sg/future
-            '{i`}'                          // Imperative sg
-            '{iu}' '{u}'                    // Present 1st sg (fallback)
-            '{v}'                           // Past masc (fallback)
-                (delete)
+        // -остей: gen pl of adj-derived abstract nouns, min 4-char stem guard.
+        // Prevents волость type regression (волостей→вол, 3 chars too short).
+        // Fallback via -{i`} strips only -й → волосте, then noun strips -е → волост.
+        ( ['{o}{s}{t}{e}{i`}'] $(cursor >= 8) delete )
+        or
+        ( [substring] among (
+                '{a}{t}{y}' '{i}{t}{y}'         // Infinitive (читати→чит, робити→роб)
+                '{y}{t}{y}'                     // Infinitive (робити with и)
+                '{a}{v}' '{i}{v}'               // Past masc (читав→чит, робів→роб)
+                '{y}{v}'                        // Past masc (робив→роб)
+                '{a}{iu}'                       // Present 1st sg (читаю)
+                // Note: -ію ({i}{iu}) removed — it falsely captures noun accusative
+                // of -ія words (поліграфію, демократію). Verb -ію (я дію) handled
+                // by -ю fallback below, giving ді instead of д (better grouping)
+                '{iu}{t}{'}'  '{u}{t}{'}'       // Present 3rd pl
+                '{a}{iu}{t}{'}'                 // Present 3rd pl variant
+                '{ie}{m}{o}' '{i}{m}{o}'        // Present 1st pl
+                '{e}{m}{o}' '{y}{m}{o}'         // Present 1st pl (живемо, робимо)
+                '{ie}{t}{e}' '{i}{t}{e}'        // Present 2nd pl
+                '{e}{t}{e}' '{y}{t}{e}'         // Present 2nd pl (живете, робите)
+                '{i`}{t}{e}'                    // Imperative pl variant
+                '{ie}{m}'                       // Present 1st pl short
+                // Note: -{y}{m} (-им) removed — adj standard ending '{y}{m}' (instr.sg/dat.pl)
+                // always fires first, so verb -им is unreachable
+                '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
+                '{t}{y}'                        // Infinitive (fallback)
+                '{ie}{sh}' '{e}{sh}' '{y}{sh}'  // Present 2nd sg (знаєш, живеш, робиш)
+                '{ie}'                          // Present 3rd sg/future
+                '{i`}'                          // Imperative sg
+                '{iu}' '{u}'                    // Present 1st sg (fallback)
+                '{v}'                           // Past masc (fallback)
+                    (delete)
+          )
         )
     )
 
     define noun as (
-        [substring] among (
-            // Fleeting vowel: -ець → -ц (nominative → oblique stem)
-            // живописець→живописц (groups with живописця/цю/цем/ці)
-            '{e}{ts}{'}' (<- '{ts}')
+        // -ості: gen/dat/loc sg, nom/gen pl of adj-derived abstract nouns.
+        // Min 4-char stem guard prevents волість→вол (3 chars); falls through
+        // to -{i} below → волост. Verb handles -остей (ends in -й), so
+        // the -{o}{s}{t}{e}{i`} entry here is removed (unreachable).
+        ( ['{o}{s}{t}{i}'] $(cursor >= 8) delete )
+        or
+        ( [substring] among (
+                // Fleeting vowel: -ець → -ц (nominative → oblique stem)
+                // живописець→живописц (groups with живописця/цю/цем/ці)
+                '{e}{ts}{'}' (<- '{ts}')
 
-            // Collective/abstract nouns (specific, safe without R2)
-            '{s}{t}{v}{o}'            // -ство (багатство→багат)
-            '{t}{v}{o}'              // -тво (words in -цтво like козацтво match -ство above)
+                // Collective/abstract nouns (specific, safe without R2)
+                '{s}{t}{v}{o}'            // -ство (багатство→багат)
+                '{t}{v}{o}'              // -тво (words in -цтво like козацтво match -ство above)
 
-            '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural
-            '{ia}{kh}' '{a}{kh}'            // Locative plural
-            '{ia}{m}' '{a}{m}'              // Dative plural
-            // Singular specific endings
-            '{o}{v}{i}'                      // -ові (братові→брат)
-            '{e}{v}{i}'
-            // Instrumental singular
-            '{e}{m}' '{o}{m}'
+                '{ia}{m}{y}' '{a}{m}{y}'        // Instrumental plural
+                '{ia}{kh}' '{a}{kh}'            // Locative plural
+                '{ia}{m}' '{a}{m}'              // Dative plural
+                // Singular specific endings
+                '{o}{v}{i}'                      // -ові (братові→брат)
+                '{e}{v}{i}'
+                // Instrumental singular
+                '{e}{m}' '{o}{m}'
 
-            // Shorter endings
-            '{ia}' '{a}' '{i}' '{yi}' '{y}' '{e}' '{o}'
-                (delete)
+                // Shorter endings
+                '{ia}' '{a}' '{i}' '{yi}' '{y}' '{e}' '{o}'
+                    (delete)
+          )
         )
     )
 
