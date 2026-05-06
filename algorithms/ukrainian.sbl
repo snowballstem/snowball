@@ -446,6 +446,16 @@ define stem as (
       backwards (['{o}'] delete)
     )
     or
+    // Word-level exceptions: prevent false root collisions from the -ості/-остей rule.
+    // вартість (value, root вартий=worth) vs варта (guard, different etymology):
+    // stripping -ості gives варт which collides with варта/вартовий paradigm.
+    // Map these forms to вартост, consistent with вартість→вартіст stem.
+    ( [substring] atlimit among (
+        '{v}{a}{r}{t}{o}{s}{t}{i}'          (<- '{v}{a}{r}{t}{o}{s}{t}')   // вартості
+        '{v}{a}{r}{t}{o}{s}{t}{e}{i`}'      (<- '{v}{a}{r}{t}{o}{s}{t}')   // вартостей
+      )
+    )
+    or
     (
         unset found_diminutive
         unset found_professional
