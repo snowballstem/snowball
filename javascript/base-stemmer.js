@@ -258,7 +258,7 @@ export default class BaseStemmer {
             const k = i + ((j - i) >>> 1);
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j; // smaller
-            // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
+            // w[0]: string, w[1]: result, w[2]: substring_i (optional), w[3]: function (optional)
             const w = v[k];
             let i2;
             // @ts-expect-error: w[0] always string.
@@ -304,8 +304,8 @@ export default class BaseStemmer {
             {
                 // @ts-expect-error: w[0] always string.
                 this.c = c + w[0].length;
-                // @ts-expect-error: w[2] always number.
-                if (w.length < 4) return w[2];
+                // @ts-expect-error: w[1] always number.
+                if (w.length < 4) return w[1];
                 // @ts-expect-error: w[3] always number.
                 this.af = w[3];
                 // @ts-expect-error: call_among_func never null here.
@@ -314,13 +314,13 @@ export default class BaseStemmer {
                     // @ts-expect-error: w[0] always string.
                     this.c = c + w[0].length;
                     // @ts-expect-error: w[3] always number.
-                    return w[2];
+                    return w[1];
                 }
             }
-            // @ts-expect-error: w[1] always number.
-            if (!w[1]) return 0;
-            // @ts-expect-error: w[1] always number.
-            i -= w[1];
+            // Tests for undefined (if w.length < 2) or 0.
+            if (!w[2]) return 0;
+            // @ts-expect-error: w[2] always number.
+            i -= w[2];
         }
     }
 
@@ -388,7 +388,7 @@ export default class BaseStemmer {
             {
                 // @ts-expect-error: w[0] always string.
                 this.c = c - w[0].length;
-                if (w.length < 4) return w[2];
+                if (w.length < 4) return w[1];
                 // @ts-expect-error: w[3] always number.
                 this.af = w[3];
                 // @ts-expect-error: call_among_func never null here.
@@ -396,12 +396,13 @@ export default class BaseStemmer {
                 {
                     // @ts-expect-error: w[0] always string.
                     this.c = c - w[0].length;
-                    return w[2];
+                    return w[1];
                 }
             }
-            if (!w[1]) return 0;
-            // @ts-expect-error: w[1] always number.
-            i -= w[1];
+            // Tests for undefined (if w.length < 2) or 0.
+            if (!w[2]) return 0;
+            // @ts-expect-error: w[2] always number.
+            i -= w[2];
         }
     }
 
