@@ -297,7 +297,7 @@ export default class BaseStemmer {
                 first_key_inspected = true;
             }
         }
-        do {
+        while (true) {
             const w = v[i];
             // @ts-expect-error: w[0] always string.
             if (common_i >= w[0].length)
@@ -318,9 +318,10 @@ export default class BaseStemmer {
                 }
             }
             // @ts-expect-error: w[1] always number.
-            i = w[1];
-        } while (i >= 0);
-        return 0;
+            if (!w[1]) return 0;
+            // @ts-expect-error: w[1] always number.
+            i -= w[1];
+        }
     }
 
     // find_among_b is for backwards processing. Same comments apply
@@ -380,7 +381,7 @@ export default class BaseStemmer {
                 first_key_inspected = true;
             }
         }
-        do {
+        while (true) {
             const w = v[i];
             // @ts-expect-error: w[0] always string.
             if (common_i >= w[0].length)
@@ -398,10 +399,10 @@ export default class BaseStemmer {
                     return w[2];
                 }
             }
+            if (!w[1]) return 0;
             // @ts-expect-error: w[1] always number.
-            i = w[1];
-        } while (i >= 0);
-        return 0;
+            i -= w[1];
+        }
     }
 
     /* to replace chars between c_bra and c_ket in this.current by the

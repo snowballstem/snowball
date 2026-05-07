@@ -1426,7 +1426,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     for (int i = 0; i < x->literalstring_count; i++) {
         if (i) w(g, ",~N");
-        g->I[0] = v[i].i;
+        g->I[0] = (v[i].i >= 0 ? i - v[i].i : 0);
         g->I[1] = v[i].result;
 
         w(g, "~M[");
