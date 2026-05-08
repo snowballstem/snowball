@@ -1,0 +1,19 @@
+// Test among.
+
+externals (stem)
+
+routines (gate)
+
+stringescapes {}
+
+define gate as 'q'
+
+define stem as (
+  test (
+    among (
+      'x' ()
+      '' gate ()
+    )
+    ='gated default among case did not fail as expected'
+  )
+)

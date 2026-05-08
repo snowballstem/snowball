@@ -1398,7 +1398,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             writef(g, " or else Check_Among (Z, ~S1, ~I2, ~S3)", p);
         }
         writef(g, " then~+~N", p);
-        if (empty_case != -1) {
+        if (empty_case != -1 && !among_cases[empty_case].function) {
             /* If the among includes the empty string, it can never fail
              * so not matching the bitmap means we match the empty string.
              */

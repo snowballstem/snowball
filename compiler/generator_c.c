@@ -1388,9 +1388,9 @@ static void generate_substring(struct generator * g, struct node * p) {
             writef(g, " || ~S1 >> 5 != ~I2 || !((~I3 >> (~S1 & 0x1f)) & 1)", p);
         }
         write_string(g, ") ");
-        if (empty_case != -1) {
-            /* If the among includes the empty string, it can never fail
-             * so not matching the bitmap means we match the empty string.
+        if (empty_case != -1 && !among_cases[empty_case].function) {
+            /* If the among includes the ungated empty string, it can never
+             * fail so not matching the bitmap means we match the empty string.
              */
             g->I[4] = among_cases[empty_case].result;
             writef(g, "among_var = ~I4; else~N", p);
