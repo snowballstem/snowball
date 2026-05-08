@@ -916,10 +916,25 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         // express a single rule in Snowball code as it can show commonality
         // with rulesets with multiple rules, but it's silly to actually
         // generate as an among.
+        //
+        // We handle an `among` which only has the empty string here - this is
+        // syntactically valid but is not a useful construct so we warn about
+        // it.
         if (substring) {
             substring->among = NULL;
-            substring->type = c_literalstring;
-            substring->literalstring = v[0].b;
+            if (SIZE(v[0].b) == 0) {
+                // substring ... among ( '' (C) )
+                //
+                // becomes:
+                //
+                // ... (C)
+                fprintf(stderr, "%s:%d: warning: `among` with only empty string always matches\n",
+                        a->tokeniser->file, p->line_number);
+                substring->type = c_true;
+            } else {
+                substring->type = c_literalstring;
+                substring->literalstring = v[0].b;
+            }
             if (v[0].action) {
                 // substring ... among ( S (C) )
                 //
@@ -944,19 +959,30 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 // (S C)
                 p = v[0].action;
                 assert(p->type == c_bra);
-                // Insert a c_literalstring node at the start of (C)
-                struct node * literalstring = new_node(a, c_literalstring);
-                literalstring->literalstring = v[0].b;
-                literalstring->right = p->left;
-                p->left = literalstring;
+                if (SIZE(v[0].b) == 0) {
+                    fprintf(stderr, "%s:%d: warning: `among` with only empty string always matches\n",
+                            a->tokeniser->file, p->line_number);
+                } else {
+                    // Insert a c_literalstring node at the start of (C)
+                    struct node * literalstring = new_node(a, c_literalstring);
+                    literalstring->literalstring = v[0].b;
+                    literalstring->right = p->left;
+                    p->left = literalstring;
+                }
             } else {
                 // among ( S )
                 //
                 // becomes:
                 //
                 // S
-                p->type = c_literalstring;
-                p->literalstring = v[0].b;
+                if (SIZE(v[0].b) == 0) {
+                    fprintf(stderr, "%s:%d: warning: `among` with only empty string always matches\n",
+                            a->tokeniser->file, p->line_number);
+                    p->type = c_true;
+                } else {
+                    p->type = c_literalstring;
+                    p->literalstring = v[0].b;
+                }
                 p->left = NULL;
             }
         }

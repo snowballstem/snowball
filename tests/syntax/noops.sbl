@@ -20,6 +20,11 @@ define stem as (
     'k' ($x = x)
     'l' (atmark cursor)
     'm' (tomark cursor)
+    'n' (among (''))
+    'o' (substring among (''))
+    'p' (among ('' (atmark cursor)))
+    'q' (substring atmark cursor among (''))
+    'r' (substring atmark cursor among ('' (atmark cursor)))
 
     // Values set are unused.
     'aa' ($y = 1)

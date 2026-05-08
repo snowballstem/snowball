@@ -1241,12 +1241,8 @@ static void generate_substring(struct generator * g, struct node * p) {
                 writef(g, "~Mif (env.cursor - ~I4 <= env.limit_backward", p);
             }
         }
-        if (n_cases == 0) {
-            /* We get this for the degenerate case: among ( '' )
-             * This doesn't seem to be a useful construct, but it is
-             * syntactically valid.
-             */
-        } else if (n_cases == 1) {
+        assert(n_cases > 0);
+        if (n_cases == 1) {
             g->I[4] = cases[0];
             writef(g, " || ~S1 as u8 != ~I4 as u8", p);
         } else if (n_cases == 2) {

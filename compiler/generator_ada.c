@@ -1382,12 +1382,8 @@ static void generate_substring(struct generator * g, struct node * p) {
                 writef(g, "~Mif Z.C - ~I4 <= Z.Lb", p);
             }
         }
-        if (n_cases == 0) {
-            /* We get this for the degenerate case: among ( '' )
-             * This doesn't seem to be a useful construct, but it is
-             * syntactically valid.
-             */
-        } else if (n_cases == 1) {
+        assert(n_cases > 0);
+        if (n_cases == 1) {
             g->I[4] = cases[0];
             writef(g, " or else ~S2 /= ~I4", p);
         } else if (n_cases == 2) {
