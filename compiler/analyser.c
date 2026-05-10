@@ -1622,49 +1622,48 @@ handle_rel_op: ;
             if (q) mark_used_in(a, q, p);
             return p;
         }
-        case c_name:
-            {
-                struct name * q = find_name(a);
-                struct node * p = new_node(a, c_name);
-                if (q) {
-                    mark_used_in(a, q, p);
-                    switch (q->type) {
-                        case t_boolean:
-                            p->type = c_booltest;
-                            q->value_used = true;
-                            break;
-                        case t_integer:
-                            report_error_location(a);
-                            fprintf(stderr, "integer name '%.*s' misplaced\n",
-                                    SIZE(t->s), t->s);
-                            break;
-                        case t_string:
-                            q->value_used = true;
-                            break;
-                        case t_routine:
-                        case t_external:
-                            p->type = c_call;
-                            check_routine_mode(a, q, a->mode);
-                            break;
-                        case t_grouping:
-                            p->type = c_grouping; break;
-                    }
+        case c_name: {
+            struct name * q = find_name(a);
+            struct node * p = new_node(a, c_name);
+            if (q) {
+                mark_used_in(a, q, p);
+                switch (q->type) {
+                    case t_boolean:
+                        p->type = c_booltest;
+                        q->value_used = true;
+                        break;
+                    case t_integer:
+                        report_error_location(a);
+                        fprintf(stderr, "integer name '%.*s' misplaced\n",
+                                SIZE(t->s), t->s);
+                        break;
+                    case t_string:
+                        q->value_used = true;
+                        break;
+                    case t_routine:
+                    case t_external:
+                        p->type = c_call;
+                        check_routine_mode(a, q, a->mode);
+                        break;
+                    case t_grouping:
+                        p->type = c_grouping;
+                        break;
                 }
-                p->name = q;
+            }
+            p->name = q;
+            return p;
+        }
+        case c_non: {
+            struct node * p = new_node(a, token);
+            read_token(t);
+            if (t->token == c_minus) read_token(t);
+            if (!check_token(a, c_name)) {
+                hold_token(t);
                 return p;
             }
-        case c_non:
-            {
-                struct node * p = new_node(a, token);
-                read_token(t);
-                if (t->token == c_minus) read_token(t);
-                if (!check_token(a, c_name)) {
-                    hold_token(t);
-                    return p;
-                }
-                name_to_node(a, p, t_grouping);
-                return p;
-            }
+            name_to_node(a, p, t_grouping);
+            return p;
+        }
         case c_literalstring: {
             struct node * p = read_literalstring(a);
             if (SIZE(p->literalstring) == 0) {
