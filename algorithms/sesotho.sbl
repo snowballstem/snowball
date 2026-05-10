@@ -49,10 +49,11 @@ integers ( pV )
 
 /* --- Mark vowel region --- */
 define mark_regions as (
-  $pV = limit
-  do (
-    gopast v  setmark pV
-  )
+  // Set pV after the first vowel and at least 2 characters into the string.
+  // Signals f if the string doesn't contain a vowel or is shorter than 2
+  // characters.
+  test (gopast v  setmark pV)
+  test (hop 2 do ($(cursor > pV) setmark pV))
 )
 
 /* --- Remove noun class prefixes --- */
@@ -61,8 +62,10 @@ define remove_noun_prefixes as (
     'mo'   'ba'   'me'   'le'
     'ma'   'se'   'boi'   'li'
   )
+  /* Require at least two characters remain */
+  test (next not atlimit)
   /* Only delete if there's a vowel after the cursor position */
-  (gopast v delete)
+  gopast v delete
 )
 
 /* --- Remove verb suffixes (from end of word) --- */
@@ -103,7 +106,7 @@ define remove_nominal_suffixes as (
 
 /* --- MAIN STEMMER --- */
 define stem as (
-  do mark_regions
+  mark_regions // Signals f if the string is too short to stem.
   do remove_nominal_suffixes
   do remove_verb_suffixes
   do remove_noun_prefixes
