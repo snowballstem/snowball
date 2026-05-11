@@ -269,7 +269,6 @@ static int K_needed_(struct node * p, int call_depth);
 static int K_needed_node(struct node * p, int call_depth) {
     switch (p->type) {
         case c_assignto:
-        case c_atlimit:
         case c_do:
         case c_dollar:
         case c_leftslice:
@@ -357,7 +356,6 @@ extern int K_needed(struct node * p) {
 static int K_needed_node_on_f_(struct node * p, int call_depth) {
     switch (p->type) {
         case c_assignto:
-        case c_atlimit:
         case c_do:
         case c_dollar:
         case c_leftslice:
@@ -478,7 +476,6 @@ static int repeat_score(struct node * p, int call_depth) {
     int score = 0;
     while (p) {
         switch (p->type) {
-            case c_atlimit:
             case c_dollar:
             case c_leftslice:
             case c_rightslice:

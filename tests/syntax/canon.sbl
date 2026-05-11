@@ -10,5 +10,8 @@ define stem as (
   atmark x
   $(cursor == y)
 
+  atlimit
+  $(cursor >= limit)
+
   $(x == y)
 )

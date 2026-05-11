@@ -12,6 +12,12 @@ define stem
     ==
     # name y
       cursor
+    >=
+    # limit
+      cursor
+    >=
+    # limit
+      cursor
     ==
     # name y
       name x

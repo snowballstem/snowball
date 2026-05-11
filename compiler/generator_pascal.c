@@ -770,13 +770,6 @@ static void generate_tolimit(struct generator * g, struct node * p) {
     writef(g, "~MFCursor := ~S0;~N", p);
 }
 
-static void generate_atlimit(struct generator * g, struct node * p) {
-    write_comment(g, p);
-    g->S[0] = p->mode == m_forward ? "FLimit" : "FBkLimit";
-    g->S[1] = p->mode == m_forward ? "<" : ">";
-    write_failure_if(g, "FCursor ~S1 ~S0", p);
-}
-
 static void generate_leftslice(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "FBra" : "FKet";
@@ -1327,7 +1320,6 @@ static void generate(struct generator * g, struct node * p) {
         case c_delete:        generate_delete(g, p); break;
         case c_next:          generate_next(g, p); break;
         case c_tolimit:       generate_tolimit(g, p); break;
-        case c_atlimit:       generate_atlimit(g, p); break;
         case c_leftslice:     generate_leftslice(g, p); break;
         case c_rightslice:    generate_rightslice(g, p); break;
         case c_assignto:      generate_assignto(g, p); break;

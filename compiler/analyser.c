@@ -1332,12 +1332,18 @@ static struct node * read_C(struct analyser * a) {
             /* fall through */
         case c_next:
         case c_tolimit:
-        case c_atlimit:
         case c_leftslice:
         case c_rightslice:
         case c_true:
         case c_false:
             return new_node(a, token);
+        case c_atlimit: {
+            int mode = a->mode;
+            struct node * n = new_node(a, mode == m_forward ? c_ge : c_le);
+            n->left = new_node_at_line(a, c_cursor, n->line_number);
+            n->AE = new_node_at_line(a, c_limit, n->line_number);
+            return n;
+        }
         case c_debug:
             a->debug_used = true;
             return new_node(a, token);
@@ -2077,7 +2083,6 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (p->name == v)
                 return SET_BEFORE_ANY_USE;
             return UNKNOWN;
-        case c_atlimit:
         case c_delete:
         case c_grouping:
         case c_leftslice:
@@ -2370,7 +2375,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             /* FIXME: unless we can prove that c is either definitely atlimit
              * or definitely not atlimit... */
             return -1;
-        case c_atlimit:
         case c_booltest:
         case c_not_booltest:
         case c_hop:
