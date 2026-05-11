@@ -1,0 +1,14 @@
+// Test canonicalisation of commands.
+externals (stem)
+integers (x y)
+define stem as (
+  $x = cursor
+  setmark y
+
+  try 'a'
+
+  atmark x
+  $(cursor == y)
+
+  $(x == y)
+)

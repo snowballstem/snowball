@@ -1263,7 +1263,8 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_setmark: {
-            struct node * n = new_node(a, token);
+            struct node * n = new_node(a, c_assign);
+            n->AE = new_node(a, c_cursor);
             if (get_token(a, c_name)) {
                 name_to_node(a, n, t_integer);
                 if (n->name) n->name->initialised = true;
@@ -1271,7 +1272,7 @@ static struct node * read_C(struct analyser * a) {
             return n;
         }
         case c_atmark: {
-            struct node * n = new_node(a, token);
+            struct node * n = new_node(a, c_eq);
             struct node * AE = read_AE(a, NULL, 0);
             if (AE->type == c_cursor) {
                 fprintf(stderr,
@@ -1279,6 +1280,7 @@ static struct node * read_C(struct analyser * a) {
                         t->file, n->line_number);
                 n->type = c_true;
             } else {
+                n->left = new_node_at_line(a, c_cursor, n->line_number);
                 n->AE = AE;
             }
             return n;
@@ -1949,7 +1951,6 @@ static void remove_dead_assignments(struct node * p, struct name * q) {
             case c_minusassign:
             case c_multiplyassign:
             case c_divideassign:
-            case c_setmark:
             case c_set:
             case c_unset:
             case c_dollar:
@@ -2071,7 +2072,6 @@ static int always_set_before_use_(struct node * p, struct node * func,
             return UNKNOWN;
         case c_assignto:
         case c_set:
-        case c_setmark:
         case c_sliceto:
         case c_unset:
             if (p->name == v)
@@ -2096,7 +2096,6 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_goto_non:
         case c_gopast_non:
             return UNKNOWN;
-        case c_atmark:
         case c_hop:
         case c_tomark:
             if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
@@ -2245,7 +2244,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_leftslice:
         case c_rightslice:
         case c_set:
-        case c_setmark:
         case c_slicefrom:
         case c_sliceto:
         case c_tolimit:
@@ -2373,7 +2371,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
              * or definitely not atlimit... */
             return -1;
         case c_atlimit:
-        case c_atmark:
         case c_booltest:
         case c_not_booltest:
         case c_hop:

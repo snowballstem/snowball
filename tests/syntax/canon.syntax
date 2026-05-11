@@ -1,0 +1,18 @@
+define stem
+  (
+    = x
+    # cursor
+    = y
+    # cursor
+    try
+      literal 'a'
+    ==
+    # name x
+      cursor
+    ==
+    # name y
+      cursor
+    ==
+    # name y
+      name x
+    Function end
