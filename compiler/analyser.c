@@ -2513,6 +2513,15 @@ static void visit_node(struct analyser * a, struct node * p) {
             p->right = p_right;
             p->next = p_next;
             *p_left = tmp;
+            if (p->type == c_among) {
+                // Update struct among's node pointer.
+                for (struct among * q = a->amongs; q; q = q->next) {
+                    if (q->node == p_left) {
+                        q->node = p;
+                        break;
+                    }
+                }
+            }
         }
 
         p = p->right;
