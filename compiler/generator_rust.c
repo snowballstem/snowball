@@ -967,6 +967,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     if (optimise_to_return) {
         w(g, "~N");
     } else {
+        write_char(g, ' ');
         write_block_start(g);
         write_failure(g);
         write_block_end(g);
