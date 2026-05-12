@@ -2203,6 +2203,12 @@ static int always_set_before_use_(struct node * p, struct node * func,
             // These are only use in the tokeniser.
             assert(0);
             break;
+        case c_atlimit:
+        case c_atmark:
+        case c_setmark:
+            // These are only use in the tokeniser and analyser.
+            assert(0);
+            break;
         case c_as:
         case c_for:
         case c_ket:
