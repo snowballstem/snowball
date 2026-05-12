@@ -1,0 +1,17 @@
+// Test legacy commands.
+externals (stem)
+strings (ch)
+stringescapes {}
+stringdef o" decimal '246'
+stringdef o^ hex 'f4'
+define stem as (
+  among (
+    (next)
+    'a' 'e' 'i' 'o' 'u' (
+      [next]
+      => ch
+      delete
+      <+ ch
+    )
+  )
+)

@@ -1,0 +1,5 @@
+syntax/legacy.sbl:5: warning: `decimal` is a legacy feature - use {U+1234} notation instead
+syntax/legacy.sbl:6: warning: `hex` is a legacy feature - use {U+1234} notation instead
+syntax/legacy.sbl:12: warning: Use of `=>` is not recommended, see https://snowballstem.org/compiler/snowman.html section 13.3 for details
+syntax/legacy.sbl:14: warning: `<+` is a legacy feature - use `insert` instead
+syntax/legacy.sbl:9: warning: among starter is a legacy feature - put starter code between `substring` and `among` instead

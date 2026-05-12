@@ -300,7 +300,13 @@ static int next_token(struct tokeniser * t) {
           case '<':
             if (ch2 == '-') return c_slicefrom;      // <-
             if (ch2 == '=') return c_le;             // <=
-            if (ch2 == '+') return c_insert;         // <+
+            if (ch2 == '+') {                        // <+
+                fprintf(stderr,
+                        "%s:%d: warning: `<+` is a legacy feature - "
+                        "use `insert` instead\n",
+                        t->file, t->line_number);
+                return c_insert;
+            }
             --t->c;
             return c_lt;                             // <
           case '=':
@@ -465,9 +471,23 @@ extern int read_token(struct tokeniser * t) {
                 read_chars(t);
                 code = read_token(t);
                 if (code == c_hex) {
+                    // We use `hex` to define U+xxxx stringdefs for single-byte
+                    // character sets so suppress the warning there, e.g.:
+                    //
+                    //   stringdef U+02D9  hex 'FF'
+                    if (!(t->s[0] == 'U' && t->s[1] == '+')) {
+                        fprintf(stderr,
+                                "%s:%d: warning: `hex` is a legacy feature - "
+                                "use {U+1234} notation instead\n",
+                                t->file, t->line_number);
+                    }
                     base = 16;
                     code = read_token(t);
                 } else if (code == c_decimal) {
+                    fprintf(stderr,
+                            "%s:%d: warning: `decimal` is a legacy feature - "
+                            "use {U+1234} notation instead\n",
+                            t->file, t->line_number);
                     base = 10;
                     code = read_token(t);
                 }

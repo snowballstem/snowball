@@ -2157,7 +2157,8 @@ static void generate_header_file(struct generator * g) {
              "~Mstd::string operator()(const std::string& word) override {~N~+"
              "~Mstruct SN_env* z = &(zlocal.z);~N"
              "~Mconst symbol* s = reinterpret_cast<const symbol*>(word.data());~N"
-             "~Mreplace_s(z, 0, z->l, word.size(), s);~N"
+             "~Mint s_size = word.size() > INT_MAX ? INT_MAX : word.size();~N"
+             "~Mreplace_s(z, 0, z->l, s_size, s);~N"
              "~Mz->c = 0;~N"
              "~M");
         write_string(g, o->package);

@@ -1,0 +1,19 @@
+define stem
+  (
+    substring
+    (
+      next
+    among
+      literal 'a'
+      literal 'e'
+      literal 'i'
+      literal 'o'
+      literal 'u'
+      (
+        [
+        next
+        ]
+        => ch
+        delete
+        insert ch
+    Function end

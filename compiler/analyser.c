@@ -746,6 +746,10 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->in_routine = a->current_routine;
 
     if (q->type == c_bra) {
+        fprintf(stderr,
+                "%s:%d: warning: among starter is a legacy feature - put "
+                "starter code between `substring` and `among` instead\n",
+                a->tokeniser->file, q->line_number);
         starter = q;
         p->left = q = q->right;
     }
