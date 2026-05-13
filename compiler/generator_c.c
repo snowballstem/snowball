@@ -745,14 +745,20 @@ static void generate_GO(struct generator * g, struct node * p, int is_goto) {
 
 static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
-    w(g, "~{~Mint i; for (i = ");
+    if (g->options->target_lang == LANG_C) {
+        w(g, "~{~Mint i; for (i = ");
+    } else {
+        w(g, "~Mfor (int i = ");
+    }
     generate_AE(g, p->AE);
     writef(g, "; i > 0; i--) {~N~+", p);
 
     generate(g, p->left);
 
-    w(g,    "~}"
-         "~}");
+    w(g, "~}");
+    if (g->options->target_lang == LANG_C) {
+        w(g, "~}");
+    }
 }
 
 static void generate_repeat_or_atleast(struct generator * g, struct node * p, struct str * loopvar) {
