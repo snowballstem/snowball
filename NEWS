@@ -1,4 +1,4 @@
-up to: e51a9bacd549ef9409ff71722e67b050c3a995cf
+up to: 8e49b51ff568889443e5863fda681a1dac699c7d
 
     Ada,C,Rust: Fix handling of gated '' in among
     We were assuming an empty string always matched, but that's incorrect
@@ -20,9 +20,6 @@ up to: e51a9bacd549ef9409ff71722e67b050c3a995cf
     Handle possible_signals for string-$
     String-$ just passes on signals from its subcommand.  Doesn't affect
     code generation for any algorithms we currently ship.
-
-    Fix to support multiple externals
-    * Ada, C#, Java, Pascal assumed a single external called "stem"
 
 Snowball 3.1.0 (2026-05-??)
 ===========================
@@ -207,7 +204,7 @@ Generic code generation changes
     these commands (though it's possible that's because people developing
     them ran into mysterious misbehaviour and worked around it).
 
-    Turn off flawed optimisation for now
+  + Turn off flawed optimisation for now
     Don't optimise repeat/atleast applied to goto/gopast on a (non)
     grouping.  This optimisation requires that the code in the loop
     preserves the cursor's value on failure, and the target language helper
@@ -409,6 +406,8 @@ Ada
       strings (s)
       define stem as ([] ->s s)
 
+  + Fix assumption that there's a single external called "stem".
+
 * Optimisations:
 
   + Avoid calling among helper when the among contains only strings which are
@@ -418,21 +417,18 @@ Ada
 
   + Fix indentation of generated grouping tables.
 
-  + Rename Context to Z in runtime code
-    This now matches variable naming in the generated Ada code (and
-    also the C runtime and generated C code).
+  + Rename Context to Z in runtime code.  This now matches variable naming in
+    the generated Ada code (and also the C runtime and generated C code).
 
-  + Eliminate redundant limit check
-    The helper generate_next() emits a call to also checks the limit.
-    Looking at the history this check is a left-over from when the
+  + Eliminate redundant limit check (the Skip_Utf8 helper also checks the
+    limit).  Looking at the history this check is a left-over from when the
     generated code directly incremented the cursor.
 
   + Emit Ada literal strings without redundant empty strings
     between adjacent escaped bytes.
 
-  + Generate dummy loop around `or`
-    This allows us to handle a sub-command succeeding with Ada `exit` rather
-    than `goto`, which seems clearer.
+  + Generate dummy loop around `or`, which allows us to handle a sub-command
+    succeeding with Ada `exit` rather than `goto`, which seems clearer.
 
   + Avoid creating unused labels.  This is just a cosmetic improvements - there
     are no longer mysterious gaps in the numbering of labels in the generated
@@ -559,9 +555,10 @@ C/C++
   + C++: The `-c++` option used to generate exactly the same code as for C,
     except with extension `.cc` instead of `.c` but now:
 
-    - C++ classes are generated
+    - C++ classes are generated.
     - C++ `bool` is used for Snowball booleans.
-    - allocation failures and internal errors (e.g. slice_check() failing)
+    - Loop variables are declared inside `for (`...`)`.
+    - Allocation failures and internal errors (e.g. slice_check() failing)
       throw a C++ exception - this is a bit simpler and more efficient that the
       C code approach of returning -1 which then has to be checked for and
       propagated through the generated code.
@@ -584,6 +581,8 @@ C#
 
   + Fix code generated for string-$.  This feature is not used by any of the
     stemmers we currently ship.
+
+  + Fix assumption that there's a single external called "stem".
 
 * Optimisations:
 
@@ -685,16 +684,15 @@ Go
 Java
 ----
 
-    Java: Fix code generated for string-$
-    We now use char[] for string variables as well as the current string,
-    which makes it much simpler to switch to working on a string variable
-    and back.
-    Fixes #252
-    Closes #253
-
 * Bug fixes:
 
   + Generate correct Java code for ASCII control chars in string literals.
+
+  + Fix code generated for string-$.  As part of this fix, we now use char[]
+    for string variables as well as the current string, which makes it much
+    simpler to switch to working on a string variable and back.  Fixes #252.
+
+  + Fix assumption that there's a single external called "stem".
 
 * Optimisations:
 
@@ -714,11 +712,10 @@ Javascript
     Closes #240.
     Co-authored-by: Adam Turner
 
-  + Annotate runtime with @ts-expect-error
-    It doesn't seem to be possible to express the types fully here, but
-    the invariants we require are ensured by the Snowball compiler.
-    Annotate the expected errors so that type checking can be done on
-    the rest of the runtime code.
+  + Annotate runtime with @ts-expect-error.  It doesn't seem to be possible to
+    express the types fully in some places, but the invariants we require are
+    ensured by the Snowball compiler.  We now annotate the expected errors so
+    that type checking can be done on the rest of the runtime code.
 
   + Adjust generated code to work with deno.
 
@@ -731,15 +728,14 @@ Javascript
 
   + Explicitly import process module.
 
-  + Change slice_check() to assert conditions.
-    In C we must not perform string slicing if slice_check() fails because
-    that could result in writing outside of the allocated buffer.
-    .
-    It's not problematic in this way for Javascript, and the situations
-    which slice_check() checks for should only happen with a Snowball
-    program containing logic errors, or for bugs in the Snowball compiler or
-    its runtime (or possibly in the Javascript interpreter, OS, hardware,
-    etc).  Therefore assert() seems an appropriate choice.
+  + Change slice_check() to assert its conditions.  In C we must not perform
+    string slicing if slice_check() fails because that could result in writing
+    outside of the allocated buffer, but it's not problematic in this way for
+    Javascript, and the situations which slice_check() checks for should only
+    happen with a Snowball program containing logic errors, or for bugs in the
+    Snowball compiler or its runtime (or possibly in the Javascript
+    interpreter, OS, hardware, etc).  Therefore assert() seems an appropriate
+    choice.
     .
     This fixes the previously buggy implementation of sliceto - an
     empty string return was used to signal slice_check() failed, but
@@ -781,20 +777,13 @@ Javascript
     Co-authored-by: Titus Ng <titusngtszhin@gmail.com>
     Co-authored-by: Adam Turner <9087854+aa-turner@users.noreply.github.com>
 
-  + Javascript: Use === and !== in stemwords.js
-    Peeled out of #234 from Adam Turner.
+  + Javascript: Use === and !== in stemwords.js.  Patch from Adam Turner.
 
-  + Javascript: Initialise integer Snowball variables
-    We annotate these as being type "number" so we shouldn't let them
-    have value undefined.
-    Peeled out of #234 from Adam Turner.
+  + Initialise integer Snowball variables - we annotate them as being type
+    "number" so we shouldn't let them have value undefined.  Patch from Adam
+    Turner.
 
-    Javascript: Fix type annotation
-    Javascript: Improve type annotations
-    Javascript: Fix incorrect array type annotations
-    Javascript: Fix @param for BaseStemmer.slice_from
-    We were annotating the type of a c_bra parameter which it doesn't take
-    instead of the s parameter it does take.
+  + Improve/fix typescript annotations.
 
 * Bug fixes:
 
@@ -888,6 +877,8 @@ Pascal
   + Fix code generated for string-$ (which isn't used by any of the algorithms
     we currently ship).
 
+  + Fix assumption that there's a single external called "stem".
+
 * Optimisations:
 
 * Code quality:
@@ -968,10 +959,9 @@ Python
     Luckily this case is not exercised by any current algorithms.
     See #242
 
-    Python: Remove deprecated licence classifier
-    This now triggers a deprecation warning from Python's setuptools.
-    We already specify the licensing in the now preferred way via
-    `license=` with a SPDX licence expression.
+  + Remove deprecated licence classifier which now triggers a deprecation
+    warning from Python's setuptools.  We already specify the licensing in the
+    now preferred way via `license=` with a SPDX licence expression.
 
 * Optimisations:
 
@@ -1074,21 +1064,6 @@ Rust
 
 * Other changes:
 
-
-
-
-$Language:
-
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
-
-* Other changes:
-
 Code Quality Improvements
 -------------------------
 
@@ -1099,25 +1074,12 @@ Code Quality Improvements
 New Code Generators
 -------------------
 
-Author: Ryan Heise <ryan@ryanheise.com>
-    Add Dart generator.
-    Fixes: #156
-    Fixes: #250
+* Add Dart generator from Ryan Heise (#156, #250).
 
-Author: Tim Whitlock <noreply@timwhitlock.info>
-    Add PHP generator
-    Closes: #243
-    Co-authored-by: Olly Betts <olly@survex.com>
-    PHP: Require PHP 8.3
-    People using a new PHP library are likely to target recent PHP versions.
-    If it turns out people want support for older version we can revert this
-    change.  Once released, it's easier to relax a version requirement than
-    to tighten it.
-    PHP 8.3 allows us to use typed class constants, which isn't vital but
-    is a reason to set this version as the threshold.
+* Add PHP generator from Tim Whitlock and Olly Betts (#243).  Requires PHP 8.3
+  or later, which allows us to use typed class constants.
 
-Author: AJ Roetker <ajroetker@antfly.io>
-* Add Zig backend.  Requires Zig 0.16.0 or later.
+* Add Zig backend from AJ Roetker.  Requires Zig 0.16.0 or later.
 
 New Snowball Language Features
 ------------------------------
@@ -1125,39 +1087,38 @@ New Snowball Language Features
 New stemming algorithms
 -----------------------
 
-    Merge Czech stemmer
-    Closes: #151
-    Co-authored-by: Olly Betts <olly@survex.com>
-    Co-authored-by: Jim O’Regan <jaoregan@tcd.ie>
+* Add Czech stemmer from Olly Betts and Jim O’Regan (#151).
 
-Author: Saeid Darvish <saeid.drgh@gmail.com>
-    Add Persian (Farsi) stemmer.
+* Add Persian (Farsi) stemmer from Saeid Darvish.
 
-Author: Dmitry Shachnev <mitya57@gmail.com>
-    Add Polish stemmer
-    Closes: #245
-    Co-authored-by: Olly Betts <olly@survex.com>
+* Add Polish stemmer from Dmitry Shachnev (#245).
 
-Author: Kamohelo Lebjane <73802593+MrLebjane@users.noreply.github.com>
-    Add Sesotho stemmer (#260)
+* Add Sesotho stemmer from Kamohelo Lebjane (#260).
 
 Behavioural changes to existing algorithms
 ------------------------------------------
 
+* Danish:
+
+  + Restrict undoubling to valid cases
+    Coverage showed that a number of the consonants we would undouble
+    never occur in our Danish vocabulary.  Testing a larger list didn't
+    find any matches for Danish words either, so restrict the undoubling
+    which reduces the potential for damage to foreign words and should be
+    a little more efficient.
+
 * English:
 
-english:
-    Revert "english.sbl: Remove unnecessary exception for `skis`"
-    This exception is actually needed to stem `skis` to `ski`.
-    This reverts commit 189db28e9f4e9fde3e7d510171a8057a3ece638a.
+  + Restore exception for `skis` so it stems to `ski`.  This reverts a
+    change made erroneously in Snowball 3.0.0.
 
-    Improve the stemming of some words starting `inter`:
-    * We now avoid conflating intern, internal, international and
+  + Improve the stemming of some words starting `inter`:
+    - We now avoid conflating intern, internal, international and
       internment.
-    * We now conflate interfere/interferes/interference with
+    - We now conflate interfere/interferes/interference with
       interfered/interfering.
-    * The stem of `interval` is now `interval` rather than `interv`, which
-      is mostly a cosmetic change as no unrelated words stemmed to `interv`.
+    - The stem of `interval` is now `interval` rather than `interv`, which
+      is mostly a cosmetic change as no unrelated words stem to `interv`.
 
 * Italian: Handle elisions (#187).
 
