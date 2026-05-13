@@ -7,11 +7,11 @@ abstract class SnowballStemmer {
     protected int $limit_backward = 0;
     protected int $bra = 0;
     protected int $ket = 0;
-    
-    
+
+
     abstract public function stem(): bool;
 
-    
+
     protected function copyFrom(self $other): void {
         $this->current          = $other->current;
         $this->cursor           = $other->cursor;
@@ -217,11 +217,11 @@ abstract class SnowballStemmer {
             if ($j - $i <= 1) {
                 if ($i > 0) {
                     break;
-                } 
+                }
                 // v->s has been inspected
                 if ($j === $i) {
                     break;
-                } 
+                }
                 // only one item in v
 
                 // - but now we need to go round once more to get

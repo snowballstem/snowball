@@ -466,7 +466,7 @@ extern void close_generator(struct generator * g);
 
 static inline int new_label(struct generator * g) {
     return g->next_label++;
-} 
+}
 
 extern struct str * vars_newname(struct generator * g);
 
