@@ -148,6 +148,11 @@ backwardmode (
                 )
             )
         )
+        do (
+            [substring] among(
+                '{'}s' '{'}sch' '{'}' (next  not atlimit  delete)
+            )
+        )
     )
 )
 
