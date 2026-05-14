@@ -1805,9 +1805,33 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     r->used_in_definition = true;
                     break;
                 }
-                case c_literalstring:
+                case c_literalstring: {
+                    bool utf8 = (a->encoding == ENC_UTF8);
+                    int i = 0;
+                    while (i < SIZE(t->b)) {
+                        symbol ch_i;
+                        int width_i = next_symbol(t->b + i, &ch_i, utf8);
+                        int j = 0;
+                        while (j < i) {
+                            symbol ch_j;
+                            int width_j = next_symbol(t->b + j, &ch_j, utf8);
+                            if (ch_i == ch_j) {
+                                fprintf(stderr, "%s:%d: warning: Duplicate "
+                                                "character in grouping: ",
+                                        t->file, t->line_number);
+                                if (ch_i >= 32 && ch_i < 127) {
+                                    fprintf(stderr, "'%c'\n", ch_i);
+                                } else {
+                                    fprintf(stderr, "U+%04X\n", ch_i);
+                                }
+                            }
+                            j += width_j;
+                        }
+                        i += width_i;
+                    }
                     p->b = alter_grouping(p->b, t->b, style, (a->encoding == ENC_UTF8));
                     break;
+                }
                 default:
                     unexpected_token_error(a, "grouping definition");
                     hold_token_if_toplevel(t);

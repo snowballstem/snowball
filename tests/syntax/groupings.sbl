@@ -1,0 +1,11 @@
+// Test groupings.
+externals (stem)
+groupings (g)
+stringescapes {}
+define g 'r{U+EB}p{U+EB}{U+E5}tss'
+define stem as (
+  g
+  non-g
+  gopast g
+  gopast non-g
+)
