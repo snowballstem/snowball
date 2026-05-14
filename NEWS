@@ -1,25 +1,4 @@
-up to: 8e49b51ff568889443e5863fda681a1dac699c7d
-
-    Ada,C,Rust: Fix handling of gated '' in among
-    We were assuming an empty string always matched, but that's incorrect
-    if it has a gating function.
-
-    Ignore last node of or/and for K_needed check
-    For both of these, the cursor only needs to be restored between nodes so
-    we don't need to check the final node in the chain.
-    This makes some small improvements to the generated code for a few
-    of the currently shipped algorithms.  Partly addresses #226.
-
-----
-
-    Fix -Wcast-qual warnings in compiler
-    We shouldn't need to cast away const, and doing so can hide bugs.
-    GCC has supported -Wcast-qual for a long time (at least since 4.3.1)
-    so it's now enabled by default in GNUmakefile.
-
-    Handle possible_signals for string-$
-    String-$ just passes on signals from its subcommand.  Doesn't affect
-    code generation for any algorithms we currently ship.
+up to: 8cb8124bbd4f3972e18c0845d9b39ac90fcecfaa
 
 Snowball 3.1.0 (2026-05-??)
 ===========================
@@ -31,11 +10,11 @@ Compiler changes
 
   + Fix segmentation fault if -syntax is used on a program with no code.
 
+  + Fix segmentation fault on some assignment syntax errors.
+
   + Fix bug introduced in v3.0.0 with conversion of `among` starter.  If there
     were any commands after the among in the same command list then the among
     itself would get lost.  Not triggered by any current algorithms.
-
-  + Fix segfault on some assignment syntax errors.
 
 * Compiler command-line options:
 
@@ -148,6 +127,10 @@ Compiler changes
     call depth reaches 100.  This is cleaner but is unlikely to make a
     difference for any real-world Snowball programs.
 
+  + Handle possible_signals for string-$ which just passes on signals from its
+    subcommand.  This doesn't affect code generation for any algorithms we
+    currently ship.
+
   + We now only generate function bodies to a temporary buffer for target
     languages where we need to.  This makes the code a bit clearer and reduces
     the amount of copying of data so will make the Snowball compiler a little
@@ -174,6 +157,8 @@ Compiler changes
 
   + Always use `snprintf()` instead of `sprintf()` and emit an error and exit if
     the buffer passed was too small rather than using truncated output.
+
+  + Fix -Wcast-qual warnings in compiler and enable this warning by default.
 
 Generic code generation changes
 -------------------------------
@@ -279,7 +264,12 @@ Generic code generation changes
     now consider whether its subcommand can modify the cursor on failure
     (rather than whether it can modify the cursor at all).  We also now
     consider each subcommand individually, and only emit the cursor restore for
-    those subcommands which need it.  Fixes #226.
+    those subcommands which need it.  (#226)
+
+  + Both `and` and `or` only need to restore the cursor between sub-commands
+    so no longer consider if the final subcommand might change the cursor.
+    This makes some small improvements to the generated code for a few
+    of the currently shipped algorithms.  (#226)
 
   + Handle more commands when checking if the cursor needs restoring - this
     improves the generated code for tamil.sbl a bit.
@@ -408,6 +398,10 @@ Ada
 
   + Fix assumption that there's a single external called "stem".
 
+  + Fix incorrect assumption that an among containing the empty string
+    always matched, even if the empty string had a gating function.
+    This construct is not used by any existing stemmers.
+
 * Optimisations:
 
   + Avoid calling among helper when the among contains only strings which are
@@ -468,6 +462,10 @@ C/C++
 
   + Fix bug in code generated when `-vprefix` is specified, introduced in
     Snowball 2.1.0.
+
+  + Fix incorrect assumption that an among containing the empty string
+    always matched, even if the empty string had a gating function.
+    This construct is not used by any existing stemmers.
 
 * Optimisations:
 
@@ -1045,6 +1043,10 @@ Rust
     check.  Luckily this case is not exercised by any current algorithms.
     See #242.
 
+  + Fix incorrect assumption that an among containing the empty string
+    always matched, even if the empty string had a gating function.
+    This construct is not used by any existing stemmers.
+
 * Optimisations:
 
   + Avoid calling among helper when the among contains only strings which are
@@ -1100,6 +1102,8 @@ Behavioural changes to existing algorithms
 
 * Danish:
 
+  + Adjust to handle apostrophe. (#187)
+
   + Restrict undoubling to valid cases
     Coverage showed that a number of the consonants we would undouble
     never occur in our Danish vocabulary.  Testing a larger list didn't
@@ -1138,6 +1142,10 @@ Behavioural changes to existing algorithms
 
   + Remove trailing apostrophe as final step - an apostrophe is sometimes used
     to separate a Lithuanian ending on an international word (#187).
+
+* Norwegian:
+
+  + Adjust to handle apostrophe. (#187)
 
 * Polish: Remove optional apostrophe after removing suffix
     Polish uses an apostrophe to separate loanwords from native suffixes.
