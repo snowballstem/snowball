@@ -3,8 +3,8 @@ externals (stem)
 integers (x unused_int)
 booleans (b unused_bool)
 strings (unused string)
-routines (r)
-groupings (g)
+routines (r undef_routine)
+groupings (g undef_grouping)
 define g 'aeiou'
 define r as (
    unset b
