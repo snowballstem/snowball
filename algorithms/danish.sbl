@@ -10,7 +10,7 @@ externals ( stem )
 
 strings ( ch )
 
-integers ( p1 x )
+integers ( p1 )
 
 groupings ( undouble_c v s_ending )
 
@@ -27,15 +27,24 @@ define undouble_c 'bdfgklmnprst'
 
 define v 'aeiouy{ae}{ao}{o/}'
 
-define s_ending  'abcdfghjklmnoprtvyz{ao}'
+define s_ending  'abcdfghjklmnoprtvyz{ao}{'}'
 
 define mark_regions as (
-
     $p1 = limit
 
-    test ( hop 3 setmark x )
-    gopast v  gopast non-v  setmark p1
-    try ( $p1 < x  $p1 = x )
+    do (
+      (
+        // If there's an apostrophe, start R1 after it to handle
+        // acronym loanwords such as "pc'en" and "ep'en".
+        gopast '{'}'
+      ) or (
+        gopast v  gopast non-v
+      )
+      setmark p1
+    )
+
+    // Ensure at least 3 characters before R1.
+    test (hop 3  do ($p1 < cursor  $p1 = cursor))
 )
 
 backwardmode (
@@ -84,11 +93,13 @@ backwardmode (
 
 define stem as (
 
-    do mark_regions
+    mark_regions
     backwards (
         do main_suffix
         do consonant_pair
         do other_suffix
         do undouble
+        // Remove trailing apostrophe.
+        ['{'}'] delete
     )
 )
