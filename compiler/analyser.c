@@ -1376,7 +1376,15 @@ static struct node * read_C(struct analyser * a) {
         case c_slicefrom: {
             check_modifyable(a);
             struct node * n = new_string_command(a, token);
-            if (n->name) n->name->value_used = true;
+            if (n->name) {
+                n->name->value_used = true;
+            } else {
+                if (SIZE(n->literalstring) == 0) {
+                    // Canonicalise `<-''` to `delete`.
+                    n->type = c_delete;
+                    n->literalstring = NULL;
+                }
+            }
             return n;
         }
         case c_setlimit: {

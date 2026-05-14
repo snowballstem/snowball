@@ -13,5 +13,11 @@ define stem as (
   atlimit
   $(cursor >= limit)
 
+  // <-'' is the same as delete.
+  [substring] among (
+    'a' (delete)
+    'b' (<-'')
+  )
+
   $(x == y)
 )

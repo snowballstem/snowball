@@ -18,6 +18,16 @@ define stem
     >=
     # limit
       cursor
+    [
+    substring
+    ]
+    among
+      literal 'a'
+      (
+        delete
+      literal 'b'
+      (
+        delete
     ==
     # name y
       name x
