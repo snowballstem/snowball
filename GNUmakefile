@@ -113,8 +113,11 @@ DIFF = diff
 ifeq ($(OS),Windows_NT)
 DIFF = diff --strip-trailing-cr
 endif
-ICONV = iconv
-#ICONV = python ./iconv.py
+
+# If iconv isn't installed you can use iconv.py instead via:
+#
+#   make check ICONV='python iconv.py'
+ICONV ?= iconv
 
 # Where the data files are located - assumes their repo is checked out as
 # a sibling to this one.
