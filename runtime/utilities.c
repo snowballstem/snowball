@@ -557,7 +557,11 @@ static int increase_size(symbol ** p, int n) {
 */
 extern SNOWBALL_ERR replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s)
 {
-    int adjustment = s_size - (c_ket - c_bra);
+    int adjustment;
+    if (c_bra < 0 || c_bra > c_ket || c_ket > SIZE(z->p) || s_size < 0) {
+        SNOWBALL_RETURN_OR_THROW(-1, std::logic_error("Snowball replace_s invalid"));
+    }
+    adjustment = s_size - (c_ket - c_bra);
     if (adjustment != 0) {
         int len = SIZE(z->p);
         if (adjustment + len > CAPACITY(z->p)) {
