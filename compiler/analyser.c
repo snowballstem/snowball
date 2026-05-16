@@ -123,6 +123,9 @@ static void unexpected_token_error(struct analyser * a,
     }
     report_error_after(a);
     putc('\n', stderr);
+    // If the token is `)` then always hold it as the actual problem is almost
+    // certainly another token missing before it.
+    if (t->token == c_ket) hold_token(t);
 }
 
 static void substring_without_among_error(struct analyser * a) {
@@ -555,16 +558,25 @@ static struct node * read_AE(struct analyser * a, struct name * assigned_to, int
     }
 }
 
+static int
+is_just_false(struct node * q)
+{
+    if (!q) return 1;
+    if (q->type == c_false) return 1;
+    if (q->type != c_bra) return 0;
+    return is_just_false(q->left);
+}
+
 static struct node * read_or(struct analyser * a, struct node * n) {
     struct tokeniser * t = a->tokeniser;
     // Note current line number so c_or node reports the right line.
     int or_line = t->line_number;
-    struct node * p = n->type == c_false ? NULL : n;
+    struct node * p = is_just_false(n) ? NULL : n;
     struct node * p_end = p;
     do {
         struct node * q = read_C(a);
         // Discard `false` nodes in an `or` chain.
-        if (q->type != c_false) {
+        if (!is_just_false(q)) {
             if (p_end) {
                 p_end->right = q;
             } else {

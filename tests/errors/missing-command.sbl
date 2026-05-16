@@ -1,0 +1,9 @@
+// Regression test for segfault introduced and fixed in git before 3.1.0.
+
+externals (stem)
+define stem as ( 'q' or )
+
+// Also, we swallowed the token for the `)` and emitted an bogus extra error
+// here (this bug was present in releases):
+//
+//   ) omitted after )
