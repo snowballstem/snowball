@@ -1417,7 +1417,7 @@ static struct node * read_C(struct analyser * a) {
                 struct node * n = read_AE(a, NULL, 0);
                 read_token(t);
                 token = t->token;
-                int eval_constant_expr = false;
+                bool eval_constant_expr = false;
                 switch (token) {
                     case c_assign:
                         // Assume `==` was meant to try to avoid an error avalanche.
@@ -1772,7 +1772,7 @@ static int finalise_grouping(struct grouping * p) {
 static void read_define_grouping(struct analyser * a, struct name * q) {
     struct tokeniser * t = a->tokeniser;
     int style = c_plus;
-    int check_nonempty = true;
+    bool check_nonempty = true;
     {
         NEW(grouping, p);
         *p = (struct grouping){0};
@@ -1814,7 +1814,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     break;
                 }
                 case c_literalstring: {
-                    bool utf8 = (a->encoding == ENC_UTF8);
+                    int utf8 = (a->encoding == ENC_UTF8);
                     int i = 0;
                     while (i < SIZE(t->b)) {
                         symbol ch_i;
@@ -2053,7 +2053,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             return UNKNOWN;
         }
         case c_among: {
-            int all_pass = true;
+            bool all_pass = true;
             struct among * x = p->among;
             for (int i = 1; i <= x->command_count; i++) {
                 int r = always_set_before_use_(x->commands[i - 1], func, v);
@@ -2065,7 +2065,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
         }
         case c_or: {
             struct node * q = p->left;
-            int all_pass = true;
+            bool all_pass = true;
             while (q) {
                 int r = always_set_before_use_(q, func, v);
                 if (r == USE_BEFORE_SET) return r;
@@ -2451,8 +2451,8 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
             }
 
             if (x->command_count > 0) {
-                int trues = (x->nocommand_count > 0);
-                int falses = false;
+                bool trues = (x->nocommand_count > 0);
+                bool falses = false;
                 for (int i = 1; i <= x->command_count; i++) {
                     int res = x->commands[i - 1]->possible_signals;
                     if (res == 0) {
@@ -2604,7 +2604,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
         // a warning later on if there are no errors.
         if (!q->used) continue;
 
-        int error = false;
+        bool error = false;
         switch (q->type) {
             case t_external: case t_routine:
                 error = (q->definition == NULL);

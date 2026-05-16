@@ -1,12 +1,12 @@
 #include <stdio.h>
+#if __STDC_VERSION__ < 202311l
+# include <stdbool.h>
+#endif
 
 #define SNOWBALL_VERSION "3.0.0"
 
 typedef unsigned char byte;
 typedef unsigned short symbol;
-
-#define true 1
-#define false 0
 
 #define MALLOC check_malloc
 #define FREE check_free
@@ -181,8 +181,8 @@ struct tokeniser {
     int error_count;
     int token;
     int previous_token;
-    byte token_held;
-    byte token_reported_as_unexpected;
+    bool token_held;
+    bool token_reported_as_unexpected;
     enc encoding;
 
     struct include * includes;
@@ -224,12 +224,12 @@ struct name {
     byte * s;
     byte type;                  /* t_string etc */
     byte mode;                  /* for routines, externals (m_forward, etc) */
-    byte value_used;            /* (For variables) is its value ever used? */
-    byte initialised;           /* (For variables) is it ever initialised? */
-    byte used_in_definition;    /* (grouping) used in grouping definition? */
-    byte amongvar_needed;       /* for routines, externals */
-    byte among_with_function;   /* (routines/externals) contains among with func */
-    byte case_collision;        /* A name of the same type differs only by case */
+    bool value_used;            /* (For variables) is its value ever used? */
+    bool initialised;           /* (For variables) is it ever initialised? */
+    bool used_in_definition;    /* (grouping) used in grouping definition? */
+    bool amongvar_needed;       /* for routines, externals */
+    bool among_with_function;   /* (routines/externals) contains among with func */
+    bool case_collision;        /* A name of the same type differs only by case */
     struct node * definition;   /* (routines/externals) c_define node */
     int used_in_among;          /* (routines/externals) Count of uses in amongs */
     // Initialised to -1; set to -2 if reachable from an external.
@@ -272,9 +272,9 @@ struct among {
     int command_count;        /* in this among (excludes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
     int function_count;       /* number of different functions in this among */
-    byte amongvar_needed;     /* do we need to set among_var? */
-    byte always_matches;      /* will this among always match? */
-    byte used;                /* is this among in reachable code? */
+    bool amongvar_needed;     /* do we need to set among_var? */
+    bool always_matches;      /* will this among always match? */
+    bool used;                /* is this among in reachable code? */
     int same_action;          /* type code if same for all actions; <0 otherwise */
     int shortest_size;        /* smallest non-zero string length in this among */
     int longest_size;         /* longest string length in this among */
@@ -306,7 +306,7 @@ struct node {
     // different value depending on platform and/or target language and/or
     // Unicode mode (e.g. maxint, sizeof '{U+0246}') - some warnings which
     // depend on a constant AE's value should only fire for the first set.
-    byte fixed_constant;
+    bool fixed_constant;
     // Return 0 for always f.
     // Return 1 for always t.
     // Return -1 for don't know (or can raise t or f).
@@ -333,7 +333,7 @@ struct analyser {
     struct name * names;
     struct literalstring * literalstrings;
     byte mode;
-    byte modifyable;          /* false inside reverse(...) */
+    bool modifyable;          /* false inside reverse(...) */
     struct node * program;
     struct node * program_end;
     /* name_count[i] counts the number of names of type i, where i is an enum
@@ -351,8 +351,8 @@ struct analyser {
     struct node * substring;  /* pending 'substring' in current routine definition */
     struct name * current_routine; /* routine/external we're currently on. */
     enc encoding;
-    byte int_limits_used;     /* are maxint or minint used? */
-    byte debug_used;          /* is the '?' command used? */
+    bool int_limits_used;     /* are maxint or minint used? */
+    bool debug_used;          /* is the '?' command used? */
 };
 
 enum analyser_modes {
@@ -376,8 +376,8 @@ extern void read_program(struct analyser * a, unsigned localise_mask);
 struct generator {
     struct analyser * analyser;
     struct options * options;
-    int unreachable;           /* 0 if code can be reached, 1 if current code
-                                * is unreachable. */
+    bool unreachable;          /* false if code can be reached, true if current
+                                * code is unreachable. */
     int var_number;            /* Number of next variable to use. */
     struct str * outbuf;       /* temporary str to store output */
     struct str * declarations; /* str storing variable declarations */
@@ -402,7 +402,7 @@ struct generator {
     int literalstring_count;
     int keep_count;      /* used to number keep/restore pairs to avoid compiler warnings
                             about shadowed variables */
-    int temporary_used;  /* track if temporary variable used (Ada and Pascal) */
+    bool temporary_used; /* track if temporary variable used (Ada and Pascal) */
     char java_import_arrays; /* need `import java.util.Arrays;` */
     char java_import_chararraysequence; /* need `import org.tartarus.snowball.CharArraySequence;` */
     // Prefix for generated variable names (`v_` by default).
@@ -426,9 +426,9 @@ struct options {
     byte * name;
     FILE * output_src;
     FILE * output_h;
-    byte syntax_tree;
-    byte comments;
-    byte coverage;
+    bool syntax_tree;
+    bool comments;
+    bool coverage;
     enc encoding;
     enum {
         LANG_C = 0, // We generate C by default.

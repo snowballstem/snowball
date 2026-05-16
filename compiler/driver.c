@@ -441,7 +441,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                  */
                 size_t len = SIZE(o->name);
                 size_t new_len = 0;
-                int uc_next = true;
+                bool uc_next = true;
                 for (size_t j = 0; j != len; ++j) {
                     byte ch = o->name[j];
                     if (ch == '_' || ch == '-') {

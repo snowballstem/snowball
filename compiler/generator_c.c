@@ -934,7 +934,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
     write_comment(g, p);
     struct str * varname = vars_newname(g);
 
-    int extra_block = false;
+    bool extra_block = false;
     if (p->left && p->left->type == c_tomark) {
         /* Special case for:
          *
@@ -1334,7 +1334,7 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
     }
 
-    int pre_check = (block != -1 || n_cases <= 2);
+    bool pre_check = (block != -1 || n_cases <= 2);
     if (g->options->coverage) {
         // Don't shortcut if generating coverage.
         pre_check = false;

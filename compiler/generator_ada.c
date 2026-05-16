@@ -90,7 +90,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
     }
     // Ada supports UTF-8 literal strings, we only need to escape the quote and
     // special characters.
-    int in_quotes = false;
+    bool in_quotes = false;
     int i = 0;
     while (i < SIZE(p)) {
         int ch;
@@ -420,7 +420,7 @@ static void generate_or(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int end_unreachable = true;
+    bool end_unreachable = true;
 
     write_comment(g, p);
     w(g, "~Mloop~N~+");
@@ -663,7 +663,7 @@ static void generate_GO(struct generator * g, struct node * p, int is_goto) {
     int used = g->label_used;
     int a0 = g->failure_label;
 
-    int end_unreachable = false;
+    bool end_unreachable = false;
 
     w(g, "~Mloop~N~+");
 
@@ -1871,7 +1871,7 @@ extern void generate_program_ada(struct generator * g) {
     }
     generate_method_decls(g, t_routine);
 
-    int need_among_handler = false;
+    bool need_among_handler = false;
     for (struct among * a = g->analyser->amongs; a; a = a->next) {
         if (a->function_count > 0) {
             need_among_handler = true;

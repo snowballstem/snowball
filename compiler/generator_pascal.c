@@ -64,7 +64,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
         write_string(g, "''");
         return;
     }
-    int in_quotes = false;
+    bool in_quotes = false;
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
         if (32 <= ch && ch < 127) {
@@ -364,7 +364,7 @@ static void generate_or(struct generator * g, struct node * p) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int end_unreachable = true;
+    bool end_unreachable = true;
 
     write_comment(g, p);
     w(g, "~MRepeat~N~+");
@@ -591,7 +591,7 @@ static void generate_GO(struct generator * g, struct node * p, int is_goto) {
     int a0 = g->failure_label;
     struct str * a1 = str_copy(g->failure_str);
 
-    int end_unreachable = false;
+    bool end_unreachable = false;
 
     w(g, "~MWhile True Do~N");
     write_block_start(g);
@@ -1406,7 +1406,7 @@ static void generate_method_decls(struct generator * g) {
     }
     w(g, "~-");
 
-    int first = true;
+    bool first = true;
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->type == t_routine) {
             if (first) {
@@ -1420,7 +1420,7 @@ static void generate_method_decls(struct generator * g) {
 }
 
 static void generate_member_decls(struct generator * g) {
-    int first = true;
+    bool first = true;
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->local_to) continue;
         switch (q->type) {

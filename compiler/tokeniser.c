@@ -117,8 +117,8 @@ static int read_literal_string(struct tokeniser * t, int c) {
         if (ch == t->m_start) {
             /* Inside insert characters. */
             int c0 = c;
-            int newlines = false; /* no newlines as yet */
-            int all_whitespace = true; /* no printing chars as yet */
+            bool newlines = false; /* no newlines as yet */
+            bool all_whitespace = true; /* no printing chars as yet */
             while (true) {
                 if (c >= SIZE(p) || (p[c] == '\n' && !all_whitespace)) {
                     error1(t, "string literal not terminated");
