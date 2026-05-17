@@ -1,4 +1,4 @@
-up to: 8cb8124bbd4f3972e18c0845d9b39ac90fcecfaa
+up to: b284b9f0fd9d0eff21cc250d949cb621aad5f3e9
 
 Snowball 3.1.0 (2026-05-??)
 ===========================
@@ -39,16 +39,16 @@ Compiler changes
 
   + The `-o` option is now optional.  If not specified we now write output(s)
     to the same filename as the first source, but with a different extension
-    (e.g.  path/to/english.sbl -> path/to/english.c and path/to/english.h).
+    (e.g. path/to/english.sbl -> path/to/english.c and path/to/english.h).
 
-  + The `-o` option can now include an extension so you can now write
-    `-c++ -o path/to/foo.cxx` instead of `-c++ -o path/to/foo`, which can be
-    more convenient (e.g. in `make` rules) and also provides an easy way to
+  + The `-o` option can now optionally include an extension so you can now
+    write `-c++ -o path/to/foo.cxx` instead of `-c++ -o path/to/foo`, which can
+    be more convenient (e.g. in `make` rules) and also provides an easy way to
     specify an alternative extension (for example, `.cxx`, `.cc` and `.cpp` are
     all extensions used for C++ source code).
 
   + Reject `-vprefix` option for target languages which don't support it (it is
-    currently only implemeneted for C/C++).
+    currently only implemented for C/C++).
 
 * Diagnostics:
 
@@ -69,7 +69,7 @@ Compiler changes
     signals `t` (meaning it will loop forever which is very undesirable for a
     stemming algorithm) or always signals `f` (meaning it will never loop,
     which seems unlikely to be what was intended).  This warning was added to
-    the C generator, but has been moved to generic code so it is now issues
+    the C generator, but has been moved to generic code so it is now issued
     regardless of the current target language.
 
   + Improve the wording of the warning if the body of a `repeat` or `atleast`
@@ -96,12 +96,15 @@ Compiler changes
     of the tokeniser (which is often the line after the command being warned
     about).
 
+  + Warn if a string used to define a grouping repeats characters.  There's no
+    reason to do this, so it seems likely to be a typo.
+
   + Avoid sometimes reporting "-1 blocks unfreed".
 
 * Optimisations:
 
-  + Greatly speed up processing larger Snowball programs by growing large
-    string buffers exponentially to avoid a huge number of reallocations.  For
+  + Speed up processing larger Snowball programs by growing large string
+    buffers exponentially to avoid a huge number of reallocations.  For
     example, this reduced the time to compile serbian.sbl to C by about 80%!
 
   + Optimise reading of input file when it is seekable (which it is in typical
@@ -111,7 +114,7 @@ Compiler changes
     sorted list; symbol tokens (for which we don't know the length in advance)
     are now decoded using switch statements.
 
-  + Optimise writing integers when generatign code.  For example, this reduced
+  + Optimise writing integers when generating code.  For example, this reduced
     the time to compile serbian.sbl to C by about 8%.
 
   + Optimise comparing among actions to find and merge equivalent actions.
@@ -147,28 +150,33 @@ Compiler changes
     doesn't affect anything otherwise.
 
   + Provide a simpler way to build a cut-down Snowball compiler.  The motivation
-    here was to have a way to build a smaller and quicker to build Snowball
-    compiler which only targets C.  Rather than have a DISABLE_xxx macro for each
-    language, just check if TARGET_C_ONLY is defined, and only turn off the code
-    to actually call the other generators which greatly reduces the amount of
-    conditionalisation required.
+    here was to have a way to more quickly build a smaller Snowball compiler
+    which only targets C.  Rather than have a DISABLE_xxx macro for each
+    language, just check if TARGET_C_ONLY is defined, and only turn off the
+    code to actually call the other generators which greatly reduces the amount
+    of conditionalisation required.
 
   + Fix small memory leaks if all uses of a name are eliminated.
 
-  + Always use `snprintf()` instead of `sprintf()` and emit an error and exit if
-    the buffer passed was too small rather than using truncated output.
+  + Always use `snprintf()` instead of `sprintf()`.  If the buffer passed was
+    too small we now emit an error rather than quietly using truncated output.
 
-  + Fix -Wcast-qual warnings in compiler and enable this warning by default.
+  + Fix GCC -Wcast-qual warnings in compiler and enable this warning by
+    default.
+
+  + Switch to using the standard C `bool` type in the code of the compiler.
+    (The generated code still aims to require only C90.)
 
 Generic code generation changes
 -------------------------------
 
 * Bug fixes:
 
-  + Fix code generated for `setlimit tomark` for all target languages.
-    We didn't restore the limit correctly afterwards.  This case is
-    not exercised by any of the existing stemmers.
+  + Fix code generated for `setlimit tomark` for all target languages to
+    restore the limit correctly afterwards.  The bug was not triggered by any
+    of the existing stemmers.
 
+FIXME
   + Update slice end after `delete` and `<-`
     The snowman said that after `[` and `]` "the slice ends will retain
     the same values until altered", which doesn't make it clear what
@@ -288,6 +296,8 @@ Generic code generation changes
   + Handle more commands in repeat_score().  None of these help code generation
     for any currently shipped algorithms, but they are valid to optimise here.
 
+  + Canonicalise `<-''` to `delete`.
+
   + Simplify some cases of compound assignment operators when the argument is
     (or can be simplified to) a constant integer, like we already do for
     arithmetic expressions.  For example, `$x += len '{a"}' - len 'a'` is a
@@ -366,6 +376,7 @@ Ada
 
   + Allow characters <32 and 127 in string literals.
 
+FIXME
   + Don't try to adjust the slice after =S
     This adjustment code is correct for `insert` and `append`, but
     wrong for `=S`.  In Ada this can cause the slice ends to be
@@ -503,6 +514,7 @@ C/C++
     (which seems cleaner than the previous approach of generating the same
     prototypes in the header and source file).
 
+FIXME
   + Implement among functions differently
     The function pointers we had in struct among require relocation when the
     code is in a dynamic library, which adds load-time overhead and means
@@ -705,42 +717,21 @@ Java
 Javascript
 ----------
 
-  + Emit Javascript classes.  The way among functions are called has been
-    reworked to allow this, copying the approach now used for C and C#.
-    Closes #240.
-    Co-authored-by: Adam Turner
+FIXME: slot these into categories below:
 
   + Annotate runtime with @ts-expect-error.  It doesn't seem to be possible to
     express the types fully in some places, but the invariants we require are
     ensured by the Snowball compiler.  We now annotate the expected errors so
     that type checking can be done on the rest of the runtime code.
 
-  + Adjust generated code to work with deno.
-
   + Generate block around case to bound the scope of `const` and `let` within
     the case.
 
-  + Use let in README example.
+  + Use `let` in README example.
 
-  + Use let consistently in stemwords.js.
+  + Use `let` consistently in stemwords.js.
 
-  + Explicitly import process module.
-
-  + Change slice_check() to assert its conditions.  In C we must not perform
-    string slicing if slice_check() fails because that could result in writing
-    outside of the allocated buffer, but it's not problematic in this way for
-    Javascript, and the situations which slice_check() checks for should only
-    happen with a Snowball program containing logic errors, or for bugs in the
-    Snowball compiler or its runtime (or possibly in the Javascript
-    interpreter, OS, hardware, etc).  Therefore assert() seems an appropriate
-    choice.
-    .
-    This fixes the previously buggy implementation of sliceto - an
-    empty string return was used to signal slice_check() failed, but
-    if the slice is empty the return value will be an empty string.
-    Luckily this case is not exercised by any current algorithms.
-    See #242
-
+FIXME
   + Make substring_i offset like C
     But use opposite sign so it is usually non-negative.
      Swap elements order in amongvec
@@ -748,6 +739,7 @@ Javascript
     it is zero (unless there's an among function as well).
     Fixes: #236
 
+FIXME
   + Improve stemwords.js option parsing
     Eliminate the check that there are at least 3 command line arguments as
     we don't require any now.
@@ -756,24 +748,11 @@ Javascript
     We now exit with status 1 if there's a problem parsing the command
     line.
 
-  + Fix code generated for string-$
-
-  + Ignore deno-lint warning prefer-const for file
-    We already ignore it for each among_var, but it's not really a
-    helpful warning for generated code in general.
-
   + stemwords.js: Make -i and -o optional
-
-  + Convert BaseStemmer to a JavaScript class.  Patch from Adam Turner.
 
   + stemwords.js: Emit help message in one console.log
     Peeled out from #221.
     Co-authored-by: Titus Ng <titusngtszhin@gmail.com>
-
-  + Add JavaScript Module support
-    Closes: #234
-    Co-authored-by: Titus Ng <titusngtszhin@gmail.com>
-    Co-authored-by: Adam Turner <9087854+aa-turner@users.noreply.github.com>
 
   + Javascript: Use === and !== in stemwords.js.  Patch from Adam Turner.
 
@@ -785,7 +764,13 @@ Javascript
 
 * Bug fixes:
 
+  + Fix `->` to work when the slice is empty - previously it incorrectly
+    signalled `f` for this case.  Luckily this case is not exercised by any
+    current algorithms (#242)
+
   + Generate public functions for all externals.  Patch from simlrh (#258).
+
+  + Fix code generated for string-$
 
 * Optimisations:
 
@@ -800,7 +785,23 @@ Javascript
     not by much, but it definitely results in smaller code, which is helpful
     for in browser use.  See #227.
 
+  + Change slice_check() to assert its conditions.  In C we must not perform
+    string slicing if slice_check() fails because that could result in writing
+    outside of the allocated buffer, but it's not problematic in this way for
+    Javascript, and the situations which slice_check() checks for should only
+    happen with a Snowball program containing logic errors, or for bugs in the
+    Snowball compiler or its runtime (or possibly in the Javascript
+    interpreter, OS, hardware, etc).  Therefore assert() seems an appropriate
+    choice.
+
 * Code quality:
+
+  + Convert to using Javascript modules and classes.  The way among functions
+    are called has been reworked to allow this, copying the approach now used
+    for C and C# (#234, #240).  Patches from Adam Turner and Titus Ng.
+
+  + Adjust generated code to work with deno, and suppress a few deno warnings
+    which are hard to avoid in generated code.
 
   + Avoid generating blocks around failure handling.  The failure handle code
     is always a single statement (and if we ever needed more than a statement
@@ -940,22 +941,9 @@ Python
   + Fix code generated for string-$ (which isn't used by any of the algorithms
     we currently ship).
 
-    Python: Change slice_check() to assert conditions
-    .
-    In C we must not perform string slicing if slice_check() fails because
-    that could result in writing outside of the allocated buffer.
-    .
-    It's not problematic in this way for Python, and the situations
-    which slice_check() checks for should only happen with a Snowball
-    program containing logic errors, or for bugs in the Snowball compiler or
-    its runtime (or possibly in the Python interpreter, OS, hardware,
-    etc).  Therefore assert() seems an appropriate choice.
-    .
-    This fixes the previously buggy implementation of sliceto - an
-    empty string return was used to signal slice_check() failed, but
-    if the slice is empty the return value will be an empty string.
-    Luckily this case is not exercised by any current algorithms.
-    See #242
+  + Fix `->` to work when the slice is empty - previously it incorrectly
+    signalled `f` for this case.  Luckily this case is not exercised by any
+    current algorithms (#242)
 
   + Remove deprecated licence classifier which now triggers a deprecation
     warning from Python's setuptools.  We already specify the licensing in the
@@ -994,6 +982,14 @@ Python
 
   + Reuse exception classes much more.  This reduces the number of labN classes
     we need by 142 over all the current stemmers.
+
+  + Change slice_check() to assert its conditions.  In C we must not perform
+    string slicing if slice_check() fails because that could result in writing
+    outside of the allocated buffer, but it's not problematic in this way for
+    Python, and the situations which slice_check() checks for should only
+    happen with a Snowball program containing logic errors, or for bugs in the
+    Snowball compiler or its runtime (or possibly in the Python interpreter,
+    OS, hardware, etc).  Therefore assert() seems an appropriate choice.
 
 * Code quality:
 
@@ -1069,10 +1065,6 @@ Rust
 Code Quality Improvements
 -------------------------
 
-    Turkish: Simplify not test X to just not X
-    If X succeeds, then the `not` fails and the cursor will get restored by
-    whatever handles that signal.
-
 New Code Generators
 -------------------
 
@@ -1102,7 +1094,7 @@ Behavioural changes to existing algorithms
 
 * Danish:
 
-  + Adjust to handle apostrophe. (#187)
+  + Adjust to handle apostrophe (#187).
 
   + Restrict undoubling to valid cases
     Coverage showed that a number of the consonants we would undouble
@@ -1124,63 +1116,72 @@ Behavioural changes to existing algorithms
     - The stem of `interval` is now `interval` rather than `interv`, which
       is mostly a cosmetic change as no unrelated words stem to `interv`.
 
-* Italian: Handle elisions (#187).
+* Estonian:
+
+  + Handle apostrophe (#187).
+
+* German:
+
+  + Handle apostrophe (#187).
+
+* Italian:
+
+  + Handle elisions (#187).
 
 * Lithuanian:
 
-  + Don't remove -er- before normal suffixes
-    These aren't real grammatic suffixes and seem to have been included
-    mainly to try to conflate ancient forms of the Lithuanian word for
-    "sister" (e.g. "sesers") with modern forms (e.g. "sesė").  We weren't
-    even doing a complete job there however as "seserimis" and "seseris"
-    were not handled.
-    Removing these suffixes entirely means we no longer try to conflate
-    the ancient and modern forms here, but at least all the forms of the old
-    word get grouped, as do all forms of the new word.  The stemming for
-    ~150 other words is also improved, without obvious downsides.
-    Patch from Justas Sakalauskas, fixing #263.
+  + Don't remove -er- before normal suffixes.  These aren't real grammatic
+    suffixes and seem to have been included mainly to try to conflate ancient
+    forms of the Lithuanian word for "sister" (e.g. "sesers") with modern forms
+    (e.g. "sesė").  We weren't even doing a complete job there however as
+    "seserimis" and "seseris" were not handled.  Removing these suffixes
+    entirely means we no longer try to conflate the ancient and modern forms
+    here, but at least all the forms of the old word get grouped, as do all
+    forms of the new word.  The stemming for ~150 other words is also improved,
+    without obvious downsides.  Patch from Justas Sakalauskas (#263).
 
   + Remove trailing apostrophe as final step - an apostrophe is sometimes used
     to separate a Lithuanian ending on an international word (#187).
 
 * Norwegian:
 
-  + Adjust to handle apostrophe. (#187)
+  + Adjust to handle apostrophe (#187).
 
-* Polish: Remove optional apostrophe after removing suffix
-    Polish uses an apostrophe to separate loanwords from native suffixes.
-    (The correct use is to mark the elision of the final sound of a
-    loanword before a Polish inflectional endings, but it's also often
-    used with any loanword).
-    See #187
+* Polish:
+
+  + Remove optional apostrophe after removing suffix.  Polish uses an
+    apostrophe to separate loanwords from native suffixes.  (The correct use is
+    to mark the elision of the final sound of a loanword before a Polish
+    inflectional endings, but it's also often used with any loanword) (#187).
 
 Optimisations to existing algorithms
 ------------------------------------
 
 * English:
 
-    Optimise -eed, -eedly handling
-    Check R1 first as it's a much cheaper check than the among of
-    exceptional cases.
+  + Optimise -eed, -eedly handling by performing the much cheaper R1 check
+    before the among of exceptional cases.
 
 * Esperanto:
 
-    Eliminate use of among functions
-    It's easy to avoid them, and they come with a performance overhead
-    in some target languages.  For C, the new version is 0.09% faster
-    (from cachegrind estimated cycle count).
+  + Eliminate use of among functions.  It's easy to avoid them, and they come
+    with a performance overhead in some target languages.  For C, the new
+    version is 0.09% faster (from cachegrind estimated cycle count).
 
 * Indonesian:
 
-    Avoid use of among functions
-    It's a bit more fiddly to avoid them here, but doing so gives a 1.9%
-    speed up for C (from cachegrind estimated cycle count).
+  + Avoid use of among functions, which gives a 1.9% speed up for C (from
+    cachegrind estimated cycle count).
 
 * Lithuanian:
 
-    Minor simplification/optimisation
-    If the length check signals f then the `try` fails and restores the
-    cursor.
+  + Minor simplification/optimisation by relying on Snowball restoring the
+    cursor on failure.
+
+* Turkish:
+
+  + Simplify `not test C` to just `not C`.  If C succeeds, then the `not` fails
+    and the cursor will get restored by whatever handles that signal.
 
 Code clarity improvements to existing algorithms
 ------------------------------------------------
@@ -1190,51 +1191,33 @@ Code clarity improvements to existing algorithms
 Build system
 ------------
 
-* `make clean` now removes all built files for all target languages.
-  It's now tested by CI to ensure this doesn't regress.
-    Rust: Clean up fully on `make clean`
-    Python: Remove python_check/ on `make clean`
-    C#: Remove csharp_stemwords on `make clean`
-    Go: Remove generated .go on `make clean`
+* `make clean` now removes all built files for all target languages, and is
+  now tested by CI to ensure this doesn't regress.
 
-    Make "make check_utf8" parallel-safe
-.
-    The stemmed output is no longer written to disk by default (except
-    for arabic).  To get the output saved as tmp.txt on error you now
-    need to use:
-.
-      make SAVETMP=1
-.
-    This will also force serial make even if -j is specified.
-    Add workaround for GNU make < 4.3
-.
-    With GNU make <4.3, make will fail to regenerate a manually deleted
-    stemmer-*.ads if the corresponding stemmer-*.adb is still present and
-    up-to-date.
-.
-    This approach allows us to support parallel make for these GNU make
-    versions, and seems a reasonable trade-off.  Prior to the recent change,
-    our makefile wouldn't handle this case anyway, and nobody seems to have
-    noticed.
-Author: Adam Turner <9087854+aa-turner@users.noreply.github.com> (#238)
-    (Partly?) addresses #237.
+* Make "make check_utf8" parallel-safe by avoiding writing the stemmed output
+  to disk by default (except for Arabic).  To get the output saved as tmp.txt
+  on error for debugging you can now use: `make SAVETMP=1 check_utf8`.  Patch
+  from Adam Turner (#237, #238)
 
-    Ada: Fix parallel build
-    Add missing dependency from .adb to the corresponding .sbl file.
-    See #237, #238
+* Ada: Fix parallel build by adding missing dependency from .adb to the
+  corresponding .sbl file (#237, #238)
 
-    Add make targets to assist comparing generated code
+* Add make targets to assist comparing generated code before and after a
+  compiler change: `baseline-create`, `generate` and `baseline-diff`.
 
-    Python: Omit output "(THIN_FACTOR=)" if set empty
+* Python: Omit output "(THIN_FACTOR=)" if set empty
 
-    Go: Use $(go) for `go generate`
+* Go: Use `$(go)` for `go generate` as well.
 
-    GNUmakefile: Add SNOWBALL_FLAGS
-    This provides an easy way to pass -comments during development.
+* Add SNOWBALL_FLAGS, intended to allow passing options such as `-comments`
+  and `-coverage` during development and debugging.
 
 * We now have CI testing that the Snowball compiler builds as C99 (we were
   already testing that the generated C code builds as C90).  Fixes #283,
   reported by Domingo Alvarez Duarte.
+
+* Add comment documenting how to use iconv.py (simple pure-Python alternative
+  which allows running the testsuite without iconv installed).
 
 libstemmer
 ----------
