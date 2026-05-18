@@ -1248,7 +1248,7 @@ static struct node * read_C(struct analyser * a) {
                         // `loop N C`, where N <= 0 is a no-op.
                         if (n->AE->fixed_constant) {
                             fprintf(stderr,
-                                    "%s:%d: warning: loop %d C is a no-op\n",
+                                    "%s:%d: warning: `loop %d C` is a no-op\n",
                                     t->file, n->AE->line_number, n->AE->number);
                         }
                         n->AE = NULL;
@@ -1326,7 +1326,7 @@ static struct node * read_C(struct analyser * a) {
                 } else if (n->AE->number == 0) {
                     if (n->AE->fixed_constant) {
                         fprintf(stderr,
-                                "%s:%d: warning: hop 0 is a no-op\n",
+                                "%s:%d: warning: `hop 0` is a no-op\n",
                                 t->file, n->AE->line_number);
                     }
                     n->AE = NULL;
