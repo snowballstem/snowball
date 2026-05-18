@@ -11,7 +11,7 @@ routines (
            mark_regions
            R2
            particle_etc possessive
-           LONG VI
+           LONG VI U
            case_ending
            i_plural
            t_plural
@@ -93,6 +93,8 @@ backwardmode (
 
     define VI as ('i' V2)
 
+    define U as 'u'
+
     define case_ending as (
         setlimit tomark p1 for ([substring])
         among(
@@ -102,6 +104,7 @@ backwardmode (
             'hon'    ('o')          // |
             'h{a"}n' ('{a"}')       // Illative   [43]
             'h{o"}n' ('{o"}')       // |
+            'hun'    U              // |
             'siin'   VI             // |
             'seen'   LONG           //-'
 
