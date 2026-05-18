@@ -184,7 +184,7 @@ FIXME
 .
     The existing handling here is inconsistent between commands: `delete`
     and `<-` leave the slice ends on the same numeric positions, while
-    `append` and `insert` adjust the slice ends to leave the slice marking
+    `attach` and `insert` adjust the slice ends to leave the slice marking
     the equivalent substring of the updated string.  When working in UTF-8
     the slice end can be in the middle of a multi-byte character after
     `delete` or `<-`, which seems especially undesirable.
@@ -378,7 +378,7 @@ Ada
 
 FIXME
   + Don't try to adjust the slice after =S
-    This adjustment code is correct for `insert` and `append`, but
+    This adjustment code is correct for `insert` and `attach`, but
     wrong for `=S`.  In Ada this can cause the slice ends to be
     adjusted to negative values which causes a CONSTRAINT_ERROR
     as the Char_Index type is defined as non-negative.
