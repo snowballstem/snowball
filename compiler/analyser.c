@@ -1390,8 +1390,17 @@ static struct node * read_C(struct analyser * a) {
             struct node * n = new_string_command(a, token);
             if (n->name) {
                 n->name->value_used = true;
-            } else {
-                if (SIZE(n->literalstring) == 0) {
+            } else if (SIZE(n->literalstring) == 0) {
+                switch (token) {
+                  case c_insert:
+                  case c_attach:
+                    fprintf(stderr,
+                            "%s:%d: warning: `%s ''` is a no-op\n",
+                            t->file, n->line_number, name_of_token(token));
+                    n->type = c_true;
+                    n->literalstring = NULL;
+                    break;
+                  case c_slicefrom:
                     // Canonicalise `<-''` to `delete`.
                     n->type = c_delete;
                     n->literalstring = NULL;

@@ -25,6 +25,8 @@ define stem as (
     'p' (among ('' (atmark cursor)))
     'q' (substring atmark cursor among (''))
     'r' (substring atmark cursor among ('' (atmark cursor)))
+    's' (insert '')
+    't' (attach '')
 
     // Values set are unused.
     'aa' ($y = 1)

@@ -14,11 +14,13 @@ syntax/noops.sbl:26: warning: `among` with only empty string always matches
 syntax/noops.sbl:27: warning: `atmark cursor` is always true
 syntax/noops.sbl:27: warning: `atmark cursor` is always true
 syntax/noops.sbl:27: warning: `among` with only empty string always matches
-syntax/noops.sbl:50: warning: `setlimit tomark limit` is a no-op
-syntax/noops.sbl:56: warning: empty literal string is a no-op
-syntax/noops.sbl:57: warning: loop 0 C is a no-op
-syntax/noops.sbl:58: warning: loop -1 C is a no-op
-syntax/noops.sbl:59: warning: hop 0 is a no-op
+syntax/noops.sbl:28: warning: `insert ''` is a no-op
+syntax/noops.sbl:29: warning: `attach ''` is a no-op
+syntax/noops.sbl:52: warning: `setlimit tomark limit` is a no-op
+syntax/noops.sbl:58: warning: empty literal string is a no-op
+syntax/noops.sbl:59: warning: loop 0 C is a no-op
+syntax/noops.sbl:60: warning: loop -1 C is a no-op
+syntax/noops.sbl:61: warning: hop 0 is a no-op
 syntax/noops.sbl:5: warning: string 's' is set but never used
 syntax/noops.sbl:4: warning: boolean 'b' is set but never used
 syntax/noops.sbl:3: warning: integer 'y' is set but never used
