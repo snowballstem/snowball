@@ -11,7 +11,7 @@ routines (
            mark_regions
            R2
            particle_etc possessive
-           LONG VI U
+           LONG VI A E I O U A_ O_
            case_ending
            i_plural
            t_plural
@@ -32,6 +32,7 @@ stringescapes {}
 
 stringdef a"   '{U+00E4}'
 stringdef o"   '{U+00F6}'
+stringdef o/   '{U+00F8}'
 
 define AEI 'a{a"}ei'
 define C 'bcdfghjklmnpqrstvwxz'
@@ -93,17 +94,24 @@ backwardmode (
 
     define VI as ('i' V2)
 
+    define A as 'a'
+    define E as 'e'
+    define I as 'i'
+    define O as 'o'
     define U as 'u'
+    define A_ as '{a"}'
+    // -ø-hön seen with Norwegian place names, e.g. Bodøhön
+    define O_ as ('{o"}' or '{o/}')
 
     define case_ending as (
         setlimit tomark p1 for ([substring])
         among(
-            'han'    ('a')          //-.
-            'hen'    ('e')          // |
-            'hin'    ('i')          // |
-            'hon'    ('o')          // |
-            'h{a"}n' ('{a"}')       // Illative   [43]
-            'h{o"}n' ('{o"}')       // |
+            'h{a"}n' A_             //-.
+            'h{o"}n' O_             // |
+            'han'    A              // |
+            'hen'    E              // |
+            'hin'    I              // Illative   [43]
+            'hon'    O              // |
             'hun'    U              // |
             'siin'   VI             // |
             'seen'   LONG           //-'
