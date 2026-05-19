@@ -1,4 +1,4 @@
-up to: b284b9f0fd9d0eff21cc250d949cb621aad5f3e9
+up to: 89bf9329b265c94d4e7018c40bc051f8427e4de4
 
 Snowball 3.1.0 (2026-05-??)
 ===========================
@@ -91,6 +91,11 @@ Compiler changes
   + We now report a division by zero error for `$x /= 0` (this was meant to be
     already implemented but wasn't working due to a code typo).
 
+  + More consistent wording of "is a no-op" warnings.
+
+  + Warn and canonicalise `insert ''` and `attach ''` (both of which are
+    no-ops).
+
   + Improve line numbers reported for some errors and warnings by using the
     line number of an appropriate token rather than the current line number
     of the tokeniser (which is often the line after the command being warned
@@ -149,12 +154,12 @@ Compiler changes
     syntax tree shown when command line option -syntax is used, but probably
     doesn't affect anything otherwise.
 
-  + Provide a simpler way to build a cut-down Snowball compiler.  The motivation
-    here was to have a way to more quickly build a smaller Snowball compiler
-    which only targets C.  Rather than have a DISABLE_xxx macro for each
-    language, just check if TARGET_C_ONLY is defined, and only turn off the
-    code to actually call the other generators which greatly reduces the amount
-    of conditionalisation required.
+  + Provide a simpler way to build a cut-down Snowball compiler.  The
+    motivation here was to have a way to more quickly build a smaller Snowball
+    compiler which only targets C.  Rather than have a DISABLE_xxx macro for
+    each language, just check if TARGET_C_ONLY is defined, and only turn off
+    the code to actually call the other generators which greatly reduces the
+    amount of conditionalisation required.
 
   + Fix small memory leaks if all uses of a name are eliminated.
 
@@ -176,39 +181,17 @@ Generic code generation changes
     restore the limit correctly afterwards.  The bug was not triggered by any
     of the existing stemmers.
 
-FIXME
-  + Update slice end after `delete` and `<-`
-    The snowman said that after `[` and `]` "the slice ends will retain
-    the same values until altered", which doesn't make it clear what
-    happens for operations which modify the text the slice ends are in.
-.
-    The existing handling here is inconsistent between commands: `delete`
-    and `<-` leave the slice ends on the same numeric positions, while
-    `attach` and `insert` adjust the slice ends to leave the slice marking
-    the equivalent substring of the updated string.  When working in UTF-8
-    the slice end can be in the middle of a multi-byte character after
-    `delete` or `<-`, which seems especially undesirable.
-.
-    I talked this over with Martin Porter and we've agreed that it makes
-    sense for `delete` and `<-` to also update the slice ends (in fact only
-    the right end needs adjusting) and I've clarified the snowman wording.
-.
-    Existing algorithms don't seem to rely on what the slice is set to after
-    these commands (though it's possible that's because people developing
-    them ran into mysterious misbehaviour and worked around it).
+  + We no longer optimise repeat/atleast applied to goto/gopast on a (non)
+    grouping.  This optimisation was flawed - it requires that the code in the
+    loop preserves the cursor's value on failure, but the target language
+    helper functions used here don't currently do that (they probably easily
+    could so there's scope to reinstate this optimisation).
 
-  + Turn off flawed optimisation for now
-    Don't optimise repeat/atleast applied to goto/gopast on a (non)
-    grouping.  This optimisation requires that the code in the loop
-    preserves the cursor's value on failure, and the target language helper
-    functions used here doesn't currently (they probably easily could
-    but let's handle that separately).
     Looking at the stemmers we ship, this affects the code generated for one
     loop in indonesian.sbl, but it happens the cursor value is overwritten
     immediately after this loop anyway.  The bug could affect non-shipped
-    Snowball code though so isn't purely latent.
-    Bug introduced by 5ef33aef14f8dc39a3290343024f10157fd15a36 which
-    was in v3.0.0.
+    Snowball code though so isn't purely latent.  This bug was introduced in
+    Snowball 3.0.0.
 
   + When generating target language literal strings we now always escape
     characters which can be problematic when viewing the generated source code.
@@ -343,6 +326,9 @@ FIXME
 
 * Other changes:
 
+  + `delete` and `<-` now update the slice end (see the "Snowball Language
+    Changes" section).
+
 Ada
 ---
 
@@ -376,29 +362,16 @@ Ada
 
   + Allow characters <32 and 127 in string literals.
 
-FIXME
-  + Don't try to adjust the slice after =S
-    This adjustment code is correct for `insert` and `attach`, but
-    wrong for `=S`.  In Ada this can cause the slice ends to be
-    adjusted to negative values which causes a CONSTRAINT_ERROR
-    as the Char_Index type is defined as non-negative.
-    .
-    While in some situations there is a meaningful way to adjust the
-    slice after `=S`, in general there isn't because it can replace
-    part of the content of the slice.  Martin said he'd not thought
-    of this case, and we've concluded it's best to refine the Snowball
-    language definition to say the slice is unset after `=S` (as it
-    is defined to be initially).
+  + `=S` can no longer result in the slice ends becoming negative and
+    triggering a CONSTRAINT_ERROR (the slice is now specified to be unset
+    after `=S` - see the "Snowball Language Changes" section).
 
-  + Fix code generated for string-$
-    The code we generated for string-$ in Ada was actually partly Pascal
+  + Fix Ada code generated for string-$ which was actually partly Pascal
     code (the Ada generator was originally based on the Pascal one) and
-    didn't even compile.
-    The simplest way to get this to work seems to be to represent Snowball
-    string variables in Ada the same way as the current string.  This means
-    they now take up more space (a fixed 1KB), but a typical Snowball
-    program has either no string variables or just one so the overhead seems
-    acceptable.
+    didn't even compile.  To fix this, Snowball string variables in Ada the
+    same way as the current string.  This means they now take up more space (a
+    fixed 1KB), but a typical Snowball program has either no string variables
+    or just one so the overhead seems acceptable.
 
   + Fix matching of an empty string variable
     This valid Snowball code would trigger "failed precondition" in Ada:
@@ -483,12 +456,12 @@ C/C++
   + Rework how non-localised variables are stored, which eliminates an
     indirection on every access to such a variable, and also avoids some extra
     allocations (one if a stemmer has any non-localised integer or boolean
-    variables, and another if the stemmer has any string variables).  So it uses
-    a bit less memory, it makes creating and destroying a stemmer faster, and it
-    also makes stemming a bit faster (though only by ~0.1% for the English
-    stemmer on our sample vocabulary).  The `-vprefix` option now generates
-    getter functions rather than using macro magic, which means the syntax for
-    accessing Snowball variables from C has changed.
+    variables, and another if the stemmer has any string variables).  So it
+    uses a bit less memory, it makes creating and destroying a stemmer faster,
+    and it also makes stemming a bit faster (though only by ~0.1% for the
+    English stemmer on our sample vocabulary).  The `-vprefix` option now
+    generates getter functions rather than using macro magic, which means the
+    syntax for accessing Snowball variables from C has changed.
 
   + We now maintain the invariant that SN_env's p member is non-NULL, which
     simplifies the runtime code.
@@ -514,25 +487,24 @@ C/C++
     (which seems cleaner than the previous approach of generating the same
     prototypes in the header and source file).
 
-FIXME
-  + Implement among functions differently
-    The function pointers we had in struct among require relocation when the
+  + The implementation of among functions has changed.  Previously we stored
+    a function pointer in struct among, but that requires relocation when the
     code is in a dynamic library, which adds load-time overhead and means
     the among structures can't be put in a read-only section.
-    .
-    Instead we now store an integer index instead, and pass in a pointer to
-    a dispatcher function to find_among()/find_among_b() which gets called
-    this index is non-zero.  The value of the index is stored in z->af so the
-    dispatcher function can use it.
-    .
-    Often only one unique function is used in an among, and in this case we
-    can just pass this to find_among() as the dispatcher which reduces the
-    overhead for this case.
-    .
+
+    We now store an integer index instead, and pass in a pointer to
+    a dispatcher function when calling the find_among()/find_among_b() helper
+    which gets called when this index is non-zero.  The value of the index is
+    stored in z->af so the dispatcher function can use it.
+
+    If only one unique function is used in an among, we can just pass this to
+    find_among() as the dispatcher which reduces the overhead for this common
+    case.
+
     Profiling with cachegrind suggests this change adds a small overhead
-    to algorithms which use among functions - currently finnish and hindi;
-    also lovins, but that's really only of academic interest and is not
-    enabled by default.
+    to algorithms which use among functions - currently finnish and hindi
+    (and also lovins, but that's really only of academic interest and is not
+    enabled by default).
 
   + Avoid long string in C source.  C90 only guarantees support for literal
     strings up to 509 characters.  Fixes GCC -Woverlength-strings warning.
@@ -544,10 +516,10 @@ FIXME
   + Fix code generated for `setlimit` to be C90.  Bug introduced in v3.0.0, but
     isn't triggered by any of the stemmers we currently ship.
 
-  + Fix -Wshadow warning for nested string-$ use.  We were generating code using
-    a C variable with the fixed name `failure` - now an integer suffix is
-    appended, and we only emit the variable in cases where the subcommand signal
-    isn't known at compile time.
+  + Fix -Wshadow warning for nested string-$ use.  We were generating code
+    using a C variable with the fixed name `failure` - now an integer suffix is
+    appended, and we only emit the variable in cases where the subcommand
+    signal isn't known at compile time.
 
   + Generate `do {`...`} while (0)` around `or` code, which allows us to handle
     a sub-command succeeding with `break;` rather than having to use `goto`,
@@ -613,13 +585,19 @@ C#
     seem to try to list characters in frequency order).  Really C# should be
     fixed to use an O(1) lookup like other target languages.
 
-  + Reimplement among functions
-      The new implementation follows the pattern of the new implementation
-      for C.
-      For C#, the main benefit is we can make all Among arrays static, even
-      those for amongs which use functions.  Partly addresses #146.
-      Crude profiling with `time make check_csharp` suggests this doesn't harm
-      performance (perhaps a little faster, but maybe just within the noise).
+  + The implementation of among functions has changed.  We now store an integer
+    index in the Among class, and pass a dispatcher function to the among
+    helper method.
+
+    If only one unique function is used in an among, we can just pass this to
+    the helper method as the dispatcher which reduces the overhead for this
+    common case.
+
+    Crude profiling with `time make check_csharp` suggests this doesn't harm
+    performance (perhaps a little faster, but maybe just within the noise).
+
+    The main benefit is all Among arrays can now be static, which previously
+    we wasn't possible for those which used among functions (#146).
 
   + Remove unused return value from Stemmer.Replace() runtime helper.
 
@@ -717,51 +695,6 @@ Java
 Javascript
 ----------
 
-FIXME: slot these into categories below:
-
-  + Annotate runtime with @ts-expect-error.  It doesn't seem to be possible to
-    express the types fully in some places, but the invariants we require are
-    ensured by the Snowball compiler.  We now annotate the expected errors so
-    that type checking can be done on the rest of the runtime code.
-
-  + Generate block around case to bound the scope of `const` and `let` within
-    the case.
-
-  + Use `let` in README example.
-
-  + Use `let` consistently in stemwords.js.
-
-FIXME
-  + Make substring_i offset like C
-    But use opposite sign so it is usually non-negative.
-     Swap elements order in amongvec
-    This means we can make substring_i optional and not store it when
-    it is zero (unless there's an among function as well).
-    Fixes: #236
-
-FIXME
-  + Improve stemwords.js option parsing
-    Eliminate the check that there are at least 3 command line arguments as
-    we don't require any now.
-    If we encounter an argument we don't understand, we now report it and
-    show the usage message (previously we silently ignored it).
-    We now exit with status 1 if there's a problem parsing the command
-    line.
-
-  + stemwords.js: Make -i and -o optional
-
-  + stemwords.js: Emit help message in one console.log
-    Peeled out from #221.
-    Co-authored-by: Titus Ng <titusngtszhin@gmail.com>
-
-  + Javascript: Use === and !== in stemwords.js.  Patch from Adam Turner.
-
-  + Initialise integer Snowball variables - we annotate them as being type
-    "number" so we shouldn't let them have value undefined.  Patch from Adam
-    Turner.
-
-  + Improve/fix typescript annotations.
-
 * Bug fixes:
 
   + Fix `->` to work when the slice is empty - previously it incorrectly
@@ -784,6 +717,13 @@ FIXME
     indexing into an array of literal strings.  This is perhaps faster, albeit
     not by much, but it definitely results in smaller code, which is helpful
     for in browser use.  See #227.
+
+  + The substring_i member in the Among class is now an offset from the current
+    index, and now zero in the common case where there's not another string
+    which is a sub-prefix/sub-suffix.  We've also swapped the order of elements
+    so we can omit this in the common case when it is zero and there's no among
+    function).  This reduces the size of the generated Javascript code (even
+    after minification).  Fixes #236.
 
   + Change slice_check() to assert its conditions.  In C we must not perform
     string slicing if slice_check() fails because that could result in writing
@@ -844,6 +784,27 @@ FIXME
     consistent before, and cuddling braces matches the generated Javascript
     code and the Snowball C code.
 
+  + Generate block around case to bound the scope of `const` and `let` within
+    the case.
+
+  + Use `let` in README example.
+
+  + Use `let` consistently in stemwords.js.
+
+  + Initialise integer Snowball variables - we annotate them as being type
+    "number" so we shouldn't let them have value undefined.  Patch from Adam
+    Turner.
+
+  + Improve/fix typescript annotations in runtime and generated code.
+
+  + Annotate runtime with @ts-expect-error.  It doesn't seem to be possible to
+    express the types fully in some places, but the invariants we require are
+    ensured by the Snowball compiler.  Annotating the expected errors allows
+    unexpected type checking errors to be be more easily seen, and they are
+    now fatal is CI.
+
+  + Use `===` and `!==` in stemwords.js.  Patch from Adam Turner.
+
 * Other changes:
 
   + Make stemmer subclasses anonymous and export them by default.  This makes
@@ -857,11 +818,15 @@ FIXME
     reduces the size of the generated stemmer code a little (even after running
     it through most Javascript minification tools).
 
-  + Improve stemwords.js option parsing.  Eliminate the check that there are at
-    least 3 command line arguments as we don't require any now.  If we
-    encounter an argument we don't understand, we now report it and show the
-    usage message (previously we silently ignored it).  We now exit with status
-    1 if there's a problem parsing the command line.
+  + Improve stemwords.js option parsing.  Make `-i` and `-o` optional to match
+    other target language versions of stemwords.  Eliminate the check that
+    there are at least 3 command line arguments as we don't require any now.
+    If we encounter an argument we don't understand, we now report it and show
+    the usage message (previously we silently ignored it).  We now exit with
+    status 1 if there's a problem parsing the command line.
+
+  + stemwords.js: Emit help message in one console.log.  Patch from Titus Ng
+    (#221).
 
 Pascal
 ------
@@ -931,9 +896,9 @@ Python
 * Bug fixes:
 
   + Fix `algorithms()` when forwarding to PyStemmer.  It looks like this has
-    never worked as the code has been like this since it was merged, and we were
-    forwarding to a method which PyStemmer doesn't provide and never seems to
-    have provided.
+    never worked as the code has been like this since it was merged, and we
+    were forwarding to a method which PyStemmer doesn't provide and never seems
+    to have provided.
 
   + stemwords.py: Make -i and -o optional.  The command syntax already
     suggested they were, but actually we gave an error if they were omitted.
@@ -1075,8 +1040,35 @@ New Code Generators
 
 * Add Zig backend from AJ Roetker.  Requires Zig 0.16.0 or later.
 
-New Snowball Language Features
-------------------------------
+Snowball Language Changes
+-------------------------
+
+* `delete` and `<-` now update the slice end.  The manual said that after
+  `[` and `]` "the slice ends will retain the same values until altered",
+  which doesn't make it clear what happens for operations which modify the
+  text the slice ends are in.
+
+  The existing handling here was inconsistent between commands: `delete`
+  and `<-` left the slice ends on the same numeric positions, while
+  `attach` and `insert` adjusted the slice ends to leave the slice marking
+  the equivalent substring of the updated string.  When working in UTF-8
+  the slice end could end up in the middle of a multi-byte character after
+  `delete` or `<-`, which seems especially undesirable.
+
+  I talked this over with Martin Porter and we've agreed that it makes
+  sense for `delete` and `<-` to also update the slice ends (in fact only
+  the right end needs adjusting) and I've clarified the wording in the
+  manual.
+
+  Existing algorithms we ship don't rely on what the slice is set to after
+  these commands.
+
+* The slice is now specified to be unset after `=S` (so the same state as at
+  the start of the program).  Previously Snowball attempted to adjust the slice
+  after `=S`, but there isn't an obvious adjustment in general because it can
+  replace part of the content of the slice.  Martin said he'd not thought of
+  this case, and we've concluded it's best to adjust the Snowball language
+  definition.
 
 New stemming algorithms
 -----------------------
@@ -1119,6 +1111,22 @@ Behavioural changes to existing algorithms
 * Estonian:
 
   + Handle apostrophe (#187).
+
+* Finnish:
+
+  + Handle apostrophe (#187).
+
+  + Improve fallback from illative rules.  If a word ends -han, -hen, -hin,
+    -hon, -hän or -hön but the vowel before does not match we were not removing
+    a suffix in case_ending, we now fallback to handling as a genitive and
+    remove -n.  This changes how we handle about 90 words - almost all for the
+    better, most of the rest seem neutral changes.
+
+  + Allow "ø" to match with -hön as this is seen with Norwegian place names,
+    e.g. Bodøhön.
+
+  + Remove illative form -hun.  This improves the stemming of 14 words in
+    our test vocabulary.
 
 * German:
 
@@ -1191,6 +1199,25 @@ Code clarity improvements to existing algorithms
 Build system
 ------------
 
+* The default flags used with `ar` are now `-cr` instead of `-cru`.  Many
+  Linux distros configure `ar` to use option `D` (deterministic mode) by
+  default, which was triggering a warning that option `u` is ignored.
+  Option `u` is just a minor optimisation for the case where the archive
+  already exist and only some object files have change, so it seems best
+  to just not try to use it and avoid the warning.
+
+  Make variable `ARFLAGS` can now be used to specify flags to use with `ar`,
+  so if you want to continue using `-cru`, you can use:
+
+    make ARFLAGS=-cru
+
+  If `D` is on by default in your `ar`, you'll actually want:
+
+    make ARFLAGS=-cruU
+
+* Add comment documenting how to use iconv.py (simple pure-Python alternative
+  which allows running the testsuite without iconv installed).
+
 * `make clean` now removes all built files for all target languages, and is
   now tested by CI to ensure this doesn't regress.
 
@@ -1202,22 +1229,19 @@ Build system
 * Ada: Fix parallel build by adding missing dependency from .adb to the
   corresponding .sbl file (#237, #238)
 
-* Add make targets to assist comparing generated code before and after a
-  compiler change: `baseline-create`, `generate` and `baseline-diff`.
+* Go: Use `$(go)` for `go generate` as well.
 
 * Python: Omit output "(THIN_FACTOR=)" if set empty
-
-* Go: Use `$(go)` for `go generate` as well.
 
 * Add SNOWBALL_FLAGS, intended to allow passing options such as `-comments`
   and `-coverage` during development and debugging.
 
+* Add make targets to assist comparing generated code before and after a
+  compiler change: `baseline-create`, `generate` and `baseline-diff`.
+
 * We now have CI testing that the Snowball compiler builds as C99 (we were
   already testing that the generated C code builds as C90).  Fixes #283,
   reported by Domingo Alvarez Duarte.
-
-* Add comment documenting how to use iconv.py (simple pure-Python alternative
-  which allows running the testsuite without iconv installed).
 
 libstemmer
 ----------
