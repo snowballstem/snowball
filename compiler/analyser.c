@@ -1057,7 +1057,8 @@ static struct node * read_among(struct analyser * a) {
                 } else {
                     hold_token(t);
                 }
-                p->number++; break;
+                p->number++;
+                break;
             case c_bra:
                 if (previous_token == c_bra) {
                     report_error_location(a);
