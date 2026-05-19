@@ -32,6 +32,7 @@ ada_src_dir = $(ada_src_main_dir)/algorithms
 
 # C
 
+ARFLAGS ?= -cr
 c_src_dir = src_c
 
 # C#
@@ -403,7 +404,7 @@ libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl $(M
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
 libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
-	$(AR) -cru $@ $^
+	$(AR) $(ARFLAGS) $@ $^
 
 examples/%.o: examples/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
@@ -597,9 +598,10 @@ dist_libstemmer_c: \
 	echo 'endif' >> $${dest}/Makefile && \
 	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
 	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
+	echo 'ARFLAGS=-cr' >> $${dest}/Makefile && \
 	echo 'all: libstemmer.a stemwords$$(EXEEXT)' >> $${dest}/Makefile && \
 	echo 'libstemmer.a: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
-	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
+	echo '	$$(AR) $(ARFLAGS) $$@ $$^' >> $${dest}/Makefile && \
 	echo 'stemwords$$(EXEEXT): examples/stemwords.o libstemmer.a' >> $${dest}/Makefile && \
 	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
