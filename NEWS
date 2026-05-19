@@ -1564,15 +1564,15 @@ Behavioural changes to existing algorithms
   contain other accented characters and it seems better for the stemmer to
   handle such words the same way regardless of the encoding in use.
 
-* English: Replace '-ogist' with '-og' to conflate "geologist" and "geology", etc.
-  Suggested by Marc Schipperheijn on snowball-discuss.
+* English: Replace '-ogist' with '-og' to conflate "geologist" and "geology",
+  etc.  Suggested by Marc Schipperheijn on snowball-discuss.
 
 * English: Add extra condition to undoubling.  We no longer undouble if the
   double consonant is preceded by exactly "a", "e" or "o" to avoid conflating
   "add"/"ad", "egg"/"eg", "off"/"of", etc.  Fixes #182, reported by Ed Page.
 
-* English: Avoid conflating 'emerge' and 'emergency'.  Reported by Frederick Ross
-  on snowball-discuss.
+* English: Avoid conflating 'emerge' and 'emergency'.  Reported by Frederick
+  Ross on snowball-discuss.
 
 * English: Avoid conflating 'evening' and 'even'.  Reported by Ann B on
   snowball-discuss.
