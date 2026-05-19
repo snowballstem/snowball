@@ -136,7 +136,11 @@ static void substring_without_among_error(struct analyser * a) {
 
 static int check_token(struct analyser * a, int code) {
     struct tokeniser * t = a->tokeniser;
-    if (t->token != code) { omission_error(a, code); return false; }
+    if (t->token != code) {
+        omission_error(a, code);
+        hold_token(t);
+        return false;
+    }
     return true;
 }
 
@@ -158,9 +162,7 @@ static void hold_token_if_toplevel(struct tokeniser * t) {
 static int get_token(struct analyser * a, int code) {
     struct tokeniser * t = a->tokeniser;
     read_token(t);
-    int x = check_token(a, code);
-    if (!x) hold_token(t);
-    return x;
+    return check_token(a, code);
 }
 
 static struct name * look_for_name(struct analyser * a) {
@@ -278,7 +280,7 @@ done_case_check:
                 }
                 break;
             default:
-                if (!check_token(a, c_ket)) hold_token(t);
+                check_token(a, c_ket);
                 return;
         }
     }
@@ -1699,7 +1701,6 @@ handle_rel_op: ;
             read_token(t);
             if (t->token == c_minus) read_token(t);
             if (!check_token(a, c_name)) {
-                hold_token(t);
                 return p;
             }
             name_to_node(a, p, t_grouping);
@@ -1976,7 +1977,6 @@ static void read_backwardmode(struct analyser * a) {
     a->mode = m_backward;
     if (get_token(a, c_bra)) {
         read_program_(a, c_ket);
-        check_token(a, c_ket);
     }
     a->mode = mode;
 }
@@ -1999,6 +1999,8 @@ static void read_program_(struct analyser * a, int terminator) {
                 unexpected_token_error(a, 0);
                 break;
             case -1:
+                if (terminator != -1)
+		    omission_error(a, terminator);
                 return;
         }
     }
