@@ -1812,7 +1812,7 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
         p->name = q;
         p->line_number = t->line_number;
         p->b = create_b(0);
-        while (true) {
+        do {
             switch (read_token(t)) {
                 case c_name: {
                     struct name * r = find_name(a);
@@ -1870,13 +1870,8 @@ static void read_define_grouping(struct analyser * a, struct name * q) {
                     (void)finalise_grouping(p);
                     return;
             }
-            switch (read_token(t)) {
-                case c_plus:
-                case c_minus: style = t->token; break;
-                default: goto label0;
-            }
-        }
-    label0:
+            style = read_token(t);
+        } while (style == c_plus || style == c_minus);
         if (!finalise_grouping(p)) {
             if (check_nonempty) {
                 report_error_location_line(a, p->line_number);
