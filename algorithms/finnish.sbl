@@ -94,14 +94,14 @@ backwardmode (
 
     define VI as ('i' V2)
 
-    define A as 'a'
-    define E as 'e'
-    define I as 'i'
-    define O as 'o'
-    define U as 'u'
-    define A_ as '{a"}'
+    define A as ('a' or '{'}')
+    define E as ('e' or '{'}')
+    define I as ('i' or '{'}')
+    define O as ('o' or '{'}')
+    define U as ('u' or '{'}')
+    define A_ as ('{a"}' or '{'}')
     // -ø-hön seen with Norwegian place names, e.g. Bodøhön
-    define O_ as ('{o"}' or '{o/}')
+    define O_ as ('{o"}' or '{o/}' or '{'}')
 
     define case_ending as (
         setlimit tomark p1 for ([substring])
@@ -188,7 +188,8 @@ backwardmode (
             do ( ['j'] 'o' or 'u' delete )
             do ( ['o'] 'j' delete )
         )
-        goto non-V1 [C] -> x  x delete // undouble consonant
+        do (goto non-V1 [C] -> x  x delete) // undouble consonant
+        ['{'}'] delete
     )
 )
 
