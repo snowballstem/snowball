@@ -40,14 +40,15 @@ extern void lose_s(symbol * p) {
 
 /*
    new_p = skip_utf8(p, c, l, n); skips n characters forwards from p + c.
-   new_p is the new position, or -1 on failure.
+   new_p is the new position, or -1 on failure (if c would be > l).
+
+   Caller ensures n >= 0.
 
    -- used to implement hop and next in the utf8 case.
 */
 
 extern int skip_utf8(const symbol * p, int c, int limit, int n) {
     int b;
-    if (n < 0) return -1;
     for (; n > 0; n--) {
         if (c >= limit) return -1;
         b = p[c++];
@@ -65,14 +66,15 @@ extern int skip_utf8(const symbol * p, int c, int limit, int n) {
 
 /*
    new_p = skip_b_utf8(p, c, lb, n); skips n characters backwards from p + c - 1
-   new_p is the new position, or -1 on failure.
+   new_p is the new position, or -1 on failure (if c would be < lb).
+
+   Caller ensures n >= 0.
 
    -- used to implement hop and next in the utf8 case.
 */
 
 extern int skip_b_utf8(const symbol * p, int c, int limit, int n) {
     int b;
-    if (n < 0) return -1;
     for (; n > 0; n--) {
         if (c <= limit) return -1;
         b = p[--c];

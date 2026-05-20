@@ -839,12 +839,23 @@ static void generate_hop(struct generator * g, struct node * p) {
     if (g->options->encoding == ENC_UTF8) {
         g->S[0] = p->mode == m_forward ? "" : "_b";
         g->S[1] = p->mode == m_forward ? "z->l" : "z->lb";
-        w(g, "~{~Mint ret = skip~S0_utf8(z->p, z->c, ~S1, ");
-        generate_AE(g, p->AE);
-        writef(g, ");~N", p);
-        writef(g, "~Mif (ret < 0) ~f~N", p);
-        writef(g, "~Mz->c = ret;~N"
-               "~}", p);
+        w(g, "~{");
+        if (p->AE->type == c_number) {
+            // Constant distance hop.
+            //
+            // No need to check for negative hop as that's converted to false by
+            // the analyser.
+            g->I[0] = p->AE->number;
+            w(g, "~Mint ret = skip~S0_utf8(z->p, z->c, ~S1, ~I0);~N");
+        } else {
+            w(g, "~Mint ae = ");
+            generate_AE(g, p->AE);
+            w(g, ";~N");
+            w(g, "~Mint ret = ae >= 0 ? skip~S0_utf8(z->p, z->c, ~S1, ae) : -1;~N");
+        }
+        w(g, "~Mif (ret < 0) ~f~N");
+        w(g, "~Mz->c = ret;~N");
+        w(g, "~}");
     } else {
         // Fixed-width characters.
         g->S[0] = p->mode == m_forward ? "+" : "-";
