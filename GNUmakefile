@@ -32,7 +32,7 @@ ada_src_dir = $(ada_src_main_dir)/algorithms
 
 # C
 
-ARFLAGS ?= -cr
+ARFLAGS = -cr
 c_src_dir = src_c
 
 # C#
