@@ -25,9 +25,11 @@ define stem
       literal 'a'
       (
         delete
+        next
       literal 'b'
       (
         delete
+        next
     ==
     # name y
       name x
