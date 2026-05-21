@@ -736,10 +736,6 @@ static void generate_hop(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "+" : "-";
 
-    w(g, "~{~Mconst /** number */ c = this.c ~S0 ");
-    generate_AE(g, p->AE);
-    w(g, ";~N");
-
     g->S[1] = p->mode == m_forward ? "> this.limit" : "< this.limit_backward";
     g->S[2] = p->mode == m_forward ? "<" : ">";
     if (p->AE->type == c_number) {
@@ -747,12 +743,17 @@ static void generate_hop(struct generator * g, struct node * p) {
         //
         // No need to check for negative hop as that's converted to false by
         // the analyser.
-        write_failure_if(g, "c ~S1", p);
+        g->I[0] = p->AE->number;
+        write_failure_if(g, "this.c ~S0 ~I0 ~S1", p);
+        writef(g, "~Mthis.c ~S0= ~I0;~N", p);
     } else {
+        w(g, "~{~Mconst /** number */ c = this.c ~S0 ");
+        generate_AE(g, p->AE);
+        w(g, ";~N");
         write_failure_if(g, "c ~S1 || c ~S2 this.c", p);
+        writef(g, "~Mthis.c = c;~N", p);
+        writef(g, "~}", p);
     }
-    writef(g, "~Mthis.c = c;~N", p);
-    writef(g, "~}", p);
 }
 
 static void generate_delete(struct generator * g, struct node * p) {
