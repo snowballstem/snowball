@@ -24,7 +24,7 @@ externals ( stem )
 integers ( p1 p2 )
 strings ( x )
 booleans ( ending_removed )
-groupings ( AEI C V1 V2 particle_end )
+groupings ( AEI C V1 particle_end )
 
 stringescapes {}
 
@@ -37,7 +37,6 @@ stringdef o/   '{U+00F8}'
 define AEI 'a{a"}ei'
 define C 'bcdfghjklmnpqrstvwxz'
 define V1 'aeiouy{a"}{o"}'
-define V2 'aeiou{a"}{o"}'
 define particle_end V1 + 'nt'
 
 define mark_regions as (
@@ -92,7 +91,8 @@ backwardmode (
     define LONG as
         among('aa' 'ee' 'ii' 'oo' 'uu' '{a"}{a"}' '{o"}{o"}')
 
-    define VI as ('i' V2)
+    define VI as
+        among('ai' 'ei' 'ii' 'oi' 'ui' '{a"}i' '{o"}i' '{'}')
 
     define A as ('a' or '{'}')
     define E as ('e' or '{'}')
