@@ -1,4 +1,4 @@
-up to: 89bf9329b265c94d4e7018c40bc051f8427e4de4
+up to: 65885b557388f0e5d325d0f1592e0bab1021f5f4
 
 Snowball 3.1.0 (2026-05-??)
 ===========================
@@ -481,6 +481,10 @@ C/C++
     integer addition and one integer subtraction, and that turns out to be
     slightly more efficient as well as simpler.
 
+  + Move check for negative hop from runtime to generated code.  This means we
+    can omit it for hop with a constant argument, which is all uses of hop in
+    the stemmers we currently ship.
+
 * Code quality:
 
   + The generated header is now included from the generated C/C++ source file
@@ -757,6 +761,10 @@ Javascript
     `cursor` is a DOM property, so Javascript minifiers are cautious about
     renaming it to avoid breaking code.  The name `c` matches the naming we use
     for C, Ada and Pascal.
+
+  + Generate smaller code for hop by constant.  All current uses of hop in the
+    stemmers we ship have a constant argument, so avoid using a temporary
+    variable in these cases.
 
   + Optimise `+=1` to `++`, `-=1` to `--`.  These are a byte shorter, and it
     seems Javascript minifiers don't do this for us because it's not a safe
@@ -1193,6 +1201,9 @@ Optimisations to existing algorithms
 
 Code clarity improvements to existing algorithms
 ------------------------------------------------
+
+* Finnish: Rename `V1` and `LONG` to match the names used in the algorithm
+  description on the website.
 
 * Italian: Eliminate use of legacy among starter.
 
