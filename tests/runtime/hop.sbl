@@ -1,0 +1,12 @@
+// Test `hop` and `next`.
+
+externals (stem)
+
+strings (s)
+
+define stem as (
+  next or fail='next failed'
+  not (hop len-3) or fail='hop by calculated negative signalled t'
+  test (tolimit not next or fail='next at end of string signalled t')
+  not (hop len-cursor+1) or fail='hop past end of string signalled t'
+)
