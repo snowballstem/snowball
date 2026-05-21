@@ -112,7 +112,7 @@ func (env *Env) PrevChar() {
 	}
 }
 
-func (env *Env) Hop(delta int32) bool {
+func (env *Env) Hop(delta int) bool {
 	res := env.Cursor
 	for delta > 0 {
 		delta--
@@ -128,11 +128,11 @@ func (env *Env) Hop(delta int32) bool {
 	return true
 }
 
-func (env *Env) HopChecked(delta int32) bool {
+func (env *Env) HopChecked(delta int) bool {
 	return delta >= 0 && env.Hop(delta)
 }
 
-func (env *Env) HopBack(delta int32) bool {
+func (env *Env) HopBack(delta int) bool {
 	res := env.Cursor
 	for delta > 0 {
 		delta--
@@ -148,7 +148,7 @@ func (env *Env) HopBack(delta int32) bool {
 	return true
 }
 
-func (env *Env) HopBackChecked(delta int32) bool {
+func (env *Env) HopBackChecked(delta int) bool {
 	return delta >= 0 && env.HopBack(delta)
 }
 
