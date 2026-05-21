@@ -39,6 +39,7 @@ russian         UTF_8,KOI8_R            russian,ru,rus
 serbian         UTF_8                   serbian,sr,srp
 spanish         UTF_8,ISO_8859_1        spanish,es,esl,spa
 swedish         UTF_8,ISO_8859_1        swedish,sv,swe
+tagalog         UTF_8,ISO_8859_1        tagalog,tl,tgl,fil,filipino
 tamil           UTF_8                   tamil,ta,tam
 turkish         UTF_8                   turkish,tr,tur
 yiddish         UTF_8                   yiddish,yi,yid
