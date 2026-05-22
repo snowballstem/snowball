@@ -241,7 +241,12 @@ jobs:
         rm -rf tmp
     - name: Test C
       if: matrix.c_tests
-      run: $MAKE ${{ matrix.c_tests }} CC="$CC"
+      run: |
+        # Kludge so "generate" target doesn't need ada installed.
+        case ${{ matrix.c_tests }} in
+          *generate*) ln -s /bin/true ada/bin/generate ;;
+        esac
+        $MAKE ${{ matrix.c_tests }} CC="$CC"
     - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
