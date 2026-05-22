@@ -11,7 +11,7 @@ on:
       - '*.rst'
       - NEWS
   pull_request:
-    branches: master
+    branches: main
     paths-ignore:
       - '*.rst'
       - NEWS

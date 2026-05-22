@@ -11,7 +11,7 @@ on:
       - '*.rst'
       - NEWS
   pull_request:
-    branches: master
+    branches: main
     paths-ignore:
       - '*.rst'
       - NEWS
@@ -144,10 +144,10 @@ jobs:
         # repo sibling of this snowball repo, so that PRs requiring changes to
         # both can be CI tested easily.
         #
-        # For a PR, GHA will have merged the PR branch into upstream master so
+        # For a PR, GHA will have merged the PR branch into upstream main so
         # we need to similarly merge the snowball-data branch into upstream
-        # master of the snowball-data repo as there may be changes there
-        # required by snowball master.
+        # main of the snowball-data repo as there may be changes there
+        # required by snowball main.
         #
         # If there's no such branch (or repo) we just use the standard
         # snowball-data repo's default branch.  If there is such a branch but
