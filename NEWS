@@ -1096,12 +1096,11 @@ Behavioural changes to existing algorithms
 
   + Adjust to handle apostrophe (#187).
 
-  + Restrict undoubling to valid cases
-    Coverage showed that a number of the consonants we would undouble
-    never occur in our Danish vocabulary.  Testing a larger list didn't
-    find any matches for Danish words either, so restrict the undoubling
-    which reduces the potential for damage to foreign words and should be
-    a little more efficient.
+  + Restrict undoubling to valid cases.  Coverage showed that a number of the
+    consonants we would undouble never occur in our Danish vocabulary.  Testing
+    a larger list didn't find any matches for Danish words either, so restrict
+    the undoubling which reduces the potential for damage to foreign words and
+    should be a little more efficient.
 
 * English:
 
