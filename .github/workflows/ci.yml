@@ -34,11 +34,16 @@ jobs:
           CFLAGS_DIST_BUILD: '-O2 -Wall -W -std=c90 -pedantic -Wmissing-prototypes -Wmissing-declarations -Wshadow -Werror'
           CC: clang
         - name: "C"
-          c_tests: y
+          c_tests: check
           WERROR: '-std=c99 -pedantic -Werror'
-        - name: "C (clang)"
-          c_tests: y
-          WERROR: '-std=c99 -pedantic -Werror'
+        - name: "C (clang+sanitisers)"
+          # Generate code for all target languages so we exercise the generator
+          # code for each target language with sanitisers on.
+          c_tests: "generate check"
+          # Overflow of unsigned types is defined behaviour, but we don't
+          # expect it to happen in the Snowball compiler or C runtime code
+          # so enable `unsigned-integer-overflow` too.
+          WERROR: '-std=c99 -pedantic -Werror -fsanitize=address,undefined,float-divide-by-zero,local-bounds,nullability,unsigned-integer-overflow -fsanitize-address-use-after-scope -fsanitize-recover=all -fno-omit-frame-pointer'
           CC: clang
         - name: java
           JAVA: java
@@ -112,7 +117,7 @@ jobs:
           apt_packages: 'gnat gprbuild'
         - name: Windows (C)
           os: windows-latest
-          c_tests: y
+          c_tests: check
           ccache: sccache
         - name: Windows (Go)
           os: windows-latest
@@ -236,7 +241,7 @@ jobs:
         rm -rf tmp
     - name: Test C
       if: matrix.c_tests
-      run: $MAKE check CC="$CC"
+      run: $MAKE ${{ matrix.c_tests }} check CC="$CC"
     - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
