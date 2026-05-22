@@ -322,7 +322,7 @@ everything: ada all csharp dart go java js pascal python rust zig
 # Generate code for all languages.  Override build tools to do as little code
 # building as possible.
 generate: gprbuild=perl -e '$$ARGV[0] eq "-Pgenerate" and unshift @ARGV, "gprbuild" and exec @ARGV' --
-generate: mcs=:
+generate: MCS=:
 generate: DART=:
 generate: go=:
 generate: JAVAC=:
