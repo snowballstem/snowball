@@ -244,7 +244,7 @@ jobs:
       run: |
         # Kludge so "generate" target doesn't need ada installed.
         case '${{ matrix.c_tests }}' in
-          *generate*) ln -s /bin/true ada/bin/generate ;;
+          *generate*) mkdir ada/bin && ln -s /bin/true ada/bin/generate ;;
         esac
         $MAKE ${{ matrix.c_tests }} CC="$CC"
     - uses: actions/setup-python@v6
