@@ -629,12 +629,11 @@ Go
 
 * Bug fixes:
 
-    Go: Fix code generated for non-constant hop
-    A non-constant integer expression has type `int` in the generated
-    Go code, but the hop helpers expected `int32`.  For a constant
-    hop this worked because Go integer literals are untyped, so
-    will convert to `int32`.
-    To fix this, the helpers now take `int` instead of `int32`.
+  + Fix code generated for non-constant hop.  A non-constant integer expression
+    has type `int` in the generated Go code, but the hop helpers expected
+    `int32`.  For a constant hop this worked because Go integer literals are
+    untyped, so will convert to `int32`.  To fix this, the helpers now take
+    `int` instead of `int32`.
 
   + Fix code generated if `minint` or `maxint` is used.  In this case we were
     generating `use std::usize;` near the start of the Go code, but that's
