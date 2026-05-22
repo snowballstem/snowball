@@ -314,6 +314,7 @@ update_version:
 		csharp/Snowball/AssemblyInfo.cs \
 		dart/pubspec.yaml \
 		python/setup.py
+	perl -pi -e 's/(libstemmer_c-)\d+\.\d+.\d+/$${1}$(SNOWBALL_VERSION)/' README.rst
 
 # Generate and build for all target languages.
 everything: ada all csharp dart go java js pascal python rust zig
