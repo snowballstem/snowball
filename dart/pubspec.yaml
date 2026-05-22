@@ -1,6 +1,6 @@
 name: snowball
 description: This package provides stemmers generated from Snowball algorithms.
-version: 3.0.0 # SNOWBALL_VERSION
+version: 3.1.0 # SNOWBALL_VERSION
 repository: https://github.com/snowballstem/snowball
 issue_tracker: https://github.com/snowballstem/snowball/issues
 topics:
