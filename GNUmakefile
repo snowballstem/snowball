@@ -326,6 +326,7 @@ generate: MCS=:
 generate: DART=:
 generate: go=:
 generate: JAVAC=:
+generate: FPC=:
 generate: everything
 
 # The directories where generated code goes for all languages.
