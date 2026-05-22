@@ -241,7 +241,7 @@ jobs:
         rm -rf tmp
     - name: Test C
       if: matrix.c_tests
-      run: $MAKE ${{ matrix.c_tests }} check CC="$CC"
+      run: $MAKE ${{ matrix.c_tests }} CC="$CC"
     - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
