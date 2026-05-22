@@ -1393,7 +1393,7 @@ static struct node * read_C(struct analyser * a) {
             struct node * n = new_string_command(a, token);
             if (n->name) {
                 n->name->value_used = true;
-            } else if (SIZE(n->literalstring) == 0) {
+            } else if (n->literalstring == NULL || SIZE(n->literalstring) == 0) {
                 switch (token) {
                   case c_insert:
                   case c_attach:
