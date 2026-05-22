@@ -9,8 +9,8 @@ string handling language from the 1960s.  It now also serves as a metaphor for
 how the project grows by gathering contributions over time.
 
 The Snowball compiler translates a Snowball program into source code in another
-language - currently Ada, ISO C, C#, Dart, Go, Java, Javascript, Object Pascal,
-PHP, Python, Rust and Zig are supported.
+language - currently Ada, C, C++, C#, Dart, Go, Java, Javascript, Object
+Pascal, PHP, Python, Rust and Zig are supported.
 
 This repository contains the source code for the snowball compiler and the
 stemming algorithms.  The snowball compiler is written in ISO C - you'll need
