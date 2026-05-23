@@ -1,4 +1,4 @@
-name: CI
+name: Snowball code coverage
 
 # Use bash by default on all platforms.
 defaults:
