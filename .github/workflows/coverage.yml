@@ -1,0 +1,107 @@
+name: CI
+
+# Use bash by default on all platforms.
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    paths:
+      - 'algorithms/*.sbl'
+  pull_request:
+    branches: main
+    paths:
+      - 'algorithms/*.sbl'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: "Snowball code coverage"
+    runs-on: ubuntu-24.04
+
+    env:
+      CC: gcc
+      MAKE: make --output-sync --jobs=4
+      STEMMING_DATA: 'snowball-data'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        show-progress: false
+
+    - name: Checkout data
+      run: |
+        # Try to check out a branch of the same name from the snowball-data
+        # repo sibling of this snowball repo, so that PRs requiring changes to
+        # both can be CI tested easily.
+        #
+        # For a PR, GHA will have merged the PR branch into upstream main so
+        # we need to similarly merge the snowball-data branch into upstream
+        # main of the snowball-data repo as there may be changes there
+        # required by snowball main.
+        #
+        # If there's no such branch (or repo) we just use the standard
+        # snowball-data repo's default branch.  If there is such a branch but
+        # the merge fails, we treat that as a fatal error.
+        UPSTREAM_REPO_URL=https://github.com/snowballstem/snowball-data.git
+        if [ -n "$GITHUB_HEAD_REF" ] ; then
+          # Pull-request.
+          GH_BRANCH=${GITHUB_HEAD_REF}
+          GH_REPO_OWNER=${GITHUB_ACTOR}
+          GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
+          git clone "$UPSTREAM_REPO_URL"
+          cd snowball-data
+          git remote add pr "$GH_REPO_URL"
+          git config --global user.email "ci@example.org"
+          git config --global user.name "CI"
+          echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
+          if git fetch pr && git branch --track "$GH_BRANCH" pr/"$GH_BRANCH" ; then
+            git merge "$GH_BRANCH"
+          else
+            echo "Falling back to $UPSTREAM_REPO_URL"
+          fi
+        else
+          # Push.
+          GH_BRANCH=${GITHUB_REF_NAME}
+          GH_REPO_OWNER=${GITHUB_REPOSITORY_OWNER}
+          GH_REPO_URL=https://github.com/$GH_REPO_OWNER/snowball-data.git
+          echo "Trying branch $GH_BRANCH from $GH_REPO_URL"
+          if ! git clone -b "$GH_BRANCH" "$GH_REPO_URL" ; then
+            echo "Falling back to $UPSTREAM_REPO_URL"
+            git clone "$UPSTREAM_REPO_URL"
+          fi
+        fi
+    - name: Install CCache
+      uses: hendrikmuhs/ccache-action@v1.2.21
+      with:
+        key: ${{ matrix.name }}
+        variant: ${{ matrix.ccache || 'ccache' }}
+    - name: Build
+      run: $MAKE CC="ccache $CC" SNOWBALL_FLAGS=-coverage CPPFLAGS=-DSNOWBALL_COVERAGE
+    - name: Generate coverage reports
+      run: |
+        # Find commit to compare with:
+        if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] ; then
+          # Manually triggered - generate coverage for all algorithms.
+          ls -1 algorithms|sed 's,\.sbl$,,p;d'
+        elif [ -n "$GITHUB_HEAD_REF" ] ; then
+          # Pull-request.
+          git diff --stat "$GITHUB_BASE_REF"... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
+        else
+          # Push.
+          # FIXME: Ideally we'd diff against the branch pre-push but how
+          # do we find out that information?
+          env|sort
+          git log --oneline --decorate v3.1.0..
+          git diff --stat HEAD^... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
+        fi | while readline a ; do
+          while readline a ; do
+           $MAKE -s check_utf8_$a 2> coverage.log ;
+           echo ; echo "=== Coverage report for $a ===" ; echo ;
+           sort -k2,2 -k3,3n -k3,3 -k5,5g coverage.log |
+             uniq -c |awk '{$1=sprintf("% 8d",$1-1);print}'
+          done
