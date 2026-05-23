@@ -99,9 +99,8 @@ jobs:
           git log --oneline --decorate v3.1.0..
           git diff --stat HEAD^... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
         fi | while readline a ; do
-          while readline a ; do
-           $MAKE -s check_utf8_$a 2> coverage.log ;
-           echo ; echo "=== Coverage report for $a ===" ; echo ;
-           sort -k2,2 -k3,3n -k3,3 -k5,5g coverage.log |
-             uniq -c |awk '{$1=sprintf("% 8d",$1-1);print}'
-          done
+          $MAKE -s "check_utf8_$a" 2> coverage.log
+          echo ; echo "=== Coverage report for $a ===" ; echo
+          sort -k2,2 -k3,3n -k3,3 -k5,5g coverage.log |
+            uniq -c |awk '{$1=sprintf("% 8d",$1-1);print}'
+        done
