@@ -304,3 +304,33 @@ jobs:
         git status --porcelain=v1|grep -v '^?? \.s\?ccache/$'|grep '^' && { echo 'The generated files listed above are not in .gitignore' ; exit 1; }; true
         $MAKE clean ${{ case(inputs.runtime-tests == true, 'clean_runtime_tests', '') }}
         git status --porcelain=v1 --ignored|grep -v '^?? \.s\?ccache/$'|grep '^' && { echo 'The generated files listed above were not removed by `make clean`' ; exit 1; }; true
+
+  pypi-publish:
+    if: >
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/tags/v') &&
+      inputs.runtime-tests != true
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/snowballstemmer
+    permissions:
+      id-token: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        show-progress: false
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Install build module
+      run: pip install build
+    - name: Generate dist
+      run: make --output-sync --jobs=4 dist_libstemmer_python
+    - name: Publish to PyPI
+      if: success()
+      uses: pypa/gh-action-pypi-publish@release/v1
