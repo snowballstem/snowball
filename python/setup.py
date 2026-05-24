@@ -42,7 +42,8 @@ for lang in langs:
     lang_titlecase = lang.title()
     # Only classifiers listed in https://pypi.org/classifiers/ are allowed
     # Remove them here or submit them to https://github.com/pypa/trove-classifiers
-    classifiers.append('Natural Language :: ' + lang_titlecase)
+    if lang_titlecase != 'Sesotho':
+        classifiers.append('Natural Language :: ' + lang_titlecase)
 
 classifiers.extend([
     'Operating System :: OS Independent',
