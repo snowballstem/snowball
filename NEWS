@@ -1,3 +1,38 @@
+up to: b81c7268c105c6994470410836aed7cc7d87f792
+
+Snowball 3.1.1 (UNRELEASED)
+===========================
+
+Compiler changes
+----------------
+
+* Bug fixes:
+
+  + Fix a segmentation fault after reporting an error for a string command
+    not followed by a string variable name or string literal.  Bug introduced
+    in 3.1.0.  Patch from Jerry James (#287).
+
+Build system
+------------
+
+* The `generate` target added in 3.1.0 now overrides `FPC` and `MCS` to do
+  nothing, to avoid compiling Pascal and C# code.
+
+Testsuite
+---------
+
+* compilertest: Require syntax tests have stderr output - we are testing errors
+  here, so we should really be checking the errors we get are the ones we
+  expect.  We expect the compiler to fail, so testing stderr means we will
+  catch unrelated failures.  This provides a regression test for #287.
+
+Documentation
+-------------
+
+* NEWS: Fix formatting of two existing entries.
+
+* README: List C++ as target language.
+
 Snowball 3.1.0 (2026-05-22)
 ===========================
 
