@@ -1173,12 +1173,22 @@ static struct node * read_C(struct analyser * a) {
         }
         case c_not: {
             struct node * subcommand = read_C(a);
-            if (subcommand->type == c_booltest) {
-                /* We synthesise a special command for "not" applied to testing
-                 * a boolean variable.
-                 */
-                subcommand->type = c_not_booltest;
-                return subcommand;
+            switch (subcommand->type) {
+                case c_booltest:
+                    /* We synthesise a special command for "not" applied to
+                     * testing a boolean variable.
+                     */
+                    subcommand->type = c_not_booltest;
+                    return subcommand;
+                case c_eq:
+                case c_ge:
+                case c_gt:
+                case c_le:
+                case c_lt:
+                case c_ne:
+                    // Flip the sense of the test.
+                    subcommand->type ^= 1;
+                    return subcommand;
             }
             struct node * p = new_node(a, token);
             p->left = subcommand;

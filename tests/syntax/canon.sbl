@@ -13,6 +13,10 @@ define stem as (
   atlimit
   $(cursor >= limit)
 
+  not atlimit
+  not $(cursor >= limit)
+  $(cursor < limit)
+
   // `<-''` is the same as `delete`.
   // `hop 1` is the same as `next`
   [substring] among (

@@ -18,6 +18,15 @@ define stem
     >=
     # limit
       cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
     [
     substring
     ]
