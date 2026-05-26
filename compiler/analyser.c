@@ -1180,6 +1180,15 @@ static struct node * read_C(struct analyser * a) {
                      */
                     subcommand->type = c_not_booltest;
                     return subcommand;
+                case c_next: {
+                    // `not next` -> compare `cursor` and `limit`.
+                    int mode = a->mode;
+                    struct node * n = new_node(a, mode == m_forward ? c_ge : c_le);
+                    n->left = subcommand;
+                    n->left->type = c_cursor;
+                    n->AE = new_node_at_line(a, c_limit, n->left->line_number);
+                    return n;
+                }
                 case c_eq:
                 case c_ge:
                 case c_gt:
@@ -1195,11 +1204,22 @@ static struct node * read_C(struct analyser * a) {
             return p;
         }
         case c_try:
-        case c_test:
         case c_do:
         case c_repeat: {
             struct node * p = new_node(a, token);
             p->left = read_C(a);
+            return p;
+        }
+        case c_test: {
+            struct node * p = new_node(a, token);
+            p->left = read_C(a);
+            if (p->left->type == c_next) {
+                // `test next` -> compare `cursor` and `limit`.
+                int mode = a->mode;
+                p->type = (mode == m_forward ? c_lt : c_gt);
+                p->left->type = c_cursor;
+                p->AE = new_node_at_line(a, c_limit, p->left->line_number);
+            }
             return p;
         }
         case c_fail: {

@@ -12,10 +12,14 @@ define stem as (
 
   atlimit
   $(cursor >= limit)
+  not next
+  not hop 1
 
   not atlimit
   not $(cursor >= limit)
   $(cursor < limit)
+  test next
+  test hop 1
 
   // `<-''` is the same as `delete`.
   // `hop 1` is the same as `next`
