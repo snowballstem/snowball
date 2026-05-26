@@ -1996,7 +1996,7 @@ static void read_program_(struct analyser * a, int terminator) {
                 break;
             case -1:
                 if (terminator != -1)
-		    omission_error(a, terminator);
+                    omission_error(a, terminator);
                 return;
         }
     }
