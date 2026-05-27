@@ -2710,6 +2710,63 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             continue;
         }
 
+        // Inline some routines.
+        //
+        // Currently we inline routines which are "simple" and only used once.
+        // Probably we should inline "simple" *OR* only used once, but to do
+        // that we probably need to clone the nodes for routines used more
+        // than once, and we need to handle updating things like
+        // amongvar_needed (which hasn't been set at this point).
+        //
+        // Note: the definition of a routine is counted as a reference to its
+        // name, so a routine only called once has 2 references.
+        if (q->type == t_routine &&
+            q->references == 2 &&
+            q->uses_in_among == 0 &&
+            q->definition->left->right &&
+            q->definition->left->right->type == c_functionend) {
+            bool inline_routine = false;
+            switch (q->definition->left->type) {
+                case c_eq:
+                case c_ge:
+                case c_gt:
+                case c_le:
+                case c_lt:
+                case c_ne:
+                case c_booltest:
+                case c_not_booltest:
+                case c_grouping:
+                case c_non:
+                case c_literalstring:
+                case c_true:
+                case c_false:
+                    // Inline "simple" single-command routines.
+                    inline_routine = true;
+                    break;
+            }
+
+            if (inline_routine) {
+#if 0
+                fprintf(stderr, "%s:%d: info: Inlining %.*s\n",
+                        a->tokeniser->file,
+                        q->used->line_number,
+                        SIZE(q->s), q->s);
+#endif
+                q->used->type = c_bra;
+                q->used->name = NULL;
+                q->used->left = q->definition->left;
+                for (struct node * n = q->definition->left; n; n = n->right) {
+                    if (n->right && n->right->type == c_functionend) {
+                        n->right = NULL;
+                        break;
+                    }
+                }
+                q->definition->left = NULL;
+                q->used = NULL;
+                continue;
+            }
+        }
+
         if (q->type == t_routine || q->type == t_grouping) {
             /* It's OK to define a grouping but only use it to define other
              * groupings.
