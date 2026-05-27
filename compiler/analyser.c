@@ -782,7 +782,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             if (q->left) {
                 struct name * function = q->left->name;
                 w1->function = function;
-                ++function->used_in_among;
+                ++function->uses_in_among;
                 check_routine_mode(a, function, direction);
                 if (function->among_index == 0) {
                     function->among_index = ++x->function_count;
@@ -1013,7 +1013,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             and_node->left->name = v[0].function;
             and_node->left->right = p;
             p = and_node;
-            --v[0].function->used_in_among;
+            --v[0].function->uses_in_among;
         }
         FREE(x->commands);
         FREE(x);

@@ -231,7 +231,7 @@ struct name {
     bool among_with_function;   /* (routines/externals) contains among with func */
     bool case_collision;        /* A name of the same type differs only by case */
     struct node * definition;   /* (routines/externals) c_define node */
-    int used_in_among;          /* (routines/externals) Count of uses in amongs */
+    int uses_in_among;          /* (routines/externals) Count of uses in amongs */
     // Initialised to -1; set to -2 if reachable from an external.
     // Reachable names are then numbered 0, 1, 2, ... with separate numbering
     // per type.
