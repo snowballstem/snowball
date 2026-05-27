@@ -796,13 +796,16 @@ check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)
 
 check_koi8r: $(KOI8_R_algorithms:%=check_koi8r_%)
 
+# Allows e.g. make RUN_STEMWORDS='valgrind ./stemwords' check
+RUN_STEMWORDS = ./stemwords
+
 check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with UTF-8"
 	@if test -f '$</voc.txt.gz' ; then \
-	  gzip -dc '$</voc.txt.gz'|./stemwords$(EXEEXT) -c UTF_8 -l $* -o tmp.txt; \
+	  gzip -dc '$</voc.txt.gz'|$(RUN_STEMWORDS) -c UTF_8 -l $* -o tmp.txt; \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
 	else \
-	  ./stemwords$(EXEEXT) -c UTF_8 -l $* -i $</voc.txt |\
+	  $(RUN_STEMWORDS) -c UTF_8 -l $* -i $</voc.txt |\
 	  $(TEE_TO_TMP_TXT) \
 	  $(DIFF) -u $</output.txt -; \
 	fi
@@ -812,21 +815,21 @@ check_utf8_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 check_iso_8859_1_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with ISO_8859_1"
 	@$(ICONV) -f UTF-8 -t ISO-8859-1 '$</voc.txt' |\
-	    ./stemwords -c ISO_8859_1 -l $* |\
+	    $(RUN_STEMWORDS) -c ISO_8859_1 -l $* |\
 	    $(ICONV) -f ISO-8859-1 -t UTF-8 |\
 	    $(DIFF) -u '$</output.txt' -
 
 check_iso_8859_2_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with ISO_8859_2"
 	@$(ICONV) -f UTF-8 -t ISO-8859-2 '$</voc.txt' |\
-	    ./stemwords -c ISO_8859_2 -l $* |\
+	    $(RUN_STEMWORDS) -c ISO_8859_2 -l $* |\
 	    $(ICONV) -f ISO-8859-2 -t UTF-8 |\
 	    $(DIFF) -u '$</output.txt' -
 
 check_koi8r_%: $(STEMMING_DATA)/% stemwords$(EXEEXT)
 	@echo "Checking output of $* stemmer with KOI8R"
 	@$(ICONV) -f UTF-8 -t KOI8-R '$</voc.txt' |\
-	    ./stemwords -c KOI8_R -l $* |\
+	    $(RUN_STEMWORDS) -c KOI8_R -l $* |\
 	    $(ICONV) -f KOI8-R -t UTF-8 |\
 	    $(DIFF) -u '$</output.txt' -
 
