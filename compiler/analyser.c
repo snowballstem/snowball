@@ -2737,9 +2737,35 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                 case c_not_booltest:
                 case c_grouping:
                 case c_non:
+                case c_goto_grouping:
+                case c_gopast_grouping:
+                case c_goto_non:
+                case c_gopast_non:
                 case c_literalstring:
+                case c_name:
                 case c_true:
                 case c_false:
+                case c_fail:
+                case c_set:
+                case c_unset:
+                case c_assign:
+                case c_plusassign:
+                case c_minusassign:
+                case c_multiplyassign:
+                case c_divideassign:
+                case c_tomark:
+                case c_tolimit:
+                case c_hop:
+                case c_next:
+                case c_delete:
+                case c_insert:
+                case c_attach:
+                case c_leftslice:
+                case c_rightslice:
+                case c_assignto:
+                case c_sliceto:
+                case c_stringassign:
+                case c_slicefrom:
                     // Inline "simple" single-command routines.
                     inline_routine = true;
                     break;
