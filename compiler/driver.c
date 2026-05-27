@@ -120,6 +120,10 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         {
             if (eq(s, "-o") || eq(s, "-output")) {
                 check_lim(i, argc);
+                if (strcmp(argv[i], "-") == 0) {
+                    fprintf(stderr, "output to stdout not supported\n");
+                    exit(1);
+                }
                 o->output_file = create_s_from_sz(argv[i++]);
                 continue;
             }
