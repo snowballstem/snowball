@@ -2087,7 +2087,7 @@ enum {
  */
 static int always_set_before_use_(struct node * p, struct node * func,
                                   struct name * v) {
-    if (!p) return UNKNOWN;
+    assert(p);
     switch (p->type) {
         case c_call: {
             if (p->name->definition == func) {
@@ -2207,7 +2207,11 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_divide:
         case c_minus:
         case c_multiply:
-        case c_plus:
+        case c_plus: {
+            int r = always_set_before_use_(p->left, func, v);
+            if (r != UNKNOWN) return r;
+            return always_set_before_use_(p->right, func, v);
+        }
         case c_eq:
         case c_ne:
         case c_gt:
@@ -2216,7 +2220,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_le: {
             int r = always_set_before_use_(p->left, func, v);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->right, func, v);
+            return always_set_before_use_(p->AE, func, v);
         }
         case c_neg:
             return always_set_before_use_(p->right, func, v);

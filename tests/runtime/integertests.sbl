@@ -1,7 +1,10 @@
 // Test integer tests.
 externals (stem)
-integers (x y)
+routines (var_local_bug var_local_bug_)
+integers (x y var_local_bug_a var_local_bug_b)
 define stem as (
+  var_local_bug
+
   $x = len
 
   $x == 2 or fail='== failed (old style)'
@@ -33,3 +36,25 @@ define stem as (
   $(1 < x) or fail='< failed (reversed)'
 )
 
+// Regression test for bug in fixed in 3.1.1 - the variable localisation
+// machinery failed to look at the rhs of integer tests.
+define var_local_bug as (
+  $var_local_bug_a = 0
+  var_local_bug_
+  $var_local_bug_a = 1
+  var_local_bug_
+)
+
+define var_local_bug_ as (
+  do (
+    $(var_local_bug_a == 1)
+    // The bug was that this use before set was not spotted.
+    $(7 != var_local_bug_b)
+    ['a'] delete
+  )
+  do (
+    $(var_local_bug_a == 0)
+    $var_local_bug_b = 7
+  )
+  $(7 == var_local_bug_b) or fail='var_local_bug_b was incorrectly localised'
+)
