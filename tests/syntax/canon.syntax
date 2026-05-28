@@ -45,11 +45,11 @@ define stem
     among
       literal 'a'
       (
-        delete
+        <- ''
         next
       literal 'b'
       (
-        delete
+        <- ''
         next
     ==
     # name y

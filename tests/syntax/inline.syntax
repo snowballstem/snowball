@@ -88,7 +88,7 @@ define stem
     (
       next
     (
-      delete
+      <- ''
     (
       insert 'x'
     (
