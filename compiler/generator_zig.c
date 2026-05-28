@@ -729,11 +729,6 @@ static void generate_hop(struct generator * g, struct node * p) {
     str_delete(ae);
 }
 
-static void generate_delete(struct generator * g, struct node * p) {
-    write_comment(g, p);
-    writef(g, "~Menv.sliceDel() catch return false;~N", p);
-}
-
 static void generate_tolimit(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->S[0] = p->mode == m_forward ? "env.limit" : "env.limit_backward";
@@ -822,9 +817,13 @@ static void generate_stringassign(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
+    if (SIZE(p->literalstring) == 0) {
+        w(g, "~Menv.sliceDel() catch return false;~N");
+        return;
+    }
     w(g, "~Menv.sliceFrom(");
     generate_address(g, p);
-    writef(g, ") catch return false;~N", p);
+    w(g, ") catch return false;~N");
 }
 
 static void generate_setlimit(struct generator * g, struct node * p) {
@@ -1303,7 +1302,6 @@ static void generate(struct generator * g, struct node * p) {
         case c_atleast:       generate_atleast(g, p); break;
         case c_tomark:        generate_tomark(g, p); break;
         case c_hop:           generate_hop(g, p); break;
-        case c_delete:        generate_delete(g, p); break;
         case c_next:          generate_next(g, p); break;
         case c_tolimit:       generate_tolimit(g, p); break;
         case c_leftslice:     generate_leftslice(g, p); break;

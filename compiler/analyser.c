@@ -1371,9 +1371,17 @@ static struct node * read_C(struct analyser * a) {
             }
             return n;
         }
-        case c_delete:
+        case c_delete: {
             check_modifyable(a);
-            /* fall through */
+            // Canonicalise `delete` to `<-''`.
+            struct node * n = new_node(a, c_slicefrom);
+            NEW(literalstring, p);
+            p->b = create_b(0);
+            p->next = a->literalstrings;
+            a->literalstrings = p;
+            n->literalstring = p->b;
+            return n;
+        }
         case c_next:
         case c_tolimit:
         case c_leftslice:
@@ -1428,10 +1436,6 @@ static struct node * read_C(struct analyser * a) {
                     n->type = c_true;
                     n->literalstring = NULL;
                     break;
-                  case c_slicefrom:
-                    // Canonicalise `<-''` to `delete`.
-                    n->type = c_delete;
-                    n->literalstring = NULL;
                 }
             }
             return n;
@@ -2144,7 +2148,6 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (p->name == v)
                 return SET_BEFORE_ANY_USE;
             return UNKNOWN;
-        case c_delete:
         case c_grouping:
         case c_leftslice:
         case c_literalstring:
@@ -2314,7 +2317,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_stringassign:
         case c_attach:
         case c_debug:
-        case c_delete:
         case c_do:
         case c_insert:
         case c_leftslice:
@@ -2711,7 +2713,6 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                 case c_tolimit:
                 case c_hop:
                 case c_next:
-                case c_delete:
                 case c_insert:
                 case c_attach:
                 case c_leftslice:

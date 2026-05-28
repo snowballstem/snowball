@@ -394,7 +394,6 @@ static int K_needed_node_on_f_(struct node * p, int call_depth) {
             // Doesn't modify the cursor on failure.
             break;
 
-        case c_delete:
         case c_repeat:
         case c_slicefrom:
         case c_tolimit:
