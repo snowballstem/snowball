@@ -933,7 +933,7 @@ static void generate_stringassign(struct generator * g, struct node * p) {
 
 static void generate_slicefrom(struct generator * g, struct node * p) {
     write_comment(g, p);
-    if (SIZE(p->literalstring) == 0) {
+    if (p->literalstring && SIZE(p->literalstring) == 0) {
         write_propagating_error(g, "slice_del(z)", false, p);
         return;
     }
