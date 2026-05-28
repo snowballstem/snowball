@@ -360,7 +360,7 @@ Generic code generation changes
     generated target language code.
 
   + If the sub-command of `repeat`/`atleast` always signals `t` or always
-    signals `f` we now prune the rest of the current comamnd list, and simplify
+    signals `f` we now prune the rest of the current command list, and simplify
     the command for always `f` (c_repeat -> c_do; c_atleast -> c_bra).  These
     changes help to avoid generating redundant target language code which can
     trigger errors or warnings.
@@ -822,7 +822,7 @@ Javascript
     we have the value of member variable `this.cursor` in local `const c` so
     use the latter instead.
 
-  + Use triple equality for JavaScript.  Patch from Adam Turner.
+  + Use triple equality for Javascript.  Patch from Adam Turner.
 
   + Fix position of grouping type comment which is now placed consistently with
     other type comments.
@@ -1959,7 +1959,7 @@ Compiler
   in the case where we were in a stringdef (but correct if we weren't).
 
 * Eliminate special handling for among starter.  We now convert the starter
-  to be a command before the among, adding an explict substring if there
+  to be a command before the among, adding an explicit substring if there
   isn't one.
 
 * We now warn if the body of a `repeat` or `atleast` loop always signals
@@ -2137,7 +2137,7 @@ Code generation improvements
   + Constant numeric subexpressions and constant numeric tests are now
     evaluated at Snowball compile time.
 
-  + Simplify the following degnerate `loop` and `atleast` constructs where
+  + Simplify the following degenerate `loop` and `atleast` constructs where
     N is a compile-time constant:
 
     - loop N C where N <= 0 is a no-op.
