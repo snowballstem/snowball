@@ -1237,7 +1237,7 @@ static void generate_among(struct generator * g, struct node * p) {
     } else if (x->command_count > 0) {
         if (x->same_action == c_slicefrom && x->command_count > 1) {
             if (x->nocommand_count > 0) {
-                w(g, "~Mif (a > 0) {~N+");
+                w(g, "~Mif (a > 0) {~N~+");
             }
             write_comment(g, x->commands[0]);
             g->I[0] = x->number;
