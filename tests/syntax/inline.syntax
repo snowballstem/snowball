@@ -1,0 +1,121 @@
+define stem
+  (
+    set b
+    [
+    next
+    ]
+    -> s
+    (
+      ==
+      # number 1
+        cursor
+    (
+      >=
+      # number 1
+        cursor
+    (
+      >
+      # number 1
+        cursor
+    (
+      <=
+      # number 1
+        cursor
+    (
+      <
+      # number 1
+        cursor
+    (
+      !=
+      # number 1
+        cursor
+    (
+      Boolean test b
+    (
+      Inverted boolean test b
+    (
+      grouping g
+    (
+      non g
+    (
+      goto grouping g
+    (
+      gopast grouping g
+    (
+      goto non g
+    (
+      gopast non g
+    (
+      literal 'xyzzy'
+    (
+      name s
+    (
+      true
+    do
+      (
+        false
+    do
+      (
+        fail
+          next
+    (
+      set b
+    (
+      unset b
+    (
+      = i
+      # number 1
+    (
+      += i
+      # number 1
+    (
+      -= i
+      # number 1
+    (
+      *= i
+      # number 42
+    (
+      /= i
+      # number 6
+    (
+      tomark
+      # name i
+    (
+      tolimit
+    (
+      hop
+      # number 2
+    (
+      next
+    (
+      delete
+    (
+      insert 'x'
+    (
+      attach 'y'
+    (
+      [
+    (
+      ]
+    (
+      -> s
+    (
+      = 'xyz'
+    (
+      <- 'x'
+    (
+      >=
+      # limit
+        cursor
+    (
+      ==
+      # name i
+        cursor
+    (
+      = i
+      # cursor
+    call external2
+    Function end
+define external2
+  true
+  Function end

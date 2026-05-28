@@ -1,0 +1,144 @@
+// Test inlining of routines.
+externals (stem external2)
+booleans (b)
+groupings (g)
+integers (i)
+strings (s)
+routines (
+  r_eq
+  r_ge
+  r_gt
+  r_le
+  r_lt
+  r_ne
+  r_booltest
+  r_not_booltest
+  r_grouping
+  r_non
+  r_goto_grouping
+  r_gopast_grouping
+  r_goto_non
+  r_gopast_non
+  r_literalstring
+  r_name
+  r_true
+  r_false
+  r_fail
+  r_set
+  r_unset
+  r_assign
+  r_plusassign
+  r_minusassign
+  r_multiplyassign
+  r_divideassign
+  r_tomark
+  r_tolimit
+  r_hop
+  r_next
+  r_delete
+  r_insert
+  r_attach
+  r_leftslice
+  r_rightslice
+  r_sliceto
+  r_stringassign
+  r_slicefrom
+  // These are canonicalised to an integer assignment or test.
+  r_atlimit
+  r_atmark
+  r_setmark
+)
+
+define g 'aeiou'
+
+define stem as (
+  set b
+  [next] -> s
+  r_eq
+  r_ge
+  r_gt
+  r_le
+  r_lt
+  r_ne
+  r_booltest
+  r_not_booltest
+  r_grouping
+  r_non
+  r_goto_grouping
+  r_gopast_grouping
+  r_goto_non
+  r_gopast_non
+  r_literalstring
+  r_name
+  r_true
+  do r_false
+  do r_fail
+  r_set
+  r_unset
+  r_assign
+  r_plusassign
+  r_minusassign
+  r_multiplyassign
+  r_divideassign
+  r_tomark
+  r_tolimit
+  r_hop
+  r_next
+  r_delete
+  r_insert
+  r_attach
+  r_leftslice
+  r_rightslice
+  r_sliceto
+  r_stringassign
+  r_slicefrom
+  r_atlimit
+  r_atmark
+  r_setmark
+  external2
+)
+
+// Externals should not get inlined.
+define external2 as true
+
+define r_eq as $(cursor == 1)
+define r_ge as $(cursor >= 1)
+define r_gt as $(cursor > 1)
+define r_le as $(cursor <= 1)
+define r_lt as $(cursor < 1)
+define r_ne as $(cursor != 1)
+define r_booltest as b
+define r_not_booltest as not b
+define r_grouping as g
+define r_non as non-g
+define r_goto_grouping as goto g
+define r_gopast_grouping as gopast g
+define r_goto_non as goto non-g
+define r_gopast_non as gopast non-g
+define r_literalstring as 'xyzzy'
+define r_name as s
+define r_true as true
+define r_false as false
+define r_fail as fail next
+define r_set as set b
+define r_unset as unset b
+define r_assign as $i = 1
+define r_plusassign as $i += 1
+define r_minusassign as $i -= 1
+define r_multiplyassign as $i *= 42
+define r_divideassign as $i /= 6
+define r_tomark as tomark i
+define r_tolimit as tolimit
+define r_hop as hop 2
+define r_next as next
+define r_delete as delete
+define r_insert as insert 'x'
+define r_attach as attach 'y'
+define r_leftslice as [
+define r_rightslice as ]
+define r_sliceto as ->s
+define r_stringassign as ='xyz'
+define r_slicefrom as <-'x'
+define r_atlimit as atlimit
+define r_atmark as atmark i
+define r_setmark as setmark i

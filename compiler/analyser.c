@@ -325,14 +325,9 @@ static int binding(int t) {
 }
 
 static void mark_used_in(struct analyser * a, struct name * q, struct node * p) {
+    (void)a;
     if (!q->used) {
         q->used = p;
-        q->local_to = a->program_end->name;
-    } else if (q->local_to) {
-        if (q->local_to != a->program_end->name) {
-            /* Used in more than one routine/external. */
-            q->local_to = NULL;
-        }
     }
 }
 
@@ -1935,25 +1930,6 @@ static void read_define_routine(struct analyser * a, struct name * q) {
     get_token(a, c_as);
     p->left = read_C(a);
     if (q) q->definition = p;
-    /* We should get a node with a NULL right pointer from read_C() for the
-     * routine's code.  We synthesise a "functionend" node there so
-     * optimisations such as dead code elimination and tail call optimisation
-     * can easily see where the function ends.
-     */
-    assert(p->left->right == NULL);
-    if (p->left->type == c_bra) {
-        /* Put the "functionend" node at the end of the command list. */
-        struct node * e = p->left->left;
-        if (e) {
-            while (e->right) e = e->right;
-            e->right = new_node(a, c_functionend);
-        } else {
-            p->left = new_node(a, c_functionend);
-        }
-    } else {
-        /* Put the "functionend" node after the single command. */
-        p->left->right = new_node(a, c_functionend);
-    }
 
     if (a->substring != NULL) {
         substring_without_among_error(a);
@@ -2315,7 +2291,7 @@ static int always_set_before_use(struct node * p, struct node * func,
     return always_set_before_use_(p, func, v) != USE_BEFORE_SET;
 }
 
-static void remove_unreachable_routine(struct analyser * a, struct name * q) {
+static void remove_routine(struct analyser * a, struct name * q) {
     struct node ** ptr = &(a->program);
     while (*ptr) {
         if ((*ptr)->name == q) {
@@ -2560,14 +2536,22 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
 
 static void visit_routine(struct analyser * a, struct name * n);
 
-static void visit_node(struct analyser * a, struct node * p) {
+static void visit_node(struct analyser * a, struct node * p, struct name * func) {
     while (p) {
         if (p->name) {
-            if (p->type == c_call) {
-                visit_routine(a, p->name);
-            } else {
-                // Mark as reachable.
-                p->name->count = -2;
+            if (p->name->count != -2) {
+                // First use of this name that visit_node() has seen.
+                p->name->used = p;
+                p->name->local_to = func;
+                if (p->type == c_call) {
+                    visit_routine(a, p->name);
+                } else {
+                    // Mark as reachable.
+                    p->name->count = -2;
+                }
+            } else if (p->name->local_to != func) {
+                // Used in more than one routine/external.
+                p->name->local_to = NULL;
             }
         } else if (p->type == c_among) {
             struct among * x = p->among;
@@ -2577,17 +2561,17 @@ static void visit_node(struct analyser * a, struct node * p) {
                     visit_routine(a, x->b[i].function);
             }
             for (int i = 0; i < x->command_count; ++i) {
-                visit_node(a, x->commands[i]);
+                visit_node(a, x->commands[i], func);
             }
         }
         if (p->left) {
-            visit_node(a, p->left);
+            visit_node(a, p->left, func);
         }
         if (p->aux) {
-            visit_node(a, p->aux);
+            visit_node(a, p->aux, func);
         }
         if (p->AE) {
-            visit_node(a, p->AE);
+            visit_node(a, p->AE, func);
         }
 
         p->possible_signals = check_possible_signals(a, p);
@@ -2644,7 +2628,7 @@ static void visit_routine(struct analyser * a, struct name * n) {
     // will be used if a function calls itself (directly or indirectly).
     p->possible_signals = -1; // Assume it could signal t or f.
 
-    visit_node(a, p->left);
+    visit_node(a, p->left, n);
 
     // Update with calculated value.
     p->possible_signals = p->left->possible_signals;
@@ -2679,37 +2663,8 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
     if (a->tokeniser->error_count)
         return;
 
-    for (struct name * n = a->names; n; n = n->next) {
-        if (n->type == t_external) {
-            if (!n->used) {
-                // Externals can be called from outside of Snowball, so if they
-                // aren't already marked as used we set the `used` field to
-                // point to the definition so we can just check this field
-                // later.
-                n->used = n->definition;
-            }
-            visit_routine(a, n);
-        }
-    }
-
-    for (struct name * q = a->names; q; q = q->next) {
-        if (q->references == 0) {
-            fprintf(stderr, "%s:%d: warning: %s '%.*s' ",
-                    a->tokeniser->file,
-                    q->declaration_line_number,
-                    name_of_type(q->type),
-                    SIZE(q->s), q->s);
-            if (q->type == t_routine ||
-                q->type == t_external ||
-                q->type == t_grouping) {
-                fprintf(stderr, "declared but not defined\n");
-            } else {
-                fprintf(stderr, "declared but not used\n");
-            }
-            q->used = NULL;
-            continue;
-        }
-
+    for (struct name ** n_ptr = &(a->names); *n_ptr; ) {
+        struct name * n = *n_ptr;
         // Inline some routines.
         //
         // Currently we inline routines which are "simple" and only used once.
@@ -2720,13 +2675,12 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
         //
         // Note: the definition of a routine is counted as a reference to its
         // name, so a routine only called once has 2 references.
-        if (q->type == t_routine &&
-            q->references == 2 &&
-            q->uses_in_among == 0 &&
-            q->definition->left->right &&
-            q->definition->left->right->type == c_functionend) {
+        if (n->type == t_routine &&
+            n->references == 2 &&
+            n->uses_in_among == 0 &&
+            !n->definition->left->right) {
             bool inline_routine = false;
-            switch (q->definition->left->type) {
+            switch (n->definition->left->type) {
                 case c_eq:
                 case c_ge:
                 case c_gt:
@@ -2762,7 +2716,6 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                 case c_attach:
                 case c_leftslice:
                 case c_rightslice:
-                case c_assignto:
                 case c_sliceto:
                 case c_stringassign:
                 case c_slicefrom:
@@ -2775,22 +2728,84 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
 #if 0
                 fprintf(stderr, "%s:%d: info: Inlining %.*s\n",
                         a->tokeniser->file,
-                        q->used->line_number,
-                        SIZE(q->s), q->s);
+                        n->used->line_number,
+                        SIZE(n->s), n->s);
 #endif
-                q->used->type = c_bra;
-                q->used->name = NULL;
-                q->used->left = q->definition->left;
-                for (struct node * n = q->definition->left; n; n = n->right) {
-                    if (n->right && n->right->type == c_functionend) {
-                        n->right = NULL;
-                        break;
-                    }
-                }
-                q->definition->left = NULL;
-                q->used = NULL;
+                struct node * call_site = n->used;
+                call_site->type = c_bra;
+                call_site->name = NULL;
+                call_site->left = n->definition->left;
+                remove_routine(a, n);
+                *n_ptr = n->next;
+                lose_s(n->s);
+                FREE(n);
                 continue;
             }
+        }
+
+        n_ptr = &(n->next);
+    }
+
+    // Add "functionend" nodes there so optimisations such as dead code
+    // elimination and tail call optimisation can easily see where the function
+    // ends.
+    for (struct name * name = a->names; name; name = name->next) {
+        if (name->type != t_routine && name->type != t_external) continue;
+
+        struct node * p = name->definition;
+        if (!p) {
+            // No definition - we'll report this later.
+            continue;
+        }
+        assert(p->type == c_define);
+        assert(p->left->right == NULL);
+        if (p->left->type == c_bra) {
+            /* Put the "functionend" node at the end of the command list. */
+            struct node * e = p->left->left;
+            if (e) {
+                while (e->right) e = e->right;
+                e->right = new_node(a, c_functionend);
+            } else {
+                p->left = new_node(a, c_functionend);
+            }
+        } else {
+            /* Put the "functionend" node after the single command. */
+            p->left->right = new_node(a, c_functionend);
+        }
+    }
+
+    // Trace possible control flow starting from externals to discover any
+    // unreachable code.  This also fills in possible_signals for each
+    // reachable node.
+    for (struct name * n = a->names; n; n = n->next) {
+        if (n->type == t_external) {
+            if (!n->used) {
+                // Externals can be called from outside of Snowball, so if they
+                // aren't already marked as used we set the `used` field to
+                // point to the definition so we can just check this field
+                // later.
+                n->used = n->definition;
+            }
+            visit_routine(a, n);
+        }
+    }
+
+    for (struct name * q = a->names; q; q = q->next) {
+        if (q->references == 0) {
+            fprintf(stderr, "%s:%d: warning: %s '%.*s' ",
+                    a->tokeniser->file,
+                    q->declaration_line_number,
+                    name_of_type(q->type),
+                    SIZE(q->s), q->s);
+            if (q->type == t_routine ||
+                q->type == t_external ||
+                q->type == t_grouping) {
+                fprintf(stderr, "declared but not defined\n");
+            } else {
+                fprintf(stderr, "declared but not used\n");
+            }
+            q->used = NULL;
+            continue;
         }
 
         if (q->type == t_routine || q->type == t_grouping) {
@@ -2846,7 +2861,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                         q->declaration_line_number,
                         name_of_type(q->type),
                         SIZE(q->s), q->s);
-                remove_unreachable_routine(a, q);
+                remove_routine(a, q);
             }
             q->used = NULL;
         }
@@ -2865,7 +2880,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                 // the groupings list just below.
                 n->grouping->name = NULL;
             } else if (n->definition) {
-                remove_unreachable_routine(a, n);
+                remove_routine(a, n);
             }
             struct name * n_next = n->next;
             lose_s(n->s);
