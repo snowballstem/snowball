@@ -85,9 +85,9 @@ impl Stemmer {
     pub fn create(lang: String) -> Self {
         // Have a look at ../build.rs
         // There we generate a file that is rust code for a closure that returns a stemmer.
-        // We match against all the algorithms in src/snowball/algoritms/ folder.
+        // We match against all the algorithms in src/snowball/algorithms/ folder.
         // Alas, this cannot be included as a match statement or function because of Rust's
-        // hygenic macros.
+        // hygienic macros.
         let match_language = include!(concat!(env!("OUT_DIR"), "/lang_matches.rs"));
         match_language(lang)
     }

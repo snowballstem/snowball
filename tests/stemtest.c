@@ -12,7 +12,7 @@
  *
  * Only cases which can't be exercised by real words in the language being
  * stemmed should go here.  Each vocabulary lists also serves as a sample
- * vocabulary for evalutating its corresponding stemmer, so we don't want to
+ * vocabulary for evaluating its corresponding stemmer, so we don't want to
  * add entries which would be junk for such use (such as emoji, numbers, hex
  * codes, etc).
  *
