@@ -3,8 +3,6 @@
 
 #include "api.h"
 
-#define HEAD 2*sizeof(int)
-
 #ifdef __cplusplus
 /* Use reinterpret_cast<> to avoid -Wcast-align warnings from clang++. */
 # define SIZE(p)        (reinterpret_cast<const int *>(p))[-1]

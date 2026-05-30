@@ -20,6 +20,15 @@
     } while (0)
 #endif
 
+#define HEAD (2 * sizeof(int))
+
+/* Note that sizeof(symbol) should divide HEAD without remainder, otherwise
+ * there is an alignment problem.
+ *
+ * We support C90 here so use a typedef trick instead of static_assert.
+ */
+typedef int sizeof_symbol_divides_head[(HEAD % sizeof(symbol) == 0) ? 1 : -1];
+
 #define CREATE_SIZE 1
 
 extern symbol * create_s(void) {
