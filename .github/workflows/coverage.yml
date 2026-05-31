@@ -9,8 +9,9 @@ on:
   push:
     paths:
       - 'algorithms/*.sbl'
+      - '.github/workflows/coverage.yml'
   pull_request:
-    branches: main ci-coverage
+    branches: main
     paths:
       - 'algorithms/*.sbl'
 
