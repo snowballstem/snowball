@@ -1,4 +1,4 @@
-up to: b81c7268c105c6994470410836aed7cc7d87f792
+up to: 158109a6112face3ea9e77e3e1fd270b6fa99341
 
 Snowball 3.1.1 (UNRELEASED)
 ===========================
@@ -12,11 +12,73 @@ Compiler changes
     not followed by a string variable name or string literal.  Bug introduced
     in 3.1.0.  Patch from Jerry James (#287).
 
+* Compiler command-line options:
+
+  + Emit an error for `-o -`/`-output -`.  Output to stdout is not supported
+    because we need to generate multiple files for some target languages.
+    We were interpreting `-` as a base filename to append extensions to, so
+    we'd create `-.c` and `-.h` for C, but creating filenames that start with
+    `-` seems unhelpful.
+
+Generic code generation changes
+-------------------------------
+
+* Bug fixes:
+
+  + Variable localisation was failing to check the expression on the RHS of an
+    integer test for uses of a variable, so would incorrectly localise an
+    integer variable whose value should have persisted between calls to a
+    function.  This bug won't realistically manifest in real world Snowball
+    code.
+
+* Optimisations:
+
+  + Inline some routines which are only used once.  This is done for routines
+    consisting of a single non-compound command (or cases such as `not <boolean>`
+    and `goto <grouping>` which we internally synthesise a non-compound command
+    for).  Localisation of variables happens after inlining, so variables can
+    now be localised in more cases.
+
+  + `test next` and `not next` are both now simplified to a comparison between
+    `cursor` and `limit` (like `not atlimit` and `atlimit`).  We already
+    normalise `hop 1` to `next`, so `test hop 1` and `not hop 1` are also
+    simplified in this way.
+
+  + Simplify `not` applied to an integer test by removing the `not` and
+    flipping the sense of the test (e.g. `not $(x > y)` becomes `$(x <= y)`)
+    which results in simpler generated code.  More usefully in real world code,
+    this also results in simpler generated code for `not atlimit` (since
+    `atlimit` is converted `$(cursor >= limit)` or `$(cursor <= limit)`
+    (depending on the current direction).
+
+  + Canonicalise `delete` to `<-''`.  3.1.0 added a canonicalisation of `<-''`
+    to `delete`, but if we instead make `<-''` the canonical representation
+    then the generators can easily handle an empty string here specially (and
+    if they don't then the results are still correct), we don't have to handle
+    the delete token after tokenisation, and the optimisation of among when
+    all actions are `<-` plus a literal string can also fire when some actions
+    are `delete`.  (This case occurs in the stemmers for arabic, czech,
+    estonian, hungarian, irish, italian, polish, porter and tamil.)
+
+Javascript
+----------
+
+* Code quality:
+
+  + Fix formatting of code generated for `among` of `<-` optimisation where we
+    were emitting a literal `+` rather than increasing the margin size.  The
+    `+` was actually harmless in practice, but the rest of the file would be
+    misindented.
+
 Build system
 ------------
 
 * The `generate` target added in 3.1.0 now overrides `FPC` and `MCS` to do
   nothing, to avoid compiling Pascal and C# code.
+
+* Provide way to run tests under valgrind:
+
+    make RUN_STEMWORDS='valgrind ./stemwords' check
 
 Testsuite
 ---------
@@ -29,7 +91,7 @@ Testsuite
 Documentation
 -------------
 
-* NEWS: Fix formatting of two existing entries.
+* NEWS: Fix formatting/wording of a few existing entries.
 
 * README: List C++ as target language.
 
