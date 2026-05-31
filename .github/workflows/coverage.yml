@@ -97,9 +97,10 @@ jobs:
           # Push.
           # FIXME: Ideally we'd diff against the branch pre-push but how
           # do we find out that information?
-          env|sort
-          git log --oneline --decorate 77e07c9c19b89266632b47a4321b33f2106135bb..||true
-          git branch -v || true
+          env|sort 1>&2
+          git log --oneline --decorate 77e07c9c19b89266632b47a4321b33f2106135bb.. 1>&2||true
+          git branch -v 1>&2|| true
+          git diff --stat HEAD^... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d' 1>&2
           git diff --stat HEAD^... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
         fi | while read a ; do
           # This will skip coverage reports for arabic, which currently has far
