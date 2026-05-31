@@ -7,7 +7,7 @@
 
 #include "header.h"
 
-#define HEAD 2*sizeof(int)
+#define HEAD (2 * sizeof(int))
 #define EXTENDER 40
 
 
