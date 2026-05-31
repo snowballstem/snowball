@@ -10,7 +10,7 @@ on:
     paths:
       - 'algorithms/*.sbl'
   pull_request:
-    branches: main
+    branches: main ci-coverage
     paths:
       - 'algorithms/*.sbl'
 
