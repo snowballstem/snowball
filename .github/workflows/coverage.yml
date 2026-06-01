@@ -90,14 +90,15 @@ jobs:
           ls -1 algorithms|sed 's,\.sbl$,,p;d'
         elif [ -n "$GITHUB_HEAD_REF" ] ; then
           # Pull-request.
-          git diff --stat "$GITHUB_BASE_REF"... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
+          git diff --numstat "$GITHUB_BASE_REF"... algorithms|sed 's,^[0-9].*/\([^ ]*\)\.sbl$,\1,p;d'
         else
           # Push.
-          # FIXME: Ideally we'd diff against the branch pre-push but how
-          # do we find out that information?
-          env|sort
-          git log --oneline --decorate v3.1.0..
-          git diff --stat HEAD^... algorithms|sed 's,^ .*/\([^ ]*\)\.sbl *|.*,\1,p;d'
+          #
+          # Currently we just generate coverage for any .sbl sources which
+          # changed in the most recent commit.  Ideally we'd diff against the
+          # branch pre-push but github doesn't seem to provide a way to get
+          # that information.
+          git show --numstat algorithms|sed 's,^[0-9].*/\([^ ]*\)\.sbl$,\1,p;d'
         fi | while read a ; do
           # This will skip coverage reports for arabic, which currently has far
           # too large a test vocabulary, such that it needs to be gzipped to get
