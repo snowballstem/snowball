@@ -3,6 +3,8 @@
 
 #include "api.h"
 
+#include <limits.h>
+
 #ifdef __cplusplus
 /* Use reinterpret_cast<> to avoid -Wcast-align warnings from clang++. */
 # define SIZE(p)        (reinterpret_cast<const int *>(p))[-1]

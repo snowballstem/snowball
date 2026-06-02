@@ -45,6 +45,9 @@ jobs:
           # so enable `unsigned-integer-overflow` too.
           WERROR: '-std=c99 -pedantic -Werror -fsanitize=address,undefined,float-divide-by-zero,local-bounds,nullability,unsigned-integer-overflow -fsanitize-address-use-after-scope -fsanitize-recover=all -fno-omit-frame-pointer'
           CC: clang
+        - name: "C++"
+          CXX: g++
+          WERROR: '-pedantic -Werror'
         - name: java
           JAVA: java
           JAVAC: javac
@@ -247,6 +250,10 @@ jobs:
           *generate*) mkdir ada/bin && ln -s /bin/true ada/bin/generate ;;
         esac
         $MAKE ${{ matrix.c_tests }} CC="$CC"
+    - name: Test C++
+      if: matrix.CXX
+      run: |
+        $MAKE check_cxx CXX='${{ matrix.CXX }}'
     - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.PYTHON_VERSION }}
