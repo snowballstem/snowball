@@ -1,4 +1,4 @@
-up to: a04abeb4f95eed8757b5107694fa0424c7026a79
+up to: 5346c74eaedfdd9495ccc8afd5d6957da9e95258
 
 Snowball 3.1.1 (UNRELEASED)
 ===========================
@@ -34,10 +34,10 @@ Generic code generation changes
 * Optimisations:
 
   + Inline some routines which are only used once.  This is done for routines
-    consisting of a single non-compound command (or cases such as `not <boolean>`
-    and `goto <grouping>` which we internally synthesise a non-compound command
-    for).  Localisation of variables happens after inlining, so variables can
-    now be localised in more cases.
+    consisting of a single non-compound command (or cases such as `not
+    <boolean>` and `goto <grouping>` which we internally synthesise a
+    non-compound command for).  Localisation of variables happens after
+    inlining, so variables can now be localised in more cases.
 
   + `test next` and `not next` are both now simplified to a comparison between
     `cursor` and `limit` (like `not atlimit` and `atlimit`).  We already
@@ -80,6 +80,16 @@ Javascript
     were emitting a literal `+` rather than increasing the margin size.  The
     `+` was actually harmless in practice, but the rest of the file would be
     misindented.
+
+Python
+------
+
+* Other changes:
+
+  + Skip classifier for Sesotho which isn't yet in the official list of
+    trove classifiers.  Patch from Dmitry Shachnev (#289).
+
+  + Add classifier to indicate support for Python 3.14.
 
 Build system
 ------------
