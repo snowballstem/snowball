@@ -198,7 +198,7 @@ STEMTEST_SOURCES = tests/stemtest.c
 # C++
 
 CXX_STEMWORDS_SOURCES = $(cxx_src_dir)/stemwords.cxx
-CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(RUNTIME_SOURCES)
+CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(cxx_src_dir)/utilities.cxx
 CXX_SOURCES = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.cxx)
 CXX_HEADERS = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.h)
 
@@ -879,7 +879,7 @@ CLEANDIRS += $(c_src_dir)
 
 .PHONY: cxx check_cxx do_check_cxx
 
-cxx: $(cxx_src_dir)/stemwords$(EXEEXT)
+cxx: $(CXX_SOURCES) $(CXX_HEADERS) $(cxx_src_dir)/stemwords$(EXEEXT)
 
 check_cxx: cxx
 	$(MAKE) do_check_cxx
