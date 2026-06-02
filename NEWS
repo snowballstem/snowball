@@ -1,4 +1,4 @@
-up to: 158109a6112face3ea9e77e3e1fd270b6fa99341
+up to: a04abeb4f95eed8757b5107694fa0424c7026a79
 
 Snowball 3.1.1 (UNRELEASED)
 ===========================
@@ -59,6 +59,17 @@ Generic code generation changes
     all actions are `<-` plus a literal string can also fire when some actions
     are `delete`.  (This case occurs in the stemmers for arabic, czech,
     estonian, hungarian, irish, italian, polish, porter and tamil.)
+
+C++
+---
+
+* Code quality:
+
+  + C++ runtime support is now fully hooked up and can be tested using
+    `make check_cxx`.
+
+  + Don't use `extern "C"` for functions which can throw as MSVC seems to
+    treat such functions as if they were marked `noexpect`.
 
 Javascript
 ----------
