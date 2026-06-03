@@ -69,7 +69,7 @@ Snowball's ``libstemmer_c`` and should provide results 100% compatible to
 **snowballstemmer**.
 
 **PyStemmer** is faster because it wraps generated C versions of the stemmers;
-**snowballstemmer** uses generate Python code and is slower but offers a pure
+**snowballstemmer** uses generated Python code and is slower, but offers a pure
 Python solution.
 
 If PyStemmer is installed, ``snowballstemmer.stemmer`` returns a ``PyStemmer``
