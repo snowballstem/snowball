@@ -3,7 +3,7 @@
 # include <stdbool.h>
 #endif
 
-#define SNOWBALL_VERSION "3.1.0"
+#define SNOWBALL_VERSION "3.1.1"
 
 typedef unsigned char byte;
 typedef unsigned short symbol;

@@ -3,7 +3,7 @@
 from setuptools import setup
 import re
 
-SNOWBALL_VERSION = '3.1.0'
+SNOWBALL_VERSION = '3.1.1'
 
 n_stemmers = 0
 
