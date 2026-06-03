@@ -45,6 +45,10 @@ for lang in langs:
     if lang_titlecase != 'Sesotho':
         classifiers.append('Natural Language :: ' + lang_titlecase)
 
+    # Portuguese stemmer also works for Brazilian Portuguese.
+    if lang_titlecase == 'Portuguese':
+        classifiers.append('Natural Language :: Portuguese (Brazilian)')
+
 classifiers.extend([
     'Operating System :: OS Independent',
     'Programming Language :: Python',
