@@ -109,9 +109,11 @@ jobs:
           # That size means generating a coverage report for it takes something
           # like 20-25 minutes.
           if [ -f "${STEMMING_DATA}/$a/voc.txt" ] ; then
-            $MAKE -s "check_utf8_$a" 2> coverage.log
-            echo ; echo "=== Coverage report for $a ===" ; echo
-            sort -k2,2 -k3,3n -k3,3 -k5,5g coverage.log |
-              uniq -c |awk '{$1=sprintf("% 8d",$1-1);print}'
+            if grep -q "^$a " libstemmer/modules.txt ; then
+              $MAKE -s "check_utf8_$a" 2> coverage.log
+              echo ; echo "=== Coverage report for $a ===" ; echo
+              sort -k2,2 -k3,3n -k3,3 -k5,5g coverage.log |
+                uniq -c |awk '{$1=sprintf("% 8d",$1-1);print}'
+            fi
           fi
         done
