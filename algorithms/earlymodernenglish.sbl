@@ -17,6 +17,9 @@ groupings ( aeo v v_WXY valid_LI )
 
 stringescapes {}
 
+stringdef ae '{U+00E6}'
+stringdef oe '{U+0153}'
+
 define aeo      'aeo'
 define v        'aeiouy'
 define v_WXY    v + 'wxY'
@@ -24,6 +27,15 @@ define v_WXY    v + 'wxY'
 define valid_LI 'cdeghkmnrt'
 
 define prelude as (
+    // Additional step for Early Modern English.
+    do repeat (
+        [substring] among(
+            '{ae}' (<- 'ae')
+            '{oe}' (<- 'oe')
+            ''  (next)
+        )
+    )
+
     unset Y_found
     do ( ['{'}'] delete)
     do ( ['y'] <-'Y' set Y_found)
