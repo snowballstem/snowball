@@ -243,10 +243,13 @@ backwardmode (
     )
 
     define verb as (
-        // -остей: gen pl of adj-derived abstract nouns, min 4-char stem guard.
-        // Prevents волость type regression (волостей→вол, 3 chars too short).
+        // -остей: gen pl of adj-derived abstract nouns. `not atlimit` keeps at
+        // least one char before the limit (pV), preventing волость regression
+        // (волостей→вол). Cursor counts bytes in UTF-8 but characters in wide
+        // mode, so a numeric cursor guard would stem inconsistently across
+        // encodings; `not atlimit` is encoding-portable.
         // Fallback via -{i`} strips only -й → волосте, then noun strips -е → волост.
-        ( ['{o}{s}{t}{e}{i`}'] $(cursor >= 8) delete )
+        ( ['{o}{s}{t}{e}{i`}'] not atlimit delete )
         or
         ( [substring] among (
                 '{a}{t}{y}' '{i}{t}{y}'         // Infinitive (читати→чит, робити→роб)
@@ -281,10 +284,13 @@ backwardmode (
 
     define noun as (
         // -ості: gen/dat/loc sg, nom/gen pl of adj-derived abstract nouns.
-        // Min 4-char stem guard prevents волість→вол (3 chars); falls through
-        // to -{i} below → волост. Verb handles -остей (ends in -й), so
-        // the -{o}{s}{t}{e}{i`} entry here is removed (unreachable).
-        ( ['{o}{s}{t}{i}'] $(cursor >= 8) delete )
+        // `not atlimit` keeps at least one char before the limit (pV),
+        // preventing волість→вол; falls through to -{i} below → волост.
+        // Encoding-portable guard (cursor counts bytes in UTF-8 but chars in
+        // wide mode, so a numeric cursor test would stem inconsistently).
+        // Verb handles -остей (ends in -й), so the -{o}{s}{t}{e}{i`} entry
+        // here is removed (unreachable).
+        ( ['{o}{s}{t}{i}'] not atlimit delete )
         or
         ( [substring] among (
                 // Fleeting vowel: -ець → -ц (nominative → oblique stem)
@@ -390,7 +396,7 @@ backwardmode (
     )
 
     define derivational as (
-        [substring] R2 among (
+        setlimit tomark p2 for ([substring]) among (
             // Quality/abstract
             '{n}{i}{s}{t}{'}'     // -ність
             '{o}{v}{i}{s}{t}{'}'  // -овість
