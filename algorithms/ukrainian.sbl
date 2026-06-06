@@ -271,13 +271,18 @@ backwardmode (
                 // Note: -{y}{m} (-им) removed — adj standard ending '{y}{m}' (instr.sg/dat.pl)
                 // always fires first, so verb -им is unreachable
                 '{l}{a}' '{l}{y}' '{l}{o}'      // Past tense (others)
-                '{t}{y}'                        // Infinitive (fallback)
                 '{ie}{sh}' '{e}{sh}' '{y}{sh}'  // Present 2nd sg (знаєш, живеш, робиш)
                 '{ie}'                          // Present 3rd sg/future
                 '{i`}'                          // Imperative sg
                 '{iu}' '{u}'                    // Present 1st sg (fallback)
                 '{v}'                           // Past masc (fallback)
                     (delete)
+                // Infinitive -ти (fallback), but skip -нти: Ukrainian has no
+                // infinitive ending in -нти, so -нти is always a noun plural
+                // (документи, моменти, студенти). Deleting -ти there over-stems
+                // (документи→докумен); the guard lets noun -и run instead.
+                '{t}{y}'
+                    ( not '{n}' delete )
           )
         )
     )
