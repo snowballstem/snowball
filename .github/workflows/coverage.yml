@@ -90,6 +90,7 @@ jobs:
           ls -1 algorithms|sed 's,\.sbl$,,p;d'
         elif [ -n "$GITHUB_HEAD_REF" ] ; then
           # Pull-request.
+          git fetch --depth=1 origin "$GITHUB_BASE_REF"
           git diff --numstat "$GITHUB_BASE_REF"... algorithms|sed 's,^[0-9].*/\([^ ]*\)\.sbl$,\1,p;d'
         else
           # Push.
