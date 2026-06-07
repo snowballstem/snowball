@@ -881,7 +881,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
 
         for (w = w0 - 1; w >= v; w--) {
             if (w->size < size && memcmp(w->b, b, w->size * sizeof(symbol)) == 0) {
-                w0->i = w - v;  /* fill in index of longest substring */
+                w0->i = (int)(w - v);  /* fill in index of longest substring */
                 break;
             }
         }

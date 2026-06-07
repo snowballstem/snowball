@@ -2,6 +2,10 @@
  * line interface for stemming using any of the algorithms provided.
  */
 
+#ifdef _MSC_VER
+# define _CRT_SECURE_NO_WARNINGS // Suppress stupid warning about fopen().
+#endif
+
 #include <stdio.h>
 #include <stdlib.h> /* for malloc, free */
 #include <string.h> /* for memmove */

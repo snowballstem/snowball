@@ -51,7 +51,7 @@ static void write_comment_literalstring(struct generator * g, const symbol *s,
         // Check if the literal string contains the target language end comment
         // string.  Don't try to be clever here as real-world literal strings
         // are unlikely to contain even partial matches.
-        int end_len = strlen(end);
+        int end_len = (int)strlen(end);
         if (end_len <= SIZE(s)) {
             for (int i = 0; i <= SIZE(s) - end_len; ++i) {
                 for (int j = 0; j < end_len; ++j) {

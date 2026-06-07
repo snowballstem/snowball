@@ -170,7 +170,7 @@ extern byte * create_s(int n) {
 }
 
 extern byte * create_s_from_sz(const char * s) {
-    int n = strlen(s);
+    int n = (int)strlen(s);
     byte * p = create_s(n);
     memcpy(p, s, n + 1);
     SET_SIZE(p, n);
@@ -241,7 +241,7 @@ extern byte * add_s_to_s(byte * p, const byte * s) {
    block is created. */
 
 extern byte * add_sz_to_s(byte * p, const char * s) {
-    return add_slen_to_s(p, s, strlen(s));
+    return add_slen_to_s(p, s, (int)strlen(s));
 }
 
 /* Add a single character to a byte block. If p = 0 the
@@ -318,7 +318,7 @@ extern void str_append_int(struct str * str, int i) {
 /* Append wide character to a string as UTF-8. */
 extern void str_append_wchar_as_utf8(struct str * str, symbol ch) {
     if (ch < 0x80) {
-        str_append_ch(str, ch);
+        str_append_ch(str, (char)ch);
         return;
     }
     if (ch < 0x800) {

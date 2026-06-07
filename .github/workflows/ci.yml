@@ -128,6 +128,12 @@ jobs:
           MAKE: mingw32-make
           mingw64_packages: 'mingw-w64-ucrt-x86_64-go'
           ccache: sccache
+        - name: Windows MSVC (C)
+          os: windows-latest
+          c_tests: check
+          ccache: sccache
+          CC: cl
+          CFLAGS: -nologo -std:c11 -W3 -WX
 
       fail-fast: false
 
@@ -188,6 +194,11 @@ jobs:
             git clone "$UPSTREAM_REPO_URL"
           fi
         fi
+    - name: Set up Visual Studio shell
+      if: ${{ endsWith(matrix.CC, 'cl') }}
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
     - name: Hook up runtime testing
       if: ${{ inputs.runtime-tests }}
       run: |
@@ -229,7 +240,7 @@ jobs:
         msystem: ucrt64
         install: base-devel ${{ matrix.mingw64_packages }}
     - name: Build
-      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC"
+      run: $MAKE CC="${{ matrix.ccache || 'ccache' }} $CC" ${{ format('{0}{1}{2}', matrix.CFLAGS && 'CFLAGS="', matrix.CFLAGS, matrix.CFLAGS && '"') }}
     - name: Test C dist
       if: matrix.CFLAGS_DIST_BUILD
       run: |
@@ -249,7 +260,7 @@ jobs:
         case '${{ matrix.c_tests }}' in
           *generate*) mkdir ada/bin && ln -s /bin/true ada/bin/generate ;;
         esac
-        $MAKE ${{ matrix.c_tests }} CC="$CC"
+        $MAKE ${{ matrix.c_tests }} CC="$CC" ${{ format('{0}{1}{2}', matrix.CFLAGS && 'CFLAGS="', matrix.CFLAGS, matrix.CFLAGS && '"') }}
     - name: Test C++
       if: matrix.CXX
       run: |

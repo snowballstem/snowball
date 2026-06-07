@@ -396,7 +396,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
 
         const char * dot = strrchr(leaf, '.');
         if (dot) {
-            o->output_file = create_s_from_data(leaf, dot - leaf);
+            o->output_file = create_s_from_data(leaf, (int)(dot - leaf));
         } else {
             o->output_file = create_s_from_sz(leaf);
         }
@@ -415,8 +415,8 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         const char * dot = strrchr(leaf, '.');
         if (dot) {
             o->extension = create_s_from_sz(dot);
-            SET_SIZE(o->output_file, dot - output_file);
-            o->output_leaf = create_s_from_data(leaf, dot - leaf);
+            SET_SIZE(o->output_file, (int)(dot - output_file));
+            o->output_leaf = create_s_from_data(leaf, (int)(dot - leaf));
         } else {
             o->output_leaf = create_s_from_sz(leaf);
         }
@@ -428,7 +428,7 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         if (dot) {
             // Trim off any extension (we only remove the last of multiple
             // extensions above).
-            SET_SIZE(o->name, dot - o->name);
+            SET_SIZE(o->name, (int)(dot - o->name));
         }
         switch (o->target_lang) {
             case LANG_CSHARP:
@@ -443,10 +443,10 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
                  * underscore+letter or hyphen+letter to an upper case
                  * letter.
                  */
-                size_t len = SIZE(o->name);
-                size_t new_len = 0;
+                int len = SIZE(o->name);
+                int new_len = 0;
                 bool uc_next = true;
-                for (size_t j = 0; j != len; ++j) {
+                for (int j = 0; j != len; ++j) {
                     byte ch = o->name[j];
                     if (ch == '_' || ch == '-') {
                         uc_next = true;

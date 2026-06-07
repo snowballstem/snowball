@@ -1760,7 +1760,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
     write_varname(g, q->name);
     w(g, " : constant Grouping_Array (0 .. ~I0) := (~N~+~M");
     for (int i = 0; i < size; i++) {
-        unsigned char m = map[i];
+        symbol m = map[i];
         if (i) w(g, ",~N~M");
         for (int j = 0; j < 8; j++) {
             if (j) w(g, ", ");

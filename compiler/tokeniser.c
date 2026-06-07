@@ -548,7 +548,7 @@ extern int read_token(struct tokeniser * t) {
                     }
                 }
                 if (u == NULL) {
-                    error(t, "Can't get '", (byte *)file, strlen(file), "'");
+                    error(t, "Can't get '", (byte *)file, (int)strlen(file), "'");
                     exit(1);
                 }
                 memmove(q, t, sizeof(struct input));
