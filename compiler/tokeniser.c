@@ -29,7 +29,7 @@ extern byte * get_input(const char * filename) {
         while (true) {
             size_t s = CAPACITY(u) - size;
             size_t r = fread(u + size, 1, s, input);
-            size += r;
+            size += (int)r;
             if (r < s) {
                 if (ferror(input)) {
                     fprintf(stderr, "%s: Read error\n", filename);
