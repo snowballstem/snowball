@@ -57,7 +57,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_char(g, ch);
         } else {
             write_string(g, "\\u{");
-            write_hex4(g, ch);
+            write_hex(g, ch);
             write_string(g, "}");
         }
     }
@@ -71,7 +71,7 @@ static void write_literal_char(struct generator * g, symbol ch) {
         write_char(g, ch);
     } else {
         write_string(g, "\\u{");
-        write_hex4(g, ch);
+        write_hex(g, ch);
         write_string(g, "}");
     }
     write_char(g, '"');
