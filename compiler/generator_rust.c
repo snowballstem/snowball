@@ -47,7 +47,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
             write_wchar_as_utf8(g, ch);
         } else {
             write_string(g, "\\u{");
-            write_hex4(g, ch);
+            write_hex(g, ch);
             write_string(g, "}");
         }
     }
