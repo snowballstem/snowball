@@ -1,14 +1,17 @@
 
 #include <stdlib.h> /* for malloc, free */
+#include <string.h> /* for memset */
 #include "snowball_runtime.h"
-
-static const struct SN_env default_SN_env;
 
 extern struct SN_env * SN_new_env(int alloc_size)
 {
     struct SN_env * z = (struct SN_env *) malloc(alloc_size);
     if (z == NULL) return NULL;
-    *z = default_SN_env;
+    /* This memset() will initialise z->p to all-bits-zero which (at least
+     * theoretically) may not be the NULL pointer representation, but that's OK
+     * as immediately afterwards we assign to z->p.
+     */
+    memset(z, 0, sizeof(*z));
     z->p = create_s();
     if (z->p == NULL) {
         SN_delete_env(z);

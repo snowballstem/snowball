@@ -13,9 +13,6 @@ struct SN_env {
     symbol * p;
     int c; int l; int lb; int bra; int ket;
     int af;
-#ifdef __cplusplus
-    SN_env() : p(), c(), l(), lb(), bra(), ket(), af() { }
-#endif
 };
 
 #ifdef __cplusplus
