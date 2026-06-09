@@ -17,8 +17,9 @@ groupings ( aeo v v_WXY valid_LI )
 
 stringescapes {}
 
-stringdef ae '{U+00E6}'
-stringdef oe '{U+0153}'
+stringdef ae     '{U+00E6}'
+stringdef oe     '{U+0153}'
+stringdef long_s '{U+017F}'
 
 define aeo      'aeo'
 define v        'aeiouy'
@@ -30,9 +31,10 @@ define prelude as (
     // Additional step for Early Modern English.
     do repeat (
         [substring] among(
-            '{ae}' (<- 'ae')
-            '{oe}' (<- 'oe')
-            ''  (next)
+            '{ae}'     (<- 'ae')
+            '{oe}'     (<- 'oe')
+            '{long_s}' (<- 's')
+            ''         (next)
         )
     )
 
