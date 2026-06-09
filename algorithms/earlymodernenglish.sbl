@@ -6,7 +6,7 @@ routines (
     mark_regions
     shortv
     R1 R2
-    Step_0
+    prefixes
     Step_1a Step_1b Step_1c Step_2 Step_3 Step_4 Step_5
     exception1
 )
@@ -45,7 +45,7 @@ define prelude as (
 )
 
 // Additional step for Early Modern English.
-define Step_0 as (
+define prefixes as (
     [substring] among (
         'o{'}er' // e.g. o'erwhelm -> overwhelm
             (<- 'over')
@@ -281,7 +281,7 @@ define stem as (
     exception1 or
     not hop 3 or (
         do prelude
-        do Step_0
+        do prefixes
         do mark_regions
         backwards (
 
