@@ -48,6 +48,7 @@ define Step_0 as (
         'o{'}er' // e.g. o'erwhelm -> overwhelm
             (<- 'over')
         'th{'}'  // e.g. th'earth -> earth
+        't{'}'   // e.g. t'assume -> assume
             (not atlimit delete)
     )
 )
@@ -91,9 +92,6 @@ backwardmode (
             [substring] among (
                 '{'}' '{'}s' '{'}s{'}'
                        (delete)
-                // Additions for Early Modern English.
-                'e{'}er' // e.g. whoe'er -> whoever
-                       (<- 'ever')
             )
         )
         [substring] among (
@@ -102,6 +100,12 @@ backwardmode (
                    ((hop 2 <-'i') or <-'ie')
             's'    (next gopast v delete)
             'us' 'ss'
+                   ()
+             // Additions for Early Modern English.
+            'e{'}er' // e.g. whoe'er -> whoever
+                   (<- 'ever')
+            'lie'    // e.g. assemblie -> assembly
+                   (R1  <- 'ly')
         )
     )
 
@@ -222,11 +226,16 @@ backwardmode (
             'e' (R2 or (R1 not shortv) delete)
             'l' (R2 'l' delete)
             // Additions for Early Modern English.
-            '{'}n'   // e.g. heav'n -> heaven
-            '{'}nd'  // e.g. quick'nd -> quicken
+            '{'}n'    // e.g. heav'n -> heaven
+            '{'}nd'   // e.g. quick'nd -> quicken
                 (<- 'en')
-            '{'}r'   // e.g. (rememb'red -> rememb'r) -> remember
+            '{'}r'    // e.g. (rememb'red -> rememb'r) -> remember
+            '{'}rous' // e.g. murd'rous -> murder
                 (<- 'er')
+            '{'}ri'   // e.g. (wat'ry -> wat'ri) -> wateri
+                (<- 'eri')
+            '{'}li'   // e.g. (happ'ly -> happ'li) -> happili
+                (<- 'ili')
         )
     )
 )
