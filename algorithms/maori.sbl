@@ -1,0 +1,88 @@
+routines (
+    normalise_diaereses
+    R1 R2 RV
+    mark_regions
+    verb_sfx
+)
+
+externals ( stem )
+
+integers ( pV p1 p2 )
+
+groupings ( v )
+
+stringescapes {}
+
+/* special characters (long vowels using macrons or diaereses) */
+
+stringdef a_    '{U+0101}'  // a-macron
+stringdef e_    '{U+0113}'  // e-macron
+stringdef i_    '{U+012B}'  // i-macron
+stringdef o_    '{U+014D}'  // o-macron
+stringdef u_    '{U+016B}'  // u-macron
+stringdef a"    '{U+00E4}'  // a-diaeresis
+stringdef e"    '{U+00EB}'  // e-diaeresis
+stringdef i"    '{U+00EF}'  // i-diaeresis
+stringdef o"    '{U+00F6}'  // o-diaeresis
+stringdef u"    '{U+00FC}'  // u-diaeresis
+
+/* define vowels */
+
+define v 'aeiou{a_}{e_}{i_}{o_}{u_}'
+
+/* normalise diaereses to macrons */
+
+define normalise_diaereses as (
+    repeat (
+        [substring] among (
+            '{a"}' (<- '{a_}')
+            '{e"}' (<- '{e_}')
+            '{i"}' (<- '{i_}')
+            '{o"}' (<- '{o_}')
+            '{u"}' (<- '{u_}')
+            '' (next)
+        )
+    )
+)
+
+define mark_regions as (
+
+    $pV = limit
+    $p1 = limit
+    $p2 = limit  // defaults
+
+    do (
+        gopast v setmark pV
+    )
+    do (
+        gopast v gopast non-v setmark p1
+        gopast v gopast non-v setmark p2
+    )
+)
+
+backwardmode (
+
+    define RV as $pV <= cursor
+    define R1 as $p1 <= cursor
+    define R2 as $p2 <= cursor
+
+    /* strip passive verb endings */
+
+    define verb_sfx as (
+        [substring] among (
+            'tia' 'hia' 'ngia' 'kia' 'mia' 'ria' 'whia' 'wh{a_}ia' 'ia'
+            'ina' 'whina' 'kina'
+            'nga' 'na' 'a'
+            (RV test v delete)
+        )
+    )
+
+)
+
+define stem as (
+    do normalise_diaereses
+    do mark_regions
+    backwards (
+        do verb_sfx
+    )
+)
