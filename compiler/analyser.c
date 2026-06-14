@@ -2754,6 +2754,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             continue;
         }
         assert(p->type == c_define);
+        assert(p->left);
         assert(p->left->right == NULL);
         if (p->left->type == c_bra) {
             /* Put the "functionend" node at the end of the command list. */
