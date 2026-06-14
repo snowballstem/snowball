@@ -553,6 +553,16 @@ extern int repeat_restore(struct node * p) {
     return repeat_score(p, 0) >= 2;
 }
 
+extern bool
+amongvar_needed(struct node * p)
+{
+    if (!p) return false;
+    if (p->among && p->among->amongvar_needed) return true;
+    return amongvar_needed(p->left) ||
+           amongvar_needed(p->right) ||
+           amongvar_needed(p->aux);
+}
+
 /* Language-independent write routines for simple entities */
 
 static void write_hexdigit(struct generator * g, unsigned i) {

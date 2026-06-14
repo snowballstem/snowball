@@ -1142,7 +1142,7 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     w(g, "~}");
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         str_append_string(g->declarations, "    AmongVar : Integer;\n");
     }
 

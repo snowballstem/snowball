@@ -752,7 +752,6 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
     x->node = p;
     x->b = v;
     x->shortest_size = INT_MAX;
-    x->in_routine = a->current_routine;
 
     if (q->type == c_bra) {
         fprintf(stderr,
@@ -1014,10 +1013,6 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
         FREE(x);
         FREE(v);
         return p;
-    }
-
-    if (x->function_count) {
-        if (a->current_routine) a->current_routine->among_with_function = true;
     }
 
     x->substring = substring;
@@ -2973,8 +2968,6 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                  * find_among*() returns zero or not.
                  */
                 x->amongvar_needed = true;
-                if (x->in_routine)
-                    x->in_routine->amongvar_needed = true;
             }
 
             a_ptr = &(x->next);

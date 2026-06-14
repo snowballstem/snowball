@@ -1086,7 +1086,7 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mlet mut among_var;~N");
     }
 

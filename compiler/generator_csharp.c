@@ -1069,7 +1069,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 

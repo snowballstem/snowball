@@ -1124,7 +1124,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     struct name * q = p->name;
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         // The "among var" (`a`) is only assigned to, but the initialisation
         // can be generated in a nested block so it seems hard to declare it as
         // const and still have it visible when we want to use it.

@@ -1134,7 +1134,7 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mvar among_var: i32 = 0;~N");
     }
 

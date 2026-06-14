@@ -1234,7 +1234,7 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     writef(g, "int ~V(struct SN_env * z) {~N~+", p);
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 
