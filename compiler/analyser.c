@@ -2631,6 +2631,60 @@ static void visit_routine(struct analyser * a, struct name * n) {
     p->possible_signals = p->left->possible_signals;
 }
 
+static struct node * clone_node(struct analyser * a, struct node * n) {
+    if (n == NULL) return n;
+
+    NEW(node, p);
+    p->among = n->among;
+    p->type = n->type;
+    p->mode = n->mode;
+    p->fixed_constant = n->fixed_constant;
+    p->possible_signals = n->possible_signals;
+    p->name = n->name;
+    p->literalstring = n->literalstring;
+    p->number = n->number;
+    p->line_number = n->line_number;
+
+    p->left = clone_node(a, n->left);
+    p->aux = clone_node(a, n->aux);
+    p->right = clone_node(a, n->right);
+    p->AE = clone_node(a, n->AE);
+
+    p->next = a->nodes;
+    a->nodes = p;
+    return p;
+}
+
+// Inline any calls to routine `n` in the code starting at `p`.
+// Returns true if there are no remaining calls to `n` anywhere in the program.
+static bool inline_calls(struct analyser * a,
+                         struct node * p,
+                         struct name * n) {
+    while (p) {
+        if (p->name == n && p->type == c_call) {
+            p->type = c_bra;
+            p->name = NULL;
+            --n->references;
+            if (n->references < 2) {
+                // No more uses of n, so there is no need to clone the code.
+                // We return true so if we're nested our parent knows to stop
+                // looking for calls to n, and to indicate the entry for n in
+                // analyser->names should be removed.
+                p->left = n->definition->left;
+                n->definition = NULL;
+                return true;
+            }
+            p->left = clone_node(a, n->definition->left);
+            p = p->right;
+            continue;
+        }
+        if (inline_calls(a, p->left, n)) return true;
+        if (inline_calls(a, p->aux, n)) return true;
+        p = p->right;
+    }
+    return false;
+}
+
 extern void read_program(struct analyser * a, unsigned localise_mask) {
     read_program_(a, -1);
     for (struct name * q = a->names; q; q = q->next) {
@@ -2662,19 +2716,16 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
 
     for (struct name ** n_ptr = &(a->names); *n_ptr; ) {
         struct name * n = *n_ptr;
-        // Inline some routines.
+        // Inline calls to routines which are "simple".
         //
-        // Currently we inline routines which are "simple" and only used once.
-        // Probably we should inline "simple" *OR* only used once, but to do
-        // that we probably need to clone the nodes for routines used more
-        // than once, and we need to handle updating things like
+        // We should probably also inline any routine which is only called once
+        // but to do that we need to handle updating things like
         // amongvar_needed (which hasn't been set at this point).
         //
         // Note: the definition of a routine is counted as a reference to its
         // name, so a routine only called once has 2 references.
         if (n->type == t_routine &&
-            n->references == 2 &&
-            n->uses_in_among == 0 &&
+            n->references >= 2 &&
             !n->definition->left->right) {
             bool inline_routine = false;
             switch (n->definition->left->type) {
@@ -2727,15 +2778,27 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                         n->used->line_number,
                         SIZE(n->s), n->s);
 #endif
-                struct node * call_site = n->used;
-                call_site->type = c_bra;
-                call_site->name = NULL;
-                call_site->left = n->definition->left;
-                remove_routine(a, n);
-                *n_ptr = n->next;
-                lose_s(n->s);
-                FREE(n);
-                continue;
+                bool remove = false;
+                for (struct name * r = a->names; r; r = r->next) {
+                    // Only routines and externals.
+                    if (!r->definition) continue;
+                    // Don't try to inline a routine into itself!
+                    if (r == n) continue;
+                    if (inline_calls(a, r->definition->left, n)) {
+                        // All calls to routine `n` have now been inlined
+                        // so remove it and move on to the next candidate
+                        // for inlining.
+                        remove = true;
+                        break;
+                    }
+                }
+                if (remove) {
+                    remove_routine(a, n);
+                    *n_ptr = n->next;
+                    lose_s(n->s);
+                    FREE(n);
+                    continue;
+                }
             }
         }
 
