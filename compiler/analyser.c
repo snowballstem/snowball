@@ -3089,18 +3089,24 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
      */
     memset(a->name_count, 0, sizeof(a->name_count));
     for (struct name * name = a->names; name; name = name->next) {
-        if (name->local_to && !name->local_to->recursive) {
+        if (name->local_to) {
             if (localise_mask & (1 << name->type)) {
                 struct node * func = name->local_to->definition;
-                if (!always_set_before_use(func->left, name)) {
+                if (name->local_to->recursive) {
+                    fprintf(stderr,
+                            "%s:%d: info: Could not localise %s `%.*s` into recursive routine `%.*s`\n",
+                            a->tokeniser->file, func->line_number,
+                            name_of_type(name->type),
+                            SIZE(name->s), name->s,
+                            SIZE(func->name->s), func->name->s);
+                    name->local_to = NULL;
+                } else if (!always_set_before_use(func->left, name)) {
                     fprintf(stderr,
                             "%s:%d: info: Could not localise %s `%.*s` to routine `%.*s`\n",
                             a->tokeniser->file, func->line_number,
                             name_of_type(name->type),
                             SIZE(name->s), name->s,
                             SIZE(func->name->s), func->name->s);
-                    report_s(stderr, name->s);
-                    fprintf(stderr, "\n");
                     name->local_to = NULL;
                 }
             } else {
