@@ -2057,30 +2057,23 @@ enum {
  * can be trivially made local in existing stemmers.
  *
  * p:    the node of the command to check.
- * func: the c_define of the routine/external this code is in.
  * v:    the variable to check.
  */
-static int always_set_before_use_(struct node * p, struct node * func,
-                                  struct name * v) {
+static int always_set_before_use_(struct node * p, struct name * v) {
     assert(p);
     switch (p->type) {
         case c_call: {
-            if (p->name->definition == func) {
-                /* We've recursed into the function we're considering
-                 * localising this variable into, which means we can't
-                 * localise it because then changes to the variable in
-                 * the nested call won't be reflected after it returns.
-                 */
-                return USE_BEFORE_SET;
-            }
-            // We know v is only referenced in the function we are checking.
+            // We know v is only referenced in the function we are checking
+            // (and we don't try to localise variables into recursive
+            // functions, so we know this call can't re-enter the current
+            // function).
             return UNKNOWN;
         }
         case c_among: {
             bool all_pass = true;
             struct among * x = p->among;
             for (int i = 1; i <= x->command_count; i++) {
-                int r = always_set_before_use_(x->commands[i - 1], func, v);
+                int r = always_set_before_use_(x->commands[i - 1], v);
                 if (r == USE_BEFORE_SET) return r;
                 all_pass = all_pass && (r == SET_BEFORE_ANY_USE);
             }
@@ -2091,7 +2084,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             struct node * q = p->left;
             bool all_pass = true;
             while (q) {
-                int r = always_set_before_use_(q, func, v);
+                int r = always_set_before_use_(q, v);
                 if (r == USE_BEFORE_SET) return r;
                 all_pass = all_pass && (r == SET_BEFORE_ANY_USE);
                 q = q->right;
@@ -2103,7 +2096,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_bra: {
             struct node * q = p->left;
             while (q) {
-                int r = always_set_before_use_(q, func, v);
+                int r = always_set_before_use_(q, v);
                 if (r != UNKNOWN) return r;
                 q = q->right;
             }
@@ -2113,25 +2106,25 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_not:
         case c_reverse:
         case c_test:
-            return always_set_before_use_(p->left, func, v);
+            return always_set_before_use_(p->left, v);
         case c_do:
         case c_fail:
         case c_gopast:
         case c_goto:
         case c_try:
         case c_repeat: {
-            if (always_set_before_use_(p->left, func, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->left, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return UNKNOWN;
         }
         case c_atleast:
         case c_loop:
-            if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
-            return always_set_before_use_(p->left, func, v);
+            return always_set_before_use_(p->left, v);
         case c_assign:
             // Check AE first: `x = x + 1` uses `x` before it sets it.
-            if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             if (p->name == v)
                 return SET_BEFORE_ANY_USE;
@@ -2162,7 +2155,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             return UNKNOWN;
         case c_hop:
         case c_tomark:
-            if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return UNKNOWN;
         case c_stringassign:
@@ -2182,9 +2175,9 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_minus:
         case c_multiply:
         case c_plus: {
-            int r = always_set_before_use_(p->left, func, v);
+            int r = always_set_before_use_(p->left, v);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->right, func, v);
+            return always_set_before_use_(p->right, v);
         }
         case c_eq:
         case c_ne:
@@ -2192,12 +2185,12 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_ge:
         case c_lt:
         case c_le: {
-            int r = always_set_before_use_(p->left, func, v);
+            int r = always_set_before_use_(p->left, v);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->AE, func, v);
+            return always_set_before_use_(p->AE, v);
         }
         case c_neg:
-            return always_set_before_use_(p->right, func, v);
+            return always_set_before_use_(p->right, v);
         case c_lenof:
         case c_sizeof:
             if (p->name == v) {
@@ -2212,9 +2205,9 @@ static int always_set_before_use_(struct node * p, struct node * func,
         case c_size:
             return UNKNOWN;
         case c_setlimit: {
-            int r = always_set_before_use_(p->aux, func, v);
+            int r = always_set_before_use_(p->aux, v);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->left, func, v);
+            return always_set_before_use_(p->left, v);
         }
         case c_divideassign:
         case c_minusassign:
@@ -2223,7 +2216,7 @@ static int always_set_before_use_(struct node * p, struct node * func,
             if (p->name == v) {
                 return USE_BEFORE_SET;
             }
-            if (always_set_before_use_(p->AE, func, v) == USE_BEFORE_SET) {
+            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET) {
                 return USE_BEFORE_SET;
             }
             return UNKNOWN;
@@ -2284,9 +2277,8 @@ static int always_set_before_use_(struct node * p, struct node * func,
     return USE_BEFORE_SET;
 }
 
-static int always_set_before_use(struct node * p, struct node * func,
-                                 struct name * v) {
-    return always_set_before_use_(p, func, v) != USE_BEFORE_SET;
+static int always_set_before_use(struct node * p, struct name * v) {
+    return always_set_before_use_(p, v) != USE_BEFORE_SET;
 }
 
 static void remove_routine(struct analyser * a, struct name * q) {
@@ -2529,6 +2521,33 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         default:
             return -1;
     }
+}
+
+// Can control flow from node `p` reach routine `func`?
+static bool recursion_check(struct node * p, struct name * func) {
+    while (p) {
+        switch (p->type) {
+            case c_call:
+                if (p->name == func) return true;
+                if (p->name->definition && !p->name->visited) {
+                    p->name->visited = true;
+                    if (recursion_check(p->name->definition->left, func)) return true;
+                }
+                break;
+            case c_among: {
+                struct among * x = p->among;
+                if (x->function_count == 0) break;
+                for (int i = 0; i < x->literalstring_count; ++i) {
+                    if (x->b[i].function == func) return true;
+                }
+                break;
+            }
+        }
+        if (p->left && recursion_check(p->left, func)) return true;
+        if (p->aux && recursion_check(p->aux, func)) return true;
+        p = p->right;
+    }
+    return false;
 }
 
 static void visit_routine(struct analyser * a, struct name * n);
@@ -2805,17 +2824,32 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
         n_ptr = &(n->next);
     }
 
-    // Add "functionend" nodes there so optimisations such as dead code
-    // elimination and tail call optimisation can easily see where the function
-    // ends.
     for (struct name * name = a->names; name; name = name->next) {
-        if (name->type != t_routine && name->type != t_external) continue;
-
         struct node * p = name->definition;
         if (!p) {
-            // No definition - we'll report this later.
+            // Either this name is not a routine/external, or it is missing
+            // a definition (which gets reported later).
             continue;
         }
+
+        // Recursion is rare in real-world Snowball programs, and there are
+        // some optimisations that we don't attempt if this flag is set.
+        for (struct name * n = a->names; n; n = n->next) {
+            n->visited = false;
+        }
+        name->recursive = recursion_check(p->left, name);
+#if 0
+        if (name->recursive) {
+            fprintf(stderr,
+                    "%s:%d: info: `%.*s` is recursive\n",
+                    a->tokeniser->file, name->definition->line_number,
+                    SIZE(name->s), name->s);
+        }
+#endif
+
+        // Add "functionend" nodes so that optimisations such as dead code
+        // elimination and tail call optimisation can easily see where the
+        // function ends.
         assert(p->type == c_define);
         assert(p->left);
         assert(p->left->right == NULL);
@@ -3040,10 +3074,13 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
 
     /* Localise variables.
      *
-     * We localise variables which are only referenced in a single function
-     * (routine or external) and which are always set before being read within
-     * that function (since a function could rely on a variable's previous
-     * value surviving).
+     * We localise variables which are only referenced in a single non-recursive
+     * function (routine or external) and which are always set before being
+     * read within that function (since a function could rely on a variable's
+     * previous value surviving).
+     *
+     * This optimisation is done after inlining, since inlining can often move
+     * all references to a variable into the same function.
      *
      * We could potentially localise variables referenced in multiple functions
      * provided that they are always set before use in every function they are
@@ -3052,10 +3089,10 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
      */
     memset(a->name_count, 0, sizeof(a->name_count));
     for (struct name * name = a->names; name; name = name->next) {
-        if (name->local_to != NULL) {
+        if (name->local_to && !name->local_to->recursive) {
             if (localise_mask & (1 << name->type)) {
                 struct node * func = name->local_to->definition;
-                if (!always_set_before_use(func->left, func, name)) {
+                if (!always_set_before_use(func->left, name)) {
                     fprintf(stderr,
                             "%s:%d: info: Could not localise %s `%.*s` to routine `%.*s`\n",
                             a->tokeniser->file, func->line_number,

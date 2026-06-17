@@ -228,6 +228,10 @@ struct name {
     bool initialised;           /* (For variables) is it ever initialised? */
     bool used_in_definition;    /* (grouping) used in grouping definition? */
     bool case_collision;        /* A name of the same type differs only by case */
+    // (routines/externals) Could this directly or indirectly call itself?
+    bool recursive;
+    // (routines/externals) Temporary flag used while determining `recursive`.
+    bool visited;
     struct node * definition;   /* (routines/externals) c_define node */
     int uses_in_among;          /* (routines/externals) Count of uses in amongs */
     // Initialised to -1; set to -2 if reachable from an external.
