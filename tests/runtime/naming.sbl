@@ -4,6 +4,15 @@ strings (notable NoTable NOTABLE)
 // Test handling of name ending `_`.
 // (Regression test for bug in Ada generator fixed in 3.1.0.)
 integers (x_ x_e x_ee)
+// Test names which would exceed the C90 guaranteed 31 significant initial
+// characters for internal identifiers.  The generator adds a 2 character
+// prefix, so we need 30 here.  We can't easily check that a short id is
+// actually generated, but we can at least exercise this case to try to catch
+// bugs.
+integers (
+  abcdefghijklmnopqrstuvwxyz0123
+  abcdefghijklmnopqrstuvwxyz0124
+)
 externals (stem)
 define stem as (
   try (
@@ -16,5 +25,8 @@ define stem as (
     $(x_ + x_ee < x_e)
     delete
   )
+  $abcdefghijklmnopqrstuvwxyz0123 = len
+  $abcdefghijklmnopqrstuvwxyz0124 = size
+  $(abcdefghijklmnopqrstuvwxyz0123 <= abcdefghijklmnopqrstuvwxyz0124)
   [tolimit] <- 'ok'
 )

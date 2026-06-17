@@ -4,6 +4,9 @@
 #include <string.h> /* for strlen */
 #include "header.h"
 
+// C90 guarantees 31 significant initial characters in an internal identifier.
+#define C_MAX_ID_LEN 31
+
 /* Define this to get warning messages when optimisations can't be used. */
 /* #define OPTIMISATION_WARNINGS */
 
@@ -38,6 +41,19 @@ static void write_varname(struct generator * g, struct name * p) {
          */
         write_char(g, "sbirxg"[p->type]);
         write_char(g, '_');
+        if (g->options->target_lang == LANG_C) {
+            if (SIZE(p->s) > C_MAX_ID_LEN - 2) {
+                // We aim to generate C90 code, and C90 only guarantees 31
+                // significant initial characters in internal identifiers.
+                // C99 raised this to 63, and modern implementations are
+                // likely to have a high limit or not impose one, but it
+                // is easy to generate an identifier based on the number
+                // instead.  A Snowball name must start with a letter so
+                // this can't collide.
+                write_int(g, p->count);
+                return;
+            }
+        }
     }
     write_s(g, p->s);
 }
