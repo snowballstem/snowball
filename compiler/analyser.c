@@ -2771,59 +2771,66 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
 
     for (struct name ** n_ptr = &(a->names); *n_ptr; ) {
         struct name * n = *n_ptr;
-        // Inline calls to routines which are "simple".
-        //
-        // We should probably also inline any routine which is only called once
-        // but to do that we need to handle updating things like
-        // amongvar_needed (which hasn't been set at this point).
-        //
-        // Note: the definition of a routine is counted as a reference to its
-        // name, so a routine only called once has 2 references.
         if (n->type == t_routine &&
             n->references >= 2 &&
             !n->definition->left->right) {
             bool inline_routine = false;
-            switch (n->definition->left->type) {
-                case c_eq:
-                case c_ge:
-                case c_gt:
-                case c_le:
-                case c_lt:
-                case c_ne:
-                case c_booltest:
-                case c_not_booltest:
-                case c_grouping:
-                case c_non:
-                case c_goto_grouping:
-                case c_gopast_grouping:
-                case c_goto_non:
-                case c_gopast_non:
-                case c_literalstring:
-                case c_name:
-                case c_true:
-                case c_false:
-                case c_fail:
-                case c_set:
-                case c_unset:
-                case c_assign:
-                case c_plusassign:
-                case c_minusassign:
-                case c_multiplyassign:
-                case c_divideassign:
-                case c_tomark:
-                case c_tolimit:
-                case c_hop:
-                case c_next:
-                case c_insert:
-                case c_attach:
-                case c_leftslice:
-                case c_rightslice:
-                case c_sliceto:
-                case c_stringassign:
-                case c_slicefrom:
-                    // Inline "simple" single-command routines.
-                    inline_routine = true;
-                    break;
+            if (n->references == 2) {
+                // Inline any routine only called once (where that call is not
+                // as an among function).
+                //
+                // Note: the definition of a routine is counted as a reference
+                // to its name, so a routine only called once has 2 references.
+                inline_routine = (n->uses_in_among == 0);
+            } else {
+                // Inline any calls to routines which is simple enough that the
+                // generated code to call the routine is likely to be a similar
+                // size to the inlined code that replaces it.
+                //
+                // Currently we inline any non-compound command (including
+                // non-compound commands we synthesise, such as `goto` applied
+                // to a grouping).
+                switch (n->definition->left->type) {
+                    case c_eq:
+                    case c_ge:
+                    case c_gt:
+                    case c_le:
+                    case c_lt:
+                    case c_ne:
+                    case c_booltest:
+                    case c_not_booltest:
+                    case c_grouping:
+                    case c_non:
+                    case c_goto_grouping:
+                    case c_gopast_grouping:
+                    case c_goto_non:
+                    case c_gopast_non:
+                    case c_literalstring:
+                    case c_name:
+                    case c_true:
+                    case c_false:
+                    case c_fail:
+                    case c_set:
+                    case c_unset:
+                    case c_assign:
+                    case c_plusassign:
+                    case c_minusassign:
+                    case c_multiplyassign:
+                    case c_divideassign:
+                    case c_tomark:
+                    case c_tolimit:
+                    case c_hop:
+                    case c_next:
+                    case c_insert:
+                    case c_attach:
+                    case c_leftslice:
+                    case c_rightslice:
+                    case c_sliceto:
+                    case c_stringassign:
+                    case c_slicefrom:
+                        inline_routine = true;
+                        break;
+                }
             }
 
             if (inline_routine) {
