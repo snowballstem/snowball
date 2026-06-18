@@ -2056,10 +2056,13 @@ enum {
  * safely localised when it can, but they allow localising all variables which
  * can be trivially made local in existing stemmers.
  *
- * p:    the node of the command to check.
- * v:    the variable to check.
+ * p:      the node of the command to check.
+ * v:      the variable to check.
+ * only_t: if true, we don't care about codepaths which signal `f`.
  */
-static int always_set_before_use_(struct node * p, struct name * v) {
+static int always_set_before_use_(struct node * p,
+                                  struct name * v,
+                                  bool only_t) {
     assert(p);
     switch (p->type) {
         case c_call: {
@@ -2073,7 +2076,7 @@ static int always_set_before_use_(struct node * p, struct name * v) {
             bool all_pass = true;
             struct among * x = p->among;
             for (int i = 1; i <= x->command_count; i++) {
-                int r = always_set_before_use_(x->commands[i - 1], v);
+                int r = always_set_before_use_(x->commands[i - 1], v, only_t);
                 if (r == USE_BEFORE_SET) return r;
                 all_pass = all_pass && (r == SET_BEFORE_ANY_USE);
             }
@@ -2084,7 +2087,10 @@ static int always_set_before_use_(struct node * p, struct name * v) {
             struct node * q = p->left;
             bool all_pass = true;
             while (q) {
-                int r = always_set_before_use_(q, v);
+                // `or` handles signal `f` from subcommands except the last.
+                // Signal `f` from the last subcommand propagates.
+                int r = always_set_before_use_(q, v,
+                                               only_t && q->right == NULL);
                 if (r == USE_BEFORE_SET) return r;
                 all_pass = all_pass && (r == SET_BEFORE_ANY_USE);
                 q = q->right;
@@ -2095,36 +2101,60 @@ static int always_set_before_use_(struct node * p, struct name * v) {
         case c_and:
         case c_bra: {
             struct node * q = p->left;
+            // If we execute this command, we'll definitely execute
+            // sub-commands up to and including the first which could
+            // fail.
             while (q) {
-                int r = always_set_before_use_(q, v);
+                int r = always_set_before_use_(q, v, only_t);
                 if (r != UNKNOWN) return r;
+                bool last = !only_t && (q->possible_signals <= 0);
+                q = q->right;
+                if (last) break;
+            }
+            // Any remaining subcommands may not get executed, so we need to
+            // scan for SET_BEFORE_ANY_USE.  However if a subcommand is
+            // executed we know the ones before must have been, so a
+            // USE_BEFORE_SET subcommand means we can at least ignore any
+            // following SET_BEFORE_ANY_USE subcommands.
+            while (q) {
+                int r = always_set_before_use_(q, v, only_t);
+                if (r == USE_BEFORE_SET) return r;
+                if (r == SET_BEFORE_ANY_USE) return UNKNOWN;
                 q = q->right;
             }
             return UNKNOWN;
         }
         case c_backwards:
-        case c_not:
         case c_reverse:
         case c_test:
-            return always_set_before_use_(p->left, v);
-        case c_do:
         case c_fail:
+            return always_set_before_use_(p->left, v, only_t);
+        case c_repeat:
+        case c_do:
+        case c_not:
+        case c_try:
+            return always_set_before_use_(p->left, v, false);
         case c_gopast:
         case c_goto:
-        case c_try:
-        case c_repeat: {
-            if (always_set_before_use_(p->left, v) == USE_BEFORE_SET)
+            // If the cursor is atlimit already the subcommand won't be
+            // executed, so a SET_BEFORE_ANY_USE from it doesn't guarantee
+            // that the variable will get set.
+            if (always_set_before_use_(p->left, v, false) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return UNKNOWN;
-        }
         case c_atleast:
         case c_loop:
-            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v, true) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
-            return always_set_before_use_(p->left, v);
+            // If AE has value <= 0 the subcommand won't be executed, so a
+            // SET_BEFORE_ANY_USE from it doesn't guarantee that the variable
+            // will get set.
+            if (always_set_before_use_(p->left, v, false) == USE_BEFORE_SET)
+                return USE_BEFORE_SET;
+            return UNKNOWN;
         case c_assign:
             // Check AE first: `x = x + 1` uses `x` before it sets it.
-            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v, true) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             if (p->name == v)
                 return SET_BEFORE_ANY_USE;
@@ -2155,7 +2185,7 @@ static int always_set_before_use_(struct node * p, struct name * v) {
             return UNKNOWN;
         case c_hop:
         case c_tomark:
-            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET)
+            if (always_set_before_use_(p->AE, v, true) == USE_BEFORE_SET)
                 return USE_BEFORE_SET;
             return UNKNOWN;
         case c_stringassign:
@@ -2175,9 +2205,9 @@ static int always_set_before_use_(struct node * p, struct name * v) {
         case c_minus:
         case c_multiply:
         case c_plus: {
-            int r = always_set_before_use_(p->left, v);
+            int r = always_set_before_use_(p->left, v, true);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->right, v);
+            return always_set_before_use_(p->right, v, true);
         }
         case c_eq:
         case c_ne:
@@ -2185,12 +2215,12 @@ static int always_set_before_use_(struct node * p, struct name * v) {
         case c_ge:
         case c_lt:
         case c_le: {
-            int r = always_set_before_use_(p->left, v);
+            int r = always_set_before_use_(p->left, v, true);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->AE, v);
+            return always_set_before_use_(p->AE, v, true);
         }
         case c_neg:
-            return always_set_before_use_(p->right, v);
+            return always_set_before_use_(p->right, v, true);
         case c_lenof:
         case c_sizeof:
             if (p->name == v) {
@@ -2205,9 +2235,15 @@ static int always_set_before_use_(struct node * p, struct name * v) {
         case c_size:
             return UNKNOWN;
         case c_setlimit: {
-            int r = always_set_before_use_(p->aux, v);
+            int r = always_set_before_use_(p->aux, v, only_t);
             if (r != UNKNOWN) return r;
-            return always_set_before_use_(p->left, v);
+            r = always_set_before_use_(p->left, v, only_t);
+            if (!only_t && p->aux->possible_signals <= 0) {
+                // aux can fail so left may not be executed.
+                if (r == USE_BEFORE_SET) return r;
+                return UNKNOWN;
+            }
+            return r;
         }
         case c_divideassign:
         case c_minusassign:
@@ -2216,7 +2252,7 @@ static int always_set_before_use_(struct node * p, struct name * v) {
             if (p->name == v) {
                 return USE_BEFORE_SET;
             }
-            if (always_set_before_use_(p->AE, v) == USE_BEFORE_SET) {
+            if (always_set_before_use_(p->AE, v, true) == USE_BEFORE_SET) {
                 return USE_BEFORE_SET;
             }
             return UNKNOWN;
@@ -2278,7 +2314,7 @@ static int always_set_before_use_(struct node * p, struct name * v) {
 }
 
 static int always_set_before_use(struct node * p, struct name * v) {
-    return always_set_before_use_(p, v) != USE_BEFORE_SET;
+    return always_set_before_use_(p, v, true) != USE_BEFORE_SET;
 }
 
 static void remove_routine(struct analyser * a, struct name * q) {

@@ -1,0 +1,16 @@
+externals (stem)
+integers (x y)
+integers (global_a)
+
+define stem as (
+  do (
+    $x = len
+    next
+    $y = cursor
+    next
+    $(y > 0)
+    $global_a = 0
+  )
+  $(x > 0)
+  $global_a > 0
+)

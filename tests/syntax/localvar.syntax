@@ -1,0 +1,22 @@
+define stem
+  (
+    do
+      (
+        = x
+        # len
+        next
+        = y
+        # cursor
+        next
+        >
+        # number 0
+          name y
+        = global_a
+        # number 0
+    >
+    # number 0
+      name x
+    >
+    # number 0
+      name global_a
+    Function end
