@@ -141,7 +141,6 @@ EOS
         print OUT "  {\"${enc}\", ENC_${enc}},\n";
     }
     print OUT <<EOS;
-  {0,ENC_UNKNOWN}
 };
 
 struct stemmer_modules {
