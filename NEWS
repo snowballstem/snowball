@@ -1,3 +1,102 @@
+up to: a4f51be2759c37ae94c3dc0581e2ed2364f576de
+
+Snowball 3.2.0 (UNRELEASED)
+===========================
+
+    Improve variable localisation machinery, and fix some obscure cases
+    it was getting wrong.
+    All variables which are only used in one function after inlining
+    are now successfully localised.
+    Fix bug in handling of recursive routines, and in the testcase that
+    was meant to test this.
+    Report an "info" diagnostic when we don't localise into a recursive
+    routine.
+
+    Fix spurious extra output of variable name on a line by itself after
+    an "info" diagnostic saying we couldn't localise it.
+
+    Extend inlining to all calls to simple routines
+    In this context, a "simple" routine is one which consists of a single
+    non-compound Snowball command.  The target language code generated for
+    such commands should be comparable in size to the target language code
+    to call a routine, and inlining may enable other optimisations (variable
+    localisation and folding `not` into integer tests, for example).
+
+    Inline any routine which is only used once (where that use is not as
+    an among function).
+    In addition to inlining all calls to "simple" routines, we now also
+    inline calls to any routine which is only used once (and where that
+    use is not as an among function).
+    This enables more variables to be localised.  Currently we fail to
+
+    C: Limit generated internal C identifier length
+    C90 guarantees 31 significant initial characters in an internal
+    identifier.  C99 raised this to 63, and modern implementations are
+    likely to have a high limit or not impose one, but it is easy to
+    generate an identifier based on the number instead.  A Snowball name
+    must start with a letter so this can't collide.
+
+
+    Add stemmer for Early Modern English
+
+    This is a variant of the English stemmer which was previously only
+    described on the website, but seems sufficiently useful to include in
+    the distribution.
+
+    A few additional rules have been added:
+
+    + Remove th'-, t'-
+    + Replace o'vr- with over-
+    + Replace -e'er with -ever
+    + Remove -edst (suggested by E. Timothy Uy in 2012!)
+    + Remove -'d, -'dly, -'dst, -'st, -'t
+    + Replace -'n, -'nd with -en
+    + Replace -'r, -'rous with -er
+    + Replace -'ri with -eri
+    + Replace -'li with -ili
+    + Replace -lie with -ly
+    earlymodernenglish: Normalise æ and œ and long-s
+    These ligatures appear in texts from this era significantly more than
+    in modern English.  `œ` is not in iso-8859-1 so drop that.
+    Fixes #261
+    earlymodernenglish: Handle more prefixes/suffixes
+
+C:
+    Simplify initialisation in SN_new_env()
+    We can just use memset() here - there is a pointer member, and the C
+    standard doesn't require NULL pointers to be represented as
+    all-bits-zero (though all modern implementations I'm aware of do)
+    but we assign the only pointer member right after the memset() so
+    the potential discrepancy isn't actually relevant here anyway.
+
+    Rust: Emit minimum length Unicode escapes
+
+    PHP: Emit minimum length Unicode escapes
+
+    Adjust to compile cleanly with MSVC
+    Add CI job which compiles and runs C tests which uses `-W3 -WX` (`-W3`
+    is apparently the default warning level when using the IDE and `-WX`
+    turns warnings into errors).
+    The build system isn't really set up properly for this currently - it
+    has `.o` hard-wired as the object extension (which MSVC handles but
+    moans about) and builds a static library with extension `.a` using the
+    mingw `ar` tool rather than the MSVC tooling.
+    The build does at least seem to work correctly, and the key thing we
+    want to ensure here is that the generated stemmer code and runtime
+    support works, which our CI now does.
+
+    Fix detection of read error for piped input
+    Read errors were effectively being ignored when the input was
+    non-seekable.
+    Bug introduced in 3.1.0.
+
+    Python: Include classifier for pt_BR too
+    We document that our Portuguese stemmer "aims to work with both European
+    Portuguese and Brazilian Portuguese".
+
+    libstemmer_python_README: Fix typo
+
+
 Snowball 3.1.1 (2026-06-03)
 ===========================
 
