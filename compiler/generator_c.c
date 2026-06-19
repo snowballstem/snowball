@@ -1952,21 +1952,20 @@ static void generate_create(struct generator * g) {
 }
 
 static void generate_close(struct generator * g) {
+    // If there are no string variables then our env is just SN_delete_env so
+    // we #define it to that in the header.
+    if (g->analyser->name_count[t_string] == 0) return;
+
     w(g, "~Nextern void ~pclose_env(struct SN_env * z) {~N~+");
+    w(g, "~Mif (!z) return;~N");
 
-    if (g->analyser->name_count[t_string] > 0) {
-        w(g, "~Mif (!z) return;~N");
-
-        for (struct name * name = g->analyser->names; name; name = name->next) {
-            if (!name->local_to && name->type == t_string) {
-                w(g, "~Mlose_s(");
-                write_varref(g, name);
-                w(g, ");~N");
-            }
+    for (struct name * name = g->analyser->names; name; name = name->next) {
+        if (!name->local_to && name->type == t_string) {
+            w(g, "~Mlose_s(");
+            write_varref(g, name);
+            w(g, ");~N");
         }
     }
-
-    // Note: SN_delete_env() no-ops if z is NULL so we don't to gate this call.
     w(g, "~MSN_delete_env(z);~N"
          "~-}~N~N");
 }
@@ -2009,9 +2008,14 @@ static void generate_header_file(struct generator * g) {
              "#endif~N");            /* for C++ */
 
         w(g, "~N"
-             "extern struct SN_env * ~pcreate_env(void);~N"
-             "extern void ~pclose_env(struct SN_env * z);~N"
-             "~N");
+             "extern struct SN_env * ~pcreate_env(void);~N");
+
+        if (g->analyser->name_count[t_string] == 0) {
+            w(g, "#define ~pclose_env SN_delete_env~N");
+        } else {
+            w(g, "extern void ~pclose_env(struct SN_env * z);~N");
+        }
+        write_newline(g);
     }
 
     const char * vp = o->variables_prefix;
