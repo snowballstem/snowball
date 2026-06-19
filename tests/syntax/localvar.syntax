@@ -5,13 +5,15 @@ define stem
         = x
         # len
         next
+        = global_a
+        # number 0
         = y
         # cursor
         next
         >
         # number 0
           name y
-        = global_a
+        = global_b
         # number 0
     >
     # number 0
@@ -19,4 +21,56 @@ define stem
     >
     # number 0
       name global_a
+    >
+    # number 0
+      name global_b
+    do
+      (
+        = u
+        # limit
+        test
+          (
+            next
+            = v
+            # cursor
+        = global_c
+        # number 0
+        try
+          (
+            <
+            # name v
+              name u
+            = u
+            # name v
+    >=
+    # name u
+      cursor
+    >
+    # number 0
+      name global_c
+    (
+      test
+        (
+          hop
+          # number 3
+          = t
+          # cursor
+      = s
+      # limit
+      do
+        (
+          gopast
+            literal 'a'
+          = s
+          # cursor
+          try
+            (
+              <
+              # name t
+                name s
+              = s
+              # name t
+    >
+    # number 3
+      name s
     Function end
