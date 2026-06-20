@@ -818,7 +818,13 @@ CLEANDIRS += $(ada_src_dir) ada/bin ada/obj
 
 .PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_compilertest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+# We don't run these when runtime tests are enabled (for stemtest, because it
+# contains tests of the shipped algorithms; for compilertest, because it is
+# orthogonal to the algorithms and so redundant to run it in both
+# configuations).
+EXTRA_TESTS ?= check_compilertest check_stemtest
+
+check: $(EXTRA_TESTS) check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_compilertest: tests/compilertest
 	cd tests && ./compilertest
@@ -1225,6 +1231,7 @@ setup_runtime_tests: clean_runtime_tests
 	printf '%s:=%s\n' \
 	  ALGORITHMS 'tests/runtime' \
 	  BASELINE 'rbaseline' \
+	  EXTRA_TESTS '' \
 	  MODULES '$(RUNTIME_DATA_DIR)/modules.txt' \
 	  other_algorithms '' \
 	  SNOWBALL_FLAGS '-comments' \
