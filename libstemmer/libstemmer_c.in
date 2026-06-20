@@ -22,10 +22,10 @@ sb_stemmer_list(void)
 static stemmer_encoding_t
 sb_getenc(const char * charenc)
 {
-    int i;
+    size_t i;
     if (charenc == NULL) return ENC_UTF_8;
     for (i = 0; i < sizeof(encodings) / sizeof(encodings[0]); ++i) {
-        if (strcmp(encodings[i].name, charenc) == 0))
+        if (strcmp(encodings[i].name, charenc) == 0)
             return encodings[i].enc;
     }
     return ENC_UNKNOWN;
