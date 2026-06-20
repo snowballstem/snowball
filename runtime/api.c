@@ -11,7 +11,7 @@ extern struct SN_env * SN_new_env(int alloc_size)
      * theoretically) may not be the NULL pointer representation, but that's OK
      * as immediately afterwards we assign to z->p.
      */
-    memset(z, 0, sizeof(*z));
+    memset(z, 0, alloc_size);
     z->p = create_s();
     if (z->p == NULL) {
         SN_delete_env(z);

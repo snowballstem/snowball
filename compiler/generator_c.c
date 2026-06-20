@@ -1891,55 +1891,46 @@ static void generate_create(struct generator * g) {
     w(g, "~N"
          "extern struct SN_env * ~pcreate_env(void) {~N~+");
 
-    if (g->analyser->variable_count == 0) {
+    if (g->analyser->name_count[t_string] == 0) {
         w(g, "~Mreturn SN_new_env(sizeof(struct SN_env));~N");
     } else {
         w(g, "~Mstruct SN_env * z = SN_new_env(sizeof(SN_local));~N"
              "~Mif (z) {~N~+");
 
+        // SN_new_env() initialises the allocated size to all-zero-bits, so
+        // assigning NULL here is only needed on platforms where NULL doesn't
+        // have an all-zero-bits representation in memory.  The C standard
+        // allows that, but there don't seem to be any current such platforms.
+        // There doesn't seem an easy way to only enable this code when it is
+        // useful though.
+        //
+        // To simplify handling a failure to allocate a string variable, if
+        // there are multiple non-localised string variables we initialise them
+        // all to NULL first, then try to allocate them in a second pass.  We
+        // don't need to do this when there's only one because in that case we
+        // can't have a partially successful allocation.
+        if (g->analyser->name_count[t_string] > 1) {
+            for (struct name * name = g->analyser->names; name; name = name->next) {
+                if (!name->local_to && name->type == t_string) {
+                    w(g, "~M");
+                    write_varref(g, name);
+                    w(g, " = NULL;~N");
+                }
+            }
+            write_newline(g);
+        }
+
         for (struct name * name = g->analyser->names; name; name = name->next) {
             if (!name->local_to) {
                 switch (name->type) {
                     case t_string:
-                        w(g, "~M");
+                        w(g, "~Mif ((");
                         write_varref(g, name);
-                        w(g, " = NULL;~N");
+                        w(g, " = create_s()) == NULL) {~N~+"
+                             "~M~pclose_env(z);~N"
+                             "~Mreturn NULL;~N~-"
+                             "~M}~N");
                         break;
-                    case t_integer:
-                        w(g, "~M");
-                        write_varref(g, name);
-                        w(g, " = 0;~N");
-                        break;
-                    case t_boolean:
-                        w(g, "~M");
-                        write_varref(g, name);
-                        if (g->options->target_lang == LANG_CPLUSPLUS) {
-                            w(g, " = false;~N");
-                        } else {
-                            w(g, " = 0;~N");
-                        }
-                        break;
-                }
-            }
-        }
-
-        if (g->analyser->name_count[t_string] > 0) {
-            write_newline(g);
-
-            // To simplify error handling, we initialise all strings to NULL
-            // above, then try to allocate them in a second pass.
-            for (struct name * name = g->analyser->names; name; name = name->next) {
-                if (!name->local_to) {
-                    switch (name->type) {
-                        case t_string:
-                            w(g, "~Mif ((");
-                            write_varref(g, name);
-                            w(g, " = create_s()) == NULL) {~N~+"
-                                 "~M~pclose_env(z);~N"
-                                 "~Mreturn NULL;~N~-"
-                                 "~M}~N");
-                            break;
-                    }
                 }
             }
         }
