@@ -50,15 +50,12 @@ static const struct testcase {
       "a" EMOJI_FACE_THROWING_A_KISS "ing",
       "a" EMOJI_FACE_THROWING_A_KISS "e" },
     { "en", 0, U_40079 "wing", 0 },
-      "a" EMOJI_FACE_THROWING_A_KISS "e" },
-    { "en", 0, U_40079 "wing", 0 },
 
     // The Persian stemmer removes ASCII space inside a word.  It shouldn't
     // appear there if our tokenisation recommendations are followed, and
     // it seems more appropriate to test here rather than adding instances
     // to persian/voc.txt.
-    { "fa", 0, U_0622 U_062B " " U_0627 U_0631,
-      U_0622 U_062B U_0627 U_0631, 0 },
+    { "fa", 0, U_0622 U_062B " " U_0627 U_0631, U_0622 U_062B U_0627 U_0631 },
 
     // The Finnish stemmer used to damage numbers ending with two or more of
     // the same digit.  Regression test, applied to all stemmers.
