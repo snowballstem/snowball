@@ -1891,8 +1891,10 @@ static void generate_create(struct generator * g) {
     w(g, "~N"
          "extern struct SN_env * ~pcreate_env(void) {~N~+");
 
-    if (g->analyser->name_count[t_string] == 0) {
+    if (g->analyser->variable_count == 0) {
         w(g, "~Mreturn SN_new_env(sizeof(struct SN_env));~N");
+    } else if (g->analyser->name_count[t_string] == 0) {
+        w(g, "~Mreturn SN_new_env(sizeof(SN_local));~N");
     } else {
         w(g, "~Mstruct SN_env * z = SN_new_env(sizeof(SN_local));~N"
              "~Mif (z) {~N~+");
