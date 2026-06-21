@@ -97,7 +97,7 @@ run_testcase(const char * language, const struct testcase *test)
             exit(1);
         }
     }
-    stemmed = sb_stemmer_stem(stemmer, (const unsigned char*)input, strlen(input));
+    stemmed = sb_stemmer_stem(stemmer, (const unsigned char*)input, (int)strlen(input));
     if (stemmed == NULL) {
         fprintf(stderr, "Out of memory");
         exit(1);
