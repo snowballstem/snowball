@@ -34,6 +34,13 @@ ada_src_dir = $(ada_src_main_dir)/algorithms
 
 ARFLAGS = -cr
 c_src_dir = src_c
+ifeq '$(filter %cl,$(CC))' ''
+o_for_obj = -o
+o_for_exe = -o
+else
+o_for_obj = -Fo:
+o_for_exe = -Fe:
+endif
 
 # C++
 
@@ -369,7 +376,7 @@ $(STEMMING_DATA)/% $(STEMMING_DATA_ABS)/%:
 	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
 
 snowball$(EXEEXT): $(COMPILER_OBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 
@@ -427,16 +434,16 @@ libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 examples/%.o: examples/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.a
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 tests/%.o: tests/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
@@ -455,7 +462,7 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)
 	$(SNOWBALL_COMPILE) charsets/ISO-8859-2.sbl $< -o $@ -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 # C++
 
