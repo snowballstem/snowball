@@ -97,7 +97,14 @@ backwardmode (
             // https://maoridictionary.co.nz/word/4506
             // However it's also a suffix which turns a verb into a noun,
             // and seems useful to remove more broadly.
-            'nga' ( test v  delete )
+            'nga' (
+                test v
+                // Don't remove -nga from -hanga (we don't try to remove
+                // -hanga itself as it can be a derived noun suffix which
+                // typically seems to change the meaning too much).
+                not ( 'ha' RV v )
+                delete
+            )
 
             // A passive ending and the one most commonly used with words of
             // more than two vowels, including borrowed words.
