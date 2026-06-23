@@ -75,11 +75,52 @@ backwardmode (
     /* strip passive verb endings */
 
     define verb_sfx as (
-        [substring] among (
-            'tia' 'hia' 'ngia' 'kia' 'mia' 'ria' 'whia' 'wh{a_}ia' 'ia'
-            'ina' 'whina' 'kina'
-            'nga' 'na' 'a'
-            (RV test v delete)
+        [substring] RV among (
+            // 'whia' is listed as a passive ending, but seems rare in
+            // practice.  Based on words extracted from mi.wikipedia.org,
+            // NZ Hansard, and Māori translations in English wiktionary
+            // removing it doesn't validly stem any words, but does the wrong
+            // thing for 11 words (which end with the letters "whia" but not
+            // as a passive ending).
+
+            // 'wh{a_}ia' doesn't seem to be listed as a passive ending.
+            // On the same text collections this only achieves iwhāia -> i
+            // which seems to be wrong.
+
+            'hia' 'ngia' 'kia' 'ria' 'ia'
+            'whina' 'kina'
+            'na'
+            ( test v  delete )
+
+            // 'nga': "A passive ending used with only a few verbs ending in
+            // -ai" e.g. kainga
+            // https://maoridictionary.co.nz/word/4506
+            // However it's also a suffix which turns a verb into a noun,
+            // and seems useful to remove more broadly.
+            'nga' ( test v  delete )
+
+            // A passive ending and the one most commonly used with words of
+            // more than two vowels, including borrowed words.
+            //
+            // The "most commonly" qualifier suggests we may need to relax
+            // this (e.g. with exceptions).  Examples I've seen which don't
+            // have more than two vowels in the stem:
+            // aha-tia
+            // awhi-tia
+            'tia' ( test ( v  gopast v  gopast v ) delete )
+
+            // "A passive ending used only after verbs ending with -o or -u."
+            // https://maoridictionary.co.nz/word/4051
+            'mia' ( test ( 'o' or 'u' ) delete )
+
+            // "A passive ending used only after words ending in -a."
+            // https://maoridictionary.co.nz/word/1708
+            'ina' ( test 'a'  delete )
+
+            // "A passive ending used mainly with verbs of one or two vowels,
+            // including some words borrowed from English."
+            // https://maoridictionary.co.nz/word/53
+            'a' ( test ( v  try gopast v  not gopast v )  delete )
         )
     )
 
