@@ -201,6 +201,7 @@ extern byte * get_input(const char * filename);
 extern struct tokeniser * create_tokeniser(byte * b, char * file);
 extern int read_token(struct tokeniser * t);
 extern int peek_token(struct tokeniser * t);
+extern void push_token(struct tokeniser * t, int token);
 #define hold_token(T) ((T)->token_held = true)
 extern const char * name_of_token(int code);
 extern void disable_token(struct tokeniser * t, int code);

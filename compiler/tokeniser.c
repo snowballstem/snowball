@@ -589,6 +589,15 @@ extern int peek_token(struct tokeniser * t) {
     return token;
 }
 
+extern void push_token(struct tokeniser * t, int token) {
+    if (t->token_held) {
+        error1(t, "push_token() called but token already held");
+        exit(1);
+    }
+    t->token = token;
+    t->token_held = true;
+}
+
 extern const char * name_of_token(int code) {
     for (int i = 0; i < NUM_ALPHA_TOKENS; i++) {
         if (alpha_tokens[i].code == code)

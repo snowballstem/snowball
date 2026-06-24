@@ -309,6 +309,12 @@ static int read_AE_test(struct analyser * a) {
         case c_lt:
         case c_le:
             return t->token;
+        case c_slicefrom:
+            // In an AE c_slicefrom (`<-`) is not a valid token, so convert
+            // it into c_lt (`<`) then c_minus (`-`) so that code such as
+            // `$x<-1` works rather than giving a syntax error.
+            push_token(t, c_minus);
+            return c_lt;
         default:
             unexpected_token_error(a, "integer test expression");
             hold_token(t);
@@ -1496,6 +1502,14 @@ report_assumed_rel_op_error:
                         // Assume `==` was meant to try to avoid an error avalanche.
                         token = c_eq;
                         goto handle_rel_op;
+                    case c_slicefrom:
+                        // In an AE c_slicefrom (`<-`) is not a valid token, so
+                        // convert it into c_lt (`<`) then c_minus (`-`) so
+                        // that code such as `$(x<-1)` works rather than giving
+                        // a syntax error.
+                        push_token(t, c_minus);
+                        token = c_lt;
+                        // FALLTHRU
                     case c_eq:
                     case c_ne:
                     case c_gt:
