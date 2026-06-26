@@ -1200,7 +1200,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1455,6 +1455,29 @@ extern void generate_program_java(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprivate void _debug(int n, int line)~N"
+            "~M{~N~+"
+            "~MSystem.out.format(\"%3d (line %4d): [%d]'\", n, line, length);~N"
+            "~Mfor (int i = 0; i <= length; ++i)~N"
+            "~M{~N~+"
+            "~Mif (limit_backward == i) System.out.write('{');~N"
+            "~Mif (bra == i) System.out.write('[');~N"
+            "~Mif (cursor == i) System.out.write('|');~N"
+            "~Mif (ket == i) System.out.write(']');~N"
+            "~Mif (limit == i) System.out.write('}');~N"
+            "~Mif (i < length)~N"
+            "~M{~N~+"
+            "~Mchar ch = current[i];~N"
+            "~Mif (ch == '\\0') System.out.write('#'); else System.out.write(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~MSystem.out.println(\"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
     generate_equals(g);
 
