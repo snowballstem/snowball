@@ -1484,7 +1484,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(Z, ~I0, ~I1);~N", p);
+    writef(g, "~MDebug(Z, ~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
