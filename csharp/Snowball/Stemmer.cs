@@ -190,11 +190,8 @@ namespace Snowball
             current.Clear();
             current.Insert(0, value);
 
-            cursor = 0;
+            limit_backward = bra = ket = cursor = 0;
             limit = current.Length;
-            limit_backward = 0;
-            bra = cursor;
-            ket = limit;
         }
 
 

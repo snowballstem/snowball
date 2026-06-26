@@ -21,7 +21,7 @@ impl<'a> SnowballEnv<'a> {
             limit: len as i32,
             limit_backward: 0,
             bra: 0,
-            ket: len as i32,
+            ket: 0,
         }
     }
 

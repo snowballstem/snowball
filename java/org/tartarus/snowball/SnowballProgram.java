@@ -12,8 +12,8 @@ public class SnowballProgram {
         cursor = 0;
         length = limit = 0;
         limit_backward = 0;
-        bra = cursor;
-        ket = limit;
+        bra = 0;
+        ket = 0;
     }
 
     /**
@@ -42,8 +42,8 @@ public class SnowballProgram {
         cursor = 0;
         this.length = limit = length;
         limit_backward = 0;
-        bra = cursor;
-        ket = limit;
+        bra = 0;
+        ket = 0;
     }
 
     /**

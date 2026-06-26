@@ -445,8 +445,8 @@ abstract class SnowballStemmer {
         $this->cursor = 0;
         $this->limit = strlen($word);
         $this->limit_backward = 0;
-        $this->bra = $this->cursor;
-        $this->ket = $this->limit;
+        $this->bra = 0;
+        $this->ket = 0;
         $this->stem();
         return $this->current;
     }

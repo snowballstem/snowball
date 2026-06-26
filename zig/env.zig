@@ -68,7 +68,7 @@ pub const Env = struct {
         self.limit = s.len;
         self.limit_backward = 0;
         self.bra = 0;
-        self.ket = s.len;
+        self.ket = 0;
     }
 
     pub fn getCurrent(self: *const Env) []const u8 {

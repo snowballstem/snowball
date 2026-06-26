@@ -20,8 +20,8 @@ export default class BaseStemmer {
         this.c = 0;
         this.limit = this.current.length;
         this.limit_backward = 0;
-        this.bra = this.c;
-        this.ket = this.limit;
+        this.bra = 0;
+        this.ket = 0;
     }
 
     /**

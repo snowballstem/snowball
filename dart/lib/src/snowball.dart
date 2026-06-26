@@ -45,8 +45,8 @@ class SnowballProgram {
     cursor = 0;
     limit = current.length;
     limit_backward = 0;
-    bra = cursor;
-    ket = limit;
+    bra = 0;
+    ket = 0;
   }
 
   void copy_from(SnowballProgram other) {

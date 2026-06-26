@@ -38,7 +38,7 @@ func (env *Env) SetCurrent(s string) {
 	env.Limit = len(s)
 	env.LimitBackward = 0
 	env.Bra = 0
-	env.Ket = len(s)
+	env.Ket = 0
 }
 
 func (env *Env) ReplaceS(bra, ket int, s string) int32 {
