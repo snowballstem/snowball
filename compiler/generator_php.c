@@ -1224,7 +1224,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~M$this->debug(~I0, ~I1);~N", p);
+    writef(g, "~M$this->_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1435,6 +1435,27 @@ extern void generate_program_php(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprivate function _debug(int $n, int $line): void {~N~+"
+            "~M$len = strlen($this->current);~N"
+            "~Mprintf(\"%3d (line %4d): [%d]'\", $n, $line, $len);~N"
+            "~Mfor ($i = 0; $i <= $len; ++$i) {~N~+"
+            "~Mif ($this->limit_backward === $i) echo '{';~N"
+            "~Mif ($this->bra === $i) echo '[';~N"
+            "~Mif ($this->cursor === $i) echo '|';~N"
+            "~Mif ($this->ket === $i) echo ']';~N"
+            "~Mif ($this->limit === $i) echo '}';~N"
+            "~Mif ($i < $len) {~N~+"
+            "~M$ch = $this->current[$i];~N"
+            "~Mif ($ch === '\\0') echo '#'; else echo $ch;~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~Mecho \"'\";~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
 
     generate_class_end(g);
