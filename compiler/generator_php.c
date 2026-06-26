@@ -1452,7 +1452,7 @@ extern void generate_program_php(struct generator * g) {
             "~Mif ($ch === '\\0') echo '#'; else echo $ch;~N~-"
             "~M}~N~-"
             "~M}~N"
-            "~Mecho \"'\";~N~-"
+            "~Mecho \"'\\n\";~N~-"
             "~M}~N");
     }
 
