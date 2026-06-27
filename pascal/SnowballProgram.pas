@@ -70,8 +70,8 @@ Begin
     FCursor  := 0;
     FLimit   := Length(Current);
     FBkLimit := 0;
-    FBra     := FCursor;
-    FKet     := FLimit;
+    FBra     := 0;
+    FKet     := 0;
 End;
 
 Function TSnowballProgram.InGrouping(s : array of char; min, max : Integer) : Boolean;
