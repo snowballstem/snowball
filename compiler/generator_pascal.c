@@ -1281,7 +1281,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~MDebug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1396,6 +1396,10 @@ static void generate_method_decl(struct generator * g, struct name * q) {
 static void generate_method_decls(struct generator * g) {
     w(g, "~Mpublic~N~+");
     w(g, "~MConstructor Create;~N");
+
+    if (g->analyser->debug_used) {
+       w(g, "~Mprocedure Debug(N : Integer; Line : Integer);~N");
+    }
 
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->type == t_external) {
@@ -1570,6 +1574,39 @@ extern void generate_program_pascal(struct generator * g) {
     /* generate implementation. */
     generate_groupings(g);
     generate_constructor(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprocedure T~n.Debug(N : Integer; Line : Integer);~N~+"
+            "~MVar Len : Integer;~N"
+            "~MVar Ch  : Char;~N"
+            "~MVar I   : Integer;~N"
+            "~-~MBegin~N~+"
+            "~MLen := Length(FCurrent);~N"
+            "~MIf N < 10 Then Write(' ');~N"
+            "~MIf N < 100 Then Write(' ');~N"
+            "~MWrite(N, ' (line ');~N"
+            "~MIf Line < 10 Then Write(' ');~N"
+            "~MIf Line < 100 Then Write(' ');~N"
+            "~MIf Line < 1000 Then Write(' ');~N"
+            "~MWrite(Line, '): [', Len, ']''');~N"
+            "~MFor I := 0 To Len Do~N"
+            "~MBegin~N~+"
+            "~MIf FBkLimit = I Then Write('{');~N"
+            "~MIf FBra = I Then Write('[');~N"
+            "~MIf FCursor = I Then Write('|');~N"
+            "~MIf FKet = I Then Write(']');~N"
+            "~MIf FLimit = I Then Write('}');~N"
+            "~MIf I < Len Then~N"
+            "~MBegin~N~+"
+            "~MCh := FCurrent[I + 1];~N"
+            "~MIf Ch = #0 Then Write('#') Else Write(Ch);~N"
+            "~-~MEnd;~N"
+            "~-~MEnd;~N"
+            "~MWriteLn('''');~N"
+            "~-~MEnd;~N");
+    }
+
     generate_methods(g);
 
     generate_unit_end(g);
