@@ -1228,7 +1228,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1465,6 +1465,34 @@ extern void generate_program_dart(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mvoid _debug(int n, int line) {~N~+"
+            "~MString s = '';~N"
+            "~Mfinal len = current.length;~N"
+            "~Mif (n < 10) s += ' ';~N"
+            "~Mif (n < 100) s += ' ';~N"
+            "~Ms += \"$n (line \";~N"
+            "~Mif (line < 10) s += ' ';~N"
+            "~Mif (line < 100) s += ' ';~N"
+            "~Mif (line < 1000) s += ' ';~N"
+            "~Ms += \"$line): [$len]'\";~N"
+            "~Mfor (int i = 0; i <= len; ++i) {~N~+"
+            "~Mif (this.limit_backward == i) s = s + '{';~N"
+            "~Mif (this.bra == i) s = s + '[';~N"
+            "~Mif (this.cursor == i) s = s + '|';~N"
+            "~Mif (this.ket == i) s = s + ']';~N"
+            "~Mif (this.limit == i) s = s + '}';~N"
+            "~Mif (i < len) {~N~+"
+            "~Mfinal ch = current.codeUnitAt(i);~N"
+            "~Mif (ch == 0) s = s + '#'; else s = s + String.fromCharCode(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~Mprint(s + \"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
     generate_equals(g);
 
