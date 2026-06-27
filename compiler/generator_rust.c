@@ -1340,7 +1340,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Menv.debug(~I0, ~I1);~N", p);
+    writef(g, "~Mdebug(env, ~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1555,12 +1555,36 @@ extern void generate_program_rust(struct generator * g) {
         /* std::i32 is used in the code generated for i32::MAX and i32::MIN */
         w(g, "use std::i32;~N~N");
     }
+    if (g->analyser->debug_used) {
+        w(g, "use std::io;~N");
+        w(g, "use std::io::Write;~N~N");
+    }
     generate_class_begin(g);
 
     generate_members(g);
 
     g->declarations = g->outbuf;
     g->outbuf = str_new();
+
+    if (g->analyser->debug_used) {
+        w(g, "~Mfn debug(env: &mut SnowballEnv, n: i32, line: i32) {~+~N"
+             "~Mlet length = env.current.len();~N"
+             "~Mprint!(\"{:3} (line {:4}): [{}]'\", n, line, length);~N"
+             "~Mlet mut b = env.current.bytes();~N"
+             "~Mfor i in 0..length + 1 {~N~+"
+             "~Mif env.limit_backward == i as i32 { print!(\"{{\") }~N"
+             "~Mif env.bra == i as i32 { print!(\"[\") }~N"
+             "~Mif env.cursor == i as i32 { print!(\"|\") }~N"
+             "~Mif env.ket == i as i32 { print!(\"]\") }~N"
+             "~Mif env.limit == i as i32 { print!(\"}}\") }~N"
+             "~Mif (i < length) {~N~+"
+             "~Mlet ch = b.next();~N"
+             "~Mif ch == Some(0) { print!(\"#\"); } else { let _ = io::stdout().write(ch.as_slice()); }~N~-"
+             "~M}~N~-"
+             "~M}~N"
+             "~Mprintln!(\"'\");~N~-"
+             "}~N~N");
+    }
 
     generate_methods(g);
 
