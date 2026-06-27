@@ -1,7 +1,7 @@
 package snowball
 
 import (
-	"log"
+	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -463,8 +463,20 @@ func (env *Env) FindAmongB(amongs []*Among, ctx interface{}) int32 {
 	}
 }
 
-func (env *Env) Debug(count, lineNumber int) {
-	log.Printf("snowball debug, count: %d, line: %d", count, lineNumber)
+func (env *Env) Debug(n, line int) {
+	length := len(env.current)
+	fmt.Printf("%3d (line %4d): [%d]'", n, line, length)
+	for i := 0; i <= length; i++ {
+		if env.LimitBackward == i { fmt.Print("{") }
+		if env.Bra == i { fmt.Print("[") }
+		if env.Cursor == i { fmt.Print("|") }
+		if env.Ket == i { fmt.Print("]") }
+		if env.Limit == i { fmt.Print("}") }
+		if (i < length) {
+			if env.current[i] == 0 { fmt.Print("#") } else { fmt.Print(env.current[i : i + 1]) }
+		}
+	}
+	fmt.Println("'")
 }
 
 func (env *Env) Clone() *Env {
