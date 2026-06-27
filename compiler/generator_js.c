@@ -1290,7 +1290,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mthis.debug(~I0, ~I1);~N", p);
+    writef(g, "~Mthis.#debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1562,6 +1562,26 @@ extern void generate_program_js(struct generator * g) {
     generate_class_begin(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~M#debug(n, line) {~N~+"
+            "~Mconst len = this.current.length;~N"
+            "~Mlet s = `${n<10?'  ':n<100?' ':''}${n} (line ${line<10?'   ':line<100?'  ':line<1000?' ':''}${line}): [${len}]'`;~N"
+            "~Mfor (let i = 0; i <= len; ++i) {~N~+"
+            "~Mif (this.limit_backward == i) s = s + '{';~N"
+            "~Mif (this.bra == i) s = s + '[';~N"
+            "~Mif (this.c == i) s = s + '|';~N"
+            "~Mif (this.ket == i) s = s + ']';~N"
+            "~Mif (this.limit == i) s = s + '}';~N"
+            "~Mif (i < len) {~N~+"
+            "~Mconst ch = this.current[i];~N"
+            "~Mif (ch == '\\0') s = s + '#'; else s = s + ch;~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~Mconsole.log(s + \"'\");~N~-"
+            "~M}~N");
+    }
 
     generate_among_dispatchers(g);
 
