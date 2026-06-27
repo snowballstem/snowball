@@ -1209,7 +1209,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1440,6 +1440,29 @@ extern void generate_program_csharp(struct generator * g) {
     generate_members(g);
     generate_groupings(g);
     generate_amongs(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprivate void _debug(int n, int line)~N"
+            "~M{~N~+"
+            "~MConsole.Write(\"{0,3} (line {1,4}): [{2}]'\", n, line, current.Length);~N"
+            "~Mfor (int i = 0; i <= current.Length; ++i)~N"
+            "~M{~N~+"
+            "~Mif (limit_backward == i) Console.Write('{');~N"
+            "~Mif (bra == i) Console.Write('[');~N"
+            "~Mif (cursor == i) Console.Write('|');~N"
+            "~Mif (ket == i) Console.Write(']');~N"
+            "~Mif (limit == i) Console.Write('}');~N"
+            "~Mif (i < current.Length)~N"
+            "~M{~N~+"
+            "~Mchar ch = current[i];~N"
+            "~Mif (ch == '\\0') Console.Write('#'); else Console.Write(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~MConsole.WriteLine(\"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
 
     generate_class_end(g);
