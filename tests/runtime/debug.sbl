@@ -1,0 +1,9 @@
+externals (stem)
+define stem as (
+    ?
+    next ?
+    do (tolimit ?)
+    ?
+    backwards (?)
+    ?
+)

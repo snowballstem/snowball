@@ -1232,7 +1232,7 @@ setup_runtime_tests: clean_runtime_tests
 	  d=`echo "$$t"|sed 's/\.sbl$$//'` ;\
 	  mkdir $$r/$$d ;\
 	  echo ok > $$r/$$d/voc.txt ;\
-	  echo ok > $$r/$$d/output.txt ;\
+	  if [ -f $$d.out ] ; then cp $$d.out $$r/$$d/output.txt ; else echo ok > $$r/$$d/output.txt ; fi ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
 	printf '%s:=%s\n' \
