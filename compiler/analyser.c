@@ -3032,7 +3032,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             //
             // We only issue a warning about unreachability for routines here
             // to avoid excess diagnostics, since other types must be used in a
-            // routine which is not reachable (or will have been warned about as
+            // routine which is reachable (or will have been warned about as
             // unused by the check above).
             if (q->type == t_routine) {
                 fprintf(stderr, "%s:%d: warning: %s '%.*s' not reachable from any externals\n",
