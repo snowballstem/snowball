@@ -3037,7 +3037,7 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
             if (q->type == t_routine) {
                 fprintf(stderr, "%s:%d: warning: %s '%.*s' not reachable from any externals\n",
                         a->tokeniser->file,
-                        q->declaration_line_number,
+                        q->definition->line_number,
                         name_of_type(q->type),
                         SIZE(q->s), q->s);
                 remove_routine(a, q);
