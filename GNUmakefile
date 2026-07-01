@@ -1212,14 +1212,14 @@ CLEANFILES += $(ZIG_SOURCES) zig/stemwords$(EXEEXT)
 # Runtime test integration is currently a bit clunky, and you need to switch
 # your tree to a different state to run runtime tests.
 #
-# make clean setup_runtime_tests
+# make setup_runtime_tests
 #
 # Then targets like `check_utf8`, `check_python`, etc will run the runtime
 # tests for a particular target language.
 #
 # Once you're done, switch the tree back to the normal state:
 #
-# make clean clean_runtime_tests
+# make clean_runtime_tests
 
 .PHONY: setup_runtime_tests clean_runtime_tests
 
@@ -1248,5 +1248,5 @@ setup_runtime_tests: clean_runtime_tests
 	rm -f algorithms.mk
 	$(MAKE) algorithms.mk
 
-clean_runtime_tests:
+clean_runtime_tests: clean
 	rm -rf $(RUNTIME_DATA_DIR) overrides.mk
