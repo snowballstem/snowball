@@ -7,9 +7,9 @@ routines (r r2 r3 undef_routine)
 groupings (g undef_grouping)
 define g 'aeiou'
 define r2 as not atlimit
-define r3 as atlimit
+define r3 as (atlimit or 'x')
 define r as (
-   r3
+   r3 r3
    unset b
    try (next set b)
    $x = size

@@ -1,5 +1,6 @@
 syntax/unused.sbl:7: warning: grouping 'undef_grouping' declared but not defined
 syntax/unused.sbl:6: warning: routine 'undef_routine' declared but not defined
+syntax/unused.sbl:6: warning: routine 'r3' not reachable from any externals
 syntax/unused.sbl:6: warning: routine 'r2' not reachable from any externals
 syntax/unused.sbl:11: warning: routine 'r' defined but not used
 syntax/unused.sbl:5: warning: string 'string' declared but not used
