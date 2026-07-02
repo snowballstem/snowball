@@ -9,7 +9,7 @@ externals ( stem )
 
 integers ( pV /* p1 p2 */ )
 
-groupings ( v longv shortv )
+groupings ( canga v longv shortv )
 
 stringescapes {}
 
@@ -31,6 +31,10 @@ stringdef u"    '{U+00FC}'  // u-diaeresis
 define shortv 'aeiou'
 define longv  '{a_}{e_}{i_}{o_}{u_}'
 define v      shortv + longv
+
+/* "Canga nominalisation" consonants: -hanga -kanga -manga -ranga -tanga */
+
+define canga  'hkmrt'
 
 /* normalise diaereses to macrons */
 
@@ -117,13 +121,17 @@ backwardmode (
             // -ai" e.g. kainga
             // https://maoridictionary.co.nz/word/4506
             // However it's also a suffix which turns a verb into a noun,
-            // and seems useful to remove more broadly.
+            // and seems useful to remove more broadly so we don't just
+            // test for 'ai' before it.
             'nga' (
                 test v
-                // Don't remove -nga from -hanga (we don't try to remove
-                // -hanga itself as it can be a derived noun suffix which
-                // typically seems to change the meaning too much).
-                not ( 'ha' RV v )
+                // Don't remove nga when it's actually part of a "Canga
+                // nominalisation" suffix - these have the form -<consonant>anga:
+                // -hanga -kanga -manga -ranga -tanga.  We don't try to remove
+                // these as they typically seem to change the meaning too much.
+                // -nga itself can also be a nominalisation suffix, but one which
+                // seems to change the meaning less.
+                not ( 'a' canga RV v )
                 delete
             )
 
