@@ -9,7 +9,7 @@ externals ( stem )
 
 integers ( pV /* p1 p2 */ )
 
-groupings ( v )
+groupings ( v longv shortv )
 
 stringescapes {}
 
@@ -28,7 +28,9 @@ stringdef u"    '{U+00FC}'  // u-diaeresis
 
 /* define vowels */
 
-define v 'aeiou{a_}{e_}{i_}{o_}{u_}'
+define shortv 'aeiou'
+define longv  '{a_}{e_}{i_}{o_}{u_}'
+define v      shortv + longv
 
 /* normalise diaereses to macrons */
 
@@ -149,7 +151,9 @@ backwardmode (
             // including some words borrowed from English."
             // https://maoridictionary.co.nz/word/53
             // The Reed Reference Grammar of Mãori notes -a as "common".
-            'a' ( test ( v  try gopast v  not gopast v )  delete )
+            // It seems that for the vowel conditions a long vowel (one with a
+            // macron) should be counted as two vowels.
+            'a' ( test ( (longv  or  (shortv not gopast longv try gopast shortv))  not gopast v )  delete )
         )
     )
 
