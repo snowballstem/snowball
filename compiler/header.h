@@ -269,7 +269,7 @@ struct amongvec {
 
 struct among {
     struct among * next;
-    struct amongvec * b;      /* pointer to the amongvec */
+    struct amongvec * v;      /* pointer to the amongvec */
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among (excludes "no command" entries) */

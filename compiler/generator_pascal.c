@@ -1474,7 +1474,7 @@ static void generate_among_decls(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;

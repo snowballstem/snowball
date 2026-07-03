@@ -1313,7 +1313,7 @@ static void generate_class_begin(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mvar A_~I0 = []*snowballRuntime.Among{~N~+");

@@ -216,7 +216,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 
                 if (x->function_count == 1) {
                     // Only one different function used in this among.
-                    struct amongvec * v = x->b;
+                    struct amongvec * v = x->v;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
                             write_varref(g, v[j].function);
@@ -1394,7 +1394,7 @@ static void generate_class_end(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mconst a_~I0 = [~N~+");
@@ -1438,7 +1438,7 @@ static void generate_amongs(struct generator * g) {
 static void generate_among_dispatcher(struct generator * g, struct among * x) {
     if (x->function_count <= 1) return;
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     write_comment(g, x->node);
 

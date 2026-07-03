@@ -201,7 +201,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 
                 if (x->function_count == 1) {
                     // Only one different function used in this among.
-                    struct amongvec * v = x->b;
+                    struct amongvec * v = x->v;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
                             write_varref(g, v[j].function);
@@ -1329,7 +1329,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mprivate static readonly Among[] a_~I0 = new[] ~N~M{~N~+");

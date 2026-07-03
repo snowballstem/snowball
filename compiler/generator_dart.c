@@ -210,7 +210,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                     continue;
                 }
                 if (x->function_count == 1) {
-                    struct amongvec * v = x->b;
+                    struct amongvec * v = x->v;
                     int found = 0;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
@@ -1344,7 +1344,7 @@ static void generate_equals(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
 

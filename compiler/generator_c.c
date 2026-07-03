@@ -246,7 +246,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
 
                 if (x->function_count == 1) {
                     // Only one different function used in this among.
-                    struct amongvec * v = x->b;
+                    struct amongvec * v = x->v;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
                             write_varref(g, v[j].function);
@@ -1308,7 +1308,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     struct among * x = p->among;
     int block = -1;
     unsigned int bitmap = 0;
-    struct amongvec * among_cases = x->b;
+    struct amongvec * among_cases = x->v;
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
@@ -1747,7 +1747,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     for (int i = 0; i < x->literalstring_count; i++) {
@@ -1792,8 +1792,8 @@ static void generate_among_table(struct generator * g, struct among * x) {
             if (g->options->comments) {
                 w(g, "/* coverage */ ");
             }
-            g->I[1] = x->b[i].line_number;
-            g->I[2] = x->b[i].string_index;
+            g->I[1] = x->v[i].line_number;
+            g->I[2] = x->v[i].string_index;
             w(g, "{ ~I0, (const symbol*)\"~S1:~I1\", 0, ~I2, 0 },~N");
         }
         if (x->always_matches) {

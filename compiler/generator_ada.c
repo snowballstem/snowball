@@ -1274,7 +1274,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     struct among * x = p->among;
     int block = -1;
     unsigned int bitmap = 0;
-    struct amongvec * among_cases = x->b;
+    struct amongvec * among_cases = x->v;
     int empty_case = -1;
     int n_cases = 0;
     symbol cases[2];
@@ -1621,7 +1621,7 @@ static void generate_member_decls(struct generator * g) {
 }
 
 static int generate_among_string(struct generator * g, struct among * x, int count) {
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
     int limit = count == 0 ? 38 : 80;
 
     g->I[0] = x->number;
@@ -1645,14 +1645,14 @@ static int generate_among_string(struct generator * g, struct among * x, int cou
 static int generate_among_table(struct generator * g, struct among * x, int start_pos, int *operation) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
 
     g->I[1] = x->literalstring_count - 1;
     w(g, "~N~MA_~I0 : constant Among_Array_Type (0 .. ~I1) := ~+(~N");
 
-    v = x->b;
+    v = x->v;
     for (int i = 0; i < x->literalstring_count; i++) {
         g->I[1] = start_pos;
 
@@ -1720,7 +1720,7 @@ static void generate_amongs(struct generator * g) {
     w(g, "~Mbegin~+~N~M");
     w(g, "case Operation is~+~N~M");
     for (struct among * x = g->analyser->amongs; x; x = x->next) {
-        struct amongvec * v = x->b;
+        struct amongvec * v = x->v;
         for (int i = 0; i < x->literalstring_count; i++) {
             if (v[i].function != NULL) {
                 operation++;

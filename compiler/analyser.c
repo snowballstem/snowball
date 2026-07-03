@@ -37,7 +37,7 @@ extern void print_program(struct analyser * a) {
 }
 
 static void free_among(struct among * q) {
-    FREE(q->b);
+    FREE(q->v);
     FREE(q->commands);
     FREE(q);
 }
@@ -762,7 +762,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
 
     *x = (struct among){0};
     x->node = p;
-    x->b = v;
+    x->v = v;
     x->shortest_size = INT_MAX;
 
     if (q->type == c_bra) {
@@ -2616,7 +2616,7 @@ static bool recursion_check(struct node * p, struct name * func) {
                 struct among * x = p->among;
                 if (x->function_count == 0) break;
                 for (int i = 0; i < x->literalstring_count; ++i) {
-                    if (x->b[i].function == func) return true;
+                    if (x->v[i].function == func) return true;
                 }
                 break;
             }
@@ -2651,8 +2651,8 @@ static void visit_node(struct analyser * a, struct node * p, struct name * func)
             struct among * x = p->among;
             x->used = true;
             for (int i = 0; i < x->literalstring_count; ++i) {
-                if (x->b[i].function)
-                    visit_routine(a, x->b[i].function);
+                if (x->v[i].function)
+                    visit_routine(a, x->v[i].function);
             }
             for (int i = 0; i < x->command_count; ++i) {
                 visit_node(a, x->commands[i], func);
@@ -3128,15 +3128,15 @@ extern void read_program(struct analyser * a, unsigned localise_mask) {
                 // and subtract one from references to command indexes after
                 // this one.
                 for (int j = 0; j < x->literalstring_count; ++j) {
-                    int diff = (x->b[j].result - i);
+                    int diff = (x->v[j].result - i);
                     if (diff == 0) {
-                        x->b[j].result = merge_with;
+                        x->v[j].result = merge_with;
                         if (merge_with == 0) {
-                            assert(x->b[j].action->type == c_bra);
-                            x->b[j].action->left = NULL;
+                            assert(x->v[j].action->type == c_bra);
+                            x->v[j].action->left = NULL;
                         }
                     } else if (diff > 0) {
-                        --x->b[j].result;
+                        --x->v[j].result;
                     }
                 }
                 memmove(x->commands + (i - 1), x->commands + i,
