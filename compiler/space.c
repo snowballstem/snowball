@@ -76,7 +76,10 @@ extern void lose_b(symbol * p) {
 }
 
 extern symbol * increase_capacity_b(symbol * p, int n) {
-    symbol * q = create_b(CAPACITY(p) + n + EXTENDER);
+    int new_size = CAPACITY(p) + n + EXTENDER;
+    // Switch to exponential growth for large strings.
+    if (new_size > 512) new_size *= 2;
+    symbol * q = create_b(new_size);
     memmove(q, p, CAPACITY(p) * sizeof(symbol));
     SET_SIZE(q, SIZE(p));
     lose_b(p); return q;
