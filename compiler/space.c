@@ -80,7 +80,7 @@ extern symbol * increase_capacity_b(symbol * p, int n) {
     // Switch to exponential growth for large strings.
     if (new_size > 512) new_size *= 2;
     symbol * q = create_b(new_size);
-    memmove(q, p, CAPACITY(p) * sizeof(symbol));
+    memmove(q, p, SIZE(p) * sizeof(symbol));
     SET_SIZE(q, SIZE(p));
     lose_b(p); return q;
 }
@@ -202,7 +202,7 @@ extern byte * increase_capacity_s(byte * p, int n) {
     // Switch to exponential growth for large strings.
     if (new_size > 512) new_size *= 2;
     byte * q = create_s(new_size);
-    memmove(q, p, CAPACITY(p));
+    memmove(q, p, SIZE(p));
     SET_SIZE(q, SIZE(p));
     lose_s(p);
     return q;
