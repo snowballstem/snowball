@@ -274,7 +274,8 @@ struct among {
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among (excludes "no command" entries) */
     int nocommand_count;      /* number of "no command" entries in this among */
-    int function_count;       /* number of different functions in this among */
+    int function_count;       /* number of cases with a function in this among */
+    int unique_function_count;/* number of different functions in this among */
     bool amongvar_needed;     /* do we need to set among_var? */
     bool always_matches;      /* will this among always match? */
     bool used;                /* is this among in reachable code? */

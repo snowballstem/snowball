@@ -791,8 +791,9 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
                 ++function->uses_in_among;
                 check_routine_mode(a, function, direction);
                 if (function->among_index == 0) {
-                    function->among_index = ++x->function_count;
+                    function->among_index = ++x->unique_function_count;
                 }
+                ++x->function_count;
                 w1->function_index = function->among_index;
             } else {
                 w1->function = NULL;
@@ -2614,7 +2615,7 @@ static bool recursion_check(struct node * p, struct name * func) {
                 break;
             case c_among: {
                 struct among * x = p->among;
-                if (x->function_count == 0) break;
+                if (x->unique_function_count == 0) break;
                 for (int i = 0; i < x->literalstring_count; ++i) {
                     if (x->v[i].function == func) return true;
                 }

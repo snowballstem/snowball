@@ -208,13 +208,13 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             }
             case 'F': { // Among function dispatcher.
                 struct among * x = p->among;
-                if (x->function_count == 0) {
+                if (x->unique_function_count == 0) {
                     continue;
                 }
 
                 w(g, ", ");
 
-                if (x->function_count == 1) {
+                if (x->unique_function_count == 1) {
                     // Only one different function used in this among.
                     struct amongvec * v = x->v;
                     for (int j = 0; j < x->literalstring_count; j++) {
@@ -223,7 +223,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                             goto continue_outer_loop;
                         }
                     }
-                    fprintf(stderr, "function_count == 1 but no among functions\n");
+                    fprintf(stderr, "unique_function_count == 1 but no among functions\n");
                     exit(1);
 continue_outer_loop:
                     continue;
@@ -1436,7 +1436,7 @@ static void generate_amongs(struct generator * g) {
 }
 
 static void generate_among_dispatcher(struct generator * g, struct among * x) {
-    if (x->function_count <= 1) return;
+    if (x->unique_function_count <= 1) return;
 
     struct amongvec * v = x->v;
 
@@ -1446,7 +1446,7 @@ static void generate_among_dispatcher(struct generator * g, struct among * x) {
     w(g, "~N~M/** @return {boolean} */~N");
     w(g, "~M#af_~I0() {~N~+");
     w(g, "~Mswitch (this.af) {~N~+");
-    for (int n = 1; n <= x->function_count; n++) {
+    for (int n = 1; n <= x->unique_function_count; n++) {
         w(g, "~Mcase ");
         write_int(g, n);
         w(g, ": return ");
