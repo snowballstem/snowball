@@ -38,7 +38,7 @@ static void write_stringref(struct generator * g, struct name * p) {
     write_string(g, ".slice()");
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     int i = 0;
     write_char(g, '"');
     while (i < SIZE(p)) {

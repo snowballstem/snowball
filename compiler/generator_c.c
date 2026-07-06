@@ -81,7 +81,7 @@ static void wlitch(struct generator * g, int ch) {
     }
 }
 
-static void wlitarray(struct generator * g, symbol * p) {  /* write literal array */
+static void wlitarray(struct generator * g, const symbol * p) {  /* write literal array */
     write_string(g, "{ ");
     for (int i = 0; i < SIZE(p); i++) {
         if (i) write_string(g, ", ");
@@ -90,7 +90,7 @@ static void wlitarray(struct generator * g, symbol * p) {  /* write literal arra
     write_string(g, " }");
 }
 
-static void wlitref(struct generator * g, symbol * p) {  /* write ref to literal array */
+static void wlitref(struct generator * g, const symbol * p) {  /* write ref to literal array */
     if (SIZE(p) == 0) {
         write_char(g, '0');
     } else {

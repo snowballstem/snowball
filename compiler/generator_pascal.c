@@ -59,7 +59,7 @@ static void write_varname(struct generator * g, struct name * p) {
     write_s(g, p->s);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     if (SIZE(p) == 0) {
         write_string(g, "''");
         return;

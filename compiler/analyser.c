@@ -1770,7 +1770,7 @@ handle_rel_op: ;
     }
 }
 
-static int next_symbol(symbol * p, symbol * W, int utf8) {
+static int next_symbol(const symbol * p, symbol * W, int utf8) {
     if (utf8) {
         int ch;
         int j = get_utf8(p, & ch);
@@ -1782,7 +1782,7 @@ static int next_symbol(symbol * p, symbol * W, int utf8) {
     }
 }
 
-static symbol * alter_grouping(symbol * p, symbol * q, int style, int utf8) {
+static symbol * alter_grouping(symbol * p, const symbol * q, int style, int utf8) {
     int j = 0;
     if (style == c_plus) {
         while (j < SIZE(q)) {
