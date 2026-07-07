@@ -1022,9 +1022,7 @@ static struct node * make_among(struct analyser * a, struct node * p, struct nod
             p = and_node;
             --v[0].function->uses_in_among;
         }
-        FREE(x->commands);
-        FREE(x);
-        FREE(v);
+        free_among(x);
         return p;
     }
 
