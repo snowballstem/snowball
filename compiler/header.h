@@ -26,7 +26,11 @@ typedef unsigned short symbol;
 extern symbol * create_b(int n);
 extern void report_b(FILE * out, const symbol * p);
 extern void lose_b(symbol * p);
-extern symbol * increase_capacity_b(symbol * p, int n);
+extern symbol * reserve_b_(symbol * p, int n);
+static inline symbol * reserve_b(symbol * p, int n) {
+    if (n > CAPACITY(p)) p = reserve_b_(p, n);
+    return p;
+}
 extern symbol * add_to_b(symbol * p, const symbol * q, int n);
 extern symbol * copy_b(const symbol * p);
 extern char * b_to_sz(const symbol * p);
@@ -40,8 +44,16 @@ extern byte * create_s_from_data(const char * s, int n);
 
 extern void report_s(FILE * out, const byte * p);
 extern void lose_s(byte * p);
-extern byte * increase_capacity_s(byte * p, int n);
-extern byte * ensure_capacity_s(byte * p, int n);
+extern byte * reserve_s_(byte * p, int n);
+static inline byte * reserve_s(byte * p, int n) {
+    if (n > CAPACITY(p)) p = reserve_s_(p, n);
+    return p;
+}
+static inline byte * ensure_nul_s(byte * p) {
+    p = reserve_s(p, SIZE(p) + 1);
+    p[SIZE(p)] = 0;
+    return p;
+}
 extern byte * copy_s(const byte * p);
 extern byte * add_s_to_s(byte * p, const byte * s);
 extern byte * add_slen_to_s(byte * p, const char * s, int n);

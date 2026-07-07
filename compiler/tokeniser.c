@@ -22,6 +22,7 @@ extern byte * get_input(const char * filename) {
             fprintf(stderr, "%s: Read error\n", filename);
             exit(1);
         }
+        SET_SIZE(u, size);
     } else {
         // Unseekable stream, e.g. piped stdin.
         size = 0;
@@ -37,11 +38,11 @@ extern byte * get_input(const char * filename) {
                 }
                 break;
             }
-            u = increase_capacity_s(u, size);
+            SET_SIZE(u, size);
+            u = reserve_s(u, size * 2);
         }
     }
     if (input != stdin) fclose(input);
-    SET_SIZE(u, size);
     return u;
 }
 
@@ -173,12 +174,12 @@ static int read_literal_string(struct tokeniser * t, int c) {
                                 error1(t, "character values exceed 0x01ffff");
                             }
                             /* Ensure there's enough space for a max length
-                             * UTF-8 sequence. */
+                             * UTF-8 sequence and then encode the character
+                             * directly into that space. */
                             int b_size = SIZE(t->b);
-                            if (CAPACITY(t->b) < b_size + 3) {
-                                t->b = increase_capacity_b(t->b, 3);
-                            }
-                            SET_SIZE(t->b, b_size + put_utf8(codepoint, t->b + b_size));
+                            t->b = reserve_b(t->b, b_size + 4);
+                            SET_SIZE(t->b, b_size + put_utf8(codepoint,
+                                                             t->b + b_size));
                         } else {
                             if (t->encoding == ENC_SINGLEBYTE) {
                                 /* Only ISO-8859-1 is handled this way - for
@@ -535,7 +536,7 @@ extern int read_token(struct tokeniser * t) {
                     for (r = t->includes; r; r = r->next) {
                         byte * s = copy_s(r->s);
                         s = add_sz_to_s(s, file);
-                        s[SIZE(s)] = 0;
+                        s = ensure_nul_s(s);
                         if (file_owned > 0) {
                             free(file);
                         } else {

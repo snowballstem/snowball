@@ -10,6 +10,8 @@
 #define HEAD (2 * sizeof(int))
 #define EXTENDER 40
 
+// Threshold in bytes above which reallocations double the size.
+#define EXPONENTIAL_GROWTH_THRESHOLD 1024
 
 /*  This module provides a simple mechanism for arbitrary length writable
     strings, called 'blocks'. They are 'symbol *' items rather than 'char *'
@@ -19,8 +21,8 @@
 
         symbol * b = create_b(n);
             - create an empty block b with room for n symbols
-        b = increase_capacity_b(b, n);
-            - increase the capacity of block b by n symbols (b may change)
+        b = reserve_b(b, n);
+            - ensure that the capacity of b is at least n (b may change)
         b2 = copy_b(b)
             - copy block b into b2
         lose_b(b);
@@ -44,9 +46,9 @@
 
 /*  For a block b, SIZE(b) is the number of symbols so far written into it,
     CAPACITY(b) the total number it can contain, so SIZE(b) <= CAPACITY(b).
-    In fact blocks have 1 extra character over the promised capacity so
-    they can be zero terminated by 'b[SIZE(b)] = 0;' without fear of
-    overwriting.
+
+    NB In the compiler, blocks do NOT have 1 extra character over the promised
+    capacity - use ensure_nul_b() and ensure_nul_s() to zero terminate.
 */
 
 extern symbol * create_b(int n) {
@@ -75,19 +77,24 @@ extern void lose_b(symbol * p) {
     FREE((char *) p - HEAD);
 }
 
-extern symbol * increase_capacity_b(symbol * p, int n) {
-    int new_size = CAPACITY(p) + n + EXTENDER;
-    // Switch to exponential growth for large strings.
-    if (new_size > 512) new_size *= 2;
+extern symbol * reserve_b_(symbol * p, int n) {
+    const int EXP_THRESHOLD = EXPONENTIAL_GROWTH_THRESHOLD / sizeof(symbol);
+    int new_size = n + EXTENDER;
+    if (new_size > EXP_THRESHOLD) {
+        // Switch to exponential growth for large strings.
+        int c = (CAPACITY(p) | (EXP_THRESHOLD * 2 - 1)) + 1;
+        while (c < new_size) c *= 2;
+        new_size = c;
+    }
     symbol * q = create_b(new_size);
     memcpy(q, p, SIZE(p) * sizeof(symbol));
     SET_SIZE(q, SIZE(p));
-    lose_b(p); return q;
+    lose_b(p);
+    return q;
 }
 
 extern symbol * add_to_b(symbol * p, const symbol * q, int n) {
-    int x = SIZE(p) + n - CAPACITY(p);
-    if (x > 0) p = increase_capacity_b(p, x);
+    p = reserve_b(p, SIZE(p) + n);
     memcpy(p + SIZE(p), q, n * sizeof(symbol));
     ADD_TO_SIZE(p, n);
     return p;
@@ -156,11 +163,12 @@ extern char * b_to_sz(const symbol * p) {
 
 /* Add a single symbol to a block. If p = 0 the block is created. */
 extern symbol * add_symbol_to_b(symbol * p, symbol ch) {
-    if (p == NULL) p = create_b(1);
-    int k = SIZE(p);
-    int x = k + 1 - CAPACITY(p);
-    if (x > 0) p = increase_capacity_b(p, x);
-    p[k] = ch;
+    if (p == NULL) {
+        p = create_b(1);
+    } else {
+        p = reserve_b(p, SIZE(p) + 1);
+    }
+    p[SIZE(p)] = ch;
     ADD_TO_SIZE(p, 1);
     return p;
 }
@@ -183,7 +191,6 @@ extern byte * create_s_from_sz(const char * s) {
 extern byte * create_s_from_data(const char * s, int n) {
     byte * p = create_s(n);
     memcpy(p, s, n);
-    p[n] = '\0';
     SET_SIZE(p, n);
     return p;
 }
@@ -197,21 +204,20 @@ extern void lose_s(byte * p) {
     FREE((byte *) p - HEAD);
 }
 
-extern byte * increase_capacity_s(byte * p, int n) {
-    int new_size = CAPACITY(p) + n + EXTENDER;
-    // Switch to exponential growth for large strings.
-    if (new_size > 512) new_size *= 2;
-    byte * q = create_s(new_size);
+extern byte * reserve_s_(byte * p, int n) {
+    const int EXP_THRESHOLD = EXPONENTIAL_GROWTH_THRESHOLD / sizeof(byte);
+    n += EXTENDER;
+    if (n > EXP_THRESHOLD) {
+        // Switch to exponential growth for large strings.
+        int c = (CAPACITY(p) | (EXP_THRESHOLD * 2 - 1)) + 1;
+        while (c < n) c *= 2;
+        n = c;
+    }
+    byte * q = create_s(n);
     memcpy(q, p, SIZE(p));
     SET_SIZE(q, SIZE(p));
     lose_s(p);
     return q;
-}
-
-extern byte * ensure_capacity_s(byte * p, int n) {
-    int x = SIZE(p) + n - CAPACITY(p);
-    if (x > 0) p = increase_capacity_s(p, x);
-    return p;
 }
 
 extern byte * copy_s(const byte * p) {
@@ -225,7 +231,7 @@ extern byte * add_slen_to_s(byte * p, const char * s, int n) {
     if (p == NULL) {
         p = create_s(n);
     } else {
-        p = ensure_capacity_s(p, n);
+        p = reserve_s(p, SIZE(p) + n);
     }
     int k = SIZE(p);
     memcpy(p + k, s, n);
@@ -254,7 +260,7 @@ extern byte * add_char_to_s(byte * p, char ch) {
     if (p == NULL) {
         p = create_s(1);
     } else {
-        p = ensure_capacity_s(p, 1);
+        p = reserve_s(p, SIZE(p) + 1);
     }
     p[SIZE(p)] = ch;
     ADD_TO_SIZE(p, 1);
@@ -311,10 +317,10 @@ extern void str_append_int(struct str * str, int i) {
     }
 
     // Ensure there's enough space then snprintf() directly onto the end.
+    int size = SIZE(str->data);
     int max_size = (CHAR_BIT * sizeof(int) + 5) / 3;
-    str->data = ensure_capacity_s(str->data, max_size);
-    int r = checked_snprintf((char*)str->data + SIZE(str->data), max_size,
-                             "%d", i);
+    str->data = reserve_s(str->data, size + max_size);
+    int r = checked_snprintf((char*)str->data + size, max_size, "%d", i);
     ADD_TO_SIZE(str->data, r);
 }
 

@@ -80,9 +80,9 @@ static void check_lim(int i, int argc) {
     }
 }
 
-static FILE * get_output(byte * s) {
-    s[SIZE(s)] = 0;
-    const char * filename = (const char *)s;
+static FILE * get_output(byte ** s_ptr) {
+    *s_ptr = ensure_nul_s(*s_ptr);
+    const char * filename = (const char *)*s_ptr;
     FILE * output = fopen(filename, "w");
     if (output == NULL) {
         fprintf(stderr, "Can't open output %s\n", filename);
@@ -404,21 +404,27 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
     } else {
         // Remove any extension from o->output_file so `-o path/to/english.c`
         // works.
-        o->output_file[SIZE(o->output_file)] = '\0';
         const char * output_file = (const char *)o->output_file;
-        const char * slash = strrchr(output_file, '/');
-        const char * leaf = (slash == NULL) ? output_file : slash + 1;
-
-        slash = strrchr(leaf, '\\');
-        if (slash != NULL) leaf = slash + 1;
-
-        const char * dot = strrchr(leaf, '.');
-        if (dot) {
-            o->extension = create_s_from_sz(dot);
-            SET_SIZE(o->output_file, (int)(dot - output_file));
-            o->output_leaf = create_s_from_data(leaf, (int)(dot - leaf));
-        } else {
-            o->output_leaf = create_s_from_sz(leaf);
+        int size = SIZE(output_file);
+        int leaf = size;
+        while (leaf > 0) {
+            int ch = output_file[leaf - 1];
+            if (ch == '/' || ch == '\\') break;
+            --leaf;
+        }
+        int ext = size;
+        while (ext > leaf) {
+            int ch = output_file[ext - 1];
+            if (ch == '.') {
+                o->extension = create_s_from_data(output_file + ext, (int)(size - ext));
+                SET_SIZE(o->output_file, ext - 1);
+                o->output_leaf = create_s_from_data(output_file + leaf, (int)(ext - leaf - 1));
+                break;
+            }
+            --ext;
+        }
+        if (ext == leaf) {
+            o->output_leaf = create_s_from_data(output_file + leaf, (int)(size - leaf));
         }
     }
 
@@ -586,7 +592,7 @@ extern int main(int argc, char * argv[]) {
             case LANG_CPLUSPLUS: {
                 byte * s = copy_s(o->output_file);
                 s = add_literal_to_s(s, ".h");
-                o->output_h = get_output(s);
+                o->output_h = get_output(&s);
                 SET_SIZE(s, SIZE(o->output_file));
                 if (o->extension &&
                     !(SIZE(o->extension) == 2 && memcmp(o->extension, ".h", 2) == 0)) {
@@ -596,7 +602,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".c");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
 
                 generate_program_c(g);
@@ -608,7 +614,7 @@ extern int main(int argc, char * argv[]) {
             case LANG_ADA: {
                 byte * s = copy_s(o->output_file);
                 s = add_literal_to_s(s, ".ads");
-                o->output_h = get_output(s);
+                o->output_h = get_output(&s);
                 SET_SIZE(s, SIZE(o->output_file));
                 if (o->extension &&
                     !(SIZE(o->extension) == 4 && memcmp(o->extension, ".ads", 2) == 0)) {
@@ -617,7 +623,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".adb");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
 
                 generate_program_ada(g);
@@ -632,7 +638,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".cs");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_csharp(g);
                 fclose(o->output_src);
@@ -645,7 +651,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".dart");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_dart(g);
                 fclose(o->output_src);
@@ -658,7 +664,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".go");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_go(g);
                 fclose(o->output_src);
@@ -671,7 +677,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".java");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_java(g);
                 fclose(o->output_src);
@@ -684,7 +690,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".js");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_js(g);
                 fclose(o->output_src);
@@ -697,7 +703,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".pas");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_pascal(g);
                 fclose(o->output_src);
@@ -710,7 +716,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".php");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_php(g);
                 fclose(o->output_src);
@@ -723,7 +729,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".py");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_python(g);
                 fclose(o->output_src);
@@ -736,7 +742,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".rs");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_rust(g);
                 fclose(o->output_src);
@@ -749,7 +755,7 @@ extern int main(int argc, char * argv[]) {
                 } else {
                     s = add_literal_to_s(s, ".zig");
                 }
-                o->output_src = get_output(s);
+                o->output_src = get_output(&s);
                 lose_s(s);
                 generate_program_zig(g);
                 fclose(o->output_src);
