@@ -31,6 +31,11 @@ static inline symbol * reserve_b(symbol * p, int n) {
     if (n > CAPACITY(p)) p = reserve_b_(p, n);
     return p;
 }
+static inline symbol * ensure_nul_b(symbol * p) {
+    p = reserve_b(p, SIZE(p) + 1);
+    p[SIZE(p)] = 0;
+    return p;
+}
 extern symbol * add_to_b(symbol * p, const symbol * q, int n);
 extern symbol * copy_b(const symbol * p);
 extern char * b_to_sz(const symbol * p);

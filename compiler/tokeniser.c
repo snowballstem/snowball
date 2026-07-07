@@ -31,6 +31,7 @@ extern byte * get_input(const char * filename) {
             size_t s = CAPACITY(u) - size;
             size_t r = fread(u + size, 1, s, input);
             size += (int)r;
+            SET_SIZE(u, size);
             if (r < s) {
                 if (ferror(input)) {
                     fprintf(stderr, "%s: Read error\n", filename);
@@ -38,7 +39,6 @@ extern byte * get_input(const char * filename) {
                 }
                 break;
             }
-            SET_SIZE(u, size);
             u = reserve_s(u, size * 2);
         }
     }

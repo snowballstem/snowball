@@ -11,7 +11,7 @@
 #define EXTENDER 40
 
 // Threshold in bytes above which reallocations double the size.
-#define EXPONENTIAL_GROWTH_THRESHOLD 1024
+#define EXPONENTIAL_GROWTH_THRESHOLD 512
 
 /*  This module provides a simple mechanism for arbitrary length writable
     strings, called 'blocks'. They are 'symbol *' items rather than 'char *'
