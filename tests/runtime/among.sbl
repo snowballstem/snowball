@@ -2,18 +2,101 @@
 
 externals (stem)
 
-routines (gate)
+routines (gate bgate bgate2 not_atlimit)
 
 stringescapes {}
 
 define gate as 'q'
 
+backwardmode (
+  define bgate as 'q'
+  define bgate2 as test hop 4
+  define not_atlimit as not atlimit
+)
+
 define stem as (
-  test (
+  not (
     among (
       'x' ()
       '' gate ()
     )
     ='gated default among case did not fail as expected'
   )
+
+  // Regression test for bug during development of new C among code.
+  not (
+    backwards among (
+      'a' bgate
+      'bc' bgate
+    )
+    ='gated among did not fail as expected'
+  )
+
+  // Regression test for bug during development of new C among code.
+  test (
+    ='jalovc'
+    backwards (
+      [substring] among (
+        // -c -> -k
+        'c'
+          (<- 'k')
+        'nc'
+        'avc'
+        'ovc'
+          ()
+        'xnc'
+          (<- 'xnk')
+      )
+    )
+    ('jalovc' atlimit) or fail='empty among action mishandled'
+  )
+
+  ='hum'
+  // Regression test for bug during development of C new among code.
+  // Generated C code triggered "c0 set but not used" warning.
+  not backwards (
+    [substring] among (
+      'am'
+        (delete)
+      'em' bgate  'iem' bgate
+        (delete)
+    )
+    ='gated among with top-level segment did not fail as expected'
+  )
+
+  // Regression test for bug during development of C new among code.
+  ='aaronem'
+  backwards (
+    [substring] among (
+      'axxem' 'am'
+      'em' not_atlimit  'iem' not_atlimit
+        (delete)
+    )
+  ) or fail='gated among did not match aaronem'
+  test ('aaron' atlimit) or fail='gated among did not stem aaronem'
+
+  // Regression test for bug during development of C new among code.
+  ='aaronem'
+  backwards (
+    [substring] among (
+      'axxem' 'am'
+      'em' not_atlimit  'iem' not_atlimit
+    )
+    delete
+  ) or fail='gated among did not match aaronem (2)'
+  test ('aaron' atlimit) or fail='gated among did not stem aaronem (2)'
+
+  // Regression test for bug during development of C new among code.
+  // This triggered malloc heap corruption during compilation.
+  ='miami'
+  backwards (
+    [substring] among (
+      'i' bgate2
+      'ami' bgate2  'iami' bgate2
+        (delete)
+    )
+  ) or fail='gated among did not match origami'
+  test ('miam' atlimit) or fail='among chained functions not handled'
+
+  ='ok'
 )
