@@ -414,14 +414,13 @@ static struct options * read_options(int * argc_ptr, char * argv[]) {
         }
         int ext = size;
         while (ext > leaf) {
-            int ch = output_file[ext - 1];
+            int ch = output_file[--ext];
             if (ch == '.') {
                 o->extension = create_s_from_data(output_file + ext, (int)(size - ext));
-                SET_SIZE(o->output_file, ext - 1);
-                o->output_leaf = create_s_from_data(output_file + leaf, (int)(ext - leaf - 1));
+                SET_SIZE(o->output_file, ext);
+                o->output_leaf = create_s_from_data(output_file + leaf, (int)(ext - leaf));
                 break;
             }
-            --ext;
         }
         if (ext == leaf) {
             o->output_leaf = create_s_from_data(output_file + leaf, (int)(size - leaf));
