@@ -98,5 +98,16 @@ define stem as (
   ) or fail='gated among did not match origami'
   test ('miam' atlimit) or fail='among chained functions not handled'
 
+  // Regression test for bug in C new among code on big-endian platforms.
+  ='youthfulness'
+  // Failed to match big-endian platforms.
+  backwards (
+    [substring] among (
+      'fulness' (<-'ful')
+      'ousness' (<-'ous')
+    )
+  ) or fail='big-endian among regression test failed to match'
+  test ('youthful' atlimit) or fail='big-endian among regression test output wrong'
+
   ='ok'
 )
