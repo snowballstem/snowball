@@ -31,6 +31,7 @@ static inline symbol * reserve_b(symbol * p, int n) {
     if (n > CAPACITY(p)) p = reserve_b_(p, n);
     return p;
 }
+extern symbol * resize_b(symbol * p, int n);
 static inline symbol * ensure_nul_b(symbol * p) {
     p = reserve_b(p, SIZE(p) + 1);
     p[SIZE(p)] = 0;
@@ -54,6 +55,7 @@ static inline byte * reserve_s(byte * p, int n) {
     if (n > CAPACITY(p)) p = reserve_s_(p, n);
     return p;
 }
+extern byte * resize_s(byte * p, int n);
 static inline byte * ensure_nul_s(byte * p) {
     p = reserve_s(p, SIZE(p) + 1);
     p[SIZE(p)] = 0;

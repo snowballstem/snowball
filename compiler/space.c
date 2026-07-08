@@ -93,6 +93,16 @@ extern symbol * reserve_b_(symbol * p, int n) {
     return q;
 }
 
+extern symbol * resize_b(symbol * p, int n) {
+    int size = SIZE(p);
+    if (n > size) {
+        p = reserve_b(p, n);
+        memset(p + size, 0, (n - size) * sizeof(symbol));
+    }
+    SET_SIZE(p, n);
+    return p;
+}
+
 extern symbol * add_to_b(symbol * p, const symbol * q, int n) {
     p = reserve_b(p, SIZE(p) + n);
     memcpy(p + SIZE(p), q, n * sizeof(symbol));
@@ -218,6 +228,16 @@ extern byte * reserve_s_(byte * p, int n) {
     SET_SIZE(q, SIZE(p));
     lose_s(p);
     return q;
+}
+
+extern byte * resize_s(byte * p, int n) {
+    int size = SIZE(p);
+    if (n > size) {
+        p = reserve_s(p, n);
+        memset(p + size, 0, n - size);
+    }
+    SET_SIZE(p, n);
+    return p;
 }
 
 extern byte * copy_s(const byte * p) {
