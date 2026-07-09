@@ -280,8 +280,10 @@ struct amongvec {
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
     struct node * action; /* the corresponding action */
-    int i;           /* the amongvec index of the longest substring of b */
-    int result;      /* the numeric result for the case */
+    // The amongvec index of the longest substring of b, or -1 for none.
+    int i;
+    // among_var value for this case (starts from 1, or -1 for empty action).
+    int result;
     int line_number; /* for diagnostics */
     int function_index; /* 1-based */
     // 0-based index giving order of strings in source.  Used for stable
