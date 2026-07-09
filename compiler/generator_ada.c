@@ -296,22 +296,6 @@ static void w(struct generator * g, const char * s) {
     writef(g, s, NULL);
 }
 
-static int need_among_var(struct node *p) {
-    while (p) {
-        if (p->type == c_among) {
-            return 1;
-        }
-        if (p->left && need_among_var(p->left)) {
-            return 1;
-        }
-        if (p->aux && need_among_var(p->aux)) {
-            return 1;
-        }
-        p = p->right;
-    }
-    return 0;
-}
-
 static void generate_AE(struct generator * g, struct node * p) {
     const char * s;
     switch (p->type) {
@@ -1220,7 +1204,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     writef(g, "~-~Mend ~W;~N", p);
 
-    if (need_among_var(p->left)) {
+    if (p->name->has_among) {
         str_append_string(saved_output, "      A : Integer;\n");
     }
 
