@@ -578,6 +578,13 @@ extern void write_hex(struct generator * g, unsigned i) {
     write_hexdigit(g, i); /* hex integer */
 }
 
+extern void write_octal3(struct generator * g, unsigned n) {
+    assert(n < 256);
+    write_char(g, '0' + ((n >> 6) & 0x03));
+    write_char(g, '0' + ((n >> 3) & 0x07));
+    write_char(g, '0' + (n & 0x07));
+}
+
 extern void write_char(struct generator * g, int ch) {
     str_append_ch(g->outbuf, ch); /* character */
 }

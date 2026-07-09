@@ -46,9 +46,7 @@ static void write_literal_string(struct generator * g, const symbol * p) {
         } else if (ch < 128) {
             // Escape as octal.
             write_char(g, '\\');
-            write_char(g, '0' + ((ch >> 6) & 0x03));
-            write_char(g, '0' + ((ch >> 3) & 0x07));
-            write_char(g, '0' + (ch & 0x07));
+            write_octal3(g, ch);
         } else {
             write_string(g, "\\u");
             write_hex4(g, ch);

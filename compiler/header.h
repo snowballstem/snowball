@@ -508,6 +508,7 @@ extern void write_int(struct generator * g, int i);
 extern void wi3(struct generator * g, int i);
 extern void write_hex4(struct generator * g, unsigned ch);
 extern void write_hex(struct generator * g, unsigned i);
+extern void write_octal3(struct generator * g, unsigned n);
 extern void write_symbol(struct generator * g, symbol s);
 extern void write_s(struct generator * g, const byte * b);
 extern void write_str(struct generator * g, struct str * str);
