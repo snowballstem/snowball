@@ -16,6 +16,46 @@ static void generate(struct generator * g, struct node * p);
 static void w(struct generator * g, const char * s);
 static void writef(struct generator * g, const char * s, struct node * p);
 
+static bool can_error_(struct node * p);
+
+// `can_error(routine_name)` returns true if the C implementation of
+// `routine_name` can return -1.  -1 indicates an internal or system type error
+// (e.g. memory allocation failed or the slice wasn't valid) for C (for C++
+// we instead throw exceptions for such cases).
+static bool can_error(struct name * n) {
+    return can_error_(n->definition->left);
+}
+
+static bool can_error_(struct node * p) {
+    while (p) {
+        switch (p->type) {
+            case c_sliceto:
+            case c_assignto:
+            case c_slicefrom:
+            case c_attach:
+            case c_insert:
+            case c_stringassign:
+                return true;
+            case c_call:
+                if (can_error(p->name)) return true;
+                break;
+            case c_among: {
+                struct among * x = p->among;
+                if (x->unique_function_count == 0) break;
+                for (int i = 0; i < x->literalstring_count; ++i) {
+                    struct name * function = x->v[i].function;
+                    if (function && can_error(function)) return true;
+                }
+                break;
+            }
+        }
+        if (p->left && can_error_(p->left)) return true;
+        if (p->aux && can_error_(p->aux)) return true;
+        p = p->right;
+    }
+    return false;
+}
+
 /* Write routines for items from the syntax tree */
 
 static void write_relop(struct generator * g, int relop) {
@@ -325,7 +365,13 @@ static void w(struct generator * g, const char * s) {
 static void write_propagating_error(struct generator * g, const char * s,
                                     int keep_c,
                                     struct node *p) {
+    bool error_possible = true;
     if (g->options->target_lang == LANG_CPLUSPLUS) {
+        error_possible = false;
+    } else if (p->type == c_call && !can_error(p->name)) {
+        error_possible = false;
+    }
+    if (!error_possible) {
         if (keep_c) {
             write_block_start(g);
             w(g, "~Mint saved_c = z->c;~N");
@@ -1145,7 +1191,8 @@ static void generate_call(struct generator * g, struct node * p) {
     if (just_return_on_fail(g)) {
         write_block_start(g);
         writef(g, "~Mint ret = ~V(z);~N", p);
-        if (g->options->target_lang == LANG_CPLUSPLUS) {
+        if (g->options->target_lang == LANG_CPLUSPLUS ||
+            !can_error(p->name)) {
             writef(g, "~Mif (ret == 0) return ret;~N", p);
         } else {
             /* For C, we need to propagate both failures and runtime errors so
@@ -1163,7 +1210,8 @@ static void generate_call(struct generator * g, struct node * p) {
             write_propagating_error(g, "~V(z)", false, p);
             writef(g, "~M~f~N", p);
         } else {
-            if (g->options->target_lang == LANG_CPLUSPLUS) {
+            if (g->options->target_lang == LANG_CPLUSPLUS ||
+                !can_error(p->name)) {
                 writef(g, "~Mif (!~V(z)) ~f~N", p);
             } else {
                 write_block_start(g);
