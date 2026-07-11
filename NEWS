@@ -1,7 +1,40 @@
-up to: a4f51be2759c37ae94c3dc0581e2ed2364f576de
+up to: a1196026d614fd42d19ec5a6467fc48168a61c38
 
 Snowball 3.2.0 (UNRELEASED)
 ===========================
+
+    Expand runtime test coverage for among
+
+    Copy less when reallocating strings
+    We only need to copy SIZE(), not CAPACITY().
+
+    Grow large sumbol strings exponentially
+    We now handle these the same as byte strings.
+
+    Routine "not reachable" now reported at definition
+    This seems a better location for the warning than the declaration.
+
+    Fix compiler memory leak from among in unreachable routine.
+
+    `make clean_runtime_tests` now first `make clean`s
+
+    Add runtime testcase for `?` (debug command)
+
+    Make default slice empty where set
+    The Snowball manual says:
+    .
+      For any string, the slice ends should be assumed to be unset until
+      they are set with the two commands `[` and `]`.
+    .
+    For many target languages, we actually initialise the slice ends
+    (either because the language requires doing so, or because the author of
+    that generator thought it cleaner to do so, or perhaps just followed an
+    existing target language which did this).
+    .
+    In these situations, what the slice is set to does not matter since
+    the Snowball language doesn't define values, so we now simply the slice
+    start and end to 0 which is slightly simpler than the previous setting
+    of the slice end to the length of the string.
 
     Improve variable localisation machinery, and fix some obscure cases
     it was getting wrong.
@@ -61,6 +94,12 @@ Snowball 3.2.0 (UNRELEASED)
     Fixes #261
     earlymodernenglish: Handle more prefixes/suffixes
 
+    Ada: Use consistent case for Debug() helper name
+
+    C: Omit code to propagate errors when impossible
+    We can statically check for a routine which can never error, and
+    omitting the code to propagate the error is slightly more efficient.
+
 C:
     Simplify initialisation in SN_new_env()
     We can just use memset() here - there is a pointer member, and the C
@@ -69,10 +108,86 @@ C:
     but we assign the only pointer member right after the memset() so
     the potential discrepancy isn't actually relevant here anyway.
 
-    Rust: Emit minimum length Unicode escapes
+    C: Use putc() in debug() helper
+
+    C: Simplify creating a stemmer
+    We now memset() the whole allocation to zero rather than just the
+    SN_env part, which takes care of initialising non-localised integer and
+    boolean variables to 0.
+    We also now skip pre-initialising non-localised string variables to
+    NULL before we try to allocate them if there's only one since we can't
+    end up with them partially allocated in that case.  We could skip this
+    entirely if we know the implementation uses all-zero-bits in memory
+    representation for NULL pointers, which all modern platforms seem to
+    but the C standard doesn't guarantee, but all the current stemmers which
+    use string variables only use one.
+
+    C: #define close_env to SN_delete_env if no strings
+    If an algorithm doesn't use strings, then its close_env() only
+    needs to call SN_delete_env(), and both take the same parameters
+    and return void, so we can instead #define in the header which
+    reduces code size and eliminates a small runtime overhead for
+    closing a stemmer.
+    35 of the 38 stemmers we currently ship benefit from this.
+
+    C: Reduce load time relocations in libstemmer
+    Use a suitably sized char[] array in struct stemmer_encoding instead
+    of const char*.
+
+    libstemmer: Eliminate sentinel at end of encodings
+    We know the length of the encodings list at compile time, so use
+    that to limit iteration rather than having a NULL entry at the end.
+
+    Fix compilation errors in stemtest.c Introduced by v3.1.0.
+    Currently stemtest doesn't get built or run by default, which is how this
+    slipped in.
+    Fixes #295, reported by Duncan Bellamy.
+    We stopped compiling or running stemtest in v3.1.0.
+    We can't actually run stemtest when runtime tests are enabled (it fails
+    with "language `en' not available for stemming") but I meant to
+    conditionalise it rather than just stop running it at all.
+    Now `stemtest` is run on `make check` unless the tree has been switched
+    to run runtime tests.  We now handle `compilertest` in the same way,
+    since that is redundant to run when running runtime tests.
+    Addresses the underlying reason why #295 wasn't detected right away,
+    as a recurrence of #295 would now fail CI.
+
+
+    C#: Implement support for `?` (debug command)
+
+    Dart: Implement support for `?` (debug command)
+    Currently untested as I don't have Dart installed locally.
+
+    Go: Improve output from `?` (debug) command
+    The output now shows the current string, cursor, limits and slice ends.
+    The format used now matches that used for other target languages.
+
+    Java: Implement support for `?` (debug command)
+
+    JS: Implement support for `?` (debug command)
+
+    Pascal: Implement support for `?` (debug command)
 
     PHP: Emit minimum length Unicode escapes
 
+    PHP: Implement support for `?` (debug command)
+
+    Python: Implement support for `?` (debug command)
+
+    Rust: Emit minimum length Unicode escapes
+
+    Rust: Implement support for `?` (debug command)
+    Fairly sure my Rust code is hideous, but it seems to work.
+
+    Zig: Implement debug like other target languages
+
+    Pander to MSVC command-line quirks
+    Microsoft have deprecated `-o` in MSVC (they don't seem to say why
+    but the cynical interpretation would be to increase vendor lock-in) so
+    we need to use `-Fo:` when the output is an object file and `-Fe:`
+    when it's an executable.
+    This fixes the stemtest compile to generate `tests/stemtest.o` instead
+    of `./stemtest.obj`.
     Adjust to compile cleanly with MSVC
     Add CI job which compiles and runs C tests which uses `-W3 -WX` (`-W3`
     is apparently the default warning level when using the IDE and `-WX`
@@ -95,6 +210,13 @@ C:
     Portuguese and Brazilian Portuguese".
 
     libstemmer_python_README: Fix typo
+
+    Handle <- in AE more gracefully
+    In this context, the symbol <- isn't meaningful, so we now interpret
+    it as < followed by -.  Previously examples such as
+      $x<-1
+    gave a syntax error.  This now parses the same way as
+      $x < -1
 
 
 Snowball 3.1.1 (2026-06-03)
