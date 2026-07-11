@@ -52,7 +52,7 @@
 */
 
 extern symbol * create_b(int n) {
-    symbol * p = (symbol *) (HEAD + (char *) MALLOC(HEAD + (n + 1) * sizeof(symbol)));
+    symbol * p = (symbol *) (HEAD + (char *) MALLOC(HEAD + ((size_t)n + 1) * sizeof(symbol)));
     CAPACITY(p) = n;
     SET_SIZE(p, 0);
     return p;
@@ -82,9 +82,9 @@ extern symbol * reserve_b_(symbol * p, int n) {
     int new_size = n + EXTENDER;
     if (new_size > EXP_THRESHOLD) {
         // Switch to exponential growth for large strings.
-        int c = (CAPACITY(p) | (EXP_THRESHOLD * 2 - 1)) + 1;
-        while (c < new_size) c *= 2;
-        new_size = c;
+        unsigned c = (CAPACITY(p) | (EXP_THRESHOLD * 2 - 1)) + 1;
+        while ((int)c < new_size) c *= 2;
+        new_size = (int)c;
     }
     symbol * q = create_b(new_size);
     memcpy(q, p, SIZE(p) * sizeof(symbol));
