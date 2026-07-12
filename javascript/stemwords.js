@@ -19,8 +19,8 @@ The output file consists of the stemmed words, one per line.
 }
 
 {
-    let input = '';
-    let output = '';
+    let input;
+    let output;
     let encoding = 'utf8';
     let language = 'English';
     let usage_error = false;
@@ -85,13 +85,13 @@ The output file consists of the stemmed words, one per line.
 
     const stemmer = await create(language);
     let istream, ostream;
-    if (input !== '') {
+    if (input !== undefined) {
        istream = fs.createReadStream(input, encoding);
     } else {
        istream = process.stdin;
        if (istream.setEncoding) istream.setEncoding(encoding);
     }
-    if (output !== '') {
+    if (output !== undefined) {
         ostream = fs.createWriteStream(output, encoding);
     } else {
         ostream = process.stdout;
