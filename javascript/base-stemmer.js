@@ -228,7 +228,7 @@ export default class BaseStemmer {
 
     /**
      * @param {Array<Array<string|number>>} v
-     * @param {?function(): boolean} call_among_func
+     * @param {function(): boolean} [call_among_func]
      * @return {number}
      */
     find_among(v, call_among_func) {
@@ -301,7 +301,8 @@ export default class BaseStemmer {
     // find_among_b is for backwards processing. Same comments apply
     /**
      * @param {Array<Array<string|number>>} v
-     * @param {?function(): boolean} call_among_func
+     * @param {function(): boolean} [call_among_func]
+     * @return {number}
      */
     find_among_b(v, call_among_func) {
         /** @protected */
