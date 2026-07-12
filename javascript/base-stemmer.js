@@ -250,15 +250,13 @@ export default class BaseStemmer {
             let common = common_i < common_j ? common_i : common_j; // smaller
             // w[0]: string, w[1]: result, w[2]: substring_i (optional), w[3]: function (optional)
             const w = v[k];
-            let i2;
-            // @ts-expect-error: w[0] always string.
-            for (i2 = common; i2 < w[0].length; i2++) {
+            const s = /**@type{string}*/ (w[0]);
+            for (let i2 = common; i2 < s.length; i2++) {
                 if (c + common === l) {
                     diff = -1;
                     break;
                 }
-                // @ts-expect-error: w[0] always string.
-                diff = this.current.charCodeAt(c + common) - w[0].charCodeAt(i2);
+                diff = this.current.charCodeAt(c + common) - s.charCodeAt(i2);
                 if (diff !== 0) break;
                 common++;
             }
@@ -283,26 +281,20 @@ export default class BaseStemmer {
         }
         while (true) {
             const w = v[i];
-            // @ts-expect-error: w[0] always string.
-            if (common_i >= w[0].length) {
-                // @ts-expect-error: w[0] always string.
-                this.c = c + w[0].length;
-                // @ts-expect-error: w[1] always number.
-                if (w.length < 4) return w[1];
-                // @ts-expect-error: w[3] always number.
-                this.af = w[3];
+            const len = /**@type {string}*/ (w[0]).length;
+            if (common_i >= len) {
+                this.c = c + len;
+                if (w.length < 4) return /**@type {number}*/ (w[1]);
+                this.af = /**@type {number}*/ (w[3]);
                 // @ts-expect-error: call_among_func never null here.
                 if (call_among_func.call(this)) {
-                    // @ts-expect-error: w[0] always string.
-                    this.c = c + w[0].length;
-                    // @ts-expect-error: w[3] always number.
-                    return w[1];
+                    this.c = c + len;
+                    return /**@type {number}*/ (w[1]);
                 }
             }
             // Tests for undefined (if w.length < 2) or 0.
             if (!w[2]) return 0;
-            // @ts-expect-error: w[2] always number.
-            i -= w[2];
+            i -= /**@type {number}*/ (w[2]);
         }
     }
 
@@ -329,15 +321,13 @@ export default class BaseStemmer {
             let diff = 0;
             let common = common_i < common_j ? common_i : common_j;
             const w = v[k];
-            let i2;
-            // @ts-expect-error: w[0] always string.
-            for (i2 = w[0].length - 1 - common; i2 >= 0; i2--) {
+            const s = /**@type{string}*/ (w[0]);
+            for (let i2 = s.length - 1 - common; i2 >= 0; i2--) {
                 if (c - common === lb) {
                     diff = -1;
                     break;
                 }
-                // @ts-expect-error: w[0] always string.
-                diff = this.current.charCodeAt(c - 1 - common) - w[0].charCodeAt(i2);
+                diff = this.current.charCodeAt(c - 1 - common) - s.charCodeAt(i2);
                 if (diff !== 0) break;
                 common++;
             }
@@ -357,24 +347,20 @@ export default class BaseStemmer {
         }
         while (true) {
             const w = v[i];
-            // @ts-expect-error: w[0] always string.
-            if (common_i >= w[0].length) {
-                // @ts-expect-error: w[0] always string.
-                this.c = c - w[0].length;
-                if (w.length < 4) return w[1];
-                // @ts-expect-error: w[3] always number.
-                this.af = w[3];
+            const len = /**@type {string}*/ (w[0]).length;
+            if (common_i >= len) {
+                this.c = c - len;
+                if (w.length < 4) return /**@type {number}*/ (w[1]);
+                this.af = /**@type {number}*/ (w[3]);
                 // @ts-expect-error: call_among_func never null here.
                 if (call_among_func.call(this)) {
-                    // @ts-expect-error: w[0] always string.
-                    this.c = c - w[0].length;
-                    return w[1];
+                    this.c = c - len;
+                    return /**@type {number}*/ (w[1]);
                 }
             }
             // Tests for undefined (if w.length < 2) or 0.
             if (!w[2]) return 0;
-            // @ts-expect-error: w[2] always number.
-            i -= w[2];
+            i -= /**@type {number}*/ (w[2]);
         }
     }
 
