@@ -1154,7 +1154,7 @@ Javascript
     express the types fully in some places, but the invariants we require are
     ensured by the Snowball compiler.  Annotating the expected errors allows
     unexpected type checking errors to be be more easily seen, and they are
-    now fatal is CI.
+    now fatal in CI.
 
   + Use `===` and `!==` in stemwords.js.  Patch from Adam Turner.
 
