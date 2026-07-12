@@ -1565,6 +1565,10 @@ extern void generate_program_js(struct generator * g) {
 
     if (g->analyser->debug_used) {
        w(g, "~N"
+            "~M/**~N"
+            "~M/* @param {number} n~N"
+            "~M/* @param {number} line~N"
+            "~M */~N"
             "~M#debug(n, line) {~N~+"
             "~Mconst len = this.current.length;~N"
             "~Mlet s = `${n<10?'  ':n<100?' ':''}${n} (line ${line<10?'   ':line<100?'  ':line<1000?' ':''}${line}): [${len}]'`;~N"
