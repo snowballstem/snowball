@@ -37,6 +37,8 @@ static bool can_error_(struct node * p) {
             case c_stringassign:
                 return true;
             case c_call:
+                // Recursive functions are rare so just assume the worst.
+                if (p->name->recursive) return true;
                 if (can_error(p->name)) return true;
                 break;
             case c_among: {
