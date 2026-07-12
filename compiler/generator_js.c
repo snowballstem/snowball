@@ -953,7 +953,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~N"
-              "~Mconst /** !Object */ ~B0 = new ~P();~N", p);
+              "~Mconst /**@type {~P}*/ ~B0 = new ~P();~N", p);
     writef(g, "~M~B0.copy_from(this);~N", p);
 
     writef(g, "~Mthis.current = ~V;~N"
