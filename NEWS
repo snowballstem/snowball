@@ -2725,9 +2725,6 @@ Build system
 * Add `WERROR` make variable to provide a way to add `-Werror` to existing
   CFLAGS.
 
-libstemmer
-----------
-
 Testsuite
 ---------
 
