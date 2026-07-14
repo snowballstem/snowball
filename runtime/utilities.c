@@ -381,6 +381,10 @@ extern int find_among(struct SN_env * z, const struct among * v, int v_size,
         for (k = 0; k < v_size; ++k) {
             w = v + k;
             fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+            if (w->function) {
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+                fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+            }
         }
         /* If the among matches the empty string without a gating function then
          * the "no match" case is impossible and so not useful to include in a
@@ -483,6 +487,10 @@ extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
         for (k = 0; k < v_size; ++k) {
             w = v + k;
             fprintf(stderr, "%s: among %d : %d of %d string '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+            if (w->function) {
+                fprintf(stderr, "%s: among %d : %d of %d func-t '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+                fprintf(stderr, "%s: among %d : %d of %d func-f '%.*s'\n", w[v_size].s, among_number, w[v_size].result, v_size, w->s_size, w->s);
+            }
         }
         /* If the among matches the empty string without a gating function then
          * the "no match" case is impossible and so not useful to include in a
