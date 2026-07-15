@@ -29,7 +29,7 @@
  */
 typedef int sizeof_symbol_divides_head[(HEAD % sizeof(symbol) == 0) ? 1 : -1];
 
-#define CREATE_SIZE 1
+#define CREATE_SIZE 31
 
 extern symbol * create_s(void) {
     symbol * p;
