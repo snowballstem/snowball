@@ -1172,7 +1172,7 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_external) {
         w(g, "~N");
         w(g, "~M/**@return{string}*/~N");
-        writef(g, "~M~W(/**string*/input) {~+~N", p);
+        writef(g, "~M~W(/**@type {string}*/input) {~+~N", p);
         w(g, "~Mthis.setCurrent(input);~N");
         writef(g, "~Mthis.#~W();~N", p);
         w(g, "~Mreturn this.getCurrent();~N");
