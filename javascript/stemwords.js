@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import fs from 'node:fs';
 import process from 'node:process';
 import readline from 'node:readline';
@@ -21,6 +22,7 @@ The output file consists of the stemmed words, one per line.
 {
     let input;
     let output;
+    /**@type {BufferEncoding}*/
     let encoding = 'utf8';
     let language = 'English';
     let usage_error = false;
@@ -45,7 +47,7 @@ The output file consists of the stemmed words, one per line.
                 usage_error = true;
                 break;
             }
-            language = argv.shift();
+            language = /**@type {string}*/ (argv.shift());
             break;
         case "-i":
             if (argv.length === 0)
@@ -69,7 +71,16 @@ The output file consists of the stemmed words, one per line.
                 usage_error = true;
                 break;
             }
-            encoding = argv.shift();
+            {
+                const enc = /**@type {string}*/ (argv.shift());
+                if (!Buffer.isEncoding(enc))
+                {
+                    console.log('Unknown character encoding: ' + enc + '\n');
+                    usage_error = true;
+                    break;
+                }
+                encoding = enc;
+            }
             break;
         default:
             console.log('Unknown command line option: ' + arg + '\n');
@@ -101,8 +112,17 @@ The output file consists of the stemmed words, one per line.
     stemming(stemmer, istream, ostream);
 }
 
-// function stemming (stemmer : Stemmer, input : Stream, output : Stream) {
-function stemming (stemmer, input, output) {
+/**
+ * @typedef {object} Stemmer
+ * @property {function(string): string} stemWord
+ */
+
+/**
+ * @param {Stemmer} stemmer
+ * @param {NodeJS.ReadableStream} input
+ * @param {NodeJS.WritableStream} output
+ */
+function stemming(stemmer, input, output) {
     const lines = readline.createInterface({
         input: input,
         terminal: false
@@ -112,13 +132,16 @@ function stemming (stemmer, input, output) {
     });
 }
 
-async function create (name) {
+/**
+ * @param {string} name
+ * @return {Promise<Stemmer>} name
+ */
+async function create(name) {
     const lc_name = name.toLowerCase();
     if (/\W/.test(lc_name) || lc_name === 'base') {
         console.log('Unknown stemming language: ' + name + '\n');
         usage();
         process.exit(1);
-        return;
     }
     const filename = `../js_out/${lc_name}-stemmer.js`;
     try {
@@ -127,5 +150,6 @@ async function create (name) {
         return new stemmerModule.default();
     } catch (error) {
         console.error(error);
+        process.exit(1);
     }
 }
