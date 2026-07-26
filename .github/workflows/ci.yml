@@ -288,7 +288,7 @@ jobs:
       if: ${{ startsWith(matrix.JSRUN, 'deno') }}
       run: |
         deno lint javascript/*.js js_out/*.js
-        deno check javascript/*.js js_out/*.js
+        deno check --check-js javascript/*.js js_out/*.js
     - name: Test Rust
       if: matrix.RUST
       run: $MAKE check_rust RUST="${{ matrix.RUST }}"

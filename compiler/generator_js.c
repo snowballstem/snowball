@@ -78,7 +78,7 @@ static void write_savecursor(struct generator * g, struct node * p,
     g->B[0] = str_data(savevar);
     g->S[1] = "";
     if (p->mode != m_forward) g->S[1] = "this.limit - ";
-    writef(g, "~Mconst /** number */ ~B0 = ~S1this.c;~N", p);
+    writef(g, "~Mconst /**@type {number}*/ ~B0 = ~S1this.c;~N", p);
 }
 
 static void append_restore_string(struct node * p, struct str * out, struct str * savevar) {
@@ -644,7 +644,7 @@ static void generate_loop(struct generator * g, struct node * p) {
     write_comment(g, p);
     struct str * loopvar = vars_newname(g);
     g->B[0] = str_data(loopvar);
-    w(g, "~Mfor (let /** number */ ~B0 = ");
+    w(g, "~Mfor (let /**@type {number}*/ ~B0 = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
     writef(g, "; ~B0 > 0; ~B0--)~N", p);
@@ -747,7 +747,7 @@ static void generate_hop(struct generator * g, struct node * p) {
         write_failure_if(g, "this.c ~S0 ~I0 ~S1", p);
         writef(g, "~Mthis.c ~S0= ~I0;~N", p);
     } else {
-        w(g, "~{~Mconst /** number */ c = this.c ~S0 ");
+        w(g, "~{~Mconst /**@type {number}*/ c = this.c ~S0 ");
         generate_AE(g, p->AE);
         w(g, ";~N");
         write_failure_if(g, "c ~S1 || c ~S2 this.c", p);
@@ -807,7 +807,7 @@ static void generate_insert(struct generator * g, struct node * p, int style) {
     int keep_c = style == c_attach;
     if (p->mode == m_backward) keep_c = !keep_c;
     if (keep_c) {
-        w(g, "~{~Mconst /** number */ c = this.c;~N");
+        w(g, "~{~Mconst /**@type {number}*/ c = this.c;~N");
         writef(g, "~Mthis.insert(c, c, ", p);
     } else {
         writef(g, "~Mthis.insert(this.c, this.c, ", p);
@@ -821,7 +821,7 @@ static void generate_stringassign(struct generator * g, struct node * p) {
     write_comment(g, p);
     int keep_c = p->mode == m_forward; /* like 'attach' */
     if (keep_c) {
-        w(g, "~{~Mconst /** number */ c = this.c;~N");
+        w(g, "~{~Mconst /**@type {number}*/ c = this.c;~N");
         if (p->mode == m_forward) {
             writef(g, "~Mthis.insert(c, this.limit, ", p);
         } else {
@@ -875,13 +875,13 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         g->B[0] = str_data(varname);
         if (p->mode == m_forward) {
-            w(g, "~Mlet /** number */ ~B0 = this.limit;~N");
+            w(g, "~Mlet /**@type {number}*/ ~B0 = this.limit;~N");
             w(g, "~Mthis.limit = ");
             generate_AE(g, q->AE);
             w(g, ";~N");
             w(g, "~M~B0 -= this.limit;~N");
         } else {
-            w(g, "~Mconst /** number */ ~B0 = this.limit_backward;~N");
+            w(g, "~Mconst /**@type {number}*/ ~B0 = this.limit_backward;~N");
             w(g, "~Mthis.limit_backward = ");
             generate_AE(g, q->AE);
             w(g, ";~N");
@@ -904,7 +904,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         if (!g->unreachable) {
             g->B[0] = str_data(varname);
-            w(g, "~Mconst /** number */ ~B0 = ");
+            w(g, "~Mconst /**@type {number}*/ ~B0 = ");
             if (p->mode == m_forward) {
                 w(g, "this.limit - this.c;~N");
                 w(g, "~Mthis.limit = this.c;~N");
@@ -962,7 +962,7 @@ static void generate_dollar(struct generator * g, struct node * p) {
               "~Mthis.limit = this.current.length;~N", p);
     if (p->left->possible_signals == -1) {
         /* Assume failure. */
-        w(g, "~Mlet /**boolean*/ ~B0_f = true;~N");
+        w(g, "~Mlet /**@type {boolean}*/ ~B0_f = true;~N");
     }
 
     wsetlab_begin(g, g->failure_label);
@@ -1024,7 +1024,10 @@ static void generate_integer_test(struct generator * g, struct node * p) {
         w(g, "~Mreturn ");
         p->right = NULL;
     } else {
-        w(g, "~Mif (");
+        // Generate a typescript annotation cast to boolean to suppress
+        // deno check errors for constant if expressions, since a constant
+        // integer test is valid Snowball code.
+        w(g, "~Mif (/**@type {boolean}*/(");
         // We want the inverse of the snowball test here.
         relop ^= 1;
     }
@@ -1034,7 +1037,7 @@ static void generate_integer_test(struct generator * g, struct node * p) {
     if (optimise_to_return) {
         w(g, ";~N");
     } else {
-        w(g, ") ");
+        w(g, ")) ");
         write_failure_after_if(g);
         g->unreachable = false;
     }
@@ -1128,7 +1131,7 @@ static void generate_define(struct generator * g, struct node * p) {
         // The "among var" (`a`) is only assigned to, but the initialisation
         // can be generated in a nested block so it seems hard to declare it as
         // const and still have it visible when we want to use it.
-        w(g, "~Mlet /** number */ a;~N");
+        w(g, "~Mlet /**@type {number}*/ a;~N");
     }
 
     /* Declare localised variables. */
@@ -1136,17 +1139,17 @@ static void generate_define(struct generator * g, struct node * p) {
         if (name->local_to == q) {
             switch (name->type) {
                 case t_string:
-                    w(g, "~Mlet /** string */ ");
+                    w(g, "~Mlet /**@type {string}*/ ");
                     write_varname(g, name);
                     w(g, ";~N");
                     break;
                 case t_integer:
-                    w(g, "~Mlet /** number */ ");
+                    w(g, "~Mlet /**@type {number}*/ ");
                     write_varname(g, name);
                     w(g, ";~N");
                     break;
                 case t_boolean:
-                    w(g, "~Mlet /** boolean */ ");
+                    w(g, "~Mlet /**@type {boolean}*/ ");
                     write_varname(g, name);
                     w(g, ";~N");
                     break;
@@ -1172,7 +1175,7 @@ static void generate_define(struct generator * g, struct node * p) {
     if (q->type == t_external) {
         w(g, "~N");
         w(g, "~M/**@return{string}*/~N");
-        writef(g, "~M~W(/**string*/input) {~+~N", p);
+        writef(g, "~M~W(/**@type {string}*/input) {~+~N", p);
         w(g, "~Mthis.setCurrent(input);~N");
         writef(g, "~Mthis.#~W();~N", p);
         w(g, "~Mreturn this.getCurrent();~N");
@@ -1420,7 +1423,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
 
     if (x->same_action == c_slicefrom && x->command_count > 1) {
         g->I[0] = x->number;
-        w(g, "~Mconst /** Array<string> */ as_~I0 = [");
+        w(g, "~Mconst /**@type {Array<string>}*/ as_~I0 = [");
         for (int i = 1; i <= x->command_count; i++) {
             if (i > 1) w(g, ", ");
             write_literal_string(g, x->commands[i - 1]->left->literalstring);
@@ -1481,7 +1484,7 @@ static void generate_grouping_table(struct generator * g, struct grouping * q) {
 
     for (int i = 0; i < SIZE(b); i++) set_bit(map, b[i] - q->smallest_ch);
 
-    w(g, "~Mconst /** Array<number> */ ");
+    w(g, "~Mconst /**@type {Array<number>}*/ ");
     write_varname(g, q->name);
     write_string(g, " = [");
     for (int i = 0; i < size; i++) {
@@ -1508,19 +1511,19 @@ static void generate_members(struct generator * g) {
             case t_string:
                 w(g, "~M#");
                 write_varname(g, q);
-                w(g, "/** string */ = '';~N");
+                w(g, "/**@type {string}*/ = '';~N");
                 wrote_members = true;
                 break;
             case t_integer:
                 w(g, "~M#");
                 write_varname(g, q);
-                w(g, "/** number */ = 0;~N");
+                w(g, "/**@type {number}*/ = 0;~N");
                 wrote_members = true;
                 break;
             case t_boolean:
                 w(g, "~M#");
                 write_varname(g, q);
-                w(g, "/** boolean */ = false;~N");
+                w(g, "/**@type {boolean}*/ = false;~N");
                 wrote_members = true;
                 break;
         }
