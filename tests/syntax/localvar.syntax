@@ -10,19 +10,19 @@ define stem
         = y
         # cursor
         next
-        >
-        # number 0
+        >=
+        # number 1
           name y
         = global_b
         # number 0
-    >
-    # number 0
+    >=
+    # number 1
       name x
-    >
-    # number 0
+    >=
+    # number 1
       name global_a
-    >
-    # number 0
+    >=
+    # number 1
       name global_b
     do
       (
@@ -45,8 +45,8 @@ define stem
     >=
     # name u
       cursor
-    >
-    # number 0
+    >=
+    # number 1
       name global_c
     (
       test
@@ -70,7 +70,7 @@ define stem
                 name s
               = s
               # name t
-    >
-    # number 3
+    >=
+    # number 4
       name s
     Function end

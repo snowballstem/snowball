@@ -1138,6 +1138,41 @@ static int ae_uses_name(struct node * p, struct name * q) {
     return 0;
 }
 
+// Put integer tests nodes into a normalised form, so that we can merge
+// among actions with equivalent integer tests - e.g. from arabic.sbl:
+//
+//   [substring] among (
+//      // [...]
+//      '{a}{n}' '{w}{n}' '{y}{n}' ($(len > 5) delete) // present
+//      '{t}{m}{a}' ($(len >= 6) delete)
+//   )
+static void normalise_comparison(struct node * n) {
+    if (!n->left || !n->AE) return;
+    if (n->left->type == c_number && n->AE->type != c_number) {
+        // Swap operands so a number goes on the RHS.
+        switch (n->type) {
+            case c_gt: n->type = c_lt; break;
+            case c_lt: n->type = c_gt; break;
+            case c_ge: n->type = c_le; break;
+            case c_le: n->type = c_ge; break;
+        }
+        struct node * p = n->left;
+        n->left = n->AE;
+        n->AE = p;
+    }
+    if (n->AE->type == c_number && abs(n->AE->number) < 32767) {
+        if (n->type == c_gt) {
+            // Normalise `$(n > 0)` to `$(n >= 1)`.
+            n->type = c_ge;
+            ++n->AE->number;
+        } else if (n->type == c_lt) {
+            // Normalise `$(n < 1)` to `$(n <= 0)`
+            n->type = c_le;
+            --n->AE->number;
+        }
+    }
+}
+
 static struct node * read_C(struct analyser * a) {
     struct tokeniser * t = a->tokeniser;
     int token = read_token(t);
@@ -1569,6 +1604,7 @@ handle_rel_op: ;
                             n = new_node(a, token);
                             n->left = lhs;
                             n->AE = rhs;
+                            normalise_comparison(n);
                         }
                         get_token(a, c_ket);
                         break;
@@ -1633,6 +1669,7 @@ handle_rel_op: ;
                     p->left = new_node(a, c_name);
                     p->left->name = q;
                     p->AE = read_AE(a, NULL, 0);
+                    normalise_comparison(p);
                     if (q) {
                         q->value_used = true;
                         mark_used_in(a, q, p);
