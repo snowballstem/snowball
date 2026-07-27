@@ -1,4 +1,4 @@
-up to: 291819f49a86f0653afa14bc2ed2000ac580bda0
+up to: 5434f70d69f3a598da3cf673df4749691c0ac448
 
 Snowball 3.2.0 (UNRELEASED)
 ===========================
@@ -11,7 +11,19 @@ Compiler changes
   - Fix detection of read errors for piped input which were effectively being
     ignored.  Bug introduced in 3.1.0.
 
+  - The coverage counts for among functions were one too low.
+
 * Compiler command-line options:
+
+  - Change how -coverage reports among functions
+    If the string matched we used to always report a string match, and
+    additionally either "func-f" or "func-t" depending what the function
+    signalled.
+    Now we only report one thing - if the string matches but the function
+    signals f we report "func-f"; if the string matches and the function
+    signals t we reprot a string match.
+    This gives a report that seems clearer, and requires logging and
+    collating less data.
 
 * Diagnostics:
 
@@ -60,6 +72,15 @@ Generic code generation changes
     inline themselves it eliminates the overhead of a call.  It may also enable
     more variables to be localised.
 
+  - Normalise comparison with an integer literal so we merge equivalent among
+    actions such as this example from arabic.sbl:
+
+      [substring] among (
+         // [...]
+         '{a}{n}' '{w}{n}' '{y}{n}' ($(len > 5) delete) // present
+         '{t}{m}{a}' ($(len >= 6) delete)
+      )
+
 * Code quality:
 
   - The Snowball manual says:
@@ -68,9 +89,9 @@ Generic code generation changes
       they are set with the two commands `[` and `]`.
   
     For many target languages, we actually initialise the slice ends
-    (either because the language requires doing so, or because the author of
-    that generator thought it cleaner to do so, or perhaps just followed an
-    existing target language which did this).
+    (either because the target language requires doing so, or because the
+    author of that generator thought it cleaner to do so, or perhaps just
+    followed an existing target language generator which did this).
 
     In these situations, what the slice is set to does not matter since the
     Snowball language doesn't define values, so we now simply set both the
@@ -123,6 +144,14 @@ C
     now `#define` the close_env function to `SN_delete_env` in the header which
     reduces code size and eliminates a small runtime overhead for closing a
     stemmer.  35 of the 38 stemmers we currently ship benefit from this.
+
+  - Use a more sensible initial string size.
+    We were allocating only enough space for a single character.  That
+    won't be enough for words being stemmed.  It might be enough for
+    some string variables, but we actually allocate an extra character to
+    allow in-place zero termination as well as space for two ints to store
+    the size and capacity, so the minimum total allocation is actually
+    10 bytes when sizeof(symbol)==1 anyway.
 
   - Use putc() in debug() helper to write single characters.
 
@@ -237,8 +266,16 @@ Javascript
 * Code quality:
 
   - Improve JSDoc TypeScript annotations.
+    JS: Fix typescript annotations in generated code
+    We need to pass `--check-js` to `deno check` to actually check .js
+    files, which we now do (so we'll spot regressions).
+    Closes #300, reported by alex-kinokon.
+    stemwords.js: Improve typescript annotations
+    Fix incorrect/missing annotations and adjust code so that type checking
+    passes.
+    Partially based on changes from alex-kinokon in #300.
 
-  - Replace most @ts-expect-error annotation with JSDoc cast annotations.  A
+  - Replace most @ts-expect-error annotations with JSDoc cast annotations.  A
     cast is better as it is more targetted, and also more self-documenting.
 
 * Documentation:
@@ -593,6 +630,8 @@ Build system
   triggers warnings from MSVC).  The command `ar` is used to create a static
   library so you'll also need the mingw toolchain installed for that.
 
+* modules.txt: Fix alphabetical ordering of entries.
+
 libstemmer
 ----------
 
@@ -626,6 +665,7 @@ Testsuite
 Documentation
 -------------
 
+* NEWS: Removed unused subheading in old entry.
 
 Snowball 3.1.1 (2026-06-03)
 ===========================
