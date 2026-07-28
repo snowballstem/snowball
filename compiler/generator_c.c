@@ -1693,7 +1693,7 @@ static void generate_head(struct generator * g) {
 
         for (struct name * name = g->analyser->names; name; name = name->next) {
             if (!name->local_to && name->type == t_boolean) {
-                if (g->options->target_lang == LANG_CPLUSPLUS) {
+                if (o->target_lang == LANG_CPLUSPLUS) {
                     w(g, "~Mbool ");
                 } else {
                     w(g, "~Munsigned char ");
@@ -1713,12 +1713,12 @@ static void generate_head(struct generator * g) {
 
         w(g, "~-~M};~N~N");
 
-        if (g->options->target_lang == LANG_C) {
+        if (o->target_lang == LANG_C) {
             w(g, "typedef struct SN_local SN_local;~N~N");
         }
     }
 
-    const char * vp = g->options->variables_prefix;
+    const char * vp = o->variables_prefix;
     if (vp) {
         for (struct name * q = g->analyser->names; q; q = q->next) {
             if (q->local_to) continue;
@@ -1746,7 +1746,7 @@ static void generate_head(struct generator * g) {
                          "}~N~N");
                     break;
                 case t_boolean:
-                    if (g->options->target_lang == LANG_CPLUSPLUS) {
+                    if (o->target_lang == LANG_CPLUSPLUS) {
                         w(g, "extern bool ");
                     } else {
                         w(g, "extern int ");
