@@ -40,7 +40,7 @@ define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
 define oux_ending 'bhjlnp'
 
 // Single character elisions
-define elision_char 'cdjlmnst'
+define elision_char 'c{cc}djlmnst'
 
 define elisions as
 (
