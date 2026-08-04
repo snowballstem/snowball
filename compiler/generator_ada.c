@@ -65,6 +65,17 @@ static void write_varname(struct generator * g, struct name * p) {
         write_char(g, '_');
     }
 
+    for (int i = SIZE(p->s) - 1; i > 0; --i) {
+        if (p->s[i] == '_' && p->s[i - 1] == '_') {
+            // Ada doesn't allow identifiers containing a double underscore
+            // so generate an identifier based on the number instead.
+            // A Snowball name must start with a letter so this can't
+            // collide.
+            write_int(g, p->count);
+            return;
+        }
+    }
+
     {
         char save_initial = p->s[0];
         p->s[0] = toupper(save_initial);
