@@ -95,6 +95,18 @@ static void write_varname(struct generator * g, struct name * p) {
                 write_int(g, p->count);
                 return;
             }
+        } else {
+            assert(g->options->target_lang == LANG_CPLUSPLUS);
+            for (int i = SIZE(p->s) - 1; i > 0; --i) {
+                if (p->s[i] == '_' && p->s[i - 1] == '_') {
+                    // C++ reserves identifiers containing a double underscore
+                    // so generate an identifier based on the number instead.
+                    // A Snowball name must start with a letter so this can't
+                    // collide.
+                    write_int(g, p->count);
+                    return;
+                }
+            }
         }
     }
     write_s(g, p->s);
