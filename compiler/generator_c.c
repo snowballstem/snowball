@@ -2173,7 +2173,7 @@ static void generate_header_file(struct generator * g) {
 
         for (struct name * name = g->analyser->names; name; name = name->next) {
             if (!name->local_to && name->type == t_boolean) {
-                if (g->options->target_lang == LANG_CPLUSPLUS) {
+                if (o->target_lang == LANG_CPLUSPLUS) {
                     w(g, "~Mbool ");
                 } else {
                     w(g, "~Munsigned char ");
@@ -2214,8 +2214,8 @@ static void generate_header_file(struct generator * g) {
         for (struct name * q = g->analyser->names; q; q = q->next) {
             if (!q->local_to && q->type == t_external) {
                 w(g, "~Mstatic int ");
-                if (g->options->externals_prefix) {
-                    write_string(g, g->options->externals_prefix);
+                if (o->externals_prefix) {
+                    write_string(g, o->externals_prefix);
                 }
                 write_s(g, q->s);
                 w(g, "(struct SN_env * z);~N~N");
@@ -2255,8 +2255,8 @@ static void generate_header_file(struct generator * g) {
         write_string(g, "::");
         write_s(g, o->name);
         write_string(g, "::");
-        if (g->options->externals_prefix) {
-            write_string(g, g->options->externals_prefix);
+        if (o->externals_prefix) {
+            write_string(g, o->externals_prefix);
         }
         w(g, "stem(z);~N"
              "~Mreturn std::string(reinterpret_cast<const char*>(z->p), SIZE(z->p));~N"
