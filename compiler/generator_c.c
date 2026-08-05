@@ -2007,8 +2007,8 @@ static void generate_create(struct generator * g) {
 }
 
 static void generate_close(struct generator * g) {
-    // If there are no string variables then our env is just SN_delete_env so
-    // we #define it to that in the header.
+    // If there are no string variables then our close_env is just
+    // SN_delete_env so we #define it to that in the header.
     if (g->analyser->name_count[t_string] == 0) return;
 
     w(g, "~Nextern void ~pclose_env(struct SN_env * z) {~N~+");
