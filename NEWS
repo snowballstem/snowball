@@ -1,4 +1,4 @@
-up to: 5434f70d69f3a598da3cf673df4749691c0ac448
+up to: 4e6010208d0fe60880731e9b42f0a3804fd8f578
 
 Snowball 3.2.0 (UNRELEASED)
 ===========================
@@ -107,6 +107,9 @@ Ada
 
 * Bug fixes:
 
+  - Generate valid Ada code for a Snowball routine/variable name which contains
+    `__`.
+
 * Optimisations:
 
 * Code quality:
@@ -174,6 +177,9 @@ C++
 ---
 
 * Bug fixes:
+
+  - Generate valid C++ code for a Snowball routine/variable name which contains
+    `__`.
 
 * Optimisations:
 
@@ -644,7 +650,7 @@ libstemmer
 Testsuite
 ---------
 
-* Expand runtime test coverage for `among`.
+* Expand runtime test coverage for `among`, `attach`, `insert`.
 
 * Add runtime test coverage for `?` (debug command).
 
