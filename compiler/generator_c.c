@@ -2240,11 +2240,18 @@ static void generate_header_file(struct generator * g) {
                  "~Mthrow;~N"
                  "~-~M}~N");
         }
+        if (o->encoding == ENC_WIDECHARS) {
+            g->S[0] = "std::wstring";
+            g->S[1] = "wchar_t";
+        } else {
+            g->S[0] = "std::string";
+            g->S[1] = "char";
+        }
         w(g, "~-~M}~N~N"
              "~M~~~n() {~N~+"
              "~Mclose_env();~N"
              "~-~M}~N~N"
-             "~Mstd::string operator()(const std::string& word) override {~N~+"
+             "~M~S0 operator()(const ~S0& word) override {~N~+"
              "~Mstruct SN_env* z = &(zlocal.z);~N"
              "~Mconst symbol* s = reinterpret_cast<const symbol*>(word.data());~N"
              "~Mint s_size = word.size() > INT_MAX ? INT_MAX : word.size();~N"
@@ -2259,7 +2266,7 @@ static void generate_header_file(struct generator * g) {
             write_string(g, o->externals_prefix);
         }
         w(g, "stem(z);~N"
-             "~Mreturn std::string(reinterpret_cast<const char*>(z->p), SIZE(z->p));~N"
+             "~Mreturn ~S0(reinterpret_cast<const ~S1*>(z->p), SIZE(z->p));~N"
              "~-~M}~N"
              "~-~M};~N~N");
 
