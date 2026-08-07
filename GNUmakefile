@@ -189,7 +189,7 @@ COMPILER_HEADERS = compiler/header.h \
 # C
 
 RUNTIME_SOURCES  = runtime/api.c \
-		   runtime/utilities.c
+		   runtime/snowball_runtime.c
 
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/snowball_runtime.h
@@ -205,7 +205,7 @@ STEMTEST_SOURCES = tests/stemtest.c
 # C++
 
 CXX_STEMWORDS_SOURCES = $(cxx_src_dir)/stemwords.cxx
-CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(cxx_src_dir)/utilities.cxx
+CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(cxx_src_dir)/snowball_runtime.cxx
 CXX_SOURCES = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.cxx)
 CXX_HEADERS = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.h)
 

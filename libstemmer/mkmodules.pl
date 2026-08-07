@@ -233,7 +233,7 @@ EOS
 
     $need_sep = 0;
     for $srcfile ('runtime/api.c',
-                  'runtime/utilities.c',
+                  'runtime/snowball_runtime.c',
                   "libstemmer/libstemmer${extn}.c") {
         print OUT " \\\n" if $need_sep;
         print OUT "  $srcfile";
