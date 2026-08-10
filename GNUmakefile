@@ -45,7 +45,7 @@ endif
 # C++
 
 CXX ?= c++
-CXXFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-declarations -Wshadow $(WERROR)
+CXXFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-declarations -Wshadow -DSNOWBALL_WIDE $(WERROR)
 cxx_src_dir = cxx
 
 # C#
@@ -474,7 +474,7 @@ $(cxx_src_dir)/stemwords$(EXEEXT): $(CXX_STEMWORDS_OBJECTS) $(CXX_RUNTIME_OBJECT
 
 $(cxx_src_dir)/%_stemmer.cxx $(cxx_src_dir)/%_stemmer.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(cxx_src_dir)
-	$(SNOWBALL_COMPILE) -c++ -cheader '"stemmer.h"' $< -o $@ -r ../runtime -u
+	$(SNOWBALL_COMPILE) -c++ -cheader '"stemmer.h"' $< -o $@ -r ../runtime -w
 
 $(cxx_src_dir)/%stemmer.o: $(cxx_src_dir)/%stemmer.h
 
