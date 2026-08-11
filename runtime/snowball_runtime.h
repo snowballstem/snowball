@@ -41,6 +41,7 @@ static void debug(struct SN_env * z, int n, int line) {
         }
     }
     printf("'\n");
+    fflush(stdout);
 }
 #endif
 
