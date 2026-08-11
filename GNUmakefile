@@ -484,6 +484,8 @@ $(cxx_src_dir)/%.o: $(cxx_src_dir)/%.cxx
 $(cxx_src_dir)/stemmer.cxx: GNUmakefile $(cxx_src_dir)/generate_algorithms.pl $(MODULES)
 	$(cxx_src_dir)/generate_algorithms.pl $@ $(MODULES)
 
+$(cxx_src_dir)/snowball_runtime.cxx: runtime/snowball_runtime.c
+
 # C#
 
 csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
