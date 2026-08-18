@@ -83,7 +83,7 @@ backwardmode (
     define verb_sfx as (
         [substring] RV among (
             // 'whia' is a passive suffix but "very rare" according to
-            // The Reed Reference Grammar of Mãori.
+            // The Reed Reference Grammar of Māori.
             //
             // Based on words extracted from mi.wikipedia.org, NZ Hansard, and
             // Māori translations in English wiktionary removing it doesn't
@@ -94,14 +94,14 @@ backwardmode (
             // On the same text collections this only achieves iwhāia -> i
             // which seems to be wrong.
 
-            // The Reed Reference Grammar of Mãori notes -ngia as "common".
+            // The Reed Reference Grammar of Māori notes -ngia as "common".
             // However in voc.txt, there's only "parangia" where removal seems
             // of dubious merit.
             'ngia'
 
             'hia' 'kia' 'ria' 'ia'
 
-            // The Reed Reference Grammar of Mãori notes these as "very rare"
+            // The Reed Reference Grammar of Māori notes these as "very rare"
             // passive suffixes:
             // 'whina' e.g. whaowhina; two unhelpful nothing helpful in voc.txt
             // (kaiāwhina and āwhina).
@@ -110,7 +110,7 @@ backwardmode (
 
             // "An uncommon passive ending [e.g.] whakaaturina"
             // https://maoridictionary.co.nz/word/6786
-            // Not listed by The Reed Reference Grammar of Mãori.
+            // Not listed by The Reed Reference Grammar of Māori.
             // Overstems (e.g. kātarina, herina)
             // 'rina'
 
@@ -144,7 +144,7 @@ backwardmode (
             // aha-tia
             // awhi-tia
             // ora-tia
-            // The Reed Reference Grammar of Mãori notes -tia as "common".
+            // The Reed Reference Grammar of Māori notes -tia as "common".
             'tia' ( test ( v  gopast v  gopast v ) delete )
 
             // "A passive ending used only after verbs ending with -o or -u."
@@ -158,7 +158,7 @@ backwardmode (
             // "A passive ending used mainly with verbs of one or two vowels,
             // including some words borrowed from English."
             // https://maoridictionary.co.nz/word/53
-            // The Reed Reference Grammar of Mãori notes -a as "common".
+            // The Reed Reference Grammar of Māori notes -a as "common".
             // It seems that for the vowel conditions a long vowel (one with a
             // macron) should be counted as two vowels.
             'a' ( test ( (longv  or  (shortv not gopast longv try gopast shortv))  not gopast v )  delete )
