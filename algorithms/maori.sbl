@@ -80,6 +80,9 @@ backwardmode (
 
     /* strip passive verb endings */
 
+    // "It is not generally possible to predict from the form of the word what
+    // its passive ending will be. However, -tia, -hia and -a probably occur
+    // most frequently." Te Whanake Te Kākano 3rd ed, p114.
     define verb_sfx as (
         [substring] RV among (
             // 'whia' is a passive suffix but "very rare" according to
@@ -90,13 +93,9 @@ backwardmode (
             // validly stem any words, but does the wrong thing for 11 words
             // (which end with the letters "whia" but not as a passive ending).
 
-            // 'wh{a_}ia' doesn't seem to be listed as a passive ending.
-            // On the same text collections this only achieves iwhāia -> i
-            // which seems to be wrong.
-
             // The Reed Reference Grammar of Māori notes -ngia as "common".
             // However in voc.txt, there's only "parangia" where removal seems
-            // of dubious merit.
+            // of dubious merit.  Harlow gives example "waiatangia".
             'ngia'
 
             'hia' 'kia' 'ria' 'ia'
@@ -105,21 +104,33 @@ backwardmode (
             // passive suffixes:
             // 'whina' e.g. whaowhina; two unhelpful nothing helpful in voc.txt
             // (kaiāwhina and āwhina).
+            // Harlow gives example "hopukina".
             'kina'
             // 'hina' e.g. rokohina; removal overstems more than it helps.
+
+            // "A passive ending" and "A suffix used to make verbs into nouns,
+            // sometimes called derived nouns"
+            // https://maoridictionary.co.nz/word/830
+            // Seems rare as a passive ending(?)
+            // Harlow gives example "rokohanga".
+            // 'hanga'
 
             // "An uncommon passive ending [e.g.] whakaaturina"
             // https://maoridictionary.co.nz/word/6786
             // Not listed by The Reed Reference Grammar of Māori.
+            // Listed by Harlow, also with example "whakaaturina"
+            // Also listed in Williams' dictionary.
             // Overstems (e.g. kātarina, herina)
             // 'rina'
 
+            // Harlow gives example "hokona".
             'na'
             ( test v  delete )
 
             // 'nga': "A passive ending used with only a few verbs ending in
             // -ai" e.g. kainga
             // https://maoridictionary.co.nz/word/4506
+            // Harlow also gives example "hāpainga".
             // However it's also a suffix which turns a verb into a noun,
             // and seems useful to remove more broadly so we don't just
             // test for 'ai' before it.
@@ -144,16 +155,27 @@ backwardmode (
             // aha-tia
             // awhi-tia
             // ora-tia
+            // kē-tia
             // The Reed Reference Grammar of Māori notes -tia as "common".
             'tia' ( test ( v  gopast v  gopast v ) delete )
 
             // "A passive ending used only after verbs ending with -o or -u."
             // https://maoridictionary.co.nz/word/4051
+            // "The use of the suffix -mia appears to be confined to words
+            // ending in o and u." Te Whanake Te Kākano 3rd ed, p115.
+            // Experimentation suggests checking for ō/ū before doesn't help.
+            // Harlow gives examples "tanumia", "whakangaromia", "inumia".
             'mia' ( test ( 'o' or 'u' ) delete )
 
             // "A passive ending used only after words ending in -a."
             // https://maoridictionary.co.nz/word/1708
+            // Experimentation suggests checking for ā before doesn't help.
+            // Harlow gives example "tuaina", "huaina", "arohaina".
             'ina' ( test 'a'  delete )
+
+            // Williams: "The occurrence of the forms heuea and keuea hardly
+            // warrants the recognition of ea as a passive termination. ‖
+            // footnote on p. xxi."
 
             // "A passive ending used mainly with verbs of one or two vowels,
             // including some words borrowed from English."
