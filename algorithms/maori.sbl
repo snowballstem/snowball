@@ -98,7 +98,7 @@ backwardmode (
             // of dubious merit.  Harlow gives example "waiatangia".
             'ngia'
 
-            'hia' 'kia' 'ria' 'ia'
+            'hia' 'kia' 'ia'
 
             // The Reed Reference Grammar of Māori notes these as "very rare"
             // passive suffixes:
@@ -166,6 +166,12 @@ backwardmode (
             // Experimentation suggests checking for ō/ū before doesn't help.
             // Harlow gives examples "tanumia", "whakangaromia", "inumia".
             'mia' ( test ( 'o' or 'u' ) delete )
+
+            // This condition allows removal in some cases when it shouldn't,
+            // but the only cases it excludes where we should remove which
+            // we've found so far are: "turia" and "tūria".
+            // Ideally we'd err the other way though...
+            'ria' ( test ( among ( 'a' 'i' 'o' 'u' '{u_}' ) gopast v ) delete )
 
             // "A passive ending used only after words ending in -a."
             // https://maoridictionary.co.nz/word/1708
