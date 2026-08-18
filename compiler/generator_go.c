@@ -33,7 +33,7 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     int i = 0;
     write_char(g, '"');
     while (i < SIZE(p)) {
@@ -1090,7 +1090,7 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mvar among_var int32~N");
     }
 
@@ -1313,7 +1313,7 @@ static void generate_class_begin(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mvar A_~I0 = []*snowballRuntime.Among{~N~+");

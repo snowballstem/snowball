@@ -36,7 +36,7 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
@@ -46,9 +46,7 @@ static void write_literal_string(struct generator * g, symbol * p) {
         } else if (ch < 128) {
             // Escape as octal.
             write_char(g, '\\');
-            write_char(g, '0' + ((ch >> 6) & 0x03));
-            write_char(g, '0' + ((ch >> 3) & 0x07));
-            write_char(g, '0' + (ch & 0x07));
+            write_octal3(g, ch);
         } else {
             write_string(g, "\\u");
             write_hex4(g, ch);
@@ -1076,7 +1074,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 
@@ -1200,7 +1198,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1348,7 +1346,7 @@ static void generate_equals(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mprivate final static Among[] a_~I0 = {~N~+");
@@ -1455,6 +1453,29 @@ extern void generate_program_java(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprivate void _debug(int n, int line)~N"
+            "~M{~N~+"
+            "~MSystem.out.format(\"%3d (line %4d): [%d]'\", n, line, length);~N"
+            "~Mfor (int i = 0; i <= length; ++i)~N"
+            "~M{~N~+"
+            "~Mif (limit_backward == i) System.out.write('{');~N"
+            "~Mif (bra == i) System.out.write('[');~N"
+            "~Mif (cursor == i) System.out.write('|');~N"
+            "~Mif (ket == i) System.out.write(']');~N"
+            "~Mif (limit == i) System.out.write('}');~N"
+            "~Mif (i < length)~N"
+            "~M{~N~+"
+            "~Mchar ch = current[i];~N"
+            "~Mif (ch == '\\0') System.out.write('#'); else System.out.write(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~MSystem.out.println(\"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
     generate_equals(g);
 

@@ -34,6 +34,13 @@ ada_src_dir = $(ada_src_main_dir)/algorithms
 
 ARFLAGS = -cr
 c_src_dir = src_c
+ifeq '$(filter %cl,$(CC))' ''
+o_for_obj = -o
+o_for_exe = -o
+else
+o_for_obj = -Fo:
+o_for_exe = -Fe:
+endif
 
 # C++
 
@@ -182,7 +189,7 @@ COMPILER_HEADERS = compiler/header.h \
 # C
 
 RUNTIME_SOURCES  = runtime/api.c \
-		   runtime/utilities.c
+		   runtime/snowball_runtime.c
 
 RUNTIME_HEADERS  = runtime/api.h \
 		   runtime/snowball_runtime.h
@@ -198,7 +205,7 @@ STEMTEST_SOURCES = tests/stemtest.c
 # C++
 
 CXX_STEMWORDS_SOURCES = $(cxx_src_dir)/stemwords.cxx
-CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(cxx_src_dir)/utilities.cxx
+CXX_RUNTIME_SOURCES = $(cxx_src_dir)/stemmer.cxx $(cxx_src_dir)/snowball_runtime.cxx
 CXX_SOURCES = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.cxx)
 CXX_HEADERS = $(libstemmer_algorithms:%=$(cxx_src_dir)/%_stemmer.h)
 
@@ -369,7 +376,7 @@ $(STEMMING_DATA)/% $(STEMMING_DATA_ABS)/%:
 	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
 
 snowball$(EXEEXT): $(COMPILER_OBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 
@@ -427,16 +434,16 @@ libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 examples/%.o: examples/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.a
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 tests/%.o: tests/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
 
 $(c_src_dir)/stem_UTF_8_%.c $(c_src_dir)/stem_UTF_8_%.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(c_src_dir)
@@ -455,7 +462,7 @@ $(c_src_dir)/stem_ISO_8859_2_%.c $(c_src_dir)/stem_ISO_8859_2_%.h: $(ALGORITHMS)
 	$(SNOWBALL_COMPILE) charsets/ISO-8859-2.sbl $< -o $@ -eprefix $*_ISO_8859_2_ -r ../runtime
 
 $(c_src_dir)/stem_%.o: $(c_src_dir)/stem_%.c $(c_src_dir)/stem_%.h
-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c $(o_for_obj) $@ $<
 
 # C++
 
@@ -476,6 +483,8 @@ $(cxx_src_dir)/%.o: $(cxx_src_dir)/%.cxx
 
 $(cxx_src_dir)/stemmer.cxx: GNUmakefile $(cxx_src_dir)/generate_algorithms.pl $(MODULES)
 	$(cxx_src_dir)/generate_algorithms.pl $@ $(MODULES)
+
+$(cxx_src_dir)/snowball_runtime.cxx: runtime/snowball_runtime.c
 
 # C#
 
@@ -818,7 +827,13 @@ CLEANDIRS += $(ada_src_dir) ada/bin ada/obj
 
 .PHONY: check check_compilertest check_stemtest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
-check: check_compilertest check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
+# We don't run these when runtime tests are enabled (for stemtest, because it
+# contains tests of the shipped algorithms; for compilertest, because it is
+# orthogonal to the algorithms and so redundant to run it in both
+# configuations).
+EXTRA_TESTS ?= check_compilertest check_stemtest
+
+check: $(EXTRA_TESTS) check_utf8 check_iso_8859_1 check_iso_8859_2 check_koi8r
 
 check_compilertest: tests/compilertest
 	cd tests && ./compilertest
@@ -1199,14 +1214,14 @@ CLEANFILES += $(ZIG_SOURCES) zig/stemwords$(EXEEXT)
 # Runtime test integration is currently a bit clunky, and you need to switch
 # your tree to a different state to run runtime tests.
 #
-# make clean setup_runtime_tests
+# make setup_runtime_tests
 #
 # Then targets like `check_utf8`, `check_python`, etc will run the runtime
 # tests for a particular target language.
 #
 # Once you're done, switch the tree back to the normal state:
 #
-# make clean clean_runtime_tests
+# make clean_runtime_tests
 
 .PHONY: setup_runtime_tests clean_runtime_tests
 
@@ -1219,12 +1234,13 @@ setup_runtime_tests: clean_runtime_tests
 	  d=`echo "$$t"|sed 's/\.sbl$$//'` ;\
 	  mkdir $$r/$$d ;\
 	  echo ok > $$r/$$d/voc.txt ;\
-	  echo ok > $$r/$$d/output.txt ;\
+	  if [ -f $$d.out ] ; then cp $$d.out $$r/$$d/output.txt ; else echo ok > $$r/$$d/output.txt ; fi ;\
 	  echo "$$d UTF_8,ISO_8859_1 $$d" >> $$r/modules.txt ;\
 	done
 	printf '%s:=%s\n' \
 	  ALGORITHMS 'tests/runtime' \
 	  BASELINE 'rbaseline' \
+	  EXTRA_TESTS '' \
 	  MODULES '$(RUNTIME_DATA_DIR)/modules.txt' \
 	  other_algorithms '' \
 	  SNOWBALL_FLAGS '-comments' \
@@ -1234,5 +1250,5 @@ setup_runtime_tests: clean_runtime_tests
 	rm -f algorithms.mk
 	$(MAKE) algorithms.mk
 
-clean_runtime_tests:
+clean_runtime_tests: clean
 	rm -rf $(RUNTIME_DATA_DIR) overrides.mk

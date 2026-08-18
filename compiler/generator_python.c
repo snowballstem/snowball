@@ -54,7 +54,7 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
@@ -1201,7 +1201,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mself.debug(~I0, ~I1)~N", p);
+    writef(g, "~Mself.__debug(~I0, ~I1)~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1314,7 +1314,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
 
@@ -1442,6 +1442,25 @@ extern void generate_program_python(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mdef __debug(self, n, line):~N~+"
+            "~Mlength = len(self.current)~N"
+            "~Mprint(\"%3d (line %4d): [%d]'\" % (n, line, length), end='')~N"
+            "~Mfor i in range(0, length + 1):~N~+"
+            "~Mif self.limit_backward == i: print('{', end='')~N"
+            "~Mif self.bra == i: print('[', end='')~N"
+            "~Mif self.cursor == i: print('|', end='')~N"
+            "~Mif self.ket == i: print(']', end='')~N"
+            "~Mif self.limit == i: print('}', end='')~N"
+            "~Mif i < length:~N~+"
+            "~Mch = self.current[i]~N"
+            "~Mprint(ch if ch != '\\0' else '#', end='')~N~-~-"
+            "~Mprint(\"'\")~N~-"
+            "~N");
+    }
+
     generate_methods(g);
 
     generate_amongs(g);

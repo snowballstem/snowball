@@ -1,0 +1,76 @@
+define stem
+  (
+    do
+      (
+        = x
+        # len
+        next
+        = global_a
+        # number 0
+        = y
+        # cursor
+        next
+        >=
+        # number 1
+          name y
+        = global_b
+        # number 0
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name global_a
+    >=
+    # number 1
+      name global_b
+    do
+      (
+        = u
+        # limit
+        test
+          (
+            next
+            = v
+            # cursor
+        = global_c
+        # number 0
+        try
+          (
+            <
+            # name v
+              name u
+            = u
+            # name v
+    >=
+    # name u
+      cursor
+    >=
+    # number 1
+      name global_c
+    (
+      test
+        (
+          hop
+          # number 3
+          = t
+          # cursor
+      = s
+      # limit
+      do
+        (
+          gopast
+            literal 'a'
+          = s
+          # cursor
+          try
+            (
+              <
+              # name t
+                name s
+              = s
+              # name t
+    >=
+    # number 4
+      name s
+    Function end

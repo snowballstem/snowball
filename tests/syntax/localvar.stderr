@@ -1,0 +1,3 @@
+syntax/localvar.sbl:5: info: Could not localise integer `global_c` to routine `stem`
+syntax/localvar.sbl:5: info: Could not localise integer `global_b` to routine `stem`
+syntax/localvar.sbl:5: info: Could not localise integer `global_a` to routine `stem`

@@ -51,6 +51,42 @@ define stem
       (
         <- ''
         next
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
     ==
     # name y
       name x

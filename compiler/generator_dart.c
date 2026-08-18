@@ -36,7 +36,7 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
@@ -205,12 +205,12 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                     write_string(g, "null");
                     continue;
                 }
-                if (x->function_count == 0) {
+                if (x->unique_function_count == 0) {
                     write_string(g, "null");
                     continue;
                 }
-                if (x->function_count == 1) {
-                    struct amongvec * v = x->b;
+                if (x->unique_function_count == 1) {
+                    struct amongvec * v = x->v;
                     int found = 0;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
@@ -220,7 +220,7 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                         }
                     }
                     if (!found) {
-                        fprintf(stderr, "function_count == 1 but no among functions\n");
+                        fprintf(stderr, "unique_function_count == 1 but no among functions\n");
                         exit(1);
                     }
                     continue;
@@ -1102,7 +1102,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 
@@ -1228,7 +1228,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1344,7 +1344,7 @@ static void generate_equals(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
 
@@ -1361,11 +1361,11 @@ static void generate_among_table(struct generator * g, struct among * x) {
     }
     w(g, "~N~-~M];~N~N");
 
-    if (x->function_count <= 1) return;
+    if (x->unique_function_count <= 1) return;
 
     w(g, "~N~Mbool af_~I0() {~N~+");
     w(g, "~Mswitch (af) {~N~+");
-    for (int n = 1; n <= x->function_count; n++) {
+    for (int n = 1; n <= x->unique_function_count; n++) {
         w(g, "~Mcase ");
         write_int(g, n);
         w(g, ": return ");
@@ -1465,6 +1465,34 @@ extern void generate_program_dart(struct generator * g) {
     generate_groupings(g);
 
     generate_members(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mvoid _debug(int n, int line) {~N~+"
+            "~MString s = '';~N"
+            "~Mfinal len = current.length;~N"
+            "~Mif (n < 10) s += ' ';~N"
+            "~Mif (n < 100) s += ' ';~N"
+            "~Ms += \"$n (line \";~N"
+            "~Mif (line < 10) s += ' ';~N"
+            "~Mif (line < 100) s += ' ';~N"
+            "~Mif (line < 1000) s += ' ';~N"
+            "~Ms += \"$line): [$len]'\";~N"
+            "~Mfor (int i = 0; i <= len; ++i) {~N~+"
+            "~Mif (this.limit_backward == i) s = s + '{';~N"
+            "~Mif (this.bra == i) s = s + '[';~N"
+            "~Mif (this.cursor == i) s = s + '|';~N"
+            "~Mif (this.ket == i) s = s + ']';~N"
+            "~Mif (this.limit == i) s = s + '}';~N"
+            "~Mif (i < len) {~N~+"
+            "~Mfinal ch = current.codeUnitAt(i);~N"
+            "~Mif (ch == 0) s = s + '#'; else s = s + String.fromCharCode(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~Mprint(s + \"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
     generate_equals(g);
 

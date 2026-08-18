@@ -2,8 +2,14 @@
 externals (stem)
 routines (var_local_bug var_local_bug_)
 integers (x y var_local_bug_a var_local_bug_b)
+routines (recursive_var_local_bug recursive_var_local_bug_)
+integers (recursive_x)
+booleans (reentered)
 define stem as (
   var_local_bug
+
+  unset reentered
+  test recursive_var_local_bug or fail='variable incorrectly localised into recursive routine'
 
   $x = len
 
@@ -57,4 +63,20 @@ define var_local_bug_ as (
     $var_local_bug_b = 7
   )
   $(7 == var_local_bug_b) or fail='var_local_bug_b was incorrectly localised'
+)
+
+define recursive_var_local_bug as (
+  $recursive_x = 0
+  reentered or (
+    set reentered
+    $recursive_x = 1
+    recursive_var_local_bug_
+    // `recursive_x` should get set back to 0 by the recursive call, but if it
+    // gets localised it will still have value 1.
+    $(recursive_x == 0)
+  )
+)
+
+define recursive_var_local_bug_ as (
+  recursive_var_local_bug
 )

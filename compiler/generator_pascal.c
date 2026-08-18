@@ -59,7 +59,7 @@ static void write_varname(struct generator * g, struct name * p) {
     write_s(g, p->s);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     if (SIZE(p) == 0) {
         write_string(g, "''");
         return;
@@ -1142,7 +1142,7 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     w(g, "~}");
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         str_append_string(g->declarations, "    AmongVar : Integer;\n");
     }
 
@@ -1281,7 +1281,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~MDebug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1397,6 +1397,10 @@ static void generate_method_decls(struct generator * g) {
     w(g, "~Mpublic~N~+");
     w(g, "~MConstructor Create;~N");
 
+    if (g->analyser->debug_used) {
+       w(g, "~Mprocedure Debug(N : Integer; Line : Integer);~N");
+    }
+
     for (struct name * q = g->analyser->names; q; q = q->next) {
         if (q->type == t_external) {
             generate_method_decl(g, q);
@@ -1470,7 +1474,7 @@ static void generate_among_decls(struct generator * g) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     g->I[1] = x->literalstring_count;
@@ -1570,6 +1574,39 @@ extern void generate_program_pascal(struct generator * g) {
     /* generate implementation. */
     generate_groupings(g);
     generate_constructor(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprocedure T~n.Debug(N : Integer; Line : Integer);~N~+"
+            "~MVar Len : Integer;~N"
+            "~MVar Ch  : Char;~N"
+            "~MVar I   : Integer;~N"
+            "~-~MBegin~N~+"
+            "~MLen := Length(FCurrent);~N"
+            "~MIf N < 10 Then Write(' ');~N"
+            "~MIf N < 100 Then Write(' ');~N"
+            "~MWrite(N, ' (line ');~N"
+            "~MIf Line < 10 Then Write(' ');~N"
+            "~MIf Line < 100 Then Write(' ');~N"
+            "~MIf Line < 1000 Then Write(' ');~N"
+            "~MWrite(Line, '): [', Len, ']''');~N"
+            "~MFor I := 0 To Len Do~N"
+            "~MBegin~N~+"
+            "~MIf FBkLimit = I Then Write('{');~N"
+            "~MIf FBra = I Then Write('[');~N"
+            "~MIf FCursor = I Then Write('|');~N"
+            "~MIf FKet = I Then Write(']');~N"
+            "~MIf FLimit = I Then Write('}');~N"
+            "~MIf I < Len Then~N"
+            "~MBegin~N~+"
+            "~MCh := FCurrent[I + 1];~N"
+            "~MIf Ch = #0 Then Write('#') Else Write(Ch);~N"
+            "~-~MEnd;~N"
+            "~-~MEnd;~N"
+            "~MWriteLn('''');~N"
+            "~-~MEnd;~N");
+    }
+
     generate_methods(g);
 
     generate_unit_end(g);

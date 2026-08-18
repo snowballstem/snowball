@@ -36,7 +36,7 @@ static void write_varref(struct generator * g, struct name * p) {
     write_varname(g, p);
 }
 
-static void write_literal_string(struct generator * g, symbol * p) {
+static void write_literal_string(struct generator * g, const symbol * p) {
     write_char(g, '"');
     for (int i = 0; i < SIZE(p); i++) {
         int ch = p[i];
@@ -194,21 +194,21 @@ static void writef(struct generator * g, const char * input, struct node * p) {
             }
             case 'F': { // Among function dispatcher.
                 struct among * x = p->among;
-                if (x->function_count == 0) {
+                if (x->unique_function_count == 0) {
                     write_string(g, "null");
                     continue;
                 }
 
-                if (x->function_count == 1) {
+                if (x->unique_function_count == 1) {
                     // Only one different function used in this among.
-                    struct amongvec * v = x->b;
+                    struct amongvec * v = x->v;
                     for (int j = 0; j < x->literalstring_count; j++) {
                         if (v[j].function) {
                             write_varref(g, v[j].function);
                             goto continue_outer_loop;
                         }
                     }
-                    fprintf(stderr, "function_count == 1 but no among functions\n");
+                    fprintf(stderr, "unique_function_count == 1 but no among functions\n");
                     exit(1);
 continue_outer_loop:
                     continue;
@@ -1069,7 +1069,7 @@ static void generate_define(struct generator * g, struct node * p) {
     g->next_label = 0;
     g->var_number = 0;
 
-    if (q->amongvar_needed) {
+    if (amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 
@@ -1209,7 +1209,7 @@ static void generate_debug(struct generator * g, struct node * p) {
     write_comment(g, p);
     g->I[0] = g->debug_count++;
     g->I[1] = p->line_number;
-    writef(g, "~Mdebug(~I0, ~I1);~N", p);
+    writef(g, "~M_debug(~I0, ~I1);~N", p);
 }
 
 static void generate(struct generator * g, struct node * p) {
@@ -1329,7 +1329,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
 
-    struct amongvec * v = x->b;
+    struct amongvec * v = x->v;
 
     g->I[0] = x->number;
     w(g, "~Mprivate static readonly Among[] a_~I0 = new[] ~N~M{~N~+");
@@ -1345,11 +1345,11 @@ static void generate_among_table(struct generator * g, struct among * x) {
     }
     w(g, "~N~-~M};~N");
 
-    if (x->function_count <= 1) return;
+    if (x->unique_function_count <= 1) return;
 
     w(g, "~N~Mprivate bool af_~I0() {~N~+");
     w(g, "~Mswitch (af) {~N~+");
-    for (int n = 1; n <= x->function_count; n++) {
+    for (int n = 1; n <= x->unique_function_count; n++) {
         w(g, "~Mcase ");
         write_int(g, n);
         w(g, ": return ");
@@ -1440,6 +1440,29 @@ extern void generate_program_csharp(struct generator * g) {
     generate_members(g);
     generate_groupings(g);
     generate_amongs(g);
+
+    if (g->analyser->debug_used) {
+       w(g, "~N"
+            "~Mprivate void _debug(int n, int line)~N"
+            "~M{~N~+"
+            "~MConsole.Write(\"{0,3} (line {1,4}): [{2}]'\", n, line, current.Length);~N"
+            "~Mfor (int i = 0; i <= current.Length; ++i)~N"
+            "~M{~N~+"
+            "~Mif (limit_backward == i) Console.Write('{');~N"
+            "~Mif (bra == i) Console.Write('[');~N"
+            "~Mif (cursor == i) Console.Write('|');~N"
+            "~Mif (ket == i) Console.Write(']');~N"
+            "~Mif (limit == i) Console.Write('}');~N"
+            "~Mif (i < current.Length)~N"
+            "~M{~N~+"
+            "~Mchar ch = current[i];~N"
+            "~Mif (ch == '\\0') Console.Write('#'); else Console.Write(ch);~N~-"
+            "~M}~N~-"
+            "~M}~N"
+            "~MConsole.WriteLine(\"'\");~N~-"
+            "~M}~N");
+    }
+
     generate_methods(g);
 
     generate_class_end(g);

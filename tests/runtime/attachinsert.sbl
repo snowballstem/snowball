@@ -11,6 +11,7 @@ define stem as (
     next
   )
   $(cursor == 0) or fail='do failed to restore cursor after forwards attach'
+  test ('ab-cd' atlimit) or fail='attach failed to update correctly'
 
   ='abcd'
   do (
@@ -20,6 +21,7 @@ define stem as (
     next
   )
   $(cursor == 0) or fail='do failed to restore cursor after forwards insert'
+  test ('ab-cd' atlimit) or fail='insert failed to update correctly'
 
   ='abcd'
   backwards (
@@ -31,6 +33,7 @@ define stem as (
     )
     $(cursor == size) or fail='do failed to restore cursor after backwards attach'
    )
+  test ('ab-cd' atlimit) or fail='attach failed to update correctly'
 
   ='abcd'
   backwards (
@@ -42,6 +45,7 @@ define stem as (
     )
     $(cursor == size) or fail='do failed to restore cursor after backwards insert'
   )
+  test ('ab-cd' atlimit) or fail='insert failed to update correctly'
 
   ='ok'
 )

@@ -10,8 +10,7 @@ class BaseStemmer:
         self.cursor = 0
         self.limit = len(self.current)
         self.limit_backward = 0
-        self.bra = self.cursor
-        self.ket = self.limit
+        self.bra = self.ket = 0
 
     def get_current(self):
         '''

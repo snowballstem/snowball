@@ -68,7 +68,7 @@ pub const Env = struct {
         self.limit = s.len;
         self.limit_backward = 0;
         self.bra = 0;
-        self.ket = s.len;
+        self.ket = 0;
     }
 
     pub fn getCurrent(self: *const Env) []const u8 {
@@ -457,9 +457,29 @@ pub const Env = struct {
         self.ket = other.ket;
     }
 
-    pub fn debug(self: *const Env, count: i32, line_number: i32) void {
-        _ = self;
-        std.log.debug("snowball debug, count: {d}, line: {d}", .{ count, line_number });
+    pub fn debug(self: *const Env, n: i32, line: i32) void {
+        var buf: [256]u8 = undefined;
+        var stdout = std.Io.File.stdout().writer(std.Options.debug_io, &buf);
+        const len = self.getCurrent().len;
+        stdout.interface.print("{:3} (line {:4}): [{}]'", .{ @as(u32, @intCast(n)), @as(u32, @intCast(line)), len }) catch {};
+        for (0..len + 1) |i_usize| {
+            const i = @as(i32, @intCast(i_usize));
+            if (self.limit_backward == i) stdout.interface.writeByte('{') catch {};
+            if (self.bra == i) stdout.interface.writeByte('[') catch {};
+            if (self.cursor == i) stdout.interface.writeByte('|') catch {};
+            if (self.ket == i) stdout.interface.writeByte(']') catch {};
+            if (self.limit == i) stdout.interface.writeByte('}') catch {};
+            if (i < len) {
+                const ch = self.current[i_usize];
+                if (ch == 0) {
+                    stdout.interface.writeByte('#') catch {};
+                } else {
+                    stdout.interface.writeByte(ch) catch {};
+                }
+            }
+        }
+        stdout.interface.writeAll("'\n") catch {};
+        stdout.interface.flush() catch {};
     }
 };
 

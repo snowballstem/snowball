@@ -1,0 +1,7 @@
+externals(stem)
+integers(x)
+define stem as (
+  $(cursor-limit<-1)
+  $x = cursor - limit
+  $x<-1
+)

@@ -1,0 +1,38 @@
+externals (stem)
+integers (s t u v x y)
+integers (global_a global_b global_c)
+
+define stem as (
+  do (
+    $x = len
+    next
+    $global_a = 0
+    $y = cursor
+    next
+    $(y > 0)
+    $global_b = 0
+  )
+  $(x > 0)
+  $global_a > 0
+  $global_b > 0
+
+  do (
+    $u = limit
+    test (next  setmark v)
+    $global_c = 0
+    try ($u < v  $u = v)
+  )
+  $(cursor >= u)
+  $global_c > 0
+
+  (
+    test (hop 3 setmark t)
+    $s = limit
+    do (
+      gopast 'a'
+      setmark s
+      try($s < t  $s = t)
+    )
+  )
+  $(s > 3)
+)

@@ -22,13 +22,13 @@ sb_stemmer_list(void)
 static stemmer_encoding_t
 sb_getenc(const char * charenc)
 {
-    const struct stemmer_encoding * encoding;
+    size_t i;
     if (charenc == NULL) return ENC_UTF_8;
-    for (encoding = encodings; encoding->name != 0; encoding++) {
-        if (strcmp(encoding->name, charenc) == 0) break;
+    for (i = 0; i < sizeof(encodings) / sizeof(encodings[0]); ++i) {
+        if (strcmp(encodings[i].name, charenc) == 0)
+            return encodings[i].enc;
     }
-    if (encoding->name == NULL) return ENC_UNKNOWN;
-    return encoding->enc;
+    return ENC_UNKNOWN;
 }
 
 extern struct sb_stemmer *
