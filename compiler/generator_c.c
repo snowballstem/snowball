@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h> /* for fprintf etc */
 #include <stdlib.h> /* for exit */
 #include <string.h> /* for strlen */
@@ -9,6 +10,12 @@
 
 /* Define this to get warning messages when optimisations can't be used. */
 /* #define OPTIMISATION_WARNINGS */
+
+// Show how sparse the N-way dispatches in the among tables are:
+// #define REPORT_SPARSE_AMONG_NWAYS
+
+// Flag bit in among result codes which indicates an "Among Function Scenario".
+#define AFS_FLAG 0x4000
 
 /* prototype functions for recursive use: */
 
@@ -159,6 +166,22 @@ static void wlitref(struct generator * g, const symbol * p) {  /* write ref to l
     }
 }
 
+// Used to generate the coverage logging code when -coverage is used.
+static void write_c_string_literal(struct generator * g, const symbol * s) {
+    for (int i = 0; i != SIZE(s); ++i) {
+        symbol ch = s[i];
+        if (32 <= ch && ch < 127) {
+            if (ch == '\"' || ch == '\\') {
+                write_char(g, '\\');
+            }
+            write_char(g, ch);
+        } else {
+            write_char(g, '\\');
+            write_octal3(g, ch);
+        }
+    }
+}
+
 static void write_comment(struct generator * g, struct node * p) {
     if (!g->options->comments) return;
     write_margin(g);
@@ -289,32 +312,6 @@ static void writef(struct generator * g, const char * input, struct node * p) {
                 if (j < 0 || j > (int)(sizeof(g->B) / sizeof(g->B[0])))
                     goto invalid_escape2;
                 write_s(g, g->B[j]);
-                continue;
-            }
-            case 'F': { // Among function dispatcher.
-                struct among * x = p->among;
-                if (x->unique_function_count == 0) {
-                    write_char(g, '0');
-                    continue;
-                }
-
-                if (x->unique_function_count == 1) {
-                    // Only one different function used in this among.
-                    struct amongvec * v = x->v;
-                    for (int j = 0; j < x->literalstring_count; j++) {
-                        if (v[j].function) {
-                            write_varref(g, v[j].function);
-                            goto continue_outer_loop;
-                        }
-                    }
-                    fprintf(stderr, "unique_function_count == 1 but no among functions\n");
-                    exit(1);
-continue_outer_loop:
-                    continue;
-                }
-
-                w(g, "af_");
-                write_int(g, x->number);
                 continue;
             }
             case 'I':
@@ -1312,7 +1309,10 @@ static void generate_define(struct generator * g, struct node * p) {
     }
     writef(g, "int ~V(struct SN_env * z) {~N~+", p);
 
-    if (amongvar_needed(p->left)) {
+    // The among implementation we use for C requires among_var for any
+    // among with functions.
+    if ((g->options->coverage ? q->has_among : q->has_among_function) ||
+        amongvar_needed(p->left)) {
         w(g, "~Mint among_var;~N");
     }
 
@@ -1341,6 +1341,44 @@ static void generate_define(struct generator * g, struct node * p) {
         }
     }
 
+    if (g->options->coverage && q->type == t_external) {
+        w(g, "~Mstatic int coverage_emitted = 0;~N");
+        w(g, "~Mif (!coverage_emitted) {~N~+");
+        w(g, "~Mcoverage_emitted = 1;~N");
+        for (struct among * x = g->analyser->amongs; x; x = x->next) {
+            if (!x->used) continue;
+            g->S[0] = g->analyser->tokeniser->file;
+            g->I[1] = x->number;
+            if (!x->always_matches) {
+                /* If the among matches the empty string without a gating
+                 * function then the "no match" case is impossible and so not
+                 * useful to include in a coverage report.
+                 */
+                g->I[0] = x->node->line_number,
+                w(g, "~Mfputs(\"~S0:~I0: among ~I1 no match\\n\", stderr);~N");
+            }
+            g->I[3] = x->literalstring_count;
+            for (int c = 0; c < x->literalstring_count; c++) {
+                /* Report every case once, then unused cases will appear (and
+                 * we can decrement each count when generating the coverage
+                 * report).
+                 */
+                const struct amongvec * e = x->v + c;
+                g->I[0] = e->line_number;
+                g->I[2] = e->string_index;
+                w(g, "~Mfputs(\"~S0:~I0: among ~I1 : ~I2 of ~I3 string '");
+                write_c_string_literal(g, e->b);
+                w(g, "'\\n\", stderr);~N");
+                if (e->function) {
+                    w(g, "~Mfputs(\"~S0:~I0: among ~I1 : ~I2 of ~I3 func-f '");
+                    write_c_string_literal(g, e->b);
+                    w(g, "'\\n\", stderr);~N");
+                }
+            }
+        }
+        w(g, "~-~M}~N");
+    }
+
     g->next_label = 0;
     g->var_number = 0;
 
@@ -1364,6 +1402,10 @@ static void generate_functionend(struct generator * g, struct node * p) {
     w(g, "~Mreturn 1;~N");
 }
 
+static int among_mode(struct among * x) {
+    return (x->substring ? x->substring : x->node)->mode;
+}
+
 static void generate_substring(struct generator * g, struct node * p) {
     write_comment(g, p);
 
@@ -1378,7 +1420,6 @@ static void generate_substring(struct generator * g, struct node * p) {
 
     g->S[0] = p->mode == m_forward ? "" : "_b";
     g->I[0] = x->number;
-    g->I[1] = x->literalstring_count;
 
     /* In forward mode with non-ASCII UTF-8 characters, the first byte
      * of the string will often be the same, so instead look at the last
@@ -1476,10 +1517,207 @@ static void generate_substring(struct generator * g, struct node * p) {
 #endif
     }
 
-    if (x->amongvar_needed) {
-        writef(g, "~Mamong_var = find_among~S0(z, a_~I0, ~I1, ~F);~N", p);
+    if (g->options->coverage || x->amongvar_needed || x->function_count) {
+        if (x->c0_used) {
+            write_block_start(g);
+            w(g, "~Mint c0 = z->c;~N");
+        }
+        writef(g, "~Mamong_var = find_among~S0(z, a_~I0);~N", p);
+        if (x->function_count) {
+            // The C/C++ find_among()/find_among_b() helper function doesn't
+            // call among functions itself, but instead returns an among
+            // function scenario (AFS) code.
+            //
+            // For an among with functions, we generate C code which handles an
+            // AFS code by calling the appropriate among function.  If it
+            // signals t then among_var is set appropriately and we continue
+            // as normal.  If it fails it adjusts among_var and the cursor;
+            // if there is a chain of among functions (e.g. lovins.sbl has two
+            // such chains of length 5) then it loops to follow along the
+            // chain, checking further among functions until either one
+            // succeeds or it reaches the end of the chain.
+            //
+            // This approach minimises calling of among functions, which is
+            // good since an among function can be arbitrarily expensive (we
+            // will call the same among functions as the original among
+            // implementation did).  It also avoids needing a dispatch function
+            // or dynamic load-time relocations.
+            int among_function_chains = false;
+            for (int i = 0; i < x->af_count; ++i) {
+                struct among_function_scenario * scenario = &x->af[i];
+                if ((scenario->t_result & AFS_FLAG) ||
+                    (scenario->f_result & AFS_FLAG)) {
+                    among_function_chains = true;
+                    break;
+                }
+            }
+            int mask = x->af_count - 1;
+            if (mask != 0) {
+                // Use smallest all-1 mask that works.
+                mask |= mask >> 1;
+                mask |= mask >> 2;
+                mask |= mask >> 4;
+                mask |= mask >> 8;
+            }
+            w(g, "~Mif ((among_var & 0x");
+            write_hex4(g, AFS_FLAG);
+            if (among_function_chains || mask == 0) {
+                // If there are among function chains then we wrap in:
+                //
+                //   do {
+                //     ...
+                //     break;
+                //   } while (1);
+                //
+                // and use `continue;` in the case where we need to follow a
+                // chain.
+                //
+                // If (mask == 0), there's only one among function scenario
+                // so we don't emit the `switch` and instead wrap in a dummy
+                // loop so that `break;` still works:
+                //
+                //   do {
+                //     ...
+                //   } while (0);
+                w(g, ")) do {~N~+");
+            } else {
+                w(g, ")) {~N~+");
+            }
+            w(g, "~Mint c = z->c;~N");
+            assert(x->af_count <= AFS_FLAG);
+            if (mask != 0) {
+                // Don't emit a switch if there's only one case.
+                w(g, "~Mswitch (among_var & 0x");
+                write_hex(g, mask);
+                w(g, ") {~N~+");
+            }
+            for (int i = 0; i < x->af_count; ++i) {
+                struct among_function_scenario * scenario = &x->af[i];
+                struct name * q = scenario->function;
+                if (q == NULL) {
+                    // With `-coverage` the AFS index is an among_vec index,
+                    // with unused entries indicated by ->function == NULL.
+                    assert(g->options->coverage);
+                    continue;
+                }
+                int cursor_adjustment = scenario->cursor_adjustment;
+                int t_result = scenario->t_result;
+                int f_result = scenario->f_result;
+                g->I[0] = i;
+                if (mask != 0) {
+                    w(g, "~Mcase ~I0: {~+~N");
+                }
+                w(g, "~Mint ret = ");
+                write_varref(g, q);
+                w(g, "(z);~N");
+
+                // ret > 0: function signalled t.
+                w(g, "~Mif (ret > 0) { ");
+                if (K_needed(q->definition)) {
+                    // Restore cursor if routine may have changed it.
+                    w(g, "z->c = c; ");
+                }
+                assert((t_result & AFS_FLAG) == 0);
+                g->I[0] = t_result;
+                w(g, "among_var = ~I0; break; }~N");
+                if (g->options->target_lang == LANG_C && can_error(q)) {
+                    // The original C among implementation swallowed an error
+                    // return from an among function.  In practice, none of
+                    // the shipped algorithms use among functions which can
+                    // error, but with the new among approach we can statically
+                    // check if the among function can error and only emit code
+                    // to handle it if it can happen.
+                    w(g, "~Mif (ret < 0) return ret;~N");
+                }
+                if (g->options->coverage) {
+                    const struct amongvec * e = x->v + i;
+                    g->S[0] = g->analyser->tokeniser->file;
+                    g->I[0] = e->line_number;
+                    g->I[1] = x->number;
+                    g->I[2] = e->string_index;
+                    g->I[3] = x->literalstring_count;
+                    w(g, "~Mfputs(\"~S0:~I0: among ~I1 : ~I2 of ~I3 func-f '");
+                    write_c_string_literal(g, e->b);
+                    w(g, "'\\n\", stderr);~N");
+                }
+                g->I[2] = cursor_adjustment;
+                g->I[3] = f_result;
+                g->S[0] = (among_mode(x) == m_forward) ? "+" : "-";
+                if (f_result) {
+                    assert(cursor_adjustment >= 0);
+                    if (cursor_adjustment > 0) {
+                        w(g, "~Mz->c = c0 ~S0 ~I2;~N");
+                    }
+                } else {
+                    // among_var == 0 means the among signals f and the cursor
+                    // will get restored when that signal is handled.
+                    assert(cursor_adjustment == -1);
+                }
+                w(g, "~Mamong_var = ~I3;~N");
+                if ((f_result & AFS_FLAG)) {
+                    assert(among_function_chains);
+                    w(g, "~Mcontinue;~N");
+                } else if (mask != 0) {
+                    w(g, "~Mbreak;~N");
+                }
+                if (mask != 0) {
+                    w(g, "~-~M}~N");
+                }
+            }
+            if (mask != 0) {
+                w(g, "~-~M}~N");
+            }
+            if (among_function_chains) {
+                w(g, "~Mbreak;~N~-"
+                     "~M} while (1);~N");
+            } else if (mask == 0) {
+                w(g, "~-"
+                     "~M} while (0);~N");
+            } else {
+                w(g, "~-"
+                     "~M}~N");
+            }
+            // Note: In general the same function may be called by more than
+            // one scenario (e.g. from different among actions with the same
+            // gating function).
+        }
+        if (g->options->coverage) {
+            // With -coverage enabled, we build the among table to return a
+            // unique value for each among string, and generate a table to map
+            // that to the among_var value.
+            g->S[0] = g->analyser->tokeniser->file;
+            g->I[1] = x->number;
+            write_block_start(g);
+            w(g, "~Mstatic const int t[] = { 0");
+            for (int c = 0; c < x->literalstring_count; ++c) {
+                write_string(g, ", ");
+                write_int(g, among_cases[c].result);
+            }
+            w(g, " };~N");
+            w(g, "~Mswitch (among_var) {~N~+");
+            g->I[0] = x->node->line_number,
+            w(g, "~Mcase 0: fputs(\"~S0:~I0: among ~I1 no match\\n\", stderr); break;~N");
+            g->I[3] = x->literalstring_count;
+            for (int c = 0; c < x->literalstring_count; ++c) {
+                const struct amongvec * e = x->v + c;
+                g->I[0] = e->line_number;
+                g->I[2] = e->string_index;
+                w(g, "~Mcase ");
+                write_int(g, c + 1);
+                w(g, ": fputs(\"~S0:~I0: among ~I1 : ~I2 of ~I3 string '");
+                write_c_string_literal(g, e->b);
+                w(g, "'\\n\", stderr); break;~N");
+            }
+            w(g, "~-~M}~N");
+            g->I[0] = AFS_FLAG;
+            w(g, "~Mif (!(among_var & ~I0)) among_var = t[among_var];~N");
+            write_block_end(g);
+        }
         if (!x->always_matches) {
             writef(g, "~Mif (!among_var) ~f~N", p);
+        }
+        if (x->c0_used) {
+            write_block_end(g);
         }
         return;
     }
@@ -1499,12 +1737,12 @@ static void generate_substring(struct generator * g, struct node * p) {
     }
 
     if (x->always_matches) {
-        writef(g, "~Mfind_among~S0(z, a_~I0, ~I1, ~F);~N", p);
+        writef(g, "~Mfind_among~S0(z, a_~I0);~N", p);
     } else if (x->command_count == 0 && tailcallable(g, p)) {
-        writef(g, "~Mreturn find_among~S0(z, a_~I0, ~I1, ~F) != 0;~N", p);
+        writef(g, "~Mreturn find_among~S0(z, a_~I0) != 0;~N", p);
         x->node->right = NULL;
     } else {
-        writef(g, "~Mif (!find_among~S0(z, a_~I0, ~I1, ~F)) ~f~N", p);
+        writef(g, "~Mif (!find_among~S0(z, a_~I0)) ~f~N", p);
     }
 }
 
@@ -1646,6 +1884,7 @@ static void generate(struct generator * g, struct node * p) {
 
 static void generate_head(struct generator * g) {
     struct options * o = g->options;
+    bool wide = (o->encoding == ENC_WIDECHARS);
     if (o->cheader) {
         int quoted = (o->cheader[0] == '<' || o->cheader[0] == '"');
         w(g, "#include ");
@@ -1671,11 +1910,22 @@ static void generate_head(struct generator * g) {
         w(g, "#include <limits.h>~N");
     }
     w(g, "#include <stddef.h>~N~N");
+    if (g->options->coverage) {
+        w(g, "#include <stdio.h>~N");
+    }
 
     if (o->target_lang == LANG_CPLUSPLUS) {
         w(g, "~Mtypedef ");
         write_string(g, o->package);
         w(g, "::~n::SN_local SN_local;~N~N");
+
+        if (g->analyser->amongs && !wide) {
+            w(g, "~M#ifdef SNOWBALL_BIGENDIAN~N");
+            w(g, "~M#define S(W) ((0x##W & 0xff) << 8 | 0x##W >> 8)~N");
+            w(g, "~M#else~N");
+            w(g, "~M#define S(W) (0x##W)~N");
+            w(g, "~M#endif~N~N");
+        }
         return;
     }
 
@@ -1728,6 +1978,14 @@ static void generate_head(struct generator * g) {
         if (o->target_lang == LANG_C) {
             w(g, "typedef struct SN_local SN_local;~N~N");
         }
+    }
+
+    if (g->analyser->amongs && !wide) {
+        w(g, "~M#ifdef SNOWBALL_BIGENDIAN~N");
+        w(g, "~M#define S(W) ((0x##W & 0xff) << 8 | 0x##W >> 8)~N");
+        w(g, "~M#else~N");
+        w(g, "~M#define S(W) (0x##W)~N");
+        w(g, "~M#endif~N~N");
     }
 
     const char * vp = o->variables_prefix;
@@ -1805,89 +2063,448 @@ static void generate_routine_declarations(struct generator * g) {
     }
 }
 
+static symbol xfix_ch(struct amongvec * v, int i, bool forwards) {
+    assert(i < v->size);
+    return v->b[forwards ? i : v->size - 1 - i];
+}
+
+// The amongvec is sorted such that common suffix/prefix strings are
+// consecutive - more precisely:
+// * if `forwards`, by byte string order of the prefixes;
+// * if `!forwards`, by byte string order of the reversed suffixes.
+// We take advantage of this and pass in a range of entries (via start index
+// `lo` and end index `hi`) and just look at that range, shrinking it for
+// recursive calls.
+//
+// "xfix" is the suffix or prefix depending on the direction.
+static int build_among_table_(struct generator * g, struct among * x,
+                              int lo, int hi, int xfix_len,
+                              int forwards, int longest_sub) {
+    struct amongvec * v = x->v;
+    bool wide = (g->options->encoding == ENC_WIDECHARS);
+
+    assert(lo <= hi);
+    assert(xfix_len >= 0);
+    assert(xfix_len <= v[lo].size);
+    for (int i = lo + 1; i <= hi; ++i) {
+        assert(xfix_len < v[i].size);
+        symbol * b0 = v[lo].b;
+        symbol * b = v[i].b;
+        if (!forwards) {
+            b0 += v[lo].size - xfix_len;
+            b += v[i].size - xfix_len;
+        }
+        assert(memcmp(b0, b, xfix_len * sizeof(symbol)) == 0);
+    }
+
+    int exact = 0;
+    if (v[lo].size == xfix_len) {
+        // The current prefix/suffix is exactly present in this among.
+        struct amongvec * v_exact = v + lo;
+        exact = g->options->coverage ? lo + 1 : v_exact->result;
+        if (exact < 0) exact = AFS_FLAG - 1;
+        assert(exact != 0);
+        if (v_exact->function_index) {
+            int cursor_adjustment;
+            if (v_exact->i < 0) {
+                cursor_adjustment = -1;
+            } else {
+                cursor_adjustment = v[v_exact->i].size;
+            }
+            // If the among function signals t, the among result is t_result
+            //   (i.e. variable `exact`)
+            // If the among function signals f:
+            // * If cursor_adjustment == -1 then f_result is 0 as is the among
+            //   result (i.e. no match)
+            // * Otherwise:
+            //   + cursor_adjustment is applied to the cursor value on entry
+            //     (add for forwards; subtract for backwards)
+            //   + the among result is f_result
+
+            struct name * function = v_exact->function;
+            int t_result = exact;
+            int f_result = longest_sub;
+            if (g->options->coverage) {
+                // With -coverage use the among_vec index as the AFS index.
+                exact = lo;
+                if (exact >= x->af_count) x->af_count = exact + 1;
+                x->af[exact].function = function;
+                x->af[exact].t_result = t_result;
+                x->af[exact].f_result = f_result;
+                x->af[exact].cursor_adjustment = cursor_adjustment;
+                x->c0_used = x->c0_used || (f_result && cursor_adjustment > 0);
+            } else {
+                bool add = true;
+                for (int i = 0; i < x->af_count; ++i) {
+                    if (x->af[i].function == function &&
+                        x->af[i].t_result == t_result &&
+                        x->af[i].f_result == f_result &&
+                        x->af[i].cursor_adjustment == cursor_adjustment) {
+                        exact = i;
+                        add = false;
+                        break;
+                    }
+                }
+                if (add) {
+                    x->af[x->af_count].function = function;
+                    x->af[x->af_count].t_result = t_result;
+                    x->af[x->af_count].f_result = f_result;
+                    x->af[x->af_count].cursor_adjustment = cursor_adjustment;
+                    x->c0_used = x->c0_used || (f_result && cursor_adjustment > 0);
+                    exact = x->af_count++;
+                }
+            }
+            exact |= AFS_FLAG;
+        }
+        if (lo == hi) {
+            return -exact;
+        }
+        ++lo;
+    }
+
+    int offset = SIZE(x->table);
+
+    symbol min = xfix_ch(v + lo, xfix_len, forwards);
+    symbol max = xfix_ch(v + hi, xfix_len, forwards);
+
+    if (min == max) {
+        // All entries with the current prefix/suffix have the same next byte.
+        // Check following bytes until we find where that stops being the
+        // case.
+        int old_xfix_len = xfix_len;
+        int size_limit = v[lo].size < v[hi].size ? v[lo].size : v[hi].size;
+        while (++xfix_len < size_limit) {
+            symbol lo_ch = xfix_ch(v + lo, xfix_len, forwards);
+            symbol hi_ch = xfix_ch(v + hi, xfix_len, forwards);
+            if (lo_ch != hi_ch) break;
+        }
+
+        // We only encode a segment of length two or more, since a 1-way switch
+        // is one word shorter and slightly easier to decode than segment of
+        // length 1.
+        int segment_len = xfix_len - old_xfix_len;
+        if (!wide && segment_len > 255) {
+            // We could encode this by splitting the segment, but it's not a
+            // limit we're realistically going to get anywhere near in a real
+            // stemming algorithm.
+            printf("Sorry, we don't currently support an among segment > 255 bytes in non-wide mode\n");
+            exit(1);
+        }
+        if (segment_len > 1) {
+            // Emit a segment to check for.
+            //
+            // non-wide:
+            //
+            // 0       2             RES_IES  <'i' 'e' packed into bytes>
+            // ^exact  ^length
+            //         (top byte 0)   ^--- NB this is negated for exact
+            //
+            // wide:
+            //
+            // 0       2       0     RES_IES   'i' 'e'
+            // ^exact  ^length
+            //                        ^--- NB this is negated for exact
+            if (exact) longest_sub = exact;
+            int entry_len = wide ? segment_len + 4 : ((segment_len + 1) >> 1) + 3;
+            int new_size = SIZE(x->table) + entry_len;
+            x->table = resize_b(x->table, new_size);
+            if (!wide)
+                x->table_endianness = resize_s(x->table_endianness, new_size);
+            x->table[offset] = exact;
+            x->table[offset + 1] = segment_len;
+            if (wide) {
+                x->table[offset + 2] = 0;
+            }
+            if (min > max) {
+                // exact can only be zero here if there is nothing in the among
+                // with the specified prefix, which shouldn't happen.
+                assert(exact);
+                x->table[offset + (wide ? 3 : 2)] = -exact;
+            } else {
+                int ptr = build_among_table_(g, x, lo, hi, xfix_len, forwards,
+                                             exact ? exact : longest_sub);
+                x->table[offset + (wide ? 3 : 2)] = ptr;
+            }
+            symbol * from = v[lo].b;
+            if (forwards) from += old_xfix_len; else from += v[lo].size - old_xfix_len - segment_len;
+            if (wide) {
+                symbol * to = &(x->table[offset + 4]);
+                for (int i = 0; i < segment_len; ++i) {
+                    to[i] = from[i];
+                }
+            } else {
+                symbol * to = &(x->table[offset + 3]);
+                for (int i = 1; i < segment_len; i += 2) {
+                    *to++ = from[i - 1] | (from[i] << 8);
+                }
+                if (segment_len & 1) {
+                    *to = from[segment_len - 1];
+                }
+                // Flag segment data as needing byteswapping on big-endian
+                // platforms.
+                memset(&x->table_endianness[offset + 3], 1,
+                       (segment_len + 1) >> 1);
+            }
+            int len = SIZE(x->table) - offset;
+            for (struct among_subtree * t = x->subtree; t; t = t->next) {
+                if (t->len == len) {
+                    if (memcmp(x->table + t->start,
+                               x->table + offset,
+                               len * sizeof(x->table[0])) == 0) {
+                        SET_SIZE(x->table, offset);
+                        return t->start;
+                    }
+                }
+            }
+            NEW(among_subtree, t);
+            t->start = offset;
+            t->len = len;
+            t->next = x->subtree;
+            x->subtree = t;
+            if (offset >= 0x8000) {
+                printf("%s:%d: generated among table is too large! "
+                       "Please open bug against snowball compiler\n",
+                       g->analyser->tokeniser->file, x->node->line_number);
+                exit(1);
+            }
+            return offset;
+        }
+        xfix_len = old_xfix_len;
+    }
+
+    assert(min <= max);
+    int min_length_match = INT_MAX;
+    for (int i = lo; i <= hi; i++) {
+        if (v[i].size < min_length_match) min_length_match = v[i].size;
+    }
+    // FIXME: If we stored this in each entry we could sometimes shortcut
+    // knowing there's no way any prefixes/suffixes can match.
+    (void)min_length_match;
+
+    if (exact) longest_sub = exact;
+    int lo1 = lo;
+    int hi0 = hi;
+    if (max > min && hi - lo > 1) {
+        // There are more than two cases and the bounds are not adjacent,
+        // but there might only be two different next characters, which
+        // means this might still be a two-way switch on the next
+        // character.
+        while (hi - lo1 > 1) {
+            symbol ch = xfix_ch(v + lo1 + 1, xfix_len, forwards);
+            if (ch != min) break;
+            ++lo1;
+        }
+        while (hi0 - lo1 > 1) {
+            symbol ch = xfix_ch(v + hi0 - 1, xfix_len, forwards);
+            if (ch != max) break;
+            --hi0;
+        }
+    }
+    if ((max > min && hi0 - lo1 == 1) && min > 0) {
+        // Only the two end values of the range are used.  This case is common
+        // (approaching half the ranges we generate) and the most extreme is a
+        // gap of 150 between 'a' and 0xf8.  We encode such cases by swapping
+        // the min and max values, and only storing two pointers.  This reduces
+        // the table size, which reduces the working set size and so is more
+        // cache friendly.
+        //
+        // Do an 2-way dispatch on the next code-unit:
+        //
+        // non-wide:
+        //
+        // 0       's'|('d'<<8)    OFFSET_D  OFFSET_S
+        //                          ^----------^-----NB negated for exact
+        //
+        // wide:
+        //
+        // 0       's'      'd'    OFFSET_D  OFFSET_S
+        //                          ^----------^-----NB negated for exact
+        //
+        // This is encoded by swapping the range ends compared to an N-way
+        // dispatch.  The edge case where min is zero would collide with the
+        // encoding of a segment, so we encode that as N-way (U+0000 is not
+        // likely to appear in real world stemmer code).
+        int entry_len = 4 + (int)wide;
+        x->table = resize_b(x->table, SIZE(x->table) + entry_len);
+        x->table[offset] = exact;
+
+        int off = offset + 1;
+        if (wide) {
+            x->table[off++] = max;
+            x->table[off++] = min;
+        } else {
+            x->table[off++] = max | (min << 8);
+        }
+        x->table[off++] = build_among_table_(g, x,
+                                             lo, lo1,
+                                             xfix_len + 1,
+                                             forwards,
+                                             exact ? exact : longest_sub);
+        x->table[off++] = build_among_table_(g, x,
+                                             hi0, hi,
+                                             xfix_len + 1,
+                                             forwards,
+                                             exact ? exact : longest_sub);
+    } else {
+        // Do an N-way dispatch on the next code-unit:
+        //
+        // non-wide:
+        //
+        // 0       'd'|('s'<<8)    OFFSET_D 0 0 ... OFFSET_S
+        //                          ^-----------------^-----NB negated for exact
+        //
+        // wide:
+        //
+        // 0       'd'      's'    OFFSET_D 0 0 ... OFFSET_S
+        //                          ^-----------------^-----NB negated for exact
+#ifdef REPORT_SPARSE_AMONG_NWAYS
+        // Report showing sparseness of n-ways:
+        if (max != min) {
+            int n = 0;
+            int l = lo;
+            while (l <= hi) {
+                ++n;
+                symbol ch = xfix_ch(v + l, xfix_len, forwards);
+                int h = l;
+                while (h < hi && ch == xfix_ch(v + h + 1, xfix_len, forwards)) {
+                    ++h;
+                }
+                l = h + 1;
+            }
+            printf("+++ NWAY window %d:%d %d of %d %.1f%%:",
+                   min, max, n, max - min + 1,
+                   100 * n / (double)(max - min + 1));
+            l = lo;
+            while (l <= hi) {
+                ++n;
+                symbol ch = xfix_ch(v + l, xfix_len, forwards);
+                printf(" 0x%x", ch);
+                int h = l;
+                while (h < hi && ch == xfix_ch(v + h + 1, xfix_len, forwards)) {
+                    ++h;
+                }
+                l = h + 1;
+            }
+            printf("\n");
+        }
+#endif
+        int entry_len = (max - min) + 1 + 2 + (int)wide;
+        x->table = resize_b(x->table, SIZE(x->table) + entry_len);
+        int off = offset;
+        x->table[off++] = exact;
+        if (wide) {
+            x->table[off++] = min;
+            x->table[off++] = max;
+        } else {
+            x->table[off++] = min | (max << 8);
+        }
+        for (int i = 0; i < max - min + 1; ++i) {
+            x->table[off + i] = 0;
+        }
+        int l = lo;
+        while (l <= hi) {
+            symbol ch = xfix_ch(v + l, xfix_len, forwards);
+            int h = l;
+            while (h < hi && ch == xfix_ch(v + h + 1, xfix_len, forwards)) {
+                ++h;
+            }
+            int r = build_among_table_(g, x,
+                                       l, h,
+                                       xfix_len + 1,
+                                       forwards,
+                                       exact ? exact : longest_sub);
+            x->table[off + (ch - min)] = r;
+            l = h + 1;
+        }
+    }
+
+    int len = SIZE(x->table) - offset;
+    for (struct among_subtree * t = x->subtree; t; t = t->next) {
+        if (t->len == len) {
+            if (memcmp(x->table + t->start,
+                       x->table + offset,
+                       len * sizeof(x->table[0])) == 0) {
+                SET_SIZE(x->table, offset);
+                return t->start;
+            }
+        }
+    }
+    NEW(among_subtree, t);
+    t->start = offset;
+    t->len = len;
+    t->next = x->subtree;
+    x->subtree = t;
+
+    if (offset >= 0x8000) {
+        printf("%s:%d: generated among table is too large! "
+               "Please open bug against snowball compiler\n",
+               g->analyser->tokeniser->file, x->node->line_number);
+        exit(1);
+    }
+    return offset;
+}
+
+static void build_among_table(struct generator * g, struct among * x) {
+    // Build a table which encodes an among as a state machine where each
+    // transition is either an O(1) multi-way dispatch on the next
+    // byte/character or a check that a particular string of bytes/characters
+    // follows (in UTF-8 it works in bytes; for fixed-width encodings it works
+    // in characters).
+    if (x->function_count) {
+        // Each among case with a function creates an among function scenario,
+        // but some may be identical in which case they are merged.  This means
+        // x->function_count is an upper bound on the number of entries we
+        // need.
+        //
+        // With -coverage we use the amongvec index as the af index.
+        bool coverage = g->options->coverage;
+        NEWVEC(among_function_scenario, af,
+               coverage ? x->literalstring_count : x->function_count);
+        if (coverage) {
+            for (int i = 0; i < x->literalstring_count; ++i) {
+                af[i] = (struct among_function_scenario){0};
+            }
+        }
+        x->af = af;
+    }
+
+    // 512 is large enough for ~90% of amongs.
+    x->table = create_b(512);
+    x->table_endianness = create_s(g->options->encoding == ENC_WIDECHARS ? 1 : 512);
+    int root = build_among_table_(g, x,
+                                  0, x->literalstring_count - 1, 0,
+                                  (among_mode(x) == m_forward), 0);
+    assert(root == 0);
+}
+
 static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
-
-    struct amongvec * v = x->v;
-
+    symbol * b = x->table;
+    byte * e = x->table_endianness;
     g->I[0] = x->number;
-    for (int i = 0; i < x->literalstring_count; i++) {
-        if (v[i].size) {
-            g->I[1] = i;
-            g->I[2] = v[i].size;
-            w(g, "static const symbol s_~I0_~I1[~I2] = ");
-            wlitarray(g, v[i].b);
-            w(g, ";~N");
+    w(g, "~Mstatic const unsigned short a_~I0[] = {~N~+");
+    write_margin(g);
+    for (int i = 0; i < SIZE(b); i++) {
+        if (i > 0) {
+            if ((i & 7)) {
+                write_string(g, ", ");
+            } else {
+                w(g, ",~N~M");
+            }
         }
-    }
-
-    g->I[1] = x->literalstring_count;
-    if (g->options->coverage) {
-        g->I[1] = g->I[1] * 2 + 1;
-    }
-    w(g, "~Mstatic const struct among a_~I0[~I1] = {~N");
-
-    for (int i = 0; i < x->literalstring_count; i++) {
-        if (i) w(g, ",~N");
-        g->I[1] = i;
-        g->I[2] = v[i].size;
-        g->I[3] = (v[i].i >= 0 ? v[i].i - i : 0);
-        g->I[4] = v[i].result;
-        g->I[5] = v[i].function_index;
-
-        if (g->options->comments) {
-            w(g, "/*~J1 */ ");
-        }
-        w(g, "{ ~I2, ");
-        if (v[i].size == 0) {
-            w(g, "0,");
+        if (i < SIZE(e) && e[i]) {
+            write_string(g, "S(");
+            write_hex4(g, (int)b[i]);
+            write_char(g, ')');
         } else {
-            w(g, "s_~I0_~I1,");
-        }
-        w(g, " ~I3, ~I4, ~I5}");
-    }
-    if (g->options->coverage) {
-        w(g, ",~N");
-        g->S[1] = g->analyser->tokeniser->file;
-        for (int i = 0; i < x->literalstring_count; i++) {
-            if (g->options->comments) {
-                w(g, "/* coverage */ ");
-            }
-            g->I[1] = x->v[i].line_number;
-            g->I[2] = x->v[i].string_index;
-            w(g, "{ ~I0, (const symbol*)\"~S1:~I1\", 0, ~I2, 0 },~N");
-        }
-        if (x->always_matches) {
-            g->I[0] = -1;
-        }
-        if (g->options->comments) {
-            w(g, "/* coverage */ ");
-        }
-        g->I[1] = x->node->line_number;
-        w(g, "{ ~I0, (const symbol*)\"~S1:~I1\", 0, 0, 0 },~N");
-    }
-    w(g, "~N};~N");
-
-    if (x->unique_function_count <= 1) return;
-
-    w(g, "~N~Mstatic int af_~I0(struct SN_env * z) {~N~+");
-    w(g, "~Mswitch (z->af) {~N~+");
-    for (int n = 1; n <= x->unique_function_count; n++) {
-        w(g, "~Mcase ");
-        write_int(g, n);
-        w(g, ": return ");
-        for (int i = 0; i < x->literalstring_count; i++) {
-            if (v[i].function_index == n) {
-                write_varref(g, v[i].function);
-                w(g, "(z);~N");
-                break;
-            }
+            write_string(g, "0x");
+            write_hex4(g, (int)b[i]);
+            write_char(g, ' ');
         }
     }
-    w(g, "~-~M}~N");
-    w(g, "~Mreturn -1;~N");
-    w(g, "~-~M}~N");
+    write_newline(g);
+    w(g, "~-~M};~N");
 }
 
 static void generate_amongs(struct generator * g) {
@@ -2275,6 +2892,12 @@ static void generate_header_file(struct generator * g) {
 }
 
 extern void generate_program_c(struct generator * g) {
+    // Build the among tables first as we need the among_function_scenario
+    // list to generate code for amongs with functions.
+    for (struct among * x = g->analyser->amongs; x; x = x->next) {
+        build_among_table(g, x);
+    }
+
     g->outbuf = str_new();
     g->failure_str = str_new();
     write_start_comment(g, "/* ", " */");

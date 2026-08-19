@@ -39,6 +39,14 @@ extern void print_program(struct analyser * a) {
 static void free_among(struct among * q) {
     FREE(q->v);
     FREE(q->commands);
+    FREE(q->af);
+    lose_b(q->table);
+    lose_s(q->table_endianness);
+    while (q->subtree) {
+        struct among_subtree * t = q->subtree;
+        q->subtree = q->subtree->next;
+        FREE(t);
+    }
     FREE(q);
 }
 

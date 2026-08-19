@@ -292,9 +292,37 @@ struct amongvec {
     struct name * function;
 };
 
+struct among_function_scenario {
+    struct name * function;
+    int t_result; // result (1...).
+    int f_result; // 0 or result (1...) or AFS_FLAG | af_index to chain.
+    // If `function` signals f, apply this delta to the value the cursor had on
+    // entry (add for forwards; subtract for backwards).
+    int cursor_adjustment;
+};
+
+// Used to find common-subtrees to reuse.  We currently linear search this for
+// each subtree we encode, but it seems in practice that's very fast, even for
+// the large amongs in the stemmers we ship (the largest seems to be in greek.sbl
+// which results in 1161 entries in this linked list).
+//
+// Note that if we had a separate list per value of len we would only need to
+// store start in each item (and could store as a symbol*).
+struct among_subtree {
+    struct among_subtree * next;
+    int start;
+    int len;
+};
+
 struct among {
     struct among * next;
     struct amongvec * v;      /* pointer to the amongvec */
+    // Details for among function handling in the state machine implementation.
+    struct among_function_scenario * af;
+    struct among_subtree * subtree;
+    int af_count;             /* number of entries in af. */
+    symbol * table;           /* table used in C implementation. */
+    byte * table_endianness;  /* flag values needing byteswap on big-endian. */
     int number;               /* amongs are numbered 0, 1, 2 ... */
     int literalstring_count;  /* in this among */
     int command_count;        /* in this among (excludes "no command" entries) */
@@ -304,6 +332,7 @@ struct among {
     bool amongvar_needed;     /* do we need to set among_var? */
     bool always_matches;      /* will this among always match? */
     bool used;                /* is this among in reachable code? */
+    bool c0_used;             /* Need c0 variable in C implementation? */
     int same_action;          /* type code if same for all actions; <0 otherwise */
     int shortest_size;        /* smallest non-zero string length in this among */
     int longest_size;         /* longest string length in this among */

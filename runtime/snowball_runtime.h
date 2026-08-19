@@ -16,6 +16,27 @@
 # define CAPACITY(p)    ((int *)(p))[-2]
 #endif
 
+#if !defined SNOWBALL_BIGENDIAN && !defined SNOWBALL_LITTLEENDIAN
+# ifdef __BYTE_ORDER__ /* GCC, clang */
+#  if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#   define SNOWBALL_BIGENDIAN
+#  else
+#   define SNOWBALL_LITTLEENDIAN
+#  endif
+# elif defined _MSC_VER && (defined _M_AMD64 || defined _M_IX86) /* MSVC */
+#  define SNOWBALL_LITTLEENDIAN
+# elif defined HAVE_ENDIAN_H
+#  include <endian.h>
+#  if BYTE_ORDER == BIG_ENDIAN
+#   define SNOWBALL_BIGENDIAN
+#  else
+#   define SNOWBALL_LITTLEENDIAN
+#  endif
+# else
+#  error Platform endianness unknown - define SNOWBALL_BIGENDIAN or SNOWBALL_LITTLEENDIAN
+# endif
+#endif
+
 #ifdef SNOWBALL_RUNTIME_THROW_EXCEPTIONS
 # define SNOWBALL_ERR void
 #else
@@ -45,20 +66,6 @@ static void debug(struct SN_env * z, int n, int line) {
 }
 #endif
 
-struct among
-{
-    /* Number of symbols in s. */
-    int s_size;
-    /* Search string. */
-    const symbol * s;
-    /* Delta of index to longest matching substring, or 0 if none. */
-    int substring_i;
-    /* Result of the lookup. */
-    int result;
-    /* Optional condition routine index, or 0 if none. */
-    int function;
-};
-
 /* MSVC doesn't like functions declared `extern "C"` throwing exceptions. */
 #if defined __cplusplus && !defined SNOWBALL_RUNTIME_THROW_EXCEPTIONS
 extern "C" {
@@ -86,10 +93,8 @@ extern int eq_s_b(struct SN_env * z, int s_size, const symbol * s);
 extern int eq_v(struct SN_env * z, const symbol * p);
 extern int eq_v_b(struct SN_env * z, const symbol * p);
 
-extern int find_among(struct SN_env * z, const struct among * v, int v_size,
-                      int (*)(struct SN_env *));
-extern int find_among_b(struct SN_env * z, const struct among * v, int v_size,
-                        int (*)(struct SN_env *));
+extern int find_among(struct SN_env * z, const unsigned short * v);
+extern int find_among_b(struct SN_env * z, const unsigned short * v);
 
 extern SNOWBALL_ERR replace_s(struct SN_env * z, int c_bra, int c_ket, int s_size, const symbol * s);
 extern SNOWBALL_ERR slice_from_s(struct SN_env * z, int s_size, const symbol * s);
