@@ -1,5 +1,6 @@
 routines (
-    normalise_diaereses
+    prelude
+    normalise
     /* R1 R2 */ RV
     mark_regions
     verb_sfx
@@ -9,7 +10,7 @@ externals ( stem )
 
 integers ( pV /* p1 p2 */ )
 
-groupings ( canga v longv shortv )
+groupings ( canga v longv shortv allv )
 
 stringescapes {}
 
@@ -31,14 +32,15 @@ stringdef u"    '{U+00FC}'  // u-diaeresis
 define shortv 'aeiou'
 define longv  '{a_}{e_}{i_}{o_}{u_}'
 define v      shortv + longv
+define allv   v + '{a"}{e"}{i"}{o"}{u"}' // Used before normalisation
 
 /* "Canga nominalisation" consonants: -hanga -kanga -manga -ranga -tanga */
 
 define canga  'hkmrt'
 
-/* normalise diaereses to macrons */
+/* normalise diaereses to macrons and w' to wh */
 
-define normalise_diaereses as (
+define normalise as (
     repeat (
         [substring] among (
             '{a"}' (<- '{a_}')
@@ -46,9 +48,28 @@ define normalise_diaereses as (
             '{i"}' (<- '{i_}')
             '{o"}' (<- '{o_}')
             '{u"}' (<- '{u_}')
+            'w{'}' (<- 'wh')
             '' (next)
         )
     )
+)
+
+define prelude as (
+    // Test for valid Māori words.  Some Latin consonants aren't used,
+    // and every consonant must be valid by a vowel (but runs of vowels
+    // are allowed).  Note `ng` and `wh` count as a single consonant,
+    // as does `w'` which is sometimes used in place of `wh`.
+    test (
+        repeat (
+            try among ( 'g' 'h' 'k' 'm' 'n' 'ng' 'p' 'r' 't' 'w' 'wh' 'w{'}' )
+            allv
+        )
+        atlimit
+    )
+
+    // Only normalise if the word looks like Māori to avoid damaging foreign
+    // words which may have a genuine diaresis (or less likely, w').
+    do normalise
 )
 
 define mark_regions as (
@@ -196,7 +217,9 @@ backwardmode (
 )
 
 define stem as (
-    do normalise_diaereses
+    // `prelude` will signal f if the word doesn't fit Māori's letter patterns.
+    // We don't want to try to stem those.
+    prelude
     do mark_regions
     backwards (
         do verb_sfx
