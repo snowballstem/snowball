@@ -14,13 +14,16 @@
 const char * progname;
 static int pretty = 1;
 
-static void
-stem_file(Snowball::Stemmer& stemmer, std::istream& f_in, std::ostream& f_out)
+template<typename Char>
+void
+stem_file(Snowball::Stemmer& stemmer,
+          std::basic_istream<Char>& f_in,
+          std::basic_ostream<Char>& f_out)
 {
-    std::string word;
+    std::basic_string<Char> word;
 
     while (true) {
-        int ch = f_in.get();
+        Char ch = f_in.get();
         if (ch < 0) {
             return;
         }
@@ -28,8 +31,12 @@ stem_file(Snowball::Stemmer& stemmer, std::istream& f_in, std::ostream& f_out)
             word.clear();
             int inlen = 0;
             while (ch != '\n' && ch >= 0) {
-                /* Update count of utf-8 characters. */
-                if (ch < 0x80 || ch > 0xBF) inlen += 1;
+                if (sizeof(Char) == 1) {
+                    /* Update count of utf-8 characters. */
+                    if (ch < 0x80 || ch > 0xBF) inlen += 1;
+                } else {
+                    inlen += 1;
+                }
                 /* force lower case: */
                 if (ch < 128) ch = tolower(ch);
 
@@ -147,6 +154,7 @@ try {
         exit(1);
     }
 
+#ifndef SNOWBALL_WIDE
     /* prepare the files */
     std::ifstream f_in;
     if (in) {
@@ -167,6 +175,28 @@ try {
 
     /* do the stemming process: */
     stem_file(*stemmer, in ? f_in : std::cin, out ? f_out : std::cout);
+#else
+    /* prepare the files */
+    std::wifstream f_in;
+    f_in.open(in ? in : "/dev/stdin");
+    if (!f_in.is_open()) {
+	fprintf(stderr, "file %s not found\n", in);
+	exit(1);
+    }
+    std::wofstream f_out;
+    f_out.open(out ? out : "/dev/stdout");
+    if (!f_out.is_open()) {
+	fprintf(stderr, "file %s cannot be opened\n", out);
+	exit(1);
+    }
+
+    std::locale c_utf8("C.UTF8");
+    f_in.imbue(c_utf8);
+    f_out.imbue(c_utf8);
+
+    /* do the stemming process: */
+    stem_file(*stemmer, f_in, f_out);
+#endif
 
     return 0;
 }
