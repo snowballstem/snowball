@@ -78,7 +78,7 @@ stem_file(Snowball::Stemmer& stemmer,
 static void
 usage(int n)
 {
-    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-c <character encoding>] [-p[2]] [-h]\n"
+    printf("usage: %s [-l <language>] [-i <input file>] [-o <output file>] [-p[2]] [-h]\n"
           "\n"
           "The input file consists of a list of words to be stemmed, one per\n"
           "line. Words should be in lower case, but (for English) A-Z letters\n"
