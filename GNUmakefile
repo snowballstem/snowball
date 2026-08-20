@@ -48,6 +48,13 @@ CXX ?= c++
 CXXFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-declarations -Wshadow $(WERROR)
 cxx_src_dir = cxx
 
+ifdef SNOWBALL_WIDE
+CXXFLAGS+=-DSNOWBALL_WIDE
+cxx_encoding_opt=-w
+else
+cxx_encoding_opt=-u
+endif
+
 # C#
 
 MONO ?= mono
@@ -474,7 +481,7 @@ $(cxx_src_dir)/stemwords$(EXEEXT): $(CXX_STEMWORDS_OBJECTS) $(CXX_RUNTIME_OBJECT
 
 $(cxx_src_dir)/%_stemmer.cxx $(cxx_src_dir)/%_stemmer.h: $(ALGORITHMS)/%.sbl snowball$(EXEEXT)
 	@mkdir -p $(cxx_src_dir)
-	$(SNOWBALL_COMPILE) -c++ -cheader '"stemmer.h"' $< -o $@ -r ../runtime -u
+	$(SNOWBALL_COMPILE) -c++ -cheader '"stemmer.h"' $< -o $@ -r ../runtime $(cxx_encoding_opt)
 
 $(cxx_src_dir)/%stemmer.o: $(cxx_src_dir)/%stemmer.h
 

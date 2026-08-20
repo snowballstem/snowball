@@ -48,6 +48,10 @@ jobs:
         - name: "C++"
           CXX: g++
           WERROR: '-pedantic -Werror'
+        - name: "C++ widechars"
+          CXX: g++
+          MAKE: 'make SNOWBALL_WIDE=1'
+          WERROR: '-pedantic -Werror'
         - name: java
           JAVA: java
           JAVAC: javac
