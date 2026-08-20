@@ -35,4 +35,4 @@ You can stem a word from PHP as follows:
     $stem = $stemmer->stemWord($word);
     printf("%s => %s\n", $word, $stem );
 
-	// prints "compiled => compil"
+    // prints "compiled => compil"

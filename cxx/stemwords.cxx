@@ -180,14 +180,14 @@ try {
     std::wifstream f_in;
     f_in.open(in ? in : "/dev/stdin");
     if (!f_in.is_open()) {
-	fprintf(stderr, "file %s not found\n", in);
-	exit(1);
+        fprintf(stderr, "file %s not found\n", in);
+        exit(1);
     }
     std::wofstream f_out;
     f_out.open(out ? out : "/dev/stdout");
     if (!f_out.is_open()) {
-	fprintf(stderr, "file %s cannot be opened\n", out);
-	exit(1);
+        fprintf(stderr, "file %s cannot be opened\n", out);
+        exit(1);
     }
 
     std::locale c_utf8("C.UTF8");

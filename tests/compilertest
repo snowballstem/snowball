@@ -37,14 +37,14 @@ for t ; do
   if $SNOWBALL -syntax "$t" 2> tmp.stderr > tmp.syntax ; then
     if [ -f "$b.stderr" ] ; then
       if ! diff "$b.stderr" tmp.stderr ; then
-	f="stderr output not as expected"
+        f="stderr output not as expected"
       fi
     fi
     if [ -z "$f" ] && [ -f "$b.syntax" ] ; then
       if ! diff "$b.syntax" tmp.syntax ; then
-	f="syntax tree not as expected"
+        f="syntax tree not as expected"
       else
-	rm tmp.syntax
+        rm tmp.syntax
       fi
     fi
   else
