@@ -1,0 +1,30 @@
+// Test `setmark`/`tomark`/`atmark`/`tolimit`/`atlimit`.
+
+externals (stem)
+
+integers (x)
+
+strings (s)
+
+define stem as (
+  not atlimit or fail='atlimit true initially'
+  test (tolimit atlimit) or fail='not atlimit after tolimit'
+  test (tolimit atmark limit) or fail='not atmark limit after tolimit'
+
+  atmark 0 or fail='not at atmark 0 at start'
+  not atmark 1 or fail='atmark 1 at start'
+
+  setmark x
+  $(x == 0) or fail='setmark at start not 0'
+  atmark x or fail='not at atmark x after setmark x'
+
+  next
+  setmark x
+  $(x != 0) or fail='setmark after next still 0'
+  atmark x or fail='not at atmark x after setmark x (2)'
+  not atlimit or fail='atlimit true after next'
+
+  tolimit
+  setmark x
+  $(x == limit) or fail='setmark not limit after tolimit'
+)
