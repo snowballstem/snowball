@@ -2480,6 +2480,7 @@ static void build_among_table(struct generator * g, struct among * x) {
 static void generate_among_table(struct generator * g, struct among * x) {
     write_newline(g);
     write_comment(g, x->node);
+    bool wide = (g->options->encoding == ENC_WIDECHARS);
     symbol * b = x->table;
     byte * e = x->table_endianness;
     g->I[0] = x->number;
@@ -2500,7 +2501,7 @@ static void generate_among_table(struct generator * g, struct among * x) {
         } else {
             write_string(g, "0x");
             write_hex4(g, (int)b[i]);
-            write_char(g, ' ');
+            if (!wide) write_char(g, ' ');
         }
     }
     write_newline(g);
