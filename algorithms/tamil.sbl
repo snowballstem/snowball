@@ -277,7 +277,13 @@ define remove_vetrumai_urupukal as (
    test (
      [substring] among (
        '{nnna}{vs_ai}'
-         ( delete )
+         // Accusative -னை on a noun stem: strip only the suffix vowel-sign
+         // (vs_ai = ை) and restore the pulli on the consonant ன, so the stem
+         // matches the nominative form (-ன்). Previously this rule deleted
+         // both the vowel-sign and the consonant, producing a truncated stem
+         // that did not collide with the nominative or other case forms
+         // (e.g. கர்ணனை -> கர்ண, while கர்ணன் -> கர்ணன்).
+         ( <- '{nnna}{pulli}' )
        '{vs_o}{tta}{vs_u}'
        '{vs_oo}{tta}{vs_u}'
        '{vs_i}{la}{pulli}'
