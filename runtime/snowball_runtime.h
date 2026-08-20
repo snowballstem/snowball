@@ -16,24 +16,28 @@
 # define CAPACITY(p)    ((int *)(p))[-2]
 #endif
 
-#if !defined SNOWBALL_BIGENDIAN && !defined SNOWBALL_LITTLEENDIAN
-# ifdef __BYTE_ORDER__ /* GCC, clang */
-#  if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define SNOWBALL_BIGENDIAN
-#  else
+// We need to know the endianness to correctly encode among tables when
+// we aren't using wide characters.
+#ifndef SNOWBALL_WIDE
+# if !defined SNOWBALL_BIGENDIAN && !defined SNOWBALL_LITTLEENDIAN
+#  ifdef __BYTE_ORDER__ /* GCC, clang */
+#   if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#    define SNOWBALL_BIGENDIAN
+#   else
+#    define SNOWBALL_LITTLEENDIAN
+#   endif
+#  elif defined _MSC_VER && (defined _M_AMD64 || defined _M_IX86) /* MSVC */
 #   define SNOWBALL_LITTLEENDIAN
-#  endif
-# elif defined _MSC_VER && (defined _M_AMD64 || defined _M_IX86) /* MSVC */
-#  define SNOWBALL_LITTLEENDIAN
-# elif defined HAVE_ENDIAN_H
-#  include <endian.h>
-#  if BYTE_ORDER == BIG_ENDIAN
-#   define SNOWBALL_BIGENDIAN
+#  elif defined HAVE_ENDIAN_H
+#   include <endian.h>
+#   if BYTE_ORDER == BIG_ENDIAN
+#    define SNOWBALL_BIGENDIAN
+#   else
+#    define SNOWBALL_LITTLEENDIAN
+#   endif
 #  else
-#   define SNOWBALL_LITTLEENDIAN
+#   error Platform endianness unknown - define SNOWBALL_BIGENDIAN or SNOWBALL_LITTLEENDIAN
 #  endif
-# else
-#  error Platform endianness unknown - define SNOWBALL_BIGENDIAN or SNOWBALL_LITTLEENDIAN
 # endif
 #endif
 
