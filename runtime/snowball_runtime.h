@@ -16,8 +16,9 @@
 # define CAPACITY(p)    ((int *)(p))[-2]
 #endif
 
-// We need to know the endianness to correctly encode among tables when
-// we aren't using wide characters.
+/* We need to know the endianness to correctly encode among tables when
+ * we aren't using wide characters.
+ */
 #ifndef SNOWBALL_WIDE
 # if !defined SNOWBALL_BIGENDIAN && !defined SNOWBALL_LITTLEENDIAN
 #  ifdef __BYTE_ORDER__ /* GCC, clang */
