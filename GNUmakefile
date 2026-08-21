@@ -49,10 +49,10 @@ CXXFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-declarations -Wshadow $(WERROR)
 cxx_src_dir = cxx
 
 ifdef SNOWBALL_WIDE
-CXXFLAGS+=-DSNOWBALL_WIDE
-cxx_encoding_opt=-w
+CXXFLAGS += -DSNOWBALL_WIDE
+cxx_encoding_opt := -w
 else
-cxx_encoding_opt=-u
+cxx_encoding_opt := -u
 endif
 
 # C#
