@@ -23,7 +23,7 @@ stem_file(Snowball::Stemmer& stemmer,
     std::basic_string<Char> word;
 
     while (true) {
-        Char ch = f_in.get();
+        int ch = f_in.get();
         if (ch < 0) {
             return;
         }
