@@ -276,6 +276,11 @@ struct literalstring {
     symbol * b;
 };
 
+struct c_literalstring {
+    struct c_literalstring * next;
+    const symbol * b;
+};
+
 struct amongvec {
     symbol * b;      /* the string giving the case */
     int size;        /* - and its size */
@@ -466,6 +471,8 @@ struct generator {
     const char * varname_prefix;
     // String to indent by for each margin level (four spaces by default).
     const char * margin_indent;
+    // (C/C++) Linked list used to merge string literals.
+    struct c_literalstring * c_literalstrings;
 };
 
 /* Special values for failure_label in struct generator. */

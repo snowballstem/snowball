@@ -152,18 +152,53 @@ static void wlitarray(struct generator * g, const symbol * p) {  /* write litera
 }
 
 static void wlitref(struct generator * g, const symbol * p) {  /* write ref to literal array */
-    if (SIZE(p) == 0) {
+    int len = SIZE(p);
+    if (len == 0) {
         write_char(g, '0');
-    } else {
-        struct str * s = g->outbuf;
-        g->outbuf = g->declarations;
-        write_string(g, "static const symbol s_"); write_int(g, g->literalstring_count); write_string(g, "[] = ");
-        wlitarray(g, p);
-        write_string(g, ";\n");
-        g->outbuf = s;
-        write_string(g, "s_"); write_int(g, g->literalstring_count);
-        g->literalstring_count++;
+        return;
     }
+
+    // We want to avoid generating duplicate literals (because the C/C++
+    // compiler can't easily merge them because they're required to have
+    // different addresses - the compiler would need to prove that nothing
+    // relies on the addresses being different, but the pointers are
+    // passed to the runtime code in a different compilation unit, so
+    // it clearly can't unless -flto is used, and not necessarily even
+    // then).
+    //
+    // Similarly, we also want to merge literals where one is a prefix of
+    // another.
+    //
+    // Currently we use a naive algorithm which scans all the literals
+    // we've allocated so far for each new literal string.  This will be
+    // O(n²) but for real world Snowball stemmers n is a few hundred at
+    // most so this is plenty fast enough in practice.
+    struct c_literalstring * s = g->c_literalstrings;
+    struct c_literalstring ** append_to = &(g->c_literalstrings);
+    int n = 0;
+    while (s) {
+        int s_len = SIZE(s->b);
+        int min_len = len < s_len ? len : s_len;
+        if (memcmp(p, s->b, min_len * sizeof(symbol)) == 0) {
+            if (len > s_len) {
+                // Replace entry with one which is longer but has the
+                // same prefix.
+                s->b = p;
+            }
+            break;
+        }
+        ++n;
+        append_to = &s->next;
+        s = s->next;
+    }
+    if (!s) {
+        NEW(c_literalstring, elt);
+        elt->next = NULL;
+        elt->b = p;
+        *append_to = elt;
+    }
+    write_string(g, "s_");
+    write_int(g, n);
 }
 
 // Used to generate the coverage logging code when -coverage is used.
@@ -2508,6 +2543,26 @@ static void generate_among_table(struct generator * g, struct among * x) {
     w(g, "~-~M};~N");
 }
 
+static void generate_stringliterals(struct generator * g) {
+    struct str * saved_outbuf = g->outbuf;
+    g->outbuf = g->declarations;
+    struct c_literalstring * s = g->c_literalstrings;
+    int n = 0;
+    while (s) {
+        write_string(g, "static const symbol s_");
+        write_int(g, n);
+        write_string(g, "[] = ");
+        wlitarray(g, s->b);
+        write_string(g, ";\n");
+        ++n;
+        struct c_literalstring * to_free = s;
+        s = s->next;
+        FREE(to_free);
+    }
+    g->c_literalstrings = NULL;
+    g->outbuf = saved_outbuf;
+}
+
 static void generate_amongs(struct generator * g) {
     struct str * s = g->outbuf;
     g->outbuf = g->declarations;
@@ -2912,6 +2967,7 @@ extern void generate_program_c(struct generator * g) {
         generate(g, p);
     }
 
+    generate_stringliterals(g);
     generate_amongs(g);
     generate_groupings(g);
 
