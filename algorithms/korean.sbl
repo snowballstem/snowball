@@ -1,0 +1,171 @@
+/* Korean Stemmer for Snowball */
+externals ( stem )
+
+routines (
+  remove_nominal_suffixes
+  remove_verbal_suffixes
+)
+
+stringescapes { }
+
+/* === Hangul 초성 (19자) === */
+stringdef G '{U+1100}'
+stringdef KK '{U+1101}'
+stringdef N '{U+1102}'
+stringdef D '{U+1103}'
+stringdef TT '{U+1104}'
+stringdef R '{U+1105}'
+stringdef M '{U+1106}'
+stringdef B '{U+1107}'
+stringdef PP '{U+1108}'
+stringdef S '{U+1109}'
+stringdef SS '{U+110A}'
+stringdef ENG '{U+110B}'
+stringdef J '{U+110C}'
+stringdef JJ '{U+110D}'
+stringdef C '{U+110E}'
+stringdef K '{U+110F}'
+stringdef T '{U+1110}'
+stringdef P '{U+1111}'
+stringdef H '{U+1112}'
+
+/* === Hangul 중성 (21자) === */
+stringdef A '{U+1161}'
+stringdef AE '{U+1162}'
+stringdef YA '{U+1163}'
+stringdef YAE '{U+1164}'
+stringdef E '{U+1165}'
+stringdef E2 '{U+1166}'
+stringdef YEO '{U+1167}'
+stringdef YE '{U+1168}'
+stringdef O '{U+1169}'
+stringdef WA '{U+116A}'
+stringdef WAE '{U+116B}'
+stringdef OE '{U+116C}'
+stringdef YO '{U+116D}'
+stringdef U '{U+116E}'
+stringdef WE '{U+116F}'
+stringdef WE2 '{U+1170}'
+stringdef WI '{U+1171}'
+stringdef UI '{U+1172}'
+stringdef YU '{U+1173}'
+stringdef EU '{U+1174}'
+stringdef I '{U+1175}'
+
+/* === 모음/자음 그룹 === */
+groupings ( backVowels frontVowels allVowels consonants )
+define backVowels '{A}{E}{O}{U}{EU}'
+define frontVowels '{AE}{E2}{OE}{WI}{UI}'
+define allVowels '{A}{AE}{YA}{YAE}{E}{E2}{YEO}{YE}{O}{WA}{WAE}{OE}{YO}{U}{WE}{WE2}{WI}{UI}{YU}{EU}{I}'
+define consonants '{G}{KK}{N}{D}{TT}{R}{M}{B}{PP}{S}{SS}{ENG}{J}{JJ}{C}{K}{T}{P}{H}'
+
+/* === 격 조사 제거 === */
+define remove_nominal_suffixes as (
+  backwards (
+    [substring] among (
+      '{U+C5D0}{U+C11C}' ( delete )
+      '{U+BD80}{U+D130}' ( delete )
+      '{U+AE4C}{U+C9C0}' ( delete )
+      '{U+C5D0}{U+AC8C}' ( delete )
+      '{U+D55C}{U+D14C}' ( delete )
+      '{U+C640}' ( delete )
+      '{U+ACFC}' ( delete )
+      '{U+B098}' ( delete )
+      '{U+AC00}' ( delete )
+      '{U+C744}' ( delete )
+      '{U+B97C}' ( delete )
+      '{U+C758}' ( delete )
+      '{U+C5D0}' ( delete )
+      '{U+B85C}' ( delete )
+      '{U+B3C4}' ( delete )
+      '{U+B9CC}' ( delete )
+      '{U+D558}{U+ACE0}' ( delete )
+      '{U+CC98}{U+B7FC}' ( delete )
+      '{U+B300}{U+B85C}' ( delete )
+      '{U+B77C}{U+B3C4}' ( delete )
+      '{U+C870}{U+CC28}' ( delete )
+      '{U+B9C8}{U+C800}' ( delete )
+      '{U+C5D0}{U+C11C}{U+C11C}' ( delete )
+      '{U+C73C}{U+B85C}{U+BD80}{U+D130}' ( delete )
+    )
+  )
+)
+
+/* === 어미/어센 접미사 제거 === */
+define remove_verbal_suffixes as (
+  backwards (
+    [substring] among (
+      '{U+C2B5}{U+B2C8}{U+B2E4}' ( delete )
+      '{U+C5B4}{U+C694}' ( delete )
+      '{U+C544}{U+C694}' ( delete )
+      '{U+B9CC}' ( delete )
+      '{U+ACE0}' ( delete )
+      '{U+B2E4}' ( delete )
+      '{U+C790}' ( delete )
+      '{U+B77C}' ( delete )
+      '{U+AC8C}' ( delete )
+      '{U+C5C8}{U+C5B4}{U+C694}' ( delete )
+      '{U+C558}{U+C5B4}{U+C694}' ( delete )
+      '{U+ACA0}{U+C5B4}{U+C694}' ( delete )
+      '{U+C138}{U+C694}' ( delete )
+      '{U+C5C8}' ( delete )  // 었
+      '{U+C558}' ( delete )  // 았
+      '{U+C600}' ( delete )  // 였
+      '{U+C73C}' ( delete )
+      '{U+B108}' ( delete )
+      '{U+C9C0}' ( delete )
+      '{U+B2C8}' ( delete )
+      '{U+AE30}' ( delete )
+    )
+  )
+)
+
+/* === 불규칙 용언 처리 === */
+define handle_irregular_verbs as (
+  /* ㅂ 불규칙: ㅂ이 ㄴ, ㅅ을 만나 ㅍ으로 */
+  if testat(1) and find_among_b(KoreanStemmer.a_irregular_bp) != 0 then
+    replace_at(-1, 1, '{H}')  // ㅂ -> ㅍ
+  fi
+  /* ㄷ 불규칙: ㄷ이 ㅏ, ㅓ를 만나 ㄹ로 */
+  if testat(1) and find_among_b(KoreanStemmer.a_irregular_dt) != 0 then
+    replace_at(-1, 1, '{R}')  // ㄷ -> ㄹ
+  fi
+  /* ㅎ 불규칙: ㅎ이 ㅏ, ㅓ를 만나 ㄹ로 */
+  if testat(1) and find_among_b(KoreanStemmer.a_irregular_h) != 0 then
+    replace_at(-1, 1, '{R}')  // ㅎ -> ㄹ
+  fi
+  /* ㅅ 불규칙: ㅅ이 ㅏ, ㅓ를 만나 ㅆ으로 */
+  if testat(1) and find_among_b(KoreanStemmer.a_irregular_s) != 0 then
+    replace_at(-1, 1, '{SS}')  // ㅅ -> ㅆ
+  fi
+)
+
+/* === 불규칙 용언 among 테이블 === */
+define KoreanStemmer.a_irregular_bp as (
+  among (
+    '{B}' ( 1 )  // ㅂ 종성
+  )
+)
+
+define KoreanStemmer.a_irregular_dt as (
+  among (
+    '{C}' ( 1 )  // ㄷ 종성
+  )
+)
+
+define KoreanStemmer.a_irregular_h as (
+  among (
+    '{H}' ( 1 )  // ㅎ 종성
+  )
+)
+
+define KoreanStemmer.a_irregular_s as (
+  among (
+    '{S}' ( 1 )  // ㅅ 종성
+  )
+)
+
+define stem as (
+  do remove_nominal_suffixes
+  do remove_verbal_suffixes
+)
