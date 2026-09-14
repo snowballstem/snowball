@@ -132,7 +132,11 @@ define noun as (
 )
 
 define verb as (
-    [ among (
+    // Keep each lemma in a separate among table. Wide-character N-way
+    // dispatch allocates the whole character range, including unused slots;
+    // combining these sparse Hangul ranges can exceed the table offset limit.
+    // Each alternative restores the cursor on failure and requires a full word.
+    ( [ among (
         // 먹다
         '{uBA39}{uC5C8}{uB2E4}' // 먹었다
         '{uBA39}{uC2B5}{uB2C8}{uB2E4}' // 먹습니다
@@ -143,6 +147,7 @@ define verb as (
         '{uBA39}{uB294}' // 먹는
         '{uBA39}{uC5C8}{uB2E4}{uACE0}' // 먹었다고
         (atlimit ] <- '{uBA39}{uB2E4}')
+    ) ) or ( [ among (
         // 읽다
         '{uC77D}{uC5C8}{uB2E4}' // 읽었다
         '{uC77D}{uC2B5}{uB2C8}{uB2E4}' // 읽습니다
@@ -152,6 +157,7 @@ define verb as (
         '{uC77D}{uC5B4}{uC694}' // 읽어요
         '{uC77D}{uB294}' // 읽는
         (atlimit ] <- '{uC77D}{uB2E4}')
+    ) ) or ( [ among (
         // 좋다
         '{uC88B}{uC558}{uB2E4}' // 좋았다
         '{uC88B}{uC2B5}{uB2C8}{uB2E4}' // 좋습니다
@@ -161,6 +167,7 @@ define verb as (
         '{uC88B}{uC544}{uC694}' // 좋아요
         '{uC88B}{uC740}' // 좋은
         (atlimit ] <- '{uC88B}{uB2E4}')
+    ) ) or ( [ among (
         // 작다
         '{uC791}{uC558}{uB2E4}' // 작았다
         '{uC791}{uC2B5}{uB2C8}{uB2E4}' // 작습니다
@@ -170,6 +177,7 @@ define verb as (
         '{uC791}{uC544}{uC694}' // 작아요
         '{uC791}{uC740}' // 작은
         (atlimit ] <- '{uC791}{uB2E4}')
+    ) ) or ( [ among (
         // 하다
         '{uD588}{uB2E4}' // 했다
         '{uD588}{uC2B5}{uB2C8}{uB2E4}' // 했습니다
@@ -183,6 +191,7 @@ define verb as (
         '{uD574}{uC694}' // 해요
         '{uD558}{uB294}' // 하는
         (atlimit ] <- '{uD558}{uB2E4}')
+    ) ) or ( [ among (
         // 보다
         '{uBD24}{uB2E4}' // 봤다
         '{uBD24}{uC2B5}{uB2C8}{uB2E4}' // 봤습니다
@@ -193,6 +202,7 @@ define verb as (
         '{uBCF4}{uBA74}' // 보면
         '{uBCF4}{uB294}' // 보는
         (atlimit ] <- '{uBCF4}{uB2E4}')
+    ) ) or ( [ among (
         // 주다
         '{uC92C}{uB2E4}' // 줬다
         '{uC92C}{uC2B5}{uB2C8}{uB2E4}' // 줬습니다
@@ -203,6 +213,7 @@ define verb as (
         '{uC8FC}{uBA74}' // 주면
         '{uC8FC}{uB294}' // 주는
         (atlimit ] <- '{uC8FC}{uB2E4}')
+    ) ) or ( [ among (
         // 예쁘다
         '{uC608}{uBEE4}{uB2E4}' // 예뻤다
         '{uC608}{uBEE4}{uC5B4}{uC694}' // 예뻤어요
@@ -211,6 +222,7 @@ define verb as (
         '{uC608}{uC058}{uAC8C}' // 예쁘게
         '{uC608}{uC05C}' // 예쁜
         (atlimit ] <- '{uC608}{uC058}{uB2E4}')
+    ) ) or ( [ among (
         // 빠르다
         '{uBE68}{uB790}{uB2E4}' // 빨랐다
         '{uBE68}{uB790}{uC5B4}{uC694}' // 빨랐어요
@@ -219,6 +231,7 @@ define verb as (
         '{uBE60}{uB974}{uAC8C}' // 빠르게
         '{uBE60}{uB978}' // 빠른
         (atlimit ] <- '{uBE60}{uB974}{uB2E4}')
+    ) ) or ( [ among (
         // 돕다
         '{uB3C4}{uC654}{uB2E4}' // 도왔다
         '{uB3C4}{uC654}{uC5B4}{uC694}' // 도왔어요
@@ -226,6 +239,7 @@ define verb as (
         '{uB3D5}{uACE0}' // 돕고
         '{uB3C4}{uC6B0}{uBA74}' // 도우면
         (atlimit ] <- '{uB3D5}{uB2E4}')
+    ) ) or ( [ among (
         // 모르다
         '{uBAB0}{uB790}{uB2E4}' // 몰랐다
         '{uBAB0}{uB790}{uC5B4}{uC694}' // 몰랐어요
@@ -234,6 +248,7 @@ define verb as (
         '{uBAB0}{uB77C}{uC694}' // 몰라요
         '{uBAA8}{uB974}{uB294}' // 모르는
         (atlimit ] <- '{uBAA8}{uB974}{uB2E4}')
+    ) ) or ( [ among (
         // 공부하다
         '{uACF5}{uBD80}{uD588}{uB2E4}' // 공부했다
         '{uACF5}{uBD80}{uD588}{uC2B5}{uB2C8}{uB2E4}' // 공부했습니다
@@ -242,6 +257,7 @@ define verb as (
         '{uACF5}{uBD80}{uD574}{uC694}' // 공부해요
         '{uACF5}{uBD80}{uD558}{uB294}' // 공부하는
         (atlimit ] <- '{uACF5}{uBD80}{uD558}{uB2E4}')
+    ) ) or ( [ among (
         // 달리다
         '{uB2EC}{uB838}{uB2E4}' // 달렸다
         '{uB2EC}{uB838}{uC5B4}{uC694}' // 달렸어요
@@ -249,7 +265,7 @@ define verb as (
         '{uB2EC}{uB9AC}{uBA74}' // 달리면
         '{uB2EC}{uB9AC}{uB294}' // 달리는
         (atlimit ] <- '{uB2EC}{uB9AC}{uB2E4}')
-    )
+    ) )
 )
 
 define stem as (
