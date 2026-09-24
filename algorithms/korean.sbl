@@ -1,0 +1,273 @@
+// Conservative Korean word stemmer (ko-rule-v1).
+// NFC input, one word at a time. Unknown and ambiguous forms are preserved.
+// Only the listed noun + case-particle paths and full verb forms are accepted.
+// In particular, do not guess a lemma for 걸었다, 들었다, 나는 or 내가.
+// See doc/korean_README.rst for coverage and preservation rationale.
+
+externals ( stem )
+routines ( noun verb )
+stringescapes {}
+
+stringdef uAC00 '{U+AC00}'
+stringdef uAC15 '{U+AC15}'
+stringdef uAC8C '{U+AC8C}'
+stringdef uACE0 '{U+ACE0}'
+stringdef uACF5 '{U+ACF5}'
+stringdef uACFC '{U+ACFC}'
+stringdef uAD50 '{U+AD50}'
+stringdef uAD6C '{U+AD6C}'
+stringdef uAD6D '{U+AD6D}'
+stringdef uAF43 '{U+AF43}'
+stringdef uB098 '{U+B098}'
+stringdef uB108 '{U+B108}'
+stringdef uB294 '{U+B294}'
+stringdef uB2C8 '{U+B2C8}'
+stringdef uB2D8 '{U+B2D8}'
+stringdef uB2E4 '{U+B2E4}'
+stringdef uB2EC '{U+B2EC}'
+stringdef uB3C4 '{U+B3C4}'
+stringdef uB3D5 '{U+B3D5}'
+stringdef uB3D9 '{U+B3D9}'
+stringdef uB77C '{U+B77C}'
+stringdef uB78C '{U+B78C}'
+stringdef uB790 '{U+B790}'
+stringdef uB791 '{U+B791}'
+stringdef uB838 '{U+B838}'
+stringdef uB974 '{U+B974}'
+stringdef uB978 '{U+B978}'
+stringdef uB97C '{U+B97C}'
+stringdef uB9AC '{U+B9AC}'
+stringdef uB9C8 '{U+B9C8}'
+stringdef uBA39 '{U+BA39}'
+stringdef uBA74 '{U+BA74}'
+stringdef uBAA8 '{U+BAA8}'
+stringdef uBAB0 '{U+BAB0}'
+stringdef uBB34 '{U+BB34}'
+stringdef uBC14 '{U+BC14}'
+stringdef uBC25 '{U+BC25}'
+stringdef uBCF4 '{U+BCF4}'
+stringdef uBD24 '{U+BD24}'
+stringdef uBD80 '{U+BD80}'
+stringdef uBE60 '{U+BE60}'
+stringdef uBE68 '{U+BE68}'
+stringdef uBEE4 '{U+BEE4}'
+stringdef uC058 '{U+C058}'
+stringdef uC05C '{U+C05C}'
+stringdef uC0AC '{U+C0AC}'
+stringdef uC0DD '{U+C0DD}'
+stringdef uC11C '{U+C11C}'
+stringdef uC120 '{U+C120}'
+stringdef uC2B5 '{U+C2B5}'
+stringdef uC544 '{U+C544}'
+stringdef uC558 '{U+C558}'
+stringdef uC591 '{U+C591}'
+stringdef uC5B4 '{U+C5B4}'
+stringdef uC5C8 '{U+C5C8}'
+stringdef uC608 '{U+C608}'
+stringdef uC640 '{U+C640}'
+stringdef uC654 '{U+C654}'
+stringdef uC694 '{U+C694}'
+stringdef uC6B0 '{U+C6B0}'
+stringdef uC6B8 '{U+C6B8}'
+stringdef uC720 '{U+C720}'
+stringdef uC73C '{U+C73C}'
+stringdef uC740 '{U+C740}'
+stringdef uC744 '{U+C744}'
+stringdef uC774 '{U+C774}'
+stringdef uC77D '{U+C77D}'
+stringdef uC790 '{U+C790}'
+stringdef uC791 '{U+C791}'
+stringdef uC800 '{U+C800}'
+stringdef uC88B '{U+C88B}'
+stringdef uC8FC '{U+C8FC}'
+stringdef uC92C '{U+C92C}'
+stringdef uC9C0 '{U+C9C0}'
+stringdef uC9D1 '{U+C9D1}'
+stringdef uCC28 '{U+CC28}'
+stringdef uCC45 '{U+CC45}'
+stringdef uCE5C '{U+CE5C}'
+stringdef uD558 '{U+D558}'
+stringdef uD559 '{U+D559}'
+stringdef uD55C '{U+D55C}'
+stringdef uD569 '{U+D569}'
+stringdef uD574 '{U+D574}'
+stringdef uD588 '{U+D588}'
+stringdef uD76C '{U+D76C}'
+
+define noun as (
+    among (
+        '{uD559}{uAD50}' // 학교
+        '{uC0AC}{uACFC}' // 사과
+        '{uB098}{uBB34}' // 나무
+        '{uCE5C}{uAD6C}' // 친구
+        '{uBC14}{uB2E4}' // 바다
+        '{uD55C}{uAD6D}{uC5B4}' // 한국어
+        '{uACE0}{uC591}{uC774}' // 고양이
+        '{uC790}{uB3D9}{uCC28}' // 자동차
+        '{uC6B0}{uC720}' // 우유
+        '{uAC15}{uC544}{uC9C0}' // 강아지
+        '{uC544}{uC774}' // 아이
+        '{uC6B0}{uB9AC}' // 우리
+        '{uC800}{uD76C}' // 저희
+        '{uB108}{uD76C}' // 너희
+        (
+            [ among ('{uAC00}' '{uB97C}') ]
+            atlimit delete
+        )
+        '{uCC45}' // 책
+        '{uD559}{uC0DD}' // 학생
+        '{uC0AC}{uB78C}' // 사람
+        '{uC0AC}{uB791}' // 사랑
+        '{uC11C}{uC6B8}' // 서울
+        '{uC120}{uC0DD}{uB2D8}' // 선생님
+        '{uB9C8}{uC744}' // 마을
+        '{uC9D1}' // 집
+        '{uBC25}' // 밥
+        '{uAF43}' // 꽃
+        (
+            [ among ('{uC774}' '{uC744}') ]
+            atlimit delete
+        )
+    )
+)
+
+define verb as (
+    // Keep each lemma in a separate among table. Wide-character N-way
+    // dispatch allocates the whole character range, including unused slots;
+    // combining these sparse Hangul ranges can exceed the table offset limit.
+    // Each alternative restores the cursor on failure and requires a full word.
+    ( [ among (
+        // 먹다
+        '{uBA39}{uC5C8}{uB2E4}' // 먹었다
+        '{uBA39}{uC2B5}{uB2C8}{uB2E4}' // 먹습니다
+        '{uBA39}{uACE0}' // 먹고
+        '{uBA39}{uC73C}{uBA74}' // 먹으면
+        '{uBA39}{uC5B4}{uC11C}' // 먹어서
+        '{uBA39}{uC5B4}{uC694}' // 먹어요
+        '{uBA39}{uB294}' // 먹는
+        '{uBA39}{uC5C8}{uB2E4}{uACE0}' // 먹었다고
+        (atlimit ] <- '{uBA39}{uB2E4}')
+    ) ) or ( [ among (
+        // 읽다
+        '{uC77D}{uC5C8}{uB2E4}' // 읽었다
+        '{uC77D}{uC2B5}{uB2C8}{uB2E4}' // 읽습니다
+        '{uC77D}{uACE0}' // 읽고
+        '{uC77D}{uC73C}{uBA74}' // 읽으면
+        '{uC77D}{uC5B4}{uC11C}' // 읽어서
+        '{uC77D}{uC5B4}{uC694}' // 읽어요
+        '{uC77D}{uB294}' // 읽는
+        (atlimit ] <- '{uC77D}{uB2E4}')
+    ) ) or ( [ among (
+        // 좋다
+        '{uC88B}{uC558}{uB2E4}' // 좋았다
+        '{uC88B}{uC2B5}{uB2C8}{uB2E4}' // 좋습니다
+        '{uC88B}{uACE0}' // 좋고
+        '{uC88B}{uC73C}{uBA74}' // 좋으면
+        '{uC88B}{uC544}{uC11C}' // 좋아서
+        '{uC88B}{uC544}{uC694}' // 좋아요
+        '{uC88B}{uC740}' // 좋은
+        (atlimit ] <- '{uC88B}{uB2E4}')
+    ) ) or ( [ among (
+        // 작다
+        '{uC791}{uC558}{uB2E4}' // 작았다
+        '{uC791}{uC2B5}{uB2C8}{uB2E4}' // 작습니다
+        '{uC791}{uACE0}' // 작고
+        '{uC791}{uC73C}{uBA74}' // 작으면
+        '{uC791}{uC544}{uC11C}' // 작아서
+        '{uC791}{uC544}{uC694}' // 작아요
+        '{uC791}{uC740}' // 작은
+        (atlimit ] <- '{uC791}{uB2E4}')
+    ) ) or ( [ among (
+        // 하다
+        '{uD588}{uB2E4}' // 했다
+        '{uD588}{uC2B5}{uB2C8}{uB2E4}' // 했습니다
+        '{uD588}{uACE0}' // 했고
+        '{uD588}{uC5B4}{uC694}' // 했어요
+        '{uD55C}{uB2E4}' // 한다
+        '{uD569}{uB2C8}{uB2E4}' // 합니다
+        '{uD558}{uACE0}' // 하고
+        '{uD558}{uBA74}' // 하면
+        '{uD574}{uC11C}' // 해서
+        '{uD574}{uC694}' // 해요
+        '{uD558}{uB294}' // 하는
+        (atlimit ] <- '{uD558}{uB2E4}')
+    ) ) or ( [ among (
+        // 보다
+        '{uBD24}{uB2E4}' // 봤다
+        '{uBD24}{uC2B5}{uB2C8}{uB2E4}' // 봤습니다
+        '{uBD24}{uC5B4}{uC694}' // 봤어요
+        '{uBCF4}{uC558}{uB2E4}' // 보았다
+        '{uBCF4}{uC558}{uC2B5}{uB2C8}{uB2E4}' // 보았습니다
+        '{uBCF4}{uACE0}' // 보고
+        '{uBCF4}{uBA74}' // 보면
+        '{uBCF4}{uB294}' // 보는
+        (atlimit ] <- '{uBCF4}{uB2E4}')
+    ) ) or ( [ among (
+        // 주다
+        '{uC92C}{uB2E4}' // 줬다
+        '{uC92C}{uC2B5}{uB2C8}{uB2E4}' // 줬습니다
+        '{uC92C}{uC5B4}{uC694}' // 줬어요
+        '{uC8FC}{uC5C8}{uB2E4}' // 주었다
+        '{uC8FC}{uC5C8}{uC2B5}{uB2C8}{uB2E4}' // 주었습니다
+        '{uC8FC}{uACE0}' // 주고
+        '{uC8FC}{uBA74}' // 주면
+        '{uC8FC}{uB294}' // 주는
+        (atlimit ] <- '{uC8FC}{uB2E4}')
+    ) ) or ( [ among (
+        // 예쁘다
+        '{uC608}{uBEE4}{uB2E4}' // 예뻤다
+        '{uC608}{uBEE4}{uC5B4}{uC694}' // 예뻤어요
+        '{uC608}{uC058}{uACE0}' // 예쁘고
+        '{uC608}{uC058}{uBA74}' // 예쁘면
+        '{uC608}{uC058}{uAC8C}' // 예쁘게
+        '{uC608}{uC05C}' // 예쁜
+        (atlimit ] <- '{uC608}{uC058}{uB2E4}')
+    ) ) or ( [ among (
+        // 빠르다
+        '{uBE68}{uB790}{uB2E4}' // 빨랐다
+        '{uBE68}{uB790}{uC5B4}{uC694}' // 빨랐어요
+        '{uBE60}{uB974}{uACE0}' // 빠르고
+        '{uBE60}{uB974}{uBA74}' // 빠르면
+        '{uBE60}{uB974}{uAC8C}' // 빠르게
+        '{uBE60}{uB978}' // 빠른
+        (atlimit ] <- '{uBE60}{uB974}{uB2E4}')
+    ) ) or ( [ among (
+        // 돕다
+        '{uB3C4}{uC654}{uB2E4}' // 도왔다
+        '{uB3C4}{uC654}{uC5B4}{uC694}' // 도왔어요
+        '{uB3C4}{uC640}{uC694}' // 도와요
+        '{uB3D5}{uACE0}' // 돕고
+        '{uB3C4}{uC6B0}{uBA74}' // 도우면
+        (atlimit ] <- '{uB3D5}{uB2E4}')
+    ) ) or ( [ among (
+        // 모르다
+        '{uBAB0}{uB790}{uB2E4}' // 몰랐다
+        '{uBAB0}{uB790}{uC5B4}{uC694}' // 몰랐어요
+        '{uBAA8}{uB974}{uACE0}' // 모르고
+        '{uBAA8}{uB974}{uBA74}' // 모르면
+        '{uBAB0}{uB77C}{uC694}' // 몰라요
+        '{uBAA8}{uB974}{uB294}' // 모르는
+        (atlimit ] <- '{uBAA8}{uB974}{uB2E4}')
+    ) ) or ( [ among (
+        // 공부하다
+        '{uACF5}{uBD80}{uD588}{uB2E4}' // 공부했다
+        '{uACF5}{uBD80}{uD588}{uC2B5}{uB2C8}{uB2E4}' // 공부했습니다
+        '{uACF5}{uBD80}{uD558}{uACE0}' // 공부하고
+        '{uACF5}{uBD80}{uD558}{uBA74}' // 공부하면
+        '{uACF5}{uBD80}{uD574}{uC694}' // 공부해요
+        '{uACF5}{uBD80}{uD558}{uB294}' // 공부하는
+        (atlimit ] <- '{uACF5}{uBD80}{uD558}{uB2E4}')
+    ) ) or ( [ among (
+        // 달리다
+        '{uB2EC}{uB838}{uB2E4}' // 달렸다
+        '{uB2EC}{uB838}{uC5B4}{uC694}' // 달렸어요
+        '{uB2EC}{uB9AC}{uACE0}' // 달리고
+        '{uB2EC}{uB9AC}{uBA74}' // 달리면
+        '{uB2EC}{uB9AC}{uB294}' // 달리는
+        (atlimit ] <- '{uB2EC}{uB9AC}{uB2E4}')
+    ) )
+)
+
+define stem as (
+    do (noun or verb)
+)

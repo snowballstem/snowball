@@ -75,6 +75,11 @@ jobs:
             git clone "$UPSTREAM_REPO_URL"
           fi
         fi
+    - name: Add local Korean vocabulary
+      run: |
+        if [ ! -d snowball-data/korean ]; then
+          cp -R tests/korean/data/korean snowball-data/korean
+        fi
     - name: Install CCache
       uses: hendrikmuhs/ccache-action@v1.2.21
       with:

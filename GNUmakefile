@@ -857,6 +857,11 @@ check_stemtest: stemtest$(EXEEXT)
 
 check_utf8: $(libstemmer_algorithms:%=check_utf8_%)
 
+# Small local regression vocabulary for the experimental Korean stemmer.
+.PHONY: check_korean
+check_korean: stemwords$(EXEEXT) check_python_stemwords js
+	$(MAKE) check_utf8_korean check_python_korean check_js_korean STEMMING_DATA=$(abspath tests/korean/data)
+
 check_iso_8859_1: $(ISO_8859_1_algorithms:%=check_iso_8859_1_%)
 
 check_iso_8859_2: $(ISO_8859_2_algorithms:%=check_iso_8859_2_%)

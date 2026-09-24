@@ -36,6 +36,16 @@ to stem in cases that are hard to resolve.  If you want to always reduce words
 to a root form and/or get a root form which is itself a word then Snowball's
 stemming algorithms likely aren't the right answer.
 
+Experimental Korean support
+===========================
+
+The ``korean`` stemmer handles a small, explicit set of noun case-particle
+paths and verb/adjective forms. Unlisted or ambiguous forms are preserved.
+It is a Snowball implementation shared by the language generators, with no
+external dictionary, model or runtime dependency. It is not a general Korean
+morphological analyzer. See `doc/korean_README.rst <doc/korean_README.rst>`_
+for scope, limitations and regression tests.
+
 Building Snowball
 =================
 
