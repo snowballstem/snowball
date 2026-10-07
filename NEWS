@@ -185,6 +185,15 @@ C
 
 * Other changes:
 
+  - libstemmer: Add sb_stemmer_version() and sb_stemmer_algorithm() functions.
+    sb_stemmer_version() returns the version of the output of the stemming
+    algorithm, which is incremented in each release which changes the output
+    of the algorithm.  Applications can store it along with the canonical
+    algorithm name returned by sb_stemmer_algorithm() and detect when data
+    such as a search index which contains stemmed words needs to be rebuilt.
+    Version 1 is the output of each algorithm in this release.  The versions
+    are listed in the new libstemmer/versions.txt file.
+
 C++
 ---
 

@@ -167,6 +167,7 @@ tarball_ext = .tar.gz
 
 ALGORITHMS ?= algorithms
 MODULES ?= libstemmer/modules.txt
+VERSIONS ?= libstemmer/versions.txt
 
 # algorithms.mk is generated from the file $(MODULES) and defines:
 # * libstemmer_algorithms
@@ -211,7 +212,7 @@ RUNTIME_HEADERS  = runtime/api.h \
 LIBSTEMMER_SOURCES = libstemmer/libstemmer.c
 LIBSTEMMER_UTF8_SOURCES = libstemmer/libstemmer_utf8.c
 LIBSTEMMER_HEADERS = include/libstemmer.h libstemmer/modules.h libstemmer/modules_utf8.h
-LIBSTEMMER_EXTRA = $(MODULES) libstemmer/libstemmer_c.in
+LIBSTEMMER_EXTRA = $(MODULES) $(VERSIONS) libstemmer/libstemmer_c.in
 
 STEMWORDS_SOURCES = examples/stemwords.c
 STEMTEST_SOURCES = tests/stemtest.c
@@ -436,11 +437,11 @@ libstemmer/libstemmer.c: libstemmer/libstemmer_c.in
 libstemmer/libstemmer_utf8.c: libstemmer/libstemmer_c.in
 	sed 's/@MODULES_H@/modules_utf8.h/' $^ >$@
 
-libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl $(MODULES)
-	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc.mak
+libstemmer/modules.h libstemmer/mkinc.mak: libstemmer/mkmodules.pl $(MODULES) $(VERSIONS)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) '$(VERSIONS)' libstemmer/mkinc.mak
 
-libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl $(MODULES)
-	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) libstemmer/mkinc_utf8.mak utf8
+libstemmer/modules_utf8.h libstemmer/mkinc_utf8.mak: libstemmer/mkmodules.pl $(MODULES) $(VERSIONS)
+	libstemmer/mkmodules.pl $@ $(c_src_dir) $(MODULES) '$(VERSIONS)' libstemmer/mkinc_utf8.mak utf8
 
 libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
 
@@ -1256,6 +1257,7 @@ setup_runtime_tests: clean_runtime_tests
 	  BASELINE 'rbaseline' \
 	  EXTRA_TESTS '' \
 	  MODULES '$(RUNTIME_DATA_DIR)/modules.txt' \
+	  VERSIONS '' \
 	  other_algorithms '' \
 	  SNOWBALL_FLAGS '-comments' \
 	  STEMMING_DATA '$(RUNTIME_DATA_DIR)' \

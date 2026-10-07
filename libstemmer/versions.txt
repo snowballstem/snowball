@@ -1,0 +1,51 @@
+# This file contains the version of the output of each stemming algorithm
+# listed in modules.txt.  On each line the first item is the name of the
+# stemmer (the first column of modules.txt) and the second item is its
+# version, which is a positive integer.
+#
+# Version 1 is the output of the algorithm in Snowball 3.2.0 (or the first
+# release which included the algorithm, if later).  The version must be
+# incremented whenever a change to the algorithm changes its output for any
+# input, but only once per release.  This allows applications to detect that
+# data stemmed using an earlier version needs to be stemmed again (e.g. that a
+# search index needs to be rebuilt).
+#
+# Lines starting with a #, or blank lines, are ignored.
+
+arabic              1
+armenian            1
+basque              1
+catalan             1
+czech               1
+danish              1
+dutch               1
+dutch_porter        1
+earlymodernenglish  1
+english             1
+esperanto           1
+estonian            1
+finnish             1
+french              1
+german              1
+greek               1
+hindi               1
+hungarian           1
+indonesian          1
+irish               1
+italian             1
+lithuanian          1
+nepali              1
+norwegian           1
+persian             1
+polish              1
+porter              1
+portuguese          1
+romanian            1
+russian             1
+serbian             1
+sesotho             1
+spanish             1
+swedish             1
+tamil               1
+turkish             1
+yiddish             1

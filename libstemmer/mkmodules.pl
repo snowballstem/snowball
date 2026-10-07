@@ -5,14 +5,15 @@ use warnings;
 
 my $progname = $0;
 
-if (scalar @ARGV < 4 || scalar @ARGV > 5) {
-  print "Usage: $progname <outfile> <C source directory> <modules description file> <source list file> [<enc>]\n";
+if (scalar @ARGV < 5 || scalar @ARGV > 6) {
+  print "Usage: $progname <outfile> <C source directory> <modules description file> <versions file> <source list file> [<enc>]\n";
   exit 1;
 }
 
 my $outname = shift(@ARGV);
 my $c_src_dir = shift(@ARGV);
 my $descfile = shift(@ARGV);
+my $versionsfile = shift(@ARGV);
 my $srclistfile = shift(@ARGV);
 my $enc_only;
 my $extn = '';
@@ -26,6 +27,8 @@ my %algorithms = ();
 my %algorithm_encs = ();
 
 my %encs = ();
+
+my %versions = ();
 
 sub addalgenc($$) {
   my $alg = shift();
@@ -70,6 +73,33 @@ sub readinput()
                 addalgenc($alg, $enc);
             }
         }
+    }
+}
+
+# Read the version of each algorithm's output.  If no versions file is
+# specified, all versions are 0 (unknown).
+sub readversions()
+{
+    return if $versionsfile eq '';
+    open VERSIONSFILE, $versionsfile or die "Can't open versions file `$versionsfile': $!\n";
+    my $line;
+    while ($line = <VERSIONSFILE>)
+    {
+        next if $line =~ m/^\s*#/;
+        next if $line =~ m/^\s*$/;
+        my ($alg,$version) = split(/\s+/, $line);
+        die "$versionsfile: Invalid version for `$alg'\n"
+            unless defined $version && $version =~ m/^[1-9][0-9]*$/;
+        die "$versionsfile: Unknown algorithm `$alg'\n"
+            unless defined $algorithms{$alg};
+        die "$versionsfile: Duplicate algorithm `$alg'\n"
+            if defined $versions{$alg};
+        $versions{$alg} = $version;
+    }
+    close VERSIONSFILE;
+    foreach my $alg (sort keys %algorithms) {
+        die "$versionsfile: No version for algorithm `$alg'\n"
+            unless defined $versions{$alg};
     }
 }
 
@@ -149,6 +179,10 @@ EOS
 struct stemmer_modules {
   const char * name;
   stemmer_encoding_t enc;
+  /* Index of the canonical name in algorithm_names[]. */
+  unsigned short algorithm;
+  /* Version of the algorithm's output (0 = unknown). */
+  unsigned short version;
   struct SN_env * (*create)(void);
   void (*close)(struct SN_env *);
   int (*stem)(struct SN_env *);
@@ -156,18 +190,24 @@ struct stemmer_modules {
 static const struct stemmer_modules modules[] = {
 EOS
 
+    my %algorithm_idx = ();
+    my $idx = 0;
+    foreach $lang (@algorithms) {
+        $algorithm_idx{$lang} = $idx++;
+    }
     for $lang (sort keys %aliases) {
         my $l = $aliases{$lang};
         my $hashref = $algorithm_encs{$l};
         my $enc;
+        my $version = defined $versions{$l} ? $versions{$l} : 0;
         foreach $enc (sort keys (%$hashref)) {
             my $p = "${l}_${enc}";
-            print OUT "  {\"$lang\", ENC_$enc, ${p}_create_env, ${p}_close_env, ${p}_stem},\n";
+            print OUT "  {\"$lang\", ENC_$enc, $algorithm_idx{$l}, $version, ${p}_create_env, ${p}_close_env, ${p}_stem},\n";
         }
     }
 
     print OUT <<EOS;
-  {0,ENC_UNKNOWN,0,0,0}
+  {0,ENC_UNKNOWN,0,0,0,0,0}
 };
 EOS
 
@@ -265,5 +305,6 @@ EOS
 }
 
 readinput();
+readversions();
 printoutput();
 printsrclist();

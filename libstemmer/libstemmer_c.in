@@ -9,6 +9,7 @@ struct sb_stemmer {
     struct SN_env * (*create)(void);
     void (*close)(struct SN_env *);
     int (*stem)(struct SN_env *);
+    const struct stemmer_modules * module;
 
     struct SN_env * env;
 };
@@ -52,6 +53,7 @@ sb_stemmer_new(const char * algorithm, const char * charenc)
     stemmer->create = module->create;
     stemmer->close = module->close;
     stemmer->stem = module->stem;
+    stemmer->module = module;
 
     stemmer->env = stemmer->create();
     if (stemmer->env == NULL)
@@ -93,4 +95,16 @@ int
 sb_stemmer_length(struct sb_stemmer * stemmer)
 {
     return stemmer->env->l;
+}
+
+const char *
+sb_stemmer_algorithm(struct sb_stemmer * stemmer)
+{
+    return algorithm_names[stemmer->module->algorithm];
+}
+
+int
+sb_stemmer_version(struct sb_stemmer * stemmer)
+{
+    return stemmer->module->version;
 }

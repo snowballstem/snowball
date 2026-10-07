@@ -112,6 +112,42 @@ run_testcase(const char * language, const struct testcase *test)
     sb_stemmer_delete(stemmer);
 }
 
+static void
+test_algorithm_version(void)
+{
+    const char ** all_languages = sb_stemmer_list();
+    const char ** l;
+    struct sb_stemmer * stemmer;
+
+    /* Each canonical name maps to itself and has a known version. */
+    for (l = all_languages; *l; ++l) {
+        stemmer = sb_stemmer_new(*l, 0);
+        if (stemmer == 0) {
+            fprintf(stderr, "language `%s' not available for stemming\n", *l);
+            exit(1);
+        }
+        if (strcmp(sb_stemmer_algorithm(stemmer), *l) != 0) {
+            fprintf(stderr, "sb_stemmer_algorithm() for %s returned %s\n",
+                            *l, sb_stemmer_algorithm(stemmer));
+            exit(1);
+        }
+        if (sb_stemmer_version(stemmer) <= 0) {
+            fprintf(stderr, "sb_stemmer_version() for %s returned %d\n",
+                            *l, sb_stemmer_version(stemmer));
+            exit(1);
+        }
+        sb_stemmer_delete(stemmer);
+    }
+
+    /* An alias returns the canonical name. */
+    stemmer = sb_stemmer_new("en", 0);
+    if (stemmer == 0 || strcmp(sb_stemmer_algorithm(stemmer), "english") != 0) {
+        fprintf(stderr, "sb_stemmer_algorithm() failed for alias en\n");
+        exit(1);
+    }
+    sb_stemmer_delete(stemmer);
+}
+
 int
 main(int argc, char * argv[])
 {
@@ -131,5 +167,6 @@ main(int argc, char * argv[])
         }
     }
 
+    test_algorithm_version();
     return 0;
 }

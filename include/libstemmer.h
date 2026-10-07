@@ -7,9 +7,6 @@ extern "C" {
 struct sb_stemmer;
 typedef unsigned char sb_symbol;
 
-/* FIXME - should be able to get a version number for each stemming
- * algorithm (which will be incremented each time the output changes). */
-
 /** Returns an array of the names of the available stemming algorithms.
  *  Note that these are the canonical names - aliases (ie, other names for
  *  the same algorithm) will not be included in the list.
@@ -76,6 +73,33 @@ const sb_symbol *   sb_stemmer_stem(struct sb_stemmer * stemmer,
  *  This should not be called before sb_stemmer_stem() has been called.
  */
 int                 sb_stemmer_length(struct sb_stemmer * stemmer);
+
+/** Get the canonical name of the algorithm used by a stemmer.
+ *
+ *  This is the name of the algorithm in the list returned by
+ *  sb_stemmer_list(), even if the stemmer was created using an alias (such
+ *  as an ISO 639 code).  Versions are per algorithm, and which algorithm an
+ *  alias refers to may change between releases, so applications which store
+ *  the version returned by sb_stemmer_version() should also store this name.
+ *
+ *  The returned string is static and must not be modified or freed.
+ */
+const char *        sb_stemmer_algorithm(struct sb_stemmer * stemmer);
+
+/** Get the version of the output of the algorithm used by a stemmer.
+ *
+ *  The version is incremented in each release which changes the output of
+ *  the algorithm for any input.  Version 1 is the output of the algorithm in
+ *  Snowball 3.2.0 (or the first release which included the algorithm, if
+ *  later).  If the version is unknown (which can happen with a libstemmer
+ *  built with a custom list of algorithms), 0 is returned.
+ *
+ *  Words stemmed using the same algorithm (as returned by
+ *  sb_stemmer_algorithm()) and the same non-zero version will get the same
+ *  stems.  If either has changed, data such as a search index which contains
+ *  stemmed words needs to be rebuilt for searches to work reliably.
+ */
+int                 sb_stemmer_version(struct sb_stemmer * stemmer);
 
 #ifdef __cplusplus
 }

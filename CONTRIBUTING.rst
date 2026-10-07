@@ -47,6 +47,14 @@ the first column.  The columns are:
   "639-2/T" and (if different) "639-2/B" columns.  For example, for the `Afar`
   language you'd put `afar,aa,aar` here.
 
+Also add an entry to `libstemmer/versions.txt` with version `1`, maintaining
+the current sorted order.
+
+If you change an existing algorithm in a way which changes its output for any
+input, increment its version in `libstemmer/versions.txt` (only once per
+release).  This allows applications to detect that data stemmed using an
+earlier version needs to be stemmed again.
+
 Some points to note about algorithm implementations:
 
 * Avoid literal non-ASCII characters in snowball string literals - they will
