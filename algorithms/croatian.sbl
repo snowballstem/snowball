@@ -1,0 +1,4324 @@
+/* Croatian stemmer for Snowball.
+ *
+ * Based on the rule tables of the "Simple stemmer for Croatian v0.2",
+ * Copyright 2012 Nikola Ljubešić and Ivan Pandžić,
+ * http://nlp.ffzg.hr/resources/tools/stemmer-for-croatian/
+ * (originally LGPLv3; included here with the permission of Nikola Ljubešić to
+ * publish it under a more permissive licence), and on the algorithm described in
+ *   Nikola Ljubešić, Damir Boras, Ozren Kubelka (2007), "Retrieving Information
+ *   in Croatian: Building a Simple and Efficient Rule-Based Stemmer".
+ * The rules below are generated from those tables by a script, one routine per
+ * rule line.
+ *
+ * Words containing a c-caron, c-acute, s-caron, z-caron or d-stroke use the diacritic rule set;
+ * all other words use the same rules with those letters folded to c c s z d, so the stemmer also
+ * works behind engines that strip diacritics before stemming.
+ */
+
+routines (
+    mark_regions
+    mark_diacritics
+    R1
+    K_1
+    L_1
+    K_2
+    L_2
+    K_3
+    L_3
+    K_4
+    L_4
+    K_5
+    L_5
+    K_6
+    L_6
+    K_7
+    L_7
+    K_8
+    L_8
+    K_9
+    L_9
+    K_10
+    L_10
+    K_11
+    L_11
+    K_12
+    L_12
+    K_13
+    L_13
+    K_14
+    L_14
+    K_15
+    L_15
+    K_16
+    L_16
+    K_17
+    L_17
+    K_18
+    L_18
+    K_19
+    L_19
+    K_20
+    L_20
+    K_21
+    L_21
+    K_22
+    L_22
+    K_23
+    L_23
+    K_24
+    L_24
+    K_25
+    L_25
+    K_26
+    L_26
+    K_27
+    L_27
+    K_28
+    L_28
+    K_29
+    L_29
+    K_30
+    L_30
+    K_31
+    L_31
+    K_32
+    L_32
+    K_33
+    L_33
+    K_34
+    L_34
+    K_35
+    L_35
+    K_36
+    L_36
+    K_37
+    L_37
+    K_38
+    L_38
+    K_39
+    L_39
+    K_40
+    L_40
+    K_41
+    L_41
+    K_42
+    L_42
+    K_43
+    L_43
+    K_44
+    L_44
+    K_45
+    L_45
+    K_46
+    L_46
+    K_47
+    L_47
+    K_48
+    L_48
+    K_49
+    L_49
+    K_50
+    L_50
+    K_51
+    L_51
+    K_52
+    L_52
+    K_53
+    L_53
+    K_54
+    L_54
+    K_55
+    L_55
+    K_56
+    L_56
+    K_57
+    L_57
+    K_58
+    L_58
+    K_59
+    L_59
+    K_60
+    L_60
+    K_61
+    L_61
+    K_62
+    L_62
+    K_63
+    L_63
+    K_64
+    L_64
+    K_65
+    L_65
+    K_66
+    L_66
+    K_67
+    L_67
+    K_68
+    L_68
+    K_69
+    L_69
+    K_70
+    L_70
+    K_71
+    L_71
+    K_72
+    L_72
+    K_73
+    L_73
+    Transform
+    Strip
+    stopword
+    aK_1
+    aL_1
+    aK_2
+    aL_2
+    aK_3
+    aL_3
+    aK_4
+    aL_4
+    aK_5
+    aL_5
+    aK_6
+    aL_6
+    aK_7
+    aL_7
+    aK_8
+    aL_8
+    aK_9
+    aL_9
+    aK_10
+    aL_10
+    aK_11
+    aL_11
+    aK_12
+    aL_12
+    aK_13
+    aL_13
+    aK_14
+    aL_14
+    aK_15
+    aL_15
+    aK_16
+    aL_16
+    aK_17
+    aL_17
+    aK_18
+    aL_18
+    aK_19
+    aL_19
+    aK_20
+    aL_20
+    aK_21
+    aL_21
+    aK_22
+    aL_22
+    aK_23
+    aL_23
+    aK_24
+    aL_24
+    aK_25
+    aL_25
+    aK_26
+    aL_26
+    aK_27
+    aL_27
+    aK_28
+    aL_28
+    aK_29
+    aL_29
+    aK_30
+    aL_30
+    aK_31
+    aL_31
+    aK_32
+    aL_32
+    aK_33
+    aL_33
+    aK_34
+    aL_34
+    aK_35
+    aL_35
+    aK_36
+    aL_36
+    aK_37
+    aL_37
+    aK_38
+    aL_38
+    aK_39
+    aL_39
+    aK_40
+    aL_40
+    aK_41
+    aL_41
+    aK_42
+    aL_42
+    aK_43
+    aL_43
+    aK_44
+    aL_44
+    aK_45
+    aL_45
+    aK_46
+    aL_46
+    aK_47
+    aL_47
+    aK_48
+    aL_48
+    aK_49
+    aL_49
+    aK_50
+    aL_50
+    aK_51
+    aL_51
+    aK_52
+    aL_52
+    aK_53
+    aL_53
+    aK_54
+    aL_54
+    aK_55
+    aL_55
+    aK_56
+    aL_56
+    aK_57
+    aL_57
+    aK_58
+    aL_58
+    aK_59
+    aL_59
+    aK_60
+    aL_60
+    aK_61
+    aL_61
+    aK_62
+    aL_62
+    aK_63
+    aL_63
+    aK_64
+    aL_64
+    aK_65
+    aL_65
+    aK_66
+    aL_66
+    aK_67
+    aL_67
+    aK_68
+    aL_68
+    aK_69
+    aL_69
+    aK_70
+    aL_70
+    aK_71
+    aL_71
+    aK_72
+    aL_72
+    aK_73
+    aL_73
+    aTransform
+    aStrip
+    astopword
+)
+
+externals ( stem )
+
+booleans ( no_diacritics )
+
+integers ( p1 )
+
+groupings ( vr sa g_neg1 g_neg2 g_neg3 g_neg4 ag_neg1 ag_neg2 ag_neg3 ag_neg4 )
+
+stringescapes {}
+
+stringdef cv   '{U+010D}'   // č
+stringdef c'   '{U+0107}'   // ć
+stringdef zv   '{U+017E}'   // ž
+stringdef sv   '{U+0161}'   // š
+stringdef d/   '{U+0111}'   // đ
+
+/* vowels, plus r (syllabic r): the first of these ends the shortest valid stem */
+define vr 'aeiour'
+/* letters that mark a word as carrying diacritics */
+define sa '{cv}{c'}{zv}{sv}{d/}'
+define g_neg1 'eo'
+define g_neg2 'z'
+define g_neg3 'dkml'
+define g_neg4 'o'
+define ag_neg1 'eo'
+define ag_neg2 'z'
+define ag_neg3 'dkml'
+define ag_neg4 'o'
+
+define mark_diacritics as (
+    set no_diacritics
+    do ( gopast sa unset no_diacritics )
+)
+
+define mark_regions as (
+    $p1 = limit + 1
+    do ( gopast vr setmark p1 )
+    do ( ($p1 < 2) $p1 = 2 )
+)
+
+define stopword as (
+    among (
+            'bi'
+            'bih'
+            'bijah'
+            'bijahu'
+            'bijasmo'
+            'bijaste'
+            'bija{sv}e'
+            'bila'
+            'bile'
+            'bili'
+            'bilo'
+            'bio'
+            'bismo'
+            'biste'
+            'biti'
+            'bi{sv}e'
+            'bje'
+            'bjeh'
+            'bjehu'
+            'bjesmo'
+            'bjeste'
+            'bje{sv}e'
+            'budem'
+            'budemo'
+            'budete'
+            'bude{sv}'
+            'budimo'
+            'budite'
+            'budu'
+            'jesam'
+            'jesi'
+            'jesmo'
+            'jeste'
+            'jesu'
+            'mogu'
+            'mora'
+            'moraju'
+            'moram'
+            'moramo'
+            'morate'
+            'mora{sv}'
+            'mo{zv}e'
+            'mo{zv}emo'
+            'mo{zv}ete'
+            'mo{zv}e{sv}'
+            'sam'
+            'si'
+            'smo'
+            'ste'
+            'su'
+            'treba'
+            'trebaju'
+            'trebam'
+            'trebamo'
+            'trebate'
+            'treba{sv}'
+            '{c'}e'
+            '{c'}emo'
+            '{c'}ete'
+            '{c'}e{sv}'
+            '{c'}u'
+            '{zv}ele'
+            '{zv}eli'
+            '{zv}elim'
+            '{zv}elimo'
+            '{zv}elite'
+            '{zv}eli{sv}'
+    )
+    atlimit
+)
+
+define astopword as (
+    among (
+            'bi'
+            'bih'
+            'bijah'
+            'bijahu'
+            'bijase'
+            'bijasmo'
+            'bijaste'
+            'bila'
+            'bile'
+            'bili'
+            'bilo'
+            'bio'
+            'bise'
+            'bismo'
+            'biste'
+            'biti'
+            'bje'
+            'bjeh'
+            'bjehu'
+            'bjese'
+            'bjesmo'
+            'bjeste'
+            'budem'
+            'budemo'
+            'budes'
+            'budete'
+            'budimo'
+            'budite'
+            'budu'
+            'ce'
+            'cemo'
+            'ces'
+            'cete'
+            'cu'
+            'jesam'
+            'jesi'
+            'jesmo'
+            'jeste'
+            'jesu'
+            'mogu'
+            'mora'
+            'moraju'
+            'moram'
+            'moramo'
+            'moras'
+            'morate'
+            'moze'
+            'mozemo'
+            'mozes'
+            'mozete'
+            'sam'
+            'si'
+            'smo'
+            'ste'
+            'su'
+            'treba'
+            'trebaju'
+            'trebam'
+            'trebamo'
+            'trebas'
+            'trebate'
+            'zele'
+            'zeli'
+            'zelim'
+            'zelimo'
+            'zelis'
+            'zelite'
+    )
+    atlimit
+)
+
+backwardmode (
+
+    define R1 as $p1 <= cursor
+
+    /* diacritic rule set: first matching lexical transformation, in file order */
+    define Transform as (
+        ( ['lozi'] <- 'loga' )
+        or ( ['lozima'] <- 'loga' )
+        or ( ['pjesi'] <- 'pjeh' )
+        or ( ['pjesima'] <- 'pjeh' )
+        or ( ['vojci'] <- 'vojka' )
+        or ( ['bojci'] <- 'bojka' )
+        or ( ['jaci'] <- 'jak' )
+        or ( ['jacima'] <- 'jak' )
+        or ( ['{cv}ajan'] <- '{cv}ajni' )
+        or ( ['ijeran'] <- 'ijerni' )
+        or ( ['laran'] <- 'larni' )
+        or ( ['ijesan'] <- 'ijesni' )
+        or ( ['anjac'] <- 'anjca' )
+        or ( ['ajac'] <- 'ajca' )
+        or ( ['ajaca'] <- 'ajca' )
+        or ( ['ljaca'] <- 'ljca' )
+        or ( ['ljac'] <- 'ljca' )
+        or ( ['ejac'] <- 'ejca' )
+        or ( ['ejaca'] <- 'ejca' )
+        or ( ['ojac'] <- 'ojca' )
+        or ( ['ojaca'] <- 'ojca' )
+        or ( ['ajaka'] <- 'ajka' )
+        or ( ['ojaka'] <- 'ojka' )
+        or ( ['{sv}aca'] <- '{sv}ca' )
+        or ( ['{sv}ac'] <- '{sv}ca' )
+        or ( ['inzima'] <- 'ing' )
+        or ( ['inzi'] <- 'ing' )
+        or ( ['tvenici'] <- 'tvenik' )
+        or ( ['tetici'] <- 'tetika' )
+        or ( ['teticima'] <- 'tetika' )
+        or ( ['nstava'] <- 'nstva' )
+        or ( ['nicima'] <- 'nik' )
+        or ( ['ticima'] <- 'tik' )
+        or ( ['zicima'] <- 'zik' )
+        or ( ['snici'] <- 'snik' )
+        or ( ['kuse'] <- 'kusi' )
+        or ( ['kusan'] <- 'kusni' )
+        or ( ['kustava'] <- 'kustva' )
+        or ( ['du{sv}an'] <- 'du{sv}ni' )
+        or ( ['antan'] <- 'antni' )
+        or ( ['bilan'] <- 'bilni' )
+        or ( ['tilan'] <- 'tilni' )
+        or ( ['avilan'] <- 'avilni' )
+        or ( ['silan'] <- 'silni' )
+        or ( ['gilan'] <- 'gilni' )
+        or ( ['rilan'] <- 'rilni' )
+        or ( ['nilan'] <- 'nilni' )
+        or ( ['alan'] <- 'alni' )
+        or ( ['ozan'] <- 'ozni' )
+        or ( ['rave'] <- 'ravi' )
+        or ( ['stavan'] <- 'stavni' )
+        or ( ['pravan'] <- 'pravni' )
+        or ( ['tivan'] <- 'tivni' )
+        or ( ['sivan'] <- 'sivni' )
+        or ( ['atan'] <- 'atni' )
+        or ( ['cenata'] <- 'centa' )
+        or ( ['denata'] <- 'denta' )
+        or ( ['genata'] <- 'genta' )
+        or ( ['lenata'] <- 'lenta' )
+        or ( ['menata'] <- 'menta' )
+        or ( ['jenata'] <- 'jenta' )
+        or ( ['venata'] <- 'venta' )
+        or ( ['tetan'] <- 'tetni' )
+        or ( ['pletan'] <- 'pletni' )
+        or ( ['{sv}ave'] <- '{sv}avi' )
+        or ( ['manata'] <- 'manta' )
+        or ( ['tanata'] <- 'tanta' )
+        or ( ['lanata'] <- 'lanta' )
+        or ( ['sanata'] <- 'santa' )
+        or ( ['a{cv}ak'] <- 'a{cv}ka' )
+        or ( ['a{cv}aka'] <- 'a{cv}ka' )
+        or ( ['u{sv}ak'] <- 'u{sv}ka' )
+        or ( ['atak'] <- 'atka' )
+        or ( ['ataka'] <- 'atka' )
+        or ( ['atci'] <- 'atka' )
+        or ( ['atcima'] <- 'atka' )
+        or ( ['etak'] <- 'etka' )
+        or ( ['etaka'] <- 'etka' )
+        or ( ['itak'] <- 'itka' )
+        or ( ['itaka'] <- 'itka' )
+        or ( ['itci'] <- 'itka' )
+        or ( ['otak'] <- 'otka' )
+        or ( ['otaka'] <- 'otka' )
+        or ( ['utak'] <- 'utka' )
+        or ( ['utaka'] <- 'utka' )
+        or ( ['utci'] <- 'utka' )
+        or ( ['utcima'] <- 'utka' )
+        or ( ['eskan'] <- 'eskna' )
+        or ( ['ti{cv}an'] <- 'ti{cv}ni' )
+        or ( ['ojsci'] <- 'ojska' )
+        or ( ['esama'] <- 'esma' )
+        or ( ['metara'] <- 'metra' )
+        or ( ['centar'] <- 'centra' )
+        or ( ['centara'] <- 'centra' )
+        or ( ['istara'] <- 'istra' )
+        or ( ['istar'] <- 'istra' )
+        or ( ['o{sv}{c'}u'] <- 'osti' )
+        or ( ['daba'] <- 'dba' )
+        or ( ['{cv}cima'] <- '{cv}ka' )
+        or ( ['{cv}ci'] <- '{cv}ka' )
+        or ( ['mac'] <- 'mca' )
+        or ( ['maca'] <- 'mca' )
+        or ( ['naca'] <- 'nca' )
+        or ( ['nac'] <- 'nca' )
+        or ( ['voljan'] <- 'voljni' )
+        or ( ['anaka'] <- 'anki' )
+        or ( ['vac'] <- 'vca' )
+        or ( ['vaca'] <- 'vca' )
+        or ( ['saca'] <- 'sca' )
+        or ( ['sac'] <- 'sca' )
+        or ( ['raca'] <- 'rca' )
+        or ( ['rac'] <- 'rca' )
+        or ( ['aoca'] <- 'alca' )
+        or ( ['alaca'] <- 'alca' )
+        or ( ['alac'] <- 'alca' )
+        or ( ['elaca'] <- 'elca' )
+        or ( ['elac'] <- 'elca' )
+        or ( ['olaca'] <- 'olca' )
+        or ( ['olac'] <- 'olca' )
+        or ( ['olce'] <- 'olca' )
+        or ( ['njac'] <- 'njca' )
+        or ( ['njaca'] <- 'njca' )
+        or ( ['ekata'] <- 'ekta' )
+        or ( ['ekat'] <- 'ekta' )
+        or ( ['izam'] <- 'izma' )
+        or ( ['izama'] <- 'izma' )
+        or ( ['jebe'] <- 'jebi' )
+        or ( ['baci'] <- 'baci' )
+        or ( ['a{sv}an'] <- 'a{sv}ni' )
+    )
+
+    define K_1 as ( 'k' ( ( 's' next ) or ( '{sv}' next ) ) )
+    define K_2 as ( 'tv' ( ( 's' next ) or ( '{sv}' next ) ) )
+    define K_3 as ( 'anij' ( ( 't' next ) or ( 'm' next ) or ( 'p' next ) or ( 'r' next ) or ( 'g' next ) ) )
+    define K_4 as ( 'an' next )
+    define K_5 as ( 'in' next )
+    define K_6 as ( 'on' next )
+    define K_7 as ( 'n' next )
+    define K_8 as ( '{c'}' ( ( 'a' next ) or ( 'e' next ) or ( 'u' next ) ) )
+    define K_9 as ( 'ugov' next )
+    define K_10 as ( 'ug' next )
+    define K_11 as ( 'log' next )
+    define K_12 as ( 'g' non-g_neg1 next )
+    define K_13 as ( 'i' ( ( 'rrar' next ) or ( 'ott' next ) or ( 'ss' next ) or ( 'll' next ) ) )
+    define K_14 as ( 'uj' next )
+    define K_15 as ( 'aj' ( ( 'c' next ) or ( '{cv}' next ) or ( '{c'}' next ) or ( '{d/}' next ) or ( 'l' next ) or ( 'r' next ) ) )
+    define K_16 as ( 'ij' ( ( 'b' next ) or ( 'c' next ) or ( 'd' next ) or ( 'l' next ) or ( 'n' next ) or ( 'm' next ) or ( '{zv}' next ) or ( 'g' next ) or ( 'f' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( 't' next ) or ( 'z' next ) ) )
+    define K_17 as ( 'nal' non-g_neg2 next )
+    define K_18 as ( 'ijal' next )
+    define K_19 as ( 'ozil' next )
+    define K_20 as ( 'olov' next )
+    define K_21 as ( 'ol' next )
+    define K_22 as ( 'lem' next )
+    define K_23 as ( 'ram' next )
+    define K_24 as ( 'r' ( ( 'a' next ) or ( 'd' next ) or ( 'e' next ) or ( 'o' next ) ) )
+    define K_25 as ( 's' ( ( 'e' next ) or ( 'i' next ) ) )
+    define K_26 as ( 'a{sv}' ( ( 't' next ) or ( 'n' next ) or ( 'j' next ) or ( 'k' next ) or ( 'b' next ) or ( 'g' next ) or ( 'v' next ) ) )
+    define K_27 as ( '{sv}' ( ( 'e' next ) or ( 'i' next ) ) )
+    define K_28 as ( 'ikat' next )
+    define K_29 as ( 'lat' next )
+    define K_30 as ( 'et' next )
+    define K_31 as ( 'st' ( ( 'e' next ) or ( 'i' next ) or ( 'k' next ) or ( 'o' next ) ) )
+    define K_32 as ( 'i{sv}t' next )
+    define K_33 as ( 'ova' next )
+    define K_34 as ( 'v' ( ( 'a' next ) or ( 'e' next ) or ( 'i' next ) ) )
+    define K_35 as ( 'ov' non-g_neg3 next )
+    define K_36 as ( 'ov' ( ( 'm' next ) or ( 'l' next ) ) )
+    define K_37 as ( 'el' next )
+    define K_38 as ( 'nj' ( ( 'a' next ) or ( 'e' next ) or ( '{sv}' next ) ) )
+    define K_39 as ( '{cv}in' next )
+    define K_40 as ( 'ro{sv}i' next )
+    define K_41 as ( 'o{sv}' next )
+    define K_42 as ( 'vit' ( ( 'e' next ) or ( 'o' next ) ) )
+    define K_43 as ( 'ast' next )
+    define K_44 as ( 'k' next )
+    define K_45 as ( 'va' ( ( 'e' next ) or ( 'a' next ) or ( 'i' next ) or ( 'u' next ) ) )
+    define K_46 as ( 'ir' next )
+    define K_47 as ( 'a{cv}' next )
+    define K_48 as ( 'a{cv}a' next )
+    define K_49 as ( 'n' next )
+    define K_50 as ( 'ni' next )
+    define K_51 as ( 'a' ( ( 'st' ( ( 'a' next ) or ( 'r' next ) or ( 'i' next ) or ( 'p' next ) or ( 'e' next ) or ( 'u' next ) ) ) or ( 'g' non-g_neg4 next ) or ( 'ik' next ) or ( 'uc' next ) or ( 'oj' next ) or ( 'aj' next ) or ( 'lj' next ) or ( 'ak' next ) or ( 'ck' next ) or ( '{cv}k' next ) or ( '{sv}k' next ) or ( 'uk' next ) or ( 'nj' next ) or ( 'im' next ) or ( 'ar' next ) or ( 'at' next ) or ( 'et' next ) or ( '{sv}t' next ) or ( 'it' next ) or ( 'ot' next ) or ( 'ut' next ) or ( 'zn' next ) or ( 'zv' next ) ) )
+    define K_52 as ( 'ur' next )
+    define K_53 as ( 'staj' ( ( 'a' next ) or ( 'i' next ) or ( 'o' next ) ) )
+    define K_54 as ( 'a' ( ( 'b' next ) or ( 'c' next ) or ( '{cv}' next ) or ( '{c'}' next ) or ( 'd' next ) or ( 'e' next ) or ( 'f' next ) or ( 'g' next ) or ( 'j' next ) or ( 'k' next ) or ( 'n' next ) or ( 'r' next ) or ( 't' next ) or ( 'u' next ) or ( 'v' next ) ) )
+    define K_55 as ( 'aj' ( ( 't' next ) or ( '{cv}' next ) or ( 'j' next ) or ( '{zv}' next ) or ( '{sv}' next ) ) )
+    define K_56 as ( 'a' ( ( 'm' non-g_neg4 next ) or ( 'i{cv}' next ) or ( 'n{cv}' next ) or ( 'u{cv}' next ) or ( 'b' next ) or ( 'c' next ) or ( '{c'}' next ) or ( 'd' next ) or ( '{d/}' next ) or ( 'h' next ) or ( 'j' next ) or ( 'k' next ) or ( 'l' next ) or ( 'n' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( '{sv}' next ) or ( 'v' next ) or ( 'z' next ) or ( '{zv}' next ) ) )
+    define K_57 as ( 'sta' ( ( 'a' next ) or ( 'i' next ) or ( 'o' next ) ) )
+    define K_58 as ( 'ta' next )
+    define K_59 as ( 'inj' next )
+    define K_60 as ( 'as' next )
+    define K_61 as ( 'i' ( ( 'elj' next ) or ( 'ulj' next ) or ( 'tit' next ) or ( 'ac' next ) or ( 'i{cv}' next ) or ( 'od' next ) or ( 'oj' next ) or ( 'et' next ) or ( 'av' next ) or ( 'ov' next ) ) )
+    define K_62 as ( 'i' ( ( 'tit' next ) or ( 'jeb' next ) or ( 'ar' next ) or ( 'ed' next ) or ( 'u{sv}' next ) or ( 'i{cv}' next ) ) )
+    define K_63 as ( 'i' ( ( 'b' next ) or ( '{cv}' next ) or ( 'd' next ) or ( 'l' next ) or ( 'm' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( '{sv}' next ) or ( '{zv}' next ) ) )
+    define K_64 as ( 'lu{cv}' next )
+    define K_65 as ( 'jeti' next )
+    define K_66 as ( 'e' next )
+    define K_67 as ( 'i' next )
+    define K_68 as ( 'at' next )
+    define K_69 as ( 'et' next )
+    define K_70 as ( next )
+    define K_71 as ( next )
+    define K_72 as ( next )
+    define K_73 as ( next )
+
+    define L_1 as (
+(
+        ( ['i'] test K_1 )
+        or ( ['e'] test K_1 )
+        or ( ['o'] test K_1 )
+        or ( ['a'] test K_1 )
+        or ( ['u'] test K_1 )
+        or ( ['og'] test K_1 )
+        or ( ['om'] test K_1 )
+        or ( ['im'] test K_1 )
+        or ( ['ih'] test K_1 )
+        or ( ['oj'] test K_1 )
+        or ( ['iji'] test K_1 )
+        or ( ['ije'] test K_1 )
+        or ( ['ija'] test K_1 )
+        or ( ['oga'] test K_1 )
+        or ( ['ome'] test K_1 )
+        or ( ['omu'] test K_1 )
+        or ( ['ima'] test K_1 )
+        or ( ['ijem'] test K_1 )
+        or ( ['ijim'] test K_1 )
+        or ( ['ijih'] test K_1 )
+        or ( ['ijoj'] test K_1 )
+        or ( ['ijeg'] test K_1 )
+        or ( ['ijima'] test K_1 )
+        or ( ['ijega'] test K_1 )
+        or ( ['ijemu'] test K_1 )
+)
+        R1
+        delete
+    )
+    define L_2 as (
+(
+        ( ['o'] test K_2 )
+        or ( ['a'] test K_2 )
+        or ( ['u'] test K_2 )
+        or ( ['om'] test K_2 )
+        or ( ['ima'] test K_2 )
+)
+        R1
+        delete
+    )
+    define L_3 as (
+(
+        ( [ ] test K_3 )
+        or ( ['a'] test K_3 )
+        or ( ['u'] test K_3 )
+        or ( ['e'] test K_3 )
+        or ( ['i'] test K_3 )
+        or ( ['om'] test K_3 )
+        or ( ['ama'] test K_3 )
+        or ( ['ima'] test K_3 )
+)
+        R1
+        delete
+    )
+    define L_4 as (
+(
+        ( [ ] test K_4 )
+        or ( ['u'] test K_4 )
+        or ( ['i'] test K_4 )
+        or ( ['a'] test K_4 )
+        or ( ['e'] test K_4 )
+        or ( ['in'] test K_4 )
+        or ( ['om'] test K_4 )
+        or ( ['ina'] test K_4 )
+        or ( ['inu'] test K_4 )
+        or ( ['ine'] test K_4 )
+        or ( ['ima'] test K_4 )
+        or ( ['inom'] test K_4 )
+)
+        R1
+        delete
+    )
+    define L_5 as (
+(
+        ( [ ] test K_5 )
+        or ( ['a'] test K_5 )
+        or ( ['e'] test K_5 )
+        or ( ['i'] test K_5 )
+        or ( ['u'] test K_5 )
+        or ( ['o'] test K_5 )
+        or ( ['om'] test K_5 )
+        or ( ['ima'] test K_5 )
+        or ( ['ama'] test K_5 )
+)
+        R1
+        delete
+    )
+    define L_6 as (
+(
+        ( [ ] test K_6 )
+        or ( ['a'] test K_6 )
+        or ( ['e'] test K_6 )
+        or ( ['i'] test K_6 )
+        or ( ['u'] test K_6 )
+        or ( ['om'] test K_6 )
+        or ( ['ova'] test K_6 )
+        or ( ['ove'] test K_6 )
+        or ( ['ovi'] test K_6 )
+        or ( ['ima'] test K_6 )
+        or ( ['ovima'] test K_6 )
+)
+        R1
+        delete
+    )
+    define L_7 as (
+(
+        ( [ ] test K_7 )
+        or ( ['o'] test K_7 )
+        or ( ['e'] test K_7 )
+        or ( ['a'] test K_7 )
+        or ( ['u'] test K_7 )
+        or ( ['i'] test K_7 )
+        or ( ['oj'] test K_7 )
+        or ( ['om'] test K_7 )
+        or ( ['ih'] test K_7 )
+        or ( ['im'] test K_7 )
+        or ( ['og'] test K_7 )
+        or ( ['iji'] test K_7 )
+        or ( ['ije'] test K_7 )
+        or ( ['ija'] test K_7 )
+        or ( ['iju'] test K_7 )
+        or ( ['ima'] test K_7 )
+        or ( ['ome'] test K_7 )
+        or ( ['omu'] test K_7 )
+        or ( ['oga'] test K_7 )
+        or ( ['ijeg'] test K_7 )
+        or ( ['ijem'] test K_7 )
+        or ( ['ijim'] test K_7 )
+        or ( ['ijih'] test K_7 )
+        or ( ['ijoj'] test K_7 )
+        or ( ['ijima'] test K_7 )
+        or ( ['ijega'] test K_7 )
+        or ( ['ijemu'] test K_7 )
+)
+        R1
+        delete
+    )
+    define L_8 as (
+(
+        ( ['e'] test K_8 )
+        or ( ['a'] test K_8 )
+        or ( ['oj'] test K_8 )
+        or ( ['ih'] test K_8 )
+        or ( ['om'] test K_8 )
+        or ( ['eg'] test K_8 )
+        or ( ['em'] test K_8 )
+        or ( ['og'] test K_8 )
+        or ( ['uh'] test K_8 )
+        or ( ['im'] test K_8 )
+        or ( ['oga'] test K_8 )
+        or ( ['ome'] test K_8 )
+        or ( ['omu'] test K_8 )
+        or ( ['ega'] test K_8 )
+        or ( ['emu'] test K_8 )
+        or ( ['ima'] test K_8 )
+)
+        R1
+        delete
+    )
+    define L_9 as (
+(
+        ( ['i'] test K_9 )
+        or ( ['e'] test K_9 )
+        or ( ['a'] test K_9 )
+        or ( ['ima'] test K_9 )
+)
+        R1
+        delete
+    )
+    define L_10 as (
+(
+        ( ['a'] test K_10 )
+        or ( ['e'] test K_10 )
+        or ( ['i'] test K_10 )
+        or ( ['u'] test K_10 )
+        or ( ['o'] test K_10 )
+        or ( ['om'] test K_10 )
+        or ( ['ama'] test K_10 )
+)
+        R1
+        delete
+    )
+    define L_11 as (
+(
+        ( [ ] test K_11 )
+        or ( ['a'] test K_11 )
+        or ( ['u'] test K_11 )
+        or ( ['e'] test K_11 )
+        or ( ['om'] test K_11 )
+        or ( ['ama'] test K_11 )
+)
+        R1
+        delete
+    )
+    define L_12 as (
+(
+        ( [ ] test K_12 )
+        or ( ['a'] test K_12 )
+        or ( ['e'] test K_12 )
+        or ( ['i'] test K_12 )
+        or ( ['u'] test K_12 )
+        or ( ['o'] test K_12 )
+        or ( ['om'] test K_12 )
+        or ( ['ama'] test K_12 )
+        or ( ['ovi'] test K_12 )
+        or ( ['ove'] test K_12 )
+        or ( ['ova'] test K_12 )
+        or ( ['ovima'] test K_12 )
+)
+        R1
+        delete
+    )
+    define L_13 as (
+(
+        ( [ ] test K_13 )
+        or ( ['o'] test K_13 )
+        or ( ['ja'] test K_13 )
+        or ( ['ju'] test K_13 )
+        or ( ['jem'] test K_13 )
+)
+        R1
+        delete
+    )
+    define L_14 as (
+(
+        ( [ ] test K_14 )
+        or ( ['e'] test K_14 )
+        or ( ['u'] test K_14 )
+        or ( ['mo'] test K_14 )
+        or ( ['em'] test K_14 )
+        or ( ['e{sv}'] test K_14 )
+        or ( ['u{c'}i'] test K_14 )
+        or ( ['emo'] test K_14 )
+        or ( ['ete'] test K_14 )
+)
+        R1
+        delete
+    )
+    define L_15 as (
+(
+        ( [ ] test K_15 )
+        or ( ['a'] test K_15 )
+        or ( ['e'] test K_15 )
+        or ( ['i'] test K_15 )
+        or ( ['u'] test K_15 )
+        or ( ['em'] test K_15 )
+        or ( ['evi'] test K_15 )
+        or ( ['eva'] test K_15 )
+        or ( ['eve'] test K_15 )
+        or ( ['ama'] test K_15 )
+        or ( ['ima'] test K_15 )
+        or ( ['evima'] test K_15 )
+)
+        R1
+        delete
+    )
+    define L_16 as (
+(
+        ( [ ] test K_16 )
+        or ( ['a'] test K_16 )
+        or ( ['e'] test K_16 )
+        or ( ['i'] test K_16 )
+        or ( ['u'] test K_16 )
+        or ( ['o'] test K_16 )
+        or ( ['om'] test K_16 )
+        or ( ['ima'] test K_16 )
+        or ( ['ama'] test K_16 )
+)
+        R1
+        delete
+    )
+    define L_17 as (
+(
+        ( [ ] test K_17 )
+        or ( ['a'] test K_17 )
+        or ( ['e'] test K_17 )
+        or ( ['i'] test K_17 )
+        or ( ['u'] test K_17 )
+        or ( ['o'] test K_17 )
+        or ( ['om'] test K_17 )
+        or ( ['ima'] test K_17 )
+        or ( ['ama'] test K_17 )
+)
+        R1
+        delete
+    )
+    define L_18 as (
+(
+        ( [ ] test K_18 )
+        or ( ['a'] test K_18 )
+        or ( ['e'] test K_18 )
+        or ( ['i'] test K_18 )
+        or ( ['u'] test K_18 )
+        or ( ['o'] test K_18 )
+        or ( ['om'] test K_18 )
+        or ( ['ima'] test K_18 )
+        or ( ['ama'] test K_18 )
+)
+        R1
+        delete
+    )
+    define L_19 as (
+(
+        ( [ ] test K_19 )
+        or ( ['a'] test K_19 )
+        or ( ['e'] test K_19 )
+        or ( ['u'] test K_19 )
+        or ( ['i'] test K_19 )
+        or ( ['om'] test K_19 )
+        or ( ['ima'] test K_19 )
+)
+        R1
+        delete
+    )
+    define L_20 as (
+(
+        ( ['i'] test K_20 )
+        or ( ['a'] test K_20 )
+        or ( ['e'] test K_20 )
+        or ( ['ima'] test K_20 )
+)
+        R1
+        delete
+    )
+    define L_21 as (
+(
+        ( [ ] test K_21 )
+        or ( ['a'] test K_21 )
+        or ( ['u'] test K_21 )
+        or ( ['e'] test K_21 )
+        or ( ['i'] test K_21 )
+        or ( ['om'] test K_21 )
+        or ( ['ima'] test K_21 )
+)
+        R1
+        delete
+    )
+    define L_22 as (
+(
+        ( [ ] test K_22 )
+        or ( ['a'] test K_22 )
+        or ( ['e'] test K_22 )
+        or ( ['i'] test K_22 )
+        or ( ['u'] test K_22 )
+        or ( ['o'] test K_22 )
+        or ( ['om'] test K_22 )
+        or ( ['ama'] test K_22 )
+        or ( ['ima'] test K_22 )
+)
+        R1
+        delete
+    )
+    define L_23 as (
+(
+        ( ['a'] test K_23 )
+        or ( ['e'] test K_23 )
+        or ( ['i'] test K_23 )
+        or ( ['u'] test K_23 )
+        or ( ['o'] test K_23 )
+        or ( ['om'] test K_23 )
+        or ( ['ama'] test K_23 )
+)
+        R1
+        delete
+    )
+    define L_24 as (
+(
+        ( [ ] test K_24 )
+        or ( ['u'] test K_24 )
+        or ( ['a'] test K_24 )
+        or ( ['e'] test K_24 )
+        or ( ['i'] test K_24 )
+        or ( ['om'] test K_24 )
+        or ( ['ama'] test K_24 )
+        or ( ['ima'] test K_24 )
+)
+        R1
+        delete
+    )
+    define L_25 as (
+(
+        ( ['e'] test K_25 )
+        or ( ['a'] test K_25 )
+        or ( ['u'] test K_25 )
+        or ( ['om'] test K_25 )
+        or ( ['ima'] test K_25 )
+)
+        R1
+        delete
+    )
+    define L_26 as (
+(
+        ( [ ] test K_26 )
+        or ( ['a'] test K_26 )
+        or ( ['u'] test K_26 )
+        or ( ['i'] test K_26 )
+        or ( ['e'] test K_26 )
+        or ( ['om'] test K_26 )
+        or ( ['em'] test K_26 )
+        or ( ['ama'] test K_26 )
+        or ( ['ima'] test K_26 )
+)
+        R1
+        delete
+    )
+    define L_27 as (
+(
+        ( [ ] test K_27 )
+        or ( ['i'] test K_27 )
+        or ( ['e'] test K_27 )
+        or ( ['a'] test K_27 )
+        or ( ['u'] test K_27 )
+        or ( ['om'] test K_27 )
+        or ( ['em'] test K_27 )
+        or ( ['ima'] test K_27 )
+        or ( ['ama'] test K_27 )
+)
+        R1
+        delete
+    )
+    define L_28 as (
+(
+        ( [ ] test K_28 )
+        or ( ['a'] test K_28 )
+        or ( ['e'] test K_28 )
+        or ( ['i'] test K_28 )
+        or ( ['u'] test K_28 )
+        or ( ['o'] test K_28 )
+        or ( ['om'] test K_28 )
+        or ( ['ima'] test K_28 )
+)
+        R1
+        delete
+    )
+    define L_29 as (
+(
+        ( [ ] test K_29 )
+        or ( ['a'] test K_29 )
+        or ( ['e'] test K_29 )
+        or ( ['i'] test K_29 )
+        or ( ['u'] test K_29 )
+        or ( ['o'] test K_29 )
+        or ( ['om'] test K_29 )
+        or ( ['ima'] test K_29 )
+)
+        R1
+        delete
+    )
+    define L_30 as (
+(
+        ( [ ] test K_30 )
+        or ( ['a'] test K_30 )
+        or ( ['e'] test K_30 )
+        or ( ['i'] test K_30 )
+        or ( ['u'] test K_30 )
+        or ( ['o'] test K_30 )
+        or ( ['om'] test K_30 )
+        or ( ['ama'] test K_30 )
+        or ( ['ima'] test K_30 )
+)
+        R1
+        delete
+    )
+    define L_31 as (
+(
+        ( [ ] test K_31 )
+        or ( ['a'] test K_31 )
+        or ( ['e'] test K_31 )
+        or ( ['i'] test K_31 )
+        or ( ['u'] test K_31 )
+        or ( ['o'] test K_31 )
+        or ( ['om'] test K_31 )
+        or ( ['ima'] test K_31 )
+        or ( ['ama'] test K_31 )
+)
+        R1
+        delete
+    )
+    define L_32 as (
+(
+        ( ['a'] test K_32 )
+        or ( ['e'] test K_32 )
+        or ( ['u'] test K_32 )
+        or ( ['em'] test K_32 )
+        or ( ['ima'] test K_32 )
+)
+        R1
+        delete
+    )
+    define L_33 as (
+(
+        ( ['t'] test K_33 )
+        or ( ['h'] test K_33 )
+        or ( ['o'] test K_33 )
+        or ( ['hu'] test K_33 )
+        or ( ['ti'] test K_33 )
+        or ( ['{sv}e'] test K_33 )
+        or ( ['li'] test K_33 )
+        or ( ['la'] test K_33 )
+        or ( ['le'] test K_33 )
+        or ( ['lo'] test K_33 )
+        or ( ['smo'] test K_33 )
+        or ( ['ste'] test K_33 )
+)
+        R1
+        delete
+    )
+    define L_34 as (
+(
+        ( [ ] test K_34 )
+        or ( ['i'] test K_34 )
+        or ( ['a'] test K_34 )
+        or ( ['u'] test K_34 )
+        or ( ['e'] test K_34 )
+        or ( ['o'] test K_34 )
+        or ( ['im'] test K_34 )
+        or ( ['ih'] test K_34 )
+        or ( ['oj'] test K_34 )
+        or ( ['om'] test K_34 )
+        or ( ['og'] test K_34 )
+        or ( ['oga'] test K_34 )
+        or ( ['ome'] test K_34 )
+        or ( ['omu'] test K_34 )
+        or ( ['ima'] test K_34 )
+        or ( ['ama'] test K_34 )
+        or ( ['iji'] test K_34 )
+        or ( ['ije'] test K_34 )
+        or ( ['ija'] test K_34 )
+        or ( ['iju'] test K_34 )
+        or ( ['ijeg'] test K_34 )
+        or ( ['ijem'] test K_34 )
+        or ( ['ijim'] test K_34 )
+        or ( ['ijih'] test K_34 )
+        or ( ['ijoj'] test K_34 )
+        or ( ['ijemu'] test K_34 )
+        or ( ['ijima'] test K_34 )
+        or ( ['ijega'] test K_34 )
+)
+        R1
+        delete
+    )
+    define L_35 as (
+(
+        ( [ ] test K_35 )
+        or ( ['i'] test K_35 )
+        or ( ['a'] test K_35 )
+        or ( ['u'] test K_35 )
+        or ( ['e'] test K_35 )
+        or ( ['o'] test K_35 )
+        or ( ['im'] test K_35 )
+        or ( ['ih'] test K_35 )
+        or ( ['oj'] test K_35 )
+        or ( ['om'] test K_35 )
+        or ( ['og'] test K_35 )
+        or ( ['oga'] test K_35 )
+        or ( ['ome'] test K_35 )
+        or ( ['omu'] test K_35 )
+        or ( ['ima'] test K_35 )
+        or ( ['iji'] test K_35 )
+        or ( ['ije'] test K_35 )
+        or ( ['ija'] test K_35 )
+        or ( ['iju'] test K_35 )
+        or ( ['ijeg'] test K_35 )
+        or ( ['ijem'] test K_35 )
+        or ( ['ijim'] test K_35 )
+        or ( ['ijih'] test K_35 )
+        or ( ['ijoj'] test K_35 )
+        or ( ['ijemu'] test K_35 )
+        or ( ['ijima'] test K_35 )
+        or ( ['ijega'] test K_35 )
+)
+        R1
+        delete
+    )
+    define L_36 as (
+(
+        ( [ ] test K_36 )
+        or ( ['a'] test K_36 )
+        or ( ['u'] test K_36 )
+        or ( ['e'] test K_36 )
+        or ( ['i'] test K_36 )
+        or ( ['om'] test K_36 )
+        or ( ['ima'] test K_36 )
+)
+        R1
+        delete
+    )
+    define L_37 as (
+(
+        ( [ ] test K_37 )
+        or ( ['i'] test K_37 )
+        or ( ['a'] test K_37 )
+        or ( ['u'] test K_37 )
+        or ( ['e'] test K_37 )
+        or ( ['o'] test K_37 )
+        or ( ['im'] test K_37 )
+        or ( ['ih'] test K_37 )
+        or ( ['oj'] test K_37 )
+        or ( ['om'] test K_37 )
+        or ( ['og'] test K_37 )
+        or ( ['oga'] test K_37 )
+        or ( ['ome'] test K_37 )
+        or ( ['omu'] test K_37 )
+        or ( ['ima'] test K_37 )
+        or ( ['iji'] test K_37 )
+        or ( ['ije'] test K_37 )
+        or ( ['ija'] test K_37 )
+        or ( ['iju'] test K_37 )
+        or ( ['ijeg'] test K_37 )
+        or ( ['ijem'] test K_37 )
+        or ( ['ijim'] test K_37 )
+        or ( ['ijih'] test K_37 )
+        or ( ['ijoj'] test K_37 )
+        or ( ['ijemu'] test K_37 )
+        or ( ['ijima'] test K_37 )
+        or ( ['ijega'] test K_37 )
+)
+        R1
+        delete
+    )
+    define L_38 as (
+(
+        ( ['a'] test K_38 )
+        or ( ['e'] test K_38 )
+        or ( ['i'] test K_38 )
+        or ( ['o'] test K_38 )
+        or ( ['u'] test K_38 )
+        or ( ['eg'] test K_38 )
+        or ( ['em'] test K_38 )
+        or ( ['im'] test K_38 )
+        or ( ['ih'] test K_38 )
+        or ( ['oj'] test K_38 )
+        or ( ['om'] test K_38 )
+        or ( ['og'] test K_38 )
+        or ( ['oga'] test K_38 )
+        or ( ['ome'] test K_38 )
+        or ( ['omu'] test K_38 )
+        or ( ['ima'] test K_38 )
+        or ( ['iji'] test K_38 )
+        or ( ['ije'] test K_38 )
+        or ( ['ija'] test K_38 )
+        or ( ['iju'] test K_38 )
+        or ( ['ega'] test K_38 )
+        or ( ['emu'] test K_38 )
+        or ( ['ijeg'] test K_38 )
+        or ( ['ijem'] test K_38 )
+        or ( ['ijim'] test K_38 )
+        or ( ['ijih'] test K_38 )
+        or ( ['ijoj'] test K_38 )
+        or ( ['ijemu'] test K_38 )
+        or ( ['ijima'] test K_38 )
+        or ( ['ijega'] test K_38 )
+)
+        R1
+        delete
+    )
+    define L_39 as (
+(
+        ( [ ] test K_39 )
+        or ( ['a'] test K_39 )
+        or ( ['u'] test K_39 )
+        or ( ['i'] test K_39 )
+        or ( ['o'] test K_39 )
+        or ( ['e'] test K_39 )
+        or ( ['og'] test K_39 )
+        or ( ['om'] test K_39 )
+        or ( ['im'] test K_39 )
+        or ( ['ih'] test K_39 )
+        or ( ['oj'] test K_39 )
+        or ( ['ama'] test K_39 )
+        or ( ['ome'] test K_39 )
+        or ( ['omu'] test K_39 )
+        or ( ['oga'] test K_39 )
+        or ( ['ima'] test K_39 )
+)
+        R1
+        delete
+    )
+    define L_40 as (
+(
+        ( ['m'] test K_40 )
+        or ( ['{sv}'] test K_40 )
+        or ( ['t'] test K_40 )
+        or ( ['h'] test K_40 )
+        or ( ['o'] test K_40 )
+        or ( ['{sv}e'] test K_40 )
+        or ( ['mo'] test K_40 )
+        or ( ['te'] test K_40 )
+        or ( ['ti'] test K_40 )
+        or ( ['li'] test K_40 )
+        or ( ['la'] test K_40 )
+        or ( ['lo'] test K_40 )
+        or ( ['le'] test K_40 )
+        or ( ['v{sv}i'] test K_40 )
+        or ( ['smo'] test K_40 )
+        or ( ['ste'] test K_40 )
+)
+        R1
+        delete
+    )
+    define L_41 as (
+(
+        ( [ ] test K_41 )
+        or ( ['i'] test K_41 )
+        or ( ['a'] test K_41 )
+        or ( ['u'] test K_41 )
+        or ( ['e'] test K_41 )
+        or ( ['im'] test K_41 )
+        or ( ['ih'] test K_41 )
+        or ( ['oj'] test K_41 )
+        or ( ['om'] test K_41 )
+        or ( ['og'] test K_41 )
+        or ( ['oga'] test K_41 )
+        or ( ['ome'] test K_41 )
+        or ( ['omu'] test K_41 )
+        or ( ['ima'] test K_41 )
+        or ( ['iji'] test K_41 )
+        or ( ['ije'] test K_41 )
+        or ( ['ija'] test K_41 )
+        or ( ['iju'] test K_41 )
+        or ( ['ijeg'] test K_41 )
+        or ( ['ijem'] test K_41 )
+        or ( ['ijim'] test K_41 )
+        or ( ['ijih'] test K_41 )
+        or ( ['ijoj'] test K_41 )
+        or ( ['ijemu'] test K_41 )
+        or ( ['ijima'] test K_41 )
+        or ( ['ijega'] test K_41 )
+)
+        R1
+        delete
+    )
+    define L_42 as (
+(
+        ( [ ] test K_42 )
+        or ( ['i'] test K_42 )
+        or ( ['e'] test K_42 )
+        or ( ['o'] test K_42 )
+        or ( ['a'] test K_42 )
+        or ( ['u'] test K_42 )
+        or ( ['og'] test K_42 )
+        or ( ['om'] test K_42 )
+        or ( ['im'] test K_42 )
+        or ( ['ih'] test K_42 )
+        or ( ['oj'] test K_42 )
+        or ( ['iji'] test K_42 )
+        or ( ['ije'] test K_42 )
+        or ( ['ija'] test K_42 )
+        or ( ['oga'] test K_42 )
+        or ( ['ome'] test K_42 )
+        or ( ['omu'] test K_42 )
+        or ( ['ima'] test K_42 )
+        or ( ['ijem'] test K_42 )
+        or ( ['ijim'] test K_42 )
+        or ( ['ijih'] test K_42 )
+        or ( ['ijoj'] test K_42 )
+        or ( ['ijeg'] test K_42 )
+        or ( ['ijima'] test K_42 )
+        or ( ['ijega'] test K_42 )
+        or ( ['ijemu'] test K_42 )
+)
+        R1
+        delete
+    )
+    define L_43 as (
+(
+        ( [ ] test K_43 )
+        or ( ['i'] test K_43 )
+        or ( ['e'] test K_43 )
+        or ( ['o'] test K_43 )
+        or ( ['a'] test K_43 )
+        or ( ['u'] test K_43 )
+        or ( ['og'] test K_43 )
+        or ( ['om'] test K_43 )
+        or ( ['im'] test K_43 )
+        or ( ['ih'] test K_43 )
+        or ( ['oj'] test K_43 )
+        or ( ['iji'] test K_43 )
+        or ( ['ije'] test K_43 )
+        or ( ['ija'] test K_43 )
+        or ( ['oga'] test K_43 )
+        or ( ['ome'] test K_43 )
+        or ( ['omu'] test K_43 )
+        or ( ['ima'] test K_43 )
+        or ( ['ijem'] test K_43 )
+        or ( ['ijim'] test K_43 )
+        or ( ['ijih'] test K_43 )
+        or ( ['ijoj'] test K_43 )
+        or ( ['ijeg'] test K_43 )
+        or ( ['ijima'] test K_43 )
+        or ( ['ijega'] test K_43 )
+        or ( ['ijemu'] test K_43 )
+)
+        R1
+        delete
+    )
+    define L_44 as (
+(
+        ( [ ] test K_44 )
+        or ( ['i'] test K_44 )
+        or ( ['a'] test K_44 )
+        or ( ['u'] test K_44 )
+        or ( ['e'] test K_44 )
+        or ( ['o'] test K_44 )
+        or ( ['im'] test K_44 )
+        or ( ['ih'] test K_44 )
+        or ( ['oj'] test K_44 )
+        or ( ['om'] test K_44 )
+        or ( ['og'] test K_44 )
+        or ( ['oga'] test K_44 )
+        or ( ['ome'] test K_44 )
+        or ( ['omu'] test K_44 )
+        or ( ['ima'] test K_44 )
+        or ( ['iji'] test K_44 )
+        or ( ['ije'] test K_44 )
+        or ( ['ija'] test K_44 )
+        or ( ['iju'] test K_44 )
+        or ( ['ijeg'] test K_44 )
+        or ( ['ijem'] test K_44 )
+        or ( ['ijim'] test K_44 )
+        or ( ['ijih'] test K_44 )
+        or ( ['ijoj'] test K_44 )
+        or ( ['ijemu'] test K_44 )
+        or ( ['ijima'] test K_44 )
+        or ( ['ijega'] test K_44 )
+)
+        R1
+        delete
+    )
+    define L_45 as (
+(
+        ( [ ] test K_45 )
+        or ( ['h'] test K_45 )
+        or ( ['j'] test K_45 )
+        or ( ['m'] test K_45 )
+        or ( ['n'] test K_45 )
+        or ( ['o'] test K_45 )
+        or ( ['t'] test K_45 )
+        or ( ['v'] test K_45 )
+        or ( ['{sv}'] test K_45 )
+        or ( ['ju'] test K_45 )
+        or ( ['la'] test K_45 )
+        or ( ['le'] test K_45 )
+        or ( ['li'] test K_45 )
+        or ( ['lo'] test K_45 )
+        or ( ['mo'] test K_45 )
+        or ( ['na'] test K_45 )
+        or ( ['ne'] test K_45 )
+        or ( ['ni'] test K_45 )
+        or ( ['no'] test K_45 )
+        or ( ['te'] test K_45 )
+        or ( ['ti'] test K_45 )
+        or ( ['{sv}e'] test K_45 )
+        or ( ['hu'] test K_45 )
+        or ( ['smo'] test K_45 )
+        or ( ['ste'] test K_45 )
+        or ( ['jmo'] test K_45 )
+        or ( ['jte'] test K_45 )
+        or ( ['ju{c'}i'] test K_45 )
+)
+        R1
+        delete
+    )
+    define L_46 as (
+(
+        ( ['uj'] test K_46 )
+        or ( ['al'] test K_46 )
+        or ( ['an'] test K_46 )
+        or ( ['am'] test K_46 )
+        or ( ['a{sv}'] test K_46 )
+        or ( ['at'] test K_46 )
+        or ( ['ah'] test K_46 )
+        or ( ['ao'] test K_46 )
+        or ( ['ati'] test K_46 )
+        or ( ['amo'] test K_46 )
+        or ( ['ate'] test K_46 )
+        or ( ['aju'] test K_46 )
+        or ( ['a{sv}e'] test K_46 )
+        or ( ['ahu'] test K_46 )
+        or ( ['ala'] test K_46 )
+        or ( ['alo'] test K_46 )
+        or ( ['ali'] test K_46 )
+        or ( ['ale'] test K_46 )
+        or ( ['uje'] test K_46 )
+        or ( ['uju'] test K_46 )
+        or ( ['ivat'] test K_46 )
+        or ( ['ujem'] test K_46 )
+        or ( ['uje{sv}'] test K_46 )
+        or ( ['ujmo'] test K_46 )
+        or ( ['ujte'] test K_46 )
+        or ( ['av{sv}i'] test K_46 )
+        or ( ['asmo'] test K_46 )
+        or ( ['aste'] test K_46 )
+        or ( ['ujemo'] test K_46 )
+        or ( ['ujete'] test K_46 )
+        or ( ['uju{c'}i'] test K_46 )
+        or ( ['aju{c'}i'] test K_46 )
+)
+        R1
+        delete
+    )
+    define L_47 as (
+(
+        ( ['i'] test K_47 )
+        or ( ['e'] test K_47 )
+        or ( ['io'] test K_47 )
+        or ( ['im'] test K_47 )
+        or ( ['i{sv}'] test K_47 )
+        or ( ['it'] test K_47 )
+        or ( ['ih'] test K_47 )
+        or ( ['en'] test K_47 )
+        or ( ['iti'] test K_47 )
+        or ( ['imo'] test K_47 )
+        or ( ['ite'] test K_47 )
+        or ( ['i{sv}e'] test K_47 )
+        or ( ['e{c'}i'] test K_47 )
+        or ( ['ila'] test K_47 )
+        or ( ['ilo'] test K_47 )
+        or ( ['ili'] test K_47 )
+        or ( ['ile'] test K_47 )
+        or ( ['ena'] test K_47 )
+        or ( ['eno'] test K_47 )
+        or ( ['eni'] test K_47 )
+        or ( ['ene'] test K_47 )
+        or ( ['ismo'] test K_47 )
+        or ( ['iste'] test K_47 )
+)
+        R1
+        delete
+    )
+    define L_48 as (
+(
+        ( ['o'] test K_48 )
+        or ( ['m'] test K_48 )
+        or ( ['{sv}'] test K_48 )
+        or ( ['t'] test K_48 )
+        or ( ['h'] test K_48 )
+        or ( ['n'] test K_48 )
+        or ( ['hu'] test K_48 )
+        or ( ['ti'] test K_48 )
+        or ( ['mo'] test K_48 )
+        or ( ['te'] test K_48 )
+        or ( ['{sv}e'] test K_48 )
+        or ( ['la'] test K_48 )
+        or ( ['lo'] test K_48 )
+        or ( ['li'] test K_48 )
+        or ( ['le'] test K_48 )
+        or ( ['ju'] test K_48 )
+        or ( ['na'] test K_48 )
+        or ( ['no'] test K_48 )
+        or ( ['ni'] test K_48 )
+        or ( ['ne'] test K_48 )
+        or ( ['v{sv}i'] test K_48 )
+        or ( ['smo'] test K_48 )
+        or ( ['ste'] test K_48 )
+)
+        R1
+        delete
+    )
+    define L_49 as (
+(
+        ( ['e'] test K_49 )
+        or ( ['u'] test K_49 )
+        or ( ['i'] test K_49 )
+        or ( ['em'] test K_49 )
+        or ( ['e{sv}'] test K_49 )
+        or ( ['uo'] test K_49 )
+        or ( ['ut'] test K_49 )
+        or ( ['u{c'}i'] test K_49 )
+        or ( ['imo'] test K_49 )
+        or ( ['ite'] test K_49 )
+        or ( ['emo'] test K_49 )
+        or ( ['ete'] test K_49 )
+        or ( ['ula'] test K_49 )
+        or ( ['ulo'] test K_49 )
+        or ( ['ule'] test K_49 )
+        or ( ['uli'] test K_49 )
+        or ( ['uto'] test K_49 )
+        or ( ['uti'] test K_49 )
+        or ( ['uta'] test K_49 )
+        or ( ['uv{sv}i'] test K_49 )
+        or ( ['usmo'] test K_49 )
+        or ( ['uste'] test K_49 )
+)
+        R1
+        delete
+    )
+    define L_50 as (
+(
+        ( ['m'] test K_50 )
+        or ( ['{sv}'] test K_50 )
+        or ( ['o'] test K_50 )
+        or ( ['ti'] test K_50 )
+        or ( ['mo'] test K_50 )
+        or ( ['te'] test K_50 )
+        or ( ['la'] test K_50 )
+        or ( ['lo'] test K_50 )
+        or ( ['le'] test K_50 )
+        or ( ['li'] test K_50 )
+        or ( ['v{sv}i'] test K_50 )
+        or ( ['smo'] test K_50 )
+        or ( ['ste'] test K_50 )
+)
+        R1
+        delete
+    )
+    define L_51 as (
+(
+        ( ['t'] test K_51 )
+        or ( ['h'] test K_51 )
+        or ( ['o'] test K_51 )
+        or ( ['j'] test K_51 )
+        or ( ['n'] test K_51 )
+        or ( ['m'] test K_51 )
+        or ( ['{sv}'] test K_51 )
+        or ( ['mo'] test K_51 )
+        or ( ['te'] test K_51 )
+        or ( ['je'] test K_51 )
+        or ( ['ju'] test K_51 )
+        or ( ['ti'] test K_51 )
+        or ( ['{sv}e'] test K_51 )
+        or ( ['hu'] test K_51 )
+        or ( ['la'] test K_51 )
+        or ( ['li'] test K_51 )
+        or ( ['le'] test K_51 )
+        or ( ['lo'] test K_51 )
+        or ( ['na'] test K_51 )
+        or ( ['no'] test K_51 )
+        or ( ['ni'] test K_51 )
+        or ( ['ne'] test K_51 )
+        or ( ['v{sv}i'] test K_51 )
+        or ( ['smo'] test K_51 )
+        or ( ['ste'] test K_51 )
+        or ( ['jmo'] test K_51 )
+        or ( ['jte'] test K_51 )
+        or ( ['jem'] test K_51 )
+        or ( ['ju{c'}i'] test K_51 )
+)
+        R1
+        delete
+    )
+    define L_52 as (
+(
+        ( ['al'] test K_52 )
+        or ( ['at'] test K_52 )
+        or ( ['ah'] test K_52 )
+        or ( ['ao'] test K_52 )
+        or ( ['aj'] test K_52 )
+        or ( ['an'] test K_52 )
+        or ( ['am'] test K_52 )
+        or ( ['a{sv}'] test K_52 )
+        or ( ['amo'] test K_52 )
+        or ( ['ate'] test K_52 )
+        or ( ['aju'] test K_52 )
+        or ( ['ati'] test K_52 )
+        or ( ['a{sv}e'] test K_52 )
+        or ( ['ahu'] test K_52 )
+        or ( ['ala'] test K_52 )
+        or ( ['ali'] test K_52 )
+        or ( ['ale'] test K_52 )
+        or ( ['alo'] test K_52 )
+        or ( ['ana'] test K_52 )
+        or ( ['ano'] test K_52 )
+        or ( ['ani'] test K_52 )
+        or ( ['ane'] test K_52 )
+        or ( ['asmo'] test K_52 )
+        or ( ['aste'] test K_52 )
+        or ( ['ajmo'] test K_52 )
+        or ( ['ajte'] test K_52 )
+        or ( ['aju{c'}i'] test K_52 )
+)
+        R1
+        delete
+    )
+    define L_53 as (
+(
+        ( [ ] test K_53 )
+        or ( ['e'] test K_53 )
+        or ( ['u'] test K_53 )
+        or ( ['mo'] test K_53 )
+        or ( ['ao'] test K_53 )
+        or ( ['em'] test K_53 )
+        or ( ['e{sv}'] test K_53 )
+        or ( ['at'] test K_53 )
+        or ( ['ah'] test K_53 )
+        or ( ['te'] test K_53 )
+        or ( ['ahu'] test K_53 )
+        or ( ['ati'] test K_53 )
+        or ( ['emo'] test K_53 )
+        or ( ['ete'] test K_53 )
+        or ( ['a{sv}e'] test K_53 )
+        or ( ['ali'] test K_53 )
+        or ( ['u{c'}i'] test K_53 )
+        or ( ['ala'] test K_53 )
+        or ( ['alo'] test K_53 )
+        or ( ['ale'] test K_53 )
+        or ( ['asmo'] test K_53 )
+        or ( ['aste'] test K_53 )
+)
+        R1
+        delete
+    )
+    define L_54 as (
+(
+        ( ['l'] test K_54 )
+        or ( ['lu'] test K_54 )
+        or ( ['li'] test K_54 )
+        or ( ['la'] test K_54 )
+        or ( ['le'] test K_54 )
+        or ( ['lo'] test K_54 )
+        or ( ['lom'] test K_54 )
+        or ( ['lama'] test K_54 )
+        or ( ['lima'] test K_54 )
+)
+        R1
+        delete
+    )
+    define L_55 as (
+(
+        ( [ ] test K_55 )
+        or ( ['a'] test K_55 )
+        or ( ['e'] test K_55 )
+        or ( ['i'] test K_55 )
+        or ( ['u'] test K_55 )
+        or ( ['em'] test K_55 )
+        or ( ['evi'] test K_55 )
+        or ( ['eva'] test K_55 )
+        or ( ['eve'] test K_55 )
+        or ( ['ama'] test K_55 )
+        or ( ['ima'] test K_55 )
+        or ( ['evima'] test K_55 )
+)
+        R1
+        delete
+    )
+    define L_56 as (
+(
+        ( ['t'] test K_56 )
+        or ( ['h'] test K_56 )
+        or ( ['o'] test K_56 )
+        or ( ['j'] test K_56 )
+        or ( ['n'] test K_56 )
+        or ( ['m'] test K_56 )
+        or ( ['{sv}'] test K_56 )
+        or ( ['mo'] test K_56 )
+        or ( ['te'] test K_56 )
+        or ( ['ju'] test K_56 )
+        or ( ['ti'] test K_56 )
+        or ( ['{sv}e'] test K_56 )
+        or ( ['hu'] test K_56 )
+        or ( ['la'] test K_56 )
+        or ( ['li'] test K_56 )
+        or ( ['le'] test K_56 )
+        or ( ['lo'] test K_56 )
+        or ( ['na'] test K_56 )
+        or ( ['no'] test K_56 )
+        or ( ['ni'] test K_56 )
+        or ( ['ne'] test K_56 )
+        or ( ['v{sv}i'] test K_56 )
+        or ( ['smo'] test K_56 )
+        or ( ['ste'] test K_56 )
+        or ( ['jmo'] test K_56 )
+        or ( ['jte'] test K_56 )
+        or ( ['ju{c'}i'] test K_56 )
+)
+        R1
+        delete
+    )
+    define L_57 as (
+(
+        ( ['t'] test K_57 )
+        or ( ['o'] test K_57 )
+        or ( ['de'] test K_57 )
+        or ( ['ti'] test K_57 )
+        or ( ['ne'] test K_57 )
+        or ( ['nu'] test K_57 )
+        or ( ['du'] test K_57 )
+        or ( ['la'] test K_57 )
+        or ( ['li'] test K_57 )
+        or ( ['lo'] test K_57 )
+        or ( ['le'] test K_57 )
+        or ( ['v{sv}i'] test K_57 )
+        or ( ['nem'] test K_57 )
+        or ( ['dem'] test K_57 )
+        or ( ['ne{sv}'] test K_57 )
+        or ( ['de{sv}'] test K_57 )
+        or ( ['doh'] test K_57 )
+        or ( ['do{sv}e'] test K_57 )
+        or ( ['nemo'] test K_57 )
+        or ( ['demo'] test K_57 )
+        or ( ['nete'] test K_57 )
+        or ( ['dete'] test K_57 )
+        or ( ['nimo'] test K_57 )
+        or ( ['nite'] test K_57 )
+        or ( ['nila'] test K_57 )
+        or ( ['dosmo'] test K_57 )
+        or ( ['doste'] test K_57 )
+)
+        R1
+        delete
+    )
+    define L_58 as (
+(
+        ( ['n'] test K_58 )
+        or ( ['j'] test K_58 )
+        or ( ['o'] test K_58 )
+        or ( ['m'] test K_58 )
+        or ( ['{sv}'] test K_58 )
+        or ( ['t'] test K_58 )
+        or ( ['h'] test K_58 )
+        or ( ['ti'] test K_58 )
+        or ( ['mo'] test K_58 )
+        or ( ['te'] test K_58 )
+        or ( ['ju'] test K_58 )
+        or ( ['{sv}e'] test K_58 )
+        or ( ['la'] test K_58 )
+        or ( ['lo'] test K_58 )
+        or ( ['le'] test K_58 )
+        or ( ['li'] test K_58 )
+        or ( ['na'] test K_58 )
+        or ( ['no'] test K_58 )
+        or ( ['ni'] test K_58 )
+        or ( ['ne'] test K_58 )
+        or ( ['smo'] test K_58 )
+        or ( ['ste'] test K_58 )
+        or ( ['jmo'] test K_58 )
+        or ( ['jte'] test K_58 )
+        or ( ['v{sv}i'] test K_58 )
+)
+        R1
+        delete
+    )
+    define L_59 as (
+(
+        ( ['em'] test K_59 )
+        or ( ['e{sv}'] test K_59 )
+        or ( ['at'] test K_59 )
+        or ( ['ah'] test K_59 )
+        or ( ['ao'] test K_59 )
+        or ( ['ati'] test K_59 )
+        or ( ['emo'] test K_59 )
+        or ( ['ete'] test K_59 )
+        or ( ['ali'] test K_59 )
+        or ( ['ala'] test K_59 )
+        or ( ['alo'] test K_59 )
+        or ( ['ale'] test K_59 )
+        or ( ['a{sv}e'] test K_59 )
+        or ( ['ahu'] test K_59 )
+        or ( ['asmo'] test K_59 )
+        or ( ['aste'] test K_59 )
+)
+        R1
+        delete
+    )
+    define L_60 as (
+(
+        ( ['te'] test K_60 )
+        or ( ['li'] test K_60 )
+        or ( ['ti'] test K_60 )
+        or ( ['la'] test K_60 )
+        or ( ['lo'] test K_60 )
+        or ( ['le'] test K_60 )
+        or ( ['tem'] test K_60 )
+        or ( ['te{sv}'] test K_60 )
+        or ( ['tao'] test K_60 )
+        or ( ['temo'] test K_60 )
+        or ( ['tete'] test K_60 )
+        or ( ['timo'] test K_60 )
+        or ( ['tite'] test K_60 )
+        or ( ['tu{c'}i'] test K_60 )
+)
+        R1
+        delete
+    )
+    define L_61 as (
+(
+        ( ['m'] test K_61 )
+        or ( ['{sv}'] test K_61 )
+        or ( ['t'] test K_61 )
+        or ( ['h'] test K_61 )
+        or ( ['o'] test K_61 )
+        or ( ['{sv}e'] test K_61 )
+        or ( ['mo'] test K_61 )
+        or ( ['te'] test K_61 )
+        or ( ['ti'] test K_61 )
+        or ( ['li'] test K_61 )
+        or ( ['la'] test K_61 )
+        or ( ['lo'] test K_61 )
+        or ( ['le'] test K_61 )
+        or ( ['v{sv}i'] test K_61 )
+        or ( ['e{c'}i'] test K_61 )
+        or ( ['smo'] test K_61 )
+        or ( ['ste'] test K_61 )
+)
+        R1
+        delete
+    )
+    define L_62 as (
+(
+        ( ['t'] test K_62 )
+        or ( ['m'] test K_62 )
+        or ( ['{sv}'] test K_62 )
+        or ( ['h'] test K_62 )
+        or ( ['j'] test K_62 )
+        or ( ['o'] test K_62 )
+        or ( ['mo'] test K_62 )
+        or ( ['{sv}e'] test K_62 )
+        or ( ['te'] test K_62 )
+        or ( ['ti'] test K_62 )
+        or ( ['ju'] test K_62 )
+        or ( ['je'] test K_62 )
+        or ( ['la'] test K_62 )
+        or ( ['lo'] test K_62 )
+        or ( ['li'] test K_62 )
+        or ( ['le'] test K_62 )
+        or ( ['jem'] test K_62 )
+        or ( ['je{sv}'] test K_62 )
+        or ( ['smo'] test K_62 )
+        or ( ['ste'] test K_62 )
+        or ( ['jmo'] test K_62 )
+        or ( ['jte'] test K_62 )
+        or ( ['v{sv}i'] test K_62 )
+        or ( ['jemo'] test K_62 )
+        or ( ['jete'] test K_62 )
+)
+        R1
+        delete
+    )
+    define L_63 as (
+(
+        ( ['t'] test K_63 )
+        or ( ['m'] test K_63 )
+        or ( ['{sv}'] test K_63 )
+        or ( ['h'] test K_63 )
+        or ( ['j'] test K_63 )
+        or ( ['o'] test K_63 )
+        or ( ['mo'] test K_63 )
+        or ( ['lu'] test K_63 )
+        or ( ['{sv}e'] test K_63 )
+        or ( ['te'] test K_63 )
+        or ( ['ti'] test K_63 )
+        or ( ['ju'] test K_63 )
+        or ( ['je'] test K_63 )
+        or ( ['la'] test K_63 )
+        or ( ['lo'] test K_63 )
+        or ( ['li'] test K_63 )
+        or ( ['le'] test K_63 )
+        or ( ['jem'] test K_63 )
+        or ( ['je{sv}'] test K_63 )
+        or ( ['smo'] test K_63 )
+        or ( ['ste'] test K_63 )
+        or ( ['jmo'] test K_63 )
+        or ( ['jte'] test K_63 )
+        or ( ['v{sv}i'] test K_63 )
+        or ( ['jemo'] test K_63 )
+        or ( ['jete'] test K_63 )
+)
+        R1
+        delete
+    )
+    define L_64 as (
+(
+        ( ['e'] test K_64 )
+        or ( ['i'] test K_64 )
+        or ( ['uj'] test K_64 )
+        or ( ['io'] test K_64 )
+        or ( ['en'] test K_64 )
+        or ( ['im'] test K_64 )
+        or ( ['i{sv}'] test K_64 )
+        or ( ['it'] test K_64 )
+        or ( ['ih'] test K_64 )
+        or ( ['uje'] test K_64 )
+        or ( ['uju'] test K_64 )
+        or ( ['i{sv}e'] test K_64 )
+        or ( ['iti'] test K_64 )
+        or ( ['imo'] test K_64 )
+        or ( ['ite'] test K_64 )
+        or ( ['ila'] test K_64 )
+        or ( ['ilo'] test K_64 )
+        or ( ['ili'] test K_64 )
+        or ( ['ile'] test K_64 )
+        or ( ['ena'] test K_64 )
+        or ( ['eno'] test K_64 )
+        or ( ['eni'] test K_64 )
+        or ( ['ene'] test K_64 )
+        or ( ['ujem'] test K_64 )
+        or ( ['uje{sv}'] test K_64 )
+        or ( ['ismo'] test K_64 )
+        or ( ['iste'] test K_64 )
+        or ( ['ujmo'] test K_64 )
+        or ( ['ujte'] test K_64 )
+        or ( ['ujete'] test K_64 )
+        or ( ['uju{c'}i'] test K_64 )
+        or ( ['ujemo'] test K_64 )
+)
+        R1
+        delete
+    )
+    define L_65 as (
+(
+        ( ['m'] test K_65 )
+        or ( ['{sv}'] test K_65 )
+        or ( ['t'] test K_65 )
+        or ( ['h'] test K_65 )
+        or ( ['o'] test K_65 )
+        or ( ['{sv}e'] test K_65 )
+        or ( ['mo'] test K_65 )
+        or ( ['te'] test K_65 )
+        or ( ['ti'] test K_65 )
+        or ( ['li'] test K_65 )
+        or ( ['la'] test K_65 )
+        or ( ['lo'] test K_65 )
+        or ( ['le'] test K_65 )
+        or ( ['smo'] test K_65 )
+        or ( ['ste'] test K_65 )
+)
+        R1
+        delete
+    )
+    define L_66 as (
+(
+        ( ['l'] test K_66 )
+        or ( ['lu'] test K_66 )
+        or ( ['li'] test K_66 )
+        or ( ['la'] test K_66 )
+        or ( ['le'] test K_66 )
+        or ( ['lo'] test K_66 )
+        or ( ['lom'] test K_66 )
+        or ( ['lama'] test K_66 )
+        or ( ['lima'] test K_66 )
+)
+        R1
+        delete
+    )
+    define L_67 as (
+(
+        ( ['l'] test K_67 )
+        or ( ['lu'] test K_67 )
+        or ( ['li'] test K_67 )
+        or ( ['la'] test K_67 )
+        or ( ['le'] test K_67 )
+        or ( ['lo'] test K_67 )
+        or ( ['lom'] test K_67 )
+        or ( ['lama'] test K_67 )
+        or ( ['lima'] test K_67 )
+)
+        R1
+        delete
+    )
+    define L_68 as (
+(
+        ( [ ] test K_68 )
+        or ( ['a'] test K_68 )
+        or ( ['u'] test K_68 )
+        or ( ['i'] test K_68 )
+        or ( ['e'] test K_68 )
+        or ( ['o'] test K_68 )
+        or ( ['oj'] test K_68 )
+        or ( ['og'] test K_68 )
+        or ( ['om'] test K_68 )
+        or ( ['im'] test K_68 )
+        or ( ['ih'] test K_68 )
+        or ( ['ima'] test K_68 )
+        or ( ['oga'] test K_68 )
+        or ( ['ome'] test K_68 )
+        or ( ['omu'] test K_68 )
+        or ( ['iji'] test K_68 )
+        or ( ['ije'] test K_68 )
+        or ( ['ija'] test K_68 )
+        or ( ['iju'] test K_68 )
+        or ( ['ijeg'] test K_68 )
+        or ( ['ijem'] test K_68 )
+        or ( ['ijih'] test K_68 )
+        or ( ['ijim'] test K_68 )
+        or ( ['ijega'] test K_68 )
+        or ( ['ijemu'] test K_68 )
+        or ( ['ijima'] test K_68 )
+)
+        R1
+        delete
+    )
+    define L_69 as (
+(
+        ( ['e'] test K_69 )
+        or ( ['u'] test K_69 )
+        or ( ['i'] test K_69 )
+        or ( ['em'] test K_69 )
+        or ( ['e{sv}'] test K_69 )
+        or ( ['u{c'}i'] test K_69 )
+        or ( ['emo'] test K_69 )
+        or ( ['imo'] test K_69 )
+        or ( ['av{sv}i'] test K_69 )
+)
+        R1
+        delete
+    )
+    define L_70 as (
+(
+        ( ['am'] test K_70 )
+        or ( ['a{sv}'] test K_70 )
+        or ( ['at'] test K_70 )
+        or ( ['ah'] test K_70 )
+        or ( ['ao'] test K_70 )
+        or ( ['aj'] test K_70 )
+        or ( ['an'] test K_70 )
+        or ( ['amo'] test K_70 )
+        or ( ['ate'] test K_70 )
+        or ( ['aju'] test K_70 )
+        or ( ['ati'] test K_70 )
+        or ( ['a{sv}e'] test K_70 )
+        or ( ['ahu'] test K_70 )
+        or ( ['ali'] test K_70 )
+        or ( ['ala'] test K_70 )
+        or ( ['ale'] test K_70 )
+        or ( ['alo'] test K_70 )
+        or ( ['ana'] test K_70 )
+        or ( ['ano'] test K_70 )
+        or ( ['ani'] test K_70 )
+        or ( ['ane'] test K_70 )
+        or ( ['alom'] test K_70 )
+        or ( ['av{sv}i'] test K_70 )
+        or ( ['asmo'] test K_70 )
+        or ( ['aste'] test K_70 )
+        or ( ['ajmo'] test K_70 )
+        or ( ['ajte'] test K_70 )
+        or ( ['iv{sv}i'] test K_70 )
+        or ( ['aju{c'}i'] test K_70 )
+        or ( ['alima'] test K_70 )
+)
+        R1
+        delete
+    )
+    define L_71 as (
+(
+        ( ['eno'] test K_71 )
+        or ( ['ovi'] test K_71 )
+        or ( ['ova'] test K_71 )
+        or ( ['oga'] test K_71 )
+        or ( ['ima'] test K_71 )
+        or ( ['ove'] test K_71 )
+        or ( ['enu'] test K_71 )
+        or ( ['anu'] test K_71 )
+        or ( ['ena'] test K_71 )
+        or ( ['ama'] test K_71 )
+        or ( ['anje'] test K_71 )
+        or ( ['enje'] test K_71 )
+        or ( ['anja'] test K_71 )
+        or ( ['enja'] test K_71 )
+        or ( ['enom'] test K_71 )
+        or ( ['enoj'] test K_71 )
+        or ( ['enog'] test K_71 )
+        or ( ['enim'] test K_71 )
+        or ( ['enih'] test K_71 )
+        or ( ['anom'] test K_71 )
+        or ( ['anoj'] test K_71 )
+        or ( ['anog'] test K_71 )
+        or ( ['anim'] test K_71 )
+        or ( ['anih'] test K_71 )
+)
+        R1
+        delete
+    )
+    define L_72 as (
+(
+        ( ['an'] test K_72 )
+        or ( ['na'] test K_72 )
+        or ( ['nu'] test K_72 )
+        or ( ['ni'] test K_72 )
+        or ( ['ne'] test K_72 )
+        or ( ['no'] test K_72 )
+        or ( ['noj'] test K_72 )
+        or ( ['nom'] test K_72 )
+        or ( ['nog'] test K_72 )
+        or ( ['nim'] test K_72 )
+        or ( ['nih'] test K_72 )
+        or ( ['nima'] test K_72 )
+        or ( ['niji'] test K_72 )
+        or ( ['nije'] test K_72 )
+        or ( ['nija'] test K_72 )
+        or ( ['niju'] test K_72 )
+        or ( ['nijeg'] test K_72 )
+        or ( ['nijem'] test K_72 )
+        or ( ['nijim'] test K_72 )
+        or ( ['nijih'] test K_72 )
+        or ( ['nijega'] test K_72 )
+        or ( ['nijemu'] test K_72 )
+        or ( ['nijima'] test K_72 )
+)
+        R1
+        delete
+    )
+    define L_73 as (
+(
+        ( ['u'] test K_73 )
+        or ( ['o'] test K_73 )
+        or ( ['i'] test K_73 )
+        or ( ['e'] test K_73 )
+        or ( ['a'] test K_73 )
+        or ( ['om'] test K_73 )
+        or ( ['og'] test K_73 )
+        or ( ['im'] test K_73 )
+        or ( ['ih'] test K_73 )
+        or ( ['em'] test K_73 )
+        or ( ['oj'] test K_73 )
+        or ( ['an'] test K_73 )
+)
+        R1
+        delete
+    )
+
+    define Strip as (
+        L_1
+        or L_2
+        or L_3
+        or L_4
+        or L_5
+        or L_6
+        or L_7
+        or L_8
+        or L_9
+        or L_10
+        or L_11
+        or L_12
+        or L_13
+        or L_14
+        or L_15
+        or L_16
+        or L_17
+        or L_18
+        or L_19
+        or L_20
+        or L_21
+        or L_22
+        or L_23
+        or L_24
+        or L_25
+        or L_26
+        or L_27
+        or L_28
+        or L_29
+        or L_30
+        or L_31
+        or L_32
+        or L_33
+        or L_34
+        or L_35
+        or L_36
+        or L_37
+        or L_38
+        or L_39
+        or L_40
+        or L_41
+        or L_42
+        or L_43
+        or L_44
+        or L_45
+        or L_46
+        or L_47
+        or L_48
+        or L_49
+        or L_50
+        or L_51
+        or L_52
+        or L_53
+        or L_54
+        or L_55
+        or L_56
+        or L_57
+        or L_58
+        or L_59
+        or L_60
+        or L_61
+        or L_62
+        or L_63
+        or L_64
+        or L_65
+        or L_66
+        or L_67
+        or L_68
+        or L_69
+        or L_70
+        or L_71
+        or L_72
+        or L_73
+    )
+
+    /* a rule set: first matching lexical transformation, in file order */
+    define aTransform as (
+        ( ['lozi'] <- 'loga' )
+        or ( ['lozima'] <- 'loga' )
+        or ( ['pjesi'] <- 'pjeh' )
+        or ( ['pjesima'] <- 'pjeh' )
+        or ( ['vojci'] <- 'vojka' )
+        or ( ['bojci'] <- 'bojka' )
+        or ( ['jaci'] <- 'jak' )
+        or ( ['jacima'] <- 'jak' )
+        or ( ['cajan'] <- 'cajni' )
+        or ( ['ijeran'] <- 'ijerni' )
+        or ( ['laran'] <- 'larni' )
+        or ( ['ijesan'] <- 'ijesni' )
+        or ( ['anjac'] <- 'anjca' )
+        or ( ['ajac'] <- 'ajca' )
+        or ( ['ajaca'] <- 'ajca' )
+        or ( ['ljaca'] <- 'ljca' )
+        or ( ['ljac'] <- 'ljca' )
+        or ( ['ejac'] <- 'ejca' )
+        or ( ['ejaca'] <- 'ejca' )
+        or ( ['ojac'] <- 'ojca' )
+        or ( ['ojaca'] <- 'ojca' )
+        or ( ['ajaka'] <- 'ajka' )
+        or ( ['ojaka'] <- 'ojka' )
+        or ( ['saca'] <- 'sca' )
+        or ( ['sac'] <- 'sca' )
+        or ( ['inzima'] <- 'ing' )
+        or ( ['inzi'] <- 'ing' )
+        or ( ['tvenici'] <- 'tvenik' )
+        or ( ['tetici'] <- 'tetika' )
+        or ( ['teticima'] <- 'tetika' )
+        or ( ['nstava'] <- 'nstva' )
+        or ( ['nicima'] <- 'nik' )
+        or ( ['ticima'] <- 'tik' )
+        or ( ['zicima'] <- 'zik' )
+        or ( ['snici'] <- 'snik' )
+        or ( ['kuse'] <- 'kusi' )
+        or ( ['kusan'] <- 'kusni' )
+        or ( ['kustava'] <- 'kustva' )
+        or ( ['dusan'] <- 'dusni' )
+        or ( ['antan'] <- 'antni' )
+        or ( ['bilan'] <- 'bilni' )
+        or ( ['tilan'] <- 'tilni' )
+        or ( ['avilan'] <- 'avilni' )
+        or ( ['silan'] <- 'silni' )
+        or ( ['gilan'] <- 'gilni' )
+        or ( ['rilan'] <- 'rilni' )
+        or ( ['nilan'] <- 'nilni' )
+        or ( ['alan'] <- 'alni' )
+        or ( ['ozan'] <- 'ozni' )
+        or ( ['rave'] <- 'ravi' )
+        or ( ['stavan'] <- 'stavni' )
+        or ( ['pravan'] <- 'pravni' )
+        or ( ['tivan'] <- 'tivni' )
+        or ( ['sivan'] <- 'sivni' )
+        or ( ['atan'] <- 'atni' )
+        or ( ['cenata'] <- 'centa' )
+        or ( ['denata'] <- 'denta' )
+        or ( ['genata'] <- 'genta' )
+        or ( ['lenata'] <- 'lenta' )
+        or ( ['menata'] <- 'menta' )
+        or ( ['jenata'] <- 'jenta' )
+        or ( ['venata'] <- 'venta' )
+        or ( ['tetan'] <- 'tetni' )
+        or ( ['pletan'] <- 'pletni' )
+        or ( ['save'] <- 'savi' )
+        or ( ['manata'] <- 'manta' )
+        or ( ['tanata'] <- 'tanta' )
+        or ( ['lanata'] <- 'lanta' )
+        or ( ['sanata'] <- 'santa' )
+        or ( ['acak'] <- 'acka' )
+        or ( ['acaka'] <- 'acka' )
+        or ( ['usak'] <- 'uska' )
+        or ( ['atak'] <- 'atka' )
+        or ( ['ataka'] <- 'atka' )
+        or ( ['atci'] <- 'atka' )
+        or ( ['atcima'] <- 'atka' )
+        or ( ['etak'] <- 'etka' )
+        or ( ['etaka'] <- 'etka' )
+        or ( ['itak'] <- 'itka' )
+        or ( ['itaka'] <- 'itka' )
+        or ( ['itci'] <- 'itka' )
+        or ( ['otak'] <- 'otka' )
+        or ( ['otaka'] <- 'otka' )
+        or ( ['utak'] <- 'utka' )
+        or ( ['utaka'] <- 'utka' )
+        or ( ['utci'] <- 'utka' )
+        or ( ['utcima'] <- 'utka' )
+        or ( ['eskan'] <- 'eskna' )
+        or ( ['tican'] <- 'ticni' )
+        or ( ['ojsci'] <- 'ojska' )
+        or ( ['esama'] <- 'esma' )
+        or ( ['metara'] <- 'metra' )
+        or ( ['centar'] <- 'centra' )
+        or ( ['centara'] <- 'centra' )
+        or ( ['istara'] <- 'istra' )
+        or ( ['istar'] <- 'istra' )
+        or ( ['oscu'] <- 'osti' )
+        or ( ['daba'] <- 'dba' )
+        or ( ['ccima'] <- 'cka' )
+        or ( ['cci'] <- 'cka' )
+        or ( ['mac'] <- 'mca' )
+        or ( ['maca'] <- 'mca' )
+        or ( ['naca'] <- 'nca' )
+        or ( ['nac'] <- 'nca' )
+        or ( ['voljan'] <- 'voljni' )
+        or ( ['anaka'] <- 'anki' )
+        or ( ['vac'] <- 'vca' )
+        or ( ['vaca'] <- 'vca' )
+        or ( ['saca'] <- 'sca' )
+        or ( ['sac'] <- 'sca' )
+        or ( ['raca'] <- 'rca' )
+        or ( ['rac'] <- 'rca' )
+        or ( ['aoca'] <- 'alca' )
+        or ( ['alaca'] <- 'alca' )
+        or ( ['alac'] <- 'alca' )
+        or ( ['elaca'] <- 'elca' )
+        or ( ['elac'] <- 'elca' )
+        or ( ['olaca'] <- 'olca' )
+        or ( ['olac'] <- 'olca' )
+        or ( ['olce'] <- 'olca' )
+        or ( ['njac'] <- 'njca' )
+        or ( ['njaca'] <- 'njca' )
+        or ( ['ekata'] <- 'ekta' )
+        or ( ['ekat'] <- 'ekta' )
+        or ( ['izam'] <- 'izma' )
+        or ( ['izama'] <- 'izma' )
+        or ( ['jebe'] <- 'jebi' )
+        or ( ['baci'] <- 'baci' )
+        or ( ['asan'] <- 'asni' )
+    )
+
+    define aK_1 as ( 'k' ( ( 's' next ) ) )
+    define aK_2 as ( 'tv' ( ( 's' next ) ) )
+    define aK_3 as ( 'anij' ( ( 't' next ) or ( 'm' next ) or ( 'p' next ) or ( 'r' next ) or ( 'g' next ) ) )
+    define aK_4 as ( 'an' next )
+    define aK_5 as ( 'in' next )
+    define aK_6 as ( 'on' next )
+    define aK_7 as ( 'n' next )
+    define aK_8 as ( 'c' ( ( 'a' next ) or ( 'e' next ) or ( 'u' next ) ) )
+    define aK_9 as ( 'ugov' next )
+    define aK_10 as ( 'ug' next )
+    define aK_11 as ( 'log' next )
+    define aK_12 as ( 'g' non-ag_neg1 next )
+    define aK_13 as ( 'i' ( ( 'rrar' next ) or ( 'ott' next ) or ( 'ss' next ) or ( 'll' next ) ) )
+    define aK_14 as ( 'uj' next )
+    define aK_15 as ( 'aj' ( ( 'c' next ) or ( 'd' next ) or ( 'l' next ) or ( 'r' next ) ) )
+    define aK_16 as ( 'ij' ( ( 'b' next ) or ( 'c' next ) or ( 'd' next ) or ( 'l' next ) or ( 'n' next ) or ( 'm' next ) or ( 'z' next ) or ( 'g' next ) or ( 'f' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( 't' next ) ) )
+    define aK_17 as ( 'nal' non-ag_neg2 next )
+    define aK_18 as ( 'ijal' next )
+    define aK_19 as ( 'ozil' next )
+    define aK_20 as ( 'olov' next )
+    define aK_21 as ( 'ol' next )
+    define aK_22 as ( 'lem' next )
+    define aK_23 as ( 'ram' next )
+    define aK_24 as ( 'r' ( ( 'a' next ) or ( 'd' next ) or ( 'e' next ) or ( 'o' next ) ) )
+    define aK_25 as ( 's' ( ( 'e' next ) or ( 'i' next ) ) )
+    define aK_26 as ( 'as' ( ( 't' next ) or ( 'n' next ) or ( 'j' next ) or ( 'k' next ) or ( 'b' next ) or ( 'g' next ) or ( 'v' next ) ) )
+    define aK_27 as ( 's' ( ( 'e' next ) or ( 'i' next ) ) )
+    define aK_28 as ( 'ikat' next )
+    define aK_29 as ( 'lat' next )
+    define aK_30 as ( 'et' next )
+    define aK_31 as ( 'st' ( ( 'e' next ) or ( 'i' next ) or ( 'k' next ) or ( 'o' next ) ) )
+    define aK_32 as ( 'ist' next )
+    define aK_33 as ( 'ova' next )
+    define aK_34 as ( 'v' ( ( 'a' next ) or ( 'e' next ) or ( 'i' next ) ) )
+    define aK_35 as ( 'ov' non-ag_neg3 next )
+    define aK_36 as ( 'ov' ( ( 'm' next ) or ( 'l' next ) ) )
+    define aK_37 as ( 'el' next )
+    define aK_38 as ( 'nj' ( ( 'a' next ) or ( 'e' next ) or ( 's' next ) ) )
+    define aK_39 as ( 'cin' next )
+    define aK_40 as ( 'rosi' next )
+    define aK_41 as ( 'os' next )
+    define aK_42 as ( 'vit' ( ( 'e' next ) or ( 'o' next ) ) )
+    define aK_43 as ( 'ast' next )
+    define aK_44 as ( 'k' next )
+    define aK_45 as ( 'va' ( ( 'e' next ) or ( 'a' next ) or ( 'i' next ) or ( 'u' next ) ) )
+    define aK_46 as ( 'ir' next )
+    define aK_47 as ( 'ac' next )
+    define aK_48 as ( 'aca' next )
+    define aK_49 as ( 'n' next )
+    define aK_50 as ( 'ni' next )
+    define aK_51 as ( 'a' ( ( 'st' ( ( 'a' next ) or ( 'r' next ) or ( 'i' next ) or ( 'p' next ) or ( 'e' next ) or ( 'u' next ) ) ) or ( 'g' non-ag_neg4 next ) or ( 'ik' next ) or ( 'uc' next ) or ( 'oj' next ) or ( 'aj' next ) or ( 'lj' next ) or ( 'ak' next ) or ( 'ck' next ) or ( 'sk' next ) or ( 'uk' next ) or ( 'nj' next ) or ( 'im' next ) or ( 'ar' next ) or ( 'at' next ) or ( 'et' next ) or ( 'st' next ) or ( 'it' next ) or ( 'ot' next ) or ( 'ut' next ) or ( 'zn' next ) or ( 'zv' next ) ) )
+    define aK_52 as ( 'ur' next )
+    define aK_53 as ( 'staj' ( ( 'a' next ) or ( 'i' next ) or ( 'o' next ) ) )
+    define aK_54 as ( 'a' ( ( 'b' next ) or ( 'c' next ) or ( 'd' next ) or ( 'e' next ) or ( 'f' next ) or ( 'g' next ) or ( 'j' next ) or ( 'k' next ) or ( 'n' next ) or ( 'r' next ) or ( 't' next ) or ( 'u' next ) or ( 'v' next ) ) )
+    define aK_55 as ( 'aj' ( ( 't' next ) or ( 'c' next ) or ( 'j' next ) or ( 'z' next ) or ( 's' next ) ) )
+    define aK_56 as ( 'a' ( ( 'm' non-ag_neg4 next ) or ( 'ic' next ) or ( 'nc' next ) or ( 'uc' next ) or ( 'b' next ) or ( 'c' next ) or ( 'd' next ) or ( 'h' next ) or ( 'j' next ) or ( 'k' next ) or ( 'l' next ) or ( 'n' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( 'v' next ) or ( 'z' next ) ) )
+    define aK_57 as ( 'sta' ( ( 'a' next ) or ( 'i' next ) or ( 'o' next ) ) )
+    define aK_58 as ( 'ta' next )
+    define aK_59 as ( 'inj' next )
+    define aK_60 as ( 'as' next )
+    define aK_61 as ( 'i' ( ( 'elj' next ) or ( 'ulj' next ) or ( 'tit' next ) or ( 'ac' next ) or ( 'ic' next ) or ( 'od' next ) or ( 'oj' next ) or ( 'et' next ) or ( 'av' next ) or ( 'ov' next ) ) )
+    define aK_62 as ( 'i' ( ( 'tit' next ) or ( 'jeb' next ) or ( 'ar' next ) or ( 'ed' next ) or ( 'us' next ) or ( 'ic' next ) ) )
+    define aK_63 as ( 'i' ( ( 'b' next ) or ( 'c' next ) or ( 'd' next ) or ( 'l' next ) or ( 'm' next ) or ( 'p' next ) or ( 'r' next ) or ( 's' next ) or ( 'z' next ) ) )
+    define aK_64 as ( 'luc' next )
+    define aK_65 as ( 'jeti' next )
+    define aK_66 as ( 'e' next )
+    define aK_67 as ( 'i' next )
+    define aK_68 as ( 'at' next )
+    define aK_69 as ( 'et' next )
+    define aK_70 as ( next )
+    define aK_71 as ( next )
+    define aK_72 as ( next )
+    define aK_73 as ( next )
+
+    define aL_1 as (
+(
+        ( ['i'] test aK_1 )
+        or ( ['e'] test aK_1 )
+        or ( ['o'] test aK_1 )
+        or ( ['a'] test aK_1 )
+        or ( ['u'] test aK_1 )
+        or ( ['og'] test aK_1 )
+        or ( ['om'] test aK_1 )
+        or ( ['im'] test aK_1 )
+        or ( ['ih'] test aK_1 )
+        or ( ['oj'] test aK_1 )
+        or ( ['iji'] test aK_1 )
+        or ( ['ije'] test aK_1 )
+        or ( ['ija'] test aK_1 )
+        or ( ['oga'] test aK_1 )
+        or ( ['ome'] test aK_1 )
+        or ( ['omu'] test aK_1 )
+        or ( ['ima'] test aK_1 )
+        or ( ['ijem'] test aK_1 )
+        or ( ['ijim'] test aK_1 )
+        or ( ['ijih'] test aK_1 )
+        or ( ['ijoj'] test aK_1 )
+        or ( ['ijeg'] test aK_1 )
+        or ( ['ijima'] test aK_1 )
+        or ( ['ijega'] test aK_1 )
+        or ( ['ijemu'] test aK_1 )
+)
+        R1
+        delete
+    )
+    define aL_2 as (
+(
+        ( ['o'] test aK_2 )
+        or ( ['a'] test aK_2 )
+        or ( ['u'] test aK_2 )
+        or ( ['om'] test aK_2 )
+        or ( ['ima'] test aK_2 )
+)
+        R1
+        delete
+    )
+    define aL_3 as (
+(
+        ( [ ] test aK_3 )
+        or ( ['a'] test aK_3 )
+        or ( ['u'] test aK_3 )
+        or ( ['e'] test aK_3 )
+        or ( ['i'] test aK_3 )
+        or ( ['om'] test aK_3 )
+        or ( ['ama'] test aK_3 )
+        or ( ['ima'] test aK_3 )
+)
+        R1
+        delete
+    )
+    define aL_4 as (
+(
+        ( [ ] test aK_4 )
+        or ( ['u'] test aK_4 )
+        or ( ['i'] test aK_4 )
+        or ( ['a'] test aK_4 )
+        or ( ['e'] test aK_4 )
+        or ( ['in'] test aK_4 )
+        or ( ['om'] test aK_4 )
+        or ( ['ina'] test aK_4 )
+        or ( ['inu'] test aK_4 )
+        or ( ['ine'] test aK_4 )
+        or ( ['ima'] test aK_4 )
+        or ( ['inom'] test aK_4 )
+)
+        R1
+        delete
+    )
+    define aL_5 as (
+(
+        ( [ ] test aK_5 )
+        or ( ['a'] test aK_5 )
+        or ( ['e'] test aK_5 )
+        or ( ['i'] test aK_5 )
+        or ( ['u'] test aK_5 )
+        or ( ['o'] test aK_5 )
+        or ( ['om'] test aK_5 )
+        or ( ['ima'] test aK_5 )
+        or ( ['ama'] test aK_5 )
+)
+        R1
+        delete
+    )
+    define aL_6 as (
+(
+        ( [ ] test aK_6 )
+        or ( ['a'] test aK_6 )
+        or ( ['e'] test aK_6 )
+        or ( ['i'] test aK_6 )
+        or ( ['u'] test aK_6 )
+        or ( ['om'] test aK_6 )
+        or ( ['ova'] test aK_6 )
+        or ( ['ove'] test aK_6 )
+        or ( ['ovi'] test aK_6 )
+        or ( ['ima'] test aK_6 )
+        or ( ['ovima'] test aK_6 )
+)
+        R1
+        delete
+    )
+    define aL_7 as (
+(
+        ( [ ] test aK_7 )
+        or ( ['o'] test aK_7 )
+        or ( ['e'] test aK_7 )
+        or ( ['a'] test aK_7 )
+        or ( ['u'] test aK_7 )
+        or ( ['i'] test aK_7 )
+        or ( ['oj'] test aK_7 )
+        or ( ['om'] test aK_7 )
+        or ( ['ih'] test aK_7 )
+        or ( ['im'] test aK_7 )
+        or ( ['og'] test aK_7 )
+        or ( ['iji'] test aK_7 )
+        or ( ['ije'] test aK_7 )
+        or ( ['ija'] test aK_7 )
+        or ( ['iju'] test aK_7 )
+        or ( ['ima'] test aK_7 )
+        or ( ['ome'] test aK_7 )
+        or ( ['omu'] test aK_7 )
+        or ( ['oga'] test aK_7 )
+        or ( ['ijeg'] test aK_7 )
+        or ( ['ijem'] test aK_7 )
+        or ( ['ijim'] test aK_7 )
+        or ( ['ijih'] test aK_7 )
+        or ( ['ijoj'] test aK_7 )
+        or ( ['ijima'] test aK_7 )
+        or ( ['ijega'] test aK_7 )
+        or ( ['ijemu'] test aK_7 )
+)
+        R1
+        delete
+    )
+    define aL_8 as (
+(
+        ( ['e'] test aK_8 )
+        or ( ['a'] test aK_8 )
+        or ( ['oj'] test aK_8 )
+        or ( ['ih'] test aK_8 )
+        or ( ['om'] test aK_8 )
+        or ( ['eg'] test aK_8 )
+        or ( ['em'] test aK_8 )
+        or ( ['og'] test aK_8 )
+        or ( ['uh'] test aK_8 )
+        or ( ['im'] test aK_8 )
+        or ( ['oga'] test aK_8 )
+        or ( ['ome'] test aK_8 )
+        or ( ['omu'] test aK_8 )
+        or ( ['ega'] test aK_8 )
+        or ( ['emu'] test aK_8 )
+        or ( ['ima'] test aK_8 )
+)
+        R1
+        delete
+    )
+    define aL_9 as (
+(
+        ( ['i'] test aK_9 )
+        or ( ['e'] test aK_9 )
+        or ( ['a'] test aK_9 )
+        or ( ['ima'] test aK_9 )
+)
+        R1
+        delete
+    )
+    define aL_10 as (
+(
+        ( ['a'] test aK_10 )
+        or ( ['e'] test aK_10 )
+        or ( ['i'] test aK_10 )
+        or ( ['u'] test aK_10 )
+        or ( ['o'] test aK_10 )
+        or ( ['om'] test aK_10 )
+        or ( ['ama'] test aK_10 )
+)
+        R1
+        delete
+    )
+    define aL_11 as (
+(
+        ( [ ] test aK_11 )
+        or ( ['a'] test aK_11 )
+        or ( ['u'] test aK_11 )
+        or ( ['e'] test aK_11 )
+        or ( ['om'] test aK_11 )
+        or ( ['ama'] test aK_11 )
+)
+        R1
+        delete
+    )
+    define aL_12 as (
+(
+        ( [ ] test aK_12 )
+        or ( ['a'] test aK_12 )
+        or ( ['e'] test aK_12 )
+        or ( ['i'] test aK_12 )
+        or ( ['u'] test aK_12 )
+        or ( ['o'] test aK_12 )
+        or ( ['om'] test aK_12 )
+        or ( ['ama'] test aK_12 )
+        or ( ['ovi'] test aK_12 )
+        or ( ['ove'] test aK_12 )
+        or ( ['ova'] test aK_12 )
+        or ( ['ovima'] test aK_12 )
+)
+        R1
+        delete
+    )
+    define aL_13 as (
+(
+        ( [ ] test aK_13 )
+        or ( ['o'] test aK_13 )
+        or ( ['ja'] test aK_13 )
+        or ( ['ju'] test aK_13 )
+        or ( ['jem'] test aK_13 )
+)
+        R1
+        delete
+    )
+    define aL_14 as (
+(
+        ( [ ] test aK_14 )
+        or ( ['e'] test aK_14 )
+        or ( ['u'] test aK_14 )
+        or ( ['mo'] test aK_14 )
+        or ( ['em'] test aK_14 )
+        or ( ['es'] test aK_14 )
+        or ( ['uci'] test aK_14 )
+        or ( ['emo'] test aK_14 )
+        or ( ['ete'] test aK_14 )
+)
+        R1
+        delete
+    )
+    define aL_15 as (
+(
+        ( [ ] test aK_15 )
+        or ( ['a'] test aK_15 )
+        or ( ['e'] test aK_15 )
+        or ( ['i'] test aK_15 )
+        or ( ['u'] test aK_15 )
+        or ( ['em'] test aK_15 )
+        or ( ['evi'] test aK_15 )
+        or ( ['eva'] test aK_15 )
+        or ( ['eve'] test aK_15 )
+        or ( ['ama'] test aK_15 )
+        or ( ['ima'] test aK_15 )
+        or ( ['evima'] test aK_15 )
+)
+        R1
+        delete
+    )
+    define aL_16 as (
+(
+        ( [ ] test aK_16 )
+        or ( ['a'] test aK_16 )
+        or ( ['e'] test aK_16 )
+        or ( ['i'] test aK_16 )
+        or ( ['u'] test aK_16 )
+        or ( ['o'] test aK_16 )
+        or ( ['om'] test aK_16 )
+        or ( ['ima'] test aK_16 )
+        or ( ['ama'] test aK_16 )
+)
+        R1
+        delete
+    )
+    define aL_17 as (
+(
+        ( [ ] test aK_17 )
+        or ( ['a'] test aK_17 )
+        or ( ['e'] test aK_17 )
+        or ( ['i'] test aK_17 )
+        or ( ['u'] test aK_17 )
+        or ( ['o'] test aK_17 )
+        or ( ['om'] test aK_17 )
+        or ( ['ima'] test aK_17 )
+        or ( ['ama'] test aK_17 )
+)
+        R1
+        delete
+    )
+    define aL_18 as (
+(
+        ( [ ] test aK_18 )
+        or ( ['a'] test aK_18 )
+        or ( ['e'] test aK_18 )
+        or ( ['i'] test aK_18 )
+        or ( ['u'] test aK_18 )
+        or ( ['o'] test aK_18 )
+        or ( ['om'] test aK_18 )
+        or ( ['ima'] test aK_18 )
+        or ( ['ama'] test aK_18 )
+)
+        R1
+        delete
+    )
+    define aL_19 as (
+(
+        ( [ ] test aK_19 )
+        or ( ['a'] test aK_19 )
+        or ( ['e'] test aK_19 )
+        or ( ['u'] test aK_19 )
+        or ( ['i'] test aK_19 )
+        or ( ['om'] test aK_19 )
+        or ( ['ima'] test aK_19 )
+)
+        R1
+        delete
+    )
+    define aL_20 as (
+(
+        ( ['i'] test aK_20 )
+        or ( ['a'] test aK_20 )
+        or ( ['e'] test aK_20 )
+        or ( ['ima'] test aK_20 )
+)
+        R1
+        delete
+    )
+    define aL_21 as (
+(
+        ( [ ] test aK_21 )
+        or ( ['a'] test aK_21 )
+        or ( ['u'] test aK_21 )
+        or ( ['e'] test aK_21 )
+        or ( ['i'] test aK_21 )
+        or ( ['om'] test aK_21 )
+        or ( ['ima'] test aK_21 )
+)
+        R1
+        delete
+    )
+    define aL_22 as (
+(
+        ( [ ] test aK_22 )
+        or ( ['a'] test aK_22 )
+        or ( ['e'] test aK_22 )
+        or ( ['i'] test aK_22 )
+        or ( ['u'] test aK_22 )
+        or ( ['o'] test aK_22 )
+        or ( ['om'] test aK_22 )
+        or ( ['ama'] test aK_22 )
+        or ( ['ima'] test aK_22 )
+)
+        R1
+        delete
+    )
+    define aL_23 as (
+(
+        ( ['a'] test aK_23 )
+        or ( ['e'] test aK_23 )
+        or ( ['i'] test aK_23 )
+        or ( ['u'] test aK_23 )
+        or ( ['o'] test aK_23 )
+        or ( ['om'] test aK_23 )
+        or ( ['ama'] test aK_23 )
+)
+        R1
+        delete
+    )
+    define aL_24 as (
+(
+        ( [ ] test aK_24 )
+        or ( ['u'] test aK_24 )
+        or ( ['a'] test aK_24 )
+        or ( ['e'] test aK_24 )
+        or ( ['i'] test aK_24 )
+        or ( ['om'] test aK_24 )
+        or ( ['ama'] test aK_24 )
+        or ( ['ima'] test aK_24 )
+)
+        R1
+        delete
+    )
+    define aL_25 as (
+(
+        ( ['e'] test aK_25 )
+        or ( ['a'] test aK_25 )
+        or ( ['u'] test aK_25 )
+        or ( ['om'] test aK_25 )
+        or ( ['ima'] test aK_25 )
+)
+        R1
+        delete
+    )
+    define aL_26 as (
+(
+        ( [ ] test aK_26 )
+        or ( ['a'] test aK_26 )
+        or ( ['u'] test aK_26 )
+        or ( ['i'] test aK_26 )
+        or ( ['e'] test aK_26 )
+        or ( ['om'] test aK_26 )
+        or ( ['em'] test aK_26 )
+        or ( ['ama'] test aK_26 )
+        or ( ['ima'] test aK_26 )
+)
+        R1
+        delete
+    )
+    define aL_27 as (
+(
+        ( [ ] test aK_27 )
+        or ( ['i'] test aK_27 )
+        or ( ['e'] test aK_27 )
+        or ( ['a'] test aK_27 )
+        or ( ['u'] test aK_27 )
+        or ( ['om'] test aK_27 )
+        or ( ['em'] test aK_27 )
+        or ( ['ima'] test aK_27 )
+        or ( ['ama'] test aK_27 )
+)
+        R1
+        delete
+    )
+    define aL_28 as (
+(
+        ( [ ] test aK_28 )
+        or ( ['a'] test aK_28 )
+        or ( ['e'] test aK_28 )
+        or ( ['i'] test aK_28 )
+        or ( ['u'] test aK_28 )
+        or ( ['o'] test aK_28 )
+        or ( ['om'] test aK_28 )
+        or ( ['ima'] test aK_28 )
+)
+        R1
+        delete
+    )
+    define aL_29 as (
+(
+        ( [ ] test aK_29 )
+        or ( ['a'] test aK_29 )
+        or ( ['e'] test aK_29 )
+        or ( ['i'] test aK_29 )
+        or ( ['u'] test aK_29 )
+        or ( ['o'] test aK_29 )
+        or ( ['om'] test aK_29 )
+        or ( ['ima'] test aK_29 )
+)
+        R1
+        delete
+    )
+    define aL_30 as (
+(
+        ( [ ] test aK_30 )
+        or ( ['a'] test aK_30 )
+        or ( ['e'] test aK_30 )
+        or ( ['i'] test aK_30 )
+        or ( ['u'] test aK_30 )
+        or ( ['o'] test aK_30 )
+        or ( ['om'] test aK_30 )
+        or ( ['ama'] test aK_30 )
+        or ( ['ima'] test aK_30 )
+)
+        R1
+        delete
+    )
+    define aL_31 as (
+(
+        ( [ ] test aK_31 )
+        or ( ['a'] test aK_31 )
+        or ( ['e'] test aK_31 )
+        or ( ['i'] test aK_31 )
+        or ( ['u'] test aK_31 )
+        or ( ['o'] test aK_31 )
+        or ( ['om'] test aK_31 )
+        or ( ['ima'] test aK_31 )
+        or ( ['ama'] test aK_31 )
+)
+        R1
+        delete
+    )
+    define aL_32 as (
+(
+        ( ['a'] test aK_32 )
+        or ( ['e'] test aK_32 )
+        or ( ['u'] test aK_32 )
+        or ( ['em'] test aK_32 )
+        or ( ['ima'] test aK_32 )
+)
+        R1
+        delete
+    )
+    define aL_33 as (
+(
+        ( ['t'] test aK_33 )
+        or ( ['h'] test aK_33 )
+        or ( ['o'] test aK_33 )
+        or ( ['hu'] test aK_33 )
+        or ( ['ti'] test aK_33 )
+        or ( ['se'] test aK_33 )
+        or ( ['li'] test aK_33 )
+        or ( ['la'] test aK_33 )
+        or ( ['le'] test aK_33 )
+        or ( ['lo'] test aK_33 )
+        or ( ['smo'] test aK_33 )
+        or ( ['ste'] test aK_33 )
+)
+        R1
+        delete
+    )
+    define aL_34 as (
+(
+        ( [ ] test aK_34 )
+        or ( ['i'] test aK_34 )
+        or ( ['a'] test aK_34 )
+        or ( ['u'] test aK_34 )
+        or ( ['e'] test aK_34 )
+        or ( ['o'] test aK_34 )
+        or ( ['im'] test aK_34 )
+        or ( ['ih'] test aK_34 )
+        or ( ['oj'] test aK_34 )
+        or ( ['om'] test aK_34 )
+        or ( ['og'] test aK_34 )
+        or ( ['oga'] test aK_34 )
+        or ( ['ome'] test aK_34 )
+        or ( ['omu'] test aK_34 )
+        or ( ['ima'] test aK_34 )
+        or ( ['ama'] test aK_34 )
+        or ( ['iji'] test aK_34 )
+        or ( ['ije'] test aK_34 )
+        or ( ['ija'] test aK_34 )
+        or ( ['iju'] test aK_34 )
+        or ( ['ijeg'] test aK_34 )
+        or ( ['ijem'] test aK_34 )
+        or ( ['ijim'] test aK_34 )
+        or ( ['ijih'] test aK_34 )
+        or ( ['ijoj'] test aK_34 )
+        or ( ['ijemu'] test aK_34 )
+        or ( ['ijima'] test aK_34 )
+        or ( ['ijega'] test aK_34 )
+)
+        R1
+        delete
+    )
+    define aL_35 as (
+(
+        ( [ ] test aK_35 )
+        or ( ['i'] test aK_35 )
+        or ( ['a'] test aK_35 )
+        or ( ['u'] test aK_35 )
+        or ( ['e'] test aK_35 )
+        or ( ['o'] test aK_35 )
+        or ( ['im'] test aK_35 )
+        or ( ['ih'] test aK_35 )
+        or ( ['oj'] test aK_35 )
+        or ( ['om'] test aK_35 )
+        or ( ['og'] test aK_35 )
+        or ( ['oga'] test aK_35 )
+        or ( ['ome'] test aK_35 )
+        or ( ['omu'] test aK_35 )
+        or ( ['ima'] test aK_35 )
+        or ( ['iji'] test aK_35 )
+        or ( ['ije'] test aK_35 )
+        or ( ['ija'] test aK_35 )
+        or ( ['iju'] test aK_35 )
+        or ( ['ijeg'] test aK_35 )
+        or ( ['ijem'] test aK_35 )
+        or ( ['ijim'] test aK_35 )
+        or ( ['ijih'] test aK_35 )
+        or ( ['ijoj'] test aK_35 )
+        or ( ['ijemu'] test aK_35 )
+        or ( ['ijima'] test aK_35 )
+        or ( ['ijega'] test aK_35 )
+)
+        R1
+        delete
+    )
+    define aL_36 as (
+(
+        ( [ ] test aK_36 )
+        or ( ['a'] test aK_36 )
+        or ( ['u'] test aK_36 )
+        or ( ['e'] test aK_36 )
+        or ( ['i'] test aK_36 )
+        or ( ['om'] test aK_36 )
+        or ( ['ima'] test aK_36 )
+)
+        R1
+        delete
+    )
+    define aL_37 as (
+(
+        ( [ ] test aK_37 )
+        or ( ['i'] test aK_37 )
+        or ( ['a'] test aK_37 )
+        or ( ['u'] test aK_37 )
+        or ( ['e'] test aK_37 )
+        or ( ['o'] test aK_37 )
+        or ( ['im'] test aK_37 )
+        or ( ['ih'] test aK_37 )
+        or ( ['oj'] test aK_37 )
+        or ( ['om'] test aK_37 )
+        or ( ['og'] test aK_37 )
+        or ( ['oga'] test aK_37 )
+        or ( ['ome'] test aK_37 )
+        or ( ['omu'] test aK_37 )
+        or ( ['ima'] test aK_37 )
+        or ( ['iji'] test aK_37 )
+        or ( ['ije'] test aK_37 )
+        or ( ['ija'] test aK_37 )
+        or ( ['iju'] test aK_37 )
+        or ( ['ijeg'] test aK_37 )
+        or ( ['ijem'] test aK_37 )
+        or ( ['ijim'] test aK_37 )
+        or ( ['ijih'] test aK_37 )
+        or ( ['ijoj'] test aK_37 )
+        or ( ['ijemu'] test aK_37 )
+        or ( ['ijima'] test aK_37 )
+        or ( ['ijega'] test aK_37 )
+)
+        R1
+        delete
+    )
+    define aL_38 as (
+(
+        ( ['a'] test aK_38 )
+        or ( ['e'] test aK_38 )
+        or ( ['i'] test aK_38 )
+        or ( ['o'] test aK_38 )
+        or ( ['u'] test aK_38 )
+        or ( ['eg'] test aK_38 )
+        or ( ['em'] test aK_38 )
+        or ( ['im'] test aK_38 )
+        or ( ['ih'] test aK_38 )
+        or ( ['oj'] test aK_38 )
+        or ( ['om'] test aK_38 )
+        or ( ['og'] test aK_38 )
+        or ( ['oga'] test aK_38 )
+        or ( ['ome'] test aK_38 )
+        or ( ['omu'] test aK_38 )
+        or ( ['ima'] test aK_38 )
+        or ( ['iji'] test aK_38 )
+        or ( ['ije'] test aK_38 )
+        or ( ['ija'] test aK_38 )
+        or ( ['iju'] test aK_38 )
+        or ( ['ega'] test aK_38 )
+        or ( ['emu'] test aK_38 )
+        or ( ['ijeg'] test aK_38 )
+        or ( ['ijem'] test aK_38 )
+        or ( ['ijim'] test aK_38 )
+        or ( ['ijih'] test aK_38 )
+        or ( ['ijoj'] test aK_38 )
+        or ( ['ijemu'] test aK_38 )
+        or ( ['ijima'] test aK_38 )
+        or ( ['ijega'] test aK_38 )
+)
+        R1
+        delete
+    )
+    define aL_39 as (
+(
+        ( [ ] test aK_39 )
+        or ( ['a'] test aK_39 )
+        or ( ['u'] test aK_39 )
+        or ( ['i'] test aK_39 )
+        or ( ['o'] test aK_39 )
+        or ( ['e'] test aK_39 )
+        or ( ['og'] test aK_39 )
+        or ( ['om'] test aK_39 )
+        or ( ['im'] test aK_39 )
+        or ( ['ih'] test aK_39 )
+        or ( ['oj'] test aK_39 )
+        or ( ['ama'] test aK_39 )
+        or ( ['ome'] test aK_39 )
+        or ( ['omu'] test aK_39 )
+        or ( ['oga'] test aK_39 )
+        or ( ['ima'] test aK_39 )
+)
+        R1
+        delete
+    )
+    define aL_40 as (
+(
+        ( ['m'] test aK_40 )
+        or ( ['s'] test aK_40 )
+        or ( ['t'] test aK_40 )
+        or ( ['h'] test aK_40 )
+        or ( ['o'] test aK_40 )
+        or ( ['se'] test aK_40 )
+        or ( ['mo'] test aK_40 )
+        or ( ['te'] test aK_40 )
+        or ( ['ti'] test aK_40 )
+        or ( ['li'] test aK_40 )
+        or ( ['la'] test aK_40 )
+        or ( ['lo'] test aK_40 )
+        or ( ['le'] test aK_40 )
+        or ( ['vsi'] test aK_40 )
+        or ( ['smo'] test aK_40 )
+        or ( ['ste'] test aK_40 )
+)
+        R1
+        delete
+    )
+    define aL_41 as (
+(
+        ( [ ] test aK_41 )
+        or ( ['i'] test aK_41 )
+        or ( ['a'] test aK_41 )
+        or ( ['u'] test aK_41 )
+        or ( ['e'] test aK_41 )
+        or ( ['im'] test aK_41 )
+        or ( ['ih'] test aK_41 )
+        or ( ['oj'] test aK_41 )
+        or ( ['om'] test aK_41 )
+        or ( ['og'] test aK_41 )
+        or ( ['oga'] test aK_41 )
+        or ( ['ome'] test aK_41 )
+        or ( ['omu'] test aK_41 )
+        or ( ['ima'] test aK_41 )
+        or ( ['iji'] test aK_41 )
+        or ( ['ije'] test aK_41 )
+        or ( ['ija'] test aK_41 )
+        or ( ['iju'] test aK_41 )
+        or ( ['ijeg'] test aK_41 )
+        or ( ['ijem'] test aK_41 )
+        or ( ['ijim'] test aK_41 )
+        or ( ['ijih'] test aK_41 )
+        or ( ['ijoj'] test aK_41 )
+        or ( ['ijemu'] test aK_41 )
+        or ( ['ijima'] test aK_41 )
+        or ( ['ijega'] test aK_41 )
+)
+        R1
+        delete
+    )
+    define aL_42 as (
+(
+        ( [ ] test aK_42 )
+        or ( ['i'] test aK_42 )
+        or ( ['e'] test aK_42 )
+        or ( ['o'] test aK_42 )
+        or ( ['a'] test aK_42 )
+        or ( ['u'] test aK_42 )
+        or ( ['og'] test aK_42 )
+        or ( ['om'] test aK_42 )
+        or ( ['im'] test aK_42 )
+        or ( ['ih'] test aK_42 )
+        or ( ['oj'] test aK_42 )
+        or ( ['iji'] test aK_42 )
+        or ( ['ije'] test aK_42 )
+        or ( ['ija'] test aK_42 )
+        or ( ['oga'] test aK_42 )
+        or ( ['ome'] test aK_42 )
+        or ( ['omu'] test aK_42 )
+        or ( ['ima'] test aK_42 )
+        or ( ['ijem'] test aK_42 )
+        or ( ['ijim'] test aK_42 )
+        or ( ['ijih'] test aK_42 )
+        or ( ['ijoj'] test aK_42 )
+        or ( ['ijeg'] test aK_42 )
+        or ( ['ijima'] test aK_42 )
+        or ( ['ijega'] test aK_42 )
+        or ( ['ijemu'] test aK_42 )
+)
+        R1
+        delete
+    )
+    define aL_43 as (
+(
+        ( [ ] test aK_43 )
+        or ( ['i'] test aK_43 )
+        or ( ['e'] test aK_43 )
+        or ( ['o'] test aK_43 )
+        or ( ['a'] test aK_43 )
+        or ( ['u'] test aK_43 )
+        or ( ['og'] test aK_43 )
+        or ( ['om'] test aK_43 )
+        or ( ['im'] test aK_43 )
+        or ( ['ih'] test aK_43 )
+        or ( ['oj'] test aK_43 )
+        or ( ['iji'] test aK_43 )
+        or ( ['ije'] test aK_43 )
+        or ( ['ija'] test aK_43 )
+        or ( ['oga'] test aK_43 )
+        or ( ['ome'] test aK_43 )
+        or ( ['omu'] test aK_43 )
+        or ( ['ima'] test aK_43 )
+        or ( ['ijem'] test aK_43 )
+        or ( ['ijim'] test aK_43 )
+        or ( ['ijih'] test aK_43 )
+        or ( ['ijoj'] test aK_43 )
+        or ( ['ijeg'] test aK_43 )
+        or ( ['ijima'] test aK_43 )
+        or ( ['ijega'] test aK_43 )
+        or ( ['ijemu'] test aK_43 )
+)
+        R1
+        delete
+    )
+    define aL_44 as (
+(
+        ( [ ] test aK_44 )
+        or ( ['i'] test aK_44 )
+        or ( ['a'] test aK_44 )
+        or ( ['u'] test aK_44 )
+        or ( ['e'] test aK_44 )
+        or ( ['o'] test aK_44 )
+        or ( ['im'] test aK_44 )
+        or ( ['ih'] test aK_44 )
+        or ( ['oj'] test aK_44 )
+        or ( ['om'] test aK_44 )
+        or ( ['og'] test aK_44 )
+        or ( ['oga'] test aK_44 )
+        or ( ['ome'] test aK_44 )
+        or ( ['omu'] test aK_44 )
+        or ( ['ima'] test aK_44 )
+        or ( ['iji'] test aK_44 )
+        or ( ['ije'] test aK_44 )
+        or ( ['ija'] test aK_44 )
+        or ( ['iju'] test aK_44 )
+        or ( ['ijeg'] test aK_44 )
+        or ( ['ijem'] test aK_44 )
+        or ( ['ijim'] test aK_44 )
+        or ( ['ijih'] test aK_44 )
+        or ( ['ijoj'] test aK_44 )
+        or ( ['ijemu'] test aK_44 )
+        or ( ['ijima'] test aK_44 )
+        or ( ['ijega'] test aK_44 )
+)
+        R1
+        delete
+    )
+    define aL_45 as (
+(
+        ( [ ] test aK_45 )
+        or ( ['h'] test aK_45 )
+        or ( ['j'] test aK_45 )
+        or ( ['m'] test aK_45 )
+        or ( ['n'] test aK_45 )
+        or ( ['o'] test aK_45 )
+        or ( ['t'] test aK_45 )
+        or ( ['v'] test aK_45 )
+        or ( ['s'] test aK_45 )
+        or ( ['ju'] test aK_45 )
+        or ( ['la'] test aK_45 )
+        or ( ['le'] test aK_45 )
+        or ( ['li'] test aK_45 )
+        or ( ['lo'] test aK_45 )
+        or ( ['mo'] test aK_45 )
+        or ( ['na'] test aK_45 )
+        or ( ['ne'] test aK_45 )
+        or ( ['ni'] test aK_45 )
+        or ( ['no'] test aK_45 )
+        or ( ['te'] test aK_45 )
+        or ( ['ti'] test aK_45 )
+        or ( ['se'] test aK_45 )
+        or ( ['hu'] test aK_45 )
+        or ( ['smo'] test aK_45 )
+        or ( ['ste'] test aK_45 )
+        or ( ['jmo'] test aK_45 )
+        or ( ['jte'] test aK_45 )
+        or ( ['juci'] test aK_45 )
+)
+        R1
+        delete
+    )
+    define aL_46 as (
+(
+        ( ['uj'] test aK_46 )
+        or ( ['al'] test aK_46 )
+        or ( ['an'] test aK_46 )
+        or ( ['am'] test aK_46 )
+        or ( ['as'] test aK_46 )
+        or ( ['at'] test aK_46 )
+        or ( ['ah'] test aK_46 )
+        or ( ['ao'] test aK_46 )
+        or ( ['ati'] test aK_46 )
+        or ( ['amo'] test aK_46 )
+        or ( ['ate'] test aK_46 )
+        or ( ['aju'] test aK_46 )
+        or ( ['ase'] test aK_46 )
+        or ( ['ahu'] test aK_46 )
+        or ( ['ala'] test aK_46 )
+        or ( ['alo'] test aK_46 )
+        or ( ['ali'] test aK_46 )
+        or ( ['ale'] test aK_46 )
+        or ( ['uje'] test aK_46 )
+        or ( ['uju'] test aK_46 )
+        or ( ['ivat'] test aK_46 )
+        or ( ['ujem'] test aK_46 )
+        or ( ['ujes'] test aK_46 )
+        or ( ['ujmo'] test aK_46 )
+        or ( ['ujte'] test aK_46 )
+        or ( ['avsi'] test aK_46 )
+        or ( ['asmo'] test aK_46 )
+        or ( ['aste'] test aK_46 )
+        or ( ['ujemo'] test aK_46 )
+        or ( ['ujete'] test aK_46 )
+        or ( ['ujuci'] test aK_46 )
+        or ( ['ajuci'] test aK_46 )
+)
+        R1
+        delete
+    )
+    define aL_47 as (
+(
+        ( ['i'] test aK_47 )
+        or ( ['e'] test aK_47 )
+        or ( ['io'] test aK_47 )
+        or ( ['im'] test aK_47 )
+        or ( ['is'] test aK_47 )
+        or ( ['it'] test aK_47 )
+        or ( ['ih'] test aK_47 )
+        or ( ['en'] test aK_47 )
+        or ( ['iti'] test aK_47 )
+        or ( ['imo'] test aK_47 )
+        or ( ['ite'] test aK_47 )
+        or ( ['ise'] test aK_47 )
+        or ( ['eci'] test aK_47 )
+        or ( ['ila'] test aK_47 )
+        or ( ['ilo'] test aK_47 )
+        or ( ['ili'] test aK_47 )
+        or ( ['ile'] test aK_47 )
+        or ( ['ena'] test aK_47 )
+        or ( ['eno'] test aK_47 )
+        or ( ['eni'] test aK_47 )
+        or ( ['ene'] test aK_47 )
+        or ( ['ismo'] test aK_47 )
+        or ( ['iste'] test aK_47 )
+)
+        R1
+        delete
+    )
+    define aL_48 as (
+(
+        ( ['o'] test aK_48 )
+        or ( ['m'] test aK_48 )
+        or ( ['s'] test aK_48 )
+        or ( ['t'] test aK_48 )
+        or ( ['h'] test aK_48 )
+        or ( ['n'] test aK_48 )
+        or ( ['hu'] test aK_48 )
+        or ( ['ti'] test aK_48 )
+        or ( ['mo'] test aK_48 )
+        or ( ['te'] test aK_48 )
+        or ( ['se'] test aK_48 )
+        or ( ['la'] test aK_48 )
+        or ( ['lo'] test aK_48 )
+        or ( ['li'] test aK_48 )
+        or ( ['le'] test aK_48 )
+        or ( ['ju'] test aK_48 )
+        or ( ['na'] test aK_48 )
+        or ( ['no'] test aK_48 )
+        or ( ['ni'] test aK_48 )
+        or ( ['ne'] test aK_48 )
+        or ( ['vsi'] test aK_48 )
+        or ( ['smo'] test aK_48 )
+        or ( ['ste'] test aK_48 )
+)
+        R1
+        delete
+    )
+    define aL_49 as (
+(
+        ( ['e'] test aK_49 )
+        or ( ['u'] test aK_49 )
+        or ( ['i'] test aK_49 )
+        or ( ['em'] test aK_49 )
+        or ( ['es'] test aK_49 )
+        or ( ['uo'] test aK_49 )
+        or ( ['ut'] test aK_49 )
+        or ( ['uci'] test aK_49 )
+        or ( ['imo'] test aK_49 )
+        or ( ['ite'] test aK_49 )
+        or ( ['emo'] test aK_49 )
+        or ( ['ete'] test aK_49 )
+        or ( ['ula'] test aK_49 )
+        or ( ['ulo'] test aK_49 )
+        or ( ['ule'] test aK_49 )
+        or ( ['uli'] test aK_49 )
+        or ( ['uto'] test aK_49 )
+        or ( ['uti'] test aK_49 )
+        or ( ['uta'] test aK_49 )
+        or ( ['uvsi'] test aK_49 )
+        or ( ['usmo'] test aK_49 )
+        or ( ['uste'] test aK_49 )
+)
+        R1
+        delete
+    )
+    define aL_50 as (
+(
+        ( ['m'] test aK_50 )
+        or ( ['s'] test aK_50 )
+        or ( ['o'] test aK_50 )
+        or ( ['ti'] test aK_50 )
+        or ( ['mo'] test aK_50 )
+        or ( ['te'] test aK_50 )
+        or ( ['la'] test aK_50 )
+        or ( ['lo'] test aK_50 )
+        or ( ['le'] test aK_50 )
+        or ( ['li'] test aK_50 )
+        or ( ['vsi'] test aK_50 )
+        or ( ['smo'] test aK_50 )
+        or ( ['ste'] test aK_50 )
+)
+        R1
+        delete
+    )
+    define aL_51 as (
+(
+        ( ['t'] test aK_51 )
+        or ( ['h'] test aK_51 )
+        or ( ['o'] test aK_51 )
+        or ( ['j'] test aK_51 )
+        or ( ['n'] test aK_51 )
+        or ( ['m'] test aK_51 )
+        or ( ['s'] test aK_51 )
+        or ( ['mo'] test aK_51 )
+        or ( ['te'] test aK_51 )
+        or ( ['je'] test aK_51 )
+        or ( ['ju'] test aK_51 )
+        or ( ['ti'] test aK_51 )
+        or ( ['se'] test aK_51 )
+        or ( ['hu'] test aK_51 )
+        or ( ['la'] test aK_51 )
+        or ( ['li'] test aK_51 )
+        or ( ['le'] test aK_51 )
+        or ( ['lo'] test aK_51 )
+        or ( ['na'] test aK_51 )
+        or ( ['no'] test aK_51 )
+        or ( ['ni'] test aK_51 )
+        or ( ['ne'] test aK_51 )
+        or ( ['vsi'] test aK_51 )
+        or ( ['smo'] test aK_51 )
+        or ( ['ste'] test aK_51 )
+        or ( ['jmo'] test aK_51 )
+        or ( ['jte'] test aK_51 )
+        or ( ['jem'] test aK_51 )
+        or ( ['juci'] test aK_51 )
+)
+        R1
+        delete
+    )
+    define aL_52 as (
+(
+        ( ['al'] test aK_52 )
+        or ( ['at'] test aK_52 )
+        or ( ['ah'] test aK_52 )
+        or ( ['ao'] test aK_52 )
+        or ( ['aj'] test aK_52 )
+        or ( ['an'] test aK_52 )
+        or ( ['am'] test aK_52 )
+        or ( ['as'] test aK_52 )
+        or ( ['amo'] test aK_52 )
+        or ( ['ate'] test aK_52 )
+        or ( ['aju'] test aK_52 )
+        or ( ['ati'] test aK_52 )
+        or ( ['ase'] test aK_52 )
+        or ( ['ahu'] test aK_52 )
+        or ( ['ala'] test aK_52 )
+        or ( ['ali'] test aK_52 )
+        or ( ['ale'] test aK_52 )
+        or ( ['alo'] test aK_52 )
+        or ( ['ana'] test aK_52 )
+        or ( ['ano'] test aK_52 )
+        or ( ['ani'] test aK_52 )
+        or ( ['ane'] test aK_52 )
+        or ( ['asmo'] test aK_52 )
+        or ( ['aste'] test aK_52 )
+        or ( ['ajmo'] test aK_52 )
+        or ( ['ajte'] test aK_52 )
+        or ( ['ajuci'] test aK_52 )
+)
+        R1
+        delete
+    )
+    define aL_53 as (
+(
+        ( [ ] test aK_53 )
+        or ( ['e'] test aK_53 )
+        or ( ['u'] test aK_53 )
+        or ( ['mo'] test aK_53 )
+        or ( ['ao'] test aK_53 )
+        or ( ['em'] test aK_53 )
+        or ( ['es'] test aK_53 )
+        or ( ['at'] test aK_53 )
+        or ( ['ah'] test aK_53 )
+        or ( ['te'] test aK_53 )
+        or ( ['ahu'] test aK_53 )
+        or ( ['ati'] test aK_53 )
+        or ( ['emo'] test aK_53 )
+        or ( ['ete'] test aK_53 )
+        or ( ['ase'] test aK_53 )
+        or ( ['ali'] test aK_53 )
+        or ( ['uci'] test aK_53 )
+        or ( ['ala'] test aK_53 )
+        or ( ['alo'] test aK_53 )
+        or ( ['ale'] test aK_53 )
+        or ( ['asmo'] test aK_53 )
+        or ( ['aste'] test aK_53 )
+)
+        R1
+        delete
+    )
+    define aL_54 as (
+(
+        ( ['l'] test aK_54 )
+        or ( ['lu'] test aK_54 )
+        or ( ['li'] test aK_54 )
+        or ( ['la'] test aK_54 )
+        or ( ['le'] test aK_54 )
+        or ( ['lo'] test aK_54 )
+        or ( ['lom'] test aK_54 )
+        or ( ['lama'] test aK_54 )
+        or ( ['lima'] test aK_54 )
+)
+        R1
+        delete
+    )
+    define aL_55 as (
+(
+        ( [ ] test aK_55 )
+        or ( ['a'] test aK_55 )
+        or ( ['e'] test aK_55 )
+        or ( ['i'] test aK_55 )
+        or ( ['u'] test aK_55 )
+        or ( ['em'] test aK_55 )
+        or ( ['evi'] test aK_55 )
+        or ( ['eva'] test aK_55 )
+        or ( ['eve'] test aK_55 )
+        or ( ['ama'] test aK_55 )
+        or ( ['ima'] test aK_55 )
+        or ( ['evima'] test aK_55 )
+)
+        R1
+        delete
+    )
+    define aL_56 as (
+(
+        ( ['t'] test aK_56 )
+        or ( ['h'] test aK_56 )
+        or ( ['o'] test aK_56 )
+        or ( ['j'] test aK_56 )
+        or ( ['n'] test aK_56 )
+        or ( ['m'] test aK_56 )
+        or ( ['s'] test aK_56 )
+        or ( ['mo'] test aK_56 )
+        or ( ['te'] test aK_56 )
+        or ( ['ju'] test aK_56 )
+        or ( ['ti'] test aK_56 )
+        or ( ['se'] test aK_56 )
+        or ( ['hu'] test aK_56 )
+        or ( ['la'] test aK_56 )
+        or ( ['li'] test aK_56 )
+        or ( ['le'] test aK_56 )
+        or ( ['lo'] test aK_56 )
+        or ( ['na'] test aK_56 )
+        or ( ['no'] test aK_56 )
+        or ( ['ni'] test aK_56 )
+        or ( ['ne'] test aK_56 )
+        or ( ['vsi'] test aK_56 )
+        or ( ['smo'] test aK_56 )
+        or ( ['ste'] test aK_56 )
+        or ( ['jmo'] test aK_56 )
+        or ( ['jte'] test aK_56 )
+        or ( ['juci'] test aK_56 )
+)
+        R1
+        delete
+    )
+    define aL_57 as (
+(
+        ( ['t'] test aK_57 )
+        or ( ['o'] test aK_57 )
+        or ( ['de'] test aK_57 )
+        or ( ['ti'] test aK_57 )
+        or ( ['ne'] test aK_57 )
+        or ( ['nu'] test aK_57 )
+        or ( ['du'] test aK_57 )
+        or ( ['la'] test aK_57 )
+        or ( ['li'] test aK_57 )
+        or ( ['lo'] test aK_57 )
+        or ( ['le'] test aK_57 )
+        or ( ['vsi'] test aK_57 )
+        or ( ['nem'] test aK_57 )
+        or ( ['dem'] test aK_57 )
+        or ( ['nes'] test aK_57 )
+        or ( ['des'] test aK_57 )
+        or ( ['doh'] test aK_57 )
+        or ( ['dose'] test aK_57 )
+        or ( ['nemo'] test aK_57 )
+        or ( ['demo'] test aK_57 )
+        or ( ['nete'] test aK_57 )
+        or ( ['dete'] test aK_57 )
+        or ( ['nimo'] test aK_57 )
+        or ( ['nite'] test aK_57 )
+        or ( ['nila'] test aK_57 )
+        or ( ['dosmo'] test aK_57 )
+        or ( ['doste'] test aK_57 )
+)
+        R1
+        delete
+    )
+    define aL_58 as (
+(
+        ( ['n'] test aK_58 )
+        or ( ['j'] test aK_58 )
+        or ( ['o'] test aK_58 )
+        or ( ['m'] test aK_58 )
+        or ( ['s'] test aK_58 )
+        or ( ['t'] test aK_58 )
+        or ( ['h'] test aK_58 )
+        or ( ['ti'] test aK_58 )
+        or ( ['mo'] test aK_58 )
+        or ( ['te'] test aK_58 )
+        or ( ['ju'] test aK_58 )
+        or ( ['se'] test aK_58 )
+        or ( ['la'] test aK_58 )
+        or ( ['lo'] test aK_58 )
+        or ( ['le'] test aK_58 )
+        or ( ['li'] test aK_58 )
+        or ( ['na'] test aK_58 )
+        or ( ['no'] test aK_58 )
+        or ( ['ni'] test aK_58 )
+        or ( ['ne'] test aK_58 )
+        or ( ['smo'] test aK_58 )
+        or ( ['ste'] test aK_58 )
+        or ( ['jmo'] test aK_58 )
+        or ( ['jte'] test aK_58 )
+        or ( ['vsi'] test aK_58 )
+)
+        R1
+        delete
+    )
+    define aL_59 as (
+(
+        ( ['em'] test aK_59 )
+        or ( ['es'] test aK_59 )
+        or ( ['at'] test aK_59 )
+        or ( ['ah'] test aK_59 )
+        or ( ['ao'] test aK_59 )
+        or ( ['ati'] test aK_59 )
+        or ( ['emo'] test aK_59 )
+        or ( ['ete'] test aK_59 )
+        or ( ['ali'] test aK_59 )
+        or ( ['ala'] test aK_59 )
+        or ( ['alo'] test aK_59 )
+        or ( ['ale'] test aK_59 )
+        or ( ['ase'] test aK_59 )
+        or ( ['ahu'] test aK_59 )
+        or ( ['asmo'] test aK_59 )
+        or ( ['aste'] test aK_59 )
+)
+        R1
+        delete
+    )
+    define aL_60 as (
+(
+        ( ['te'] test aK_60 )
+        or ( ['li'] test aK_60 )
+        or ( ['ti'] test aK_60 )
+        or ( ['la'] test aK_60 )
+        or ( ['lo'] test aK_60 )
+        or ( ['le'] test aK_60 )
+        or ( ['tem'] test aK_60 )
+        or ( ['tes'] test aK_60 )
+        or ( ['tao'] test aK_60 )
+        or ( ['temo'] test aK_60 )
+        or ( ['tete'] test aK_60 )
+        or ( ['timo'] test aK_60 )
+        or ( ['tite'] test aK_60 )
+        or ( ['tuci'] test aK_60 )
+)
+        R1
+        delete
+    )
+    define aL_61 as (
+(
+        ( ['m'] test aK_61 )
+        or ( ['s'] test aK_61 )
+        or ( ['t'] test aK_61 )
+        or ( ['h'] test aK_61 )
+        or ( ['o'] test aK_61 )
+        or ( ['se'] test aK_61 )
+        or ( ['mo'] test aK_61 )
+        or ( ['te'] test aK_61 )
+        or ( ['ti'] test aK_61 )
+        or ( ['li'] test aK_61 )
+        or ( ['la'] test aK_61 )
+        or ( ['lo'] test aK_61 )
+        or ( ['le'] test aK_61 )
+        or ( ['vsi'] test aK_61 )
+        or ( ['eci'] test aK_61 )
+        or ( ['smo'] test aK_61 )
+        or ( ['ste'] test aK_61 )
+)
+        R1
+        delete
+    )
+    define aL_62 as (
+(
+        ( ['t'] test aK_62 )
+        or ( ['m'] test aK_62 )
+        or ( ['s'] test aK_62 )
+        or ( ['h'] test aK_62 )
+        or ( ['j'] test aK_62 )
+        or ( ['o'] test aK_62 )
+        or ( ['mo'] test aK_62 )
+        or ( ['se'] test aK_62 )
+        or ( ['te'] test aK_62 )
+        or ( ['ti'] test aK_62 )
+        or ( ['ju'] test aK_62 )
+        or ( ['je'] test aK_62 )
+        or ( ['la'] test aK_62 )
+        or ( ['lo'] test aK_62 )
+        or ( ['li'] test aK_62 )
+        or ( ['le'] test aK_62 )
+        or ( ['jem'] test aK_62 )
+        or ( ['jes'] test aK_62 )
+        or ( ['smo'] test aK_62 )
+        or ( ['ste'] test aK_62 )
+        or ( ['jmo'] test aK_62 )
+        or ( ['jte'] test aK_62 )
+        or ( ['vsi'] test aK_62 )
+        or ( ['jemo'] test aK_62 )
+        or ( ['jete'] test aK_62 )
+)
+        R1
+        delete
+    )
+    define aL_63 as (
+(
+        ( ['t'] test aK_63 )
+        or ( ['m'] test aK_63 )
+        or ( ['s'] test aK_63 )
+        or ( ['h'] test aK_63 )
+        or ( ['j'] test aK_63 )
+        or ( ['o'] test aK_63 )
+        or ( ['mo'] test aK_63 )
+        or ( ['lu'] test aK_63 )
+        or ( ['se'] test aK_63 )
+        or ( ['te'] test aK_63 )
+        or ( ['ti'] test aK_63 )
+        or ( ['ju'] test aK_63 )
+        or ( ['je'] test aK_63 )
+        or ( ['la'] test aK_63 )
+        or ( ['lo'] test aK_63 )
+        or ( ['li'] test aK_63 )
+        or ( ['le'] test aK_63 )
+        or ( ['jem'] test aK_63 )
+        or ( ['jes'] test aK_63 )
+        or ( ['smo'] test aK_63 )
+        or ( ['ste'] test aK_63 )
+        or ( ['jmo'] test aK_63 )
+        or ( ['jte'] test aK_63 )
+        or ( ['vsi'] test aK_63 )
+        or ( ['jemo'] test aK_63 )
+        or ( ['jete'] test aK_63 )
+)
+        R1
+        delete
+    )
+    define aL_64 as (
+(
+        ( ['e'] test aK_64 )
+        or ( ['i'] test aK_64 )
+        or ( ['uj'] test aK_64 )
+        or ( ['io'] test aK_64 )
+        or ( ['en'] test aK_64 )
+        or ( ['im'] test aK_64 )
+        or ( ['is'] test aK_64 )
+        or ( ['it'] test aK_64 )
+        or ( ['ih'] test aK_64 )
+        or ( ['uje'] test aK_64 )
+        or ( ['uju'] test aK_64 )
+        or ( ['ise'] test aK_64 )
+        or ( ['iti'] test aK_64 )
+        or ( ['imo'] test aK_64 )
+        or ( ['ite'] test aK_64 )
+        or ( ['ila'] test aK_64 )
+        or ( ['ilo'] test aK_64 )
+        or ( ['ili'] test aK_64 )
+        or ( ['ile'] test aK_64 )
+        or ( ['ena'] test aK_64 )
+        or ( ['eno'] test aK_64 )
+        or ( ['eni'] test aK_64 )
+        or ( ['ene'] test aK_64 )
+        or ( ['ujem'] test aK_64 )
+        or ( ['ujes'] test aK_64 )
+        or ( ['ismo'] test aK_64 )
+        or ( ['iste'] test aK_64 )
+        or ( ['ujmo'] test aK_64 )
+        or ( ['ujte'] test aK_64 )
+        or ( ['ujete'] test aK_64 )
+        or ( ['ujuci'] test aK_64 )
+        or ( ['ujemo'] test aK_64 )
+)
+        R1
+        delete
+    )
+    define aL_65 as (
+(
+        ( ['m'] test aK_65 )
+        or ( ['s'] test aK_65 )
+        or ( ['t'] test aK_65 )
+        or ( ['h'] test aK_65 )
+        or ( ['o'] test aK_65 )
+        or ( ['se'] test aK_65 )
+        or ( ['mo'] test aK_65 )
+        or ( ['te'] test aK_65 )
+        or ( ['ti'] test aK_65 )
+        or ( ['li'] test aK_65 )
+        or ( ['la'] test aK_65 )
+        or ( ['lo'] test aK_65 )
+        or ( ['le'] test aK_65 )
+        or ( ['smo'] test aK_65 )
+        or ( ['ste'] test aK_65 )
+)
+        R1
+        delete
+    )
+    define aL_66 as (
+(
+        ( ['l'] test aK_66 )
+        or ( ['lu'] test aK_66 )
+        or ( ['li'] test aK_66 )
+        or ( ['la'] test aK_66 )
+        or ( ['le'] test aK_66 )
+        or ( ['lo'] test aK_66 )
+        or ( ['lom'] test aK_66 )
+        or ( ['lama'] test aK_66 )
+        or ( ['lima'] test aK_66 )
+)
+        R1
+        delete
+    )
+    define aL_67 as (
+(
+        ( ['l'] test aK_67 )
+        or ( ['lu'] test aK_67 )
+        or ( ['li'] test aK_67 )
+        or ( ['la'] test aK_67 )
+        or ( ['le'] test aK_67 )
+        or ( ['lo'] test aK_67 )
+        or ( ['lom'] test aK_67 )
+        or ( ['lama'] test aK_67 )
+        or ( ['lima'] test aK_67 )
+)
+        R1
+        delete
+    )
+    define aL_68 as (
+(
+        ( [ ] test aK_68 )
+        or ( ['a'] test aK_68 )
+        or ( ['u'] test aK_68 )
+        or ( ['i'] test aK_68 )
+        or ( ['e'] test aK_68 )
+        or ( ['o'] test aK_68 )
+        or ( ['oj'] test aK_68 )
+        or ( ['og'] test aK_68 )
+        or ( ['om'] test aK_68 )
+        or ( ['im'] test aK_68 )
+        or ( ['ih'] test aK_68 )
+        or ( ['ima'] test aK_68 )
+        or ( ['oga'] test aK_68 )
+        or ( ['ome'] test aK_68 )
+        or ( ['omu'] test aK_68 )
+        or ( ['iji'] test aK_68 )
+        or ( ['ije'] test aK_68 )
+        or ( ['ija'] test aK_68 )
+        or ( ['iju'] test aK_68 )
+        or ( ['ijeg'] test aK_68 )
+        or ( ['ijem'] test aK_68 )
+        or ( ['ijih'] test aK_68 )
+        or ( ['ijim'] test aK_68 )
+        or ( ['ijega'] test aK_68 )
+        or ( ['ijemu'] test aK_68 )
+        or ( ['ijima'] test aK_68 )
+)
+        R1
+        delete
+    )
+    define aL_69 as (
+(
+        ( ['e'] test aK_69 )
+        or ( ['u'] test aK_69 )
+        or ( ['i'] test aK_69 )
+        or ( ['em'] test aK_69 )
+        or ( ['es'] test aK_69 )
+        or ( ['uci'] test aK_69 )
+        or ( ['emo'] test aK_69 )
+        or ( ['imo'] test aK_69 )
+        or ( ['avsi'] test aK_69 )
+)
+        R1
+        delete
+    )
+    define aL_70 as (
+(
+        ( ['am'] test aK_70 )
+        or ( ['as'] test aK_70 )
+        or ( ['at'] test aK_70 )
+        or ( ['ah'] test aK_70 )
+        or ( ['ao'] test aK_70 )
+        or ( ['aj'] test aK_70 )
+        or ( ['an'] test aK_70 )
+        or ( ['amo'] test aK_70 )
+        or ( ['ate'] test aK_70 )
+        or ( ['aju'] test aK_70 )
+        or ( ['ati'] test aK_70 )
+        or ( ['ase'] test aK_70 )
+        or ( ['ahu'] test aK_70 )
+        or ( ['ali'] test aK_70 )
+        or ( ['ala'] test aK_70 )
+        or ( ['ale'] test aK_70 )
+        or ( ['alo'] test aK_70 )
+        or ( ['ana'] test aK_70 )
+        or ( ['ano'] test aK_70 )
+        or ( ['ani'] test aK_70 )
+        or ( ['ane'] test aK_70 )
+        or ( ['alom'] test aK_70 )
+        or ( ['avsi'] test aK_70 )
+        or ( ['asmo'] test aK_70 )
+        or ( ['aste'] test aK_70 )
+        or ( ['ajmo'] test aK_70 )
+        or ( ['ajte'] test aK_70 )
+        or ( ['ivsi'] test aK_70 )
+        or ( ['ajuci'] test aK_70 )
+        or ( ['alima'] test aK_70 )
+)
+        R1
+        delete
+    )
+    define aL_71 as (
+(
+        ( ['eno'] test aK_71 )
+        or ( ['ovi'] test aK_71 )
+        or ( ['ova'] test aK_71 )
+        or ( ['oga'] test aK_71 )
+        or ( ['ima'] test aK_71 )
+        or ( ['ove'] test aK_71 )
+        or ( ['enu'] test aK_71 )
+        or ( ['anu'] test aK_71 )
+        or ( ['ena'] test aK_71 )
+        or ( ['ama'] test aK_71 )
+        or ( ['anje'] test aK_71 )
+        or ( ['enje'] test aK_71 )
+        or ( ['anja'] test aK_71 )
+        or ( ['enja'] test aK_71 )
+        or ( ['enom'] test aK_71 )
+        or ( ['enoj'] test aK_71 )
+        or ( ['enog'] test aK_71 )
+        or ( ['enim'] test aK_71 )
+        or ( ['enih'] test aK_71 )
+        or ( ['anom'] test aK_71 )
+        or ( ['anoj'] test aK_71 )
+        or ( ['anog'] test aK_71 )
+        or ( ['anim'] test aK_71 )
+        or ( ['anih'] test aK_71 )
+)
+        R1
+        delete
+    )
+    define aL_72 as (
+(
+        ( ['an'] test aK_72 )
+        or ( ['na'] test aK_72 )
+        or ( ['nu'] test aK_72 )
+        or ( ['ni'] test aK_72 )
+        or ( ['ne'] test aK_72 )
+        or ( ['no'] test aK_72 )
+        or ( ['noj'] test aK_72 )
+        or ( ['nom'] test aK_72 )
+        or ( ['nog'] test aK_72 )
+        or ( ['nim'] test aK_72 )
+        or ( ['nih'] test aK_72 )
+        or ( ['nima'] test aK_72 )
+        or ( ['niji'] test aK_72 )
+        or ( ['nije'] test aK_72 )
+        or ( ['nija'] test aK_72 )
+        or ( ['niju'] test aK_72 )
+        or ( ['nijeg'] test aK_72 )
+        or ( ['nijem'] test aK_72 )
+        or ( ['nijim'] test aK_72 )
+        or ( ['nijih'] test aK_72 )
+        or ( ['nijega'] test aK_72 )
+        or ( ['nijemu'] test aK_72 )
+        or ( ['nijima'] test aK_72 )
+)
+        R1
+        delete
+    )
+    define aL_73 as (
+(
+        ( ['u'] test aK_73 )
+        or ( ['o'] test aK_73 )
+        or ( ['i'] test aK_73 )
+        or ( ['e'] test aK_73 )
+        or ( ['a'] test aK_73 )
+        or ( ['om'] test aK_73 )
+        or ( ['og'] test aK_73 )
+        or ( ['im'] test aK_73 )
+        or ( ['ih'] test aK_73 )
+        or ( ['em'] test aK_73 )
+        or ( ['oj'] test aK_73 )
+        or ( ['an'] test aK_73 )
+)
+        R1
+        delete
+    )
+
+    define aStrip as (
+        aL_1
+        or aL_2
+        or aL_3
+        or aL_4
+        or aL_5
+        or aL_6
+        or aL_7
+        or aL_8
+        or aL_9
+        or aL_10
+        or aL_11
+        or aL_12
+        or aL_13
+        or aL_14
+        or aL_15
+        or aL_16
+        or aL_17
+        or aL_18
+        or aL_19
+        or aL_20
+        or aL_21
+        or aL_22
+        or aL_23
+        or aL_24
+        or aL_25
+        or aL_26
+        or aL_27
+        or aL_28
+        or aL_29
+        or aL_30
+        or aL_31
+        or aL_32
+        or aL_33
+        or aL_34
+        or aL_35
+        or aL_36
+        or aL_37
+        or aL_38
+        or aL_39
+        or aL_40
+        or aL_41
+        or aL_42
+        or aL_43
+        or aL_44
+        or aL_45
+        or aL_46
+        or aL_47
+        or aL_48
+        or aL_49
+        or aL_50
+        or aL_51
+        or aL_52
+        or aL_53
+        or aL_54
+        or aL_55
+        or aL_56
+        or aL_57
+        or aL_58
+        or aL_59
+        or aL_60
+        or aL_61
+        or aL_62
+        or aL_63
+        or aL_64
+        or aL_65
+        or aL_66
+        or aL_67
+        or aL_68
+        or aL_69
+        or aL_70
+        or aL_71
+        or aL_72
+        or aL_73
+    )
+
+)
+
+define stem as (
+    do mark_diacritics
+    (
+        no_diacritics
+        (
+            astopword
+            or (
+                backwards ( do aTransform )
+                do mark_regions
+                backwards ( do aStrip )
+            )
+        )
+    ) or (
+        stopword
+        or (
+            backwards ( do Transform )
+            do mark_regions
+            backwards ( do Strip )
+        )
+    )
+)
