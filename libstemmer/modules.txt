@@ -56,7 +56,26 @@ porter          UTF_8,ISO_8859_1        porter                  english
 # we concluded that the Kraaij-Pohlmann Dutch stemmer was a better default.
 # We still provide this to help people who have a lot of existing data indexed
 # using it.
-dutch_porter    UTF_8,ISO_8859_1        dutch_porter            dutch
+dutch_porter    UTF_8,ISO_8859_1        dutch_porter,dutch_v2,nl_v2,dut_v2,nld_v2 dutch
+
+# Snowball 3.0.0 changed the output of the stemming algorithms for several
+# languages.  These are the versions from Snowball 2.2.0, provided to help
+# people who have a lot of existing data indexed using them.  Each can be
+# referred to by appending "_v2" to any of the names of the current version.
+# For Dutch the Snowball 2.2.0 version is dutch_porter (also available as
+# dutch_v2).  New systems should use the current versions.
+danish_v2       UTF_8,ISO_8859_1        danish_v2,da_v2,dan_v2  danish
+english_v2      UTF_8,ISO_8859_1        english_v2,en_v2,eng_v2 english
+finnish_v2      UTF_8,ISO_8859_1        finnish_v2,fi_v2,fin_v2 finnish
+french_v2       UTF_8,ISO_8859_1        french_v2,fr_v2,fre_v2,fra_v2 french
+german_v2       UTF_8,ISO_8859_1        german_v2,de_v2,ger_v2,deu_v2 german
+italian_v2      UTF_8,ISO_8859_1        italian_v2,it_v2,ita_v2 italian
+lithuanian_v2   UTF_8                   lithuanian_v2,lt_v2,lit_v2 lithuanian
+norwegian_v2    UTF_8,ISO_8859_1        norwegian_v2,no_v2,nor_v2 norwegian
+romanian_v2     UTF_8                   romanian_v2,ro_v2,rum_v2,ron_v2 romanian
+spanish_v2      UTF_8,ISO_8859_1        spanish_v2,es_v2,esl_v2,spa_v2 spanish
+swedish_v2      UTF_8,ISO_8859_1        swedish_v2,sv_v2,swe_v2 swedish
+turkish_v2      UTF_8                   turkish_v2,tr_v2,tur_v2 turkish
 
 # Some other stemmers in the snowball project are not included in the standard
 # distribution. To compile a libstemmer with them in, add them to this list,

@@ -475,6 +475,19 @@ New stemming algorithms
     Fixes #261
     earlymodernenglish: Handle more prefixes/suffixes
 
+* Add the Snowball 2.2.0 versions of the stemmers whose output changed in
+  Snowball 3.0.0, as danish_v2, english_v2, finnish_v2, french_v2, german_v2,
+  italian_v2, lithuanian_v2, norwegian_v2, romanian_v2, spanish_v2,
+  swedish_v2 and turkish_v2.  Each "_v2" variant can also be selected by
+  appending "_v2" to any of the names or ISO 639 codes of the current
+  version (e.g. en_v2).  For Dutch, the Snowball 2.2.0 version was already
+  available as dutch_porter, and it can now also be selected as dutch_v2.
+
+    Stems from different stemmer versions don't match, so after upgrading
+    to Snowball 3.x an existing index built using Snowball 2.2.0 or earlier
+    needed to be rebuilt.  With these an application can continue to use
+    the existing index, and switch to the current stemmers when convenient.
+
 Behavioural changes to existing algorithms
 ------------------------------------------
 
