@@ -3,8 +3,8 @@
  * Based on the rule tables of the "Simple stemmer for Croatian v0.2",
  * Copyright 2012 Nikola Ljubešić and Ivan Pandžić,
  * http://nlp.ffzg.hr/resources/tools/stemmer-for-croatian/
- * (originally LGPLv3; included here with the permission of Nikola Ljubešić to
- * publish it under a more permissive licence), and on the algorithm described in
+ * (originally LGPLv3; both authors have agreed to their use in Snowball under
+ * the BSD-3-Clause licence), and on the algorithm described in
  *   Nikola Ljubešić, Damir Boras, Ozren Kubelka (2007), "Retrieving Information
  *   in Croatian: Building a Simple and Efficient Rule-Based Stemmer".
  * The rules below are generated from those tables by a script, one routine per
