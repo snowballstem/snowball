@@ -1,4 +1,4 @@
-up to: 66f90da769e7c95f47584ddb37a704d070f65016
+up to: c1d92ac5c81373f5544dfabc222f2f5feddbd556
 
 Snowball 3.2.0 (UNRELEASED)
 ===========================
@@ -18,15 +18,13 @@ Compiler changes
 
 * Compiler command-line options:
 
-  - Change how -coverage reports among functions
-    If the string matched we used to always report a string match, and
-    additionally either "func-f" or "func-t" depending what the function
-    signalled.
-    Now we only report one thing - if the string matches but the function
-    signals f we report "func-f"; if the string matches and the function
-    signals t we reprot a string match.
-    This gives a report that seems clearer, and requires logging and
-    collating less data.
+  - Change how `-coverage` reports among functions.  If the string matched we
+    used to always report a string match, and additionally either "func-f" or
+    "func-t" depending what the function signalled.  Now we only report one
+    thing - if the string matches but the function signals f we report
+    "func-f"; if the string matches and the function signals t we reprot a
+    string match.  This gives a report that seems clearer, and requires logging
+    and collating less data.
 
 * Diagnostics:
 
@@ -178,7 +176,7 @@ C
     impose one, but it is easy to instead generate a short identifier using a
     number when the Snowball name is long.
 
-  - The code now compile cleanly with MSVC with warning level `-W3` (which is
+  - The code now compiles cleanly with MSVC with warning level `-W3` (which is
     apparently the default warning level when using the IDE).
 
 * Documentation:
@@ -257,7 +255,7 @@ C/C++
 
 * Other changes:
 
-  - Flush stdout after each debug() call.  The debug command (`?`) is not a
+  - Flush stdout after each debug() call.  The debug command (`?`) is not
     performance sensitive, and it can be confusing if its output is delayed by
     buffering.
 
@@ -330,15 +328,8 @@ Javascript
 
 * Code quality:
 
-  - Improve JSDoc TypeScript annotations.
-    JS: Fix typescript annotations in generated code
-    We need to pass `--check-js` to `deno check` to actually check .js
-    files, which we now do (so we'll spot regressions).
-    Closes #300, reported by alex-kinokon.
-    stemwords.js: Improve typescript annotations
-    Fix incorrect/missing annotations and adjust code so that type checking
-    passes.
-    Partially based on changes from alex-kinokon in #300.
+  - Improve JSDoc TypeScript annotations.  Closes #300, reported by
+    alex-kinokon.
 
   - Replace most @ts-expect-error annotations with JSDoc cast annotations.  A
     cast is better as it is more targetted, and also more self-documenting.
@@ -452,28 +443,24 @@ Snowball Language Changes
 New stemming algorithms
 -----------------------
 
-* Add stemmer for Early Modern English
-    This is a variant of the English stemmer which was previously only
-    described on the website, but seems sufficiently useful to include in
-    the distribution.
+* Add stemmer for Early Modern English.  This is a variant of the English
+  stemmer which was previously only described on the website, but seems
+  sufficiently useful to include in the distribution.  Fixes #261.  The merged
+  version includes some additional rules:
 
-    A few additional rules have been added:
-
-    + Remove th'-, t'-
-    + Replace o'vr- with over-
-    + Replace -e'er with -ever
-    + Remove -edst (suggested by E. Timothy Uy in 2012!)
-    + Remove -'d, -'dly, -'dst, -'st, -'t
-    + Replace -'n, -'nd with -en
-    + Replace -'r, -'rous with -er
-    + Replace -'ri with -eri
-    + Replace -'li with -ili
-    + Replace -lie with -ly
-    earlymodernenglish: Normalise æ and œ and long-s
-    These ligatures appear in texts from this era significantly more than
-    in modern English.  `œ` is not in iso-8859-1 so drop that.
-    Fixes #261
-    earlymodernenglish: Handle more prefixes/suffixes
+  + Remove th'-, t'-
+  + Replace o'vr- with over-
+  + Replace -e'er with -ever
+  + Remove -edst (suggested by E. Timothy Uy in 2012!)
+  + Remove -'d, -'dly, -'dst, -'st, -'t
+  + Replace -'n, -'nd with -en
+  + Replace -'r, -'rous with -er
+  + Replace -'ri with -eri
+  + Replace -'li with -ili
+  + Replace -lie with -ly
+  + Normalise `æ` and `œ` and long-s.  These ligatures appear in texts from
+    this era significantly more than in modern English.  (Including `œ` here
+    means there's not an iso-8859-1 version of this stemmer.)
 
 Behavioural changes to existing algorithms
 ------------------------------------------
@@ -700,10 +687,9 @@ Build system
   to runtime test mode.
 
 * The build system now supports MSVC better.  If CC matches `*cl` then it uses
-  Microsoft's non-standard `-Fo:` and `-Fe:` instead of `-o`, which avoids lots
-  of deprecation warnings.  Extensions `.o` and `.a` are still used (which
-  triggers warnings from MSVC).  The command `ar` is used to create a static
-  library so you'll also need the mingw toolchain installed for that.
+  Microsoft's `LIB` instead of `ar`, and Microsoft's non-standard `-Fo:` and
+  `-Fe:` instead of `-o` (which avoids lots of deprecation warnings).
+  Extensions `.o` and `.a` are still used (which triggers warnings from MSVC).
 
 * C++: Add missing dependency for runtime code.
 
@@ -732,19 +718,8 @@ Testsuite
 
 * Add runtime test coverage for `?` (debug command).
 
-* Fix compilation errors in stemtest.c Introduced by v3.1.0.
-    Currently stemtest doesn't get built or run by default, which is how this
-    slipped in.
-    Fixes #295, reported by Duncan Bellamy.
-    We stopped compiling or running stemtest in v3.1.0.
-    We can't actually run stemtest when runtime tests are enabled (it fails
-    with "language `en' not available for stemming") but I meant to
-    conditionalise it rather than just stop running it at all.
-    Now `stemtest` is run on `make check` unless the tree has been switched
-    to run runtime tests.  We now handle `compilertest` in the same way,
-    since that is redundant to run when running runtime tests.
-    Addresses the underlying reason why #295 wasn't detected right away,
-    as a recurrence of #295 would now fail CI.
+* Fix compilation errors in stemtest.c, and actually run stemtest.  Regression
+  introduced in v3.1.0.  Fixes #295, reported by Duncan Bellamy.
 
 Documentation
 -------------
