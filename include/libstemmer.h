@@ -7,9 +7,6 @@ extern "C" {
 struct sb_stemmer;
 typedef unsigned char sb_symbol;
 
-/* FIXME - should be able to get a version number for each stemming
- * algorithm (which will be incremented each time the output changes). */
-
 /** Returns an array of the names of the available stemming algorithms.
  *  Note that these are the canonical names - aliases (ie, other names for
  *  the same algorithm) will not be included in the list.
