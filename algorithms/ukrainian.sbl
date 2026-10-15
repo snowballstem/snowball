@@ -464,9 +464,9 @@ backwardmode (
         )
         or
         ( [substring] among (
-                // -істю: instrumental sg of -ість abstract nouns. Restore the
-                // nominative so derivational (-ність/-ість) and tidy_up treat
-                // it exactly like -ість (активністю → активність → актив).
+                // -істю too close to pV for the rule above: restore the
+                // nominative so it stems like the -ість form, which keeps
+                // its ending there (радістю → радість → радіст).
                 '{i}{s}{t}{iu}' (<- '{i}{s}{t}{'}')
 
                 // Fleeting vowel: -ець → -ц (nominative → oblique stem)
@@ -553,7 +553,8 @@ backwardmode (
             // дівчинка = дівчинку holds without it
             // Note: -усь omitted — reflexive(-сь)+verb(-у) handles these (дідусь→дід, братусь→брат)
             // -інь omitted: камінь, корінь, промінь, осінь are not diminutives
-            '{u}{n}{'}'  '{e}{n}{'}'
+            // -ень omitted: verbal_noun removes it first (gen pl рішень)
+            '{u}{n}{'}'
                 (delete)
             // -ок: the о is fleeting, so only it goes and the stem meets the
             // oblique forms (будинок → будинк = будинку, грибок = грибка).
@@ -611,21 +612,14 @@ backwardmode (
 
     define derivational as (
         setlimit tomark p2 for ([substring]) among (
-            // Quality/abstract. -ість keeps the adjectival н so the noun
-            // stems like its adjective and its -ості/-істю forms
-            // (активність → активн = активна, активності). After ь the
-            // whole -ьність goes, matching the -ьн rule below
-            // (національність → націонал = національний).
-            '{'}{n}{i}{s}{t}{'}'  // -ьність
-            '{o}{v}{i}{s}{t}{'}'  // -овість (промисловість → промисл = промисловий)
-            // -ованість: abstract nouns of -ований participles; the whole
-            // suffix goes so they meet the verb (організованість → організ =
-            // організований)
-            '{o}{v}{a}{n}{i}{s}{t}{'}'    // -ованість
-            '{i}{s}{t}{'}'        // -ість
+            // Abstract nouns reach this point without -ість (noun removes it
+            // in every case), so what is left is the adjective stem and the
+            // rules below treat it as such (національність → національн →
+            // націонал, промисловість → промислов → промисл).
 
-            // -ован left by noun -ості/-остей on -ованість
-            // (організованості → організован → організ, as організованість)
+            // -ован left by noun on -ованість: the whole suffix goes so it
+            // meets the verb (організованість → організован → організ =
+            // організований)
             '{o}{v}{a}{n}'        // -ован
 
             // Adjectival derivational
@@ -669,13 +663,9 @@ backwardmode (
             // (лікув = лікувати, лікування). Elsewhere only ьн goes.
             '{a}{l}{'}{n}'
                 ( (('{u}{v}' or '{iu}{v}') delete) or (<- '{a}{l}') )
-            // -аність after -ув-/-юв-: abstract nouns of -уваний participles
-            // (засвоюваність → засвоюв = засвоювати). Elsewhere it is
-            // -ан + ість (вихованість → вихован = вихована).
-            '{a}{n}{i}{s}{t}{'}'
-                ( (('{u}{v}' or '{iu}{v}') delete) or (<- '{a}{n}') )
-            // -ан left by noun -ості/-остей on -уваність
-            // (відвідуваності → відвідуван → відвідув, as відвідуваність)
+            // -ан after -ув-/-юв-, left by noun on abstract nouns of -уваний
+            // participles (засвоюваність → засвоюван → засвоюв = засвоювати).
+            // Elsewhere it stays (вихованість → вихован = вихована).
             '{a}{n}'
                 ( ('{u}{v}' or '{iu}{v}') delete )
         )
