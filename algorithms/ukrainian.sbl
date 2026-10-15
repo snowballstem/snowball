@@ -417,10 +417,11 @@ backwardmode (
                 // ending is removed as before there.
                 '{v}'
                     ( not '{o}' (atlimit or v) delete )
-                // Present 1st sg -у (fallback), but not after -ств: -ству is
-                // the dative of -ство nouns (товариству), left for noun.
+                // Present 1st sg -у (fallback), but not after -ств/-цтв: -ству
+                // and -цтву are the dative of -ство/-цтво nouns (товариству,
+                // мистецтву), left for noun.
                 '{u}'
-                    ( not '{s}{t}{v}' delete )
+                    ( not ('{s}{t}{v}' or '{ts}{t}{v}') delete )
                 // Past tense -ла/-ли/-ло, unless the letter before the
                 // ending marks a noun (found_la_noun, tested on the whole
                 // word in stem: школа, число, Павло, світло).
