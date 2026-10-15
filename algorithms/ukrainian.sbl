@@ -176,7 +176,6 @@ backwardmode (
                 '{a}{ts}{i}{i`}{n}{i}{s}{t}{'}'       // -аційність
                 '{a}{ts}{i}{i`}{n}{o}{s}{t}{i}'       // -аційності
                 '{a}{ts}{i}{i`}{n}{i}{s}{t}{iu}'      // -аційністю
-                '{a}{ts}{i}{i`}{n}{o}{s}{t}{e}{i`}'   // -аційностей
 
                 // -ічн-/-ичн- (лінгвістичний, історичний, логічний)
                 '{i}{ch}{n}{y}{m}{y}'         // -ічними
@@ -196,7 +195,6 @@ backwardmode (
                 '{i}{ch}{n}{i}{s}{t}{'}'      // -ічність
                 '{i}{ch}{n}{o}{s}{t}{i}'      // -ічності
                 '{i}{ch}{n}{i}{s}{t}{iu}'     // -ічністю
-                '{i}{ch}{n}{o}{s}{t}{e}{i`}'  // -ічностей
                 '{y}{ch}{n}{y}{m}{y}'         // -ичними
                 '{y}{ch}{n}{o}{h}{o}'         // -ичного
                 '{y}{ch}{n}{o}{m}{u}'         // -ичному
@@ -234,7 +232,6 @@ backwardmode (
                 '{i}{i`}{n}{i}{s}{t}{'}'      // -ійність
                 '{i}{i`}{n}{o}{s}{t}{i}'      // -ійності
                 '{i}{i`}{n}{i}{s}{t}{iu}'     // -ійністю
-                '{i}{i`}{n}{o}{s}{t}{e}{i`}'  // -ійностей
 
                 // -уальн- (інтелектуальний, віртуальний, актуальний)
                 '{u}{a}{l}{'}{n}{y}{m}{y}'    // -уальними
@@ -344,11 +341,12 @@ backwardmode (
                 // mirrors the а series
                 '{ia}{v}' '{ia}{l}{a}' '{ia}{l}{y}' '{ia}{l}{o}'
                 '{ia}{ie}' '{ia}{iu}{t}{'}' '{ia}{ie}{m}{o}' '{ia}{ie}{t}{e}' '{ia}{ie}{sh}'
-                // Future (читатиме, робитимуть, стоятимемо)
-                '{a}{t}{y}{m}{e}' '{a}{t}{y}{m}{u}{t}{'}' '{a}{t}{y}{m}{e}{m}{o}' '{a}{t}{y}{m}{e}{t}{e}' '{a}{t}{y}{m}{e}{sh}' '{a}{t}{y}{m}{u}'
-                '{y}{t}{y}{m}{e}' '{y}{t}{y}{m}{u}{t}{'}' '{y}{t}{y}{m}{e}{m}{o}' '{y}{t}{y}{m}{e}{t}{e}' '{y}{t}{y}{m}{e}{sh}' '{y}{t}{y}{m}{u}'
-                '{i}{t}{y}{m}{e}' '{i}{t}{y}{m}{u}{t}{'}' '{i}{t}{y}{m}{e}{m}{o}' '{i}{t}{y}{m}{e}{t}{e}' '{i}{t}{y}{m}{e}{sh}' '{i}{t}{y}{m}{u}'
-                '{ia}{t}{y}{m}{e}' '{ia}{t}{y}{m}{u}{t}{'}' '{ia}{t}{y}{m}{e}{m}{o}' '{ia}{t}{y}{m}{e}{t}{e}' '{ia}{t}{y}{m}{e}{sh}' '{ia}{t}{y}{m}{u}'
+                // Future (читатиме, робитимуть, сприятимуть), the persons
+                // that occur in the corpus
+                '{a}{t}{y}{m}{e}' '{a}{t}{y}{m}{u}{t}{'}' '{a}{t}{y}{m}{e}{m}{o}' '{a}{t}{y}{m}{u}'
+                '{y}{t}{y}{m}{e}' '{y}{t}{y}{m}{u}{t}{'}' '{y}{t}{y}{m}{u}'
+                '{i}{t}{y}{m}{e}'
+                '{ia}{t}{y}{m}{e}' '{ia}{t}{y}{m}{u}{t}{'}'
                 '{a}{iu}'                       // Present 1st sg (читаю)
                 // Note: -ію ({i}{iu}) removed — it falsely captures noun accusative
                 // of -ія words (поліграфію, демократію). Verb -ію (я дію) handled
@@ -1024,7 +1022,6 @@ define stem as (
         // відання (jurisdiction) would become the preposition від
         '{v}{i}{d}{a}{n}{n}{ia}'            (<- '{v}{i}{d}{a}{n}')         // відання
         '{v}{i}{d}{a}{n}{n}{i}'             (<- '{v}{i}{d}{a}{n}')         // віданні
-        '{v}{i}{d}{a}{n}{'}'                (<- '{v}{i}{d}{a}{n}')         // відань
         // Plurals of -нний adjectives that look like the locative of a -ння noun
         '{p}{r}{y}{t}{a}{m}{a}{n}{n}{i}'    (<- '{p}{r}{y}{t}{a}{m}{a}{n}') // притаманні
         '{n}{e}{ch}{y}{s}{l}{e}{n}{n}{i}'   (<- '{n}{e}{ch}{y}{s}{l}{e}{n}') // нечисленні
