@@ -1,6 +1,4 @@
-up to: 74f19fead79c669988a01445f40fbc6b1007b808
-
-Snowball 3.2.0 (UNRELEASED)
+Snowball 3.2.0 (2026-10-17)
 ===========================
 
 Compiler changes
@@ -25,7 +23,7 @@ Compiler changes
     used to always report a string match, and additionally either "func-f" or
     "func-t" depending what the function signalled.  Now we only report one
     thing - if the string matches but the function signals f we report
-    "func-f"; if the string matches and the function signals t we reprot a
+    "func-f"; if the string matches and the function signals t we report a
     string match.  This gives a report that seems clearer, and requires logging
     and collating less data.
 
@@ -42,7 +40,7 @@ Compiler changes
 
 * Optimisations:
 
-  - Grow large sumbol strings exponentially, like we already do for byte
+  - Grow large symbol strings exponentially, like we already do for byte
     strings.
 
   - Eliminate some unnecessary copying when growing strings during compilation.
@@ -51,12 +49,8 @@ Compiler changes
 
   - Fix compiler memory leak when an unreachable routine contains an `among`.
 
-* Other changes:
-
 Generic code generation changes
 -------------------------------
-
-* Bug fixes:
 
 * Optimisations:
 
@@ -105,10 +99,6 @@ Generic code generation changes
     slice start and end to 0 which is slightly simpler than the previous
     setting of the slice end to the length of the string.
 
-* Documentation:
-
-* Other changes:
-
 Ada
 ---
 
@@ -117,20 +107,18 @@ Ada
   - Generate valid Ada code for a Snowball routine/variable name which contains
     `__`.
 
-* Optimisations:
+  - Fix code generated for `=>`.  We deprecated `=>` in 3.0.0, but ideally we
+    should generate code for it which actually compiles, and it was easy to
+    fix.
 
 * Code quality:
 
   - Use consistent case for `Debug()` helper function name.
 
-* Documentation:
-
-* Other changes:
-
 C
 -
 
-* Bug fixes:
+See also C/C++ section for changes affecting both C and C++.
 
 * Optimisations:
 
@@ -178,19 +166,15 @@ C
   - The code now compiles cleanly with MSVC with warning level `-W3` (which is
     apparently the default warning level when using the IDE).
 
-* Documentation:
-
-* Other changes:
-
 C++
 ---
+
+See also C/C++ section for changes affecting both C and C++.
 
 * Bug fixes:
 
   - Generate valid C++ code for a Snowball routine/variable name which contains
     `__`.
-
-* Optimisations:
 
 * Code quality:
 
@@ -215,8 +199,6 @@ C++
 
 C/C++
 -----
-
-* Bug fixes:
 
 * Optimisations:
 
@@ -248,8 +230,6 @@ C/C++
     overlapped with the start of another.  This reduces the size of the
     string data, which should improve CPU cache utilisation.  Fixes #262.
 
-* Code quality:
-
 * Documentation:
 
   - libstemmer_c_README: Document that libstemmer aims to support C90.
@@ -263,28 +243,12 @@ C/C++
 C#
 --
 
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
-
 * Other changes:
 
   - Support Snowball debug command (`?`).
 
 Dart
 ----
-
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
 
 * Other changes:
 
@@ -293,14 +257,6 @@ Dart
 Go
 --
 
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
-
 * Other changes:
 
   - Properly implement Snowball debug command (`?`).
@@ -308,24 +264,12 @@ Go
 Java
 ----
 
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
-
 * Other changes:
 
   - Support Snowball debug command (`?`).
 
 Javascript
 ----------
-
-* Bug fixes:
-
-* Optimisations:
 
 * Code quality:
 
@@ -335,22 +279,12 @@ Javascript
   - Replace most @ts-expect-error annotations with JSDoc cast annotations.  A
     cast is better as it is more targetted, and also more self-documenting.
 
-* Documentation:
-
 * Other changes:
 
   - Support Snowball debug command (`?`).
 
 Pascal
 ------
-
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
 
 * Other changes:
 
@@ -359,15 +293,9 @@ Pascal
 PHP
 ---
 
-* Bug fixes:
-
-* Optimisations:
-
 * Code quality:
 
   - Emit minimum length Unicode escapes.
-
-* Documentation:
 
 * Other changes:
 
@@ -375,12 +303,6 @@ PHP
 
 Python
 ------
-
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
 
 * Documentation:
 
@@ -399,15 +321,9 @@ Python
 Rust
 ----
 
-* Bug fixes:
-
-* Optimisations:
-
 * Code quality:
 
   - Emit minimum length Unicode escapes.
-
-* Documentation:
 
 * Other changes:
 
@@ -416,20 +332,9 @@ Rust
 Zig
 ---
 
-* Bug fixes:
-
-* Optimisations:
-
-* Code quality:
-
-* Documentation:
-
 * Other changes:
 
   - Properly implement Snowball debug command (`?`).
-
-New Code Generators
--------------------
 
 Snowball Language Changes
 -------------------------
@@ -466,220 +371,12 @@ New stemming algorithms
 Behavioural changes to existing algorithms
 ------------------------------------------
 
-* Arabic:
-
-* Armenian:
-
-* Basque:
-
-* Catalan:
-
-* Czech:
-
-* Danish:
-
-* Dutch:
-
-* English:
-
-* Early Modern English:
-
-* Esperanto:
-
-* Estonian:
-
-* Finnish:
-
 * French:
 
-  - Remove z'- which is a colloquial, nonstandard elision (for "vous"), and
-    also a prefix used to represent a nonstandard liaison within a plural noun
+  - Remove z'- which is a colloquial, non-standard elision (for "vous"), and
+    also a prefix used to represent a non-standard liaison within a plural noun
     phrase, or eye dialect for a standard liaison.
     https://en.wiktionary.org/wiki/z%27#French
-
-* German:
-
-* Greek:
-
-* Hindi:
-
-* Hungarian:
-
-* Indonesian:
-
-* Irish:
-
-* Italian:
-
-* Lithuanian:
-
-* Nepali:
-
-* Norwegian:
-
-* Persian:
-
-* Polish:
-
-* Romanian:
-
-* Russian:
-
-* Serbian:
-
-* Sesotho:
-
-* Spanish:
-
-* Swedish:
-
-* Tamil:
-
-* Turkish:
-
-* Yiddish:
-
-Optimisations to existing algorithms
-------------------------------------
-
-* Arabic:
-
-* Armenian:
-
-* Basque:
-
-* Catalan:
-
-* Czech:
-
-* Danish:
-
-* Dutch:
-
-* English:
-
-* Early Modern English:
-
-* Esperanto:
-
-* Estonian:
-
-* Finnish:
-
-* French:
-
-* German:
-
-* Greek:
-
-* Hindi:
-
-* Hungarian:
-
-* Indonesian:
-
-* Irish:
-
-* Italian:
-
-* Lithuanian:
-
-* Nepali:
-
-* Norwegian:
-
-* Persian:
-
-* Polish:
-
-* Romanian:
-
-* Russian:
-
-* Serbian:
-
-* Sesotho:
-
-* Spanish:
-
-* Swedish:
-
-* Tamil:
-
-* Turkish:
-
-* Yiddish:
-
-Code clarity improvements to existing algorithms
-------------------------------------------------
-
-* Arabic:
-
-* Armenian:
-
-* Basque:
-
-* Catalan:
-
-* Czech:
-
-* Danish:
-
-* Dutch:
-
-* English:
-
-* Early Modern English:
-
-* Esperanto:
-
-* Estonian:
-
-* Finnish:
-
-* French:
-
-* German:
-
-* Greek:
-
-* Hindi:
-
-* Hungarian:
-
-* Indonesian:
-
-* Irish:
-
-* Italian:
-
-* Lithuanian:
-
-* Nepali:
-
-* Norwegian:
-
-* Persian:
-
-* Polish:
-
-* Romanian:
-
-* Russian:
-
-* Serbian:
-
-* Sesotho:
-
-* Spanish:
-
-* Swedish:
-
-* Tamil:
-
-* Turkish:
-
-* Yiddish:
 
 Build system
 ------------
