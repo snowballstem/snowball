@@ -1,0 +1,11 @@
+// Test `reverse`.
+
+externals (stem)
+
+strings (x y)
+
+define stem as (
+  do (reverse => x)
+  do ([tolimit] reverse -> y)
+  $(lenof x == lenof y)
+)

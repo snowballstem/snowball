@@ -1464,7 +1464,6 @@ static struct node * read_C(struct analyser * a) {
             return new_node(a, token);
         case c_assignto:
         case c_sliceto: {
-            check_modifyable(a);
             struct node * n = new_node(a, token);
             if (get_token(a, c_name)) {
                 name_to_node(a, n, t_string);
