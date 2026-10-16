@@ -1,4 +1,4 @@
-up to: c1d92ac5c81373f5544dfabc222f2f5feddbd556
+up to: 74f19fead79c669988a01445f40fbc6b1007b808
 
 Snowball 3.2.0 (UNRELEASED)
 ===========================
@@ -7,6 +7,9 @@ Compiler changes
 ----------------
 
 * Bug fixes:
+
+  - Stop rejecting `->` and `=>` inside `reverse`.  These operations are
+    both safe as they modify a string variable not the working string.
 
   - Fix detection of read errors for piped input which were effectively being
     ignored.  Bug introduced in 3.1.0.
@@ -158,13 +161,9 @@ C
     reduces code size and eliminates a small runtime overhead for closing a
     stemmer.  35 of the 38 stemmers we currently ship benefit from this.
 
-  - Use a more sensible initial string size.
-    We were allocating only enough space for a single character.  That
-    won't be enough for words being stemmed.  It might be enough for
-    some string variables, but we actually allocate an extra character to
-    allow in-place zero termination as well as space for two ints to store
-    the size and capacity, so the minimum total allocation is actually
-    10 bytes when sizeof(symbol)==1 anyway.
+  - Use a more sensible initial string size.  We were allocating only enough
+    space for a single character which meant we'd have to reallocate as soon
+    as we stem a word.
 
   - Use putc() in debug() helper to write single characters.
 
@@ -252,6 +251,8 @@ C/C++
 * Code quality:
 
 * Documentation:
+
+  - libstemmer_c_README: Document that libstemmer aims to support C90.
 
 * Other changes:
 
@@ -383,8 +384,6 @@ Python
 
 * Documentation:
 
-  - libstemmer_c_README: Document that libstemmer aims to support C90.
-
   - libstemmer_python_README: Note that Python 3.8 is the oldest version we CI
     test with.
 
@@ -461,6 +460,8 @@ New stemming algorithms
   + Normalise `æ` and `œ` and long-s.  These ligatures appear in texts from
     this era significantly more than in modern English.  (Including `œ` here
     means there's not an iso-8859-1 version of this stemmer.)
+
+* Add Ukrainian stemmer from Dmitry Prudnikov (#277).
 
 Behavioural changes to existing algorithms
 ------------------------------------------
