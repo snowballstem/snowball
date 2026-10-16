@@ -830,8 +830,8 @@ static void generate_rightslice(struct generator * g, struct node * p) {
 
 static void generate_assignto(struct generator * g, struct node * p) {
     write_comment(g, p);
-    writef(g, "~M~V := Assign_To (Z, ~V);~N", p);
-    write_failure_if(g, "~V == 0", p);
+    writef(g, "~MZ.L~W := Z.L;~N", p);
+    writef(g, "~M~V (1 .. Z.L~W) := Z.P (1 .. Z.L);~N", p);
 }
 
 static void generate_sliceto(struct generator * g, struct node * p) {
