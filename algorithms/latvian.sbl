@@ -1,24 +1,29 @@
-// Latvian light stemmer.
+// Latvian stemmer.
 //
-// Based on the algorithm in Kārlis Krēsliņš, "A stemming algorithm for
-// Latvian", PhD thesis, Loughborough University, 1996, in the light form
-// implemented by Lucene's LatvianStemmer: only the inflectional endings of
-// nouns and adjectives (case, number, gender, definiteness) are removed, and
-// the consonant alternations of declensions II, V and VI (brālis -> brāļi,
-// zivs -> zivju) are undone after the endings which cause them.
+// Based on Kārlis Krēsliņš, "A stemming algorithm for Latvian", PhD thesis,
+// Loughborough University, 1996, and on its light form in Lucene's
+// LatvianStemmer. One inflectional ending is removed (noun, adjective or verb),
+// then the suffixes of definite and comparative adjectives, diminutives,
+// participles and the verb stem, and the consonant alternations at the end of
+// the stem are undone. Krēsliņš' derivational suffix steps are not included.
 
 routines (
-    mark_regions
-    ending
-    unpalatalize
-    unpalatalize_u
+    mark_regions verb_prefix
+    R1 R2 infinitive future reflexive_ties
+    verb_ending noun_ending
+    definite comparative
+    diminutive unpalatalize
+    participle verb_stem
+    own_sz undo_alternation
 )
 
 externals ( stem )
 
-integers ( p1 x )
+integers ( p1 p2 q x )
 
-groupings ( v labial )
+booleans ( ending_removed palatal palatal_u noun_only comparative_found )
+
+groupings ( v type_v labial )
 
 stringescapes {}
 
@@ -33,20 +38,134 @@ stringdef u-   '{U+016B}'
 stringdef zv   '{U+017E}'
 
 define v 'aeiou{a-}{e-}{i-}{u-}'
+define type_v '{a-}{e-}{i-}o'
 define labial 'bmpv'
 
-// The stem left after removing an ending must be at least three letters
+define verb_prefix as
+    among ( 'aiz' 'ap' 'at' 'ie' 'iz' 'no' 'pa' 'p{a-}r' 'pie' 'sa' 'uz' )
+
+// p1: the stem left after removing a suffix must be at least three letters
 // long and contain a vowel.
+// p2: the same, but the vowel must come after ne- and a verb prefix, if the
+// word has them (q), so that aizies is not left as aiz, nor nostājas as nost.
 define mark_regions as (
     $p1 = limit
+    $p2 = limit
+    do (try 'ne' try verb_prefix setmark q)
     test (hop 3 setmark x)
-    gopast v  setmark p1
-    try ($p1 < x  $p1 = x)
+    do (gopast v  setmark p1  try ($p1 < x  $p1 = x))
+    do (tomark q  gopast v  setmark p2  try ($p2 < x  $p2 = x))
 )
 
 backwardmode (
 
-    // Ambiguous alternations (s, t -> š; d, z -> ž) are not undone.
+    define R1 as $p1 <= cursor
+    define R2 as $p2 <= cursor
+
+    // One-syllable infinitives (nest, sākt) keep their -t.
+    define infinitive as (R2 gopast v gopast v)
+
+    // The future only after a type vowel: strādāšu, but not sieviešu.
+    define future as (R2 type_v)
+
+    // centies is cent-ies (censties), not cen-ties next to cena.
+    define reflexive_ties as (R2 not 'n')
+
+    // A verb's type vowel (ā, ē, ī, o) goes with the ending:
+    // strādāt, strādāšu, strādāsiet -> strād, skatīties -> skat.
+    define verb_ending as (
+        [substring] among (
+            't'         infinitive
+            'iet'       R2
+            // -ātu, -ītu, -otu are also accusatives: rezultātu, kredītu.
+            '{e-}tu'    R2
+            '{sv}u'     future
+            'si'        future
+            'sim'       future
+            'siet'      future
+            'ies'       R2
+            'ties'      reflexive_ties
+            'aties'     R2
+            'oties'     R2
+            'amies'     R2
+            '{a-}mies'  R2
+            'dams'      R2
+            'dama'      R2
+            'damas'     R2
+            'dam{a-}s'  R2
+            'damies'    R2
+            'usi'       R2
+            'usies'     R2
+            'u{sv}ies'  R2
+        )
+        delete
+        set ending_removed
+        try ([type_v] R2 delete)
+    )
+
+    define noun_ending as (
+        setlimit tomark p1 for ([substring])
+        among (
+            'ajiem' 'ajai' 'ajam' 'aj{a-}m' 'ajos' 'aj{a-}s' 'aj{a-}'
+            'ais' 'ai' '{a-}m' 'am' '{i-}m' 'um'
+            'as' '{a-}s' '{i-}s' 'ij' 'ie'
+            'o' '{a-}' '{u-}' 's' '{sv}'
+                ()
+            // Endings which nouns have but participles do not.
+            'is' 'im' '{i-}' 'e' 'ei' '{e-}' 'es' '{e-}m' '{e-}s'
+                (set noun_only)
+            'iem' 'os' 'a' 'i'
+                (set palatal)
+            'us' 'u'
+                (set palatal set palatal_u)
+        )
+        delete
+        set ending_removed
+    )
+
+    // lielajam, pirmajiem -> liel, pirm
+    define definite as (
+        ['aj'] R2 delete
+    )
+
+    // lielāks, labāk -> liel, lab (vis- of the superlative is removed later).
+    // vecāki (parents) is not a comparative.
+    define comparative as (
+        ['{a-}k'] R2 not ('vec' atlimit) delete
+        set comparative_found
+    )
+
+    // -iņ- after a consonant (sieriņš, burkāniņi), where c and dz come from
+    // k and g (kūciņa <- kūka, pīrādziņš <- pīrāgs); -īt- and -īš- (maizīte,
+    // brālītis, brālīša). -īt- is also the participle of -īt verbs (dalīts,
+    // sālītas), so it is only removed before an ending participles do not
+    // have.
+    define diminutive as (
+        [substring] R1 among (
+            'i{nc}' (
+                test non-v
+                not ('z' $q == cursor)          // ziņa, apziņa, paziņot
+                not among ( 'atm' 'piem' 't{u-}l' )
+                delete
+                try ([substring] among ( 'dz' (<- 'g') 'c' (<- 'k') ))
+            )
+            '{i-}t' (
+                test non-v
+                noun_only
+                not (among ( 'viz' 'favor' 'satel' ) atlimit)
+                delete
+            )
+            '{i-}{sv}' (
+                test non-v
+                delete
+            )
+        )
+    )
+
+    // The consonant alternations of declensions II, V and VI, undone right
+    // after -a, -i, -u, -us, -os, -iem: brāļi, zivju, dzirkšu -> brāl, ziv,
+    // dzirkst. A single ļ, ņ or č is undone after any ending, see
+    // undo_alternation.
     define unpalatalize as (
         [substring] among (
             'j'          (labial delete)
@@ -56,41 +175,79 @@ backwardmode (
             '{zv}{lc}'   (<- 'zl')
             '{lc}{nc}'   (<- 'ln')
             '{lc}{lc}'   (<- 'll')
-            '{cv}'       (<- 'c')
-            '{lc}'       (<- 'l')
-            '{nc}'       (<- 'n')
+            'k{sv}'      (palatal_u <- 'kst')
+            '{nc}{nc}'   (palatal_u <- 'nn')
         )
     )
 
-    // kst -> kš and nn -> ņņ are only undone after -u (genitive plural of
-    // declensions II, V and VI) or -us.
-    define unpalatalize_u as (
-        (
-            [substring] among (
-                'k{sv}'      (<- 'kst')
-                '{nc}{nc}'   (<- 'nn')
-            )
-        ) or unpalatalize
+    // strādājošs, strādājušais, redzams, lasāms
+    define participle as (
+        do (['o{sv}'] R2 delete)
+        do (['u{sv}'] R2 delete)
+        do ([substring] R2 among ( 'am' '{a-}m' ) delete)
     )
 
-    define ending as (
-        setlimit tomark p1 for ([substring])
-        among (
-            'ajiem' 'ajai' 'ajam' 'aj{a-}m' 'ajos' 'aj{a-}s' 'aj{a-}'
-            'ais' 'ai' 'ei'
-            '{a-}m' 'am' '{e-}m' '{i-}m' 'im' 'um'
-            'as' '{a-}s' 'es' '{e-}s' 'is' '{i-}s' 'ij' 'ie'
-            'e' 'o' '{a-}' '{e-}' '{i-}' '{u-}' 's' '{sv}'
-                (delete)
-            'iem' 'os' 'a' 'i'
-                (delete try unpalatalize)
-            'us' 'u'
-                (delete try unpalatalize_u)
+    // The -j- of the present and past stem: strādāja, strādājis -> strād
+    define verb_stem as (
+        [substring] R2 among (
+            // Agent nouns: vadītājs, ražotājs.
+            '{a-}j' (not 't')
+            // Adjectives: vidējs, vietējs, kopējs, pēdējs, vispārējs.
+            '{e-}j' (not among ( 'vid' 'p{e-}d' 'iek{sv}' '{a-}r' 'aug{sv}'
+                                 'apak{sv}' 'reiz' 'tagad' 'gal' 'viet' 'kop'
+                                 'pret' 'k{a-}rt' 'sav' '{sv}ejien' 'tur'
+                                 'm{u-}{zv}' ))
+            '{i-}j' 'oj' ()
+        )
+        delete
+    )
+
+    // Stems whose š or ž must stay: tiešs (not tiesa), tumšs (not tumsa),
+    // gaišs (not gaiss), bieži (not biezs), mežs, duša, māšu (māte, not māsa).
+    define own_sz as among (
+        'tie{sv}' 'tum{sv}' 'gai{sv}' 'aug{sv}' 'pla{sv}' 'sve{sv}' 'dro{sv}'
+        'm{i-}k{sv}' 'kau{sv}' 'bie{zv}' 'me{zv}' 'lau{zv}'
+            ()
+        'du{sv}' 'm{a-}{sv}'
+            (atlimit)
+    )
+
+    // š and ž at the end of the stem come from s or t and z or d: lasis,
+    // laša; reize, reižu. -ieš- is the one common t: sieviete, sieviešu.
+    define undo_alternation as (
+        not own_sz
+        [substring] among (
+            '{sv}'  (('ie' hop 3 <- 't') or <- 's')
+            '{zv}'  (<- 'z')
+            '{lc}'  (<- 'l')
+            '{nc}'  (<- 'n')
+            '{cv}'  (<- 'c')
         )
     )
 )
 
 define stem as (
+    unset ending_removed
+    unset palatal
+    unset palatal_u
+    unset noun_only
+    unset comparative_found
     do mark_regions
-    backwards do ending
+    backwards (
+        do (verb_ending or noun_ending)
+        // The alternations are only undone right after the ending.
+        do (definite unset palatal)
+        do (comparative unset palatal)
+    )
+    do (
+        comparative_found
+        ['vis'] test hop 3 delete     // vislielākais -> liel
+        do mark_regions
+    )
+    backwards (
+        do (diminutive or (palatal unpalatalize))
+        do participle
+        do verb_stem
+        do (ending_removed undo_alternation)
+    )
 )
