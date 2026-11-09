@@ -61,7 +61,7 @@ classifiers.extend([
 ])
 
 # NB adds minor versions < range end.
-for minor in range(3, 14 + 1):
+for minor in range(3, 15 + 1):
     classifiers.append('Programming Language :: Python :: 3.%d' % minor)
 
 classifiers.extend([
