@@ -163,18 +163,12 @@ backwardmode (
     )
 
     // The consonant alternations of declensions II, V and VI, undone right
-    // after -a, -i, -u, -us, -os, -iem: brāļi, zivju, dzirkšu -> brāl, ziv,
-    // dzirkst. A single ļ, ņ or č is undone after any ending, see
-    // undo_alternation.
+    // after -a, -i, -u, -us, -os, -iem: zivju, dzirkšu -> ziv, dzirkst.
+    // ļ, ņ, č and the pairs (brāļi, zvaigžņu) are undone after any ending,
+    // see undo_alternation.
     define unpalatalize as (
         [substring] among (
             'j'          (labial delete)
-            '{sv}{nc}'   (<- 'sn')
-            '{zv}{nc}'   (<- 'zn')
-            '{sv}{lc}'   (<- 'sl')
-            '{zv}{lc}'   (<- 'zl')
-            '{lc}{nc}'   (<- 'ln')
-            '{lc}{lc}'   (<- 'll')
             'k{sv}'      (palatal_u <- 'kst')
             '{nc}{nc}'   (palatal_u <- 'nn')
         )
@@ -214,14 +208,22 @@ backwardmode (
 
     // š and ž at the end of the stem come from s or t and z or d: lasis,
     // laša; reize, reižu. -ieš- is the one common t: sieviete, sieviešu.
+    // ļ, ņ and č are undone after every ending, so that gaļa and gaļas meet,
+    // and so are the pairs: eļļa, eļļas, eļļā -> ell; viļņi, viļņot -> viln.
     define undo_alternation as (
         not own_sz
         [substring] among (
-            '{sv}'  (('ie' hop 3 <- 't') or <- 's')
-            '{zv}'  (<- 'z')
-            '{lc}'  (<- 'l')
-            '{nc}'  (<- 'n')
-            '{cv}'  (<- 'c')
+            '{sv}'          (('ie' hop 3 <- 't') or <- 's')
+            '{zv}'          (<- 'z')
+            '{lc}'          (<- 'l')
+            '{nc}'          (<- 'n')
+            '{cv}'          (<- 'c')
+            '{sv}{nc}'      (<- 'sn')
+            '{zv}{nc}'      (<- 'zn')
+            '{sv}{lc}'      (<- 'sl')
+            '{zv}{lc}'      (<- 'zl')
+            '{lc}{nc}'      (<- 'ln')
+            '{lc}{lc}'      (<- 'll')
         )
     )
 )
