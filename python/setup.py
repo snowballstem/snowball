@@ -39,11 +39,16 @@ classifiers = [
 ]
 
 for lang in langs:
-    lang_titlecase = lang.title()
     # Only classifiers listed in https://pypi.org/classifiers/ are allowed
     # Remove them here or submit them to https://github.com/pypa/trove-classifiers
-    if lang_titlecase != 'Sesotho':
-        classifiers.append('Natural Language :: ' + lang_titlecase)
+    if lang in (
+            'earlymodernenglish',
+            'sesotho',
+            ):
+        continue
+
+    lang_titlecase = lang.title()
+    classifiers.append('Natural Language :: ' + lang_titlecase)
 
     # Portuguese stemmer also works for Brazilian Portuguese.
     if lang_titlecase == 'Portuguese':
