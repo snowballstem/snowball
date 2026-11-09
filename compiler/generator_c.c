@@ -1557,8 +1557,12 @@ static void generate_substring(struct generator * g, struct node * p) {
             /* If the among includes the ungated empty string, it can never
              * fail so not matching the bitmap means we match the empty string.
              */
-            g->I[4] = among_cases[empty_case].result;
-            writef(g, "among_var = ~I4; else~N", p);
+            if (x->amongvar_needed) {
+                g->I[4] = among_cases[empty_case].result;
+                writef(g, "among_var = ~I4; else~N", p);
+            } else {
+                writef(g, "{ } else~N", p);
+            }
         } else {
             writef(g, "~f~N", p);
         }

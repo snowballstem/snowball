@@ -2,7 +2,9 @@
 
 externals (stem)
 
-routines (gate bgate bgate2 not_atlimit)
+routines (
+  amongvar_regression_test gate bgate bgate2 not_atlimit
+)
 
 stringescapes {}
 
@@ -12,6 +14,17 @@ backwardmode (
   define bgate as 'q'
   define bgate2 as test hop 4
   define not_atlimit as not atlimit
+)
+
+define amongvar_regression_test as (
+  // Regression test - the generated C code for this referenced undeclared
+  // `among_var`.
+  try (
+    [substring] among (
+      'qq'
+      ''
+    ) delete
+  )
 )
 
 define stem as (
@@ -108,6 +121,9 @@ define stem as (
     )
   ) or fail='big-endian among regression test failed to match'
   test ('youthful' atlimit) or fail='big-endian among regression test output wrong'
+
+  // Call twice to prevent inlining.
+  amongvar_regression_test and amongvar_regression_test
 
   ='ok'
 )
