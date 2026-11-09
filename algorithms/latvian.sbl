@@ -88,6 +88,9 @@ backwardmode (
             'si'        future
             'sim'       future
             'siet'      future
+            // The relative mood of the future: atradīšot, neatgriezīšoties.
+            '{sv}ot'    future
+            '{sv}oties' future
             'ies'       R2
             'ties'      reflexive_ties
             'aties'     R2
