@@ -1094,11 +1094,14 @@ static void generate_literalstring(struct generator * g, struct node * p) {
     }
 }
 
-static void generate_cast_context(struct generator * g) {
+static void generate_cast_context(struct generator * g, struct name * q) {
     w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
     w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
-    // A routine may not use env at all (e.g. one which only tests a boolean).
-    w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(env)));~N");
+    if (!q->has_among) {
+        // This routine may not use env at all (e.g. it might only test a
+        // boolean).
+        w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(env)));~N");
+    }
 }
 
 static void generate_setup_context(struct generator * g) {
@@ -1121,7 +1124,7 @@ static void generate_define(struct generator * g, struct node * p) {
 
     if (q->type == t_routine) {
         writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-        generate_cast_context(g);
+        generate_cast_context(g, q);
     } else {
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
         generate_setup_context(g);
@@ -1132,7 +1135,7 @@ static void generate_define(struct generator * g, struct node * p) {
             writef(g, "~Mreturn ~W(env, @as(*anyopaque, @ptrCast(context)));~N", p);
             w(g, "~-~M}~N~N");
             writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
-            generate_cast_context(g);
+            generate_cast_context(g, q);
         }
     }
 
