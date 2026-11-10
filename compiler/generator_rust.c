@@ -1233,11 +1233,15 @@ static void generate_substring(struct generator * g, struct node * p) {
         }
         write_string(g, ") ");
         if (empty_case != -1 && !among_cases[empty_case].function) {
-            /* If the among includes the empty string, it can never fail
-             * so not matching the bitmap means we match the empty string.
+            /* If the among includes the ungated empty string, it can never
+             * fail so not matching the bitmap means we match the empty string.
              */
-            g->I[4] = among_cases[empty_case].result;
-            writef(g, "{among_var = ~I4;}~N~Melse ", p);
+            if (x->amongvar_needed) {
+                g->I[4] = among_cases[empty_case].result;
+                writef(g, "{among_var = ~I4;}~N~Melse ", p);
+            } else {
+                writef(g, "{ }~N~Melse ", p);
+            }
             write_block_start(g);
             block_opened = 1;
         } else {
@@ -1270,6 +1274,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             }
             // Suppress generating table for this among.
             x->used = false;
+            if (block_opened) write_block_end(g);
             return;
         }
     }
@@ -1283,6 +1288,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else {
         write_failure_if(g, "env.find_among~S0(A_~I0, context) == 0", p);
     }
+    if (block_opened) write_block_end(g);
 }
 
 static void generate_among(struct generator * g, struct node * p) {
