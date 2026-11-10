@@ -78,6 +78,15 @@ define stem
       literal 'F'
       (
     literal 'X'
+    (
+      (
+        [
+        substring
+        ]
+        among
+          literal 'qq'
+          literal ''
+        <- ''
     [
     substring
     ]

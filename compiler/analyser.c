@@ -2449,7 +2449,6 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_tolimit:
         case c_tomark:
         case c_true:
-        case c_try:
         case c_unset:
         case c_assign:
         case c_plusassign:
@@ -2459,6 +2458,16 @@ static int check_possible_signals(struct analyser * a, struct node * p) {
         case c_functionend:
             /* Always gives signal t. */
             return 1;
+        case c_try: {
+            int possible_signals = p->left->possible_signals;
+            if (possible_signals == 1) {
+                fprintf(stderr, "%s:%d: warning: body of 'try' always signals 't'\n",
+                        a->tokeniser->file, p->line_number);
+                p->type = c_bra;
+            }
+            /* Always gives signal t. */
+            return 1;
+        }
         case c_repeat: {
             int possible_signals = p->left->possible_signals;
             if (possible_signals == 1) {

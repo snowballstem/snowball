@@ -51,6 +51,14 @@ define stem as (
   // `setlimit tomark limit for X` is equivalent to just `X`.
   setlimit tomark limit for 'X'
 
+  // `try X` when X always signals `t` is equivalent to just `X`.
+  try (
+   [substring] among (
+      'qq'
+      ''
+    ) delete
+  )
+
   [substring] among ( // All actions equivalent to `false`.
     '0' (false)
     'a' (fail ())

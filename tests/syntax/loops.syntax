@@ -7,21 +7,21 @@ define stem
     literal 'i'
     repeat
       literal 'y'
-    try
+    (
       atleast
       # len
         (
-    try
+    (
       atleast
       # len
         true
     try
       (
         false
-    try
+    (
       repeat
         (
-    try
+    (
       repeat
         true
     do
