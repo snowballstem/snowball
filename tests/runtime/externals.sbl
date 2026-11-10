@@ -1,6 +1,6 @@
 // Test calling externals within the program.
 
-externals (stem e1 e2)
+externals (stem e1 e2 ef et)
 
 define stem as (
   not e2 or fail='failed to call external e2'
@@ -20,3 +20,7 @@ define e1 as (
 )
 
 define e2 as atlimit
+
+define ef as false
+
+define et as ()

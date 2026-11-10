@@ -1430,6 +1430,12 @@ static void generate_define(struct generator * g, struct node * p) {
         w(g, "~-~M}~N");
     }
 
+    if (!q->has_among) {
+        // This routine may not use z at all (e.g. it might only test a
+        // boolean) so suppress unused variable warnings.
+        w(g, "~M(void)z;~N");
+    }
+
     g->next_label = 0;
     g->var_number = 0;
 

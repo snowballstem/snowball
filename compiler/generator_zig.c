@@ -1104,15 +1104,33 @@ static void generate_cast_context(struct generator * g, struct name * q) {
     }
 }
 
-static void generate_setup_context(struct generator * g) {
+static void generate_setup_context(struct generator * g,
+                                   struct name * q,
+                                   bool forward_to_routine) {
     w(g, "~Mvar context_val = Context{};~N");
     w(g, "~Mconst context = &context_val;~N");
-    w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
-    for (struct name * q = g->analyser->names; q; q = q->next) {
-        if (q->local_to != NULL || q->type != t_string) continue;
+    if (!forward_to_routine) {
+        w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
+    }
+    bool env_definitely_used = forward_to_routine;
+    for (struct name * n = g->analyser->names; n; n = n->next) {
+        if (n->local_to != NULL || n->type != t_string) continue;
         w(g, "~Mdefer context.");
-        write_varname(g, q);
+        write_varname(g, n);
         w(g, ".deinit(env.allocator);~N");
+        env_definitely_used = true;
+    }
+
+    env_definitely_used = env_definitely_used || q->has_among;
+
+    if (!env_definitely_used) {
+        // This allows us to generate valid Zig code for an external which is
+        // just `false` or `true` which won't use env at all.  These cases are
+        // valid Snowball code, though unlikely in real world use.
+        //
+        // We will also needlessly generate this for numerous other situations,
+        // but that's not really a problem.
+        w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(env)));~N");
     }
 }
 
@@ -1126,9 +1144,10 @@ static void generate_define(struct generator * g, struct node * p) {
         writef(g, "~Mfn ~W(env: *snowball.Env, ctx: *anyopaque) bool {~+~N", p);
         generate_cast_context(g, q);
     } else {
+        bool forward_to_routine = (q->used != q->definition);
         writef(g, "~Mpub fn ~E(env: *snowball.Env) bool {~+~N", p);
-        generate_setup_context(g);
-        if (q->used != q->definition) {
+        generate_setup_context(g, q, forward_to_routine);
+        if (forward_to_routine) {
             // This external needs to be callable as a routine, so generate
             // the actual code like a routine with an external which just
             // forwards to that.
