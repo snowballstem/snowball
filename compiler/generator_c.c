@@ -1701,19 +1701,22 @@ static void generate_substring(struct generator * g, struct node * p) {
                     write_c_string_literal(g, e->b);
                     w(g, "'\\n\", stderr);~N");
                 }
-                g->I[2] = cursor_adjustment;
-                g->I[3] = f_result;
-                g->S[0] = (among_mode(x) == m_forward) ? "+" : "-";
                 if (f_result) {
                     assert(cursor_adjustment >= 0);
+                    // Restore position of cursor.
                     if (cursor_adjustment > 0) {
+                        g->I[2] = cursor_adjustment;
+                        g->S[0] = (among_mode(x) == m_forward) ? "+" : "-";
                         w(g, "~Mz->c = c0 ~S0 ~I2;~N");
+                    } else {
+                        w(g, "~Mz->c = c0;~N");
                     }
                 } else {
                     // among_var == 0 means the among signals f and the cursor
                     // will get restored when that signal is handled.
                     assert(cursor_adjustment == -1);
                 }
+                g->I[3] = f_result;
                 w(g, "~Mamong_var = ~I3;~N");
                 if ((f_result & AFS_FLAG)) {
                     assert(among_function_chains);
@@ -2193,7 +2196,7 @@ static int build_among_table_(struct generator * g, struct among * x,
                 x->af[exact].t_result = t_result;
                 x->af[exact].f_result = f_result;
                 x->af[exact].cursor_adjustment = cursor_adjustment;
-                x->c0_used = x->c0_used || (f_result && cursor_adjustment > 0);
+                x->c0_used = x->c0_used || (f_result && cursor_adjustment >= 0);
             } else {
                 bool add = true;
                 for (int i = 0; i < x->af_count; ++i) {
@@ -2211,7 +2214,7 @@ static int build_among_table_(struct generator * g, struct among * x,
                     x->af[x->af_count].t_result = t_result;
                     x->af[x->af_count].f_result = f_result;
                     x->af[x->af_count].cursor_adjustment = cursor_adjustment;
-                    x->c0_used = x->c0_used || (f_result && cursor_adjustment > 0);
+                    x->c0_used = x->c0_used || (f_result && cursor_adjustment >= 0);
                     exact = x->af_count++;
                 }
             }

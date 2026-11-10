@@ -5,7 +5,9 @@ externals (stem)
 integers (n)
 
 routines (
-  amongvar_regression_test gate bgate bgate2 cmpgate bcmpgate not_atlimit
+  amongvar_regression_test
+  c0_regression_test
+  gate bgate bgate2 cmpgate bcmpgate not_atlimit
 )
 
 stringescapes {}
@@ -18,6 +20,13 @@ backwardmode (
   define bgate2 as test hop 4
   define bcmpgate as $(n > 3)
   define not_atlimit as not atlimit
+
+  define c0_regression_test as (
+    [substring] among (
+      'uci' bgate
+      ''
+    ) delete
+  )
 )
 
 define amongvar_regression_test as (
@@ -144,6 +153,18 @@ define stem as (
 
   // Call twice to prevent inlining.
   amongvar_regression_test and amongvar_regression_test
+
+  // Regression tests for #310.
+  test (
+    ='juci'
+    backwards c0_regression_test
+    'juci' atlimit
+  )
+  test (
+    ='x'
+    backwards c0_regression_test
+    'x' atlimit
+  )
 
   ='ok'
 )
