@@ -2,17 +2,21 @@
 
 externals (stem)
 
+integers (n)
+
 routines (
-  amongvar_regression_test gate bgate bgate2 not_atlimit
+  amongvar_regression_test gate bgate bgate2 cmpgate bcmpgate not_atlimit
 )
 
 stringescapes {}
 
 define gate as 'q'
+define cmpgate as $(n > 3)
 
 backwardmode (
   define bgate as 'q'
   define bgate2 as test hop 4
+  define bcmpgate as $(n > 3)
   define not_atlimit as not atlimit
 )
 
@@ -28,6 +32,7 @@ define amongvar_regression_test as (
 )
 
 define stem as (
+  $n = len
   not (
     among (
       'x' ()
@@ -121,6 +126,21 @@ define stem as (
     )
   ) or fail='big-endian among regression test failed to match'
   test ('youthful' atlimit) or fail='big-endian among regression test output wrong'
+
+  // Test among gating functions which don't look at the current string.
+  // Regression test for Zig unused variable error in generated code (#311).
+  try (
+    [substring] among (
+      'qq' cmpgate
+      ''
+    ) delete
+  )
+  try backwards (
+    [substring] among (
+      'zz' bcmpgate
+      ''
+    ) delete
+  )
 
   // Call twice to prevent inlining.
   amongvar_regression_test and amongvar_regression_test

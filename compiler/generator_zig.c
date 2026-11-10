@@ -1097,6 +1097,8 @@ static void generate_literalstring(struct generator * g, struct node * p) {
 static void generate_cast_context(struct generator * g) {
     w(g, "~Mconst context: *Context = @ptrCast(@alignCast(ctx));~N");
     w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(context)));~N");
+    // A routine may not use env at all (e.g. one which only tests a boolean).
+    w(g, "~Msuppress_any_unused_warning(@as(*anyopaque, @ptrCast(env)));~N");
 }
 
 static void generate_setup_context(struct generator * g) {
