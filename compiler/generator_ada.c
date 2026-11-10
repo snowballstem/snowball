@@ -1414,6 +1414,7 @@ static void generate_substring(struct generator * g, struct node * p) {
             }
             // Suppress generating table for this among.
             x->used = false;
+            if (block_opened) writef(g, "~-~Mend if;~N", p);
             return;
         }
     }
@@ -1427,6 +1428,7 @@ static void generate_substring(struct generator * g, struct node * p) {
     } else {
         write_failure_if(g, "A = 0", p);
     }
+    if (block_opened) writef(g, "~-~Mend if;~N", p);
 }
 
 static void generate_among(struct generator * g, struct node * p) {
