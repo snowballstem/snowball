@@ -1,0 +1,564 @@
+// Albanian stemmer.
+//
+// A light, inflectional stemmer for keyword search, written for Snowball by
+// edisnord (https://github.com/edisnord/albanian-stemmer), where the
+// endings were pruned against Albanian corpus lexicons and the result was
+// checked on retrieval benchmarks and a hand-labelled sample. That repository
+// generates this file from its rules (albanian.json) and documents the
+// choices made; the comments below say why each part is there.
+//
+// Like Romanian, Albanian suffixes its definite article and fuses it with the
+// case ending (mollë, molla, mollës, mollën, mollët, mollëve), so, as in the
+// Romanian stemmer, the article and case endings go first (step1, which also
+// holds the verb endings: punoj, punonte, punohet, punuar), then plural and
+// stem vowels (step2), then the stem's end is normalized (stem_end: sëmundj →
+// sëmund, libër → libr). Derived words mostly keep their own stems (punëtor),
+// except that an -oj verb meets the noun it is made from (kontrolloj,
+// kontroll), and a third step joins nouns of action in -im to their verb
+// (përdorimi, përdor). Stems can be shorter than any word (moll, semund).
+// Some endings also need certain letters before them (as in the Finnish and
+// Turkish stemmers), where a word's own letters look like the ending: -t only
+// after a vowel (mollët, but rast keeps its t), -nte not after e (punonte, but
+// dokumente), -së not after je (shtëpisë, but pjesë). An exception table,
+// looked up first, joins the forms of the irregular verbs (vij, erdhi, ardhur;
+// jam, është, qenë) and of the nouns with an irregular plural (dorë, duar;
+// grua, gra).
+//
+// ë and ç are folded first, so text typed without them, as much Albanian
+// text on the web is, stems the same.
+
+routines ( prelude exception mark_regions R1 S1 S2 InR2 AfterV AfterKGH
+    AfterE NotAfterI NotAfterIO NotAfterE NotAfterOTI NotAfterS AfterU
+    NotAfterIZBLST AfterVNotJE AfterOANotIO NotAfterAEOUY step1 step2 step3
+    stem_end )
+
+externals ( stem )
+
+integers ( p1 s1 s2 pr2 )
+
+groupings ( v kgh )
+
+stringescapes {}
+
+stringdef e"   '{U+00EB}'  // e diaeresis
+stringdef c,   '{U+00E7}'  // c cedilla
+
+// Fold the two Albanian diacritics, so that a word typed without them
+// (semundjes, molles) stems like its standard spelling.
+define prelude as (
+    do repeat goto (
+        [substring] among ( '{e"}' (<- 'e') '{c,}' (<- 'c') )
+    )
+)
+
+// Irregular words: their forms share no stem a suffix rule reaches
+// (vij, erdhi, ardhur; them, thotë, thënë; dorë, duar), each mapped
+// to one stem.
+define exception as (
+    [substring] atlimit among (
+        'befsh' 'befsha' 'befshi' 'befshim' 'befshin' 'behej' 'behem' 'behemi'
+        'behen' 'beheni' 'behesh' 'behesha' 'beheshe' 'beheshim' 'beheshin'
+        'beheshit' 'behet' 'behu' 'behuni' 'bejini' 'bejme' 'beka' 'bekam'
+        'bekan' 'beke' 'bekej' 'bekemi' 'bekeni' 'bekesha' 'bekeshe' 'bekeshim'
+        'bekeshin' 'bekeshit' 'ben' 'bene' 'beni' 'benim' 'benin' 'benit'
+        'bente' 'bera' 'bere' 'beri' 'besh' 'bete'
+            (<- 'bej')
+        'biem' 'biesh' 'bini' 'binim' 'binin' 'binit' 'binte' 'bjer' 'bjere'
+        'bjeri' 'rane' 'rashe' 'rate' 'renc' 'renca' 'renci' 'rencim' 'rencin'
+        'rene' 'renka' 'renkam' 'renkan' 'renke' 'renkej' 'renkemi' 'renkeni'
+        'renkesha' 'renkeshe' 'renkeshim' 'renkeshin' 'renkeshit' 'rente'
+            (<- 'bie')
+        'blofsha' 'blofshi' 'blofte' 'blova' 'blove' 'bluaj' 'bluaja' 'bluaje'
+        'bluajme' 'bluajne' 'bluaka' 'bluakam' 'bluakan' 'bluake' 'bluakej'
+        'bluakemi' 'bluakeni' 'bluakesha' 'bluakeshe' 'bluakeshim' 'bluakeshin'
+        'bluakeshit' 'bluam' 'bluan' 'bluani' 'bluanim' 'bluanin' 'bluanit'
+        'bluante' 'bluar' 'bluash' 'bluat'
+            (<- 'blo')
+        'bredhe' 'bredhesh' 'bredhkam' 'bredhkan' 'bredhkemi'
+        'bredhkeni' 'bredhsh' 'bredhsha' 'bredhshi' 'bredhshim' 'bredhshin'
+        'bredhur' 'bridh' 'bridhja' 'bridhje' 'bridhni' 'bridhnim' 'bridhnin'
+        'bridhnit' 'bridhte' 'brodha' 'brodhe' 'brodhem' 'brodhen' 'brodhet'
+        'brodhi'
+            (<- 'bredhq')
+        'brigje' 'brigjet' 'brigjeve'
+            (<- 'breg')
+        'dyer' 'dyert' 'dyerve'
+            (<- 'der')
+        'djem' 'djemte' 'djemve'
+            (<- 'djal')
+        'digj' 'digjej' 'digjem' 'digjemi' 'digjen' 'digjeni' 'digjesh'
+        'digjesha' 'digjeshe' 'digjeshim' 'digjeshin' 'digjeshit' 'digjet'
+        'digjja' 'digjje' 'digjni' 'digjnim' 'digjnin' 'digjnit' 'digjte' 'djeg'
+        'djege' 'djegesh' 'djegin' 'djegka' 'djegkam' 'djegkan' 'djegke'
+        'djegkej' 'djegkemi' 'djegkeni' 'djegkesha' 'djegkeshe' 'djegkeshim'
+        'djegkeshin' 'djegkeshit' 'djegsh' 'djegsha' 'djegshi' 'djegshim'
+        'djegshin' 'djegte' 'djegur' 'dogj' 'dogja' 'dogje' 'dogjem' 'dogjen'
+        'dogjet' 'dogji'
+            (<- 'djegim')
+        'dal' 'dale' 'dalesh' 'dalim' 'dalin' 'dalka' 'dalkam' 'dalkan' 'dalke'
+        'dalkej' 'dalkemi' 'dalkeni' 'dalkesha' 'dalkeshe' 'dalkeshim'
+        'dalkeshin' 'dalkeshit' 'dalsh' 'dalsha' 'dalshi' 'dalshim' 'dalshin'
+        'del' 'dil' 'dilet' 'dilja' 'dilje' 'dilni' 'dilnim' 'dilnin' 'dilnit'
+        'dilte' 'dual'
+            (<- 'dol')
+        'duar' 'duart' 'duarve'
+            (<- 'dor')
+        'dredh' 'dredhe' 'dredhesh' 'dredhin' 'dredhkam' 'dredhkan' 'dredhkemi'
+        'dredhkeni' 'dredhsh' 'dredhsha' 'dredhshi' 'dredhshim' 'dredhshin'
+        'dredhte' 'dredhur' 'drodh' 'drodha' 'drodhe' 'drodhem' 'drodhen'
+        'drodhet' 'drodhi'
+            (<- 'dredhq')
+        'dacim' 'dacin' 'dacte' 'dashka' 'dashkam' 'dashkan' 'dashke' 'dashkej'
+        'dashkemi' 'dashkeni' 'dashkesha' 'dashkeshe' 'dashkeshim' 'dashkeshin'
+        'dashkeshit' 'dashte' 'dashtun' 'dashur' 'desha' 'deshe' 'deshem'
+        'deshen' 'deshet' 'deshi' 'doja' 'doje' 'don' 'doni' 'donim' 'donin'
+        'donit' 'donte' 'doshin' 'doshit' 'dua' 'duaja' 'duaje' 'duan' 'duash'
+            (<- 'duam')
+        'ardhe' 'ardhka' 'ardhkam' 'ardhkan' 'ardhke' 'ardhkemi' 'ardhkeni'
+        'ardhkesh' 'ardhkesha' 'ardhkeshe' 'ardhkeshim' 'ardhkeshin'
+        'ardhkeshit' 'ardhsh' 'ardhsha' 'ardhshi' 'ardhshim' 'ardhshin' 'ardhte'
+        'ardhur' 'eja' 'ejani' 'erdhem' 'vij' 'vijme' 'vijne' 'vjen'
+            (<- 'erdh')
+        'fjetem' 'fjetet' 'fjetkam' 'fjetkan' 'fjetkemi' 'fjetkeni'
+        'fjetsh' 'fjetsha' 'fjetshi' 'fjetshim' 'fjetshin' 'fjette' 'fjetur'
+        'fleje' 'flene' 'flinit'
+            (<- 'fjetq')
+        'flasesh' 'flasim' 'flasin' 'flet' 'flisje' 'flisni' 'flisnim' 'flisnin'
+        'flisnit' 'fliste' 'flitej' 'fliten' 'flitet' 'flitni' 'fol' 'fola'
+        'folem' 'folen' 'folet' 'foli' 'folka' 'folkam' 'folkan' 'folke'
+        'folkej' 'folkemi' 'folkeni' 'folkesha' 'folkeshe' 'folkeshim'
+        'folkeshin' 'folkeshit' 'folsh' 'folsha' 'folshi' 'folshim' 'folshin'
+        'folte' 'folur'
+            (<- 'fla')
+        'gra' 'grash' 'grave'
+            (<- 'gru')
+        'hahem' 'hahemi' 'hahen' 'haheni' 'hahesh' 'hahesha' 'haheshe'
+        'haheshim' 'haheshin' 'haheshit' 'hahet' 'hahu' 'hama' 'hame' 'hana'
+        'hane' 'hanim' 'hante' 'henger' 'hengra' 'hengre' 'hengrem' 'hengren'
+        'hengret' 'hengri' 'ngrenc' 'ngrenca' 'ngrenci' 'ngrencim' 'ngrencin'
+        'ngrenka' 'ngrenkam' 'ngrenkan' 'ngrenke' 'ngrenkej' 'ngrenkemi'
+        'ngrenkeni' 'ngrenkesha' 'ngrenkeshe' 'ngrenkeshim' 'ngrenkeshin'
+        'ngrenkeshit' 'ngrente'
+            (<- 'ha')
+        'hedh' 'hedhe' 'hedhesh' 'hedhin' 'hedhka' 'hedhkam' 'hedhkan' 'hedhke'
+        'hedhkej' 'hedhkemi' 'hedhkeni' 'hedhkesha' 'hedhkeshe' 'hedhkeshim'
+        'hedhkeshin' 'hedhkeshit' 'hedhsh' 'hedhsha' 'hedhshi' 'hedhshim'
+        'hedhshin' 'hedhte' 'hedhun' 'hedhur' 'hidh' 'hidhej' 'hidhem' 'hidhemi'
+        'hidhen' 'hidheni' 'hidhesh' 'hidhesha' 'hidheshe' 'hidheshim'
+        'hidheshin' 'hidheshit' 'hidhet' 'hidhini' 'hidhja' 'hidhje' 'hidhni'
+        'hidhnim' 'hidhnin' 'hidhnit' 'hodh' 'hodha' 'hodhe' 'hodhem' 'hodhen'
+        'hodhet' 'hodhi'
+            (<- 'hedhim')
+        'heq' 'heqe' 'heqesh' 'heqin' 'heqka' 'heqkam' 'heqkan' 'heqke' 'heqkej'
+        'heqkemi' 'heqkeni' 'heqkesha' 'heqkeshe' 'heqkeshim' 'heqkeshin'
+        'heqkeshit' 'heqsh' 'heqsha' 'heqshi' 'heqshim' 'heqshin' 'heqte'
+        'hequr' 'hiqini' 'hiqnim' 'hiqte' 'hoq' 'hoqa' 'hoqe' 'hoqem' 'hoqen'
+        'hoqet' 'hoqi'
+            (<- 'hiq')
+        'hy' 'hyfsh' 'hyfsha' 'hyfshi' 'hyfshim' 'hyfshin' 'hyfte' 'hyhet'
+        'hyja' 'hyje' 'hyjme' 'hyka' 'hykam' 'hykan' 'hyke' 'hykej' 'hykemi'
+        'hykeni' 'hykesha' 'hykeshe' 'hykeshim' 'hykeshin' 'hykeshit' 'hyme'
+        'hynim' 'hynte' 'hyr' 'hyra' 'hyre' 'hysh' 'hyte'
+            (<- 'hyn')
+        'ashte' 'eshte' 'isha' 'ishe' 'ishim' 'ishin' 'ishit' 'ishte' 'jam'
+        'jane' 'jem' 'jemi' 'jesh' 'ji' 'jini' 'qene' 'qenka' 'qenkam' 'qenkan'
+        'qenke' 'qenkej' 'qenkemi' 'qenkeni' 'qenkesha' 'qenkeshe' 'qenkeshim'
+        'qenkeshin' 'qenkeshit'
+            (<- 'je')
+        'dha' 'dhame' 'dhan' 'dhane' 'dhashe' 'dhate' 'dhenc' 'dhenca' 'dhenci'
+        'dhencim' 'dhencin' 'dhene' 'dhenka' 'dhenkam' 'dhenkan' 'dhenke'
+        'dhenkej' 'dhenkemi' 'dhenkeni' 'dhenkesha' 'dhenkeshe' 'dhenkeshim'
+        'dhenkeshin' 'dhenkeshit' 'dhente' 'ip' 'ipet' 'jap' 'jape' 'japesh'
+        'japim' 'japin' 'jepini' 'jepnim' 'jepte'
+            (<- 'jep')
+        'kuaj' 'kuajt' 'kuajve'
+            (<- 'kal')
+        'kam' 'kem' 'kemi' 'kene' 'keni' 'kishim' 'kishin' 'kishit' 'pacim'
+        'pacin' 'pase' 'paska' 'paskam' 'paskan' 'paske' 'paskej' 'paskemi'
+        'paskesh' 'paskesha' 'paskeshe' 'paskeshim' 'paskeshin' 'paskeshit'
+        'pasur' 'patem' 'patet' 'patur'
+            (<- 'kisht')
+        'lashe' 'lenc' 'lenca' 'lenci' 'lencim' 'lencin' 'lene' 'lenka' 'lenkam'
+        'lenkan' 'lenke' 'lenkej' 'lenkemi' 'lenkeni' 'lenkesha' 'lenkeshe'
+        'lenkeshim' 'lenkeshin' 'lenkeshit' 'lere' 'leri' 'lihej' 'lihem'
+        'lihemi' 'lihen' 'liheni' 'lihesh' 'lihesha' 'liheshe' 'liheshim'
+        'liheshin' 'liheshit' 'lihet' 'lihu' 'lini' 'linim' 'linin' 'linit'
+        'linte'
+            (<- 'le')
+        'meshkuj' 'meshkujt' 'meshkujve'
+            (<- 'mashku')
+        'mbillnim' 'mbillte' 'mbjell' 'mbjelle' 'mbjellesh' 'mbjellim'
+        'mbjellin' 'mbjellka' 'mbjellkam' 'mbjellkan' 'mbjellke' 'mbjellkej'
+        'mbjellkemi' 'mbjellkeni' 'mbjellkesha' 'mbjellkeshe' 'mbjellkeshim'
+        'mbjellkeshin' 'mbjellkeshit' 'mbjellsh' 'mbjellsha' 'mbjellshi'
+        'mbjellshim' 'mbjellshin' 'mbjellte' 'mbolla' 'mbolle' 'mbollem'
+        'mbollen' 'mbollet' 'mbolli'
+            (<- 'mbill')
+        'mbledh' 'mbledhe' 'mbledhesh' 'mbledhim' 'mbledhin' 'mbledhka'
+        'mbledhkam' 'mbledhkan' 'mbledhke' 'mbledhkej' 'mbledhkemi' 'mbledhkeni'
+        'mbledhkesha' 'mbledhkeshe' 'mbledhkeshim' 'mbledhkeshin' 'mbledhkeshit'
+        'mbledhsh' 'mbledhsha' 'mbledhshi' 'mbledhshim' 'mbledhshin' 'mbledhte'
+        'mbledhur' 'mblidhej' 'mblidhem' 'mblidheni' 'mblidhesha' 'mblidheshe'
+        'mblidheshim' 'mblidheshin' 'mblidheshit' 'mblidhnim' 'mblidhte'
+        'mblodh' 'mblodha' 'mblodhe' 'mblodhem' 'mblodhen' 'mblodhet' 'mblodhi'
+            (<- 'mblidh')
+        'marim' 'marin' 'marr' 'marre' 'marresh' 'marrin' 'marrka' 'marrkam'
+        'marrkan' 'marrke' 'marrkej' 'marrkemi' 'marrkeni' 'marrkesha'
+        'marrkeshe' 'marrkeshim' 'marrkeshin' 'marrkeshit' 'marrsh' 'marrsha'
+        'marrshi' 'marrshim' 'marrshin' 'meren' 'meret' 'merni' 'merrnim'
+        'merrte' 'merruni' 'merte' 'mirren' 'mirret' 'morem' 'moret' 'muar'
+            (<- 'merr')
+        'milni' 'milnim' 'milnin' 'milnit' 'milte' 'mjelim' 'mjelka' 'mjelke'
+        'mjelkej' 'mjelkesha' 'mjelkeshe' 'mjelkeshim' 'mjelkeshin' 'mjelkeshit'
+        'mjelsh' 'mjelsha' 'mjelshi' 'mjelshim' 'mjelshin' 'mjelte' 'molem'
+        'molet'
+            (<- 'mjel')
+        'net' 'netet'
+            (<- 'nat')
+        'ndiq' 'ndiqe' 'ndiqej' 'ndiqem' 'ndiqemi' 'ndiqen' 'ndiqeni' 'ndiqesh'
+        'ndiqesha' 'ndiqeshe' 'ndiqeshim' 'ndiqeshin' 'ndiqeshit' 'ndiqet'
+        'ndiqja' 'ndiqje' 'ndiqni' 'ndiqnim' 'ndiqnin' 'ndiqnit' 'ndiqte'
+        'ndjek' 'ndjeke' 'ndjekin' 'ndjekka' 'ndjekkam' 'ndjekkan' 'ndjekke'
+        'ndjekkej' 'ndjekkemi' 'ndjekkeni' 'ndjekkesha' 'ndjekkeshe'
+        'ndjekkeshim' 'ndjekkeshin' 'ndjekkeshit' 'ndjeksh' 'ndjeksha'
+        'ndjekshi' 'ndjekte' 'ndjekur' 'ndoq' 'ndoqa' 'ndoqe' 'ndoqem' 'ndoqen'
+        'ndoqet' 'ndoqi'
+            (<- 'ndjekim')
+        'ngre' 'ngreje' 'ngresh' 'ngritem' 'ngritka' 'ngritkam' 'ngritkan'
+        'ngritke' 'ngritkemi' 'ngritkeni' 'ngritkesh' 'ngritkesha' 'ngritkeshe'
+        'ngritkeshim' 'ngritkeshin' 'ngritkeshit' 'ngritsh' 'ngritsha'
+        'ngritshi' 'ngritshim' 'ngritshin' 'ngritte' 'ngritur'
+            (<- 'ngrem')
+        'njerez' 'njerezish' 'njerezit' 'njerezve'
+            (<- 'njr')
+        'nxe' 'nxeme' 'nxencim' 'nxene' 'nxenka' 'nxenkam' 'nxenkan' 'nxenke'
+        'nxenkej' 'nxenkemi' 'nxenkeni' 'nxenkesha' 'nxenkeshe' 'nxenkeshim'
+        'nxenkeshin' 'nxenkeshit' 'nxente' 'nxer' 'nxere' 'nxesh' 'nxume'
+        'nxune' 'nxura' 'nxure' 'nxuri' 'nxute'
+            (<- 'nxenc')
+        'nxirr' 'nxirrem' 'nxirremi' 'nxirren' 'nxirreni' 'nxirresh' 'nxirresha'
+        'nxirreshe' 'nxirreshim' 'nxirreshin' 'nxirreshit' 'nxirret' 'nxirrja'
+        'nxirrje' 'nxirrni' 'nxirrnim' 'nxirrnin' 'nxirrnit' 'nxirrte' 'nxjerr'
+        'nxjerre' 'nxjerresh' 'nxjerrim' 'nxjerrin' 'nxjerrka' 'nxjerrkam'
+        'nxjerrkan' 'nxjerrke' 'nxjerrkej' 'nxjerrkemi' 'nxjerrkeni'
+        'nxjerrkesha' 'nxjerrkeshe' 'nxjerrkeshim' 'nxjerrkeshin' 'nxjerrkeshit'
+        'nxjerrsh' 'nxjerrsha' 'nxjerrshi' 'nxjerrshim' 'nxjerrshin' 'nxjerrte'
+        'nxorren' 'nxorri'
+            (<- 'nxor')
+        'piqem' 'piqemi' 'piqen' 'piqeni' 'piqesh' 'piqesha' 'piqeshe'
+        'piqeshim' 'piqeshin' 'piqeshit' 'piqet' 'piqja' 'piqje' 'piqni'
+        'piqnim' 'piqnin' 'piqnit' 'piqte' 'pjekka' 'pjekke' 'pjekkej'
+        'pjekkesha' 'pjekkeshe' 'pjekkeshim' 'pjekkeshin' 'pjekkeshit' 'pjeksh'
+        'pjeksha' 'pjekshi' 'pjekshim' 'pjekshin' 'pjekte' 'poq' 'poqa' 'poqe'
+        'poqem' 'poqen' 'poqet' 'poqi'
+            (<- 'pjeq')
+        'pirdh' 'pirdhja' 'pirdhje' 'pirdhni' 'pirdhnim' 'pirdhnin' 'pirdhnit'
+        'pirdhte' 'pjerdhim' 'pjerdhka' 'pjerdhke' 'pjerdhkej' 'pjerdhkesha'
+        'pjerdhkeshe' 'pjerdhkeshim' 'pjerdhkeshin' 'pjerdhkeshit' 'pjerdhsh'
+        'pjerdhsha' 'pjerdhshi' 'pjerdhshim' 'pjerdhshin' 'pjerdhte' 'pordhem'
+        'pordhet' 'pordhi'
+            (<- 'pjerdh')
+        'ndenjc' 'ndenjca' 'ndenjci' 'ndenjcim' 'ndenjcin' 'ndenjem' 'ndenjen'
+        'ndenjet' 'ndenji' 'ndenjka' 'ndenjkam' 'ndenjkan' 'ndenjke' 'ndenjkej'
+        'ndenjkemi' 'ndenjkeni' 'ndenjkesha' 'ndenjkeshe' 'ndenjkeshim'
+        'ndenjkeshin' 'ndenjkeshit' 'ndenjte' 'ndenjur' 'rri' 'rrija' 'rrije'
+        'rrine' 'rrini' 'rrinim' 'rrinin' 'rrinit' 'rrinte'
+            (<- 'rrish')
+        'shes' 'shese' 'shesim' 'shet' 'shisje' 'shisni' 'shisnim' 'shisnin'
+        'shisnit' 'shitej' 'shitem' 'shitemi' 'shiteni' 'shitesh' 'shitesha'
+        'shiteshe' 'shiteshim' 'shiteshin' 'shiteshit' 'shitet' 'shiti' 'shitka'
+        'shitkam' 'shitkan' 'shitke' 'shitkej' 'shitkemi' 'shitkeni' 'shitkesha'
+        'shitkeshe' 'shitkeshim' 'shitkeshin' 'shitkeshit' 'shitni' 'shitsh'
+        'shitsha' 'shitshi' 'shitshim' 'shitshin' 'shitte' 'shitur'
+            (<- 'shes')
+        'shkofsh' 'shkofsha' 'shkofshi' 'shkofshim' 'shkofshin' 'shkofte'
+        'shkohej' 'shkohet' 'shkoi' 'shkoj' 'shkojme' 'shkojne' 'shkon'
+        'shkonim' 'shkonin' 'shkonit' 'shkonte' 'shkova' 'shkove' 'shku' 'shkua'
+        'shkuaka' 'shkuakam' 'shkuakan' 'shkuake' 'shkuakej' 'shkuakemi'
+        'shkuakeni' 'shkuakesha' 'shkuakeshe' 'shkuakeshim' 'shkuakeshin'
+        'shkuakeshit' 'shkuam' 'shkuan' 'shkuar' 'shkuat' 'shkue'
+            (<- 'shko')
+        'pafsh' 'pafsha' 'pafshi' 'pafshim' 'pafshin' 'pakam' 'pakan' 'pakesha'
+        'pakeshe' 'pakeshim' 'pakeshin' 'pakeshit' 'shih' 'shihja' 'shihje'
+        'shihni' 'shihnim' 'shihnin' 'shihnit' 'shihte' 'shoh' 'shohe' 'shohesh'
+        'shohin'
+            (<- 'shohim')
+        'shpenc' 'shpenca' 'shpenci' 'shpencim' 'shpencin' 'shpene' 'shpenka'
+        'shpenkam' 'shpenkan' 'shpenke' 'shpenkemi' 'shpenkeni' 'shpenkesh'
+        'shpenkesha' 'shpenkeshe' 'shpenkeshim' 'shpenkeshin' 'shpenkeshit'
+        'shpente' 'shpjer' 'shpjere' 'shpume' 'shpune' 'shpur' 'shpuri'
+            (<- 'shpi')
+        'shtigje' 'shtigjet' 'shtigjeve'
+            (<- 'shteg')
+        'shtet'
+            (<- 'shtet')
+        'shtenc' 'shtenca' 'shtenci' 'shtencim' 'shtencin' 'shtene' 'shtenka'
+        'shtenkam' 'shtenkan' 'shtenke' 'shtenkemi' 'shtenkeni' 'shtenkesh'
+        'shtenkesha' 'shtenkeshe' 'shtenkeshim' 'shtenkeshin' 'shtenkeshit'
+        'shtente' 'shti' 'shtihemi' 'shtihesh' 'shtika' 'shtine' 'shtinim'
+        'shtite' 'shtiva' 'shtive' 'shtjer' 'shtjeru'
+            (<- 'shti')
+        'shtreter' 'shtreterit' 'shtreterve'
+            (<- 'shtr')
+        'shofsh' 'shofsha' 'shofshi' 'shofshim' 'shofshin' 'shofte' 'shoi'
+        'shova' 'shove' 'shuaka' 'shuake' 'shuakej' 'shuakesha' 'shuakeshe'
+        'shuakeshim' 'shuakeshin' 'shuakeshit' 'shuam' 'shuar' 'shuhemi'
+        'shuhesh'
+            (<- 'shu')
+        'skllever' 'sklleverit' 'sklleverve'
+            (<- 'skllav')
+        'sill' 'sillej' 'sillem' 'sillemi' 'sillen' 'silleni' 'sillesh'
+        'sillesha' 'silleshe' 'silleshim' 'silleshin' 'silleshit' 'sillet'
+        'sillja' 'sillje' 'sillni' 'sillnim' 'sillnin' 'sillnit' 'sillte'
+        'sjell' 'sjelle' 'sjellesh' 'sjellim' 'sjellin' 'sjellka' 'sjellkam'
+        'sjellkan' 'sjellke' 'sjellkej' 'sjellkemi' 'sjellkeni' 'sjellkesha'
+        'sjellkeshe' 'sjellkeshim' 'sjellkeshin' 'sjellkeshit' 'sjellsh'
+        'sjellsha' 'sjellshi' 'sjellshim' 'sjellshin' 'sjellte'
+            (<- 'soll')
+        'thase' 'thaset'
+            (<- 'the')
+        'therrasesh' 'therrasim' 'therrasin' 'therrisja' 'therrisje' 'therrisni'
+        'therrisnim' 'therrisnin' 'therrisnit' 'therriste' 'therrita'
+        'therritem' 'therritemi' 'therriten' 'therriteni' 'therritesh'
+        'therritesha' 'therriteshe' 'therriteshim' 'therriteshin' 'therriteshit'
+        'therritet' 'therriti' 'therritka' 'therritkam' 'therritkan' 'therritke'
+        'therritkej' 'therritkemi' 'therritkeni' 'therritkesha' 'therritkeshe'
+        'therritkeshim' 'therritkeshin' 'therritkeshit' 'therritni' 'therritsh'
+        'therritsha' 'therritshi' 'therritshim' 'therritshin' 'therritte'
+        'therritur' 'thirra' 'thirrej' 'thirren' 'thirret' 'thirrur'
+            (<- 'therr')
+        'thashe' 'the' 'them' 'themi' 'thenc' 'thenca' 'thenci' 'thencim'
+        'thencin' 'thene' 'thenka' 'thenkam' 'thenkan' 'thenke' 'thenkemi'
+        'thenkeni' 'thenkesh' 'thenkesha' 'thenkeshe' 'thenkeshim' 'thenkeshin'
+        'thenkeshit' 'thente' 'thoja' 'thom' 'thone' 'thoni' 'thonim' 'thonin'
+        'thonte' 'thosha' 'thoshe' 'thoshim' 'thoshin' 'thoshit' 'thoshte'
+        'thot' 'thuaj' 'thuaja' 'thuaje' 'thuaji' 'thuash' 'thuhej' 'thuhen'
+        'thuhet'
+            (<- 'thot')
+        'thonj' 'thonjve'
+            (<- 'thu')
+        'tirr' 'tirrja' 'tirrje' 'tirrni' 'tirrnim' 'tirrnin' 'tirrnit' 'tirrte'
+        'tjerrim' 'tjerrka' 'tjerrke' 'tjerrkej' 'tjerrkesha' 'tjerrkeshe'
+        'tjerrkeshim' 'tjerrkeshin' 'tjerrkeshit' 'tjerrsh' 'tjerrsha'
+        'tjerrshi' 'tjerrshim' 'tjerrshin' 'tjerrte' 'tora' 'tore' 'torem'
+        'toren'
+            (<- 'tjerr')
+        'tredhim' 'tredhka' 'tredhke' 'tredhkej' 'tredhkesha' 'tredhkeshe'
+        'tredhkeshim' 'tredhkeshin' 'tredhkeshit' 'tredhsh' 'tredhsha'
+        'tredhshi' 'tredhshim' 'tredhshin' 'tredhte' 'tridh' 'tridhem'
+        'tridhemi' 'tridhen' 'tridheni' 'tridhesh' 'tridhesha' 'tridheshe'
+        'tridheshim' 'tridheshin' 'tridheshit' 'tridhet' 'tridhja' 'tridhje'
+        'tridhni' 'tridhnim' 'tridhnin' 'tridhnit' 'tridhte' 'trodhem'
+            (<- 'tredh')
+        'troje' 'trojet' 'trojeve'
+            (<- 'truall')
+        'vafshim' 'vafte' 'vajta' 'vajte' 'vajtem' 'vajten' 'vajtet' 'vajti'
+        'vajtka' 'vajtkam' 'vajtkan' 'vajtke' 'vajtkemi' 'vajtkeni' 'vajtkesh'
+        'vajtkesha' 'vajtkeshe' 'vajtkeshim' 'vajtkeshin' 'vajtkeshit' 'vajtur'
+        'vata'
+            (<- 'vafsh')
+        'vdekka' 'vdekkam' 'vdekkan' 'vdekke' 'vdekkemi' 'vdekkeni' 'vdekkesh'
+        'vdekkesha' 'vdekkeshe' 'vdekkeshim' 'vdekkeshin' 'vdekkeshit' 'vdeksh'
+        'vdeksha' 'vdekshi' 'vdekshim' 'vdekshin' 'vdekte' 'vdekur' 'vdes'
+        'vdese' 'vdesesh' 'vdesim' 'vdesin' 'vdis' 'vdisja' 'vdisje' 'vdisni'
+        'vdisnim' 'vdisnin' 'vdisnit' 'vdiste'
+            (<- 'vdiq')
+        'veme' 'venc' 'venca' 'venci' 'vencim' 'vencin' 'venka' 'venkam'
+        'venkan' 'venke' 'venkej' 'venkemi' 'venkeni' 'venkesha' 'venkeshe'
+        'venkeshim' 'venkeshin' 'venkeshit' 'vume' 'vune' 'vura' 'vure' 'vuri'
+            (<- 've')
+        'vidhem' 'vidhemi' 'vidhen' 'vidheni' 'vidhesha' 'vidheshe' 'vidheshim'
+        'vidheshin' 'vidhja' 'vidhje' 'vidhni' 'vidhnim' 'vidhnin' 'vidhnit'
+        'vidhte' 'vjedh' 'vjedhe' 'vjedhesh' 'vjedhim' 'vjedhin' 'vjedhka'
+        'vjedhkam' 'vjedhkan' 'vjedhke' 'vjedhkej' 'vjedhkemi' 'vjedhkeni'
+        'vjedhkesha' 'vjedhkeshe' 'vjedhkeshim' 'vjedhkeshin' 'vjedhkeshit'
+        'vjedhsh' 'vjedhsha' 'vjedhshi' 'vjedhshim' 'vjedhshin' 'vjedhte'
+        'vjedhur' 'vodhem'
+            (<- 'vedh')
+        'vellezer' 'vellezerit' 'vellezerve'
+            (<- 'vell')
+        'vil' 'vilje' 'vilni' 'vilnin' 'vilnit' 'vilte' 'vjel' 'vjele' 'vjelesh'
+        'vjelim' 'vjelin' 'vjelka' 'vjelkam' 'vjelkan' 'vjelke' 'vjelkej'
+        'vjelkemi' 'vjelkeni' 'vjelkesha' 'vjelkeshe' 'vjelkeshim' 'vjelkeshin'
+        'vjelkeshit' 'vjelsh' 'vjelsha' 'vjelshi' 'vjelshim' 'vjelshin' 'vjelte'
+        'volem' 'volet'
+            (<- 'vilnim')
+        'yje' 'yjesh' 'yjet' 'yjeve'
+            (<- 'yll')
+        'zbresesh' 'zbresim' 'zbresin' 'zbrisja' 'zbrisje' 'zbrisni' 'zbrisnim'
+        'zbrisnin' 'zbrisnit' 'zbriste' 'zbrita' 'zbritem' 'zbriten' 'zbritet'
+        'zbriti' 'zbritka' 'zbritkam' 'zbritkan' 'zbritke' 'zbritkej'
+        'zbritkemi' 'zbritkeni' 'zbritkesha' 'zbritkeshe' 'zbritkeshim'
+        'zbritkeshin' 'zbritkeshit' 'zbritni' 'zbritsh' 'zbritsha' 'zbritshi'
+        'zbritshim' 'zbritshin' 'zbritte' 'zbritur'
+            (<- 'zbr')
+        'zeme' 'zenc' 'zenca' 'zenci' 'zencim' 'zencin' 'zene' 'zenkam' 'zenkan'
+        'zenkej' 'zenkemi' 'zenkeni' 'zenkesha' 'zenkeshe' 'zenkeshim'
+        'zenkeshin' 'zenkeshit' 'zente' 'zer' 'zesh' 'zija' 'zije' 'zini'
+        'zinim' 'zinin' 'zinit' 'zinte' 'zu' 'zume' 'zune' 'zura' 'zure' 'zuri'
+        'zute'
+            (<- 'ze')
+    )
+)
+
+define v 'aeiouy'  // after folding, so e also stands for {e"}
+define kgh 'kgh'
+
+// R1 is the region after the first 3 letters: no ending is removed
+// from them, so a stem keeps at least 3 letters.
+// pr1 and pr2 mark the usual Snowball regions (called R1 and R2 in the
+// rules file): pr1 after the first non-vowel following a vowel, pr2 the
+// same again from pr1. An ending marked InR1 or InR2 must also lie in it.
+// An ending marked AfterV or AfterKGH must follow a vowel, or k, g or h,
+// itself outside the first letters.
+// The other After... and NotAfter... routines test the letters before
+// an ending: it must follow one of them (After), or none (NotAfter).
+// Each keeps a frequent ending off the stems whose own letters end like
+// it; its comment names the ending, a form it takes and one it spares.
+define mark_regions as (
+    $p1 = limit
+    do ( hop 3 setmark p1 )
+    $s1 = limit  do ( hop 1 setmark s1 )
+    $s2 = limit  do ( hop 2 setmark s2 )
+    $pr2 = limit
+    do ( gopast v gopast non-v
+         gopast v gopast non-v setmark pr2 )
+)
+
+backwardmode (
+
+    define R1 as $p1 <= cursor
+    define S1 as $s1 <= cursor  // 1 letter precedes
+    define S2 as $s2 <= cursor  // 2 letters precede
+    define InR2 as ( R1 $pr2 <= cursor )
+    define AfterV as ( R1 test v )
+    define AfterKGH as ( R1 test kgh )
+    // -ra: gjëra, not mënyra
+    define AfterE as ( R1 test 'e' )
+    // -oj, -oni: punoni, not aksioni
+    define NotAfterI as ( R1 not 'i' )
+    // -n, -ne, -ni: punojnë, not aksione
+    define NotAfterIO as ( R1 not 'io' )
+    // -nte, -jta: punonte, mbajti, not dokumente, drejta
+    define NotAfterE as ( R1 not 'e' )
+    // -ve, not after o or ti: shtëpive, not Kosovë, sportive
+    define NotAfterOTI as ( R1 not among ( 'o' 'ti' ) )
+    // -hem: lahem, not rëndësishëm
+    define NotAfterS as ( R1 not 's' )
+    // -jt: artikujt
+    define AfterU as ( R1 test 'u' )
+    // -em, not after iz, bl or st: hapem, not organizëm, problem, sistem
+    define NotAfterIZBLST as ( R1 not among ( 'iz' 'bl' 'st' ) )
+    // -së, after a vowel but not je: shtëpisë, not pjesë
+    define AfterVNotJE as ( R1 test v not 'je' )
+    // -nim, after o or a but not io: punonim, not bashkëpunim, funksionim
+    define AfterOANotIO as ( R1 test among ( 'o' 'a' ) not 'io' )
+    // shm → sh: rëndësishme, not dëshmi
+    define NotAfterAEOUY as ( S1 not among ( 'a' 'e' 'o' 'u' 'y' ) )
+
+    // The longest ending of step1 in R1, if any, is removed.
+    define step1 as (
+        [substring] among (
+            // nouns, masculine: definite and oblique (mali, malin, malit; mjeku, mjekun)
+            'i' R1 'u' R1 'in' R1 'it' R1 'un' R1 'ut' R1
+            // after a stressed vowel (druri, drurin, drurit)
+            'rin' AfterKGH 'rit' AfterKGH
+            // nouns, feminine: definite and oblique (molla, mollën, mollës; lulja; shtëpisë)
+            'a' R1 'n' NotAfterIO 's' AfterV 'en' R1 'es' R1 'ja' AfterV 'je' AfterV
+            'ne' NotAfterIO 'se' AfterVNotJE
+            // neuter and plural definite (vitet, mollët, shtëpitë, mollat)
+            't' AfterV 'at' R1 'et' R1
+            // plural oblique and ablative (mollëve, maleve, fermerësh)
+            've' NotAfterOTI 'ash' R1 'ave' R1 'esh' R1 'eve' R1
+            // neuter plurals in -ra (plehra, plehrat, plehrave)
+            'ra' AfterE 'rat' AfterE 'rash' AfterE 'rave' AfterE
+            // verbs, present (punoj, punon, punojmë, punoni, punojnë)
+            'j' AfterV 'ej' R1 'ni' NotAfterIO 'oj' NotAfterI 'on' NotAfterI 'eni' R1
+            'jme' R1 'jne' R1 'oni' NotAfterI 'ejme' R1 'ejne' R1 'ijme' R1
+            'ojme' NotAfterI 'ojne' NotAfterI
+            // imperfect (punoja, punonte, punonim, punonin)
+            'nim' AfterOANotIO 'nin' NotAfterIO 'nit' NotAfterIO 'nte' NotAfterE
+            'oja' AfterV 'oje' NotAfterI 'onim' NotAfterI 'onin' NotAfterI
+            'onit' NotAfterI 'onte' NotAfterI
+            // aorist (punova, punove, punoi, punuam, punuat, punuan)
+            'am' AfterKGH 'an' R1 'oi' R1 'ova' R1 'uam' R1 'uan' R1 'uat' R1
+            // participle (punuar, ujitur, mbjellë)
+            'ur' R1 'uar' R1
+            // non-active (mbillet, mbillen, punohet, punohej)
+            'em' NotAfterIZBLST 'emi' NotAfterIZBLST 'hej' R1 'hem' NotAfterS
+            'hen' AfterV 'het' AfterV 'ohu' R1 'esha' R1 'eshe' R1 'heni' R1 'ohej' R1
+            'ohem' R1 'ohen' R1 'ohet' R1 'eshim' R1 'eshin' R1 'eshit' R1 'hesha' R1
+            'heshe' R1 'ohemi' R1 'oheni' R1 'ohesh' R1 'heshim' R1 'heshin' R1
+            'heshit' R1 'ohesha' R1 'oheshe' R1 'oheshim' R1 'oheshin' R1 'oheshit' R1
+            // optative (punofsha, punoftë)
+            'fsh' R1 'ofsh' R1 'ofte' R1 'fshim' R1 'fshin' R1 'fshit' R1 'ofsha' R1
+            'ofshim' R1 'ofshin' R1 'ofshit' R1
+            // admirative (punuakam, punuaka); not a bare -ka, which is the
+            // root's k + -a of banka, maska, marka (hapka keeps its k)
+            'kam' R1 'kan' R1 'kane' R1 'kemi' R1 'keni' R1 'uaka' R1
+            'uake' R1 'uakam' R1 'uakan' R1 'uakane' R1 'uakemi' R1 'uakeni' R1
+            // declined participle (punuara, punuarit), non-active aorist (u punua)
+            'ua' R1 'ue' R1 'uem' R1 'uara' R1 'uare' R1 'uari' R1 'uarat' R1 'uarin' R1
+            'uarit' R1 'uarve' R1 'uarave' R1 'uaresh' R1
+            // the stressed -i of shtëpi, energji, in every form (shtëpia, shtëpisë)
+            'ia' R1 'ine' R1 'ise' R1 'ish' R1 'ite' R1
+            // aorist and participle of vowel + j verbs (mbajti, luajtur, mbrojti, vërejtur)
+            'jta' NotAfterE 'jte' NotAfterE 'jti' NotAfterE 'jtem' AfterV 'jtet' AfterV
+            'jtur' AfterV 'ojta' R1 'ojte' R1 'ojti' R1 'ejtem' R1 'ejtet' R1 'ejtur' R1
+            'ojtem' R1 'ojtet' R1 'ojtur' R1 'uajta' R1 'uajte' R1 'uajti' R1
+            'uajtem' R1 'uajtet' R1 'uajtur' R1
+            // plurals of -ull nouns (artikujt)
+            'jt' AfterU
+                (delete)
+        )
+    )
+
+    // The longest ending of step2 in R1, if any, is removed.
+    define step2 as (
+        setlimit tomark p1 for ([substring]) among (
+            // nouns, feminine: definite and oblique (molla, mollën, mollës; lulja; shtëpisë)
+            'a'
+            // plural and stem vowels (male, mollë; ullinj)
+            'e' 'enj' 'inj'
+                (delete)
+        )
+    )
+
+    // The longest ending of step3 in R1, if any, is removed.
+    define step3 as (
+        setlimit tomark p1 for ([substring]) among (
+            // derivation: nouns of action from verbs (përdorim, kultivimi → përdor, kultiv)
+            'im' InR2
+                (delete)
+        )
+    )
+
+    // The stem's end, by the longest alternation that leaves it long enough.
+    define stem_end as (
+        [substring] among (
+            'k' S2 (<- 'q')
+            'j' R1 (delete)
+            'e' R1 (delete)
+            'er' S2 (<- 'r')
+            'ull' S2 (<- 'u')
+            'shm' NotAfterAEOUY (<- 'sh')
+            'odh' (<- 'edh')
+            'ytet' S1 (<- 'yt')
+            'itet' S1 (<- 'it')
+            'izem' (<- 'izm')
+        )
+    )
+)
+
+define stem as (
+    do prelude
+    exception or (
+        do mark_regions
+        backwards (
+            do step1
+            do step2
+            do step3
+            do stem_end
+        )
+    )
+)

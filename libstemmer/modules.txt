@@ -9,6 +9,7 @@
 # List all the main algorithms for each language, in UTF-8, and also with
 # the most commonly used encoding.
 
+albanian        UTF_8,ISO_8859_1        albanian,sq,sqi,alb
 arabic          UTF_8                   arabic,ar,ara
 armenian        UTF_8                   armenian,hy,hye,arm
 basque          UTF_8,ISO_8859_1        basque,eu,eus,baq
