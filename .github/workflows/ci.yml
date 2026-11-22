@@ -354,6 +354,28 @@ jobs:
         $MAKE clean ${{ case(inputs.runtime-tests == true, 'clean_runtime_tests', '') }}
         git status --porcelain=v1 --ignored|grep -v '^?? \.s\?ccache/$'|grep '^' && { echo 'The generated files listed above were not removed by `make clean`' ; exit 1; }; true
 
+  pypi-check:
+    # Build the Python dist and check it is acceptable to PyPI so problems
+    # are found on every commit, not just when we try to deploy a release.
+    if: inputs.runtime-tests != true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        show-progress: false
+    - name: Set up Python
+      uses: actions/setup-python@v7
+      with:
+        python-version: '3.15'
+    - name: Install modules
+      # Use latest trove-classifiers so we check against the current list.
+      run: pip install --upgrade build trove-classifiers
+    - name: Generate dist
+      run: make --output-sync --jobs=4 dist_libstemmer_python
+    - name: Check classifiers
+      run: python python/check_classifiers.py dist/snowballstemmer-*.tar.gz
+
   pypi-publish:
     if: >
       github.event_name == 'push' &&
@@ -361,6 +383,7 @@ jobs:
       inputs.runtime-tests != true
     needs:
     - build
+    - pypi-check
     runs-on: ubuntu-latest
     environment:
       name: pypi
