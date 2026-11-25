@@ -454,6 +454,7 @@ backwardmode (
             )
         define Suffix_Verb_Step2a as (
                 [substring] among (
+                        '{a}{t}' ($(len >= 5) delete) // plural -at
                        '{t}' ($(len >= 4)  delete)
                         '{a}' '{n}' '{y}' ($(len >= 4) delete)
                         '{n}{a}' '{t}{a}'  '{t}{n}'  ($(len >= 5) delete)// past
