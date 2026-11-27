@@ -92,6 +92,7 @@ routines (
   // Noun tier (HPS categories)
   AN_Exception
   Irregular_Noun
+  GI_After_NR
   Stem_Noun_or_Adjective
   Stem_Verb
 )
@@ -247,9 +248,19 @@ backwardmode (
     )
   )
 
+  // --- -GI after nun or re: remove only the ye.  In farhangi, ahangi and
+  //     bozorgi the gaf belongs to the word (farhang, ahang, bozorg), and
+  //     deleting all of -GI left farhan, ahan (iron) and bozor.  This runs
+  //     outside the setlimit below because the nun or re can sit before p1
+  //     (ahangi).  As before, the whole -GI must be in R1.
+  define GI_After_NR as (
+    ['{ye}'] '{gaf}' R1 ('{nun}' or '{re}') delete
+  )
+
   // --- Noun/Adjective step.
   define Stem_Noun_or_Adjective as (
     Irregular_Noun or
+    GI_After_NR or
     setlimit tomark p1 for (
       [substring] among (
         // Noun possessive suffixes
@@ -273,7 +284,10 @@ backwardmode (
         '{ye}{alef}{nun}'   (delete) // -YAN
         '{gaf}{alef}{nun}'  (delete) // -GAN
         '{heh}{alef}{ye}'   (delete) // -HAY
-        '{alef}{nun}{ye}'   (delete) // -ANI
+        // -ANI: remove only the final ye, so the next pass applies the -AN
+        // rule and its lexical guard: irani -> iran (kept), rohani -> rohan
+        // -> roh.  Deleting all of -ANI cut inside the word: irani -> ir.
+        '{alef}{nun}{ye}'   (<- '{alef}{nun}') // -ANI
         '{heh}{alef}'       (delete) // -HA
         '{alef}{te}'        (delete) // -AT (Arabic sound plural; can also be possessive "your")
         '{alef}{nun}'       (delete) // -AN (only if not lexical)
